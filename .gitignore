@@ -1,3 +1,10 @@
+# My stuff
+geodat-address-cache*.csv
+myTree.html
+.vs/
+other/
+
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

@@ -1,0 +1,77 @@
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Build">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{588881e5-acd3-413b-9a45-7db0bcb4a3cb}</ProjectGuid>
+    <ProjectHome>.</ProjectHome>
+    <StartupFile>gedcom-to-map\gedcom-to-map.py</StartupFile>
+    <SearchPath>samples\;gedcom-to-map\</SearchPath>
+    <WorkingDirectory>.</WorkingDirectory>
+    <OutputPath>.</OutputPath>
+    <Name>gedcom-to-map</Name>
+    <RootNamespace>gedcom-to-map</RootNamespace>
+    <IsWindowsApplication>False</IsWindowsApplication>
+    <LaunchProvider>Standard Python launcher</LaunchProvider>
+    <CommandLineArguments>c:\Users\darre\Downloads\mytree-py.ged  myTree   "@I500003@"   -maptiletype 2  -groupby 1 -heattime -heatstep 5 -homemarker -nomarkstar -antpath </CommandLineArguments>
+    <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
+    <Environment>sav="c:\Users\darre\Downloads\mytree-py.ged" fol.html   "@I500003@"  -nobornmarker   -maptiletype 1 -h  -nomarker -nobornmarker -antpath 
+input.ged  "out" "@I0000@" --format HTML --nogps</Environment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <DebugSymbols>true</DebugSymbols>
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <DebugSymbols>true</DebugSymbols>
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
+  </PropertyGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition=" '$(VisualStudioVersion)' == '' ">10.0</VisualStudioVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Include="mykml.kml" />
+    <Content Include="output.kml" />
+    <Content Include="requirements.txt" />
+    <Content Include="samples\heatmap.kml" />
+    <Content Include="samples\input.png" />
+    <Content Include="samples\output.kml" />
+    <Content Include="samples\output.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="build\lib\gedcom-to-map\gedcom-to-map.py" />
+    <Compile Include="build\lib\gedcom-to-map\__init__.py" />
+    <Compile Include="gedcom-to-map\creator\Creator.py" />
+    <Compile Include="gedcom-to-map\gedcom-to-map.py" />
+    <Compile Include="gedcom-to-map\gedcom\GedcomParser.py" />
+    <Compile Include="gedcom-to-map\kml\gpslookup.py" />
+    <Compile Include="gedcom-to-map\kml\foliumExp.py" />
+    <Compile Include="gedcom-to-map\kml\KmlExporter.py" />
+    <Compile Include="gedcom-to-map\models\Color.py" />
+    <Compile Include="gedcom-to-map\models\Human.py" />
+    <Compile Include="gedcom-to-map\models\Line.py" />
+    <Compile Include="gedcom-to-map\models\Pos.py" />
+    <Compile Include="gedcom-to-map\models\Rainbow.py" />
+    <Compile Include="gedcom-to-map\__init__.py" />
+    <Compile Include="setup.py" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="build\" />
+    <Folder Include="build\lib\" />
+    <Folder Include="build\lib\gedcom-to-map" />
+    <Folder Include="gedcom-to-map" />
+    <Folder Include="gedcom-to-map\creator" />
+    <Folder Include="gedcom-to-map\gedcom" />
+    <Folder Include="gedcom-to-map\kml" />
+    <Folder Include="gedcom-to-map\models" />
+    <Folder Include="samples" />
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
+  <!-- Uncomment the CoreCompile target to enable the Build command in
+       Visual Studio and specify your pre- and post-build commands in
+       the BeforeBuild and AfterBuild targets below. -->
+  <!--<Target Name="CoreCompile" />-->
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+</Project>

@@ -1,6 +1,8 @@
 # gedcom-to-visualmap
 ### WIP
 
+Orginally forked from [https://github.com/lmallez/gedcom-to-map]
+
 Read a GEDCOM file and translate the locations into GPS addresses.
 The produces different KML map types which should timelines and movements around the earth.
 The produces HTML file which is interactive..

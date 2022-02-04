@@ -66,7 +66,12 @@ class LifeEvent:
         w = self.whenyear(last)
         if not w:
             w = 0
-        return int(w)
+        else:
+            # TODO this is a range date hack
+            if len(w)>3:
+                w = int(w[0:3])
+        
+        return w
 
     def __getattr__(self, name):
         if name == 'pos':

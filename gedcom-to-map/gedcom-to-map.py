@@ -81,7 +81,7 @@ def Geoheatmap(input_file, output_file, main_entity, max_missing=0, max_line_wei
     creator = LifetimeCreator(humans, max_missing).create(main_entity)    
     if main_entity not in humans:
         print ("Could not find your starting person: {}".format(main_entity))
-        raise
+        exit(1)
     foliumExporter(output_file, max_line_weight, gOptions=gOptions).export(humans[main_entity], creator)
     
 
@@ -116,7 +116,10 @@ class ArgParse(argparse.ArgumentParser):
         self.kmlgroup = self.add_argument_group('KML processing')
         self.kmlgroup.add_argument('-born', action='store_true', dest='usebornplace', help="use place born for mapping")
         
-        self.args = self.parse_args()
+        try:
+            self.args = self.parse_args()
+        except Exception as e:
+            print(repr(e))
         pathname, extension = os.path.splitext(self.args.output_file)
         if extension == "":
             if self.args.format=='KML':  self.args.output_file = self.args.output_file + ".kml"
@@ -126,8 +129,7 @@ class ArgParse(argparse.ArgumentParser):
 if __name__ == '__main__':
     arg_parse = ArgParse()
 
-    # "c:\Users\darre\Downloads\mytree-py.ged" fol.html   "@I500003@"  --nobornmarker --gpscache  --maptiletype 1
-    # "input.ged"  "output_fol.html"   "@I0000@"  --nobornmarker  --maptiletype 1
+
     myGeoOptions = setGeoExpOptions(BornMark = not arg_parse.args.bornmarksoff, MarksOn = not arg_parse.args.marksoff, 
                                      HeatMap = not arg_parse.args.heatmapoff,
                                      MapStyle = arg_parse.args.maptiletype, 

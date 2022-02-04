@@ -31,6 +31,9 @@ class MyMarkClusters:
         if spot and spot.lat and spot.lon:
             cnt = 1
             if (when):
+                # TODO this is a range date hack
+                if type(when) == type (" "):
+                   when = when[0:3]
                 when = int(when) - (int(when) % self.step)
                 markname = str(spot.lat)+ str(spot.lon)  + str(when)
             else:
@@ -169,7 +172,7 @@ class foliumExporter:
                 if type(mycluster.pmarker[marker][3]) == type(' '):
                         print (mycluster.pmarker[marker])
                 theyear = mycluster.pmarker[marker][3]
-                if not theyear in years: 
+                if theyear and not theyear in years: 
                         years.append(theyear)
                
             years.sort()

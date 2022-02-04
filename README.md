@@ -72,8 +72,7 @@ It produces a HTML file which is interactive and shows relationships betwenn chi
 over the years.  It includes a heatmap to show busiey places.  If you zoom in enough you can see the different markers 
 which are overlayed on each other.
 
-## Sample Export using orginal sample GED
-![img](samples/msedge_2022-01-03_20-06-34.png)
+
 
 ```
 pip install -r requirements.txt
@@ -116,7 +115,7 @@ python3 ..\gedcom-to-map\gedcom-to-map.py pres2020.ged pres2020-2 "@I676@" -form
 ```
 
 
-## Complex Export of MyHeritage
-![img](samples/msedge_2022-01-03_16-06-09.png)
+## Complex Export of MyHeritage - intereactive map
+![img](samples/msedge_2022-02-02_22-33-16.gif)
 
 

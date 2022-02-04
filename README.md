@@ -82,15 +82,15 @@ python3 ..\gedcom-to-map\gedcom-to-map.py input.ged out "@I0000@" -format KML
 
 ```
 
-* HTML Output : [samples/output.html](sample/output.html)
+* HTML Output : [samples/output.html](samples/output.html)
 
 ## KML Example revised
 ![img](samples/msedge_2022-01-02_12-36-33.png)
-* KML Output  : [samples/output.kml](sample/output.kml)
+* KML Output  : [samples/output.kml](samples/output.kml)
 
 Go to https://www.google.ca/maps/about/mymaps  and open the KML file
 The *geodat-address-cache.csv* file can be edited to feed back in new Addresses for GeoCoding.  Just edit or clear any column except the *Name* column to have it re-lookup that address.  Especially useful if you want to make a bad or old style name resolve to a new name/location.
-* Cache : samples/geodat-address-cache.csv
+* Cache : [samples/geodat-address-cache.csv](samples/geodat-address-cache.csv)
 
 
 ```
@@ -102,14 +102,14 @@ python gedcom-to-map\gedcom-to-map.py "c:\Users\darre\Downloads\mytree-py.ged" f
 cd samples
 python3 ..\gedcom-to-map\gedcom-to-map.py pres2020.ged pres2020 "@I1@" -format HTML -groupby 1 -nomarkstar -antpath
 ```
-* HTML Output  : [samples/pres2020-2.html](sample/pres2020-2.html)
+* HTML Output  : [samples/pres2020-2.html](samples/pres2020-2.html)
 
 ![img](samples/pres2020-2.png)
 ```
 python3 ..\gedcom-to-map\gedcom-to-map.py pres2020.ged pres2020-2 "@I676@" -format HTML -groupby 1 -nomarkstar -antpath
 ```
 
-* KML Output  : [samples/pres2020-2.kml](sample/pres2020-2.kml)
+* KML Output  : [samples/pres2020-2.kml](samples/pres2020-2.kml)
 ```
 python3 ..\gedcom-to-map\gedcom-to-map.py pres2020.ged pres2020-2 "@I676@" -format KML
 ```

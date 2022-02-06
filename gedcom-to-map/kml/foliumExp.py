@@ -33,7 +33,7 @@ class MyMarkClusters:
             if (when):
                 # TODO this is a range date hack
                 if type(when) == type (" "):
-                   when = when[0:3]
+                   when = when[0:4]
                 when = int(when) - (int(when) % self.step)
                 markname = str(spot.lat)+ str(spot.lon)  + str(when)
             else:
@@ -121,18 +121,18 @@ class foliumExporter:
         flp = folium.FeatureGroup(name= lgd_txt.format(txt= 'People', col='Black'), show=False  )
         mycluster = MyMarkClusters(fm, self.gOptions.HeatMapTimeStep)
 
-        print("building clusters")
+        
 
         """ *****************************
             HEAT MAP Section
             *****************************
         """
         if self.gOptions.HeatMapTimeLine:
-            
+            print("building clusters")    
            
             
             for line in lines:
-                if (line.style == 'Life'):
+                if (hasattr(line,'style') and line.style == 'Life'):
                     if line.human.birth and line.human.birth.pos:
                         mycluster.mark(line.human.birth.pos, line.human.birth.whenyear())
                         minyear = line.human.birth.whenyearnum()
@@ -196,7 +196,7 @@ class foliumExporter:
                     heat_data[i][j][2] = float(heat_data[i][j][2])/mx
             
             
-            hm = folium.plugins.HeatMapWithTime(heat_data,index = years , name= 'Heatmap', max_opacity=0.8, min_speed=1, speed_step=1, max_speed=25,
+            hm = folium.plugins.HeatMapWithTime(heat_data,index = years , name= 'Heatmap', max_opacity=0.9, min_speed=1, speed_step=1, max_speed=25,
                                             gradient={'0':'Navy', '0.25':'Blue','0.5':'Green', '0.75':'Yellow','1': 'Red'})
             fm.add_child( hm)
         else:
@@ -228,9 +228,10 @@ class foliumExporter:
         """
         
         i = 0
-        for line in lines:
+        for line in (list(filter (lambda line: hasattr(line,'style'), lines))):
+          
           i += 1
-          if (line.style == 'Life'):
+          if ( line.style == 'Life'):
              flc = flp
              aicc = 'orange'
              aici = 'child'
@@ -241,6 +242,7 @@ class foliumExporter:
              ln = line.parentofhuman
              g = ""
              markertipname = "Life of " + line.name
+             fancyname = line.style + " of "+ line.parentofhuman
              markhome = 'house'
           else: 
              flc = flr
@@ -261,13 +263,14 @@ class foliumExporter:
              ln = line.name
              g = line.name.split(' ',2)[0] 
              markertipname = line.name +  " " + line.style + " of "+ line.parentofhuman
+             fancyname = line.name + " " + line.style + " of "+ line.parentofhuman
           fg = None
           newfg = False
           labelname = str(i) +' '+ ln
           if (len(labelname) > 25): labelname = labelname[1:25] +"..."
           gn = lgd_txt.format( txt=labelname, col= lc)
           fm_line = []
-          fancyname = line.name + line.style + " of "+ line.parentofhuman
+          
           
           bextra = "Born {}".format(line.human.birth.whenyear()) if line.human.birth and line.human.birth.when else ''
           dextra = "Died {}".format(line.human.death.whenyear()) if line.human.death and line.human.death.when else ''
@@ -363,7 +366,7 @@ class foliumExporter:
             # print ("]]{} : {}".format(fgn, fglastname[fgn][1]))          
             self.fglastname[fgn][0].layer_name = "{} : {}".format(fgn, self.fglastname[fgn][1])          
             fm.add_child(self.fglastname[fgn][0])
-        folium.map.LayerControl('topleft', collapsed= False).add_to(fm)
+        folium.map.LayerControl('topleft', collapsed= True).add_to(fm)
 
         if main and main.birth and main.birth.pos and main.birth.pos.lat:         
             #TODO Look at MarkerClusters           

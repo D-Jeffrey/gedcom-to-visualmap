@@ -39,7 +39,7 @@ class Line:
     def valueWhen (self, newwhen):
         if type(newwhen) == type(" "):
             # TODO this is a range date hack
-            newwhen = int(newwhen[0:3])
+            newwhen = int(newwhen[0:4])
         return newwhen
 
     def updateWhen(self, newwhen):

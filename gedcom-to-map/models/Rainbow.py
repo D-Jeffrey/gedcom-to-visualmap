@@ -51,7 +51,10 @@ class Rainbow:
 
     def get(self, v: float) -> Color:
         if v >= 1 or v < 0:
-            raise
+            #TODO Need to improve this hack
+
+            # raise
+            v = 0.9999
         len_steps = len(self.steps ) - 1
         step = int(v * len_steps)
         pos = v % (1 / len_steps) * len_steps

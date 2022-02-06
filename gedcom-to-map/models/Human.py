@@ -1,3 +1,4 @@
+import re
 from models.Pos import Pos
 
 class Human:
@@ -55,6 +56,9 @@ class LifeEvent:
                         return self.when.value.date1.year_str
                     else:
                         return self.when.value.date2.year_str
+                elif self.when.value.kind.name == "PHRASE":
+                    # TODO poor error checking here
+                    return re.search(r"[0-9]{4}", self.when.value.phrase)[0]
                 else:
                     return self.when.value.date.year_str
         return None
@@ -69,7 +73,7 @@ class LifeEvent:
         else:
             # TODO this is a range date hack
             if len(w)>3:
-                w = int(w[0:3])
+                w = int(w[0:4])
         
         return w
 

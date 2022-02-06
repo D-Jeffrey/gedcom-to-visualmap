@@ -23,7 +23,7 @@ $ pip install -r requirements.txt
 3. Start the application:
 ```
 cd gedcom-to-map
-python3 gedcom-to-map.py myhertitagetree.ged myTree "@I500003@" 
+python gedcom-to-map.py myhertitagetree.ged myTree -main "@I500003@" 
 ```
 
 Output to HTML using folium
@@ -31,29 +31,29 @@ Output to HTML using folium
  ### Usage
  
  ```
- usage: gedcom-to-map.py [-h] [-format {HTML,KML}] [-max_missing MAX_MISSING] [-max_line_weight MAX_LINE_WEIGHT]
-                        [-gpscache] [-nogps] [-nomarker] [-nobornmarker] [-noheatmap] [-maptiletype {1,2,3,4,5,6,7}]
-                        [-nomarkstar] [-groupby {0,1,2}] [-antpath] [-heattime] [-heatstep HEATSTEP] [-born]
-                        input_file output_file main_entity
+ usage: gedcom-to-map.py [-h] [-main MAIN] [-format {HTML,KML}] [-max_missing MAX_MISSING] [-max_line_weight MAX_LINE_WEIGHT] [-everyone] [-gpscache] [-nogps] [-nomarker] [-nobornmarker] [-noheatmap]
+                        [-maptiletype {1,2,3,4,5,6,7}] [-nomarkstar] [-groupby {0,1,2}] [-antpath] [-heattime] [-heatstep HEATSTEP] [-homemarker] [-born] [-death]
+                        input_file output_file
 
 convert gedcom to kml file and lookup GPS addresses
 
 positional arguments:
-  input_file
-  output_file
-  main_entity
+  input_file            GEDCOM file, usually ends at .ged
+  output_file           results file, extension will be added if none is given
 
 optional arguments:
   -h, --help            show this help message and exit
+  -main MAIN            if this is missing it will use the first person in the GEDCOM file
   -format {HTML,KML}    type of output result for map format
   -max_missing MAX_MISSING
                         maximum generation missing (0 = no limit)
   -max_line_weight MAX_LINE_WEIGHT
-                        line maximum weight
+                        Line maximum weight
+  -everyone             Plot everyone in your tree
 
 Geocoding:
-  -gpscache             use the GPS cache only
-  -nogps                lookup places using geocode to determine GPS
+  -gpscache             Use the GPS cache only
+  -nogps                Do not lookup places using geocode to determine GPS, use built in GPS values
 
 Folium Map as HTML (format HTML):
   -nomarker             Turn off the markers
@@ -66,9 +66,11 @@ Folium Map as HTML (format HTML):
   -antpath              Turn on AntPath
   -heattime             Turn on heatmap timeline
   -heatstep HEATSTEP    years per heatmap group step
+  -homemarker           Turn on marking homes
 
 KML processing:
   -born                 use place born for mapping
+  -death                use place born for mapping
 ```
 It produces a HTML file which is interactive and shows relationships betwenn childern and parents and where people lived 
 over the years.  It includes a heatmap to show busiey places.  If you zoom in enough you can see the different markers 
@@ -79,8 +81,8 @@ which are overlayed on each other.
 ```
 pip install -r requirements.txt
 cd samples
-python3 ..\gedcom-to-map\gedcom-to-map.py input.ged out "@I0000@" -format HTML -groupby 1
-python3 ..\gedcom-to-map\gedcom-to-map.py input.ged out "@I0000@" -format KML
+python ..\gedcom-to-map\gedcom-to-map.py input.ged out  -format HTML -groupby 1
+python ..\gedcom-to-map\gedcom-to-map.py input.ged out -main "@I0000@" -format KML
 
 ```
 
@@ -92,28 +94,27 @@ python3 ..\gedcom-to-map\gedcom-to-map.py input.ged out "@I0000@" -format KML
 
 Go to https://www.google.ca/maps/about/mymaps  and open the KML file
 The *geodat-address-cache.csv* file can be edited to feed back in new Addresses for GeoCoding.  Just edit or clear any column except the *Name* column to have it re-lookup that address.  Especially useful if you want to make a bad or old style name resolve to a new name/location.
+If you do not have GPS location in your GEDCOM file, then use -born or -born -death so have it use the place where the person was born and/or died.
+
 * Cache : [samples/geodat-address-cache.csv](samples/geodat-address-cache.csv)
 
 
-```
-python gedcom-to-map\gedcom-to-map.py "c:\Users\darre\Downloads\mytree-py.ged" fol.html   "@I500003@"  --nobornmarker   --maptiletype 3
-```
 
 ![img](samples/pres2020.png)
 ```
 cd samples
-python3 ..\gedcom-to-map\gedcom-to-map.py pres2020.ged pres2020 "@I1@" -format HTML -groupby 1 -nomarkstar -antpath
+python ..\gedcom-to-map\gedcom-to-map.py pres2020.ged pres2020 -main "@I1@" -format HTML -groupby 1 -nomarkstar -antpath
 ```
 * HTML Output  : [samples/pres2020-2.html](samples/pres2020-2.html)
 
 ![img](samples/pres2020-2.png)
 ```
-python3 ..\gedcom-to-map\gedcom-to-map.py pres2020.ged pres2020-2 "@I676@" -format HTML -groupby 1 -nomarkstar -antpath
+python ..\gedcom-to-map\gedcom-to-map.py pres2020.ged pres2020-2 -main "@I676@" -format HTML -groupby 1 -nomarkstar -antpath
 ```
 
 * KML Output  : [samples/pres2020-2.kml](samples/pres2020-2.kml)
 ```
-python3 ..\gedcom-to-map\gedcom-to-map.py pres2020.ged pres2020-2 "@I676@" -format KML
+python ..\gedcom-to-map\gedcom-to-map.py pres2020.ged pres2020-2 -main "@I676@" -format KML
 ```
 
 

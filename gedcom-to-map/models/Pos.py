@@ -12,5 +12,7 @@ class Pos:
             
     def __repr__(self):
         return "[{},{}]".format(self.lat, self.lon)
+    def __str__(self):
+        return "({},{})".format(self.lat, self.lon)
 
     

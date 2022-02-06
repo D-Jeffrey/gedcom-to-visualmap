@@ -47,6 +47,13 @@ class Creator:
         current = self.humans[main_id]
         return self.link(current.pos, current)
 
+    def createothers(self,listof):
+       for human in self.humans:
+           c = [creates.human.xref_id for creates in listof]
+           if not human in c:
+               # print (f"Others: + {self.humans[human].name}({human}) ({len(listof)})")
+               listof.extend(self.line(self.humans[human].pos, self.humans[human], len(listof)/10, 5, 0, path=""))
+
 class LifetimeCreator:
     def __init__(self, humans: Dict[str, Human], max_missing=0):
         self.humans = humans
@@ -109,5 +116,12 @@ class LifetimeCreator:
             raise
         current = self.humans[main_id]
 
-        return self.link(current.birth.pos if hasattr(current, 'birth') else (None, None), current) 
+        return self.link(current.birth.pos if hasattr(current, 'birth') and current.birth != None else Pos(None, None), current) 
     
+    def createothers(self,listof):
+       for human in self.humans:
+           c = [creates.human.xref_id for creates in listof]
+           if not human in c:
+               # print (f"Others: + {self.humans[human].name}({human}) ({len(listof)})")
+               listof.extend(self.selfline(self.humans[human], len(listof)/10, len(listof)/10, 5, path=""))
+               

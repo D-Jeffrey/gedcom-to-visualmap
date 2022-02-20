@@ -34,7 +34,7 @@ python gedcomVisualGUI.py
 ```
 
 GUI
-![img](samples/pythonw3.9_2022-02-20a)
+![img](samples/pythonw3.9_2022-02-20a.png)
 
 
 Output to HTML using folium

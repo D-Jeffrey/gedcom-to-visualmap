@@ -3,18 +3,21 @@ import math
 import simplekml as simplekml
 from models.Line import Line
 from models.Pos import Pos
-
+from gedcomoptions import gvOptions
 
 
 class KmlExporter:
-    def __init__(self, file_name, max_line_weight=1):
-        self.file_name = file_name
+    def __init__(self, gOp: gvOptions):
+        self.file_name = gOp.Result
+        self.max_line_weight = gOp.MaxLineWeight
         self.kml = None
-        self.max_line_weight = max_line_weight
+        self.gOp = gOp
 
     def Done(self):
+        self.gOp.step("Saving KML")
         self.kml.save(self.file_name)
-        self.kml = None
+        self.gOp.stop()
+        # self.kml = None
     def export(self, main: Pos, lines: [Line], ntag =""):
         if self.kml:
             kml = self.kml     
@@ -29,7 +32,9 @@ class KmlExporter:
         else:
             print ("No GPS locations to generate a map.")
 
+        self.gOp.step("Generating KML")
         for line in lines:
+          self.gOp.step()
           if (line.a.lon and line.a.lat):
                 kml.newpoint(name=line.name  + ntag, coords=[
                     (line.a.lon, line.a.lat)
@@ -49,5 +54,5 @@ class KmlExporter:
             )
           else:
             print("skipping {} ({},{}) ({},{})".format(line.name, line.a.lon, line.a.lat, line.b.lon, line.b.lat) )
-        #self.Done()
+        self.Done()
    

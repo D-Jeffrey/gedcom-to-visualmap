@@ -7,12 +7,15 @@ from ged4py.date import DateValueVisitor
 
 from models.Human import Human, LifeEvent
 from models.Pos import Pos
+from gedcomoptions import gvOptions
 
 homelocationtags = ('OCCU', 'CENS', 'EDUC')
 otherlocationtags = ('CHR', 'BAPM', 'BASM', 'BAPL', 'MARR', 'IMMI', 'NATU', 'ORDN','ORDI''RETI', 
                      'EVEN',  'CEME', 'CREM' )
 
 addrtags = ('ADR1', 'ADR2', 'ADR3', 'CITY', 'STAE', 'POST', 'CTRY')
+
+thisgvOps = None
 
 def getgdate (str):
     r = datetime.fromisocalendar(1000,1,1)
@@ -50,11 +53,22 @@ def getplace(gedcomtag : Record, placetag ="PLAC"):
 
 
 class GedcomParser:
-    def __init__(self, file_name):
-        self.file_path = file_name
+    def __init__(self, gOp :gvOptions):
+        self.file_path = gOp.GEDCOMinput
+        self.gOp = gOp
+        global thisgvOps
+        thisgvOps= gOp
+        if self.file_path == '':
+            self.gOp.step("no file to Parse")
+        else:
+            self.gOp.step("GEDCOM Parsing")
+        self.gOp.parsed = False
+
 
     @staticmethod
     def __create_human(record: Record) -> Human:
+        global thisgvOps
+        thisgvOps.step()
         human = Human(record.xref_id)
         human.name = ''
         name: NameRec = record.sub_tag("NAME")
@@ -161,10 +175,15 @@ class GedcomParser:
 
     @staticmethod
     def __create_humans(records0) -> Dict[str, Human]:
+        global thisgvOps
         humans = dict()
         for record in records0("INDI"):
+            if thisgvOps.ShouldStop():
+                break
             humans[record.xref_id] = GedcomParser.__create_human(record)
         for record in records0("FAM"):
+            if thisgvOps.ShouldStop():
+                break
             husband = record.sub_tag("HUSB")
             wife = record.sub_tag("WIFE")
             for chil in record.sub_tags("CHIL"):
@@ -178,8 +197,13 @@ class GedcomParser:
         return humans
 
     def create_humans(self) -> Dict[str, Human]:
+        if self.file_path == '':
+            return None
+       
         with GedcomReader(self.file_path) as parser:
             return self.__create_humans(parser.records0)
+        
+
 
 
 

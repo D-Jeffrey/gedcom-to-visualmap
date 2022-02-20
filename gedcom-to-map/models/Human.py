@@ -29,7 +29,13 @@ class Human:
             self.pos
             
         )
-    
+    def refyear(self):
+        bestyear = "Unknown"
+        if self.birth and self.birth.when:
+            bestyear = "Born " + self.birth.whenyear()
+        elif self.death and self.death.when:
+            bestyear = "Died " + self.death.whenyear()
+        return bestyear
 
 class LifeEvent:
     def __init__(self, place :str, atime, position : Pos = None, what = None):  # atime is a Record

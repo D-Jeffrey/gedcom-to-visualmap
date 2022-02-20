@@ -1,16 +1,19 @@
 import time
 import csv
 import os.path
+import tempfile
 import json
 import urllib.request
 # import pyap
 import re
+import hashlib
 
 from models.Human import Human, LifeEvent
 from models.Pos import Pos
 
 from geopy.geocoders import Nominatim
 from pprint import pprint
+from gedcomoptions import gvOptions
 
 fixuplist   = {r'\bof\s': '',
                r'\spart of\s' : ' ', 
@@ -32,12 +35,16 @@ debug = False
 
 defaultcountry = "CA"
 
-def cachefile(cfile, url):
-    if os.path.exists(cfile):
-        return
-    r = requests.get(url, allow_redirects=True)
-    open(cfile, 'wb').write(r.content)
-    return
+   
+def readCachedURL(cfile, url):
+    nfile = os.path.join(tempfile.gettempdir() , cfile)
+    if not os.path.exists(nfile):
+        webUrl  = urllib.request.urlopen(url)
+        data = webUrl.read()
+        with open(nfile, 'wb') as file:
+            file.write(data)
+        
+    return open(nfile, 'rb').read()
 
 def getattr(line, attr):
     if attr in line.keys():
@@ -68,10 +75,16 @@ class WordXlator(Xlator):
           r'\b'+r'\b|\b'.join(map(re.escape, self.keys(  )))+r'\b')
     
 class GEDComGPSLookup:
-    def __init__(self, humans, cacheonly):    
+    def __init__(self, humans,  gvOptions: gvOptions):    
         self.addresses = None
         self.addresslist = None
-        self.usecacheonly = cacheonly
+        self.usecacheonly = not gvOptions.UseGPS
+        self.gOptions = gvOptions 
+        self.orgMD5 = None
+        self.humans = humans
+      
+        # TODO this should be in the same directory as GEDCOM file, with make path
+
         if (os.path.exists(cache_filename[0])):
           
              with open(cache_filename[0],  newline='', encoding='utf-8') as csvfile:
@@ -83,9 +96,10 @@ class GEDComGPSLookup:
                             self.addresslist.extend([line])
                         else:
                             self.addresslist = [line]
-             
+                    self.gOptions.set('gpsfile', cache_filename[0])     
                 except csv.Error as e:
                     print ('Error reading GPS cache file {}, line {}: {}'.format(cache_filename[0], readfrom.line_num, e))
+                    self.gOptions.set('gpsfile', None)
              
              
         if (self.addresslist):
@@ -93,7 +107,7 @@ class GEDComGPSLookup:
             
             self.addressalt = dict()
             
-            
+            self.orgMD5 = hashlib.md5()    
             for a in range(0,len(self.addresslist)):
                 if self.addresslist[a]['name'] !='': 
                     
@@ -107,40 +121,62 @@ class GEDComGPSLookup:
                     self.addresslist[a]['used'] = 0
                     self.addresses[self.addresslist[a]['name'].lower()]= self.addresslist[a]
                     self.addressalt[self.addresslist[a]['alt'].lower()]= self.addresslist[a]['name']
-            print ("Loaded {} cached records".format(len(self.addresses)))            
+                    self.orgMD5.update((self.addresslist[a]['name'] +  
+                         self.addresslist[a]['alt'] +  
+                         str(self.addresslist[a]['lat']) +  
+                         str(self.addresslist[a]['long'])).encode(errors='ignore'))
+            print ("Loaded {} cached records".format(len(self.addresses)))    
+            self.gOptions.step("Loaded {} cached records".format(len(self.addresses)))
         else:
             print ("No GPS cached addresses to use")
-        self.humans = humans
+            self.gOptions.step("No GPS cached addresses")
+        
+        
+        
+        # Cache up and don't reload if it we have it already
 
-
-        webUrl  = urllib.request.urlopen('https://raw.githubusercontent.com/nnjeim/world/master/resources/json/countries.json')
-        data = webUrl.read()
-        self.countrieslist = json.loads(data)
-        self.countrynames=dict()
-        self.countryname3=dict()
-        self.countries=dict()
-        for c in range(0,len(self.countrieslist)): 
-            self.countrynames[self.countrieslist[c]['iso2']] = self.countrieslist[c]['name'].lower()
-            self.countryname3[self.countrieslist[c]['iso3']] = self.countrieslist[c]['name'].lower()
-            self.countries[self.countrieslist[c]['name'].lower()] = self.countrieslist[c]
+        if not (hasattr(self, 'countrieslist') and self.countrieslist):
+            
+            self.gOptions.step("Loading Countries/states")
+            data = readCachedURL ('gv.countries.json', 'https://raw.githubusercontent.com/nnjeim/world/master/resources/json/countries.json')
+        
+            self.countrieslist = json.loads(data)
+            self.countrynames=dict()
+            self.countryname3=dict()
+            self.countries=dict()
+            for c in range(0,len(self.countrieslist)): 
+                self.countrynames[self.countrieslist[c]['iso2']] = self.countrieslist[c]['name'].lower()
+                self.countryname3[self.countrieslist[c]['iso3']] = self.countrieslist[c]['name'].lower()
+                self.countries[self.countrieslist[c]['name'].lower()] = self.countrieslist[c]
             
         
-        webUrl  = urllib.request.urlopen('https://raw.githubusercontent.com/nnjeim/world/master/resources/json/states.json')
-        data = webUrl.read()
-        self.stateslist = json.loads(data)
-        self.states=dict()
-        for c in range(0,len(self.stateslist)): 
-            self.states[(self.stateslist[c]['name']).lower()] = self.stateslist[c]
-        self.wordxlat = WordXlator(wordfixlist)
-        self.xlat = Xlator(fixuplist)
+            data = readCachedURL ('gv.states.json', 'https://raw.githubusercontent.com/nnjeim/world/master/resources/json/states.json')
+            self.stateslist = json.loads(data)
+            self.states=dict()
+            for c in range(0,len(self.stateslist)): 
+                self.states[(self.stateslist[c]['name']).lower()] = self.stateslist[c]
+            self.wordxlat = WordXlator(wordfixlist)
+            self.xlat = Xlator(fixuplist)
 
     def saveAddressCache(self):
-        if (self.usecacheonly):
+        if self.usecacheonly or self.gOptions.ShouldStop():
+            return
+        # Nothing to save ?? and has not changed
+        newMD5 = hashlib.md5()   
+        for a in range(0,len(self.addresslist)):
+          if self.addresslist[a]['name'] !='': 
+            newMD5.update((self.addresslist[a]['name'] +  
+                         self.addresslist[a]['alt'] +  
+                         str(self.addresslist[a]['lat']) +  
+                         str(self.addresslist[a]['long'])).encode(errors='ignore'))
+        if newMD5.hexdigest() == self.orgMD5.hexdigest():
+            print("GPS Cache has not changed")
             return
         used = 0
         usedNone = 0
         totaladdr = 0
         if self.addresses:
+            self.gOptions.step("Saving GPS Cache")
             if (os.path.exists(cache_filename[0])):
                   if (os.path.exists(cache_filename[1])):
                     if (os.path.exists(cache_filename[2])):
@@ -156,8 +192,9 @@ class GEDComGPSLookup:
                      os.rename(cache_filename[0], cache_filename[1])
                   except:
                      print("**Error renaming {}".format(cache_filename[0]))
-            
+            self.gOptions.set('gpsfile', cache_filename[0])     
             with open(cache_filename[0], "w", newline='', encoding='utf-8') as csvfile:
+                
                 csvwriter = csv.writer(csvfile, dialect='excel' )
                 csvwriter.writerow(csvheader)
                 
@@ -198,7 +235,7 @@ class GEDComGPSLookup:
                         if (self.addresses[xaddr]['lat'] == None): usedNone += 1
 
         print("Unique addresses: {} and {} have missing GPS for a Total of {}".format(used, usedNone, totaladdr))   
-          
+        self.gOptions.step(f"Saved {totaladdr} addresses")  
 
         
     def improveaddress(self,theaddress, thecountry= None):
@@ -264,6 +301,7 @@ class GEDComGPSLookup:
         return Pos(self.addresses[name]['lat'], self.addresses[name]['long'])
     
     def lookupaddresses(self, myaddress, addressdepth=0):
+       self.gOptions.step()  
        addressindex = None
        theaddress = None
        trycountry = ""
@@ -395,8 +433,11 @@ class GEDComGPSLookup:
    
     def resolveaddresses(self, humans):
 
-        self.Geoapp = Nominatim(user_agent="GEDCOM-to-map-folium")        
+        self.Geoapp = Nominatim(user_agent="GEDCOM-to-map-folium")  
+        self.gOptions.step("Lookup addresses")
         for human in humans:
+            if self.gOptions.ShouldStop():
+                break
             if (humans[human].birth and humans[human].birth):
                 humans[human].birth.pos = self.lookupaddresses(humans[human].birth.where)
                 # print ("{:30} @ B {:60} = {}".format(humans[human].name, humans[human].birth.where if humans[human].birth.where else '??', humans[human].birth.pos ))

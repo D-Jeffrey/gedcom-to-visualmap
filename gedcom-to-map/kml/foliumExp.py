@@ -5,8 +5,10 @@ import folium
 # import simplekml as simplekml
 from models.Line import Line
 from models.Pos import Pos
-import webbrowser
+
 import time
+
+from gedcomoptions import gvOptions
 from folium.plugins import FloatImage, AntPath, MiniMap, HeatMapWithTime
 legend_file = 'legend.png'
 lgd_txt = '<span style="color: {col};">{txt}</span>'
@@ -54,27 +56,12 @@ class MyMarkClusters:
                 self.markercluster[markname] = folium.MarkerCluster(name), add_to(self.mymap)
                 return self.markercluster[markname]
 
-class setGeoExpOptions:
-    def __init__ (self, MarksOn = True, HeatMap = True, MarkStarOn = True, BornMark = False, DieMark = True, MapStyle = 3, GroupBy=0, AntPath=True, HeatMapTimeLine=False, HeatMapTimeStep=1, HomeMarker=False):
-
-        self.MarksOn = MarksOn
-        self.HeatMap = HeatMap
-        self.BornMark = BornMark
-        self.DieMark = DieMark
-        self.MapStyle = MapStyle
-        self.MarkStarOn = MarkStarOn
-        self.GroupBy = GroupBy
-        self.UseAntPath = AntPath
-        self.HeatMapTimeLine = HeatMapTimeLine
-        self.HeatMapTimeStep = HeatMapTimeStep
-        self.HomeMarker = HomeMarker
 
         
 class foliumExporter:
-    def __init__(self, file_name, max_line_weight=1, gOptions : setGeoExpOptions = setGeoExpOptions()):
-        self.file_name = file_name
-        self.kml = None
-        self.max_line_weight = max_line_weight
+    def __init__(self, gOptions : gvOptions):
+        self.file_name = gOptions.Result
+        self.max_line_weight = gOptions.MaxLineWeight
         self.gOptions = gOptions
         self.fm = folium.Map(location=[0, 0], zoom_start=2)
         
@@ -84,11 +71,11 @@ class foliumExporter:
         for bt in range(0,4):
             folium.raster_layers.TileLayer(backTypes[bt], name=backTypes[bt]).add_to(self.fm)
         
-
-        folium.plugins.MiniMap(toggle_display=True).add_to(self.fm)
+        if (self.gOptions.mapMini):
+            folium.plugins.MiniMap(toggle_display=True).add_to(self.fm)
         
         random.seed()
-        
+        self.gOptions.step()
 
     def setoptions(self):
 
@@ -96,7 +83,8 @@ class foliumExporter:
 
     def Done(self):
         self.fm.save(self.file_name)
-        self.fm = None
+        self.gOptions.stop()
+        # self.fm = None
 
     def getFeatureGroup(self, thename, depth):
         if not thename in self.fglastname:
@@ -113,7 +101,7 @@ class foliumExporter:
         SortByPerson = (self.gOptions.GroupBy == 2)
         fm = self.fm
         
-        
+        self.gOptions.step("Preparing")
         self.fglastname = dict()
         
 
@@ -130,8 +118,10 @@ class foliumExporter:
         if self.gOptions.HeatMapTimeLine:
             print("building clusters")    
            
-            
+            self.gOptions.step("Building Heatmap Clusters")
             for line in lines:
+                if (self.gOptions.step()):
+                    break
                 if (hasattr(line,'style') and line.style == 'Life'):
                     if line.human.birth and line.human.birth.pos:
                         mycluster.mark(line.human.birth.pos, line.human.birth.whenyear())
@@ -169,6 +159,7 @@ class foliumExporter:
                         mycluster.mark(line.human.death.pos, line.human.death.whenyearnum())            
             years= []
             for marker in mycluster.pmarker:
+                self.gOptions.step()
                 if type(mycluster.pmarker[marker][3]) == type(' '):
                         print (mycluster.pmarker[marker])
                 theyear = mycluster.pmarker[marker][3]
@@ -182,6 +173,7 @@ class foliumExporter:
     
             
             for mkyear in range(0,len(years)):
+                self.gOptions.step()
                 for markname in (mycluster.pmarker):
                     if years[mkyear] == mycluster.pmarker[markname][3]:
                         heat_data[mkyear].append([mycluster.pmarker[markname][0], mycluster.pmarker[markname][1], mycluster.pmarker[markname][2]])
@@ -201,6 +193,7 @@ class foliumExporter:
             fm.add_child( hm)
         else:
             for line in lines:
+                self.gOptions.step()
                 mycluster.mark(line.a)
                 mycluster.mark(line.b)
                 if line.midpoints:
@@ -210,6 +203,7 @@ class foliumExporter:
             fg = folium.FeatureGroup(name= lgd_txt.format(txt= 'Heatmap', col='black'), show=(self.gOptions.HeatMap))
             heat_data = []
             for markname in (mycluster.pmarker):
+                self.gOptions.step()
                 heat_data.append([mycluster.pmarker[markname][0], mycluster.pmarker[markname][1], mycluster.pmarker[markname][2]])
                  
             
@@ -228,8 +222,9 @@ class foliumExporter:
         """
         
         i = 0
+        self.gOptions.step("Building lines")
         for line in (list(filter (lambda line: hasattr(line,'style'), lines))):
-          
+          self.gOptions.step()
           i += 1
           if ( line.style == 'Life'):
              flc = flp
@@ -335,7 +330,10 @@ class foliumExporter:
           if (len(fm_line) > 1):                     
             lcolor = line.color.to_hexa()
             lcolor = lc
-            lwidth = max(int(self.max_line_weight/math.exp(0.5*line.prof)), 2)
+            if line.prof:
+                lwidth = max(int(self.max_line_weight/math.exp(0.5*line.prof)), 2)
+            else:
+                lwidth = 1
             if self.gOptions.UseAntPath:
                 if line.style == 'Life':
                     pl = folium.plugins.AntPath(fm_line, weight=lwidth, opacity=.7, tooltip=ln, popup=fancyname, color=lcolor, lineJoin='arcs')
@@ -366,7 +364,9 @@ class foliumExporter:
             # print ("]]{} : {}".format(fgn, fglastname[fgn][1]))          
             self.fglastname[fgn][0].layer_name = "{} : {}".format(fgn, self.fglastname[fgn][1])          
             fm.add_child(self.fglastname[fgn][0])
-        folium.map.LayerControl('topleft', collapsed= True).add_to(fm)
+        sc = False if self.gOptions.showLayerControl else True
+        
+        folium.map.LayerControl('topleft', collapsed= sc).add_to(fm)
 
         if main and main.birth and main.birth.pos and main.birth.pos.lat:         
             #TODO Look at MarkerClusters           
@@ -381,5 +381,4 @@ class foliumExporter:
                print ("Number of FG lastName: {}".format(len(self.fglastname)))
             
         self.Done()
-        webbrowser.open(self.file_name, new = 0, autoraise = True)
         return

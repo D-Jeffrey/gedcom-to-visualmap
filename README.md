@@ -7,6 +7,8 @@ Read a GEDCOM file and translate the locations into GPS addresses.
 The produces different KML map types which should timelines and movements around the earth.
 The produces HTML file which is interactive..
 
+This contains two interfaces: command-line and GUI (only tested on Windows)
+
 # How to Run
 
 1. Clone the repository:
@@ -20,11 +22,20 @@ $ cd gedcom-to-visualmap
 $ pip install -r requirements.txt
 ```
 
-3. Start the application:
+3. Start the command line
 ```
 cd gedcom-to-map
 python gedcom-to-map.py myhertitagetree.ged myTree -main "@I500003@" 
 ```
+3b or Run the GUI interface:
+```
+cd gedcom-to-map
+python gedcomVisualGUI.py 
+```
+
+GUI
+![img](samples/pythonw3.9_2022-02-20a)
+
 
 Output to HTML using folium
 

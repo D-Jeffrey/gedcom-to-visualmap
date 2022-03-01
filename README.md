@@ -1,5 +1,4 @@
 # gedcom-to-visualmap
-### WIP
 
 Orginally forked from [https://github.com/lmallez/gedcom-to-map]
 

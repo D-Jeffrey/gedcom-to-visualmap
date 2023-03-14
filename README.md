@@ -22,7 +22,7 @@ $ cd gedcom-to-visualmap
 $ pip install -r requirements.txt
 ```
 
-3. or Run the GUI interface:
+3. Run the GUI interface:
 ```
 cd gedcom-to-map
 python gedcomVisualGUI.py 
@@ -158,4 +158,10 @@ python ..\gedcom-to-map\gedcom-to-map.py pres2020.ged pres2020-2 -main "@I676@" 
 - Need to better detect change to the GPS cache file
 - could be memory leak issues
 - need to determine how do deal with very large HTML files
-- 
+
+## Releases
+### v0.1.0 
+- Adjusted GUI and saving of cache file location
+- Fixed issue if the cache did not already exist results in a ```
+line 166, in saveAddressCache for a in range(0,len(self.addresslist)): 
+TypeError: object of type 'NoneType' has no len()```

@@ -5,7 +5,7 @@ import folium
 # import simplekml as simplekml
 from models.Line import Line
 from models.Pos import Pos
-
+import os.path
 import time
 
 from gedcomoptions import gvOptions
@@ -60,7 +60,7 @@ class MyMarkClusters:
         
 class foliumExporter:
     def __init__(self, gOptions : gvOptions):
-        self.file_name = gOptions.Result
+        self.file_name = os.path.join(gOptions.resultpath, gOptions.Result)
         self.max_line_weight = gOptions.MaxLineWeight
         self.gOptions = gOptions
         self.fm = folium.Map(location=[0, 0], zoom_start=2)

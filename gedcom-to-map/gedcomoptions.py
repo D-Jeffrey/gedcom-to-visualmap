@@ -17,6 +17,7 @@ class gvOptions:
         self.HomeMarker = HomeMarker
 
         self.GEDCOMinput= None
+        self.resultpath = None
         self.Result = None      # output file (could be of resulttype .html or .kml)
         self.ResultType = "html"
         self.ResultHTML = True
@@ -91,6 +92,7 @@ class gvOptions:
         pathname, extension = os.path.splitext(self.GEDCOMinput)
         if extension == "" and self.GEDCOMinput != "":
            self.GEDCOMinput = self.GEDCOMinput + ".ged"
+        self.resultpath = os.path.dirname(self.GEDCOMinput)
         if org != self.GEDCOMinput:
             self.parsed = False
 
@@ -100,12 +102,13 @@ class gvOptions:
     def ShouldStop(self):
         return self.stopping
 
-    def step(self, state = None):
+    def step(self, state = None, info=None):
         if state:
             self.state = state
             self.counter = 0
         else:
             self.counter = self.counter+1
+            self.stepinfo = info
         self.running = True
         return self.ShouldStop()
                 

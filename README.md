@@ -1,4 +1,5 @@
 # gedcom-to-visualmap
+### WIP, looking for feedback
 
 Orginally forked from [https://github.com/lmallez/gedcom-to-map]
 
@@ -21,22 +22,33 @@ $ cd gedcom-to-visualmap
 $ pip install -r requirements.txt
 ```
 
-3. Start the command line
-```
-cd gedcom-to-map
-python gedcom-to-map.py myhertitagetree.ged myTree -main "@I500003@" 
-```
-3b or Run the GUI interface:
+3. or Run the GUI interface:
 ```
 cd gedcom-to-map
 python gedcomVisualGUI.py 
 ```
 
-GUI
+Alternate 3. Start the command line  (Not recommended as there are so many options)
+```
+cd gedcom-to-map
+python gedcom-to-map.py myhertitagetree.ged myTree -main "@I500003@" 
+```
+
+## GUI
 ![img](samples/pythonw3.9_2022-02-20a.png)
 
+To use the GUI version, `File- > Open` and select your .ged file.
+Set your options in the GUI interface  
+- Type in the Output file name (It saves to the same directory as the Load file).
+- Result type drives the options mixture
 
-Output to HTML using folium
+Once you have selected your options, 
+- click the `Load` button and it will start to load the GED and then resolve the addresses.
+- `Draw Update` button is a 'Save' button.  For HTML it will trying and open the file with your web browser automatically.  For KML, it will save the file so you can load it onto a map.  (See below)
+- `Open GPS` button will open the CSV file in Excel if you have it... (I'm thinking that does not work on a Mac)
+- `Stop` will allow you to abort the Load/ Resolving of addresses without killing the GUI, allowing your to pick different options.
+
+## Output to HTML using folium
 
  ### Usage
  
@@ -102,11 +114,17 @@ python ..\gedcom-to-map\gedcom-to-map.py input.ged out -main "@I0000@" -format K
 ![img](samples/msedge_2022-01-02_12-36-33.png)
 * KML Output  : [samples/output.kml](samples/output.kml)
 
-Go to https://www.google.ca/maps/about/mymaps  and open the KML file
-The *geodat-address-cache.csv* file can be edited to feed back in new Addresses for GeoCoding.  Just edit or clear any column except the *Name* column to have it re-lookup that address.  Especially useful if you want to make a bad or old style name resolve to a new name/location.
+Go to https://www.google.ca/maps/about/mymaps  
+- Click on `Getting Started`
+- Click `Create a New Map`
+- On Untitled map click on the `Import` options and open the your KML file
+#### Note this does not work in Google Earth as the lines don't appear, not sure about other KML viewers.
+
+The *`geodat-address-cache.csv`* file can be edited to feed back in new Addresses for GeoCoding.  Just edit or clear any column except the *Name* column to have it re-lookup that address.  Especially useful if you want to make a bad or old style name resolve to a new name/location.
 If you do not have GPS location in your GEDCOM file, then use -born or -born -death so have it use the place where the person was born and/or died.
 
 * Cache : [samples/geodat-address-cache.csv](samples/geodat-address-cache.csv)
+
 
 
 
@@ -132,3 +150,12 @@ python ..\gedcom-to-map\gedcom-to-map.py pres2020.ged pres2020-2 -main "@I676@" 
 ![img](samples/msedge_2022-02-02_22-33-16.gif)
 
 
+## Issues
+### GUI
+- Sorting does not work correctly
+- Cache Only checkboxes is not working
+- Need to seperate the Load and GPS resolve steps
+- Need to better detect change to the GPS cache file
+- could be memory leak issues
+- need to determine how do deal with very large HTML files
+- 

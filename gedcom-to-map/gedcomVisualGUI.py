@@ -234,7 +234,7 @@ class VisualMapFrame(wx.Frame):
 
     def OnAbout(self, event):
         """Display an About Dialog"""
-        wx.MessageBox("Visual GEDCOM mapping",
+        wx.MessageBox("Visual GEDCOM mapping\n see Githib Repository\n\n https://github.com/D-Jeffrey/gedcom-to-visualmap",
                       "About GEDCOM-Visualmap",
                       wx.OK|wx.ICON_INFORMATION)
 
@@ -457,7 +457,8 @@ class VisualMapPanel(wx.Panel):
         # create a panel in the frame
         
         self.panelA = wx.Panel(self, -1, size=(760,420),style=wx.SIMPLE_BORDER  )
-        self.panelA.SetBackgroundColour(wx.GREEN)
+        # https://docs.wxpython.org/wx.ColourDatabase.html#wx-colourdatabase
+        self.panelA.SetBackgroundColour(wx.TheColourDatabase.FindColour('GOLDENROD'))
 
         lc = wx.LayoutConstraints()
         lc.top.SameAs( self, wx.Top, 5)
@@ -574,7 +575,7 @@ class VisualMapPanel(wx.Panel):
         hsizer.Add( hboxIn, wx.EXPAND|wx.BOTTOM|wx.LEFT|wx.RIGHT, hOtherBorder+10)
         
         hbox.SetSizer(hsizer)
-
+        self.hbox = hbox
         #
         # KML select controls in a Box
         #
@@ -587,7 +588,7 @@ class VisualMapPanel(wx.Panel):
         kboxIn.AddMany( [self.d.LISTPlaceType])
         ksizer.Add( kboxIn, wx.EXPAND|wx.BOTTOM|wx.LEFT|wx.RIGHT, kOtherBorder+10)
         kbox.SetSizer(ksizer)
-        
+        self.kbox = kbox
         
         box.Add(hbox, 1, wx.EXPAND|wx.ALL, 15)
         box.Add(kbox, 1, wx.EXPAND|wx.ALL, 15)
@@ -619,7 +620,7 @@ class VisualMapPanel(wx.Panel):
         
         # panel.SetSizeHints(box)
         panel.SetSizer(box)
-
+        
 
 
         self.Bind(wx.EVT_RADIOBOX, self.EvtRadioBox, id = ID_RBResultHTML)
@@ -793,6 +794,8 @@ class VisualMapPanel(wx.Panel):
                 status = status + ' - Processing'
             if self.gO.counter > 0:
                 status = status + ' : ' + str(panel.gO.counter)
+                if panel.gO.stepinfo:
+                    status = status + ' (' + panel.gO.stepinfo +')'
             if self.gO.ShouldStop():
                     self.d.BTNUpdate.Enable()
                     status = status + ' - please wait.. Stopping'
@@ -851,6 +854,8 @@ class VisualMapPanel(wx.Panel):
             # self.d.CBCacheOnly
             
         if ResultTypeHTML:
+            # self.kbox.SetBackgroundColour((230, 230, 230, 255))
+            # self.hbox.SetBackgroundColour((255, 255, 255, 255)) 
             for ctrl in list([self.d.CBMarksOn,
                 self.d.CBMapControl,
                 self.d.CBMapMini,
@@ -875,6 +880,8 @@ class VisualMapPanel(wx.Panel):
                 self.d.CBHomeMarker.Disable()
                 
         else:
+            # self.kbox.SetBackgroundColour((255, 255, 255, 255)) 
+            # self.hbox.SetBackgroundColour((230, 230, 230, 255))
             for ctrl in list([self.d.CBMarksOn, 
                 self.d.CBMapControl,
                 self.d.CBMapMini,
@@ -958,7 +965,7 @@ class VisualMapPanel(wx.Panel):
             wx.Execute(csvprogram + " " + csvfile, wx.EXEC_ASYNC)
         pass
     def OpenBrowser(self):
-        webbrowser.open(self.gO.Result, new = 0, autoraise = True)
+        webbrowser.open(os.path.join(self.gO.resultpath, self.gO.Result), new = 0, autoraise = True)
 
     def OnCloseWindow(self, evt):
         busy = wx.BusyInfo("One moment please, waiting for threads to die...")

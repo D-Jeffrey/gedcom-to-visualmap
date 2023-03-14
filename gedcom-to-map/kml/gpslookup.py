@@ -83,24 +83,24 @@ class GEDComGPSLookup:
         self.orgMD5 = None
         self.humans = humans
       
-        # TODO this should be in the same directory as GEDCOM file, with make path
-
-        if (os.path.exists(cache_filename[0])):
+        # This pulls from the same directory as GEDCOM file
+        if gvOptions.resultpath:
+            cachefile = os.path.join(gvOptions.resultpath, cache_filename[0])
+            self.gOptions.set('gpsfile', cachefile )     
+            if os.path.exists(cachefile):
           
-             with open(cache_filename[0],  newline='', encoding='utf-8') as csvfile:
-                readfrom = csv.DictReader(csvfile, dialect='excel')
-                try: 
+                 with open(cachefile,  newline='', encoding='utf-8') as csvfile:
+                    readfrom = csv.DictReader(csvfile, dialect='excel')
+                    try: 
                     
-                    for line in readfrom:
-                        if self.addresslist:
-                            self.addresslist.extend([line])
-                        else:
-                            self.addresslist = [line]
-                    self.gOptions.set('gpsfile', cache_filename[0])     
-                except csv.Error as e:
-                    print ('Error reading GPS cache file {}, line {}: {}'.format(cache_filename[0], readfrom.line_num, e))
-                    self.gOptions.set('gpsfile', None)
-             
+                        for line in readfrom:
+                            if self.addresslist:
+                                self.addresslist.extend([line])
+                            else:
+                                self.addresslist = [line]
+                        
+                    except csv.Error as e:
+                        print ('Error reading GPS cache file {}, line {}: {}'.format(cache_filename[0], readfrom.line_num, e))
              
         if (self.addresslist):
             self.addresses = dict()
@@ -162,38 +162,43 @@ class GEDComGPSLookup:
         if self.usecacheonly or self.gOptions.ShouldStop():
             return
         # Nothing to save ?? and has not changed
-        newMD5 = hashlib.md5()   
-        for a in range(0,len(self.addresslist)):
-          if self.addresslist[a]['name'] !='': 
-            newMD5.update((self.addresslist[a]['name'] +  
+        newMD5 = hashlib.md5()
+        if self.addresslist:
+            for a in range(0,len(self.addresslist)):
+              if self.addresslist[a]['name'] !='': 
+                newMD5.update((self.addresslist[a]['name'] +  
                          self.addresslist[a]['alt'] +  
                          str(self.addresslist[a]['lat']) +  
                          str(self.addresslist[a]['long'])).encode(errors='ignore'))
-        if newMD5.hexdigest() == self.orgMD5.hexdigest():
-            print("GPS Cache has not changed")
-            return
+            if newMD5.hexdigest() == self.orgMD5.hexdigest():
+                print("*Warning* Blank GPS Cache has not changed")
+                return
+        else:
+            print("**Warning No Addresses in addresslist")
         used = 0
         usedNone = 0
         totaladdr = 0
         if self.addresses:
+            resultpath = self.gOptions.resultpath
             self.gOptions.step("Saving GPS Cache")
-            if (os.path.exists(cache_filename[0])):
-                  if (os.path.exists(cache_filename[1])):
-                    if (os.path.exists(cache_filename[2])):
+            
+            if (os.path.exists(os.path.join(resultpath,cache_filename[0]))):
+                  if (os.path.exists(os.path.join(resultpath,cache_filename[1]))):
+                    if (os.path.exists(os.path.join(resultpath,cache_filename[2]))):
                        try:
-                          os.remove(cache_filename[2])
+                          os.remove(os.path.join(resultpath,cache_filename[2]))
                        except:
-                           print("**Error removing {}".format(cache_filename[2]))
+                           print("**Error removing {}".format(os.path.join(resultpath,cache_filename[2])))
                     try:
-                       os.rename(cache_filename[1], cache_filename[2])
+                       os.rename(os.path.join(resultpath,cache_filename[1]), os.path.join(resultpath,cache_filename[2]))
                     except:
-                           print("**Error renaming {}".format(cache_filename[1]))
+                           print("**Error renaming {}".format(os.path.join(resultpath,cache_filename[1])))
                   try:
-                     os.rename(cache_filename[0], cache_filename[1])
+                     os.rename(os.path.join(resultpath,cache_filename[0]), os.path.join(resultpath,cache_filename[1]))
                   except:
-                     print("**Error renaming {}".format(cache_filename[0]))
-            self.gOptions.set('gpsfile', cache_filename[0])     
-            with open(cache_filename[0], "w", newline='', encoding='utf-8') as csvfile:
+                     print("**Error renaming {}".format(os.path.join(resultpath,cache_filename[0])))
+            self.gOptions.set('gpsfile', os.path.join(resultpath,cache_filename[0]))     
+            with open(os.path.join(resultpath,cache_filename[0]), "w", newline='', encoding='utf-8') as csvfile:
                 
                 csvwriter = csv.writer(csvfile, dialect='excel' )
                 csvwriter.writerow(csvheader)
@@ -203,7 +208,7 @@ class GEDComGPSLookup:
                     if self.addresses[xaddr]['boundry']:
                             for i in (range(0,len(self.addresses[xaddr]['boundry']))):
                                self.addresses[xaddr]['boundry'][i] = float(self.addresses[xaddr]['boundry'][i])
-                    if self.addresses[xaddr]['size'] == None or self.addresses[xaddr]['size'] == '':
+                    if self.addresses[xaddr]['size'] is None or self.addresses[xaddr]['size'] == '':
                         boundrybox = self.addresses[xaddr]['boundry']
                         if boundrybox:
                             self.addresses[xaddr]['size'] = abs(boundrybox[1]-boundrybox[0]) * abs(boundrybox[3]-boundrybox[2])*1000000
@@ -232,7 +237,7 @@ class GEDComGPSLookup:
                     if (self.addresses[xaddr]['used'] > 0): 
                         used += 1
                         totaladdr += self.addresses[xaddr]['used']
-                        if (self.addresses[xaddr]['lat'] == None): usedNone += 1
+                        if (self.addresses[xaddr]['lat'] is None): usedNone += 1
 
         print("Unique addresses: {} and {} have missing GPS for a Total of {}".format(used, usedNone, totaladdr))   
         self.gOptions.step(f"Saved {totaladdr} addresses")  
@@ -301,7 +306,7 @@ class GEDComGPSLookup:
         return Pos(self.addresses[name]['lat'], self.addresses[name]['long'])
     
     def lookupaddresses(self, myaddress, addressdepth=0):
-       self.gOptions.step()  
+       self.gOptions.step(info=myaddress)  
        addressindex = None
        theaddress = None
        trycountry = ""

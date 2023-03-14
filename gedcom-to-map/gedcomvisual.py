@@ -7,6 +7,7 @@ from kml.gpslookup import GEDComGPSLookup
 from models.Pos import Pos
 from gedcomoptions import gvOptions
 import webbrowser
+import os.path
 
 def gedcom_to_map(gOp : gvOptions):
     
@@ -83,7 +84,7 @@ def doHTML(gOp : gvOptions, humans):
         print (f"Total of {len(creator)} people.")   
     gOp.totalpeople = len(creator)
     foliumExporter(gOp).export(humans[gOp.Main], creator)
-    webbrowser.open(gOp.Result, new = 0, autoraise = True)
+    webbrowser.open(os.path.join(gOp.resultpath, gOp.Result), new = 0, autoraise = True)
         
     
 

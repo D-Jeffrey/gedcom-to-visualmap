@@ -352,7 +352,8 @@ class PeopleListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
         listmix.ColumnSorterMixin.__init__(self, 3)
         #self.SortListItems(0, True)
         # self.list.CheckItem(item=selectperson, check=True)
-        # NOTE: self.list can be empty (the global value, m, is empty and passed as humans).if 0 <= selectperson < self.list.GetItemCount():
+        # NOTE: self.list can be empty (the global value, m, is empty and passed as humans).
+        if 0 <= selectperson < self.list.GetItemCount():
             self.list.SetItemState(selectperson, wx.LIST_STATE_SELECTED, wx.LIST_STATE_SELECTED)
 
     # Used by the ColumnSorterMixin, see wx/lib/mixins/listctrl.py

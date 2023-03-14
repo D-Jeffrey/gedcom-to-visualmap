@@ -352,7 +352,8 @@ class PeopleListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
         listmix.ColumnSorterMixin.__init__(self, 3)
         #self.SortListItems(0, True)
         # self.list.CheckItem(item=selectperson, check=True)
-        self.list.SetItemState(selectperson, wx.LIST_STATE_SELECTED, wx.LIST_STATE_SELECTED)
+        # NOTE: self.list can be empty (the global value, m, is empty and passed as humans).if 0 <= selectperson < self.list.GetItemCount():
+            self.list.SetItemState(selectperson, wx.LIST_STATE_SELECTED, wx.LIST_STATE_SELECTED)
 
     # Used by the ColumnSorterMixin, see wx/lib/mixins/listctrl.py
     def GetListCtrl(self):
@@ -495,7 +496,7 @@ class VisualMapPanel(wx.Panel):
         title = wx.StaticText(panel, -1, "Visual Mapping Options")#, (10, 10))
         title.SetFont(wx.FFont(16, wx.FONTFAMILY_SWISS, wx.FONTFLAG_BOLD))
         box.Add(title, 0, wx.ALIGN_CENTER|wx.ALL, 5)
-        box.Add(wx.StaticLine(self), 0, wx.EXPAND)
+        box.Add(wx.StaticLine(panel), 0, wx.EXPAND)
         self.d = Ids()
         
         txtinfile = wx.StaticText(panel, -1,  "Input file name:  ") 

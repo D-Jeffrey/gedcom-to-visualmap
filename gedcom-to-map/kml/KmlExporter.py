@@ -34,25 +34,25 @@ class KmlExporter:
 
         self.gOp.step("Generating KML")
         for line in lines:
-          self.gOp.step()
-          if (line.a.lon and line.a.lat):
+            self.gOp.step()
+            if (line.a.lon and line.a.lat):
                 kml.newpoint(name=line.name  + ntag, coords=[
                     (line.a.lon, line.a.lat)
                 ])
-          if (line.b.lon and line.b.lat):
+            if (line.b.lon and line.b.lat):
                 kml.newpoint(name=line.name  + ntag, coords=[
                     (line.b.lon, line.b.lat)
                 ])
-          if (line.a.lon and line.a.lat and line.b.lon and line.b.lat):
-            kml_line = kml.newlinestring(name=line.name, coords=[
-                (line.a.lon, line.a.lat), (line.b.lon, line.b.lat)
-            ])
-            kml_line.linestyle.color = line.color.to_hexa()
-            kml_line.linestyle.width = max(
-                int(self.max_line_weight/math.exp(0.5*line.prof)),
-                1
-            )
-          else:
-            print("skipping {} ({},{}) ({},{})".format(line.name, line.a.lon, line.a.lat, line.b.lon, line.b.lat) )
+            if (line.a.lon and line.a.lat and line.b.lon and line.b.lat):
+                kml_line = kml.newlinestring(name=line.name, coords=[
+                    (line.a.lon, line.a.lat), (line.b.lon, line.b.lat)
+                ])
+                kml_line.linestyle.color = line.color.to_hexa()
+                kml_line.linestyle.width = max(
+                    int(self.max_line_weight/math.exp(0.5*line.prof)),
+                    1
+                )
+            else:
+                print("skipping {} ({},{}) ({},{})".format(line.name, line.a.lon, line.a.lat, line.b.lon, line.b.lat) )
         self.Done()
    

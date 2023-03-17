@@ -11,6 +11,7 @@ import wx.lib.mixins.listctrl as listmix
 import _thread
 import webbrowser
 
+from const import VERSION
 from gedcomoptions import gvOptions
 from gedcomvisual import doKML, doHTML, ParseAndGPS
 from models.Human import Human, LifeEvent
@@ -107,6 +108,7 @@ class VisualMapFrame(wx.Frame):
         # ensure the parent's __init__ is called so the wx.frame is created
         #
         super(VisualMapFrame, self).__init__(*args, **kw)
+        #TODO improve logging control
         self.log = sys.stdout
 
         self.SetMinSize((800,800))
@@ -235,7 +237,7 @@ class VisualMapFrame(wx.Frame):
     def OnAbout(self, event):
         """Display an About Dialog"""
         wx.MessageBox("Visual GEDCOM mapping\n see Githib Repository\n\n https://github.com/D-Jeffrey/gedcom-to-visualmap",
-                      "About GEDCOM-Visualmap",
+                      "About gedcom-to-visualmap "+ VERSION,
                       wx.OK|wx.ICON_INFORMATION)
 
 

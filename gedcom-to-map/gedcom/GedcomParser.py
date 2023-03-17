@@ -10,32 +10,32 @@ from models.Pos import Pos
 from gedcomoptions import gvOptions
 
 homelocationtags = ('OCCU', 'CENS', 'EDUC')
-otherlocationtags = ('CHR', 'BAPM', 'BASM', 'BAPL', 'MARR', 'IMMI', 'NATU', 'ORDN','ORDI''RETI', 
+otherlocationtags = ('CHR', 'BAPM', 'BASM', 'BAPL', 'MARR', 'IMMI', 'NATU', 'ORDN','ORDI', 'RETI', 
                      'EVEN',  'CEME', 'CREM' )
 
 addrtags = ('ADR1', 'ADR2', 'ADR3', 'CITY', 'STAE', 'POST', 'CTRY')
 
 thisgvOps = None
 
-def getgdate (str):
+def getgdate (gstr):
     r = datetime.fromisocalendar(1000,1,1)
     d = m = y = None
-    if str:
-        k = str.value.kind.name
+    if gstr:
+        k = gstr.value.kind.name
         if (k == 'SIMPLE') or (k == 'ABOUT') or (k == 'FROM'):
-            y = str.value.date.year
-            m = str.value.date.month_num
-            d = str.value.date.day
+            y = gstr.value.date.year
+            m = gstr.value.date.month_num
+            d = gstr.value.date.day
         elif (k == 'RANGE') or(k ==  'PERIOD'):
-            y = str.value.date1.year
-            m = str.value.date1.month_num
-            d = str.value.date1.day
+            y = gstr.value.date1.year
+            m = gstr.value.date1.month_num
+            d = gstr.value.date1.day
 
         elif (k == 'PHRASE'):
-           y = y 
+            y = y 
             #TODO need to fix up
         else:
-            print ("Date type; {}".format(str.value.kind.name))
+            print ("Date type; {}".format(gstr.value.kind.name))
         y = (y, 1000) [y == None]
         m = (m, 1) [m == None]
         d = (d, 1) [d == None]
@@ -98,10 +98,10 @@ class GedcomParser:
             plac = getplace(birt)
             plactag = birt.sub_tag("PLAC")
             if plactag:
-                map = plactag.sub_tag("MAP")
-                if map:
-                    lat = map.sub_tag("LATI")
-                    lon = map.sub_tag("LONG")
+                maploc = plactag.sub_tag("MAP")
+                if maploc:
+                    lat = maploc.sub_tag("LATI")
+                    lon = maploc.sub_tag("LONG")
                     if lat and lon:
                         human.pos = Pos(lat.value,lon.value)
                         human.birth.pos = Pos(lat.value,lon.value)
@@ -115,10 +115,10 @@ class GedcomParser:
             human.death = LifeEvent(plac if plac else buri.where, pdate if pdate else buri.when)
             plactag = death.sub_tag("PLAC")
             if plactag:
-                map = plactag.sub_tag("MAP")
-                if map:
-                    lat = map.sub_tag("LATI")
-                    lon = map.sub_tag("LONG")
+                maploc = plactag.sub_tag("MAP")
+                if maploc:
+                    lat = maploc.sub_tag("LATI")
+                    lon = maploc.sub_tag("LONG")
                     if lat and lon:
                         human.pos = Pos(lat.value,lon.value)
                         human.death.pos = Pos(lat.value,lon.value)
@@ -165,10 +165,10 @@ class GedcomParser:
                     
         # Sort them by year          
         if (homes):
-             for i in sorted (homes.keys()) :
-                 if human.home:
+            for i in sorted (homes.keys()) :
+                if human.home:
                     human.home.append(homes[i])
-                 else:
+                else:
                     human.home = [homes[i]]
 
         return human

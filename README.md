@@ -1,3 +1,8 @@
+[![GitHub Activity][releases-shield]][releases]
+[![License][license-shield]]([lisense])
+![Project Maintenance][maintenance-shield]
+[![GitHub Activity][commits-shield]][commits]
+
 # gedcom-to-visualmap
 ### WIP, looking for feedback
 
@@ -165,3 +170,12 @@ python ..\gedcom-to-map\gedcom-to-map.py pres2020.ged pres2020-2 -main "@I676@" 
 - Fixed issue if the cache did not already exist results in a ```
 line 166, in saveAddressCache for a in range(0,len(self.addresslist)): 
 TypeError: object of type 'NoneType' has no len()```
+
+
+[license-shield]: https://img.shields.io/github/license/D-Jeffrey/gedcom-to-visualmap.svg?style=for-the-badge
+[license]: LICENSE
+[commits]: https://github.com/D-Jeffrey/gedcom-to-visualmap/commits
+[commits-shield]: https://img.shields.io/github/commit-activity/y/D-Jeffrey/gedcom-to-visualmap?style=for-the-badge
+[maintenance-shield]: https://img.shields.io/maintenance/yes/2023.svg?style=for-the-badge
+[releases-shield]: https://img.shields.io/github/v/release/D-Jeffrey/gedcom-to-visualmap.svg?style=for-the-badge
+[releases]: https://github.com/crowbarz/D-Jeffrey/gedcom-to-visualmap/releases

@@ -10,7 +10,7 @@ import hashlib
 
 from models.Human import Human, LifeEvent
 from models.Pos import Pos
-
+from const import GV_COUNTRIES_JSON
 from geopy.geocoders import Nominatim
 from pprint import pprint
 from gedcomoptions import gvOptions
@@ -89,7 +89,7 @@ class GEDComGPSLookup:
             self.gOptions.set('gpsfile', cachefile )     
             if os.path.exists(cachefile):
           
-                 with open(cachefile,  newline='', encoding='utf-8') as csvfile:
+                with open(cachefile,  newline='', encoding='utf-8') as csvfile:
                     readfrom = csv.DictReader(csvfile, dialect='excel')
                     try: 
                     
@@ -138,7 +138,7 @@ class GEDComGPSLookup:
         if not (hasattr(self, 'countrieslist') and self.countrieslist):
             
             self.gOptions.step("Loading Countries/states")
-            data = readCachedURL ('gv.countries.json', 'https://raw.githubusercontent.com/nnjeim/world/master/resources/json/countries.json')
+            data = readCachedURL ('gv.countries.json', GV_COUNTRIES_JSON)
         
             self.countrieslist = json.loads(data)
             self.countrynames=dict()
@@ -165,11 +165,11 @@ class GEDComGPSLookup:
         newMD5 = hashlib.md5()
         if self.addresslist:
             for a in range(0,len(self.addresslist)):
-              if self.addresslist[a]['name'] !='': 
-                newMD5.update((self.addresslist[a]['name'] +  
-                         self.addresslist[a]['alt'] +  
-                         str(self.addresslist[a]['lat']) +  
-                         str(self.addresslist[a]['long'])).encode(errors='ignore'))
+                if self.addresslist[a]['name'] !='': 
+                    newMD5.update((self.addresslist[a]['name'] +  
+                             self.addresslist[a]['alt'] +  
+                             str(self.addresslist[a]['lat']) +  
+                             str(self.addresslist[a]['long'])).encode(errors='ignore'))
             if newMD5.hexdigest() == self.orgMD5.hexdigest():
                 print("*Warning* Blank GPS Cache has not changed")
                 return
@@ -183,20 +183,20 @@ class GEDComGPSLookup:
             self.gOptions.step("Saving GPS Cache")
             
             if (os.path.exists(os.path.join(resultpath,cache_filename[0]))):
-                  if (os.path.exists(os.path.join(resultpath,cache_filename[1]))):
+                if (os.path.exists(os.path.join(resultpath,cache_filename[1]))):
                     if (os.path.exists(os.path.join(resultpath,cache_filename[2]))):
-                       try:
-                          os.remove(os.path.join(resultpath,cache_filename[2]))
-                       except:
-                           print("**Error removing {}".format(os.path.join(resultpath,cache_filename[2])))
+                        try:
+                            os.remove(os.path.join(resultpath,cache_filename[2]))
+                        except:
+                            print("**Error removing {}".format(os.path.join(resultpath,cache_filename[2])))
                     try:
-                       os.rename(os.path.join(resultpath,cache_filename[1]), os.path.join(resultpath,cache_filename[2]))
+                        os.rename(os.path.join(resultpath,cache_filename[1]), os.path.join(resultpath,cache_filename[2]))
                     except:
-                           print("**Error renaming {}".format(os.path.join(resultpath,cache_filename[1])))
-                  try:
-                     os.rename(os.path.join(resultpath,cache_filename[0]), os.path.join(resultpath,cache_filename[1]))
-                  except:
-                     print("**Error renaming {}".format(os.path.join(resultpath,cache_filename[0])))
+                        print("**Error renaming {}".format(os.path.join(resultpath,cache_filename[1])))
+                try:
+                    os.rename(os.path.join(resultpath,cache_filename[0]), os.path.join(resultpath,cache_filename[1]))
+                except:
+                    print("**Error renaming {}".format(os.path.join(resultpath,cache_filename[0])))
             self.gOptions.set('gpsfile', os.path.join(resultpath,cache_filename[0]))     
             with open(os.path.join(resultpath,cache_filename[0]), "w", newline='', encoding='utf-8') as csvfile:
                 
@@ -206,8 +206,8 @@ class GEDComGPSLookup:
                 for xaddr in self.addresses.keys():
                     # TODO Short term fix
                     if self.addresses[xaddr]['boundry']:
-                            for i in (range(0,len(self.addresses[xaddr]['boundry']))):
-                               self.addresses[xaddr]['boundry'][i] = float(self.addresses[xaddr]['boundry'][i])
+                        for i in (range(0,len(self.addresses[xaddr]['boundry']))):
+                            self.addresses[xaddr]['boundry'][i] = float(self.addresses[xaddr]['boundry'][i])
                     if self.addresses[xaddr]['size'] is None or self.addresses[xaddr]['size'] == '':
                         boundrybox = self.addresses[xaddr]['boundry']
                         if boundrybox:
@@ -255,7 +255,7 @@ class GEDComGPSLookup:
         # Check for the state name, if that is found, then add country to the geocoding to get the right country
         # Loop thru twice for countries with two words
         for i in (0,1):
-            lastwords = re.findall("[\s,]((\w+){"+ str(i) + "}\s?\w+)$",theaddress.strip())
+            lastwords = re.findall(r"[\s,]((\w+){"+ str(i) + "}\s?\w+)$",theaddress.strip())
         
             # the last word should be the country
             if not lastwords:
@@ -306,134 +306,134 @@ class GEDComGPSLookup:
         return Pos(self.addresses[name]['lat'], self.addresses[name]['long'])
     
     def lookupaddresses(self, myaddress, addressdepth=0):
-       self.gOptions.step(info=myaddress)  
-       addressindex = None
-       theaddress = None
-       trycountry = ""
+        self.gOptions.step(info=myaddress)  
+        addressindex = None
+        theaddress = None
+        trycountry = ""
 
        
-       if myaddress:
-          if (debug): print ("### {} {}".format( addressdepth, myaddress))
-          if self.addresses:
-             # straight up, is it a valid existing cached address?
-             if myaddress.lower() in self.addresses.keys():
-                 addressindex = myaddress.lower()
-             # okay then , check the alternate cached addresses?
-             elif myaddress.lower() in self.addressalt.keys():
-                 # TODO Set the Lat/Long of this source record
-                 a = self.addresses[self.addressalt[myaddress.lower()].lower()]
-                 ps = (self.lookupaddresses(a['name'], addressdepth+1))
-                 if (ps.lat and ps.lon):
-                     # Do we need to look this up?
-                    if (not self.addresses[self.addressalt[myaddress.lower()].lower()]['lat']):
-                        print ("##* Updated POS\t{}\t{} {},{}".format(a['name'], self.addressalt[myaddress.lower()].lower(), ps.lat, ps.lon))
+        if myaddress:
+            if (debug): print ("### {} {}".format( addressdepth, myaddress))
+            if self.addresses:
+                # straight up, is it a valid existing cached address?
+                if myaddress.lower() in self.addresses.keys():
+                    addressindex = myaddress.lower()
+                # okay then , check the alternate cached addresses?
+                elif myaddress.lower() in self.addressalt.keys():
+                    # TODO Set the Lat/Long of this source record
+                    a = self.addresses[self.addressalt[myaddress.lower()].lower()]
+                    ps = (self.lookupaddresses(a['name'], addressdepth+1))
+                    if (ps.lat and ps.lon):
+                        # Do we need to look this up?
+                        if (not self.addresses[self.addressalt[myaddress.lower()].lower()]['lat']):
+                            print ("##* Updated POS\t{}\t{} {},{}".format(a['name'], self.addressalt[myaddress.lower()].lower(), ps.lat, ps.lon))
                     (self.addresses[self.addressalt[myaddress.lower()].lower()]['lat'] , self.addresses[self.addressalt[myaddress.lower()].lower()]['long']) = (ps.lat, ps.lon)
                     (self.addresses[a['name'].lower()]['lat'], self.addresses[a['name'].lower()]['lon']) = (ps.lat, ps.lon)
                     
                  
-                 return ps
-                 #   addressindex = self.addressalt[myaddress.lower()].lower()
-                 #   if (self.addresses[addressindex]['name'] != self.addresses[addressindex]['alt']):
+                    return ps
+                    #   addressindex = self.addressalt[myaddress.lower()].lower()
+                    #   if (self.addresses[addressindex]['name'] != self.addresses[addressindex]['alt']):
                         
-             if (addressindex):         
+                if (addressindex):         
                 # We have a Cache match, but is there any Lat/Long there?
-                if self.addresses[addressindex]['lat'] and self.addresses[addressindex]['lat']:
-                      return self.returnandcount(addressindex)
+                    if self.addresses[addressindex]['lat'] and self.addresses[addressindex]['lat']:
+                        return self.returnandcount(addressindex)
                       
                  
-                      # Try using an alternate name from the cache
-                if self.addresses[addressindex]['name'].lower() == self.addresses[addressindex]['alt'].lower():
-                         return self.returnandcount(addressindex)
-          trycountry = None
-          if (self.usecacheonly):
-              theaddress = myaddress
-          else:
-              if addressindex:
-                 (theaddress, trycountry) = self.improveaddress(myaddress, self.addresses[addressindex]['country'])
-              else:
-                 (theaddress, trycountry) = self.improveaddress(myaddress)
+                        # Try using an alternate name from the cache
+                    if self.addresses[addressindex]['name'].lower() == self.addresses[addressindex]['alt'].lower():
+                            return self.returnandcount(addressindex)
+            trycountry = None
+            if (self.usecacheonly):
+                theaddress = myaddress
+            else:
+                if addressindex:
+                    (theaddress, trycountry) = self.improveaddress(myaddress, self.addresses[addressindex]['country'])
+                else:
+                    (theaddress, trycountry) = self.improveaddress(myaddress)
               
           
-          if self.addresses and theaddress.lower() in self.addresses.keys():
-              addressindex = theaddress.lower()
-              if self.addresses[addressindex]['lat'] and self.addresses[addressindex]['lat']:
-                  return self.returnandcount(addressindex)
-              else: 
-                  if theaddress in self.addressalt.keys():
-                    if self.addresses[addressindex]['name'].lower() == self.addresses[addressindex]['alt'].lower():
-                      return self.returnandcount(addressindex)
-                      # We have tried alternate  (This is a bit of a hack with the 4 but it works)
-              if self.addresses[addressindex]['name'].lower() != self.addresses[addressindex]['alt'].lower() and addressdepth < 4 :
-                 # TODO Set the Lat/Long of this source record
-                 a = self.addresses[addressindex]['alt'].lower()
-                 ps = (self.lookupaddresses(a, addressdepth+1))
-                 if (ps.lat and ps.lon):
-                    (self.addresses[addressindex]['lat'] , self.addresses[addressindex]['long']) = (ps.lat, ps.lon)
+            if self.addresses and theaddress.lower() in self.addresses.keys():
+                addressindex = theaddress.lower()
+                if self.addresses[addressindex]['lat'] and self.addresses[addressindex]['lat']:
+                    return self.returnandcount(addressindex)
+                else: 
+                    if theaddress in self.addressalt.keys():
+                        if self.addresses[addressindex]['name'].lower() == self.addresses[addressindex]['alt'].lower():
+                            return self.returnandcount(addressindex)
+                        # We have tried alternate  (This is a bit of a hack with the 4 but it works)
+                if self.addresses[addressindex]['name'].lower() != self.addresses[addressindex]['alt'].lower() and addressdepth < 4 :
+                    # TODO Set the Lat/Long of this source record
+                    a = self.addresses[addressindex]['alt'].lower()
+                    ps = (self.lookupaddresses(a, addressdepth+1))
+                    if (ps.lat and ps.lon):
+                        (self.addresses[addressindex]['lat'] , self.addresses[addressindex]['long']) = (ps.lat, ps.lon)
                     print ("## Updated POS\t{} {},{}".format(self.addresses[addressindex]['name'], ps.lat, ps.lon))
                  
-                 return ps
+                    return ps
 
                   
-              # Been here looked this up
-              if self.addresses[addressindex]['used'] > 0:
+                # Been here looked this up
+                if self.addresses[addressindex]['used'] > 0:
                     return self.returnandcount(addressindex)
-              if self.addresses[addressindex]['name'].lower() != self.addresses[addressindex]['alt'].lower()  and addressdepth > 0:
+                if self.addresses[addressindex]['name'].lower() != self.addresses[addressindex]['alt'].lower()  and addressdepth > 0:
                     return self.returnandcount(addressindex)
 
 
-          # Been here and looked this up before
-          if self.addresses and myaddress.lower() in self.addresses.keys():
-              if self.addresses[myaddress.lower()]['name'].lower() == myaddress.lower() and self.addresses[myaddress.lower()]['alt'].lower() == theaddress.lower():
-                 return self.returnandcount(myaddress)
-              else:
-                 # The user gave a new address???
-                 theaddress = self.addresses[myaddress.lower()]['alt'].lower()
-          if self.addresses and theaddress.lower() in self.addresses.keys():
-              print ("#BBefore ??? {}\n\t{}\n\t{}".format(theaddress.lower() in self.addresses.keys(), self.addresses[addressindex]['name'], self.addresses[addressindex]['alt']))          
-          if (self.usecacheonly):
-              return (Pos(None,None))
-          if (len(theaddress)>0):
-              print(":Lookup: {} +within+ {}::".format(theaddress, trycountry), end=" ")
-              try:
-                  location = self.Geoapp.geocode(theaddress, country_codes=trycountry)
-              except:
-                  print("Error: Geocode {}".format(theaddress))
-                  time.sleep(1)  # extra sleep time
-                  location = None
-          else:
-              print(":Lookup: {} ::".format(myaddress), end=" ")
-              try:
-                  location = self.Geoapp.geocode(myaddress)
-              except:
-                  print("Error: Geocode {}".format(myaddress))
-                  time.sleep(1)     # extra sleep time
-                  location = None
-          if location:
-              location = location.raw
-              print(location['display_name'])
-              boundrybox = getattr(location, 'boundingbox')
-              bsize = abs(float(boundrybox[1])-float(boundrybox[0])) * abs(float(boundrybox[3])-float(boundrybox[2]))*1000000
-              locrec = {'name': myaddress, 'alt' : getattr(location, 'display_name'), 'country' : trycountry, 'type': getattr(location, 'type'), 'class': getattr(location,'class'), 'icon': getattr(location,'icon'),
+            # Been here and looked this up before
+            if self.addresses and myaddress.lower() in self.addresses.keys():
+                if self.addresses[myaddress.lower()]['name'].lower() == myaddress.lower() and self.addresses[myaddress.lower()]['alt'].lower() == theaddress.lower():
+                    return self.returnandcount(myaddress)
+                else:
+                    # The user gave a new address???
+                    theaddress = self.addresses[myaddress.lower()]['alt'].lower()
+            if self.addresses and theaddress.lower() in self.addresses.keys():
+                print ("#BBefore ??? {}\n\t{}\n\t{}".format(theaddress.lower() in self.addresses.keys(), self.addresses[addressindex]['name'], self.addresses[addressindex]['alt']))          
+            if (self.usecacheonly):
+                return (Pos(None,None))
+            if (len(theaddress)>0):
+                print(":Lookup: {} +within+ {}::".format(theaddress, trycountry), end=" ")
+                try:
+                    location = self.Geoapp.geocode(theaddress, country_codes=trycountry)
+                except:
+                    print("Error: Geocode {}".format(theaddress))
+                    time.sleep(1)  # extra sleep time
+                    location = None
+            else:
+                print(":Lookup: {} ::".format(myaddress), end=" ")
+                try:
+                    location = self.Geoapp.geocode(myaddress)
+                except:
+                    print("Error: Geocode {}".format(myaddress))
+                    time.sleep(1)     # extra sleep time
+                    location = None
+            if location:
+                location = location.raw
+                print(location['display_name'])
+                boundrybox = getattr(location, 'boundingbox')
+                bsize = abs(float(boundrybox[1])-float(boundrybox[0])) * abs(float(boundrybox[3])-float(boundrybox[2]))*1000000
+                locrec = {'name': myaddress, 'alt' : getattr(location, 'display_name'), 'country' : trycountry, 'type': getattr(location, 'type'), 'class': getattr(location,'class'), 'icon': getattr(location,'icon'),
                                 'place_id': getattr(location,'place_id'), 'lat': getattr(location, 'lat'),
                                 'long': getattr(location, 'lon'), 'boundry' : boundrybox, 'importance': getattr(location, 'importance'), 'size': bsize, 'used' : 0}
               
-          else:
-              print("----none----")
-              locrec = {'name': myaddress, 'alt' : theaddress, 'country' : trycountry, 'type': None, 'class':None, 'icon':None,'place_id': None,'lat': None, 'long': None, 'boundry' : None, 'importance': None, 'size': None, 'used' : 0}
-          time.sleep(1)         # Go slow so since Nominatim limits the speed for a free service
+            else:
+                print("----none----")
+                locrec = {'name': myaddress, 'alt' : theaddress, 'country' : trycountry, 'type': None, 'class':None, 'icon':None,'place_id': None,'lat': None, 'long': None, 'boundry' : None, 'importance': None, 'size': None, 'used' : 0}
+            time.sleep(1)         # Go slow so since Nominatim limits the speed for a free service
           
-          if not self.addresses:
-             self.addresses=dict()
-             self.addressalt=dict()
-          if locrec['name'].lower() in self.addresses.keys():
+            if not self.addresses:
+                self.addresses=dict()
+                self.addressalt=dict()
+            if locrec['name'].lower() in self.addresses.keys():
                 print ("#UU={} Changed\n\t{}\n\t{}".format(self.addresses[locrec['name'].lower()]['used'], myaddress, theaddress))
 
-          self.addresses[locrec['name'].lower()]= locrec
-          self.addressalt[locrec['alt'].lower()]= locrec['name'].lower()
+            self.addresses[locrec['name'].lower()]= locrec
+            self.addressalt[locrec['alt'].lower()]= locrec['name'].lower()
           
-          if location:
-             return self.returnandcount(locrec['name'])
-       return Pos(None,None)
+            if location:
+                return self.returnandcount(locrec['name'])
+        return Pos(None,None)
      
    
     def resolveaddresses(self, humans):
@@ -447,10 +447,10 @@ class GEDComGPSLookup:
                 humans[human].birth.pos = self.lookupaddresses(humans[human].birth.where)
                 # print ("{:30} @ B {:60} = {}".format(humans[human].name, humans[human].birth.where if humans[human].birth.where else '??', humans[human].birth.pos ))
             if (humans[human].home):
-               for homs in (range(0,len(humans[human].home))):
-                   h = humans[human].home[homs]
-                   if (humans[human].home[homs].where):
-                      humans[human].home[homs].pos = self.lookupaddresses(humans[human].home[homs].where)
+                for homs in (range(0,len(humans[human].home))):
+                    homeOfhome = humans[human].home[homs]
+                    if (homeOfhome.where):
+                        homeOfhome.pos = self.lookupaddresses(homeOfhome.where)
             if (humans[human].death and humans[human].death.where):
                 humans[human].death.pos = self.lookupaddresses(humans[human].death.where)
                 # print ("{:30} @ D {:60} = {}".format(humans[human].name, humans[human].death.where, humans[human].death.pos ))

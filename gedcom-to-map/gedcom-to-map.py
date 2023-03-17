@@ -2,11 +2,11 @@ import argparse
 
 from gedcomoptions import gvOptions
 from gedcomvisual import gedcom_to_map, Geoheatmap
-
+from const import VERSION
 
 class ArgParse(argparse.ArgumentParser):
     def __init__(self):
-        super().__init__(description="convert gedcom to kml file and lookup GPS addresses")
+        super().__init__(description="convert gedcom to kml file and lookup GPS addresses - V" + VERSION )
         self.add_argument('input_file', type=str, help="GEDCOM file, usually ends at .ged")
         self.add_argument('output_file', type=str, help="results file, extension will be added if none is given")
         self.add_argument('-main', type=str, default=None,  help="if this is missing it will use the first person in the GEDCOM file")
@@ -58,11 +58,11 @@ if __name__ == '__main__':
                                      HomeMarker = arg_parse.args.markhomes)
     places = {'native':'native'}
     if arg_parse.args.born or arg_parse.args.death:
-       places = {}
-       if arg_parse.args.born:
-          places['born'] = 'born'
-       if arg_parse.args.death:
-          places['death'] = 'death'
+        places = {}
+        if arg_parse.args.born:
+            places['born'] = 'born'
+        if arg_parse.args.death:
+            places['death'] = 'death'
        
     myGeoOptions.setstatic( arg_parse.args.input_file, arg_parse.args.output_file,
             arg_parse.args.format =='HTML', arg_parse.args.main, 

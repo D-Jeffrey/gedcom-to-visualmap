@@ -10,9 +10,9 @@ def merge_color(color_a: Color, color_b: Color, coef):
 
 
 class Tint:
-    def __init__(self, x, y, min: Color, max: Color):
-        self.min = min
-        self.max = max
+    def __init__(self, x, y, mincolor: Color, maxcolor: Color):
+        self.min = mincolor
+        self.max = maxcolor
         self.x = x
         self.y = y
 

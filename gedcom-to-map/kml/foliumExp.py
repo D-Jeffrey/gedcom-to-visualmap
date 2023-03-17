@@ -17,14 +17,15 @@ def dift(l):
     d  = ((random.random() * 0.001) - 0.0005)
     #d = 0
     if (l):
-       return (float(l)+d)
+        return (float(l)+d)
     else:
-       return None
+        return None
 
 
 class MyMarkClusters:
     def __init__(self, mymap, step):
         self.pmarker = dict()
+        self.cmarker = dict()
         self.markercluster = dict()
         self.mymap = mymap
         self.step = step
@@ -35,7 +36,7 @@ class MyMarkClusters:
             if (when):
                 # TODO this is a range date hack
                 if type(when) == type (" "):
-                   when = when[0:4]
+                    when = when[0:4]
                 when = int(when) - (int(when) % self.step)
                 markname = str(spot.lat)+ str(spot.lon)  + str(when)
             else:
@@ -48,12 +49,12 @@ class MyMarkClusters:
     def checkmarker(self, lat, long, name):
         if lat and long:
             markname = str(lat)+","+ str(long)
-            if (self.cmarker[mark] == 1):
+            if (self.cmarker[markname] == 1):
                 return None
             if (markname in self.markercluster.keys()):
                 return self.markercluster[markname]
             else:
-                self.markercluster[markname] = folium.MarkerCluster(name), add_to(self.mymap)
+                self.markercluster[markname] = folium.plugins.MarkerCluster(name).add_to(self.mymap)
                 return self.markercluster[markname]
 
 
@@ -161,10 +162,10 @@ class foliumExporter:
             for marker in mycluster.pmarker:
                 self.gOptions.step()
                 if type(mycluster.pmarker[marker][3]) == type(' '):
-                        print (mycluster.pmarker[marker])
+                    print (mycluster.pmarker[marker])
                 theyear = mycluster.pmarker[marker][3]
                 if theyear and not theyear in years: 
-                        years.append(theyear)
+                    years.append(theyear)
                
             years.sort()
             
@@ -224,56 +225,56 @@ class foliumExporter:
         i = 0
         self.gOptions.step("Building lines")
         for line in (list(filter (lambda line: hasattr(line,'style'), lines))):
-          self.gOptions.step()
-          i += 1
-          if ( line.style == 'Life'):
-             flc = flp
-             aicc = 'orange'
-             aici = 'child'
-             bicc = 'gray'
-             bici = 'cross'
-             lc = '#' + line.color.to_hexa()
-             da = []
-             ln = line.parentofhuman
-             g = ""
-             markertipname = "Life of " + line.name
-             fancyname = line.style + " of "+ line.parentofhuman
-             markhome = 'house'
-          else: 
-             flc = flr
-             aicc = 'green'
-             aici = 'baby'
-             bicc = 'green'
-             lc = 'green'
-             da = [5,5]
-             if (line.style == 'father'):  
-                 lc = 'blue'
-                 lc = '#2b8cbe'
-                 bici = 'male'
-                 bicc = 'blue'
-             if (line.style == 'mother'):  
-                 lc = 'pink'
-                 bici = 'female'
-                 bicc = 'pink'
-             ln = line.name
-             g = line.name.split(' ',2)[0] 
-             markertipname = line.name +  " " + line.style + " of "+ line.parentofhuman
-             fancyname = line.name + " " + line.style + " of "+ line.parentofhuman
-          fg = None
-          newfg = False
-          labelname = str(i) +' '+ ln
-          if (len(labelname) > 25): labelname = labelname[1:25] +"..."
-          gn = lgd_txt.format( txt=labelname, col= lc)
-          fm_line = []
+            self.gOptions.step()
+            i += 1
+            if ( line.style == 'Life'):
+                flc = flp
+                aicc = 'orange'
+                aici = 'child'
+                bicc = 'gray'
+                bici = 'cross'
+                lc = '#' + line.color.to_hexa()
+                da = []
+                ln = line.parentofhuman
+                g = ""
+                markertipname = "Life of " + line.name
+                fancyname = line.style + " of "+ line.parentofhuman
+                markhome = 'house'
+            else: 
+                flc = flr
+                aicc = 'green'
+                aici = 'baby'
+                bicc = 'green'
+                lc = 'green'
+                da = [5,5]
+                if (line.style == 'father'):  
+                    lc = 'blue'
+                    lc = '#2b8cbe'
+                    bici = 'male'
+                    bicc = 'blue'
+                if (line.style == 'mother'):  
+                    lc = 'pink'
+                    bici = 'female'
+                    bicc = 'pink'
+                ln = line.name
+                g = line.name.split(' ',2)[0] 
+                markertipname = line.name +  " " + line.style + " of "+ line.parentofhuman
+                fancyname = line.name + " " + line.style + " of "+ line.parentofhuman
+            fg = None
+            newfg = False
+            labelname = str(i) +' '+ ln
+            if (len(labelname) > 25): labelname = labelname[1:25] +"..."
+            gn = lgd_txt.format( txt=labelname, col= lc)
+            fm_line = []
           
           
-          bextra = "Born {}".format(line.human.birth.whenyear()) if line.human.birth and line.human.birth.when else ''
-          dextra = "Died {}".format(line.human.death.whenyear()) if line.human.death and line.human.death.when else ''
-          fancyname = fancyname + "<br>" + bextra +" "+ dextra if (bextra != '') or (dextra != '') else fancyname
-          if line.human.photo:
+            bextra = "Born {}".format(line.human.birth.whenyear()) if line.human.birth and line.human.birth.when else ''
+            dextra = "Died {}".format(line.human.death.whenyear()) if line.human.death and line.human.death.when else ''
+            fancyname = fancyname + "<br>" + bextra +" "+ dextra if (bextra != '') or (dextra != '') else fancyname
+            if line.human.photo:
                 fancyname = fancyname + "<img src='{}' width='150'>".format(line.human.photo)
-          difta = diftb = None
-          if (line.a and line.a.lat and line.a.lon):
+            difta = diftb = None
+            if (line.a and line.a.lat and line.a.lon):
                 # color = father/mother, born = baby, male, female
                 difta = [dift(line.a.lat), dift(line.a.lon)]
                 if self.gOptions.MarksOn:
@@ -288,22 +289,22 @@ class foliumExporter:
                             newfg = True
                         fg.add_child(mk)
                 # 'tombstone' or  'cross'
-          if (line.b and line.b.lat and line.b.lon):
+            if (line.b and line.b.lat and line.b.lon):
                 diftb = [dift(line.b.lat), dift(line.b.lon)]
                 if self.gOptions.MarksOn:
                     mk = folium.features.Marker(diftb,tooltip =markertipname , popup=fancyname, opacity=.5,icon=folium.Icon(color=bicc,icon=bici, prefix='fa', extraClasses = 'fas'))
                     if SortByLast:
-                            fg = self.getFeatureGroup(line.human.surname, line.prof)
+                        fg = self.getFeatureGroup(line.human.surname, line.prof)
                     if SortByPerson:
-                            fg = self.getFeatureGroup(line.parentofhuman, line.prof)
+                        fg = self.getFeatureGroup(line.parentofhuman, line.prof)
                         
                     if (not fg):
-                       fg = folium.FeatureGroup(name= gn, show=False)
-                       newfg = True
+                        fg = folium.FeatureGroup(name= gn, show=False)
+                        newfg = True
                     fg.add_child(mk)
-          if difta:
-            fm_line.append(tuple(difta))
-          if line.midpoints:
+            if difta:
+                fm_line.append(tuple(difta))
+            if line.midpoints:
                 # Change line type
                 lc = "gray"
                 for mids in (line.midpoints):
@@ -324,41 +325,41 @@ class foliumExporter:
                         mk = folium.features.Marker(midspot,tooltip =tip, opacity=.5, icon=folium.Icon(color=mkcolor,icon=mker, prefix='fa', extraClasses = 'fas'))
                         fg.add_child(mk)
                     
-          if diftb:
-            fm_line.append(tuple(diftb))
+            if diftb:
+                fm_line.append(tuple(diftb))
 
-          if (len(fm_line) > 1):                     
-            lcolor = line.color.to_hexa()
-            lcolor = lc
-            if line.prof:
-                lwidth = max(int(self.max_line_weight/math.exp(0.5*line.prof)), 2)
-            else:
-                lwidth = 1
-            if self.gOptions.UseAntPath:
-                if line.style == 'Life':
-                    pl = folium.plugins.AntPath(fm_line, weight=lwidth, opacity=.7, tooltip=ln, popup=fancyname, color=lcolor, lineJoin='arcs')
+            if (len(fm_line) > 1):                     
+                lcolor = line.color.to_hexa()
+                lcolor = lc
+                if line.prof:
+                    lwidth = max(int(self.max_line_weight/math.exp(0.5*line.prof)), 2)
                 else:
-                    pl = folium.features.PolyLine(fm_line, color=lcolor, weight=lwidth, opacity=1, tooltip=ln, popup=fancyname, dash_array = da, lineJoin='arcs' )
-            else:
-                pl = folium.features.PolyLine(fm_line, color=lcolor, weight=lwidth, opacity=1, tooltip=ln,  popup=fancyname, dash_array = da, lineJoin='arcs')
-            if (pl):
-              if SortByLast:
-                   fg = self.getFeatureGroup(line.human.surname, line.prof)
-              if SortByPerson:
-                   fg = self.getFeatureGroup(line.parentofhuman, line.prof)
+                    lwidth = 1
+                if self.gOptions.UseAntPath:
+                    if line.style == 'Life':
+                        pl = folium.plugins.AntPath(fm_line, weight=lwidth, opacity=.7, tooltip=ln, popup=fancyname, color=lcolor, lineJoin='arcs')
+                    else:
+                        pl = folium.features.PolyLine(fm_line, color=lcolor, weight=lwidth, opacity=1, tooltip=ln, popup=fancyname, dash_array = da, lineJoin='arcs' )
+                else:
+                    pl = folium.features.PolyLine(fm_line, color=lcolor, weight=lwidth, opacity=1, tooltip=ln,  popup=fancyname, dash_array = da, lineJoin='arcs')
+                if (pl):
+                    if SortByLast:
+                        fg = self.getFeatureGroup(line.human.surname, line.prof)
+                    if SortByPerson:
+                        fg = self.getFeatureGroup(line.parentofhuman, line.prof)
                         
               
-              if (not fg):
-                  fg = folium.FeatureGroup(name= gn, show=False)
-                  newfg = True
-              fg.add_child(pl)
+                    if (not fg):
+                        fg = folium.FeatureGroup(name= gn, show=False)
+                        newfg = True
+                    fg.add_child(pl)
           
-          print(f"Name:{line.human.name:30};\tParent:{line.parentofhuman:30};\tStyle:{line.style};\tfrom:{line.a}; to:{line.b}")
+            print(f"Name:{line.human.name:30};\tParent:{line.parentofhuman:30};\tStyle:{line.style};\tfrom:{line.a}; to:{line.b}")
 
-          # Did we just create a feature group for this person?
-          if newfg:
-            fg.layer_name = fg.layer_name + " ({})".format(len(fm_line) + 1 if diftb else 0 + 1 if diftb else 0)     
-            fm.add_child(fg)
+            # Did we just create a feature group for this person?
+            if newfg:
+                fg.layer_name = fg.layer_name + " ({})".format(len(fm_line) + 1 if diftb else 0 + 1 if diftb else 0)     
+                fm.add_child(fg)
 
         for fgn in sorted(self.fglastname.keys(), key=lambda x: self.fglastname[x][2], reverse = False ):
             # print ("]]{} : {}".format(fgn, fglastname[fgn][1]))          
@@ -378,7 +379,7 @@ class foliumExporter:
         # TODO Add a legend
         # FloatImage(image_file, bottom=0, left=86).add_to(fm)
         if SortByLast:
-               print ("Number of FG lastName: {}".format(len(self.fglastname)))
+            print ("Number of FG lastName: {}".format(len(self.fglastname)))
             
         self.Done()
         return

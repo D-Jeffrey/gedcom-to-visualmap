@@ -1,8 +1,17 @@
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+#
+#
+#  getcom-to-map : command-line version of interface
+#    See https://github.com/D-Jeffrey/gedcom-to-visualmap
+#
+#
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 import argparse
+import logging
 
 from gedcomoptions import gvOptions
 from gedcomvisual import gedcom_to_map, Geoheatmap
-from const import VERSION
+from const import NAME, VERSION, LOG_CONFIG
 
 class ArgParse(argparse.ArgumentParser):
     def __init__(self):
@@ -14,6 +23,8 @@ class ArgParse(argparse.ArgumentParser):
         self.add_argument('-max_missing', type=int, default=0, help="maximum generation missing (0 = no limit)")
         self.add_argument('-max_line_weight', type=int, default=20, help="Line maximum weight")
         self.add_argument('-everyone', action='store_true',  help="Plot everyone in your tree")
+        self.add_argument('-log', type=str, default='WARNING', choices=('ERROR', 'WARNING', 'INFO', 'DEBUG'), help="logging level")
+        self.add_argument('-logfile', type=str, default=None, help="log file name")
 
         self.geocodegroup = self.add_argument_group('Geocoding')
         self.geocodegroup.add_argument('-gpscache', action='store_true', dest='cacheonly', help="Use the GPS cache only")
@@ -45,8 +56,14 @@ class ArgParse(argparse.ArgumentParser):
 
 if __name__ == '__main__':
     arg_parse = ArgParse()
-
-
+    
+    
+    
+    logging.config.dictConfig(LOG_CONFIG)
+    logger = logging.getLogger("")
+    logger.info("Starting up %s %s", NAME, VERSION)
+    logging.basicConfig(level=logging.INFO)
+    
     myGeoOptions = gvOptions    (BornMark = not arg_parse.args.bornmarksoff, MarksOn = not arg_parse.args.marksoff, 
                                      HeatMap = not arg_parse.args.heatmapoff,
                                      MapStyle = arg_parse.args.maptiletype, 
@@ -73,5 +90,6 @@ if __name__ == '__main__':
         Geoheatmap(myGeoOptions)
     elif arg_parse.args.format =='KML': 
         gedcom_to_map(myGeoOptions)
-    pass       
+    logger.info('Finished')
+    exit(0)
         

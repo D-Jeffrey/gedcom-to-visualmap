@@ -1,3 +1,4 @@
+__all__ = ['gvOptions']
 import os
 import time
 
@@ -43,6 +44,8 @@ class gvOptions:
         self.stopping = False
         self.lookup = None
         self.totalpeople = None
+        self.stepinfo = ''
+        self.lastmax = self.counter
         
         
         
@@ -82,7 +85,7 @@ class gvOptions:
             self.ResultType = "kml"
         pathname, extension = os.path.splitext(self.Result)
         if extension == "" and self.Result != "":
-           self.Result = self.Result + "." + self.ResultType
+            self.Result = self.Result + "." + self.ResultType
 
     def setInput(self, GEDCOMinput):
         """ Set the Results Output file and type """
@@ -91,7 +94,7 @@ class gvOptions:
 
         pathname, extension = os.path.splitext(self.GEDCOMinput)
         if extension == "" and self.GEDCOMinput != "":
-           self.GEDCOMinput = self.GEDCOMinput + ".ged"
+            self.GEDCOMinput = self.GEDCOMinput + ".ged"
         self.resultpath = os.path.dirname(self.GEDCOMinput)
         if org != self.GEDCOMinput:
             self.parsed = False

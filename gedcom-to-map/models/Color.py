@@ -1,3 +1,5 @@
+__all__ = ['Color']
+
 class Color:
     def __init__(self, r=255, g=0, b=0, a=255):
         self.r = r

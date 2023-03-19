@@ -1,20 +1,34 @@
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+#
+#
+#  gedcomVisualGUI.py : GUI Interface main for gedcom-to-map
+#    See https://github.com/D-Jeffrey/gedcom-to-visualmap
+#
+#
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+
 #!/usr/bin/env python
 
 import os
-import sys
+import os.path
 import time
 import re
 import wx
+# pylint: disable=no-member
 import wx.lib.anchors as anchors
 import wx.lib.newevent
 import wx.lib.mixins.listctrl as listmix
 import _thread
 import webbrowser
+import logging
+import logging.config
 
-from const import VERSION
+from const import NAME, VERSION, LOG_CONFIG
 from gedcomoptions import gvOptions
 from gedcomvisual import doKML, doHTML, ParseAndGPS
 from models.Human import Human, LifeEvent
+
+logger = logging.getLogger(__name__)
 
 [   ID_CBMarksOn,
     ID_CBHeatMap,
@@ -108,8 +122,6 @@ class VisualMapFrame(wx.Frame):
         # ensure the parent's __init__ is called so the wx.frame is created
         #
         super(VisualMapFrame, self).__init__(*args, **kw)
-        #TODO improve logging control
-        self.log = sys.stdout
 
         self.SetMinSize((800,800))
         self.CreateStatusBar()
@@ -150,6 +162,7 @@ class VisualMapFrame(wx.Frame):
 
         optionsMenu = wx.Menu()
         optionsMenu.Append(wx.ID_REVERT, "&Reset to Default")
+        optionsMenu.Append(wx.ID_SETUP, "&Configuration")
         
         self.ActionMenu = ActionMenu =  wx.Menu()
         ActionMenu.Append(ID_BTNBROWSER,    "Open Result in &Browser")
@@ -179,6 +192,7 @@ class VisualMapFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.OnAbout, id=wx.ID_ABOUT)
         self.Bind(wx.EVT_MENU_RANGE, self.OnFileHistory, id=wx.ID_FILE1, id2=wx.ID_FILE9)
         self.Bind(wx.EVT_MENU, self.onOptionsReset, id=wx.ID_REVERT)
+        self.Bind(wx.EVT_MENU, self.onOptionsSetup, id=wx.ID_SETUP)
         self.Bind(wx.EVT_MENU, self.OnOpenCSV, id = ID_BTNCSV)
         self.Bind(wx.EVT_MENU, self.OnOpenBrowser, id = ID_BTNBROWSER)
     
@@ -197,10 +211,11 @@ class VisualMapFrame(wx.Frame):
 
     
     def OnFileOpenDialog(self, evt):
+
         dDir = os.getcwd()
         if panel and panel.gO:
-           infile = panel.gO.get('GEDCOMinput')
-           if infile != '':
+            infile = panel.gO.get('GEDCOMinput')
+            if infile != '':
                 dDir, filen  = os.path.split(infile)
         dlg = wx.FileDialog(self,
                            defaultDir = dDir,
@@ -210,7 +225,7 @@ class VisualMapFrame(wx.Frame):
 
         if dlg.ShowModal() == wx.ID_OK:
             path = dlg.GetPath()
-            self.log.write("You selected %s\n" % path)
+            logger.debug("You selected %s" % path)
             panel.setInputFile(path)
 
             # add it to the history
@@ -225,10 +240,11 @@ class VisualMapFrame(wx.Frame):
         self.menu.Destroy()
 
     def OnFileHistory(self, evt):
+
         # get the file based on the menu ID
         fileNum = evt.GetId() - wx.ID_FILE1
         path = self.filehistory.GetHistoryFile(fileNum)
-        self.log.write("You selected %s\n" % path)
+        logger.debug("You selected %s" % path)
 
         # add it back to the history so it will be moved up the list
         self.filehistory.AddFileToHistory(path)
@@ -246,7 +262,55 @@ class VisualMapFrame(wx.Frame):
         self.Bind(wx.EVT_BUTTON, self.OnButton, b)
     """
     def onOptionsReset(self, event):
-        pass
+        wx.MessageBox("Does nothing",
+                      "reset options",
+                      wx.OK|wx.ICON_INFORMATION)
+        
+    def onOptionsSetup(self, event):
+        dialog = ConfigDialog(None, title='Configuration')
+        result = dialog.ShowModal()
+        if result == wx.ID_OK:
+            logging_level = dialog.get_logging_level()
+            logging.basicConfig(level=logging_level)
+            logging.info('Logging level set to: %s', logging_level)
+        dialog.Destroy()
+        
+#==============================================================
+class ConfigDialog(wx.Dialog):
+    
+    def __init__(self, parent, title):
+        wx.Dialog.__init__(self, parent, title=title)
+
+        logging_level_choices = ['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL']
+        #TODO this does not work with getting the previous log level
+        current_level = logging.getLevelName(logging.getLogger().getEffectiveLevel())
+        self.radio_box = wx.RadioBox(self, label='Select Logging Level:', choices=logging_level_choices, majorDimension=5, style=wx.RA_SPECIFY_COLS)
+        self.radio_box.SetStringSelection(current_level)
+
+        ok_button = wx.Button(self, wx.ID_OK, label='OK')
+        cancel_button = wx.Button(self, wx.ID_CANCEL, label='Cancel')
+
+        button_box = wx.BoxSizer(wx.HORIZONTAL)
+        button_box.Add(ok_button, 0, wx.ALL, 5)
+        button_box.Add(cancel_button, 0, wx.ALL, 5)
+
+        message = wx.StaticText(self, label='This does not work yet.  It does not correctly adjust the log level')
+        message.SetForegroundColour(wx.Colour(255, 0, 0))
+
+        main_box = wx.BoxSizer(wx.VERTICAL)
+        main_box.Add(self.radio_box, 0, wx.ALL, 5)
+        main_box.Add(message, 0, wx.ALIGN_CENTER|wx.ALL, 5)
+        main_box.Add(button_box, 0, wx.ALIGN_CENTER|wx.ALL, 5)
+        
+
+
+        self.SetSizer(main_box)
+        main_box.Fit(self)
+
+    def get_logging_level(self):
+        return self.radio_box.GetStringSelection()
+
+        
 
 
 #=============================================================
@@ -259,9 +323,9 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin):
 
 class PeopleListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
     def __init__(self, parent, humans):
+
         wx.Panel.__init__(self, parent, -1, style=wx.WANTS_CHARS)
 
-        self.log = sys.stdout
         self.gO = None
         tID = wx.NewIdRef()
 
@@ -367,9 +431,10 @@ class PeopleListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
         return (self.sm_dn, self.sm_up)
 
     def OnItemSelected(self, event):
-        ##print(event.GetItem().GetTextColour())
+
+      
         self.currentItem = event.Index
-        self.log.write("OnItemSelected: %s, %s, %s, %s\n" %
+        logger.debug("%s, %s, %s, %s" %
                            (self.currentItem,
                             self.list.GetItemText(self.currentItem),
                             self.list.GetItemText(self.currentItem, 1),
@@ -379,59 +444,70 @@ class PeopleListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
         event.Skip()
 
     def OnItemDeselected(self, event):
+
         item = event.GetItem()
-        self.log.write("OnItemDeselected: %d" % event.Index)
+        logger.debug("%d" % event.Index)
 
      
     def OnItemActivated(self, event):
+
         self.currentItem = event.Index
-        self.log.write("OnItemActivated: %s\nTopItem: %s" %
+        logger.debug("%s TopItem: %s" %
                            (self.list.GetItemText(self.currentItem), self.list.GetTopItem()))
         if self.gO:
            self.gO.set('Main', self.list.GetItemText(self.currentItem, 2))
 
     def OnBeginEdit(self, event):
-        self.log.write("OnBeginEdit")
+
+        logger.debug("")
         event.Allow()
 
     def OnEndEdit(self, event):
-        self.log.write("OnEndEdit: " + event.GetText())
+
+        logger.debug(event.GetText())
         event.Allow()
 
     def OnItemDelete(self, event):
-        self.log.write("OnItemDelete\n")
+
+        logger.debug("")
 
     def OnColClick(self, event):
-        self.log.write("OnColClick: %d\n" % event.GetColumn())
+
+        logger.debug("%d" % event.GetColumn())
         event.Skip()
 
     def OnColRightClick(self, event):
+
         item = self.list.GetColumn(event.GetColumn())
-        self.log.write("OnColRightClick: %d %s\n" %
+        logger.debug("%d %s" %
                            (event.GetColumn(), (item.GetText(), item.GetAlign(),
                                                 item.GetWidth(), item.GetImage())))
         if self.list.HasColumnOrderSupport():
-            self.log.write("OnColRightClick: column order: %d\n" %
+            logger.debug("column order: %d" %
                                self.list.GetColumnOrder(event.GetColumn()))
 
     def OnColBeginDrag(self, event):
-        self.log.write("OnColBeginDrag\n")
+
+        logger.debug("")
         ## Show how to not allow a column to be resized
         #if event.GetColumn() == 0:
         #    event.Veto()
 
     def OnColDragging(self, event):
-        self.log.write("OnColDragging\n")
+
+        logger.debug("")
 
     def OnColEndDrag(self, event):
-        self.log.write("OnColEndDrag\n")
+
+        logger.debug("")
 
     
 
     def OnGetItemsChecked(self, event):
+
         itemcount = self.list.GetItemCount()
         itemschecked = [i for i in range(itemcount) if self.list.IsItemChecked(item=i)]
-        self.log.write("OnGetItemsChecked: %s \n" % itemschecked)
+        logger.debug("%s " % itemschecked)
 
     
 
@@ -449,7 +525,7 @@ class VisualMapPanel(wx.Panel):
         # ensure the parent's __init__ is called so the wx.frame is created
         #
         super(VisualMapPanel, self).__init__(*args, **kw)
-        self.log = sys.stdout
+
 
         self.SetMinSize((800,800))
         self.frame = self.TopLevelParent        
@@ -693,7 +769,8 @@ class VisualMapPanel(wx.Panel):
             self.NeedReload()
 
     def EvtRadioBox(self, event):
-        self.log.write('EvtRadioBox: %d is %d\n' % (event.GetId(), event.GetInt()))
+
+        logger.debug('%d is %d' % (event.GetId(), event.GetInt()))
         if event.GetId() == ID_RBResultHTML:
             self.gO.set('ResultHTML', event.GetInt() == 0)
            
@@ -701,23 +778,26 @@ class VisualMapPanel(wx.Panel):
         elif event.GetId() ==  ID_RBGroupBy:
             self.gO.GroupBy = event.GetSelection()
         else:
-            self.log.write('We have a Problem')
+            logger.debug.error('We have a Problem')
         
 
     def EvtText(self, event):
+
         if event.GetId() == ID_TEXTResult:
             event.GetString()
             self.gO.set('Result', event.GetString())
-            self.config.Write("Result", self.gO.get('Result') )
+            logger.debug("Result {}".format(self.gO.get('Result')) )
         else:
-            self.log.write("uncontrolled TEXT")
+            logger.error("uncontrolled TEXT")
 
     def EvtCheckBox(self, event):
-        self.log.write('EvtCheckBox: {} for {}\n'.format( event.IsChecked(), event.GetId()))
+
+        logger.debug('%s for %i', event.IsChecked(), event.GetId() )
         cb = event.GetEventObject()
         if cb.Is3State():
-            self.log.write("\t3StateValue: %s\n" % cb.Get3StateValue())
+            logger.debug("3StateValue: %s" % cb.Get3StateValue())
         cbid = event.GetId()
+        logger.debug('set %s to %s (%s)', IDtoAttr[cbid][0], cb.GetValue(), IDtoAttr[cbid][1] )
         panel.gO.set(IDtoAttr[cbid][0], cb.GetValue())
         if cbid == ID_CBHeatMap or cbid == ID_CBHeatMapTimeLine or cbid == ID_CBMarksOn:
             self.SetupButtonState()
@@ -725,8 +805,10 @@ class VisualMapPanel(wx.Panel):
             self.NeedRedraw()
         elif (IDtoAttr[cbid][1] == 'Reload'):
             self.NeedReload()
+        elif (IDtoAttr[cbid][1] == ''):
+            pass # Nothing to do for this one
         else:
-            self.log.write("uncontrolled CB")
+            logger.error("uncontrolled CB %d with '%s'", cbid,  IDtoAttr[cbid][1])
         if cbid == ID_CBAllEntities and cb.GetValue():
             dlg = None
             # TODO Fix this up
@@ -745,7 +827,7 @@ class VisualMapPanel(wx.Panel):
 
     def EvtButton(self, event):
         id = event.GetId() 
-        self.log.write("Click! (%d)\n" % id)
+        logger.debug("Click! (%d)" % id)
         if id == ID_BTNLoad:
                 self.LoadGEDCOM()
                 
@@ -760,12 +842,13 @@ class VisualMapPanel(wx.Panel):
                 self.NeedRedraw()
                 self.NeedReload()
         else:
-            self.log.write("uncontrolled ID")
+            logger.error("uncontrolled ID")
     
 
     def EvtListBox(self, event):
+
         id = event.GetId()
-        self.log.write('EvtListBox: {}, {}, {}\n'.format(event.GetString(),
+        logger.debug('{}, {}, {}'.format(event.GetString(),
                             event.IsSelection(),
                             event.GetSelection()
                             # event.GetClientData()
@@ -779,14 +862,16 @@ class VisualMapPanel(wx.Panel):
                 places = {'native':'native'}
             panel.gO.PlaceType = places
         else:
-            print ("Uncontrol LISTbox")
+            logger.error ("Uncontrol LISTbox")
     
 
     def EvtSlider(self, event):
-        self.log.write('Slider: %s\n' % event.GetSelection())
+
+        logger.debug('%s' % event.GetSelection())
         panel.gO.HeatMapTimeStep = event.GetSelection()
 
     def OnMyTimer(self, evt):
+
         status = ''
         if self.gO:
             if self.gO.ShouldStop() or not self.gO.running:
@@ -902,6 +987,7 @@ class VisualMapPanel(wx.Panel):
             self.d.LISTPlaceType.Enable()
 
     def SetupOptions(self):
+
         self.config = wx.Config("gedcomVisualGUI")
         
         
@@ -961,11 +1047,12 @@ class VisualMapPanel(wx.Panel):
         pass
     
     def OpenCSV(self):
+
         csvfile = self.gO.get('gpsfile')
         csvprogram = self.gO.get('csvprogram')
         
         if csvfile and csvfile != '':
-            print (csvprogram + " " + csvfile)
+            logger.debug  (csvprogram + " " + csvfile)
             wx.Execute(csvprogram + " " + csvfile, wx.EXEC_ASYNC)
         pass
     def OpenBrowser(self):
@@ -1029,37 +1116,38 @@ class BackgroundActions:
         self.updateinfo = self.updateinfo + line
         
     def Run(self):
+
         while self.keepGoing:
             # We communicate with the UI by sending events to it. There can be
             # no manipulation of UI objects from the worker thread.
             if self.do != 0:
-                print (f"triggered thread {self.do}")
+                logger.info(f"triggered thread {self.do}")
                 self.gOptions.stopping = False
                 if self.do & 1 or (self.do & 4 and not self.gOptions.parsed):
-                    print("start ParseAndGPS")
+                    logger.info("start ParseAndGPS")
                     if hasattr(self, 'humans'):
                         if self.humans:
                             del self.humans
-                    print("ParseAndGPS")
+                    logger.info("ParseAndGPS")
                     self.humans = ParseAndGPS(self.gOptions)
-                    print("human count {}".format(len(self.humans)))
+                    logger.info("human count %i", len(self.humans))
                     self.updategrid = True
                     self.AddInfo(f"Loaded {len(self.humans)} people")
                     if self.gOptions.Main:
                         self.AddInfo(f"with '{self.gOptions.Main}' as starting person", False)
 
                 if self.do & 2:
-                    print("start do 2")
+                    logger.info("start do 2")
                     if (self.gOptions.parsed):
-                        print("ParseAndGPS")
+                        logger.info("ParseAndGPS")
                         if (self.gOptions.ResultHTML):
                             doHTML(self.gOptions, self.humans)
                             self.AddInfo(f"HTML generated resulting in {self.gOptions.totalpeople} people")
                         else: 
                             doKML(self.gOptions, self.humans)
                     else:
-                        print("not parsed")
-                    print("done draw")
+                        logger.info("not parsed")
+                    logger.info("done draw")
                 
                 self.do = 0
                 self.gOptions.stop()
@@ -1078,6 +1166,10 @@ if __name__ == '__main__':
     # When this module is run (not imported) then create the app, the
     # frame, show it, and start the event loop.
 
+    logging.config.dictConfig(LOG_CONFIG)
+
+    logger.setLevel(logging.DEBUG)
+    logger.info("Starting up %s %s", NAME, VERSION)
     app = wx.App()
     frm = VisualMapFrame(None, title='GEDCOM Visual Map', size=(800, 800), style = wx.DEFAULT_FRAME_STYLE)
     panel = VisualMapPanel(frm)
@@ -1086,4 +1178,5 @@ if __name__ == '__main__':
         
     frm.Show()
     app.MainLoop()
+    logger.info('Finished')
     exit(0)

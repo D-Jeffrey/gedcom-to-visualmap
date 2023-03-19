@@ -1,4 +1,5 @@
-import numpy as nump
+__all__ = ['MyMarkClusters', 'foliumExporter']
+
 import math
 import random
 import folium 
@@ -6,10 +7,13 @@ import folium
 from models.Line import Line
 from models.Pos import Pos
 import os.path
-import time
+import logging
 
 from gedcomoptions import gvOptions
 from folium.plugins import FloatImage, AntPath, MiniMap, HeatMapWithTime
+
+logger = logging.getLogger(__name__)
+
 legend_file = 'legend.png'
 lgd_txt = '<span style="color: {col};">{txt}</span>'
 
@@ -65,6 +69,7 @@ class foliumExporter:
         self.max_line_weight = gOptions.MaxLineWeight
         self.gOptions = gOptions
         self.fm = folium.Map(location=[0, 0], zoom_start=2)
+        self.fglastname = dict()
         
         backTypes = ('Open Street Map', 'Stamen Terrain', 'CartoDB Positron', 'Stamen Toner',  'Stamen Watercolor', 'Cartodbdark_matter')
         if (self.gOptions.MapStyle < 1 or self.gOptions.MapStyle > len(backTypes)):
@@ -97,7 +102,6 @@ class foliumExporter:
         return thefg
 
     def export(self, main: Pos, lines: [Line], ntag =""):
-
         SortByLast = (self.gOptions.GroupBy == 1)
         SortByPerson = (self.gOptions.GroupBy == 2)
         fm = self.fm
@@ -112,12 +116,12 @@ class foliumExporter:
 
         
 
-        """ *****************************
-            HEAT MAP Section
-            *****************************
-        """
+        """ ***************************** """ 
+        """    HEAT MAP Section           """ 
+        """ ***************************** """ 
+        
         if self.gOptions.HeatMapTimeLine:
-            print("building clusters")    
+            logger.info("building clusters")    
            
             self.gOptions.step("Building Heatmap Clusters")
             for line in lines:
@@ -162,7 +166,7 @@ class foliumExporter:
             for marker in mycluster.pmarker:
                 self.gOptions.step()
                 if type(mycluster.pmarker[marker][3]) == type(' '):
-                    print (mycluster.pmarker[marker])
+                    logger.debug (mycluster.pmarker[marker])
                 theyear = mycluster.pmarker[marker][3]
                 if theyear and not theyear in years: 
                     years.append(theyear)
@@ -217,10 +221,10 @@ class foliumExporter:
         # missing tag a the end on purpose
         fm.default_js.append(['hack.js', 'https://use.fontawesome.com/releases/v5.15.4/js/all.js" data-auto-replace-svg="nest'])
     
-        """ *****************************
-            Line Drawing Section
-            *****************************
-        """
+        """ ***************************** """ 
+        """     Line Drawing Section      """ 
+        """ ***************************** """ 
+        
         
         i = 0
         self.gOptions.step("Building lines")
@@ -354,7 +358,7 @@ class foliumExporter:
                         newfg = True
                     fg.add_child(pl)
           
-            print(f"Name:{line.human.name:30};\tParent:{line.parentofhuman:30};\tStyle:{line.style};\tfrom:{line.a}; to:{line.b}")
+            logger.info(f"Name:{line.human.name:30};\tParent:{line.parentofhuman:30};\tStyle:{line.style};\tfrom:{line.a}; to:{line.b}")
 
             # Did we just create a feature group for this person?
             if newfg:
@@ -362,7 +366,7 @@ class foliumExporter:
                 fm.add_child(fg)
 
         for fgn in sorted(self.fglastname.keys(), key=lambda x: self.fglastname[x][2], reverse = False ):
-            # print ("]]{} : {}".format(fgn, fglastname[fgn][1]))          
+            logger.debug ("]]%s : %s", fgn, self.fglastname[fgn][1])
             self.fglastname[fgn][0].layer_name = "{} : {}".format(fgn, self.fglastname[fgn][1])          
             fm.add_child(self.fglastname[fgn][0])
         sc = False if self.gOptions.showLayerControl else True
@@ -374,12 +378,12 @@ class foliumExporter:
             if self.gOptions.MarkStarOn:
                 folium.Marker([dift(main.birth.pos.lat), dift(main.birth.pos.lon)], tooltip = main.name, opacity=0.5, icon=folium.Icon(color='lightred',icon='star', prefix='fa', iconSize = ['50%', '50%'])).add_to(fm)
         else:
-            print ("No GPS locations to generate a map.")
+            logger.warning ("No GPS locations to generate a map.")
         
         # TODO Add a legend
         # FloatImage(image_file, bottom=0, left=86).add_to(fm)
         if SortByLast:
-            print ("Number of FG lastName: {}".format(len(self.fglastname)))
+            logger.info ("Number of FG lastName: %i", len(self.fglastname))
             
         self.Done()
         return

@@ -1,10 +1,14 @@
+__all__ = ['KmlExporter']
+
 import math
 
 import simplekml as simplekml
 from models.Line import Line
 from models.Pos import Pos
 from gedcomoptions import gvOptions
+import logging
 
+logger = logging.getLogger(__name__)
 
 class KmlExporter:
     def __init__(self, gOp: gvOptions):
@@ -30,7 +34,7 @@ class KmlExporter:
                 (main.lon, main.lat)
             ])
         else:
-            print ("No GPS locations to generate a map.")
+            logger.error ("No GPS locations to generate a map.")
 
         self.gOp.step("Generating KML")
         for line in lines:
@@ -53,6 +57,6 @@ class KmlExporter:
                     1
                 )
             else:
-                print("skipping {} ({},{}) ({},{})".format(line.name, line.a.lon, line.a.lat, line.b.lon, line.b.lat) )
+                logger.warning ("skipping {} ({},{}) ({},{})".format(line.name, line.a.lon, line.a.lat, line.b.lon, line.b.lat) )
         self.Done()
    

@@ -1,5 +1,8 @@
+__all__ = ['GedcomParser', 'DateFormatter']
+
 from typing import Dict
 from datetime import datetime
+import logging
 
 from ged4py import GedcomReader
 from ged4py.model import Record, NameRec
@@ -8,6 +11,8 @@ from ged4py.date import DateValueVisitor
 from models.Human import Human, LifeEvent
 from models.Pos import Pos
 from gedcomoptions import gvOptions
+
+logger = logging.getLogger(__name__)
 
 homelocationtags = ('OCCU', 'CENS', 'EDUC')
 otherlocationtags = ('CHR', 'BAPM', 'BASM', 'BAPL', 'MARR', 'IMMI', 'NATU', 'ORDN','ORDI', 'RETI', 
@@ -35,7 +40,7 @@ def getgdate (gstr):
             y = y 
             #TODO need to fix up
         else:
-            print ("Date type; {}".format(gstr.value.kind.name))
+            logger.warning ("Date type; %s".gstr.value.kind.name)
         y = (y, 1000) [y == None]
         m = (m, 1) [m == None]
         d = (d, 1) [d == None]
@@ -135,10 +140,10 @@ class GedcomParser:
                     # If we don't have an address it is of no use
                     alladdr = alladdr.strip()
                     if alladdr != '':
-                        hdate = getgdate(hom.sub_tag("DATE"))
-                        #if hdate in homes:
-                        #    print (f"**Double RESI location for : {human.name} on {hdate} @ {alladdr}")
-                        homes[hdate] = LifeEvent(alladdr, hom.sub_tag("DATE"))
+                        homedate = getgdate(hom.sub_tag("DATE"))
+                        if homedate in homes:
+                            logger.debug ("**Double RESI location for : %s on %s @ %s", human.name, homedate , alladdr)
+                        homes[homedate] = LifeEvent(alladdr, hom.sub_tag("DATE"))
         for tags in (homelocationtags):
             allhomes=record.sub_tags(tags)
             if allhomes:
@@ -146,8 +151,8 @@ class GedcomParser:
                     # If we don't have an address it is of no use
                     plac = getplace(hom)
                     if plac: 
-                        hdate = getgdate(hom.sub_tag("DATE"))
-                        homes[hdate] = LifeEvent(plac, hom.sub_tag("DATE"), what='home')
+                        homedate = getgdate(hom.sub_tag("DATE"))
+                        homes[homedate] = LifeEvent(plac, hom.sub_tag("DATE"), what='home')
         for tags in (otherlocationtags):
             allhomes=record.sub_tags(tags)
             if allhomes:
@@ -159,8 +164,8 @@ class GedcomParser:
                         otherstype = hom.sub_tag("TYPE")
                         if otherstype:
                             otherwhat = otherstype.value
-                        hdate = getgdate(hom.sub_tag("DATE"))
-                        homes[hdate] = LifeEvent(plac, hom.sub_tag("DATE"), what=otherwhat)
+                        homedate = getgdate(hom.sub_tag("DATE"))
+                        homes[homedate] = LifeEvent(plac, hom.sub_tag("DATE"), what=otherwhat)
                     
                     
         # Sort them by year          

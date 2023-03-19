@@ -1,12 +1,15 @@
+__all__ = ['Xlator', 'WordXlator', 'GEDComGPSLookup']
+
 import time
 import csv
 import os.path
 import tempfile
 import json
 import urllib.request
-# import pyap
 import re
 import hashlib
+import logging
+
 
 from models.Human import Human, LifeEvent
 from models.Pos import Pos
@@ -14,6 +17,8 @@ from const import GV_COUNTRIES_JSON
 from geopy.geocoders import Nominatim
 from pprint import pprint
 from gedcomoptions import gvOptions
+
+logger = logging.getLogger(__name__)
 
 fixuplist   = {r'\bof\s': '',
                r'\spart of\s' : ' ', 
@@ -39,8 +44,10 @@ defaultcountry = "CA"
 def readCachedURL(cfile, url):
     nfile = os.path.join(tempfile.gettempdir() , cfile)
     if not os.path.exists(nfile):
+        logger.debug("Attempting to request %s as %s", urle)
         webUrl  = urllib.request.urlopen(url)
         data = webUrl.read()
+        logger.debug("request read, saving to %s", cfile)
         with open(nfile, 'wb') as file:
             file.write(data)
         
@@ -75,10 +82,11 @@ class WordXlator(Xlator):
           r'\b'+r'\b|\b'.join(map(re.escape, self.keys(  )))+r'\b')
     
 class GEDComGPSLookup:
-    def __init__(self, humans,  gvOptions: gvOptions):    
+    def __init__(self, humans,  gvOptions: gvOptions):
+
         self.addresses = None
         self.addresslist = None
-        self.usecacheonly = not gvOptions.UseGPS
+        self.usecacheonly = not gvOptions.get('CacheOnly')
         self.gOptions = gvOptions 
         self.orgMD5 = None
         self.humans = humans
@@ -100,7 +108,7 @@ class GEDComGPSLookup:
                                 self.addresslist = [line]
                         
                     except csv.Error as e:
-                        print ('Error reading GPS cache file {}, line {}: {}'.format(cache_filename[0], readfrom.line_num, e))
+                        logger.error  ('Error reading GPS cache file {}, line {}: {}'.format(cache_filename[0], readfrom.line_num, e))
              
         if (self.addresslist):
             self.addresses = dict()
@@ -125,10 +133,10 @@ class GEDComGPSLookup:
                          self.addresslist[a]['alt'] +  
                          str(self.addresslist[a]['lat']) +  
                          str(self.addresslist[a]['long'])).encode(errors='ignore'))
-            print ("Loaded {} cached records".format(len(self.addresses)))    
+            logger.info ("Loaded {} cached records".format(len(self.addresses)))    
             self.gOptions.step("Loaded {} cached records".format(len(self.addresses)))
         else:
-            print ("No GPS cached addresses to use")
+            logger.info ("No GPS cached addresses to use")
             self.gOptions.step("No GPS cached addresses")
         
         
@@ -171,10 +179,10 @@ class GEDComGPSLookup:
                              str(self.addresslist[a]['lat']) +  
                              str(self.addresslist[a]['long'])).encode(errors='ignore'))
             if newMD5.hexdigest() == self.orgMD5.hexdigest():
-                print("*Warning* Blank GPS Cache has not changed")
+                logger.debug("GPS Cache has not changed")
                 return
         else:
-            print("**Warning No Addresses in addresslist")
+            logger.warning("No Addresses in addresslist")
         used = 0
         usedNone = 0
         totaladdr = 0
@@ -188,15 +196,15 @@ class GEDComGPSLookup:
                         try:
                             os.remove(os.path.join(resultpath,cache_filename[2]))
                         except:
-                            print("**Error removing {}".format(os.path.join(resultpath,cache_filename[2])))
+                            logger.error("removing {}".format(os.path.join(resultpath,cache_filename[2])))
                     try:
                         os.rename(os.path.join(resultpath,cache_filename[1]), os.path.join(resultpath,cache_filename[2]))
                     except:
-                        print("**Error renaming {}".format(os.path.join(resultpath,cache_filename[1])))
+                        logger.error("renaming {}".format(os.path.join(resultpath,cache_filename[1])))
                 try:
                     os.rename(os.path.join(resultpath,cache_filename[0]), os.path.join(resultpath,cache_filename[1]))
                 except:
-                    print("**Error renaming {}".format(os.path.join(resultpath,cache_filename[0])))
+                    logger.error("renaming {}".format(os.path.join(resultpath,cache_filename[0])))
             self.gOptions.set('gpsfile', os.path.join(resultpath,cache_filename[0]))     
             with open(os.path.join(resultpath,cache_filename[0]), "w", newline='', encoding='utf-8') as csvfile:
                 
@@ -239,7 +247,7 @@ class GEDComGPSLookup:
                         totaladdr += self.addresses[xaddr]['used']
                         if (self.addresses[xaddr]['lat'] is None): usedNone += 1
 
-        print("Unique addresses: {} and {} have missing GPS for a Total of {}".format(used, usedNone, totaladdr))   
+        logger.info("Unique addresses: {} and {} have missing GPS for a Total of {}".format(used, usedNone, totaladdr))   
         self.gOptions.step(f"Saved {totaladdr} addresses")  
 
         
@@ -300,20 +308,21 @@ class GEDComGPSLookup:
     def returnandcount(self, name):
         name = name.lower()
         # if self.addresses[name]['size'] and self.addresses[name]['used'] == 0 and self.addresses[name]['size'] > 100000:
-        #        print(" !Large location for: {} ({})".format(self.addresses[name]['name'], self.addresses[name]['size']))
+        #        logger.debug(" !Large location for: {} ({})".format(self.addresses[name]['name'], self.addresses[name]['size']))
         self.addresses[name]['used'] += 1
         # This large areas maps the trace look wrong, because they are most likely a state or provience.  Flag them to the user.
         return Pos(self.addresses[name]['lat'], self.addresses[name]['long'])
     
     def lookupaddresses(self, myaddress, addressdepth=0):
         self.gOptions.step(info=myaddress)  
+        
         addressindex = None
         theaddress = None
         trycountry = ""
 
        
         if myaddress:
-            if (debug): print ("### {} {}".format( addressdepth, myaddress))
+            logger.debug("### {} {}".format( addressdepth, myaddress))
             if self.addresses:
                 # straight up, is it a valid existing cached address?
                 if myaddress.lower() in self.addresses.keys():
@@ -326,7 +335,7 @@ class GEDComGPSLookup:
                     if (ps.lat and ps.lon):
                         # Do we need to look this up?
                         if (not self.addresses[self.addressalt[myaddress.lower()].lower()]['lat']):
-                            print ("##* Updated POS\t{}\t{} {},{}".format(a['name'], self.addressalt[myaddress.lower()].lower(), ps.lat, ps.lon))
+                            logger.debug ("##* Updated POS\t{}\t{} {},{}".format(a['name'], self.addressalt[myaddress.lower()].lower(), ps.lat, ps.lon))
                     (self.addresses[self.addressalt[myaddress.lower()].lower()]['lat'] , self.addresses[self.addressalt[myaddress.lower()].lower()]['long']) = (ps.lat, ps.lon)
                     (self.addresses[a['name'].lower()]['lat'], self.addresses[a['name'].lower()]['lon']) = (ps.lat, ps.lon)
                     
@@ -369,7 +378,7 @@ class GEDComGPSLookup:
                     ps = (self.lookupaddresses(a, addressdepth+1))
                     if (ps.lat and ps.lon):
                         (self.addresses[addressindex]['lat'] , self.addresses[addressindex]['long']) = (ps.lat, ps.lon)
-                    print ("## Updated POS\t{} {},{}".format(self.addresses[addressindex]['name'], ps.lat, ps.lon))
+                    logger.debug ("## Updated POS\t{} {},{}".format(self.addresses[addressindex]['name'], ps.lat, ps.lon))
                  
                     return ps
 
@@ -389,28 +398,28 @@ class GEDComGPSLookup:
                     # The user gave a new address???
                     theaddress = self.addresses[myaddress.lower()]['alt'].lower()
             if self.addresses and theaddress.lower() in self.addresses.keys():
-                print ("#BBefore ??? {}\n\t{}\n\t{}".format(theaddress.lower() in self.addresses.keys(), self.addresses[addressindex]['name'], self.addresses[addressindex]['alt']))          
+                logger.debug ("#BBefore ??? {}\n\t{}\n\t{}".format(theaddress.lower() in self.addresses.keys(), self.addresses[addressindex]['name'], self.addresses[addressindex]['alt']))          
             if (self.usecacheonly):
                 return (Pos(None,None))
             if (len(theaddress)>0):
-                print(":Lookup: {} +within+ {}::".format(theaddress, trycountry), end=" ")
+                logger.debug(":Lookup: %s +within+ %s::", theaddress, trycountry)
                 try:
                     location = self.Geoapp.geocode(theaddress, country_codes=trycountry)
                 except:
-                    print("Error: Geocode {}".format(theaddress))
+                    logger.error("Error: Geocode %", theaddress)
                     time.sleep(1)  # extra sleep time
                     location = None
             else:
-                print(":Lookup: {} ::".format(myaddress), end=" ")
+                logger.info(":Lookup: %s ::", myaddress)
                 try:
                     location = self.Geoapp.geocode(myaddress)
                 except:
-                    print("Error: Geocode {}".format(myaddress))
+                    logger.error("Error: Geocode %s", myaddress)
                     time.sleep(1)     # extra sleep time
                     location = None
             if location:
                 location = location.raw
-                print(location['display_name'])
+                logger.info(location['display_name'])
                 boundrybox = getattr(location, 'boundingbox')
                 bsize = abs(float(boundrybox[1])-float(boundrybox[0])) * abs(float(boundrybox[3])-float(boundrybox[2]))*1000000
                 locrec = {'name': myaddress, 'alt' : getattr(location, 'display_name'), 'country' : trycountry, 'type': getattr(location, 'type'), 'class': getattr(location,'class'), 'icon': getattr(location,'icon'),
@@ -418,7 +427,7 @@ class GEDComGPSLookup:
                                 'long': getattr(location, 'lon'), 'boundry' : boundrybox, 'importance': getattr(location, 'importance'), 'size': bsize, 'used' : 0}
               
             else:
-                print("----none----")
+                logger.info("----none----")
                 locrec = {'name': myaddress, 'alt' : theaddress, 'country' : trycountry, 'type': None, 'class':None, 'icon':None,'place_id': None,'lat': None, 'long': None, 'boundry' : None, 'importance': None, 'size': None, 'used' : 0}
             time.sleep(1)         # Go slow so since Nominatim limits the speed for a free service
           
@@ -426,7 +435,7 @@ class GEDComGPSLookup:
                 self.addresses=dict()
                 self.addressalt=dict()
             if locrec['name'].lower() in self.addresses.keys():
-                print ("#UU={} Changed\n\t{}\n\t{}".format(self.addresses[locrec['name'].lower()]['used'], myaddress, theaddress))
+                logger.debug ("#UU={} Changed\n\t{}\n\t{}".format(self.addresses[locrec['name'].lower()]['used'], myaddress, theaddress))
 
             self.addresses[locrec['name'].lower()]= locrec
             self.addressalt[locrec['alt'].lower()]= locrec['name'].lower()
@@ -437,7 +446,6 @@ class GEDComGPSLookup:
      
    
     def resolveaddresses(self, humans):
-
         self.Geoapp = Nominatim(user_agent="GEDCOM-to-map-folium")  
         self.gOptions.step("Lookup addresses")
         for human in humans:
@@ -445,7 +453,7 @@ class GEDComGPSLookup:
                 break
             if (humans[human].birth and humans[human].birth):
                 humans[human].birth.pos = self.lookupaddresses(humans[human].birth.where)
-                # print ("{:30} @ B {:60} = {}".format(humans[human].name, humans[human].birth.where if humans[human].birth.where else '??', humans[human].birth.pos ))
+                logger.debug("{:30} @ B {:60} = {}".format(humans[human].name, humans[human].birth.where if humans[human].birth.where else '??', humans[human].birth.pos ))
             if (humans[human].home):
                 for homs in (range(0,len(humans[human].home))):
                     homeOfhome = humans[human].home[homs]
@@ -453,6 +461,6 @@ class GEDComGPSLookup:
                         homeOfhome.pos = self.lookupaddresses(homeOfhome.where)
             if (humans[human].death and humans[human].death.where):
                 humans[human].death.pos = self.lookupaddresses(humans[human].death.where)
-                # print ("{:30} @ D {:60} = {}".format(humans[human].name, humans[human].death.where, humans[human].death.pos ))
+                logger.debug ("{:30} @ D {:60} = {}".format(humans[human].name, humans[human].death.where, humans[human].death.pos ))
             
    

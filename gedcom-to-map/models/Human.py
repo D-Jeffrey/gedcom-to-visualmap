@@ -1,3 +1,5 @@
+__all__ = ['Human', 'LifeEvent']
+
 import re
 from models.Pos import Pos
 

@@ -1,3 +1,5 @@
+__all__ = ['Line']
+
 from models.Color import Color
 from models.Pos import Pos
 from models.Human import Human, LifeEvent 

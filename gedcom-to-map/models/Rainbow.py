@@ -1,3 +1,4 @@
+__all__ = ['Tint', 'Rainbow']
 from models.Color import Color
 
 

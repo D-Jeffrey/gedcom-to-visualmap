@@ -13,7 +13,7 @@ import logging
 
 from models.Human import Human, LifeEvent
 from models.Pos import Pos
-from const import GV_COUNTRIES_JSON
+from const import GV_COUNTRIES_JSON, GV_STATES_JSON
 from geopy.geocoders import Nominatim
 from pprint import pprint
 from gedcomoptions import gvOptions
@@ -86,7 +86,7 @@ class GEDComGPSLookup:
 
         self.addresses = None
         self.addresslist = None
-        self.usecacheonly = not gvOptions.get('CacheOnly')
+        self.usecacheonly = gvOptions.get('CacheOnly')
         self.gOptions = gvOptions 
         self.orgMD5 = None
         self.humans = humans
@@ -158,7 +158,7 @@ class GEDComGPSLookup:
                 self.countries[self.countrieslist[c]['name'].lower()] = self.countrieslist[c]
             
         
-            data = readCachedURL ('gv.states.json', 'https://raw.githubusercontent.com/nnjeim/world/master/resources/json/states.json')
+            data = readCachedURL ('gv.states.json', GV_STATES_JSON)
             self.stateslist = json.loads(data)
             self.states=dict()
             for c in range(0,len(self.stateslist)): 
@@ -315,7 +315,7 @@ class GEDComGPSLookup:
     
     def lookupaddresses(self, myaddress, addressdepth=0):
         self.gOptions.step(info=myaddress)  
-        
+        self.usecacheonly = self.gOptions.get('CacheOnly')          # Refresh as it could have changed since _init_
         addressindex = None
         theaddress = None
         trycountry = ""
@@ -404,7 +404,7 @@ class GEDComGPSLookup:
             if (len(theaddress)>0):
                 logger.debug(":Lookup: %s +within+ %s::", theaddress, trycountry)
                 try:
-                    location = self.Geoapp.geocode(theaddress, country_codes=trycountry)
+                    location = self.Geoapp.geocode(theaddress, country_codes=trycountry, timeout=5)
                 except:
                     logger.error("Error: Geocode %", theaddress)
                     time.sleep(1)  # extra sleep time
@@ -427,9 +427,13 @@ class GEDComGPSLookup:
                                 'long': getattr(location, 'lon'), 'boundry' : boundrybox, 'importance': getattr(location, 'importance'), 'size': bsize, 'used' : 0}
               
             else:
-                logger.info("----none----")
+                logger.info("----none---- for %s", myaddress)
                 locrec = {'name': myaddress, 'alt' : theaddress, 'country' : trycountry, 'type': None, 'class':None, 'icon':None,'place_id': None,'lat': None, 'long': None, 'boundry' : None, 'importance': None, 'size': None, 'used' : 0}
+
+            # https://operations.osmfoundation.org/policies/nominatim/
+            #       "No heavy uses (an absolute maximum of 1 request per second)."
             time.sleep(1)         # Go slow so since Nominatim limits the speed for a free service
+                        
           
             if not self.addresses:
                 self.addresses=dict()

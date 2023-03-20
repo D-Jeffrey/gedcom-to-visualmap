@@ -101,6 +101,10 @@ class foliumExporter:
         self.fglastname[thename][2] = depth
         return thefg
 
+        """ ***************************** """ 
+        """    Export results into HTML   """ 
+        """ ***************************** """ 
+
     def export(self, main: Pos, lines: [Line], ntag =""):
         SortByLast = (self.gOptions.GroupBy == 1)
         SortByPerson = (self.gOptions.GroupBy == 2)
@@ -270,7 +274,8 @@ class foliumExporter:
             if (len(labelname) > 25): labelname = labelname[1:25] +"..."
             gn = lgd_txt.format( txt=labelname, col= lc)
             fm_line = []
-          
+            # TODO Use below
+            htmltooltop = folium.map.Tooltip(markertipname, style=None, sticky=True)
           
             bextra = "Born {}".format(line.human.birth.whenyear()) if line.human.birth and line.human.birth.when else ''
             dextra = "Died {}".format(line.human.death.whenyear()) if line.human.death and line.human.death.when else ''
@@ -386,4 +391,33 @@ class foliumExporter:
             logger.info ("Number of FG lastName: %i", len(self.fglastname))
             
         self.Done()
+        return
+        """ *****************************************************  """ 
+        """    Display people using subgroup control to navigate   """ 
+        """ *****************************************************  """ 
+
+    def peopleAsTreeNav():
+        peoplegroup = folium.FeatureGroup("Chránené oblasti",control=False)
+        # https://nbviewer.org/github/chansooligans/folium/blob/plugins-groupedlayercontrol/examples/plugin-GroupedLayerControl.ipynb
+        fg1 = folium.FeatureGroup(name='g1', show=False)
+        fg2 = folium.FeatureGroup(name='g2', show=False)
+        fg3 = folium.FeatureGroup(name='g3')
+        folium.Marker([40, 74]).add_to(fg1)
+        folium.Marker([38, 72]).add_to(fg2)
+        folium.Marker([40, 72]).add_to(fg3)
+        m.add_child(fg1)
+        m.add_child(fg2)
+        m.add_child(fg3)
+
+        folium.LayerControl(collapsed=False).add_to(m)
+
+        GroupedLayerControl(
+            groups={'groups1': [fg1, fg2]},
+            exclusive_groups=False,
+            collapsed=False,
+        ).add_to(m)
+        
+        # https://github.com/python-visualization/folium/issues/1712
+        # https://nbviewer.org/github/chansooligans/folium/blob/plugins-groupedlayercontrol/examples/plugin-GroupedLayerControl.ipynb
+
         return

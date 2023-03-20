@@ -1,7 +1,10 @@
 __all__ = ['Human', 'LifeEvent']
 
 import re
+import logging
 from models.Pos import Pos
+
+logger = logging.getLogger(__name__)
 
 class Human:
     def __init__(self, xref_id):
@@ -34,10 +37,21 @@ class Human:
     def refyear(self):
         bestyear = "Unknown"
         if self.birth and self.birth.when:
-            bestyear = "Born " + self.birth.whenyear()
+            year = self.birth.whenyear()
+            bestyear = "Born " + self.birth.whenyear() if year else "Unknown"
         elif self.death and self.death.when:
-            bestyear = "Died " + self.death.whenyear()
+            year = self.death.whenyear()
+            bestyear = "Died " + self.death.whenyear() if year else "Unknown"
         return bestyear
+
+    def bestlocation(self):
+        best = ["Unknown", ""]
+        if self.birth and self.birth.pos:
+            best = [str(self.birth.pos), "Born " + self.birth.where if self.birth.where else "Unknown"]
+        elif self.death and self.death.pos:
+            best = [str(self.death.pos), "Died " + self.death.where if self.death.where else "Unknown"]
+        return best
+
 
 class LifeEvent:
     def __init__(self, place :str, atime, position : Pos = None, what = None):  # atime is a Record
@@ -65,8 +79,18 @@ class LifeEvent:
                     else:
                         return self.when.value.date2.year_str
                 elif self.when.value.kind.name == "PHRASE":
-                    # TODO poor error checking here
-                    return re.search(r"[0-9]{4}", self.when.value.phrase)[0]
+                    # TODO poor error checking here Assumes a year is in this date
+                    if re.search(r"[0-9]{4}", self.when.value.phrase):
+                        try:
+                            return re.search(r"[0-9]{4}", self.when.value.phrase)[0]
+                        except:
+                            return None
+                    else:
+                        if hasattr(self.when.value, 'name') :
+                            logger.warning ("when year %s as %s", self.when.value.name, self.when.value.phrase)
+                        else:
+                            logger.warning ("unknown when name %s ", self.when.value)
+                        return None
                 else:
                     return self.when.value.date.year_str
         return None
@@ -85,7 +109,19 @@ class LifeEvent:
         
         return w
 
-    def __getattr__(self, name):
+    def getattr(self, name):
         if name == 'pos':
-            return (None, None)
+            return self.pos
+        elif name == 'when':
+            return self.whenyear()
+        elif name == 'where':
+            return self.where if self.where else ""
+        elif name == 'what':
+            return self.what if self.what else ""
+        logger.warning("Life Event attr: %s", name)       
         return None
+
+    def __str__(self):
+        return f"{self.getattr('where')} : {self.getattr('when')} - {self.getattr('pos')} {self.getattr('what')}"
+        
+    

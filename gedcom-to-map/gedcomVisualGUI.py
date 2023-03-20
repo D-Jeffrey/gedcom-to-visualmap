@@ -312,7 +312,6 @@ class ConfigDialog(wx.Dialog):
 
         
 
-
 #=============================================================
 class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin):
     def __init__(self, parent, ID, pos=wx.DefaultPosition,
@@ -330,7 +329,7 @@ class PeopleListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
         tID = wx.NewIdRef()
 
         sizer = wx.BoxSizer(wx.VERTICAL)
-        self.InfoBox = wx.StaticText(parent, -1, "Select a file, Load it and Draw Update\nor change type to KML ", size=wx.Size(500,2))
+        self.InfoBox = wx.StaticText(parent, -1, "Select a file, Load it and Draw Update\nor change type to KML\nOpen Geo Table to edit addresses", size=wx.Size(500,2))
         self.InfoBox.SetFont(wx.FFont(10, wx.FONTFAMILY_SWISS ))
         sizer.Add(self.InfoBox, -1, wx.FIXED_MINSIZE | wx.LEFT)
 
@@ -349,7 +348,7 @@ class PeopleListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
                                  # | wx.LC_VRULES
                                  # | wx.LC_HRULES
                                   | wx.LC_SINGLE_SEL
-                                 ,size=wx.Size(500,600))
+                                 ,size=wx.Size(600,600))
 
         self.list.SetImageList(self.il, wx.IMAGE_LIST_SMALL)
         sizer.Add(self.list, -1, wx.EXPAND)
@@ -359,6 +358,8 @@ class PeopleListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
         self.list.InsertColumn(0, "Name")
         self.list.InsertColumn(1, "Year", wx.LIST_FORMAT_RIGHT)
         self.list.InsertColumn(2, "ID")
+        self.list.InsertColumn(3, "Geocode")
+        self.list.InsertColumn(4, "Address")
         
         self.PopulateList(humans, None)
 
@@ -367,7 +368,7 @@ class PeopleListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
         parent.SetSizer(sizer)
         # self.SetAutoLayout(True)
 
-        parent.Bind(wx.EVT_LIST_ITEM_SELECTED, self.OnItemSelected, self.list)
+        parent.Bind(wx.EVT_LIST_ITEM_RIGHT_CLICK, self.OnItemRightClick, self.list)
         parent.Bind(wx.EVT_LIST_COL_CLICK, self.OnColClick, self.list)
         #self.Bind(wx.EVT_LIST_COL_RIGHT_CLICK, self.OnColRightClick, self.list)
         parent.Bind(wx.EVT_LIST_COL_BEGIN_DRAG, self.OnColBeginDrag, self.list)
@@ -393,7 +394,9 @@ class PeopleListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
         for h in humans:
             if hasattr(humans[h], 'name'):
                 d = humans[h].refyear()
-                popdata[i] = (humans[h].name, d, humans[h].xref_id)
+                (location, where) = humans[h].bestlocation()
+                    
+                popdata[i] = (humans[h].name, d, humans[h].xref_id, location , where)
                 if mainperson == humans[h].xref_id:
                     selectperson = i-1
                 i += 1
@@ -404,18 +407,23 @@ class PeopleListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
             index = self.list.InsertItem(self.list.GetItemCount(), data[0]) # , self.idx1)
             self.list.SetItem(index, 1, data[1])
             self.list.SetItem(index, 2, data[2])
+            self.list.SetItem(index, 3, data[3])
+            self.list.SetItem(index, 4, data[4])
             self.list.SetItemData(index, key)
 
         self.list.SetColumnWidth(0, wx.LIST_AUTOSIZE_USEHEADER)
         self.list.SetColumnWidth(1, wx.LIST_AUTOSIZE_USEHEADER)
-        self.list.SetColumnWidth(2, 60)
+        self.list.SetColumnWidth(2, wx.LIST_AUTOSIZE_USEHEADER)
+        self.list.SetColumnWidth(3, wx.LIST_AUTOSIZE_USEHEADER)
+        self.list.SetColumnWidth(4, 60)
 
         # show how to select an item
    
                # Now that the list exists we can init the other base class,
         # see wx/lib/mixins/listctrl.py
         self.itemDataMap = popdata
-        listmix.ColumnSorterMixin.__init__(self, 3)
+        # Adjust Colums when adding colum
+        listmix.ColumnSorterMixin.__init__(self, 5)
         #self.SortListItems(0, True)
         # self.list.CheckItem(item=selectperson, check=True)
         # NOTE: self.list can be empty (the global value, m, is empty and passed as humans).
@@ -430,7 +438,7 @@ class PeopleListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
     def GetSortImages(self):
         return (self.sm_dn, self.sm_up)
 
-    def OnItemSelected(self, event):
+    def OnItemRightClick(self, event):
 
       
         self.currentItem = event.Index
@@ -442,6 +450,12 @@ class PeopleListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
         if self.gO:
            self.gO.set('Main', self.list.GetItemText(self.currentItem, 2))
         event.Skip()
+        
+           
+
+        dialog = PersonDialog(None, panel.threads[0].humans[self.list.GetItemText(self.currentItem, 2)])
+        result = dialog.ShowModal()
+        dialog.Destroy()
 
     def OnItemDeselected(self, event):
 
@@ -544,7 +558,7 @@ class VisualMapPanel(wx.Panel):
         lc.top.SameAs( self, wx.Top, 5)
         lc.left.SameAs( self, wx.Left, 5)
         lc.bottom.SameAs( self, wx.Bottom, 5)
-        lc.right.PercentOf( self, wx.Right, 50)
+        lc.right.PercentOf( self, wx.Right, 60)
         self.panelA.SetConstraints(lc)
         
         self.panelB = wx.Panel(self, -1, size=(760,420),style=wx.SIMPLE_BORDER  )
@@ -677,11 +691,11 @@ class VisualMapPanel(wx.Panel):
         l1 = wx.BoxSizer(wx.HORIZONTAL)
         self.d.BTNLoad = wx.Button(panel, ID_BTNLoad, "Load")
         self.d.BTNUpdate = wx.Button(panel, ID_BTNUpdate, "Draw & Update")
-        self.d.BTNCSV = wx.Button(panel, ID_BTNCSV, "Open GPS")
+        self.d.BTNCSV = wx.Button(panel, ID_BTNCSV, "Open Geo Table")
         self.d.BTNSTOP = wx.Button(panel, ID_BTNSTOP, "Stop")
-        l1.Add (self.d.BTNLoad, 0, wx.EXPAND | wx.ALL, 10)
-        l1.Add (self.d.BTNUpdate, 0, wx.EXPAND | wx.ALL, 10)
-        l1.Add (self.d.BTNCSV, 0, wx.EXPAND | wx.ALL, 10)
+        l1.Add (self.d.BTNLoad, 0, wx.EXPAND | wx.ALL, 5)
+        l1.Add (self.d.BTNUpdate, 0, wx.EXPAND | wx.ALL, 5)
+        l1.Add (self.d.BTNCSV, 0, wx.EXPAND | wx.ALL, 5)
         box.Add(l1, 0, wx.EXPAND | wx.ALL,0)
         l1 = wx.BoxSizer(wx.HORIZONTAL)
         l1.Add (self.d.ai, 0, wx.EXPAND | wx.ALL | wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 5)
@@ -922,12 +936,12 @@ class VisualMapPanel(wx.Panel):
             self.threads[0].updategrid = False
             self.peopleList.PopulateList(self.threads[0].humans, self.gO.get('Main'))
         if self.threads[0].updateinfo:
-            old = self.peopleList.InfoBox.GetLabel()
-            #TODO Shorten OLD
-            lines = re.findall(r'([^\n]+)\n', old + '\n')
-            if len(lines) > 4:
-                old = lines[0]  + lines[1]  + lines[2]  + lines[3] 
-            self.peopleList.InfoBox.SetLabel(old + '\n' + self.threads[0].updateinfo)
+            messages = self.peopleList.InfoBox.GetLabel()
+            logger.debug("Infobox: %s", self.threads[0].updateinfo)
+            lines = messages.split("\n")
+            if len(lines) > 15:
+                messages = "\n".join(lines[:15])
+            self.peopleList.InfoBox.SetLabel(self.threads[0].updateinfo + '\n' + messages)
 
             self.threads[0].updateinfo = ''
         
@@ -1076,6 +1090,78 @@ class VisualMapPanel(wx.Panel):
             time.sleep(0.1)
 
         self.Destroy()
+    #==============================================================
+
+
+
+class PersonDialog(wx.Dialog):
+    def __init__(self, parent, human):
+        super().__init__(parent, title="Person Details", size=(400, 300))
+        
+        humans = panel.threads[0].humans
+        # create the UI controls to display the person's data
+        name_label = wx.StaticText(self, label="Name: ")
+        father_label = wx.StaticText(self, label="Father: ")
+        mother_label = wx.StaticText(self, label="Mother: ")
+        birth_label = wx.StaticText(self, label="Birth: ")
+        death_label = wx.StaticText(self, label="Death: ")
+        sex_label = wx.StaticText(self, label="Sex: ")
+        marriage_label = wx.StaticText(self, label="Marriages: ")
+        home_label = wx.StaticText(self, label="Homes: ")
+
+        self.name_textctrl = wx.TextCtrl(self, style=wx.TE_READONLY, size=(350,-1))
+        self.father_textctrl = wx.TextCtrl(self, style=wx.TE_READONLY|wx.TE_MULTILINE)
+        self.mother_textctrl = wx.TextCtrl(self, style=wx.TE_READONLY|wx.TE_MULTILINE)
+        self.birth_textctrl = wx.TextCtrl(self, style=wx.TE_READONLY)
+        self.death_textctrl = wx.TextCtrl(self, style=wx.TE_READONLY)
+        self.sex_textctrl = wx.TextCtrl(self, style=wx.TE_READONLY)
+        self.marriage_textctrl = wx.TextCtrl(self, style=wx.TE_READONLY|wx.TE_MULTILINE)
+        self.home_textctrl = wx.TextCtrl(self, style=wx.TE_READONLY|wx.TE_MULTILINE)
+
+        # layout the UI controls using a grid sizer
+        
+        sizer = wx.FlexGridSizer(cols=2, hgap=5, vgap=5)
+        # sizer = wx.StaticBoxSizer(wx.VERTICAL, self, "Person Details")
+        sizer.Add(name_label, 0, wx.LEFT|wx.TOP, border=5)
+        sizer.Add(self.name_textctrl, 0, wx.EXPAND|wx.LEFT|wx.RIGHT|wx.BOTTOM, border=5)
+        sizer.Add(father_label, 0, wx.LEFT|wx.TOP, border=5)
+        sizer.Add(self.father_textctrl, 1, wx.EXPAND)
+        sizer.Add(mother_label, 0, wx.LEFT|wx.TOP, border=5)
+        sizer.Add(self.mother_textctrl, 1, wx.EXPAND)
+        sizer.Add(birth_label, 0, wx.LEFT|wx.TOP, border=5)
+        sizer.Add(self.birth_textctrl, 0, wx.EXPAND)
+        sizer.Add(death_label, 0, wx.LEFT|wx.TOP, border=5)
+        sizer.Add(self.death_textctrl, 0, wx.EXPAND)
+        sizer.Add(sex_label, 0, wx.LEFT|wx.TOP, border=5)
+        sizer.Add(self.sex_textctrl, 0, wx.EXPAND)
+        sizer.Add(marriage_label, 0, wx.LEFT|wx.TOP, border=5)
+        sizer.Add(self.marriage_textctrl, 1, wx.EXPAND|wx.LEFT|wx.RIGHT|wx.BOTTOM, border=5)
+        sizer.Add(home_label, 0, wx.LEFT|wx.TOP, border=5)
+        sizer.Add(self.home_textctrl, 1, wx.EXPAND|wx.LEFT|wx.RIGHT|wx.BOTTOM, border=5)
+        # self.SetSizer(sizer)
+
+        # set the person's data in the UI controls
+        self.name_textctrl.SetValue(str(human.surname))
+      
+        self.father_textctrl.SetValue(str(humans[human.father].first + " " + str(humans[human.father].surname)) if human.father else "<none>")
+        self.mother_textctrl.SetValue(str(humans[human.mother].first + " " + str(humans[human.mother].surname)) if human.mother else "<none>")
+        self.birth_textctrl.SetValue(str(human.birth))
+        self.death_textctrl.SetValue(str(human.death))
+        self.sex_textctrl.SetValue(str(human.sex) if human.sex else "")
+        self.marriage_textctrl.SetValue(str(human.marriage))
+        self.home_textctrl.SetValue(str(human.home))
+
+        # create the OK button
+        ok_btn = wx.Button(self, wx.ID_OK)
+        btn_sizer = wx.StdDialogButtonSizer()
+        btn_sizer.AddButton(ok_btn)
+        btn_sizer.Realize()
+        sizer.Add(btn_sizer, flag=wx.ALIGN_CENTER|wx.BOTTOM, border=10)
+        self.SetSizer(sizer)
+        self.SetBackgroundColour(wx.TheColourDatabase.FindColour('WHITE'))
+        self.Fit()
+
+
     
 
 
@@ -1153,6 +1239,7 @@ class BackgroundActions:
                 self.gOptions.stop()
                 evt = UpdateBackgroundEvent(value='done')
                 wx.PostEvent(self.win, evt)
+                
             else:
                 time.sleep(0.25)
 

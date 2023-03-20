@@ -104,6 +104,7 @@ def ParseAndGPS(gOp: gvOptions):
             lookupresults = gOp.lookup
         else:
             lookupresults = GEDComGPSLookup(humans, gOp)
+            logger.info ("Completed Geocode")
             gOp.lookup = lookupresults
         lookupresults.resolveaddresses(humans)
         gOp.step('Saving Address Cache')

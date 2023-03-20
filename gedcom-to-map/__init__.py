@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 from models.Human import Human, LifeEvent
 from models.Pos import Pos
 from models.Line import Line

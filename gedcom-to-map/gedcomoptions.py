@@ -47,8 +47,6 @@ class gvOptions:
         self.stepinfo = ''
         self.lastmax = self.counter
         
-        
-        
             # HKEY_LOCAL_MACHINE\SOFTWARE\Classes\.csv
             # HKEY_LOCAL_MACHINE\SOFTWARE\Classes\.csv\Content Type
             #   HKEY_CLASSES_ROOT\CLSID\{5e941d80-bf96-11cd-b579-08002b30bfeb}

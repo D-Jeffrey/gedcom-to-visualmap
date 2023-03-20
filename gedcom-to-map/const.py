@@ -4,6 +4,7 @@ VERSION = "0.1.1"
 NAME = "gedcom-to-visualmap"
 
 GV_COUNTRIES_JSON = 'https://raw.githubusercontent.com/nnjeim/world/master/resources/json/countries.json'
+GV_STATES_JSON = 'https://raw.githubusercontent.com/nnjeim/world/master/resources/json/states.json'
 
 LOG_CONFIG = {
     'version': 1,
@@ -18,7 +19,7 @@ LOG_CONFIG = {
     },
     'handlers': { 
         'default': { 
-            'level': 'DEBUG',
+            'level': 'INFO',                        # This one matters
             'formatter': 'standard',
             'class': 'logging.StreamHandler',
             'stream': 'ext://sys.stdout',  # Default is stderr

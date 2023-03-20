@@ -15,7 +15,7 @@ from gedcomoptions import gvOptions
 logger = logging.getLogger(__name__)
 
 homelocationtags = ('OCCU', 'CENS', 'EDUC')
-otherlocationtags = ('CHR', 'BAPM', 'BASM', 'BAPL', 'MARR', 'IMMI', 'NATU', 'ORDN','ORDI', 'RETI', 
+otherlocationtags = ('CHR', 'BAPM', 'BASM', 'BAPL', 'IMMI', 'NATU', 'ORDN','ORDI', 'RETI', 
                      'EVEN',  'CEME', 'CREM' )
 
 addrtags = ('ADR1', 'ADR2', 'ADR3', 'CITY', 'STAE', 'POST', 'CTRY')
@@ -56,6 +56,28 @@ def getplace(gedcomtag : Record, placetag ="PLAC"):
 
     return None
 
+class GetPosFromTag: 
+    """ build an LifeEvent, but also return the other attributes """
+    def __init__(self, gedcomtag : Record, tag : str, placetag ="PLAC"):
+        self.when = None
+        self.place = None
+        self.pos = Pos(None, None)
+        self.event = None
+
+        subtag = gedcomtag.sub_tag(tag)
+        if subtag:
+            self.place = getplace(subtag)
+            self.when = subtag.sub_tag("DATE")
+            plactag = subtag.sub_tag(placetag)
+            if plactag:
+                maploc = plactag.sub_tag("MAP")
+                if maploc:
+                    lat = maploc.sub_tag("LATI")
+                    lon = maploc.sub_tag("LONG")
+                    if lat and lon:
+                        self.pos = Pos(lat.value,lon.value)
+            self.event = LifeEvent(self.place, self.when, self.pos, tag)
+            
 
 class GedcomParser:
     def __init__(self, gOp :gvOptions):
@@ -97,36 +119,23 @@ class GedcomParser:
             if (isjpg):
                 human.photo = obj.sub_tag("FILE").value
         human.sex = record.sex
-        birt = record.sub_tag("BIRT")
-        if birt:
-            human.birth = LifeEvent(getplace(birt), birt.sub_tag("DATE"))
-            plac = getplace(birt)
-            plactag = birt.sub_tag("PLAC")
-            if plactag:
-                maploc = plactag.sub_tag("MAP")
-                if maploc:
-                    lat = maploc.sub_tag("LATI")
-                    lon = maploc.sub_tag("LONG")
-                    if lat and lon:
-                        human.pos = Pos(lat.value,lon.value)
-                        human.birth.pos = Pos(lat.value,lon.value)
+        # BIRTH TAG
+        birthtag = GetPosFromTag(record, "BIRT")
+        human.birth = birthtag.event
+        human.pos = birthtag.pos
+        
         # Use the Burial Tag as a backup for the Death attributes
-        buri = record.sub_tag("BURI")
-        buri = LifeEvent(getplace(buri), buri.sub_tag("DATE")) if buri else LifeEvent(None, None)
-        death = record.sub_tag("DEAT")
-        if death:
-            plac = getplace(death)
-            pdate = death.sub_tag("DATE")
-            human.death = LifeEvent(plac if plac else buri.where, pdate if pdate else buri.when)
-            plactag = death.sub_tag("PLAC")
-            if plactag:
-                maploc = plactag.sub_tag("MAP")
-                if maploc:
-                    lat = maploc.sub_tag("LATI")
-                    lon = maploc.sub_tag("LONG")
-                    if lat and lon:
-                        human.pos = Pos(lat.value,lon.value)
-                        human.death.pos = Pos(lat.value,lon.value)
+        # TODO need to code this as backup
+        burialtag = GetPosFromTag(record, "BURI")
+
+        # DEATH TAG
+        deathtag = GetPosFromTag(record, "DEAT")
+        human.death = deathtag.event 
+        
+        # Last Possible is death (or birth)
+        if human.death and (human.death.pos != Pos(None, None)):
+            human.pos = human.death.pos
+        
         homes = {}
         allhomes=record.sub_tags("RESI")
         if allhomes:
@@ -196,8 +205,12 @@ class GedcomParser:
                     continue
                 if husband:
                     humans[chil.xref_id].father = husband.xref_id
+                    humans[husband.xref_id].marriage = GetPosFromTag(record, "MARR").event
                 if wife:
                     humans[chil.xref_id].mother = wife.xref_id
+                    humans[wife.xref_id].marriage = GetPosFromTag(record, "MARR").event
+            
+            
 
         return humans
 

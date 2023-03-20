@@ -50,8 +50,12 @@ Set your options in the GUI interface
 Once you have selected your options, 
 - click the `Load` button and it will start to load the GED and then resolve the addresses.
 - `Draw Update` button is a 'Save' button.  For HTML it will trying and open the file with your web browser automatically.  For KML, it will save the file so you can load it onto a map.  (See below)
-- `Open GPS` button will open the CSV file in Excel if you have it... (I'm thinking that does not work on a Mac)
+- `Open GPS` button will open the CSV file in Excel if you have it... (I'm thinking that does not work on a Mac)  Make sure you close it before running again, or it may not be able to update the CSV file.
 - `Stop` will allow you to abort the Load/ Resolving of addresses without killing the GUI, allowing your to pick different options.
+- Using the left mouse click to select the starting person in (Star)
+- Use the right click on list of people to bring up some known details and how it was geocoded
+- When the people are loaded you can sort by the various columns by clicking on the column
+- You can resize the window (larger or maximized) to see more details about the people.
 
 ## Output to HTML using folium
 

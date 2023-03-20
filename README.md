@@ -54,8 +54,9 @@ Once you have selected your options,
 - `Stop` will allow you to abort the Load/ Resolving of addresses without killing the GUI, allowing your to pick different options.
 - Using the left mouse click to select the starting person in (Star)
 - Use the right click on list of people to bring up some known details and how it was geocoded
-- When the people are loaded you can sort by the various columns by clicking on the column
+- When the people are loaded you can sort by the various columns by clicking on the column.  When the list of people is selected for display it is relative to this starting person, unless you select the `Map all people`
 - You can resize the window (larger or maximized) to see more details about the people.
+- When display people on the HTML map, you can choose to list them as single people, as a group by the last name or by their parent
 
 ## Output to HTML using folium
 
@@ -157,6 +158,16 @@ python ..\gedcom-to-map\gedcom-to-map.py pres2020.ged pres2020-2 -main "@I676@" 
 
 ## Complex Export of MyHeritage - intereactive map
 ![img](samples/msedge_2022-02-02_22-33-16.gif)
+
+## TODO
+- Add a treed hierachary selector to enable people as groups
+- more troubleshooting on the address lookup
+- option to remove 'lines' to not core points (such as RESI or other)
+- Sort the Last Name by the highest number of people first or by distance from star
+- create a marker animation by year (in time steps)
+- better save the state of the options for next use
+- in Person dialog show something for people still alive (vs None or Unknown)
+- allow sorting by last name in List box
 
 
 ## Issues

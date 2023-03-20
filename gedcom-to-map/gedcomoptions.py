@@ -3,7 +3,7 @@ import os
 import time
 
 class gvOptions:
-    def __init__ (self, MarksOn = True, HeatMap = True, MarkStarOn = True, BornMark = False, DieMark = True, MapStyle = 3, GroupBy=0, AntPath=True, HeatMapTimeLine=False, HeatMapTimeStep=1, HomeMarker=False):
+    def __init__ (self, MarksOn = True, HeatMap = False, MarkStarOn = True, BornMark = True, DieMark = True, MapStyle = 3, GroupBy=2, AntPath=False, HeatMapTimeLine=False, HeatMapTimeStep=1, HomeMarker=False):
 
         self.MarksOn = MarksOn
         self.HeatMap = HeatMap

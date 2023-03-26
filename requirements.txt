@@ -2,6 +2,4 @@ ged4py
 simplekml
 geopy
 folium
-json
-webbrowser
-images
+wxPython

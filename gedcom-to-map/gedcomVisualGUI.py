@@ -369,6 +369,7 @@ class PeopleListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
         # self.SetAutoLayout(True)
 
         parent.Bind(wx.EVT_LIST_ITEM_RIGHT_CLICK, self.OnItemRightClick, self.list)
+        parent.Bind(wx.EVT_LIST_ITEM_SELECTED, self.OnItemActivated, self.list)
         parent.Bind(wx.EVT_LIST_COL_CLICK, self.OnColClick, self.list)
         #self.Bind(wx.EVT_LIST_COL_RIGHT_CLICK, self.OnColRightClick, self.list)
         parent.Bind(wx.EVT_LIST_COL_BEGIN_DRAG, self.OnColBeginDrag, self.list)
@@ -488,6 +489,7 @@ class PeopleListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
     def OnColClick(self, event):
 
         logger.debug("%d" % event.GetColumn())
+
         event.Skip()
 
     def OnColRightClick(self, event):
@@ -917,6 +919,7 @@ class VisualMapPanel(wx.Panel):
                 self.d.BTNCSV.Enable()
         if not status or status == '':
             status = 'Ready'
+            self.OnBusyStop(-1)
         self.frame.SetStatusText(status)
         
         wx.Yield()
@@ -944,9 +947,7 @@ class VisualMapPanel(wx.Panel):
             self.peopleList.InfoBox.SetLabel(self.threads[0].updateinfo + '\n' + messages)
 
             self.threads[0].updateinfo = ''
-        
-        self.OnBusyStop(-1)
-        
+    
         pass
         
     def SetupButtonState(self):
@@ -1212,20 +1213,30 @@ class BackgroundActions:
                 if self.do & 1 or (self.do & 4 and not self.gOptions.parsed):
                     logger.info("start ParseAndGPS")
                     if hasattr(self, 'humans'):
-                        if self.humans:
+                        if self.humans:                            
                             del self.humans
+                            self.gOptions.humans = None
                     logger.info("ParseAndGPS")
-                    self.humans = ParseAndGPS(self.gOptions)
-                    logger.info("human count %i", len(self.humans))
+                    self.humans = ParseAndGPS(self.gOptions, 1)
                     self.updategrid = True
+                    evt = UpdateBackgroundEvent(value='busy')
+                    wx.PostEvent(self.win, evt)
+                    time.sleep(0.25)
+                    
+
+                    logger.info("human count %i", len(self.humans))
+                    self.humans = ParseAndGPS(self.gOptions, 2)
+                    self.updategrid = True
+                    
                     self.AddInfo(f"Loaded {len(self.humans)} people")
                     if self.gOptions.Main:
-                        self.AddInfo(f"with '{self.gOptions.Main}' as starting person", False)
-
+                        self.AddInfo(f" with '{self.gOptions.Main}' as starting person", False)
+                    
+                    
                 if self.do & 2:
                     logger.info("start do 2")
                     if (self.gOptions.parsed):
-                        logger.info("ParseAndGPS")
+                        logger.info("doHTML or doKML")
                         if (self.gOptions.ResultHTML):
                             doHTML(self.gOptions, self.humans)
                             self.AddInfo(f"HTML generated resulting in {self.gOptions.totalpeople} people")

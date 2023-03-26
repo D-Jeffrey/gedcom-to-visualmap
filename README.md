@@ -171,6 +171,7 @@ python ..\gedcom-to-map\gedcom-to-map.py pres2020.ged pres2020-2 -main "@I676@" 
 
 
 ## Issues
+- Marriage is not read correctly all the time, does not deal with multiple marriages
 ### GUI
 - Sorting does not work correctly
 - Cache Only checkboxes is not working
@@ -180,6 +181,18 @@ python ..\gedcom-to-map\gedcom-to-map.py pres2020.ged pres2020-2 -main "@I676@" 
 - need to determine how do deal with very large HTML files
 
 ## Releases
+### v0.1.3
+- fixed requirements.txt
+- improved feedback loop on loading in Visual
+- Fixed issue with selection (broken in 0.1.2)
+- Added Legend (Needs work)
+### v0.1.2
+- New details dialog about people, fixed issues with GPS lookup, options 
+- adjusted logging (Need more work)
+- lots of linting work, bug fixes for addresses. 
+- Still needs a lot work.
+### v0.1.1
+- Folded in GUI bugs from @rajeeshp & @frankbracq
 ### v0.1.0 
 - Adjusted GUI and saving of cache file location
 - Fixed issue if the cache did not already exist results in a ```

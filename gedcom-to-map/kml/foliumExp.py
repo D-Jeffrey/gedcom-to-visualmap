@@ -13,10 +13,14 @@ from gedcomoptions import gvOptions
 from folium.plugins import FloatImage, AntPath, MiniMap, HeatMapWithTime
 
 logger = logging.getLogger(__name__)
-
+# TODO need to create this Legend to explain things
 legend_file = 'legend.png'
 lgd_txt = '<span style="color: {col};">{txt}</span>'
 
+# --------------------------------------------------------------------------------------------------
+# Drift is used to create some distance between point so when multiple come/live in the same place, 
+# the lines and pins will have some distances and the are not stack on top of each other
+#
 def dift(l):
     d  = ((random.random() * 0.001) - 0.0005)
     #d = 0
@@ -68,15 +72,16 @@ class foliumExporter:
         self.file_name = os.path.join(gOptions.resultpath, gOptions.Result)
         self.max_line_weight = gOptions.MaxLineWeight
         self.gOptions = gOptions
-        self.fm = folium.Map(location=[0, 0], zoom_start=2)
         self.fglastname = dict()
         
-        backTypes = ('Open Street Map', 'Stamen Terrain', 'CartoDB Positron', 'Stamen Toner',  'Stamen Watercolor', 'Cartodbdark_matter')
+        backTypes = ('OpenStreetMap', 'Stamen Terrain', 'CartoDB Positron', 'Stamen Toner',  'Stamen Watercolor', 'Cartodbdark_matter')
         if (self.gOptions.MapStyle < 1 or self.gOptions.MapStyle > len(backTypes)):
             self.gOptions.MapStyle = 3
-        for bt in range(0,4):
-            folium.raster_layers.TileLayer(backTypes[bt], name=backTypes[bt]).add_to(self.fm)
-        
+
+        self.fm = folium.Map(location=[0, 0], zoom_start=2, tiles=backTypes[self.gOptions.MapStyle])
+        for bt in range(0,len(backTypes)):
+            if bt + 1 !=  self.gOptions.MapStyle:
+                folium.raster_layers.TileLayer(backTypes[bt], name=backTypes[bt]).add_to(self.fm)
         if (self.gOptions.mapMini):
             folium.plugins.MiniMap(toggle_display=True).add_to(self.fm)
         
@@ -236,18 +241,18 @@ class foliumExporter:
             self.gOptions.step()
             i += 1
             if ( line.style == 'Life'):
-                flc = flp
-                aicc = 'orange'
-                aici = 'child'
-                bicc = 'gray'
-                bici = 'cross'
-                lc = '#' + line.color.to_hexa()
+                flc = flp                                                   # Feature Group Class   (To create a Hierachary NOT USED)
+                aicc = 'orange'                                             # Start Point Icon color
+                aici = 'child'                                              # Start Point Icon itself
+                bicc = 'gray'                                               # End Point Icon color
+                bici = 'cross'                                              # End Point Icon itself
+                lc = '#' + line.color.to_hexa()                             # Line Color
                 da = []
-                ln = line.parentofhuman
+                ln = line.parentofhuman                                     # Line Name
                 g = ""
-                markertipname = "Life of " + line.name
-                fancyname = line.style + " of "+ line.parentofhuman
-                markhome = 'house'
+                markertipname = "Life of " + line.name                      # Marker Tool Tip
+                fancyname = line.style + " of "+ line.parentofhuman         # Formated Line Tool Tool Tip
+                markhome = 'house'                                          # Icon to put at the Start  (NOT USED)
             else: 
                 flc = flr
                 aicc = 'green'
@@ -255,7 +260,8 @@ class foliumExporter:
                 bicc = 'green'
                 lc = 'green'
                 da = [5,5]
-                if (line.style == 'father'):  
+                # If it is a link to the father, then color it blue if mother then pink, otherwise it is green
+                if (line.style == 'father'):                                
                     lc = 'blue'
                     lc = '#2b8cbe'
                     bici = 'male'
@@ -274,21 +280,23 @@ class foliumExporter:
             if (len(labelname) > 25): labelname = labelname[1:25] +"..."
             gn = lgd_txt.format( txt=labelname, col= lc)
             fm_line = []
-            # TODO Use below
-            htmltooltop = folium.map.Tooltip(markertipname, style=None, sticky=True)
           
             bextra = "Born {}".format(line.human.birth.whenyear()) if line.human.birth and line.human.birth.when else ''
             dextra = "Died {}".format(line.human.death.whenyear()) if line.human.death and line.human.death.when else ''
             fancyname = fancyname + "<br>" + bextra +" "+ dextra if (bextra != '') or (dextra != '') else fancyname
+            fancypopup = f"<div style='min-width: 150px'>{fancyname}</div>" 
             if line.human.photo:
-                fancyname = fancyname + "<img src='{}' width='150'>".format(line.human.photo)
+                fancypopup = fancypopup + "<img src='{}' width='150'>".format(line.human.photo)
             difta = diftb = None
+            
             if (line.a and line.a.lat and line.a.lon):
-                # color = father/mother, born = baby, male, female
+                # color = father/mother or born = baby, male, female
                 difta = [dift(line.a.lat), dift(line.a.lon)]
                 if self.gOptions.MarksOn:
                     if self.gOptions.BornMark:
-                        mk = folium.features.Marker(difta,tooltip=markertipname , popup=fancyname, opacity=.5, icon=folium.Icon(color=aicc,icon=aici, prefix='fa' ))
+                        mk = folium.features.Marker(difta,tooltip=markertipname , popup=fancypopup, opacity=.5, icon=folium.Icon(color=aicc,icon=aici, prefix='fa' ))
+                        #
+                        ## We are going to either create a new Feature Group or get an existing one or create a new one if that existing does not work with the get
                         if SortByLast:
                             fg = self.getFeatureGroup(line.human.surname, line.prof)
                         if SortByPerson:
@@ -301,7 +309,7 @@ class foliumExporter:
             if (line.b and line.b.lat and line.b.lon):
                 diftb = [dift(line.b.lat), dift(line.b.lon)]
                 if self.gOptions.MarksOn:
-                    mk = folium.features.Marker(diftb,tooltip =markertipname , popup=fancyname, opacity=.5,icon=folium.Icon(color=bicc,icon=bici, prefix='fa', extraClasses = 'fas'))
+                    mk = folium.features.Marker(diftb,tooltip =markertipname , popup=fancypopup, opacity=.5,icon=folium.Icon(color=bicc,icon=bici, prefix='fa', extraClasses = 'fas'))
                     if SortByLast:
                         fg = self.getFeatureGroup(line.human.surname, line.prof)
                     if SortByPerson:
@@ -346,11 +354,11 @@ class foliumExporter:
                     lwidth = 1
                 if self.gOptions.UseAntPath:
                     if line.style == 'Life':
-                        pl = folium.plugins.AntPath(fm_line, weight=lwidth, opacity=.7, tooltip=ln, popup=fancyname, color=lcolor, lineJoin='arcs')
+                        pl = folium.plugins.AntPath(fm_line, weight=lwidth, opacity=.7, tooltip=ln, popup=fancypopup, color=lcolor, lineJoin='arcs')
                     else:
-                        pl = folium.features.PolyLine(fm_line, color=lcolor, weight=lwidth, opacity=1, tooltip=ln, popup=fancyname, dash_array = da, lineJoin='arcs' )
+                        pl = folium.features.PolyLine(fm_line, color=lcolor, weight=lwidth, opacity=1, tooltip=ln, popup=fancypopup, dash_array = da, lineJoin='arcs' )
                 else:
-                    pl = folium.features.PolyLine(fm_line, color=lcolor, weight=lwidth, opacity=1, tooltip=ln,  popup=fancyname, dash_array = da, lineJoin='arcs')
+                    pl = folium.features.PolyLine(fm_line, color=lcolor, weight=lwidth, opacity=1, tooltip=ln,  popup=fancypopup, dash_array = da, lineJoin='arcs')
                 if (pl):
                     if SortByLast:
                         fg = self.getFeatureGroup(line.human.surname, line.prof)
@@ -360,6 +368,7 @@ class foliumExporter:
               
                     if (not fg):
                         fg = folium.FeatureGroup(name= gn, show=False)
+
                         newfg = True
                     fg.add_child(pl)
           
@@ -386,7 +395,7 @@ class foliumExporter:
             logger.warning ("No GPS locations to generate a map.")
         
         # TODO Add a legend
-        # FloatImage(image_file, bottom=0, left=86).add_to(fm)
+        FloatImage(legend_file, bottom=0, left=86).add_to(fm)
         if SortByLast:
             logger.info ("Number of FG lastName: %i", len(self.fglastname))
             

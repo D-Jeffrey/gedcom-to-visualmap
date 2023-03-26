@@ -44,7 +44,7 @@ defaultcountry = "CA"
 def readCachedURL(cfile, url):
     nfile = os.path.join(tempfile.gettempdir() , cfile)
     if not os.path.exists(nfile):
-        logger.debug("Attempting to request %s as %s", urle)
+        logger.debug("Attempting to request %s as %s", url)
         webUrl  = urllib.request.urlopen(url)
         data = webUrl.read()
         logger.debug("request read, saving to %s", cfile)
@@ -122,7 +122,10 @@ class GEDComGPSLookup:
                     # self.addresslist[a]['name'] = bytearray(self.addresslist[a]['name'],encoding='utf-8').decode('unicode_escape').strip("'") 
                     # self.addresslist[a]['alt'] = bytearray(self.addresslist[a]['alt'],encoding='utf-8').decode('unicode_escape').strip("'") 
                     self.addresslist[a]['boundry'] = None if self.addresslist[a]['boundry'] == '' else eval(self.addresslist[a]['boundry'])
-                    self.addresslist[a]['size'] = 0 if self.addresslist[a]['size'] == '' else float(self.addresslist[a]['size'])
+                    if hasattr(self.addresslist[a], 'size'):
+                        self.addresslist[a]['size'] = 0 if self.addresslist[a]['size'] == '' else float(self.addresslist[a]['size'])
+                    else:
+                        self.addresslist[a]['size'] = 0 
                     self.addresslist[a]['lat'] = None if self.addresslist[a]['lat'] == '' else self.addresslist[a]['lat']
                     self.addresslist[a]['long'] = None if self.addresslist[a]['long'] == '' else self.addresslist[a]['long']
                     # Clear the 'used' column so we can count reference

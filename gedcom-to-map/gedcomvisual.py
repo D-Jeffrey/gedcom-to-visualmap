@@ -91,12 +91,16 @@ def doHTML(gOp : gvOptions, humans):
     
 
 
-def ParseAndGPS(gOp: gvOptions):
+def ParseAndGPS(gOp: gvOptions, stage : 0 ):
     logger.info ("Starting parsing of GEDCOM : %s", gOp.GEDCOMinput)
-    humans = GedcomParser(gOp).create_humans()
+    if (stage == 0 or stage == 1):
+        humans = GedcomParser(gOp).create_humans()
+        gOp.humans = humans
     gOp.parsed = True
     gOp.goodmain = False
-    if (humans and gOp.UseGPS):
+    if (stage == 2):
+        humans = gOp.humans
+    if (humans and gOp.UseGPS and (stage == 0 or stage == 2)):
         logger.info ("Starting Address to GPS resolution")
         # TODO This could cause issues
         # Check for change in the datetime of CSV

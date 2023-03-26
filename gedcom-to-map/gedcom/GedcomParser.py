@@ -195,9 +195,13 @@ class GedcomParser:
             if thisgvOps.ShouldStop():
                 break
             humans[record.xref_id] = GedcomParser.__create_human(record)
+        familyloop = 0
         for record in records0("FAM"):
             if thisgvOps.ShouldStop():
                 break
+            familyloop += 1
+            if familyloop % 15 == 0:
+                thisgvOps.step(info=f"Family loop {familyloop}")  
             husband = record.sub_tag("HUSB")
             wife = record.sub_tag("WIFE")
             for chil in record.sub_tags("CHIL"):

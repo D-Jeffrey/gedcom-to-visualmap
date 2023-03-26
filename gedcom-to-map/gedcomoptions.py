@@ -46,6 +46,7 @@ class gvOptions:
         self.totalpeople = None
         self.stepinfo = ''
         self.lastmax = self.counter
+        self.humans = None
         
             # HKEY_LOCAL_MACHINE\SOFTWARE\Classes\.csv
             # HKEY_LOCAL_MACHINE\SOFTWARE\Classes\.csv\Content Type

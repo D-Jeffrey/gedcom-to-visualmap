@@ -181,10 +181,12 @@ python ..\gedcom-to-map\gedcom-to-map.py pres2020.ged pres2020-2 -main "@I676@" 
 - need to determine how do deal with very large HTML files
 
 ## Releases
-### v0.1.3
+### v0.2.0
 - fixed requirements.txt
+- Add highlighting of people used in the draw
+- Major improvements to KML Exporting
 - improved feedback loop on loading in Visual
-- Fixed issue with selection (broken in 0.1.2)
+- Fixed issue with selection (broken in 0.1.2), fix issue with caching
 - Added Legend (Needs work)
 ### v0.1.2
 - New details dialog about people, fixed issues with GPS lookup, options 

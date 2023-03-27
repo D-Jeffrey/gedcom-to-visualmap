@@ -24,16 +24,14 @@ class Human:
         self.surname = None
         self.maiden: None
         self.sex: None
+
+    def __str__(self):
+        return f"Human(id={self.xref_id}, name={self.name})"
         
     def __repr__(self):
-        return "[ {} : {} - {} {} - {} ]".format(
-            self.xref_id,
-            self.name,
-            self.father,
-            self.mother,
-            self.pos
+        return f"[ {self.xref_id} : {self.name} - {self.father} & {self.mother} - {self.pos} ]"
             
-        )
+            
     def refyear(self):
         bestyear = "Unknown"
         if self.birth and self.birth.when:
@@ -62,10 +60,7 @@ class LifeEvent:
         
 
     def __repr__(self):
-        return "[ {} : {} ]".format(
-            self.when,
-            self.where
-        )
+        return f"[ {self.when} : {self.where} is {self.what}]"
 
     def whenyear(self, last = False):
         
@@ -109,16 +104,16 @@ class LifeEvent:
         
         return w
 
-    def getattr(self, name):
-        if name == 'pos':
+    def getattr(self, attr):
+        if attr == 'pos':
             return self.pos
-        elif name == 'when':
+        elif attr == 'when':
             return self.whenyear()
-        elif name == 'where':
+        elif attr == 'where':
             return self.where if self.where else ""
-        elif name == 'what':
+        elif attr == 'what':
             return self.what if self.what else ""
-        logger.warning("Life Event attr: %s", name)       
+        logger.warning("Life Event attr: %s' object has no attribute '%s'" "Life Event attr: %s", type(self).__name__, attr)    
         return None
 
     def __str__(self):

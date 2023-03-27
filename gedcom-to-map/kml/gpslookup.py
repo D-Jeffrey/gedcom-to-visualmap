@@ -15,7 +15,7 @@ from models.Human import Human, LifeEvent
 from models.Pos import Pos
 from const import GV_COUNTRIES_JSON, GV_STATES_JSON
 from geopy.geocoders import Nominatim
-from pprint import pprint
+#  from pprint import pprint
 from gedcomoptions import gvOptions
 
 logger = logging.getLogger(__name__)
@@ -44,10 +44,10 @@ defaultcountry = "CA"
 def readCachedURL(cfile, url):
     nfile = os.path.join(tempfile.gettempdir() , cfile)
     if not os.path.exists(nfile):
-        logger.debug("Attempting to request %s as %s", url)
+        logger.debug("Attempting to request %s as %s", url, nfile)
         webUrl  = urllib.request.urlopen(url)
         data = webUrl.read()
-        logger.debug("request read, saving to %s", cfile)
+        logger.debug("request read, saving to %s", nfile)
         with open(nfile, 'wb') as file:
             file.write(data)
         
@@ -90,6 +90,7 @@ class GEDComGPSLookup:
         self.gOptions = gvOptions 
         self.orgMD5 = None
         self.humans = humans
+        self.countrieslist = None
       
         # This pulls from the same directory as GEDCOM file
         if gvOptions.resultpath:
@@ -108,14 +109,14 @@ class GEDComGPSLookup:
                                 self.addresslist = [line]
                         
                     except csv.Error as e:
-                        logger.error  ('Error reading GPS cache file {}, line {}: {}'.format(cache_filename[0], readfrom.line_num, e))
+                        logger.error  ('Error reading GPS cache file %s, line %d: %s', cache_filename[0], readfrom.line_num, e)
              
         if (self.addresslist):
+            gvOptions.step('Loading Geocode Cache')
             self.addresses = dict()
             
             self.addressalt = dict()
             
-            self.orgMD5 = hashlib.md5()    
             for a in range(0,len(self.addresslist)):
                 if self.addresslist[a]['name'] !='': 
                     
@@ -132,12 +133,17 @@ class GEDComGPSLookup:
                     self.addresslist[a]['used'] = 0
                     self.addresses[self.addresslist[a]['name'].lower()]= self.addresslist[a]
                     self.addressalt[self.addresslist[a]['alt'].lower()]= self.addresslist[a]['name']
-                    self.orgMD5.update((self.addresslist[a]['name'] +  
-                         self.addresslist[a]['alt'] +  
-                         str(self.addresslist[a]['lat']) +  
-                         str(self.addresslist[a]['long'])).encode(errors='ignore'))
-            logger.info ("Loaded {} cached records".format(len(self.addresses)))    
+            logger.info ("Loaded %d cached records", len(self.addresses))
+            #
+            # Make the checksum for checking later to see if the table has changed
+            #
+            self.orgMD5 = hashlib.md5()
+            for a in self.addresses.keys():
+                if self.addresses[a]['name'] !='': 
+                    self.orgMD5.update((self.addresses[a]['name'] +  self.addresses[a]['alt'] +  
+                             str(self.addresses[a]['lat']) +  str(self.addresses[a]['long'])).encode(errors='ignore'))
             self.gOptions.step("Loaded {} cached records".format(len(self.addresses)))
+            self.addresslist = None
         else:
             logger.info ("No GPS cached addresses to use")
             self.gOptions.step("No GPS cached addresses")
@@ -146,7 +152,7 @@ class GEDComGPSLookup:
         
         # Cache up and don't reload if it we have it already
 
-        if not (hasattr(self, 'countrieslist') and self.countrieslist):
+        if not self.countrieslist:
             
             self.gOptions.step("Loading Countries/states")
             data = readCachedURL ('gv.countries.json', GV_COUNTRIES_JSON)
@@ -174,13 +180,11 @@ class GEDComGPSLookup:
             return
         # Nothing to save ?? and has not changed
         newMD5 = hashlib.md5()
-        if self.addresslist:
-            for a in range(0,len(self.addresslist)):
-                if self.addresslist[a]['name'] !='': 
-                    newMD5.update((self.addresslist[a]['name'] +  
-                             self.addresslist[a]['alt'] +  
-                             str(self.addresslist[a]['lat']) +  
-                             str(self.addresslist[a]['long'])).encode(errors='ignore'))
+        if self.addresses:
+            for a in self.addresses.keys():
+                if self.addresses[a]['name'] !='': 
+                    newMD5.update((self.addresses[a]['name'] +  self.addresses[a]['alt'] +  
+                             str(self.addresses[a]['lat']) +  str(self.addresses[a]['long'])).encode(errors='ignore'))
             if newMD5.hexdigest() == self.orgMD5.hexdigest():
                 logger.debug("GPS Cache has not changed")
                 return
@@ -409,7 +413,7 @@ class GEDComGPSLookup:
                 try:
                     location = self.Geoapp.geocode(theaddress, country_codes=trycountry, timeout=5)
                 except:
-                    logger.error("Error: Geocode %", theaddress)
+                    logger.error("Error: Geocode %s", theaddress)
                     time.sleep(1)  # extra sleep time
                     location = None
             else:
@@ -458,7 +462,7 @@ class GEDComGPSLookup:
         for human in humans:
             if self.gOptions.ShouldStop():
                 break
-            if (humans[human].birth and humans[human].birth):
+            if (humans[human].birth and humans[human].birth.where):
                 humans[human].birth.pos = self.lookupaddresses(humans[human].birth.where)
                 logger.debug("{:30} @ B {:60} = {}".format(humans[human].name, humans[human].birth.where if humans[human].birth.where else '??', humans[human].birth.pos ))
             if (humans[human].home):

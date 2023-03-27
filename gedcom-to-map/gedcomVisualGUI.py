@@ -23,7 +23,7 @@ import webbrowser
 import logging
 import logging.config
 
-from const import NAME, VERSION, LOG_CONFIG
+from const import NAME, VERSION, LOG_CONFIG, KMLMAPSURL
 from gedcomoptions import gvOptions
 from gedcomvisual import doKML, doHTML, ParseAndGPS
 from models.Human import Human, LifeEvent
@@ -82,8 +82,8 @@ IDtoAttr = {ID_CBMarksOn : ('MarksOn', 'Redraw'),
     ID_INTMaxLineWeight : ('MaxMissing', 'Reload'),
     ID_CBUseGPS : ('UseGPS', 'Reload'),
     ID_CBCacheOnly : ('CacheOnly', 'Reload'),
-    ID_CBAllEntities: ('AllEntities', 'Reload'),
-    ID_LISTPlaceType : ('PlaceType', 'Reload'),
+    ID_CBAllEntities: ('AllEntities', 'Redraw'),
+    ID_LISTPlaceType : ('PlaceType', 'Redraw'),
     ID_CBMapControl : ('showLayerControl',  'Redraw'),
     ID_CBMapMini : ('mapMini',  'Redraw'),
     ID_BTNLoad : 'Load',
@@ -225,7 +225,7 @@ class VisualMapFrame(wx.Frame):
 
         if dlg.ShowModal() == wx.ID_OK:
             path = dlg.GetPath()
-            logger.debug("You selected %s" % path)
+            logger.debug("You selected %s", path)
             panel.setInputFile(path)
 
             # add it to the history
@@ -244,7 +244,7 @@ class VisualMapFrame(wx.Frame):
         # get the file based on the menu ID
         fileNum = evt.GetId() - wx.ID_FILE1
         path = self.filehistory.GetHistoryFile(fileNum)
-        logger.debug("You selected %s" % path)
+        logger.debug("You selected %s", path)
 
         # add it back to the history so it will be moved up the list
         self.filehistory.AddFileToHistory(path)
@@ -257,10 +257,7 @@ class VisualMapFrame(wx.Frame):
                       wx.OK|wx.ICON_INFORMATION)
 
 
-    """
-        b = wx.Button(self, -1, "Create and Show a ProgressDialog", (50,50))
-        self.Bind(wx.EVT_BUTTON, self.OnButton, b)
-    """
+    
     def onOptionsReset(self, event):
         wx.MessageBox("Does nothing",
                       "reset options",
@@ -362,6 +359,7 @@ class PeopleListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
         self.list.InsertColumn(4, "Address")
         
         self.PopulateList(humans, None)
+        self.currentItem = 0
 
 
 
@@ -411,6 +409,10 @@ class PeopleListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
             self.list.SetItem(index, 3, data[3])
             self.list.SetItem(index, 4, data[4])
             self.list.SetItemData(index, key)
+            if self.gO.Referenced:
+                if self.gO.Referenced.exists(data[2]):
+                    self.list.SetItemBackgroundColour(index, "LIME GREEN")
+
 
         self.list.SetColumnWidth(0, wx.LIST_AUTOSIZE_USEHEADER)
         self.list.SetColumnWidth(1, wx.LIST_AUTOSIZE_USEHEADER)
@@ -443,11 +445,11 @@ class PeopleListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
 
       
         self.currentItem = event.Index
-        logger.debug("%s, %s, %s, %s" %
-                           (self.currentItem,
+        logger.debug("%s, %s, %s, %s", 
+                           self.currentItem,
                             self.list.GetItemText(self.currentItem),
                             self.list.GetItemText(self.currentItem, 1),
-                            self.list.GetItemText(self.currentItem, 2)))
+                            self.list.GetItemText(self.currentItem, 2))
         if self.gO:
            self.gO.set('Main', self.list.GetItemText(self.currentItem, 2))
         event.Skip()
@@ -461,14 +463,13 @@ class PeopleListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
     def OnItemDeselected(self, event):
 
         item = event.GetItem()
-        logger.debug("%d" % event.Index)
+        logger.debug("OnItemDeselected %d" % event.Index)
 
      
     def OnItemActivated(self, event):
 
         self.currentItem = event.Index
-        logger.debug("%s TopItem: %s" %
-                           (self.list.GetItemText(self.currentItem), self.list.GetTopItem()))
+        logger.debug("%s TopItem: %s", self.list.GetItemText(self.currentItem), self.list.GetTopItem())
         if self.gO:
            self.gO.set('Main', self.list.GetItemText(self.currentItem, 2))
 
@@ -488,19 +489,16 @@ class PeopleListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
 
     def OnColClick(self, event):
 
-        logger.debug("%d" % event.GetColumn())
+        logger.debug("%s" % event.GetColumn())
 
         event.Skip()
 
     def OnColRightClick(self, event):
 
         item = self.list.GetColumn(event.GetColumn())
-        logger.debug("%d %s" %
-                           (event.GetColumn(), (item.GetText(), item.GetAlign(),
-                                                item.GetWidth(), item.GetImage())))
+        logger.debug("%s %s", event.GetColumn(), (item.GetText(), item.GetAlign(), item.GetWidth(), item.GetImage()))
         if self.list.HasColumnOrderSupport():
-            logger.debug("column order: %d" %
-                               self.list.GetColumnOrder(event.GetColumn()))
+            logger.debug("column order: %s", self.list.GetColumnOrder(event.GetColumn()))
 
     def OnColBeginDrag(self, event):
 
@@ -523,7 +521,7 @@ class PeopleListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
 
         itemcount = self.list.GetItemCount()
         itemschecked = [i for i in range(itemcount) if self.list.IsItemChecked(item=i)]
-        logger.debug("%s " % itemschecked)
+        logger.debug("%s ",  itemschecked)
 
     
 
@@ -695,13 +693,17 @@ class VisualMapPanel(wx.Panel):
         self.d.BTNUpdate = wx.Button(panel, ID_BTNUpdate, "Draw & Update")
         self.d.BTNCSV = wx.Button(panel, ID_BTNCSV, "Open Geo Table")
         self.d.BTNSTOP = wx.Button(panel, ID_BTNSTOP, "Stop")
+        self.d.BTNBROWSER = wx.Button(panel, ID_BTNBROWSER, "Browser")
         l1.Add (self.d.BTNLoad, 0, wx.EXPAND | wx.ALL, 5)
         l1.Add (self.d.BTNUpdate, 0, wx.EXPAND | wx.ALL, 5)
         l1.Add (self.d.BTNCSV, 0, wx.EXPAND | wx.ALL, 5)
         box.Add(l1, 0, wx.EXPAND | wx.ALL,0)
         l1 = wx.BoxSizer(wx.HORIZONTAL)
         l1.Add (self.d.ai, 0, wx.EXPAND | wx.ALL | wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 5)
-        l1.Add (self.d.BTNSTOP, 0, wx.EXPAND | wx.LEFT, 90)
+        l1.Add (self.d.BTNSTOP, 0, wx.EXPAND | wx.LEFT, 30)
+        l1.AddSpacer(20)
+        l1.Add (self.d.BTNBROWSER, wx.EXPAND | wx.ALL, 5)
+        l1.AddSpacer(30)
         box.Add((0,10))
         box.Add(l1, 0, wx.EXPAND | wx.ALL,0)
  
@@ -739,6 +741,7 @@ class VisualMapPanel(wx.Panel):
         self.Bind(wx.EVT_BUTTON, self.EvtButton, id = ID_BTNUpdate)
         self.Bind(wx.EVT_BUTTON, self.EvtButton, id = ID_BTNCSV)
         self.Bind(wx.EVT_BUTTON, self.EvtButton, id = ID_BTNSTOP)
+        self.Bind(wx.EVT_BUTTON, self.EvtButton, id = ID_BTNBROWSER)
         self.Bind(wx.EVT_TEXT, self.EvtText, id = ID_TEXTResult)
         self.OnBusyStop(-1)
         
@@ -786,9 +789,21 @@ class VisualMapPanel(wx.Panel):
 
     def EvtRadioBox(self, event):
 
-        logger.debug('%d is %d' % (event.GetId(), event.GetInt()))
+        logger.debug('%d is %d',  event.GetId(), event.GetInt())
         if event.GetId() == ID_RBResultHTML:
             self.gO.set('ResultHTML', event.GetInt() == 0)
+            filename = self.gO.get('Result')
+            newname = filename
+            if self.gO.get('ResultHTML'):
+                if '.kml' in filename.lower():
+                    newname = self.gO.get('Result').replace('.kml', '.html', -1)
+            else:
+                if '.html' in filename.lower():
+                    newname = self.gO.get('Result').replace('.html', '.kml', -1)
+            if filename != newname:      
+                self.gO.set('Result', newname)
+                self.d.TEXTResult.SetValue(self.gO.get('Result'))
+
            
             self.SetupButtonState()
         elif event.GetId() ==  ID_RBGroupBy:
@@ -802,7 +817,7 @@ class VisualMapPanel(wx.Panel):
         if event.GetId() == ID_TEXTResult:
             event.GetString()
             self.gO.set('Result', event.GetString())
-            logger.debug("Result {}".format(self.gO.get('Result')) )
+            logger.debug("Result %s", self.gO.get('Result') )
         else:
             logger.error("uncontrolled TEXT")
 
@@ -811,7 +826,7 @@ class VisualMapPanel(wx.Panel):
         logger.debug('%s for %i', event.IsChecked(), event.GetId() )
         cb = event.GetEventObject()
         if cb.Is3State():
-            logger.debug("3StateValue: %s" % cb.Get3StateValue())
+            logger.debug("3StateValue: %s", cb.Get3StateValue())
         cbid = event.GetId()
         logger.debug('set %s to %s (%s)', IDtoAttr[cbid][0], cb.GetValue(), IDtoAttr[cbid][1] )
         panel.gO.set(IDtoAttr[cbid][0], cb.GetValue())
@@ -829,48 +844,46 @@ class VisualMapPanel(wx.Panel):
             dlg = None
             # TODO Fix this up
             if hasattr(self.threads[0], 'humans') and self.threads[0].humans:
-               if len(self.threads[0].humans) > 200:
-                  dlg = wx.MessageDialog(self, f'Caution, {len(self.threads[0].humans)} people in your tree\n it may create very large HTML files and may not open in the browser',
+                if len(self.threads[0].humans) > 200:
+                    dlg = wx.MessageDialog(self, f'Caution, {len(self.threads[0].humans)} people in your tree\n it may create very large HTML files and may not open in the browser',
                                'Warning', wx.OK | wx.ICON_WARNING)
             else:
-               dlg = wx.MessageDialog(self, 'Caution, if you load a GEDCOM with lots of people in your tree\n it may create very large HTML files and may not open in the browser',
+                dlg = wx.MessageDialog(self, 'Caution, if you load a GEDCOM with lots of people in your tree\n it may create very large HTML files and may not open in the browser',
                                'Warning', wx.OK | wx.ICON_WARNING)
 
             if dlg:                    
-              dlg.ShowModal()
-              dlg.Destroy()
+                dlg.ShowModal()
+                dlg.Destroy()
 
 
     def EvtButton(self, event):
         id = event.GetId() 
-        logger.debug("Click! (%d)" % id)
+        logger.debug("Click! (%d)", id)
         if id == ID_BTNLoad:
-                self.LoadGEDCOM()
+            self.LoadGEDCOM()
                 
         elif id == ID_BTNUpdate:
-                self.DrawGEDCOM()
+            self.DrawGEDCOM()
                                 
         elif id == ID_BTNCSV:
-                self.OpenCSV()
+            self.OpenCSV()
         elif id == ID_BTNSTOP:
-                self.gO.set('stopping', True)
-                self.gO.set('parsed', False)
-                self.NeedRedraw()
-                self.NeedReload()
+            self.gO.set('stopping', True)
+            self.gO.set('parsed', False)
+            self.NeedRedraw()
+            self.NeedReload()
+        elif id == ID_BTNBROWSER:
+            self.OpenBrowser()
         else:
             logger.error("uncontrolled ID")
     
 
     def EvtListBox(self, event):
 
-        id = event.GetId()
-        logger.debug('{}, {}, {}'.format(event.GetString(),
-                            event.IsSelection(),
-                            event.GetSelection()
-                            # event.GetClientData()
-                            ))
+        eventid = event.GetId()
+        logger.debug('%s, %s, %s', event.GetString(), event.IsSelection(), event.GetSelection())                            
         lb = event.GetEventObject()
-        if id ==  ID_LISTPlaceType:
+        if eventid ==  ID_LISTPlaceType:
             places = {}
             for cstr in event.EventObject.CheckedStrings:
                 places[cstr] = cstr
@@ -883,7 +896,7 @@ class VisualMapPanel(wx.Panel):
 
     def EvtSlider(self, event):
 
-        logger.debug('%s' % event.GetSelection())
+        logger.debug('%s', event.GetSelection())
         panel.gO.HeatMapTimeStep = event.GetSelection()
 
     def OnMyTimer(self, evt):
@@ -923,15 +936,15 @@ class VisualMapPanel(wx.Panel):
         self.frame.SetStatusText(status)
         
         wx.Yield()
-        pass
+        
 
     def OnBusyStart(self, evt):
-            self.d.ai.Start()
-            self.d.ai.Show()
+        self.d.ai.Start()
+        self.d.ai.Show()
             
     def OnBusyStop(self, evt):
-            self.d.ai.Stop()
-            self.d.ai.Hide()
+        self.d.ai.Stop()
+        self.d.ai.Hide()
 
     def OnUpdate(self, evt):
         # proces evt state hand off
@@ -948,8 +961,6 @@ class VisualMapPanel(wx.Panel):
 
             self.threads[0].updateinfo = ''
     
-        pass
-        
     def SetupButtonState(self):
         ResultTypeHTML = self.gO.get('ResultHTML')
         # Always enabled
@@ -1071,8 +1082,11 @@ class VisualMapPanel(wx.Panel):
             wx.Execute(csvprogram + " " + csvfile, wx.EXEC_ASYNC)
         pass
     def OpenBrowser(self):
-        webbrowser.open(os.path.join(self.gO.resultpath, self.gO.Result), new = 0, autoraise = True)
-
+        if self.gO.get('ResultHTML'):
+            webbrowser.open(os.path.join(self.gO.resultpath, self.gO.Result), new = 0, autoraise = True)
+        else:
+            webbrowser.open(KMLMAPSURL, new = 0, autoraise = True)
+            
     def OnCloseWindow(self, evt):
         busy = wx.BusyInfo("One moment please, waiting for threads to die...")
         wx.Yield()
@@ -1224,7 +1238,7 @@ class BackgroundActions:
                     time.sleep(0.25)
                     
 
-                    logger.info("human count %i", len(self.humans))
+                    logger.info("human count %d", len(self.humans))
                     self.humans = ParseAndGPS(self.gOptions, 2)
                     self.updategrid = True
                     
@@ -1245,6 +1259,8 @@ class BackgroundActions:
                     else:
                         logger.info("not parsed")
                     logger.info("done draw")
+                    self.updategrid = True
+
                 
                 self.do = 0
                 self.gOptions.stop()

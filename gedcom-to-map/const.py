@@ -1,10 +1,11 @@
 """Constants for gedcom-to-visualmap"""
 
-VERSION = "0.1.2"
+VERSION = "0.2.0"
 NAME = "gedcom-to-visualmap"
 
 GV_COUNTRIES_JSON = 'https://raw.githubusercontent.com/nnjeim/world/master/resources/json/countries.json'
 GV_STATES_JSON = 'https://raw.githubusercontent.com/nnjeim/world/master/resources/json/states.json'
+KMLMAPSURL = "https://www.google.ca/maps/about/mymaps"
 
 LOG_CONFIG = {
     'version': 1,
@@ -19,7 +20,7 @@ LOG_CONFIG = {
     },
     'handlers': { 
         'default': { 
-            'level': 'INFO',                        # This one matters
+            'level': 'WARNING',                        # This one matters
             'formatter': 'standard',
             'class': 'logging.StreamHandler',
             'stream': 'ext://sys.stdout',  # Default is stderr

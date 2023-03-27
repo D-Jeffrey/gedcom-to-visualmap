@@ -6,6 +6,7 @@ import folium
 # import simplekml as simplekml
 from models.Line import Line
 from models.Pos import Pos
+from render.Referenced import Referenced
 import os.path
 import logging
 
@@ -87,6 +88,7 @@ class foliumExporter:
         
         random.seed()
         self.gOptions.step()
+        self.gOptions.Referenced = Referenced()
 
     def setoptions(self):
 
@@ -106,9 +108,9 @@ class foliumExporter:
         self.fglastname[thename][2] = depth
         return thefg
 
-        """ ***************************** """ 
-        """    Export results into HTML   """ 
-        """ ***************************** """ 
+        # ***************************** 
+        #    Export results into HTML   
+        # ***************************** 
 
     def export(self, main: Pos, lines: [Line], ntag =""):
         SortByLast = (self.gOptions.GroupBy == 1)
@@ -125,9 +127,9 @@ class foliumExporter:
 
         
 
-        """ ***************************** """ 
-        """    HEAT MAP Section           """ 
-        """ ***************************** """ 
+        # *****************************  
+        #    HEAT MAP Section            
+        # ***************************** 
         
         if self.gOptions.HeatMapTimeLine:
             logger.info("building clusters")    
@@ -137,6 +139,7 @@ class foliumExporter:
                 if (self.gOptions.step()):
                     break
                 if (hasattr(line,'style') and line.style == 'Life'):
+                    Referenced.add(line.human.xref_id, 'heat')
                     if line.human.birth and line.human.birth.pos:
                         mycluster.mark(line.human.birth.pos, line.human.birth.whenyear())
                         minyear = line.human.birth.whenyearnum()
@@ -237,9 +240,14 @@ class foliumExporter:
         
         i = 0
         self.gOptions.step("Building lines")
-        for line in (list(filter (lambda line: hasattr(line,'style'), lines))):
+        if SortByLast:
+            lines_sorted = lines
+        else:
+            lines_sorted = sorted(lines, key=lambda x: x.prof)
+        for line in (list(filter (lambda line: hasattr(line,'style'), lines_sorted))):
             self.gOptions.step()
             i += 1
+            self.gOptions.Referenced.add(line.human.xref_id, 'line')        # Line ID
             if ( line.style == 'Life'):
                 flc = flp                                                   # Feature Group Class   (To create a Hierachary NOT USED)
                 aicc = 'orange'                                             # Start Point Icon color
@@ -248,10 +256,10 @@ class foliumExporter:
                 bici = 'cross'                                              # End Point Icon itself
                 lc = '#' + line.color.to_hexa()                             # Line Color
                 da = []
-                ln = line.parentofhuman                                     # Line Name
+                ln = line.name                                              # Line Name
                 g = ""
                 markertipname = "Life of " + line.name                      # Marker Tool Tip
-                fancyname = line.style + " of "+ line.parentofhuman         # Formated Line Tool Tool Tip
+                fancyname = line.style + " of " + line.name                 # the line represents and name for Tool Tip
                 markhome = 'house'                                          # Icon to put at the Start  (NOT USED)
             else: 
                 flc = flr
@@ -272,11 +280,12 @@ class foliumExporter:
                     bicc = 'pink'
                 ln = line.name
                 g = line.name.split(' ',2)[0] 
-                markertipname = line.name +  " " + line.style + " of "+ line.parentofhuman
-                fancyname = line.name + " " + line.style + " of "+ line.parentofhuman
+                markertipname = line.name +  " " + line.style + " of "+ (line.parentofhuman.name if line.parentofhuman else '')
+                fancyname = line.name + " " + line.style + " of "+ (line.parentofhuman.name if line.parentofhuman else '')
             fg = None
             newfg = False
-            labelname = str(i) +' '+ ln
+            # labelname = str(i) +' '+ ln
+            labelname = ln
             if (len(labelname) > 25): labelname = labelname[1:25] +"..."
             gn = lgd_txt.format( txt=labelname, col= lc)
             fm_line = []
@@ -300,7 +309,8 @@ class foliumExporter:
                         if SortByLast:
                             fg = self.getFeatureGroup(line.human.surname, line.prof)
                         if SortByPerson:
-                            fg = self.getFeatureGroup(line.parentofhuman, line.prof)
+                            parentname = line.parentofhuman.name if line.parentofhuman else ''
+                            fg = self.getFeatureGroup(parentname , line.prof)
                         if (not fg):
                             fg = folium.FeatureGroup(name= gn, show=False)
                             newfg = True
@@ -313,7 +323,8 @@ class foliumExporter:
                     if SortByLast:
                         fg = self.getFeatureGroup(line.human.surname, line.prof)
                     if SortByPerson:
-                        fg = self.getFeatureGroup(line.parentofhuman, line.prof)
+                        parentname = line.parentofhuman.name if line.parentofhuman else ''
+                        fg = self.getFeatureGroup(parentname, line.prof)
                         
                     if (not fg):
                         fg = folium.FeatureGroup(name= gn, show=False)
@@ -363,7 +374,8 @@ class foliumExporter:
                     if SortByLast:
                         fg = self.getFeatureGroup(line.human.surname, line.prof)
                     if SortByPerson:
-                        fg = self.getFeatureGroup(line.parentofhuman, line.prof)
+                        parentname = line.parentofhuman.name if line.parentofhuman else ''
+                        fg = self.getFeatureGroup(parentname, line.prof)
                         
               
                     if (not fg):
@@ -371,8 +383,8 @@ class foliumExporter:
 
                         newfg = True
                     fg.add_child(pl)
-          
-            logger.info(f"Name:{line.human.name:30};\tParent:{line.parentofhuman:30};\tStyle:{line.style};\tfrom:{line.a}; to:{line.b}")
+            parentname = line.parentofhuman.name if line.parentofhuman else ''
+            logger.info(f"Name:{line.human.name:30};\tParent:{parentname:30};\tStyle:{line.style};\tfrom:{line.a}; to:{line.b}")
 
             # Did we just create a feature group for this person?
             if newfg:
@@ -401,32 +413,36 @@ class foliumExporter:
             
         self.Done()
         return
+
+
+
         """ *****************************************************  """ 
         """    Display people using subgroup control to navigate   """ 
+        """    NOT USED YET                                        """ 
         """ *****************************************************  """ 
 
-    def peopleAsTreeNav():
-        peoplegroup = folium.FeatureGroup("Chránené oblasti",control=False)
-        # https://nbviewer.org/github/chansooligans/folium/blob/plugins-groupedlayercontrol/examples/plugin-GroupedLayerControl.ipynb
-        fg1 = folium.FeatureGroup(name='g1', show=False)
-        fg2 = folium.FeatureGroup(name='g2', show=False)
-        fg3 = folium.FeatureGroup(name='g3')
-        folium.Marker([40, 74]).add_to(fg1)
-        folium.Marker([38, 72]).add_to(fg2)
-        folium.Marker([40, 72]).add_to(fg3)
-        m.add_child(fg1)
-        m.add_child(fg2)
-        m.add_child(fg3)
+    #def peopleAsTreeNav(people):
+    #    peoplegroup = folium.FeatureGroup("Chránené oblasti",control=False)
+    #    # https://nbviewer.org/github/chansooligans/folium/blob/plugins-groupedlayercontrol/examples/plugin-GroupedLayerControl.ipynb
+    #    fg1 = folium.FeatureGroup(name='g1', show=False)
+    #    fg2 = folium.FeatureGroup(name='g2', show=False)
+    #    fg3 = folium.FeatureGroup(name='g3')
+    #    folium.Marker([40, 74]).add_to(fg1)
+    #    folium.Marker([38, 72]).add_to(fg2)
+    #    folium.Marker([40, 72]).add_to(fg3)
+    #    m.add_child(fg1)
+    #    m.add_child(fg2)
+    #    m.add_child(fg3)
 
-        folium.LayerControl(collapsed=False).add_to(m)
+    #    folium.LayerControl(collapsed=False).add_to(m)
 
-        GroupedLayerControl(
-            groups={'groups1': [fg1, fg2]},
-            exclusive_groups=False,
-            collapsed=False,
-        ).add_to(m)
+    #    GroupedLayerControl(
+    #        groups={'groups1': [fg1, fg2]},
+    #        exclusive_groups=False,
+    #        collapsed=False,
+    #    ).add_to(m)
         
-        # https://github.com/python-visualization/folium/issues/1712
-        # https://nbviewer.org/github/chansooligans/folium/blob/plugins-groupedlayercontrol/examples/plugin-GroupedLayerControl.ipynb
+    #    # https://github.com/python-visualization/folium/issues/1712
+    #    # https://nbviewer.org/github/chansooligans/folium/blob/plugins-groupedlayercontrol/examples/plugin-GroupedLayerControl.ipynb
 
-        return
+    #    return

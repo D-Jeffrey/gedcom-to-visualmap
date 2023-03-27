@@ -37,10 +37,10 @@ def getgdate (gstr):
             d = gstr.value.date1.day
 
         elif (k == 'PHRASE'):
-            y = y 
             #TODO need to fix up
+            y = y 
         else:
-            logger.warning ("Date type; %s".gstr.value.kind.name)
+            logger.warning ("Date type; %s", gstr.value.kind.name)
         y = (y, 1000) [y == None]
         m = (m, 1) [m == None]
         d = (d, 1) [d == None]

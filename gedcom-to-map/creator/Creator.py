@@ -48,7 +48,8 @@ class Creator:
     def create(self, main_id: str):
         if main_id not in self.humans.keys():
             logger.error("Could not find your starting person: %s", main_id)
-            raise
+            raise IndexError(f"Missing starting person {main_id}")
+
         current = self.humans[main_id]
         return self.link(current.pos, current)
 
@@ -56,7 +57,7 @@ class Creator:
         for human in self.humans:
             c = [creates.human.xref_id for creates in listof]
             if not human in c:
-                logger.debug(f"Others: + {self.humans[human].name}({human}) ({len(listof)})")
+                logger.debug("Others: + %s (%s) (%d)", self.humans[human].name, human, len(listof))
                 listof.extend(self.line(self.humans[human].pos, self.humans[human], len(listof)/10, 5, 0, path=""))
 
 class LifetimeCreator:
@@ -85,7 +86,7 @@ class LifetimeCreator:
         bp = current.birth.pos if current.birth else None
         bd = current.death.pos if current.death else None
         line = Line("{:8} {}".format(path, current.name), bp, bd, self.rainbow.get(color), prof, 'Life', 
-                    current.name, midpoints, current, wyear)
+                    None, midpoints, current, wyear)
         if current.birth: 
             line.updateWhen(current.birth.whenyear())
         line.updateWhen(wyear)
@@ -95,12 +96,12 @@ class LifetimeCreator:
         
     # Draw a line from the parents birth to the child birth location
                             
-    def line(self, pos: Pos, parent: Human, branch, prof, miss, path="", linestyle="", forhuman="") -> [Line]:
+    def line(self, pos: Pos, parent: Human, branch, prof, miss, path="", linestyle="", forhuman: Human = None ) -> [Line]:
         if hasattr(parent, 'birth') and parent.birth:
             color = (branch + delta / 2) / (space ** prof)
-            logger.info("{:8} {:8} {:2} {:.10f} {} {:20} from {:20}".format(path, branch, prof, color, self.rainbow.get(color).to_hexa(), parent.name, forhuman))
+            logger.info("{:8} {:8} {:2} {:.10f} {} {:20} from {:20}".format(path, branch, prof, color, self.rainbow.get(color).to_hexa(), parent.name, forhuman.name))
             line = Line("{:8} {}".format(path, parent.name), pos, parent.birth.pos, self.rainbow.get(color), prof, linestyle,  
-                            forhuman,  human=parent, when= (parent.birth.whenyear(), getattrif(parent, 'death','whenyear()')))
+                            forhuman,  human=parent, when= (parent.birth.whenyear(), getattrif(parent, 'death','whenyear')))
             return self.link(parent.birth.pos, parent, branch, prof, 0, path) + [line]
         else:
             if self.max_missing != 0 and miss >= self.max_missing:
@@ -112,13 +113,13 @@ class LifetimeCreator:
         
     def link(self, pos: Pos, current: Human, branch=0, prof=0, miss=0, path="") -> [Line]:
         return (self.selfline(current, branch*space, prof+1, miss, path)) \
-               + (self.line(pos, self.humans[current.father], branch*space, prof+1, miss, path + "0",'father', current.name) if current.father else []) \
-               + (self.line(pos, self.humans[current.mother], branch*space+delta, prof+1, miss, path + "1", 'mother', current.name) if current.mother else [])
+               + (self.line(pos, self.humans[current.father], branch*space, prof+1, miss, path + "0",'father', current) if current.father else []) \
+               + (self.line(pos, self.humans[current.mother], branch*space+delta, prof+1, miss, path + "1", 'mother', current) if current.mother else [])
 
     def create(self, main_id: str):
         if main_id not in self.humans.keys():
             logger.error ("Could not find your starting person: %s", main_id)
-            raise
+            raise IndexError(f"Missing starting person {main_id}")
         current = self.humans[main_id]
 
         return self.link(current.birth.pos if hasattr(current, 'birth') and current.birth != None else Pos(None, None), current) 
@@ -127,6 +128,6 @@ class LifetimeCreator:
         for human in self.humans:
             c = [creates.human.xref_id for creates in listof]
             if not human in c:
-                logger.debug (f"Others: + {self.humans[human].name}({human}) ({len(listof)})")
+                logger.debug ("Others: + %s(%s) (%d)", self.humans[human].name, human, len(listof))
                 listof.extend(self.selfline(self.humans[human], len(listof)/10, len(listof)/10, 5, path=""))
                

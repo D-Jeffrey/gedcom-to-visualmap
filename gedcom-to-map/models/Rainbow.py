@@ -40,7 +40,7 @@ class Rainbow:
             Color(0, 0, 255),
         ]
         if len(self.steps) == 0:
-            raise
+            raise AssertionError(f"Rainbow did not initialize")
 
     @staticmethod
     def merge_color(color_a: Color, color_b: Color, coef: float):

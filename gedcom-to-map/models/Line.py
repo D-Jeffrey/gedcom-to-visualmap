@@ -13,9 +13,12 @@ class Line:
     prof - how far from orginal, midpoint - (LifeEvent) array,
     human - reference to themeselves, 
     """
-    def __init__(self, name: str, a: Pos, b: Pos, color: Color, prof: int, style : str = '', parentofhuman = '', 
+    def __init__(self, name: str, a: Pos, b: Pos, color: Color, prof: int, style : str = '', parentofhuman : Human = None, 
                         midpoints:[]=None, human=None, when: int =None, tag:str='', type=''):
         self.name = name
+        # TODO we need to use id to avoid problems with duplicate names
+        # BUG
+        
         self.a = a
         self.b = b
         self.color = color
@@ -50,6 +53,16 @@ class Line:
            self.when = newwhen
         if self.when and newwhen and newwhen < self.when:
             self.when = newwhen
+
+    def __getattr__(self, attr):
+        if attr == 'parentofhuman' and self.parentofhuman is None:
+            return ''
+        raise AttributeError(f"'{type(self).__name__}' object has no attribute '{attr}'")
+
+    def __str__(self, attr):
+        if attr == 'parentofhuman' and self.parentofhuman is None:
+            return ''
+        raise AttributeError(f"'{type(self).__name__}' object has no attribute '{attr}'")
         
     
     

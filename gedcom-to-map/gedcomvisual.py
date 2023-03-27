@@ -1,4 +1,5 @@
-from creator.Creator import Creator, LifetimeCreator
+from creator.Creator import Creator
+from creator.Creator import LifetimeCreator
 from gedcom.GedcomParser import GedcomParser
 from kml.KmlExporter import KmlExporter
 from kml.foliumExp import foliumExporter
@@ -61,8 +62,13 @@ def doKML(gOp : gvOptions, humans):
         gOp.setMainName(humans[gOp.Main].name)
         if (not kmlInstance):
             kmlInstance = KmlExporter(gOp)
+
         kmlInstance.export(humans[gOp.Main].pos, creator, nametag)
     kmlInstance.Done()
+    # TODO restore keys (this is a patch that needs to be changed)
+    for h in humans.keys():
+        humans[h].pos = humans[h].map
+
 
 
 def Geoheatmap(gOp : gvOptions):
@@ -91,7 +97,7 @@ def doHTML(gOp : gvOptions, humans):
     
 
 
-def ParseAndGPS(gOp: gvOptions, stage : 0 ):
+def ParseAndGPS(gOp: gvOptions, stage: int = 0 ):
     logger.info ("Starting parsing of GEDCOM : %s", gOp.GEDCOMinput)
     if (stage == 0 or stage == 1):
         humans = GedcomParser(gOp).create_humans()

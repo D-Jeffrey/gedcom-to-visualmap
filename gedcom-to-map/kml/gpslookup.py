@@ -185,7 +185,7 @@ class GEDComGPSLookup:
                 if self.addresses[a]['name'] !='': 
                     newMD5.update((self.addresses[a]['name'] +  self.addresses[a]['alt'] +  
                              str(self.addresses[a]['lat']) +  str(self.addresses[a]['long'])).encode(errors='ignore'))
-            if newMD5.hexdigest() == self.orgMD5.hexdigest():
+            if self.orgMD5 and newMD5.hexdigest() == self.orgMD5.hexdigest():
                 logger.debug("GPS Cache has not changed")
                 return
         else:

@@ -181,6 +181,9 @@ python ..\gedcom-to-map\gedcom-to-map.py pres2020.ged pres2020-2 -main "@I676@" 
 - need to determine how do deal with very large HTML files
 
 ## Releases
+### v0.2.1
+- more issues with cache, the first time you run it in the new directory
+- added Kennedy samples
 ### v0.2.0
 - fixed requirements.txt
 - Add highlighting of people used in the draw

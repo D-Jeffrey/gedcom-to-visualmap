@@ -49,14 +49,6 @@ class gvOptions:
         self.humans = None
         self.Referenced = None
         
-            # HKEY_LOCAL_MACHINE\SOFTWARE\Classes\.csv
-            # HKEY_LOCAL_MACHINE\SOFTWARE\Classes\.csv\Content Type
-            #   HKEY_CLASSES_ROOT\CLSID\{5e941d80-bf96-11cd-b579-08002b30bfeb}
-            # HKEY_CLASSES_ROOT\MIME\Database\Content Type\application/vnd.ms-excel
-            # HKEY_CLASSES_ROOT\Excel.CSV\shell\Open\command
-
-        self.csvprogram = '"C:\Program Files\Microsoft Office\Root\Office16\EXCEL.EXE"'
-
     def setstatic(self,  GEDCOMinput:str, Result:str, ResultHTML: bool, Main=None, MaxMissing:int = 0, MaxLineWeight:int = 20, UseGPS:bool = True, CacheOnly:bool = False,  AllEntities:bool = False, PlaceType = {'native':'native'}):
         self.setInput(GEDCOMinput)
         self.setResults(Result, ResultHTML)

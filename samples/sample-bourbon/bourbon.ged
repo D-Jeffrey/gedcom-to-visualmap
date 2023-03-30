@@ -1,0 +1,6216 @@
+﻿0 HEAD
+1 NOTE Généalogie faisant le lien avec les Ducs, Princes et Rois de Bretagne
+1 SUBM @B1@
+1 SOUR ANCESTRIS
+2 VERS 11.0.10221
+2 NAME Ancestris
+2 CORP Ancestris Team
+3 ADDR http://www.ancestris.org
+1 DEST ANY
+1 DATE 11 MAY 2020
+2 TIME 20:53:28
+1 FILE bourbon.ged
+1 GEDC
+2 VERS 5.5.1
+2 FORM LINEAGE-LINKED
+1 CHAR UTF-8
+1 LANG French
+1 PLAC
+2 FORM Lieudit, Commune, Code_INSEE, Département, Région, Pays
+1 COPR (c) Ancestris 2018
+0 @B1@ SUBM
+1 NAME VOYEAUD Yannick
+1 ADDR 59 rue Druge
+2 CITY VIENNE
+2 POST 38200
+2 CTRY France
+1 PHON
+1 EMAIL yannick@@voyeaud.org
+1 WWW http://voyeaud.org
+1 _EMAIL support@@ancestris.org
+1 _WWW http://www.ancestris.org
+1 CHAN
+2 DATE 23 APR 2016
+3 TIME 18:23:11
+0 @I1@ INDI
+1 NAME Louis XIII /CAPET/
+2 GIVN Louis, XIII
+2 SURN CAPET
+1 _SOSADABOVILLE 64 G7
+1 SEX M
+1 BIRT
+2 DATE 27 SEP 1601
+2 PLAC , Fontainebleau, 77186, Seine-et-Marne, Île-de-France, FRANCE
+3 MAP
+4 LATI N48.4
+4 LONG E2.7
+1 DEAT
+2 DATE 14 MAY 1643
+2 PLAC Château, Saint-Germain-en-Laye, 78551, Yvelines, Île-de-France, FRANCE
+3 MAP
+4 LATI N48.8979
+4 LONG E2.09592
+1 EVEN
+2 TYPE Sacre
+2 DATE 17 OCT 1610
+2 PLAC , Reims, 51454, Marne, Grand Est, FRANCE
+3 MAP
+4 LATI N49.25
+4 LONG E4.03333
+1 FAMC @F11@
+1 FAMS @F1@
+1 OBJE
+2 TITL Louis XIII par Rubens
+2 FILE photos/Louis_XIII.jpg
+3 FORM jpg
+2 NOTE
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:25
+0 @I2@ INDI
+1 NAME Anne /HABSBOURG/
+2 GIVN Anne
+2 NICK D'Autriche
+2 SURN HABSBOURG
+1 _SOSADABOVILLE 65 G7
+1 SEX F
+1 BIRT
+2 DATE 22 SEP 1601
+2 PLAC , Valladolid, , Valladolid, Castille-et-León, ESPAGNE
+3 MAP
+4 LATI N41.65518
+4 LONG W4.72372
+1 DEAT
+2 DATE 20 JAN 1666
+2 PLAC , Paris, 75056, Paris, Île-de-France, FRANCE
+3 MAP
+4 LATI N48.85341
+4 LONG E2.3488
+1 FAMS @F1@
+1 OBJE
+2 TITL Anne d'Autriche
+2 FILE photos/Anne_d_Autriche.jpg
+3 FORM jpg
+2 NOTE
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:25
+0 @F1@ FAM
+1 HUSB @I1@
+1 WIFE @I2@
+1 MARR
+2 DATE 21 NOV 1615
+2 PLAC , Bordeaux, 33063, Gironde, Nouvelle-Aquitaine, FRANCE
+3 MAP
+4 LATI N44.84044
+4 LONG W0.5805
+1 CHIL @I3@
+1 CHIL @I4@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:17:08
+0 @I3@ INDI
+1 NAME Louis XIV /CAPET/
+2 GIVN Louis, XIV
+2 SURN CAPET
+1 _SOSADABOVILLE 32 G6
+1 SEX M
+1 BIRT
+2 DATE 5 SEP 1638
+2 PLAC Château, Saint-Germain-en-Laye, 78551, Yvelines, Île-de-France, FRANCE
+3 MAP
+4 LATI N48.8979
+4 LONG E2.09592
+2 SOUR @S1@
+3 DATA
+4 TEXT Le cinquiesme jour de septembre mil six
+5 CONT cents trente huict nasquit dans le chasteau
+5 CONT neuf de St Germain en Laye a onze heures
+5 CONT un quart du matin Monseigneur le dauphin
+5 CONT fils premier nay de tres chrestien et tres puissant
+5 CONT Monarqz Louys treiziesme de ce nom Roy
+5 CONT de france et de Navarre et de tres religieuse
+5 CONT et Illustre Princesse Anne d'Austriche
+5 CONT sa tres chaste et chere Espouse Et funt Incontinent
+5 CONT apres et le mesme Jour Ondoye par le
+5 CONT Reverand Pere en Dieu Messire dominiqz
+5 CONT Seguier Evesqz de Meaux et premier Aumosnier
+5 CONT de sa Maj[es]te avec les eaues baptismales des
+5 CONT fonts de la paroisse dud[it] lieu de st Germain en 
+5 CONT Laye bailles et livrees par Me Pierre
+5 CONT Cagnye pbre et cure de ladicte
+5 CONT Paroisse
+5 CONT Bailly
+3 OBJE
+4 TITL Acte de Baptême de Louis XIV
+4 FILE actes/Bapteme_Louis_XIV.jpg
+5 FORM jpg
+4 NOTE Collection Communale
+5 CONT Cote 1168917
+5 CONT Registre des Baptêmes (1629-1640)
+5 CONT Page 108
+4 FILE actes/Transcription_bapteme_Louis_XIV.pdf
+5 FORM pdf
+1 DEAT
+2 DATE 1 SEP 1715
+2 PLAC , Versailles, 78646, Yvelines, Île-de-France, FRANCE
+3 MAP
+4 LATI N48.8
+4 LONG E2.13333
+1 RESI
+2 DATE 6 MAY 1682
+2 ADDR Le Château
+3 CITY Versailles,Yvelines
+3 POST 78000
+1 BURI
+2 DATE 9 SEP 1715
+2 PLAC Basilique, Saint-Denis, 93066, Seine-Saint-Denis, Île-de-France, FRANCE
+3 MAP
+4 LATI N48.9354
+4 LONG E2.35991
+2 SOUR @S2@
+3 DATA
+4 TEXT Le premier jour de septembre de l'an mil sept
+5 CONT cents quinze est decedé tres haut tres puissant et tres
+5 CONT excellent Roy de france Louis quatorze deglorieuse
+5 CONT memoire agé de Soixante et dix sept ans
+5 CONT Dans son ch(ate)au et transporté a St Denys
+5 CONT Le neufieme dudit mois en presence de M(essir)e Jean
+5 CONT Dubois chanoine de St quentin chappelain ord(inai)re de la
+5 CONT musique du Roy et M(essir)e Pierre mamoury p(re)b(t)re de la
+5 CONT con(gregatio)n de la mission qui ont signé avec nous
+3 OBJE
+4 TITL Inhumation de Louis XIV
+4 FILE actes/Sepulture_Louis_XIV.jpg
+5 FORM jpg
+4 NOTE
+1 EVEN
+2 TYPE Sacre
+2 DATE 7 JUN 1654
+2 PLAC , Reims, 51454, Marne, Grand Est, FRANCE
+3 MAP
+4 LATI N49.25
+4 LONG E4.03333
+1 FAMC @F1@
+1 FAMS @F2@
+1 FAMS @F3@
+1 OBJE
+2 TITL Louis XIV en habit de sacre
+2 FILE photos/Louis_XIV.jpg
+3 FORM jpg
+2 NOTE
+1 CHAN
+2 DATE 7 MAY 2020
+3 TIME 18:46:35
+0 @I4@ INDI
+1 NAME Philippe I /CAPET/
+2 GIVN Philippe, I
+2 NICK D'Orléans
+2 SURN CAPET
+1 _SOSADABOVILLE 64-2 G6
+1 SEX M
+1 BIRT
+2 DATE 21 SEP 1640
+2 PLAC Château, Saint-Germain-en-Laye, 78551, Yvelines, Île-de-France, FRANCE
+3 MAP
+4 LATI N48.8979
+4 LONG E2.09592
+1 DEAT
+2 DATE 9 JUN 1701
+2 PLAC , Saint-Cloud, 92064, Hauts-de-Seine, Île-de-France, FRANCE
+3 MAP
+4 LATI N48.84598
+4 LONG E2.20289
+1 FAMC @F1@
+1 FAMS @F6@
+1 OBJE
+2 TITL Phillipe II d'Orléans
+2 FILE photos/Philippe_II.jpg
+3 FORM jpg
+2 NOTE
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:26
+0 @I5@ INDI
+1 NAME Marie-Thérèse /HABSBOURG/
+2 GIVN Marie-Thérèse
+2 NICK D'Autriche
+2 SURN HABSBOURG
+1 _SOSADABOVILLE 33 G6
+1 SEX F
+1 BIRT
+2 DATE 20 SEP 1638
+2 PLAC , Madrid, , Province de Madrid, Communauté de Madrid, ESPAGNE
+3 MAP
+4 LATI N40.4165
+4 LONG W3.70256
+1 DEAT
+2 DATE 30 JUL 1683
+2 PLAC , Versailles, 78646, Yvelines, Île-de-France, FRANCE
+3 MAP
+4 LATI N48.8
+4 LONG E2.13333
+1 FAMS @F2@
+1 OBJE
+2 TITL Marie-Thérèse avec son fils, Louis
+2 FILE photos/Marie_Terese.jpg
+3 FORM jpg
+2 NOTE
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:25
+0 @F2@ FAM
+1 HUSB @I3@
+1 WIFE @I5@
+1 MARR
+2 DATE 9 JUN 1660
+2 PLAC , Saint-Jean-de-Luz, 64483, Pyrénées-Atlantiques, Nouvelle-Aquitaine, FRANCE
+3 MAP
+4 LATI N43.38871
+4 LONG W1.66267
+1 CHIL @I6@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:34:26
+0 @I6@ INDI
+1 NAME Louis /CAPET/
+2 GIVN Louis
+2 NICK Le Grand Dauphin
+2 SURN CAPET
+1 _SOSADABOVILLE 16 G5
+1 SEX M
+1 BIRT
+2 DATE 1 NOV 1661
+2 PLAC , Fontainebleau, 77186, Seine-et-Marne, Île-de-France, FRANCE
+3 MAP
+4 LATI N48.4
+4 LONG E2.7
+1 DEAT
+2 DATE 14 FEB 1711
+2 PLAC , Meudon, 92048, Hauts-de-Seine, Île-de-France, FRANCE
+3 MAP
+4 LATI N48.81381
+4 LONG E2.235
+1 FAMC @F2@
+1 FAMS @F4@
+1 OBJE
+2 TITL Louis, Le Grand Dauphin
+2 FILE photos/Louis_de_France.jpg
+3 FORM jpg
+2 NOTE
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:25
+0 @I7@ INDI
+1 NAME Françoise /D'AUBIGNÉ/
+2 GIVN Françoise
+2 NICK De Maintenon
+2 SURN D'AUBIGNÉ
+1 SEX F
+1 BIRT
+2 DATE 27 NOV 1635
+2 PLAC , Niort, 79191, Deux-Sèvres, Nouvelle-Aquitaine, FRANCE
+3 MAP
+4 LATI N46.32313
+4 LONG W0.45877
+1 DEAT
+2 DATE 15 APR 1719
+2 PLAC , Saint-Cyr-l'École, 78545, Yvelines, Île-de-France, FRANCE
+3 MAP
+4 LATI N48.79865
+4 LONG E2.06814
+1 RESI
+2 DATE 1 JAN 1716
+2 ADDR Maison Royale de Saint-Louis
+3 CITY Saint-Cyr-l'École,Yvelines
+3 POST 78210
+1 FAMS @F3@
+1 OBJE
+2 TITL Madame de Maintenon
+2 FILE photos/Madame_de_Maintenon.jpg
+3 FORM jpg
+2 NOTE
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:32:44
+0 @F3@ FAM
+1 HUSB @I3@
+1 WIFE @I7@
+1 MARR
+2 DATE 10 OCT 1683
+2 PLAC , Fontainebleau, 77186, Seine-et-Marne, Île-de-France, FRANCE
+3 MAP
+4 LATI N48.4
+4 LONG E2.7
+1 CHIL @I14@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:22:44
+0 @I8@ INDI
+1 NAME Marie Anne Victoire /DE BAVIÈRE/
+2 GIVN Marie, Anne, Victoire
+2 SURN DE BAVIÈRE
+1 _SOSADABOVILLE 17 G5
+1 SEX F
+1 BIRT
+2 DATE 28 NOV 1660
+2 PLAC , Munich, 09162000, Haute-Bavière, Bavière, ALLEMAGNE
+3 MAP
+4 LATI N48.13743
+4 LONG E11.57549
+1 DEAT
+2 DATE 20 APR 1690
+2 PLAC , Versailles, 78646, Yvelines, Île-de-France, FRANCE
+3 MAP
+4 LATI N48.8
+4 LONG E2.13333
+1 FAMS @F4@
+1 OBJE
+2 TITL Marie Anne DE BAVIÈRE
+2 FILE photos/Dauphine_Bayern.jpg
+3 FORM jpg
+2 NOTE
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:25
+0 @F4@ FAM
+1 HUSB @I6@
+1 WIFE @I8@
+1 MARR
+2 DATE 7 MAR 1680
+2 PLAC , Châlons, 51108, Marne, Grand Est, FRANCE
+3 MAP
+4 LATI N48.95393
+4 LONG E4.36724
+1 CHIL @I9@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:20:15
+0 @I9@ INDI
+1 NAME Louis /CAPET/
+2 GIVN Louis
+2 NICK Duc de Bourgogne
+2 SURN CAPET
+1 _SOSADABOVILLE 8 G4
+1 SEX M
+1 BIRT
+2 DATE 6 AUG 1682
+2 PLAC , Versailles, 78646, Yvelines, Île-de-France, FRANCE
+3 MAP
+4 LATI N48.8
+4 LONG E2.13333
+1 DEAT
+2 DATE 18 FEB 1712
+2 PLAC , Marly, 78372, Yvelines, Île-de-France, FRANCE
+3 MAP
+4 LATI N48.86667
+4 LONG E2.08333
+1 FAMC @F4@
+1 FAMS @F5@
+1 OBJE
+2 TITL Louis, Duc de BOURGOGNE
+2 FILE photos/Duc_de_Bourgogne.jpg
+3 FORM jpg
+2 NOTE
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:25
+0 @I10@ INDI
+1 NAME Marie-Adélaïde /DE SAVOIE/
+2 GIVN Marie-Adélaïde
+2 SURN DE SAVOIE
+1 _SOSADABOVILLE 9 G4
+1 SEX F
+1 BIRT
+2 DATE 6 DEC 1685
+2 PLAC , Turin, 0012721, Turin, Piémont, ITALIE
+3 MAP
+4 LATI N45.07049
+4 LONG E7.68682
+1 DEAT
+2 DATE 12 FEB 1712
+2 PLAC , Versailles, 78646, Yvelines, Île-de-France, FRANCE
+3 MAP
+4 LATI N48.8
+4 LONG E2.13333
+1 FAMS @F5@
+1 OBJE
+2 TITL Marie-Adélaïde DE SAVOIE
+2 FILE photos/Maria_Adelaide_von_Savoyen_02.jpg
+3 FORM jpg
+2 NOTE
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:25
+0 @F5@ FAM
+1 HUSB @I9@
+1 WIFE @I10@
+1 MARR
+2 DATE 7 DEC 1697
+2 PLAC , Versailles, 78646, Yvelines, Île-de-France, FRANCE
+3 MAP
+4 LATI N48.8
+4 LONG E2.13333
+1 CHIL @I11@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:35:46
+0 @I11@ INDI
+1 NAME Louis XV /CAPET/
+2 GIVN Louis, XV
+2 SURN CAPET
+1 _SOSADABOVILLE 4 G3
+1 SEX M
+1 BIRT
+2 DATE 15 FEB 1710
+2 PLAC , Versailles, 78646, Yvelines, Île-de-France, FRANCE
+3 MAP
+4 LATI N48.8
+4 LONG E2.13333
+1 DEAT
+2 DATE 10 MAY 1774
+2 PLAC , Versailles, 78646, Yvelines, Île-de-France, FRANCE
+3 MAP
+4 LATI N48.8
+4 LONG E2.13333
+1 EVEN
+2 TYPE Sacre
+2 DATE 25 OCT 1722
+2 PLAC , Reims, 51454, Marne, Grand Est, FRANCE
+3 MAP
+4 LATI N49.25
+4 LONG E4.03333
+2 OBJE
+3 TITL Louis XV en costume de sacre
+3 FILE photos/Louis_XV_sacre.jpg
+4 FORM jpg
+3 NOTE
+1 FAMC @F5@
+1 FAMS @F8@
+1 OBJE
+2 TITL Louis XV
+2 FILE photos/Louis_XV.jpg
+3 FORM jpg
+2 NOTE
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:25
+0 @I12@ INDI
+1 NAME Charlotte-Élisabeth /VON DER PFALZ-SIMMERN/
+2 GIVN Charlotte-Élisabeth
+2 NICK De Bavière
+2 SURN VON DER PFALZ-SIMMERN
+1 SEX F
+1 BIRT
+2 DATE 27 MAY 1652
+2 PLAC , Heidelberg, 08221000, District de Karlsruhe, Baden-Württemberg, ALLEMAGNE
+3 MAP
+4 LATI N49.40768
+4 LONG E8.69079
+1 DEAT
+2 DATE 8 DEC 1722
+2 PLAC , Saint-Cloud, 92064, Hauts-de-Seine, Île-de-France, FRANCE
+3 MAP
+4 LATI N48.84598
+4 LONG E2.20289
+1 FAMS @F6@
+1 OBJE
+2 TITL Charlotte-Élisabeth De Bavière
+2 FILE photos/Elisabeth_de_Baviere.jpg
+3 FORM jpg
+2 NOTE
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:32:09
+0 @F6@ FAM
+1 HUSB @I4@
+1 WIFE @I12@
+1 MARR
+2 DATE 16 NOV 1671
+2 PLAC , Metz, 57463, Mozelle, Grand Est, FRANCE
+3 MAP
+4 LATI N49.11911
+4 LONG E6.17269
+1 CHIL @I13@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:24:25
+0 @I13@ INDI
+1 NAME Philippe II /CAPET/
+2 GIVN Philippe, II
+2 NICK D'Orléans
+2 SURN CAPET
+1 _SOSADABOVILLE 64-2.1 G5
+1 SEX M
+1 BIRT
+2 DATE 2 AUG 1674
+2 PLAC , Saint-Cloud, 92064, Hauts-de-Seine, Île-de-France, FRANCE
+3 MAP
+4 LATI N48.84598
+4 LONG E2.20289
+1 DEAT
+2 DATE 2 DEC 1723
+2 PLAC , Versailles, 78646, Yvelines, Île-de-France, FRANCE
+3 MAP
+4 LATI N48.8
+4 LONG E2.13333
+1 OCCU Régent
+2 DATE BET 2 SEP 1715 AND 16 FEB 1723
+2 PLAC , Versailles, 78646, Yvelines, Île-de-France, FRANCE
+3 MAP
+4 LATI N48.8
+4 LONG E2.13333
+1 FAMC @F6@
+1 FAMS @F7@
+1 OBJE
+2 TITL Philippe d'Orléans
+2 FILE photos/Philippe_Orleans.jpg
+3 FORM jpg
+2 NOTE
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:26
+0 @I14@ INDI
+1 NAME Françoise Marie /DE BOURBON/
+2 GIVN Françoise, Marie
+2 SURN DE BOURBON
+1 _SOSADABOVILLE 32-b.1 G4
+1 SEX F
+1 BIRT
+2 DATE 4 MAY 1677
+2 PLAC , Versailles, 78646, Yvelines, Île-de-France, FRANCE
+3 MAP
+4 LATI N48.8
+4 LONG E2.13333
+1 DEAT
+2 DATE 1 FEB 1749
+2 PLAC , Versailles, 78646, Yvelines, Île-de-France, FRANCE
+3 MAP
+4 LATI N48.8
+4 LONG E2.13333
+1 FAMC @F3@
+1 FAMS @F7@
+1 OBJE
+2 TITL Françoise Marie DE BOURBON, avec sa soeur
+2 FILE photos/Francoise_Marie_de_Blois.jpg
+3 FORM jpg
+2 NOTE
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:26
+0 @F7@ FAM
+1 HUSB @I13@
+1 WIFE @I14@
+1 MARR
+2 DATE 9 JAN 1692
+2 PLAC , Versailles, 78646, Yvelines, Île-de-France, FRANCE
+3 MAP
+4 LATI N48.8
+4 LONG E2.13333
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:35:46
+0 @I15@ INDI
+1 NAME Marie /LESZCZYNSKA/
+2 GIVN Marie
+2 SURN LESZCZYNSKA
+1 _SOSADABOVILLE 5 G3
+1 SEX F
+1 BIRT
+2 DATE 23 JUN 1703
+2 PLAC , Trzebnica, , Powiat de Trzebnica, Voïvodie de Basse-Silésie, POLOGNE
+3 MAP
+4 LATI N51.31076
+4 LONG E17.06331
+1 DEAT
+2 DATE 24 JUN 1768
+2 PLAC , Versailles, 78646, Yvelines, Île-de-France, FRANCE
+3 MAP
+4 LATI N48.8
+4 LONG E2.13333
+1 FAMS @F8@
+1 OBJE
+2 TITL Marie LESZCZYNSKA
+2 FILE photos/Marie_Leszczynska.jpg
+3 FORM jpg
+2 NOTE
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:25
+0 @F8@ FAM
+1 HUSB @I11@
+1 WIFE @I15@
+1 MARR
+2 DATE 5 SEP 1725
+2 PLAC , Fontainebleau, 77186, Seine-et-Marne, Île-de-France, FRANCE
+3 MAP
+4 LATI N48.4
+4 LONG E2.7
+1 CHIL @I16@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:22:44
+0 @I16@ INDI
+1 NAME Louis /CAPET/
+2 GIVN Louis
+2 SURN CAPET
+1 _SOSADABOVILLE 2 G2
+1 SEX M
+1 BIRT
+2 DATE 4 SEP 1729
+2 PLAC , Versailles, 78646, Yvelines, Île-de-France, FRANCE
+3 MAP
+4 LATI N48.8
+4 LONG E2.13333
+1 DEAT
+2 DATE 20 DEC 1765
+2 PLAC , Fontainebleau, 77186, Seine-et-Marne, Île-de-France, FRANCE
+3 MAP
+4 LATI N48.4
+4 LONG E2.7
+1 FAMC @F8@
+1 FAMS @F9@
+1 OBJE
+2 TITL Louis de France
+2 FILE photos/Louis_de_France_02.jpg
+3 FORM jpg
+2 NOTE
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:25
+0 @I17@ INDI
+1 NAME Marie-Josèphe /VON SACHSEN/
+2 GIVN Marie-Josèphe
+2 NICK De Saxe
+2 SURN VON SACHSEN
+1 _SOSADABOVILLE 3 G2
+1 SEX F
+1 BIRT
+2 DATE 4 NOV 1731
+2 PLAC , Dresde, 14612000, , Saxe, ALLEMAGNE
+3 MAP
+4 LATI N51.05089
+4 LONG E13.73832
+1 DEAT
+2 DATE 13 MAR 1767
+2 PLAC , Versailles, 78646, Yvelines, Île-de-France, FRANCE
+3 MAP
+4 LATI N48.8
+4 LONG E2.13333
+1 FAMS @F9@
+1 OBJE
+2 TITL Marie-Josèphe DE SAXE
+2 FILE photos/Marie-Josephe_de_Saxe.jpg
+3 FORM jpg
+2 NOTE
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:25
+0 @F9@ FAM
+1 HUSB @I16@
+1 WIFE @I17@
+1 MARR
+2 DATE 9 FEB 1747
+1 CHIL @I18@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:00
+0 @I18@ INDI
+1 NAME Louis XVI /CAPET/
+2 GIVN Louis, XVI
+2 SURN CAPET
+1 _SOSADABOVILLE 1 G1
+1 SEX M
+1 BIRT
+2 DATE 23 AUG 1754
+2 PLAC , Versailles, 78646, Yvelines, Île-de-France, FRANCE
+3 MAP
+4 LATI N48.8
+4 LONG E2.13333
+1 DEAT
+2 DATE @#DFRENCH R@ 2 PLUV 1
+2 PLAC , Paris, 75056, Paris, Île-de-France, FRANCE
+3 MAP
+4 LATI N48.85341
+4 LONG E2.3488
+1 EVEN
+2 TYPE Sacre
+2 DATE 11 JUN 1775
+2 PLAC , Reims, 51454, Marne, Grand Est, FRANCE
+3 MAP
+4 LATI N49.25
+4 LONG E4.03333
+1 FAMC @F9@
+1 FAMS @F10@
+1 OBJE
+2 TITL Louis XVI
+2 FILE photos/Louis_XVI.jpg
+3 FORM jpg
+2 NOTE
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:25
+0 @I19@ INDI
+1 NAME Marie Antoinette /DE HASBOURG-LORRAINE/
+2 GIVN Marie, Antoinette
+2 NICK D'Autriche
+2 SURN DE HASBOURG-LORRAINE
+1 SEX F
+1 BIRT
+2 DATE 2 NOV 1755
+2 PLAC , Vienne, , Wien Stadt, Vienne, AUTRICHE
+3 MAP
+4 LATI N48.20849
+4 LONG E16.37208
+1 DEAT
+2 DATE @#DFRENCH R@ 25 VEND 2
+2 PLAC , Paris, 75056, Paris, Île-de-France, FRANCE
+3 MAP
+4 LATI N48.85341
+4 LONG E2.3488
+1 FAMS @F10@
+1 OBJE
+2 TITL Marie Antoinette d'Autriche
+2 FILE photos/Marie_Antoinette.jpg
+3 FORM jpg
+2 NOTE
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:35:57
+0 @F10@ FAM
+1 HUSB @I18@
+1 WIFE @I19@
+1 MARR
+2 DATE 16 MAY 1770
+2 PLAC , Versailles, 78646, Yvelines, Île-de-France, FRANCE
+3 MAP
+4 LATI N48.8
+4 LONG E2.13333
+2 SOUR @S3@
+3 DATA
+4 TEXT L'an mil sept cent soixante-dix, le seize may vu=û la dispense de parenté accordée par nôtre saint pere le pape clement quatorze en datte du trente aoust mil sept cent soixante-neuf et la dispense accordée par Mgr l'Archevêque de paris de la publ
+5 CONC ication de trois bans ensemble la permission d'être fiancés et mariés le même jour dans telle église, ou chapelle par tel évêque ou prêtre qu'il plaira à Sa majesté, même in pontificalibus en datte du quatre de ce mois, signé christophe Archevêqu
+5 CONC e de paris, plus bas de la Touche secrétaire...
+2 OBJE
+3 TITL Acte de Mariage de Louis XVI et Marie Antoinette
+3 FILE actes/Acte_mariage_Louis16.jpg
+4 FORM jpg
+3 FILE actes/Transcription_mariage_louis16.pdf
+4 FORM pdf
+3 NOTE Adresse de l'acte : http://doc.geneanet.org/actes/zoom.php?idacte=40472
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:35:46
+0 @N1@ NOTE Cette généalogie est un exemple fourni avec Ancestris. Elle peut cependant être corrigée et/ou complétée.
+1 CONT
+1 CONT N'hésitez pas à la modifier, toujours dans le respect de la norme gedcom, et à nous la faire parvenir (uniquement le fichier gedcom sauf si vous rajoutez des images et autres documents liés à vos modifications), à l'adresse:
+1 CONT support@@ancestris.org
+1 CONT
+1 CONT Merci. L'équipe de développement.
+1 CHAN
+2 DATE 3 SEP 2011
+3 TIME 06:38:48
+0 @S1@ SOUR
+1 AUTH Registre Communal de Saint-Germain-en-Laye
+1 TITL Site Internet Archives Départementales des Yvelines
+1 TEXT 5 Septembre 1638
+2 CONT Naissance de Louis XIV
+2 CONT
+2 CONT Le cinquième jour de septembre mil-six-cent-trente-huit, nasquit dans le château neuf de Saint-Germain-en-Laye à onze heures un quart du matin, Monseigneur le Dauphin fils premier-né de très chrétien et très puissant Monarque Louis treizième de c
+2 CONC e nom, Roy de France et de Navarre et de très religieuse et illustre Princesse Anne d'Autriche, sa très chaste et fidèle épouse et fut incontinent après, le même jour ondoyé par le Révérend Père en Dieu Messir Dominique Séguier, Evesque de Meau
+2 CONC x et premier Aumonier de Sa Majesté, avec les eaux baptismales des fonts de la paroisse du lieu de Saint-Germain-en-Laye, baillées et livrées par M. Cagnyé, prêtre et curé de la dite paroisse.
+1 REPO @R1@
+1 REPO @R4@
+1 CHAN
+2 DATE 7 MAY 2020
+3 TIME 18:46:35
+0 @R1@ REPO
+1 NAME Généanet
+1 ADDR http://www.geneanet.org
+1 CHAN
+2 DATE 7 MAY 2020
+3 TIME 18:46:35
+0 @R2@ REPO
+1 NAME Archives Départementales des Yvelines
+1 ADDR 2 Avenue de Lunca
+2 CITY Montigny-le-Bretonneux
+2 POST 78180
+2 CTRY France
+1 PHON +33 161 373 630
+1 CHAN
+2 DATE 6 SEP 2011
+3 TIME 18:12:07
+0 @R4@ REPO
+1 NAME Site Internet des Archives Départementales des Yvelines
+1 ADDR http://archives.yvelines.fr/decouvrir/archives_en_ligne/index.php
+1 CHAN
+2 DATE 6 SEP 2011
+3 TIME 18:12:07
+0 @S2@ SOUR
+1 AUTH Archives Départementales de Seine-Saint-Denis
+1 TITL Site Internet Archives Départementales de Seine-Saint-Denis
+1 TEXT 18 Avenue du Président Salvador Allende
+2 CONT 93000 Bobigny
+1 REPO @R1@
+1 CHAN
+2 DATE 6 SEP 2011
+3 TIME 16:50:48
+0 @S3@ SOUR
+1 AUTH Site Internet Archives Départementales Yvelines
+1 TITL Registres Paroissiaux de Versailles
+1 TEXT
+1 REPO @R1@
+1 CHAN
+2 DATE 6 SEP 2011
+3 TIME 16:56:12
+0 @I20@ INDI
+1 NAME Henri IV /CAPET/
+2 GIVN Henri, IV
+2 SURN CAPET
+2 NOTE @N3@
+1 _SOSADABOVILLE 128 G8
+1 SEX M
+1 BIRT
+2 DATE 13 DEC 1553
+2 PLAC Château, Pau, 64445, Pyrénées-Atlantiques, Nouvelle-Aquitaine, FRANCE
+3 MAP
+4 LATI N43.3
+4 LONG W0.36667
+1 DEAT
+2 DATE 14 MAY 1610
+2 PLAC Rue de la Ferronnerie, Paris, 75056, Paris, Île-de-France, FRANCE
+3 MAP
+4 LATI N48.85341
+4 LONG E2.3488
+2 NOTE Assassiné par François RAVAILLAC
+2 OBJE
+3 TITL L'assassinat d'Henri IV par Gaspas BOUTTATS
+3 FILE photos/Assassinat_de_Henri_IV.jpg
+4 FORM jpg
+1 OCCU Roi de Navarre
+2 DATE 1572
+1 OCCU Roi de France
+2 DATE 2 AUG 1589
+2 CAUS Mort de son cousin au 29° degré CAPET Henri III
+1 BURI
+2 DATE 1 JUL 1610
+2 PLAC Basilique, Saint-Denis, 93066, Seine-Saint-Denis, Île-de-France, FRANCE
+3 MAP
+4 LATI N48.9354
+4 LONG E2.35991
+1 EVEN
+2 TYPE Sacrement
+2 DATE 27 FEB 1594
+2 PLAC , Chartres, , , Normandie, 
+3 MAP
+4 LATI N48.44811
+4 LONG E1.4882
+1 FAMS @F11@
+1 FAMS @F18@
+1 OBJE
+2 TITL Portrait d'Henri IV 
+2 FILE photos/Henri_IV.jpg
+3 FORM jpg
+2 NOTE
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:25
+0 @F11@ FAM
+1 HUSB @I20@
+1 WIFE @I21@
+1 MARR
+2 DATE 17 DEC 1600
+2 PLAC , Lyon, 69123, Rhône, Lyonnais, FRANCE
+3 MAP
+4 LATI N45.74846
+4 LONG E4.84671
+1 CHIL @I1@
+1 CHIL @I22@
+1 CHIL @I24@
+1 CHIL @I25@
+1 CHIL @I26@
+1 CHIL @I28@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:23:44
+0 @I21@ INDI
+1 NAME Maria /de MEDICIS/
+2 GIVN Maria
+2 SPFX de
+2 SURN MEDICIS
+1 _SOSADABOVILLE 129 G8
+1 SEX F
+1 BIRT
+2 DATE 26 APR 1575
+2 PLAC , Florence, , Florence, Tuscany, Italy
+3 MAP
+4 LATI N43.77925
+4 LONG E11.24626
+1 DEAT
+2 DATE 3 JUL 1642
+2 PLAC , Cologne, 05315000, District de Cologne, Rhénanie-du-Nord-Westphalie, ALLEMAGNE
+3 MAP
+4 LATI N50.93333
+4 LONG E6.95
+1 FAMC @F20@
+1 FAMS @F11@
+1 OBJE
+2 TITL Marie de Medicis
+2 FILE photos/Marie_de_Medicis.jpg
+3 FORM jpg
+2 NOTE
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:25
+0 @I22@ INDI
+1 NAME Élisabeth /CAPET/
+2 GIVN Élisabeth
+2 SURN CAPET
+1 _SOSADABOVILLE 128-b.2 G6
+1 SEX F
+1 BIRT
+2 DATE 22 NOV 1602
+2 PLAC , Fontainebleau, 77186, Seine-et-Marne, Île-de-France, FRANCE
+3 MAP
+4 LATI N48.4
+4 LONG E2.7
+1 DEAT
+2 DATE 6 OCT 1644
+2 PLAC , Madrid, , Province de Madrid, Communauté de Madrid, ESPAGNE
+3 MAP
+4 LATI N40.4165
+4 LONG W3.70256
+1 FAMC @F11@
+1 FAMS @F12@
+1 OBJE
+2 TITL Élisabeth de France
+2 FILE photos/Elisabeth_de_France.jpg
+3 FORM jpg
+2 NOTE
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:26
+0 @I23@ INDI
+1 NAME Philippe IV /HASBOURG/
+2 GIVN Philippe, IV
+2 NICK d'Espagne
+2 SURN HASBOURG
+1 SEX M
+1 BIRT
+2 DATE 8 APR 1605
+2 PLAC , Valladolid, , Valladolid, Castille-et-León, ESPAGNE
+3 MAP
+4 LATI N41.65518
+4 LONG W4.72372
+1 DEAT
+2 DATE 17 SEP 1665
+2 PLAC , Madrid, , Province de Madrid, Communauté de Madrid, ESPAGNE
+3 MAP
+4 LATI N40.4165
+4 LONG W3.70256
+1 FAMS @F12@
+1 OBJE
+2 TITL Philippe IV d'Espagne
+2 FILE photos/Philippe_IV_espagne.jpg
+3 FORM jpg
+2 NOTE
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:35:10
+0 @F12@ FAM
+1 HUSB @I23@
+1 WIFE @I22@
+1 MARR
+2 DATE 25 NOV 1615
+2 PLAC , Bordeaux, 33063, Gironde, Nouvelle-Aquitaine, FRANCE
+3 MAP
+4 LATI N44.84044
+4 LONG W0.5805
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:17:07
+0 @I24@ INDI
+1 NAME N*** /CAPET/
+2 GIVN N***
+2 SURN CAPET
+1 _SOSADABOVILLE 128-b.4 G6
+1 SEX M
+1 BIRT
+2 DATE 16 APR 1607
+1 DEAT
+2 DATE 17 NOV 1611
+1 NOTE Mort sans avoir reçu le baptême complet, d'où l'absence de prénom
+2 SOUR @S4@
+1 FAMC @F11@
+1 OBJE
+2 TITL N*** de BOURBON-CAPET
+2 FILE photos/Nicolas_de_bourbon.jpg
+3 FORM jpg
+2 NOTE
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:00
+0 @S4@ SOUR
+1 AUTH Wikipedia
+1 TITL Nicolas de France
+1 TEXT http://fr.wikipedia.org/wiki/Nicolas_de_France
+1 REPO @R3@
+1 CHAN
+2 DATE 20 SEP 2011
+3 TIME 16:28:07
+0 @R3@ REPO
+1 NAME Wikipedia
+1 ADDR http://fr.wikipedia.org
+1 CHAN
+2 DATE 20 SEP 2011
+3 TIME 16:57:56
+0 @I25@ INDI
+1 NAME Gaston Jean Baptiste /CAPET/
+2 GIVN Gaston, Jean, Baptiste
+2 SURN CAPET
+1 _SOSADABOVILLE 128-b.5 G6
+1 SEX M
+1 BIRT
+2 DATE 24 APR 1608
+2 PLAC , Fontainebleau, 77186, Seine-et-Marne, Île-de-France, FRANCE
+3 MAP
+4 LATI N48.4
+4 LONG E2.7
+1 DEAT
+2 DATE 2 FEB 1660
+2 PLAC Château, Blois, 41018, Loir-et-Cher, , FRANCE
+3 MAP
+4 LATI N47.58557
+4 LONG E1.33179
+1 FAMC @F11@
+1 OBJE
+2 TITL Gaston de France
+2 FILE photos/Gaston_de_France.jpg
+3 FORM jpg
+2 NOTE
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:26
+0 @I26@ INDI
+1 NAME Henriette Marie /CAPET/
+2 GIVN Henriette, Marie
+2 NICK de France
+2 SURN CAPET
+1 _SOSADABOVILLE 128-b.6 G6
+1 SEX F
+1 BIRT
+2 DATE 26 NOV 1609
+2 PLAC Palais du Louvre, Paris, 75056, Paris, Île-de-France, FRANCE
+3 MAP
+4 LATI N48.8592
+4 LONG E2.3417
+1 DEAT
+2 DATE 10 SEP 1669
+2 PLAC Château de Colombes, Paris, 75056, Paris, Île-de-France, FRANCE
+3 MAP
+4 LATI N48.85341
+4 LONG E2.3488
+1 FAMC @F11@
+1 FAMS @F13@
+1 OBJE
+2 TITL Henriette de France
+2 FILE photos/Henriette_de_France.jpg
+3 FORM jpg
+2 NOTE
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:26
+0 @I27@ INDI
+1 NAME Charles I /STUART/
+2 GIVN Charles, I
+2 SURN STUART
+1 SEX M
+1 BIRT
+2 DATE 19 NOV 1600
+2 PLAC , Dunfermline, , Fife, Ecosse, ÉCOSSE
+3 MAP
+4 LATI N56.07156
+4 LONG W3.45887
+1 DEAT
+2 DATE 30 JAN 1649
+2 PLAC , Londres, , Grand Londres, Angleterre, ANGLETERRE
+3 MAP
+4 LATI N51.50853
+4 LONG W0.12574
+1 FAMS @F13@
+1 OBJE
+2 TITL Charles I STUART
+2 FILE photos/Charles_I_Stuart.jpg
+3 FORM jpg
+2 NOTE
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:23:16
+0 @F13@ FAM
+1 HUSB @I27@
+1 WIFE @I26@
+1 CHAN
+2 DATE 20 SEP 2011
+3 TIME 16:42:46
+0 @I28@ INDI
+1 NAME Christine /CAPET/
+2 GIVN Christine
+2 SURN CAPET
+1 _SOSADABOVILLE 128-b.3 G6
+1 SEX F
+1 BIRT
+2 DATE 10 FEB 1606
+2 PLAC , Paris, 75056, Paris, Île-de-France, FRANCE
+3 MAP
+4 LATI N48.85341
+4 LONG E2.3488
+1 DEAT
+2 DATE 27 DEC 1663
+2 PLAC , Turin, 0012721, Turin, Piémont, ITALIE
+3 MAP
+4 LATI N45.07049
+4 LONG E7.68682
+1 FAMC @F11@
+1 OBJE
+2 TITL Christine CAPET
+2 FILE photos/Christine_de_France.jpg
+3 FORM jpg
+2 NOTE
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:26
+0 @N2@ NOTE Assassiné par François RAVAILLAC
+1 SOUR @S5@
+1 CHAN
+2 DATE 11 OCT 2015
+3 TIME 14:49:16
+0 @S5@ SOUR
+1 AUTH Wikipedia
+1 TITL Henri IV de France
+1 TEXT http://fr.wikipedia.org/wiki/Henri_IV_de_France
+1 REPO @R3@
+1 CHAN
+2 DATE 11 OCT 2015
+3 TIME 13:32:44
+0 @F14@ FAM
+1 HUSB @I29@
+1 CHAN
+2 DATE 11 OCT 2015
+3 TIME 13:57:50
+0 @I29@ INDI
+1 NAME Robert /CAPET/ de CLERMONT
+2 GIVN Robert
+2 SURN CAPET
+2 NSFX de, CLERMONT
+2 SOUR @S5@
+1 SEX M
+1 BIRT
+1 FAMC @F15@
+1 FAMS @F14@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @I30@ INDI
+1 NAME Louis IX /CAPET/
+2 GIVN Louis, IX
+2 NICK Saint-Louis
+2 SURN CAPET
+1 SEX M
+1 BIRT
+2 DATE 25 APR 1214
+1 DEAT
+2 DATE 25 AUG 1270
+2 PLAC , Tunis, , , Tūnis, Tunisia
+3 MAP
+4 LATI N36.81897
+4 LONG E10.16579
+2 CAUS Dysenterie
+2 SOUR @S5@
+1 FAMS @F15@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:00
+0 @F15@ FAM
+1 HUSB @I30@
+1 WIFE @I31@
+1 CHIL @I29@
+1 CHIL @I32@
+1 CHAN
+2 DATE 11 OCT 2015
+3 TIME 13:42:23
+0 @I31@ INDI
+1 NAME Marguerite /de PROVENCE/
+2 GIVN Marguerite
+2 SPFX de
+2 SURN PROVENCE
+2 SOUR @S5@
+1 SEX F
+1 BIRT
+1 FAMS @F15@
+1 FAMS @F16@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @F16@ FAM
+1 WIFE @I31@
+1 CHIL @I32@
+1 CHAN
+2 DATE 11 OCT 2015
+3 TIME 13:40:42
+0 @I32@ INDI
+1 NAME Philippe III /CAPET/
+2 GIVN Philippe, III
+2 NICK Le Hardi
+2 SURN CAPET
+2 TYPE Nom donné sur le certificat de Naissance
+1 SEX M
+1 BIRT
+2 DATE 30 APR 1245
+1 DEAT
+2 DATE 5 OCT 1285
+1 FAMC @F16@
+1 FAMC @F15@
+1 CHAN
+2 DATE 11 OCT 2015
+3 TIME 13:45:01
+0 @F17@ FAM
+1 CHAN
+2 DATE 11 OCT 2015
+3 TIME 13:41:30
+0 @F18@ FAM
+1 HUSB @I20@
+1 WIFE @I33@
+1 MARR
+2 DATE 1572
+1 ANUL
+2 DATE 1599
+1 DIV
+2 DATE 1599
+1 CHAN
+2 DATE 11 OCT 2015
+3 TIME 14:16:30
+0 @I33@ INDI
+1 NAME Marguerite /de VALOIS/
+2 GIVN Marguerite
+2 NICK de France
+2 SPFX de
+2 SURN VALOIS
+1 _SOSADABOVILLE 258-4 G8
+1 SEX F
+1 BIRT
+2 DATE 14 MAY 1553
+2 PLAC Château, Saint-Germain-en-Laye, 78551, Yvelines, Île-de-France, FRANCE
+3 MAP
+4 LATI N48.8979
+4 LONG E2.09592
+1 DEAT
+2 DATE 27 MAR 1615
+2 PLAC , Paris, 75056, Paris, Île-de-France, FRANCE
+3 MAP
+4 LATI N48.85341
+4 LONG E2.3488
+1 FAMC @F20@
+1 FAMS @F18@
+1 FAMS @F19@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:26
+0 @F19@ FAM
+1 WIFE @I33@
+1 CHAN
+2 DATE 11 OCT 2015
+3 TIME 14:07:07
+0 @F20@ FAM
+1 HUSB @I34@
+1 WIFE @I35@
+1 CHIL @I33@
+1 CHIL @I36@
+1 CHIL @I21@
+1 CHIL @I42@
+1 CHIL @I43@
+1 CHAN
+2 DATE 11 OCT 2015
+3 TIME 15:47:08
+0 @I34@ INDI
+1 NAME Henri II /CAPET/
+2 GIVN Henri, II
+2 SURN CAPET
+1 _SOSADABOVILLE 258 G9
+1 SEX M
+1 BIRT
+2 DATE 31 MAR 1519
+2 PLAC Château, Saint-Germain-en-Laye, 78551, Yvelines, Île-de-France, FRANCE
+3 MAP
+4 LATI N48.8979
+4 LONG E2.09592
+2 CAUS Accident de tournoi, 10 jours d'agonie
+1 DEAT
+2 DATE 10 JUL 1559
+2 PLAC , Paris, 75056, Paris, Île-de-France, FRANCE
+3 MAP
+4 LATI N48.85341
+4 LONG E2.3488
+1 FAMC @F21@
+1 FAMS @F20@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:25
+0 @I35@ INDI
+1 NAME Catherine /de MÉDICIS/
+2 GIVN Catherine
+2 SPFX de
+2 SURN MÉDICIS
+1 _SOSADABOVILLE 259 G9
+1 SEX F
+1 BIRT
+2 DATE 13 APR 1519
+2 PLAC , Florence, , Florence, Tuscany, Italy
+3 MAP
+4 LATI N43.77925
+4 LONG E11.24626
+1 DEAT
+2 DATE 5 JAN 1589
+2 PLAC Château, Blois, 41018, Loir-et-Cher, , FRANCE
+3 MAP
+4 LATI N47.58557
+4 LONG E1.33179
+1 FAMS @F20@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:25
+0 @I36@ INDI
+1 NAME Charles IX /CAPET/
+2 GIVN Charles, IX
+2 SURN CAPET
+1 _SOSADABOVILLE 258-1 G8
+1 SEX M
+1 FAMC @F20@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:26
+0 @F21@ FAM
+1 HUSB @I37@
+1 WIFE @I38@
+1 CHIL @I34@
+1 CHIL @I39@
+1 CHIL @I46@
+1 CHAN
+2 DATE 11 OCT 2015
+3 TIME 20:58:19
+0 @I37@ INDI
+1 NAME François /CAPET/
+2 GIVN François
+2 NICK I, Père et restaurateur des Lettres
+2 SURN CAPET
+2 NOTE Branche de Valois
+1 _SOSADABOVILLE 516 G10
+1 SEX M
+1 BIRT
+2 DATE 12 SEP 1494
+1 DEAT
+2 DATE 25 JAN 1547
+2 CAUS Septicémie
+1 FAMS @F21@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:25
+0 @I38@ INDI
+1 NAME Claude /CAPET/
+2 GIVN Claude
+2 NICK de FRANCE
+2 SURN CAPET
+1 _SOSADABOVILLE 517 G10
+1 SEX F
+1 DEAT
+2 DATE 1524
+1 TITL Duchesse de Bretagne
+2 DATE 9 JAN 1514
+2 CAUS Décès de sa mère
+1 FAMC @F22@
+1 FAMS @F21@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:25
+0 @I39@ INDI
+1 NAME François /CAPET/
+2 GIVN François
+2 NICK
+2 SURN CAPET
+1 _SOSADABOVILLE 516-1 G9
+1 SEX U
+1 DEAT
+2 DATE 1536
+1 TITL Duc de Bretagne
+2 DATE 1524
+2 CAUS Décès de sa mère
+1 FAMC @F21@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:26
+0 @F22@ FAM
+1 HUSB @I40@
+1 WIFE @I41@
+1 ENGA Y
+1 CHIL @I38@
+1 CHIL @I44@
+1 CHIL @I48@
+1 CHIL @I49@
+1 CHAN
+2 DATE 11 OCT 2015
+3 TIME 22:07:34
+0 @I40@ INDI
+1 NAME Louis XII /CAPET/
+2 GIVN Louis, XII
+2 SURN CAPET
+1 _SOSADABOVILLE 1034 G11
+1 SEX M
+1 FAMS @F22@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:25
+0 @I41@ INDI
+1 NAME Anne /de MONTFORT/
+2 GIVN Anne
+2 SPFX de
+2 SURN MONTFORT
+1 _SOSADABOVILLE 1035 G11
+1 SEX F
+1 BIRT
+2 DATE 25 JAN 1477
+2 PLAC Château, Nantes, 44109, , , FRANCE
+3 MAP
+4 LATI N47.21604
+4 LONG W1.54993
+1 DEAT
+2 DATE 9 JAN 1514
+2 PLAC Château, Blois, 41018, Loir-et-Cher, , FRANCE
+3 MAP
+4 LATI N47.58557
+4 LONG E1.33179
+1 TITL Duchesse de Bretagne
+2 TYPE Couronnement le 10 février 1489
+2 DATE FROM 9 SEP 1488 TO 9 JAN 1514
+2 CAUS Décès de son père
+1 TITL Archiduchesse d'Autriche, Reine de Germanie
+2 DATE FROM 19 DEC 1490 TO 6 DEC 1491
+2 CAUS Mariage avec Maximilien d'Autriche
+1 TITL Reine de France
+2 CAUS Épouse de Charles VIII
+2 DATE FROM 6 DEC 1491 TO 7 APR 1498
+1 TITL Reine de France
+2 DATE FROM 8 JAN 1499 TO 9 JAN 1514
+2 CAUS Épouse de Louis XII
+1 TITL Duchesse consort de Milan
+2 DATE FROM 6 SEP 1499 TO 5 FEB 1500
+1 TITL Duchesse consort de Milan
+2 DATE FROM 17 APR 1500 TO 16 JUN 1512
+1 TITL Reine consort de Naples
+2 DATE FROM 1 AUG 1501 TO 29 DEC 1503
+1 TITL Comtesse d'Étampes
+2 DATE FROM 11 APR 1512 TO 9 JAN 1514
+1 BURI Y
+2 TYPE Toutefois son cœur se trouve à Nantes
+2 PLAC Basilique, Saint-Denis, 93066, Seine-Saint-Denis, Île-de-France, FRANCE
+3 MAP
+4 LATI N48.9354
+4 LONG E2.35991
+1 FAMC @F37@
+1 FAMS @F22@
+1 FAMS @F27@
+1 FAMS @F28@
+1 FAMS @F29@
+1 FAMS @F30@
+1 FAMS @F31@
+1 FAMS @F35@
+1 FAMS @F36@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:25
+0 @N3@ NOTE Maison de Bourbon
+1 CHAN
+2 DATE 11 OCT 2015
+3 TIME 14:46:56
+0 @F23@ FAM
+1 CHAN
+2 DATE 11 OCT 2015
+3 TIME 15:43:56
+0 @I42@ INDI
+1 NAME Henri /CAPET/
+2 GIVN Henri
+2 SURN CAPET
+1 _SOSADABOVILLE 258-2 G8
+1 SEX M
+1 FAMC @F20@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:26
+0 @I43@ INDI
+1 NAME François /CAPET/
+2 GIVN François
+2 SURN CAPET
+1 _SOSADABOVILLE 258-3 G8
+1 SEX M
+1 FAMC @F20@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:26
+0 @I44@ INDI
+1 NAME Renée /CAPET/
+2 GIVN Renée
+2 SURN CAPET
+1 _SOSADABOVILLE 1034-4 G10
+1 SEX F
+1 BIRT
+2 DATE 1510
+1 DEAT
+2 DATE 1575
+1 TITL Dame de Montargis, Duchesse de Chartres
+2 DATE 1528
+1 FAMC @F22@
+1 FAMS @F24@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:26
+0 @F24@ FAM
+1 HUSB @I50@
+1 WIFE @I44@
+1 MARR
+2 DATE 1528
+1 CHIL @I45@
+1 CHAN
+2 DATE 11 OCT 2015
+3 TIME 21:02:12
+0 @I45@ INDI
+1 NAME Anne /d' ESTE/
+2 GIVN Anne
+2 SPFX d'
+2 SURN ESTE
+1 _SOSADABOVILLE 1034-4.1 G9
+1 SEX U
+1 FAMC @F24@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:26
+0 @I46@ INDI
+1 NAME Marguerite /CAPET/
+2 GIVN Marguerite
+2 SURN CAPET
+1 _SOSADABOVILLE 516-2 G9
+1 SEX F
+1 BIRT
+2 DATE BEF 1519
+1 FAMC @F21@
+1 FAMS @F25@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:26
+0 @F25@ FAM
+1 HUSB @I47@
+1 WIFE @I46@
+1 CHAN
+2 DATE 11 OCT 2015
+3 TIME 20:57:57
+0 @I47@ INDI
+1 NAME
+1 SEX M
+1 TITL Duc de Savoie
+1 FAMS @F25@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:38:17
+0 @F26@ FAM
+1 CHAN
+2 DATE 11 OCT 2015
+3 TIME 20:59:04
+0 @I48@ INDI
+1 NAME /CAPET/
+2 SURN CAPET
+1 _SOSADABOVILLE 1034-2 G10
+1 SEX U
+1 FAMC @F22@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:26
+0 @I49@ INDI
+1 NAME /CAPET/
+2 SURN CAPET
+1 _SOSADABOVILLE 1034-3 G10
+1 SEX U
+1 FAMC @F22@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:26
+0 @I50@ INDI
+1 NAME Hercule II /d' ESTE/
+2 GIVN Hercule, II
+2 SPFX d'
+2 SURN ESTE
+1 SEX M
+1 TITL Duc de Ferrare, de Modène et de Reggio
+1 FAMS @F24@
+1 CHAN
+2 DATE 11 OCT 2015
+3 TIME 21:03:17
+0 @F27@ FAM
+1 HUSB @I51@
+1 WIFE @I41@
+1 MARR
+2 DATE 19 DEC 1490
+1 ANUL
+2 DATE 6 DEC 1491
+1 CHAN
+2 DATE 11 OCT 2015
+3 TIME 21:14:24
+0 @I51@ INDI
+1 NAME Maximilien /HABSBOURG/
+2 GIVN Maximilien
+2 SURN HABSBOURG
+1 SEX M
+1 BIRT
+2 DATE 1449
+1 DEAT
+2 DATE 1519
+1 TITL Duc d'Autriche, roi de Germanie
+2 DATE 1508
+1 FAMS @F27@
+1 CHAN
+2 DATE 11 OCT 2015
+3 TIME 21:55:03
+0 @F28@ FAM
+1 HUSB @I52@
+1 WIFE @I41@
+1 ENGA
+2 DATE 17 NOV 1491
+2 PLAC Chapelle des Jacobins, Rennes, 35238, Ille-et-Vilaine, Bretagne, FRANCE
+3 MAP
+4 LATI N48.11478
+4 LONG W1.67765
+1 MARR
+2 TYPE Mariage validé par l'annulation antidatée le 15 février 1492
+2 DATE 6 DEC 1491
+2 PLAC Château, Langeais, 37123, Indre et Loire, Centre-Val de Loire, FRANCE
+3 MAP
+4 LATI N47.3248
+4 LONG E0.4061
+1 CHIL @I53@
+1 CHIL @I54@
+1 CHIL @I55@
+1 CHIL @I56@
+1 CHIL @I57@
+1 CHIL @I58@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:32:30
+0 @I52@ INDI
+1 NAME Charles VIII /CAPET/
+2 GIVN Charles, VIII
+2 SURN CAPET
+1 SEX M
+1 DEAT
+2 DATE 7 APR 1498
+1 TITL Roi de France
+1 FAMS @F28@
+1 CHAN
+2 DATE 11 OCT 2015
+3 TIME 21:18:29
+0 @I53@ INDI
+1 NAME Charles-Orland /CAPET/
+2 GIVN Charles-Orland
+2 SURN CAPET
+1 SEX M
+1 BIRT
+2 DATE 1492
+1 DEAT
+2 DATE 1495
+2 CAUS Rougeole
+1 FAMC @F28@
+1 CHAN
+2 DATE 11 OCT 2015
+3 TIME 21:28:00
+0 @I54@ INDI
+1 NAME François /CAPET/
+2 GIVN François
+2 SURN CAPET
+1 SEX M
+1 BIRT
+2 TYPE Prématuré de 2 mois
+2 DATE AUG 1493
+2 PLAC , Courcelles, , , , FRANCE
+1 DEAT
+2 DATE AUG 1493
+2 PLAC , Courcelles, , , , FRANCE
+2 CAUS Prématuré de 2 mois
+1 FAMC @F28@
+1 CHAN
+2 DATE 11 OCT 2015
+3 TIME 21:28:18
+0 @I55@ INDI
+1 NAME N /CAPET/
+2 GIVN N
+2 SURN CAPET
+1 SEX F
+1 BIRT
+2 DATE 1495
+1 DEAT
+2 DATE 1495
+2 CAUS Mort-née
+1 FAMC @F28@
+1 CHAN
+2 DATE 11 OCT 2015
+3 TIME 21:27:42
+0 @I56@ INDI
+1 NAME Charles /CAPET/
+2 GIVN Charles
+2 SURN CAPET
+1 SEX M
+1 BIRT
+2 DATE 1496
+1 FAMC @F28@
+1 CHAN
+2 DATE 11 OCT 2015
+3 TIME 21:29:49
+0 @I57@ INDI
+1 NAME François /CAPET/
+2 GIVN François
+2 SURN CAPET
+1 SEX M
+1 BIRT
+2 DATE 1497
+1 DEAT
+2 DATE 1498
+1 FAMC @F28@
+1 CHAN
+2 DATE 11 OCT 2015
+3 TIME 21:31:02
+0 @I58@ INDI
+1 NAME Anne /CAPET/
+2 GIVN Anne
+2 SURN CAPET
+1 SEX F
+1 BIRT
+2 DATE 20 MAR 1498
+1 FAMC @F28@
+1 CHAN
+2 DATE 29 MAR 2016
+3 TIME 00:45:17
+0 @F29@ FAM
+1 HUSB @I59@
+1 WIFE @I41@
+1 ENGA
+2 DATE 1481
+1 CHAN
+2 DATE 11 OCT 2015
+3 TIME 21:47:54
+0 @I59@ INDI
+1 NAME Édouard
+2 GIVN Édouard
+1 SEX M
+1 DEAT
+2 DATE ABT 1483
+1 TITL Prince de Galles
+1 TITL Roi d'Angleterre
+1 FAMS @F29@
+1 CHAN
+2 DATE 11 OCT 2015
+3 TIME 21:47:19
+0 @F30@ FAM
+1 HUSB @I60@
+1 WIFE @I41@
+1 ENGA Y
+1 CHAN
+2 DATE 11 OCT 2015
+3 TIME 21:52:32
+0 @I60@ INDI
+1 NAME Henri
+2 GIVN Henri
+1 SEX M
+1 BIRT
+2 DATE 1457
+1 DEAT
+2 DATE 1509
+1 TITL Roi d'Angleterre
+2 DATE 1485
+1 FAMS @F30@
+1 CHAN
+2 DATE 11 OCT 2015
+3 TIME 21:52:11
+0 @F31@ FAM
+1 HUSB @I61@
+1 WIFE @I41@
+1 ENGA Y
+1 NOTE Anne refusera le mariage du fait du dégout que le futur lui inspire
+1 CHAN
+2 DATE 11 OCT 2015
+3 TIME 22:06:15
+0 @I61@ INDI
+1 NAME Alain /d' ALBRET/
+2 GIVN Alain
+2 SPFX d'
+2 SURN ALBRET
+1 SEX M
+1 FAMC @F32@
+1 FAMS @F33@
+1 FAMS @F31@
+1 CHAN
+2 DATE 11 OCT 2015
+3 TIME 22:03:09
+0 @F32@ FAM
+1 HUSB @I62@
+1 WIFE @I63@
+1 CHIL @I61@
+1 CHAN
+2 DATE 11 OCT 2015
+3 TIME 21:59:30
+0 @I62@ INDI
+1 NAME Jean I /d' ALBRET/
+2 GIVN Jean, I
+2 SPFX d'
+2 SURN ALBRET
+1 SEX M
+1 FAMS @F32@
+1 CHAN
+2 DATE 11 OCT 2015
+3 TIME 21:58:33
+0 @I63@ INDI
+1 NAME Catherine /de ROHAN/
+2 GIVN Catherine
+2 SPFX de
+2 SURN ROHAN
+1 SEX F
+1 FAMS @F32@
+1 CHAN
+2 DATE 11 OCT 2015
+3 TIME 21:59:30
+0 @F33@ FAM
+1 HUSB @I61@
+1 WIFE @I64@
+1 MARR Y
+1 CHAN
+2 DATE 11 OCT 2015
+3 TIME 22:05:18
+0 @F34@ FAM
+1 CHAN
+2 DATE 11 OCT 2015
+3 TIME 22:03:09
+0 @I64@ INDI
+1 NAME Françoise /de CHÂTILLON/
+2 GIVN Françoise
+2 SPFX de
+2 SURN CHÂTILLON
+1 SEX F
+1 FAMS @F33@
+1 CHAN
+2 DATE 11 OCT 2015
+3 TIME 22:04:29
+0 @F35@ FAM
+1 HUSB @I65@
+1 WIFE @I41@
+1 ENGA Y
+1 CHAN
+2 DATE 11 OCT 2015
+3 TIME 22:12:50
+0 @I65@ INDI
+1 NAME Jean /de CHÂLONS/
+2 GIVN Jean
+2 SPFX de
+2 SURN CHÂLONS
+1 SEX M
+1 BIRT
+2 DATE 1443
+1 DEAT
+2 DATE 1502
+1 TITL Prince d'Orange
+1 FAMS @F35@
+1 CHAN
+2 DATE 11 OCT 2015
+3 TIME 22:12:17
+0 @F36@ FAM
+1 HUSB @I66@
+1 WIFE @I41@
+1 ENGA Y
+1 CHAN
+2 DATE 11 OCT 2015
+3 TIME 22:19:17
+0 @I66@ INDI
+1 NAME Edward /STAFFORD/
+2 GIVN Edward
+2 SURN STAFFORD
+1 SEX M
+1 BIRT
+2 DATE 1478
+1 DEAT
+2 DATE 1521
+1 TITL Duc de Buckingham
+1 FAMS @F36@
+1 CHAN
+2 DATE 11 OCT 2015
+3 TIME 22:18:43
+0 @F37@ FAM
+1 HUSB @I67@
+1 WIFE @I68@
+1 CHIL @I41@
+1 CHAN
+2 DATE 23 JAN 2016
+3 TIME 22:01:01
+0 @I67@ INDI
+1 NAME François /de MONTFORT/
+2 GIVN François
+2 NICK François II
+2 SPFX de
+2 SURN MONTFORT
+1 _SOSADABOVILLE 2070 G12
+1 SEX M
+1 DEAT
+2 DATE 9 SEP 1488
+1 TITL Duc de Bretagne
+2 DATE 1458
+1 FAMC @F40@
+1 FAMS @F37@
+1 FAMS @F39@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:52:05
+0 @I68@ INDI
+1 NAME Marguerite /de FOIX/
+2 GIVN Marguerite
+2 SPFX de
+2 SURN FOIX
+1 _SOSADABOVILLE 2071 G12
+1 SEX F
+1 FAMS @F37@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:52:05
+0 @I69@ INDI
+1 NAME Marguerite /de MONTFORT/
+2 GIVN Marguerite
+2 SPFX de
+2 SURN MONTFORT
+1 _SOSADABOVILLE 8280-a.4.3b.1 G10
+1 SEX F
+1 BIRT
+1 FAMC @F56@
+1 FAMS @F39@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @F39@ FAM
+1 HUSB @I67@
+1 WIFE @I69@
+1 CHAN
+2 DATE 23 JAN 2016
+3 TIME 22:01:35
+0 @I70@ INDI
+1 NAME Richard /de MONTFORT/
+2 GIVN Richard
+2 SPFX de
+2 SURN MONTFORT
+1 _SOSADABOVILLE 4140 G13
+1 SEX M
+1 BIRT
+1 DEAT
+2 DATE 1438
+1 TITL Comte d'Étampes
+1 FAMC @F41@
+1 FAMC @F44@
+1 FAMS @F40@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @F40@ FAM
+1 HUSB @I70@
+1 WIFE @I71@
+1 CHIL @I67@
+1 CHIL @I168@
+1 CHAN
+2 DATE 26 MAR 2016
+3 TIME 00:05:02
+0 @I71@ INDI
+1 NAME Marguerite /d' ORLÉANS/
+2 GIVN Marguerite
+2 SPFX d'
+2 SURN ORLÉANS
+1 _SOSADABOVILLE 4141 G13
+1 SEX F
+1 BIRT
+1 FAMS @F40@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @I72@ INDI
+1 NAME Jean /de MONTFORT/
+2 GIVN Jean
+2 NICK Jean IV le Conquéreur
+2 SPFX de
+2 SURN MONTFORT
+1 _SOSADABOVILLE 8280 G14
+1 SEX M
+1 DEAT
+2 DATE 1399
+1 TITL Duc de Bretagne
+2 DATE 1345
+1 FAMC @F58@
+1 FAMS @F41@
+1 FAMS @F42@
+1 FAMS @F43@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:25
+0 @F41@ FAM
+1 HUSB @I72@
+1 WIFE @I73@
+1 CHIL @I70@
+1 CHIL @I76@
+1 CHIL @I77@
+1 CHIL @I81@
+1 CHAN
+2 DATE 23 JAN 2016
+3 TIME 22:41:42
+0 @I73@ INDI
+1 NAME Jeanne /de NAVARRE/
+2 GIVN Jeanne
+2 SPFX de
+2 SURN NAVARRE
+1 _SOSADABOVILLE 8281 G14
+1 SEX F
+1 BIRT
+1 FAMS @F41@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @F42@ FAM
+1 HUSB @I72@
+1 WIFE @I74@
+1 CHAN
+2 DATE 23 JAN 2016
+3 TIME 22:11:54
+0 @I74@ INDI
+1 NAME Marie /d' ANGLETERRE/
+2 GIVN Marie
+2 SPFX d'
+2 SURN ANGLETERRE
+1 SEX F
+1 FAMS @F42@
+1 CHAN
+2 DATE 23 JAN 2016
+3 TIME 22:11:54
+0 @F43@ FAM
+1 HUSB @I72@
+1 WIFE @I75@
+1 CHAN
+2 DATE 23 JAN 2016
+3 TIME 22:12:46
+0 @I75@ INDI
+1 NAME Jeanne /de KENT/
+2 GIVN Jeanne
+2 SPFX de
+2 SURN KENT
+1 SEX F
+1 FAMS @F43@
+1 CHAN
+2 DATE 23 JAN 2016
+3 TIME 22:12:46
+0 @F44@ FAM
+1 CHIL @I70@
+1 CHAN
+2 DATE 23 JAN 2016
+3 TIME 22:14:13
+0 @I76@ INDI
+1 NAME Gilles /de MONTFORT/
+2 GIVN Gilles
+2 SPFX de
+2 SURN MONTFORT
+1 _SOSADABOVILLE 8280-a.2 G12
+1 SEX M
+1 BIRT
+1 DEAT
+2 DATE 1442
+1 FAMC @F41@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @I77@ INDI
+1 NAME Arthur /de MONTFORT/
+2 GIVN Arthur
+2 NICK Arthur III
+2 SPFX de
+2 SURN MONTFORT
+1 _SOSADABOVILLE 8280-a.3 G12
+1 SEX M
+1 BIRT
+1 DEAT
+2 DATE 1458
+1 TITL Duc de Bretagne
+2 DATE 1457
+1 TITL Comte de Richemont
+1 TITL Connétable de France
+1 FAMC @F41@
+1 FAMS @F46@
+1 FAMS @F47@
+1 FAMS @F48@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @F45@ FAM
+1 CHAN
+2 DATE 23 JAN 2016
+3 TIME 22:22:46
+0 @F46@ FAM
+1 HUSB @I77@
+1 WIFE @I78@
+1 CHAN
+2 DATE 23 JAN 2016
+3 TIME 22:24:08
+0 @I78@ INDI
+1 NAME Marguerite /de BOURGOGNE/
+2 GIVN Marguerite
+2 SPFX de
+2 SURN BOURGOGNE
+1 SEX F
+1 FAMS @F46@
+1 CHAN
+2 DATE 23 JAN 2016
+3 TIME 22:24:08
+0 @F47@ FAM
+1 HUSB @I77@
+1 WIFE @I79@
+1 CHAN
+2 DATE 23 JAN 2016
+3 TIME 22:27:27
+0 @I79@ INDI
+1 NAME Jeanne /d' ALBRET/
+2 GIVN Jeanne
+2 SPFX d'
+2 SURN ALBRET
+1 SEX F
+1 FAMS @F47@
+1 CHAN
+2 DATE 23 JAN 2016
+3 TIME 22:27:27
+0 @F48@ FAM
+1 HUSB @I77@
+1 WIFE @I80@
+1 CHAN
+2 DATE 23 JAN 2016
+3 TIME 22:30:28
+0 @I80@ INDI
+1 NAME Catherine /de LUXEMBOURG/
+2 GIVN Catherine
+2 SPFX de
+2 SURN LUXEMBOURG
+1 SEX F
+1 FAMS @F48@
+1 CHAN
+2 DATE 23 JAN 2016
+3 TIME 22:30:28
+0 @I81@ INDI
+1 NAME Jean /de MONTFORT/
+2 GIVN Jean
+2 NICK Jean V le Sage
+2 SPFX de
+2 SURN MONTFORT
+1 _SOSADABOVILLE 8280-a.4 G12
+1 SEX M
+1 BIRT
+1 DEAT Y
+1 TITL Duc de Bretagne
+2 DATE 1399
+1 FAMC @F41@
+1 FAMS @F49@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @F49@ FAM
+1 HUSB @I81@
+1 WIFE @I82@
+1 CHIL @I83@
+1 CHIL @I84@
+1 CHIL @I86@
+1 CHAN
+2 DATE 23 JAN 2016
+3 TIME 22:56:32
+0 @I82@ INDI
+1 NAME Jeanne /de FRANCE/
+2 GIVN Jeanne
+2 SPFX de
+2 SURN FRANCE
+1 SEX F
+1 FAMC @F57@
+1 FAMS @F49@
+1 CHAN
+2 DATE 23 JAN 2016
+3 TIME 23:12:51
+0 @I83@ INDI
+1 NAME Gilles /de MONTFORT/
+2 GIVN Gilles
+2 SPFX de
+2 SURN MONTFORT
+1 _SOSADABOVILLE 8280-a.4.1 G11
+1 SEX M
+1 TITL connétable d'Angleterre
+1 FAMC @F49@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:26
+0 @I84@ INDI
+1 NAME Pierre /de MONTFORT/
+2 GIVN Pierre
+2 SPFX de
+2 SURN MONTFORT
+1 _SOSADABOVILLE 8280-a.4.2 G11
+1 SEX M
+1 DEAT
+2 DATE 1457
+1 TITL Duc de Bretagne
+2 DATE 1450
+1 FAMC @F49@
+1 FAMS @F52@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:26
+0 @F50@ FAM
+1 CHAN
+2 DATE 23 JAN 2016
+3 TIME 22:49:14
+0 @F51@ FAM
+1 CHAN
+2 DATE 23 JAN 2016
+3 TIME 22:49:24
+0 @F52@ FAM
+1 HUSB @I84@
+1 WIFE @I85@
+1 CHAN
+2 DATE 23 JAN 2016
+3 TIME 22:52:01
+0 @I85@ INDI
+1 NAME Françoise /d' AMBOISE/
+2 GIVN Françoise
+2 SPFX d'
+2 SURN AMBOISE
+1 SEX F
+1 FAMS @F52@
+1 CHAN
+2 DATE 23 JAN 2016
+3 TIME 22:52:01
+0 @I86@ INDI
+1 NAME François /de MONTFORT/
+2 GIVN François
+2 NICK François I
+2 SPFX de
+2 SURN MONTFORT
+1 _SOSADABOVILLE 8280-a.4.3 G11
+1 SEX M
+1 DEAT
+2 DATE 1450
+1 TITL Duc de Bretagne
+2 DATE 1442
+1 FAMC @F49@
+1 FAMS @F55@
+1 FAMS @F56@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:26
+0 @F53@ FAM
+1 CHAN
+2 DATE 23 JAN 2016
+3 TIME 22:58:14
+0 @F54@ FAM
+1 CHAN
+2 DATE 23 JAN 2016
+3 TIME 22:58:27
+0 @F55@ FAM
+1 HUSB @I86@
+1 WIFE @I87@
+1 CHAN
+2 DATE 23 JAN 2016
+3 TIME 22:59:29
+0 @I87@ INDI
+1 NAME Yolande /d' ANJOU-SICILE/
+2 GIVN Yolande
+2 SPFX d'
+2 SURN ANJOU-SICILE
+1 SEX F
+1 FAMS @F55@
+1 CHAN
+2 DATE 23 JAN 2016
+3 TIME 22:59:29
+0 @F56@ FAM
+1 HUSB @I86@
+1 WIFE @I88@
+1 CHIL @I69@
+1 CHAN
+2 DATE 23 JAN 2016
+3 TIME 23:01:46
+0 @I88@ INDI
+1 NAME Isabelle /d' ÉCOSSE/
+2 GIVN Isabelle
+2 SPFX d'
+2 SURN ÉCOSSE
+1 SEX F
+1 FAMS @F56@
+1 CHAN
+2 DATE 23 JAN 2016
+3 TIME 23:00:36
+0 @I89@ INDI
+1 NAME Charles
+2 GIVN Charles
+2 NICK Charles VI
+1 SEX M
+1 BIRT
+1 TITL Roi de France
+1 FAMS @F57@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @F57@ FAM
+1 HUSB @I89@
+1 WIFE @I90@
+1 CHIL @I82@
+1 CHAN
+2 DATE 23 JAN 2016
+3 TIME 23:12:51
+0 @I90@ INDI
+1 NAME
+1 SEX F
+1 BIRT
+1 FAMS @F57@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @I91@ INDI
+1 NAME Jean /de DREUX/
+2 GIVN Jean
+2 SPFX de
+2 SURN DREUX
+1 _SOSADABOVILLE 16560 G15
+1 SEX M
+1 DEAT
+2 DATE 1345
+1 TITL Comte de Richemont
+1 NOTE @N4@
+1 FAMC @F59@
+1 FAMS @F58@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:25
+0 @F58@ FAM
+1 HUSB @I91@
+1 WIFE @I93@
+1 CHIL @I72@
+1 CHAN
+2 DATE 23 JAN 2016
+3 TIME 23:21:30
+0 @I92@ INDI
+1 NAME
+1 SEX F
+1 BIRT
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @I93@ INDI
+1 NAME Jeanne /de FLANDRES/
+2 GIVN Jeanne
+2 NICK Jeanne la Flamme
+2 SPFX de
+2 SURN FLANDRES
+1 _SOSADABOVILLE 16561 G15
+1 SEX F
+1 FAMS @F58@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:25
+0 @I94@ INDI
+1 NAME Arthur /de DREUX/
+2 GIVN Arthur
+2 NICK Arthur II
+2 SPFX de
+2 SURN DREUX
+1 _SOSADABOVILLE 33120 G16
+1 SEX M
+1 DEAT
+2 DATE 1312
+1 TITL Duc de Bretagne
+2 DATE 1305
+1 FAMC @F68@
+1 FAMS @F59@
+1 FAMS @F60@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:25
+0 @F59@ FAM
+1 HUSB @I94@
+1 WIFE @I95@
+1 CHIL @I91@
+1 CHIL @I97@
+1 CHIL @I98@
+1 CHIL @I102@
+1 CHAN
+2 DATE 23 JAN 2016
+3 TIME 23:58:38
+0 @I95@ INDI
+1 NAME Yolande /de MONTFORT/
+2 GIVN Yolande
+2 SPFX de
+2 SURN MONTFORT
+1 _SOSADABOVILLE 33121 G16
+1 SEX F
+1 TITL Comtesse de MONFORT
+1 FAMS @F59@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:25
+0 @F60@ FAM
+1 HUSB @I94@
+1 WIFE @I96@
+1 CHAN
+2 DATE 23 JAN 2016
+3 TIME 23:27:04
+0 @I96@ INDI
+1 NAME Marie /de LIMOGES/
+2 GIVN Marie
+2 SPFX de
+2 SURN LIMOGES
+1 SEX F
+1 FAMS @F60@
+1 CHAN
+2 DATE 23 JAN 2016
+3 TIME 23:27:04
+0 @I97@ INDI
+1 NAME Pierre /de DREUX/
+2 GIVN Pierre
+2 SPFX de
+2 SURN DREUX
+1 _SOSADABOVILLE 33120-a.2 G14
+1 SEX M
+1 DEAT
+2 DATE BEF 1312
+1 TITL Vicomte de Léon
+1 FAMC @F59@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:26
+0 @I98@ INDI
+1 NAME Gui /de DREUX/
+2 GIVN Gui
+2 SPFX de
+2 SURN DREUX
+1 _SOSADABOVILLE 33120-a.3 G14
+1 SEX M
+1 DEAT
+2 DATE 1331
+1 TITL Vicomte de Limoges
+1 FAMC @F59@
+1 FAMS @F63@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:26
+0 @F61@ FAM
+1 CHAN
+2 DATE 23 JAN 2016
+3 TIME 23:37:30
+0 @F62@ FAM
+1 CHAN
+2 DATE 23 JAN 2016
+3 TIME 23:37:46
+0 @F63@ FAM
+1 HUSB @I98@
+1 WIFE @I99@
+1 CHIL @I100@
+1 CHAN
+2 DATE 23 JAN 2016
+3 TIME 23:40:28
+0 @I99@ INDI
+1 NAME Jeanne /de PENTHIÈVRE/
+2 GIVN Jeanne
+2 SPFX de
+2 SURN PENTHIÈVRE
+1 SEX F
+1 FAMS @F63@
+1 CHAN
+2 DATE 23 JAN 2016
+3 TIME 23:39:21
+0 @I100@ INDI
+1 NAME Jeanne /de DREUX/
+2 GIVN Jeanne
+2 SPFX de
+2 SURN DREUX
+1 _SOSADABOVILLE 33120-a.3.1 G13
+1 SEX F
+1 FAMC @F63@
+1 FAMS @F64@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:26
+0 @F64@ FAM
+1 HUSB @I101@
+1 WIFE @I100@
+1 CHAN
+2 DATE 23 JAN 2016
+3 TIME 23:45:09
+0 @I101@ INDI
+1 NAME Charles /de CHASTILLON/
+2 GIVN Charles
+2 SPFX de
+2 SURN CHASTILLON
+1 SEX M
+1 DEAT
+2 DATE 1364
+1 TITL Comte de Blois
+1 NOTE @N4@
+1 FAMS @F64@
+1 CHAN
+2 DATE 23 JAN 2016
+3 TIME 23:52:30
+0 @N4@ NOTE Prétendant à la couronne de Bretagne en 1341
+1 CHAN
+2 DATE 29 MAR 2016
+3 TIME 21:57:41
+0 @I102@ INDI
+1 NAME Jean /de DREUX/
+2 GIVN Jean
+2 NICK Jean III
+2 SPFX de
+2 SURN DREUX
+1 _SOSADABOVILLE 33120-a.4 G14
+1 SEX M
+1 DEAT
+2 DATE 1341
+1 TITL Duc de Bretagne
+2 DATE 1312
+1 FAMC @F59@
+1 FAMS @F65@
+1 FAMS @F66@
+1 FAMS @F67@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:26
+0 @F65@ FAM
+1 HUSB @I102@
+1 WIFE @I103@
+1 CHAN
+2 DATE 24 JAN 2016
+3 TIME 00:20:37
+0 @I103@ INDI
+1 NAME Isabelle /de VALOIS/
+2 GIVN Isabelle
+2 SPFX de
+2 SURN VALOIS
+1 SEX F
+1 FAMS @F65@
+1 CHAN
+2 DATE 24 JAN 2016
+3 TIME 00:20:37
+0 @F66@ FAM
+1 HUSB @I102@
+1 WIFE @I104@
+1 CHAN
+2 DATE 24 JAN 2016
+3 TIME 00:22:14
+0 @I104@ INDI
+1 NAME Isabelle /de CASTILLE/
+2 GIVN Isabelle
+2 SPFX de
+2 SURN CASTILLE
+1 SEX F
+1 FAMS @F66@
+1 CHAN
+2 DATE 24 JAN 2016
+3 TIME 00:22:14
+0 @F67@ FAM
+1 HUSB @I102@
+1 WIFE @I105@
+1 CHAN
+2 DATE 24 JAN 2016
+3 TIME 00:23:57
+0 @I105@ INDI
+1 NAME Jeanne /de SAVOIE/
+2 GIVN Jeanne
+2 SPFX de
+2 SURN SAVOIE
+1 SEX F
+1 FAMS @F67@
+1 CHAN
+2 DATE 24 JAN 2016
+3 TIME 00:23:57
+0 @I106@ INDI
+1 NAME Jean /de DREUX/
+2 GIVN Jean
+2 NICK Jean II
+2 SPFX de
+2 SURN DREUX
+1 _SOSADABOVILLE 66240 G17
+1 SEX M
+1 BIRT
+2 DATE 3 JAN 1239
+1 DEAT
+2 DATE 18 NOV 1305
+2 PLAC , Lyon, 69123, Rhône, Lyonnais, FRANCE
+3 MAP
+4 LATI N45.74846
+4 LONG E4.84671
+2 CAUS Accident
+1 TITL Duc de Bretagne
+2 DATE 1286
+1 BURI
+2 DATE 16 DEC 1305
+2 PLAC Carmes, Ploërmel, 56165, Morbihan, Bretagne, BRETAGNE
+3 MAP
+4 LATI N47.93172
+4 LONG W2.39781
+1 FAMC @F70@
+1 FAMS @F68@
+1 OBJE
+2 TITL Sceau de Jean II de Bretagne
+2 FILE photos/Jean_II_de_Bretagne.png
+3 FORM png
+2 NOTE
+1 OBJE
+2 TITL Blason de Jean II de Bretagne
+2 FILE photos/Blason_Pierre_Ier_de_Bretagne.svg.png
+3 FORM png
+2 NOTE
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:00
+0 @F68@ FAM
+1 HUSB @I106@
+1 WIFE @I107@
+1 CHIL @I94@
+1 CHIL @I167@
+1 CHAN
+2 DATE 26 MAR 2016
+3 TIME 00:00:21
+0 @I107@ INDI
+1 NAME Béatrice /PLANTAGENET/
+2 GIVN Béatrice
+2 NICK
+2 SURN PLANTAGENET
+1 _SOSADABOVILLE 66241 G17
+1 SEX F
+1 BIRT
+1 FAMC @F69@
+1 FAMS @F68@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @F69@ FAM
+1 HUSB @I108@
+1 CHIL @I107@
+1 CHAN
+2 DATE 24 JAN 2016
+3 TIME 00:31:06
+0 @I108@ INDI
+1 NAME Henri /PLANTAGENET/
+2 GIVN Henri
+2 NICK Henri III
+2 SURN PLANTAGENET
+1 _SOSADABOVILLE 132482 G18
+1 SEX M
+1 BIRT
+2 DATE 1155
+1 DEAT
+2 DATE 1183
+1 TITL Roi d'Angleterre
+1 FAMC @F76@
+1 FAMS @F69@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:25
+0 @F70@ FAM
+1 HUSB @I109@
+1 WIFE @I114@
+1 NCHI 8
+1 MARR
+2 DATE 1236
+1 CHIL @I106@
+1 CHIL @I130@
+1 CHIL @I131@
+1 CHIL @I133@
+1 CHIL @I134@
+1 CHIL @I135@
+1 CHIL @I136@
+1 CHIL @I137@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:00
+0 @I109@ INDI
+1 NAME Jean /de DREUX/
+2 GIVN Jean
+2 NICK Jean I le Roux
+2 SPFX de
+2 SURN DREUX
+1 _SOSADABOVILLE 132480 G18
+1 SEX M
+1 DEAT
+2 DATE 1286
+1 TITL Duc de Bretagne, mineur
+2 DATE 1221
+1 TITL Duc de Bretagne
+2 DATE 1237
+1 FAMC @F71@
+1 FAMS @F70@
+1 OBJE
+2 TITL Jean I de Bretagne dit le Roux
+2 FILE photos/Jean_Ier_le_Roux.png
+3 FORM png
+2 NOTE
+1 OBJE
+2 TITL Sceau de Jean I de Bretagne
+2 FILE photos/Sceau_de_Jean_I_-_Duc_de_Bretagne.png
+3 FORM png
+2 NOTE
+1 OBJE
+2 TITL Blason de Jean I de Bretagne
+2 FILE photos/Blason_Pierre_Ier_de_Bretagne.svg.png
+3 FORM png
+2 NOTE
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:25
+0 @F71@ FAM
+1 HUSB @I110@
+1 WIFE @I111@
+1 NCHI 3
+1 ENGA
+2 DATE ABT JAN 1213
+1 MARR
+2 DATE ABT MAR 1214
+1 CHIL @I109@
+1 CHIL @I126@
+1 CHIL @I128@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:00
+0 @I110@ INDI
+1 NAME Pierre /de DREUX/
+2 GIVN Pierre
+2 NICK Mauclerc
+2 SPFX de
+2 SURN DREUX
+1 _SOSADABOVILLE 264960 G19
+1 SEX M
+1 DEAT
+2 DATE AFT 1250
+1 TITL Régent de Bretagne
+2 DATE BET 1221 AND 1237
+1 FAMS @F71@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:25
+0 @I111@ INDI
+1 NAME Allix /de THOUARS/
+2 GIVN Allix
+2 SPFX de
+2 SURN THOUARS
+1 _SOSADABOVILLE 264961 G19
+1 SEX F
+1 BIRT
+2 DATE ABT 1201
+1 DEAT
+2 DATE 21 OCT 1221
+1 TITL Duchesse de Bretagne
+2 DATE 1203
+1 BURI
+2 DATE 24 NOV 1225
+2 PLAC Abbaye Notre-Dame, Villeneuve, , Loire-Atlantique, Bretagne, BRETAGNE
+2 OBJE
+3 TITL Tombeau d'Alix de Thouars et de sa fille Yolande de Bretagne, dans l'abbaye de Villeneuve-« lès-Nantes » (d'après l'original de Boudan)
+3 FILE photos/220px-Tombeau_Alix_de_Thouars_et_Yolande_de_Bretagne.png
+4 FORM png
+1 FAMC @F72@
+1 FAMS @F71@
+1 FAMS @F79@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:00
+0 @F72@ FAM
+1 HUSB @I112@
+1 WIFE @I113@
+1 MARR
+2 DATE BET AUG 1199 AND OCT 1199
+1 CHIL @I111@
+1 CHIL @I122@
+1 CHAN
+2 DATE 10 MAR 2016
+3 TIME 18:33:59
+0 @I112@ INDI
+1 NAME Gui /de THOUARS/
+2 GIVN Gui
+2 SPFX de
+2 SURN THOUARS
+1 _SOSADABOVILLE 529922 G20
+1 SEX M
+1 DEAT
+2 DATE 13 APR 1213
+2 PLAC , Chemillé, , , , 
+1 BURI
+2 DATE 25 OCT 1223
+2 PLAC Abbaye Notre-Dame, Villeneuve, , Loire-Atlantique, Bretagne, BRETAGNE
+1 FAMS @F72@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:25
+0 @I113@ INDI
+1 NAME Constance /de RENNES/
+2 GIVN Constance
+2 SPFX de
+2 SURN RENNES
+1 _SOSADABOVILLE 529923 G20
+1 SEX F
+1 BIRT
+2 DATE ABT 1161
+1 DEAT
+2 DATE 1201
+2 PLAC Château, Nantes, 44109, , , FRANCE
+3 MAP
+4 LATI N47.21604
+4 LONG W1.54993
+1 TITL Duchesse de Bretagne
+2 DATE 1171
+1 BURI
+2 PLAC Abbaye Notre-Dame, Villeneuve, , Loire-Atlantique, Bretagne, BRETAGNE
+1 FAMC @F81@
+1 FAMS @F72@
+1 FAMS @F74@
+1 FAMS @F75@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:25
+0 @I114@ INDI
+1 NAME Blanche /de NAVARRE/
+2 GIVN Blanche
+2 SPFX de
+2 SURN NAVARRE
+1 _SOSADABOVILLE 132481 G18
+1 SEX F
+1 BIRT
+2 DATE 1226
+1 DEAT
+2 DATE 1283
+1 FAMC @F73@
+1 FAMS @F70@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:00
+0 @F73@ FAM
+1 HUSB @I115@
+1 CHIL @I114@
+1 CHAN
+2 DATE 24 JAN 2016
+3 TIME 00:58:10
+0 @I115@ INDI
+1 NAME Thibaud /de NAVARRE/
+2 GIVN Thibaud
+2 SPFX de
+2 SURN NAVARRE
+1 _SOSADABOVILLE 264962 G19
+1 SEX M
+1 TITL Roi de Navarre
+1 FAMS @F73@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:25
+0 @F74@ FAM
+1 HUSB @I125@
+1 WIFE @I113@
+1 MARR
+2 DATE ABT 1189
+1 DIV
+2 DATE 1198
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:00
+0 @F75@ FAM
+1 HUSB @I116@
+1 WIFE @I113@
+1 MARR
+2 DATE JUL 1181
+1 CHIL @I118@
+1 CHIL @I119@
+1 CHIL @I121@
+1 CHAN
+2 DATE 10 MAR 2016
+3 TIME 18:17:11
+0 @I116@ INDI
+1 NAME Geoffroy /PLANTAGENÊT/
+2 GIVN Geoffroy
+2 NICK
+2 SURN PLANTAGENÊT
+1 _SOSADABOVILLE 264964-5 G18
+1 SEX M
+1 BIRT
+2 DATE 23 SEP 1158
+1 DEAT
+2 DATE 19 AUG 1186
+2 PLAC , Paris, 75056, Paris, Île-de-France, FRANCE
+3 MAP
+4 LATI N48.85341
+4 LONG E2.3488
+2 CAUS Blessures reçues lors d'un tournoi
+1 BURI
+2 PLAC Cathédrale Notre-Dame de Paris, Paris, 75056, Paris, Île-de-France, FRANCE
+3 NOTE Tombeau disparu lors du réaménagement du chœur en 1699
+3 MAP
+4 LATI N48.85296
+4 LONG E2.35007
+1 NOTE Wikipedia https://fr.wikipedia.org/wiki/Geoffroy_II_de_Bretagne
+1 FAMC @F76@
+1 FAMS @F75@
+1 OBJE
+2 TITL Portrait de Geoffroy II tiré d'une généalogie du XIVe siècle
+2 FILE photos/Geoffrey2.jpg
+3 FORM jpg
+1 OBJE
+2 TITL Sceau de Geoffroy II de Bretagne selon Dom Morice
+2 FILE photos/220px-Sceau_de_Geoffroi_II_-_Duc_de_Bretagne.png
+3 FORM png
+1 OBJE
+2 TITL Sceau de Geoffroy Plantagenêt
+2 FILE photos/220px-Geoffroy_II_de_Bretagne.jpg
+3 FORM jpg
+1 SOUR @S6@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @F76@ FAM
+1 HUSB @I117@
+1 CHIL @I116@
+1 CHIL @I120@
+1 CHIL @I138@
+1 CHIL @I108@
+1 CHIL @I139@
+1 CHIL @I140@
+1 CHIL @I141@
+1 CHIL @I142@
+1 CHIL @I120@
+1 CHAN
+2 DATE 25 MAR 2016
+3 TIME 21:17:53
+0 @I117@ INDI
+1 NAME Henri /PLANTAGENÊT/
+2 GIVN Henri
+2 NICK Henri II
+2 SURN PLANTAGENÊT
+1 _SOSADABOVILLE 264964 G19
+1 SEX M
+1 TITL Roi d'Angleterre
+1 FAMS @F76@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:25
+0 @I118@ INDI
+1 NAME Aliénor /PLANTAGENÊT/
+2 GIVN Aliénor
+2 SURN PLANTAGENÊT
+2 NOTE Emprisonnée jusqu'à sa mort
+1 _SOSADABOVILLE 264964-5.1 G17
+1 SEX F
+1 BIRT
+2 DATE BET 1182 AND 1184
+1 DEAT
+2 DATE 10 AUG 1241
+2 PLAC , Bristol, , City of Bristol, Angleterre, ANGLETERRE
+3 MAP
+4 LATI N51.45523
+4 LONG W2.59665
+1 FAMC @F75@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:00
+0 @I119@ INDI
+1 NAME Arthur /PLANTAGENÊT/
+2 GIVN Arthur
+2 NICK Arthur I
+2 SURN PLANTAGENÊT
+1 _SOSADABOVILLE 264964-5.3 G17
+1 SEX M
+1 BIRT
+2 DATE 29 MAR 1187
+1 DEAT
+2 DATE 3 APR 1203
+2 PLAC , Rouen, 76540, Seine-Maritime, Normandie, ANGLETERRE
+3 MAP
+4 LATI N49.44313
+4 LONG E1.09932
+2 CAUS Assassiné par son oncle Jean "Sans Terre" car héritier de la couronne d'Angleterre
+1 TITL Duc de Bretagne
+2 DATE 1201
+1 FAMC @F75@
+1 OBJE
+2 TITL Arthur et Hubert de Burgh, par William Frederick Yeames
+2 FILE photos/220px-Prince_Arthur_and_Hubert_de_Burgh.jpg
+3 FORM jpg
+2 NOTE
+1 OBJE
+2 TITL Arthur I, duc de Bretagne en 1202
+2 FILE photos/220px-Arthur_I_of_Brittany.jpg
+3 FORM jpg
+2 NOTE
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:00
+0 @I120@ INDI
+1 NAME Jean /PLANTAGENÊT/
+2 GIVN Jean
+2 NICK Jean Sans Terre
+2 SURN PLANTAGENÊT
+1 _SOSADABOVILLE 264964-8 G18
+1 SEX U
+1 BIRT
+2 DATE 1166
+1 DEAT
+2 DATE 1216
+1 FAMC @F76@
+1 FAMC @F76@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:00
+0 @S6@ SOUR
+1 DATA
+2 EVEN DEAT, MARR, BIRT
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:00
+0 @I121@ INDI
+1 NAME Mathilde /PLANTAGENÊT/
+2 GIVN Mathilde
+2 SURN PLANTAGENÊT
+1 _SOSADABOVILLE 264964-5.2 G17
+1 SEX F
+1 BIRT
+2 DATE ABT 1185
+1 DEAT
+2 DATE BEF MAY 1189
+1 FAMC @F75@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:26
+0 @I122@ INDI
+1 NAME Catherine /THOUARS/
+2 GIVN Catherine
+2 SURN THOUARS
+1 _SOSADABOVILLE 529922-1 G19
+1 SEX F
+1 BIRT
+2 DATE 1200
+1 DEAT
+2 DATE 1221
+1 FAMC @F72@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:00
+0 @I123@ INDI
+1 NAME Marguerite
+2 GIVN Marguerite
+1 SEX F
+1 BIRT
+1 NOTE Fille putative
+1 FAMS @F77@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @I124@ INDI
+1 NAME Geoffroy
+2 GIVN Geoffroy
+2 NICK I, vicomte de Rohan
+1 SEX M
+1 BIRT
+1 FAMS @F77@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @F77@ FAM
+1 HUSB @I124@
+1 WIFE @I123@
+1 CHAN
+2 DATE 10 MAR 2016
+3 TIME 18:28:08
+0 @I125@ INDI
+1 NAME Ranulph /de BLONDEVILLE/
+2 GIVN Ranulph
+2 SPFX de
+2 SURN BLONDEVILLE
+1 SEX M
+1 OCCU Comte de Chester, vicomte d'Avranches et de Bayeux
+1 FAMS @F74@
+1 CHAN
+2 DATE 10 MAR 2016
+3 TIME 18:50:44
+0 @I126@ INDI
+1 NAME Yolande /de DREUX/
+2 GIVN Yolande
+2 SPFX de
+2 SURN DREUX
+1 _SOSADABOVILLE 264960-2 G18
+1 SEX F
+1 BIRT
+2 DATE 1218
+1 DEAT
+2 DATE 10 OCT 1272
+1 BURI
+2 PLAC Abbaye Notre-Dame, Villeneuve, , Loire-Atlantique, Bretagne, BRETAGNE
+2 OBJE
+3 TITL Tombeau d'Alix de Thouars et de sa fille Yolande de Bretagne, dans l'abbaye de Villeneuve-« lès-Nantes » (d'après l'original de Boudan)
+3 FILE photos/220px-Tombeau_Alix_de_Thouars_et_Yolande_de_Bretagne.png
+4 FORM png
+1 FAMC @F71@
+1 FAMS @F78@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @I127@ INDI
+1 NAME Hugues
+2 GIVN Hugues
+2 NICK XI de Lusignan, comte de la Marche et d'Angoulême
+1 SEX M
+1 BIRT
+1 FAMS @F78@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @F78@ FAM
+1 HUSB @I127@
+1 WIFE @I126@
+1 MARR
+2 DATE JAN 1236
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:00
+0 @I128@ INDI
+1 NAME Arthur /DREUX/
+2 GIVN Arthur
+2 SURN DREUX
+1 _SOSADABOVILLE 264960-3 G18
+1 SEX U
+1 BIRT
+2 DATE 1220
+1 DEAT
+2 DATE 1224
+1 FAMC @F71@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:00
+0 @I129@ INDI
+1 NAME Henri II /d' AVAUGOUR/
+2 GIVN Henri, II
+2 SPFX d'
+2 SURN AVAUGOUR
+1 SEX M
+1 BIRT
+1 FAMS @F79@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @F79@ FAM
+1 HUSB @I129@
+1 WIFE @I111@
+1 CHAN
+2 DATE 10 MAR 2016
+3 TIME 19:29:05
+0 @I130@ INDI
+1 NAME Pierre /de DREUX/
+2 GIVN Pierre
+2 SPFX de
+2 SURN DREUX
+1 _SOSADABOVILLE 132480-2 G17
+1 SEX M
+1 BIRT
+2 DATE 2 APR 1241
+1 DEAT
+2 DATE 19 OCT 1268
+1 FAMC @F70@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:00
+0 @I131@ INDI
+1 NAME Alix /DREUX/
+2 GIVN Alix
+2 SURN DREUX
+1 _SOSADABOVILLE 132480-3 G17
+1 SEX F
+1 BIRT
+2 DATE 6 JUN 1243
+1 DEAT
+2 DATE 2 AUG 1288
+1 FAMC @F70@
+1 FAMS @F80@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:00
+0 @I132@ INDI
+1 NAME Jean I /de BLOIS-CHÂTILLON/
+2 GIVN Jean, I
+2 SPFX de
+2 SURN BLOIS-CHÂTILLON
+1 SEX M
+1 BIRT
+1 FAMS @F80@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @F80@ FAM
+1 HUSB @I132@
+1 WIFE @I131@
+1 CHAN
+2 DATE 10 MAR 2016
+3 TIME 20:02:23
+0 @I133@ INDI
+1 NAME Thibaut /de DREUX/
+2 GIVN Thibaut
+2 SPFX de
+2 SURN DREUX
+1 _SOSADABOVILLE 132480-4 G17
+1 SEX M
+1 BIRT
+2 DATE 23 JUL 1245
+1 DEAT
+2 DATE 23 OCT 1246
+1 BURI
+2 PLAC Église abbatiale, Saint-Gildas-de-Rhuys, 56214, Morbihan, Bretagne, BRETAGNE
+3 MAP
+4 LATI N47.5006
+4 LONG W2.83825
+1 FAMC @F70@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @I134@ INDI
+1 NAME Thibaut /de DREUX/
+2 GIVN Thibaut
+2 SPFX de
+2 SURN DREUX
+1 _SOSADABOVILLE 132480-5 G17
+1 SEX M
+1 BIRT
+2 DATE 9 NOV 1247
+1 BURI
+2 PLAC Église abbatiale, Saint-Gildas-de-Rhuys, 56214, Morbihan, Bretagne, BRETAGNE
+3 MAP
+4 LATI N47.5006
+4 LONG W2.83825
+1 FAMC @F70@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @I135@ INDI
+1 NAME Aliénor /de DREUX/
+2 GIVN Aliénor
+2 SPFX de
+2 SURN DREUX
+1 _SOSADABOVILLE 132480-6 G17
+1 SEX F
+1 BIRT
+2 DATE 1248
+1 BURI
+2 PLAC Église abbatiale, Saint-Gildas-de-Rhuys, 56214, Morbihan, Bretagne, BRETAGNE
+3 MAP
+4 LATI N47.5006
+4 LONG W2.83825
+1 FAMC @F70@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @I136@ INDI
+1 NAME Nicolas /de DREUX/
+2 GIVN Nicolas
+2 SPFX de
+2 SURN DREUX
+1 _SOSADABOVILLE 132480-7 G17
+1 SEX M
+1 BIRT
+2 DATE 8 DEC 1249
+1 DEAT
+2 DATE 14 AUG 1251
+1 BURI
+2 PLAC Église abbatiale, Saint-Gildas-de-Rhuys, 56214, Morbihan, Bretagne, BRETAGNE
+3 MAP
+4 LATI N47.5006
+4 LONG W2.83825
+1 FAMC @F70@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @I137@ INDI
+1 NAME Robert /de DREUX/
+2 GIVN Robert
+2 SPFX de
+2 SURN DREUX
+1 _SOSADABOVILLE 132480-8 G17
+1 SEX M
+1 BIRT
+2 DATE 6 MAR 1251
+1 DEAT
+2 DATE 4 FEB 1259
+1 BURI
+2 PLAC Église du couvent des Cordeliers, Nantes, 44109, Loire-Atlantique, Bretagne, BRETAGNE
+3 MAP
+4 LATI N47.21725
+4 LONG W1.55336
+1 FAMC @F70@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @I138@ INDI
+1 NAME Guillaume /PLANTAGENÊT/
+2 GIVN Guillaume
+2 SURN PLANTAGENÊT
+1 _SOSADABOVILLE 264964-1 G18
+1 SEX M
+1 BIRT
+2 DATE 1153
+1 DEAT
+2 DATE 1156
+1 FAMC @F76@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:00
+0 @I139@ INDI
+1 NAME Mathilde /PLANTAGENÊT/
+2 GIVN Mathilde
+2 SURN PLANTAGENÊT
+1 _SOSADABOVILLE 264964-3 G18
+1 SEX F
+1 BIRT
+2 DATE 1156
+1 DEAT
+2 DATE 1189
+1 TITL Duchesse de Saxe
+1 FAMC @F76@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:00
+0 @I140@ INDI
+1 NAME Richard /PLANTAGENÊT/
+2 GIVN Richard
+2 NICK I, Cœur de Lion
+2 SURN PLANTAGENÊT
+1 _SOSADABOVILLE 264964-4 G18
+1 SEX M
+1 BIRT
+2 DATE 1157
+1 DEAT
+2 DATE 1199
+1 TITL Roi d'Angleterre
+1 FAMC @F76@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:00
+0 @I141@ INDI
+1 NAME Aliénor /PLANTAGENÊT/
+2 GIVN Aliénor
+2 SURN PLANTAGENÊT
+1 _SOSADABOVILLE 264964-6 G18
+1 SEX F
+1 BIRT
+2 DATE 1161
+1 DEAT
+2 DATE 1214
+1 TITL Reine de Castille
+1 FAMC @F76@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:00
+0 @I142@ INDI
+1 NAME Jeanne /PLANTAGENÊT/
+2 GIVN Jeanne
+2 SURN PLANTAGENÊT
+1 _SOSADABOVILLE 264964-7 G18
+1 SEX F
+1 BIRT
+2 DATE 1165
+1 DEAT
+2 DATE 1199
+1 TITL Reine de Sicile
+1 FAMC @F76@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:00
+0 @I143@ INDI
+1 NAME Conan /RENNES/
+2 GIVN Conan
+2 NICK IV, La Petit
+2 SURN RENNES
+1 _SOSADABOVILLE 1059846 G21
+1 SEX M
+1 BIRT
+2 DATE ABT 1135
+1 DEAT
+2 DATE 20 FEB 1171
+1 TITL Comte de Richemond
+2 DATE FROM 1146 TO 1171
+1 TITL Duc de Bretagne
+2 DATE FROM 1156 TO 1166
+1 BURI Y
+2 PLAC Abbaye Notre-Dame, Abbaye de Begar, 22004, Côtes-d'Armor, Bretagne, BRETAGNE
+3 MAP
+4 LATI N48.62996
+4 LONG W3.29811
+1 FAMC @F83@
+1 FAMS @F81@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:00
+0 @F81@ FAM
+1 HUSB @I143@
+1 WIFE @I144@
+1 MARR
+2 DATE 1160
+1 CHIL @I113@
+1 CHIL @I150@
+1 CHIL @I151@
+1 CHIL @I152@
+1 CHAN
+2 DATE 25 MAR 2016
+3 TIME 22:16:27
+0 @I144@ INDI
+1 NAME Marguerite /de HUNTINGDON/
+2 GIVN Marguerite
+2 SPFX de
+2 SURN HUNTINGDON
+1 _SOSADABOVILLE 1059847 G21
+1 SEX F
+1 BIRT
+1 DEAT
+2 DATE 1201
+1 BURI Y
+2 PLAC Abbaye, Sawtry, , , Huntingdonshire, ANGLETERRE
+3 MAP
+4 LATI N52.44089
+4 LONG W0.27738
+1 FAMC @F82@
+1 FAMS @F81@
+1 FAMS @F84@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @F82@ FAM
+1 HUSB @I145@
+1 CHIL @I144@
+1 CHIL @I146@
+1 CHIL @I147@
+1 CHIL @I147@
+1 CHAN
+2 DATE 25 MAR 2016
+3 TIME 21:30:55
+0 @I145@ INDI
+1 NAME Henri /de NORTHUMBERLAND/
+2 GIVN Henri
+2 SPFX de
+2 SURN NORTHUMBERLAND
+1 _SOSADABOVILLE 2119694 G22
+1 SEX M
+1 TITL Prince d'Écosse
+1 TITL Comte de Northumbland et de Huntingdon
+1 FAMS @F82@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:25
+0 @I146@ INDI
+1 NAME Malcom /NORTHUMBERLAND/
+2 GIVN Malcom
+2 NICK IV
+2 SURN NORTHUMBERLAND
+1 _SOSADABOVILLE 2119694-2 G21
+1 SEX M
+1 BIRT
+1 TITL Roi d'Écosse
+1 FAMC @F82@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @I147@ INDI
+1 NAME Guillaume /NORTHUMBERLAND/
+2 GIVN Guillaume
+2 NICK Le Lion
+2 SURN NORTHUMBERLAND
+1 _SOSADABOVILLE 2119694-3 G21
+1 SEX U
+1 BIRT
+1 FAMC @F82@
+1 FAMC @F82@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @I148@ INDI
+1 NAME Alain /RENNES/
+2 GIVN Alain
+2 NICK Le Noir
+2 SURN RENNES
+1 _SOSADABOVILLE 2119692 G22
+1 SEX M
+1 BIRT
+2 DATE ABT 1100
+1 DEAT
+2 DATE 15 SEP 1146
+1 TITL Comte de Richemond
+2 DATE FROM 1135 TO 15 SEP 1146
+1 TITL Comte de Penthièvre
+1 TITL Comte de Cornouailles
+2 DATE FROM 1140 TO 1141
+1 TITL Seigneur de Guimgamp
+1 FAMC @F108@
+1 FAMC @F110@
+1 FAMS @F83@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:00
+0 @F83@ FAM
+1 HUSB @I148@
+1 WIFE @I149@
+1 MARR
+2 DATE BET 1137 AND 1138
+1 CHIL @I143@
+1 CHIL @I154@
+1 CHIL @I154@
+1 CHIL @I156@
+1 CHAN
+2 DATE 26 MAR 2016
+3 TIME 01:45:32
+0 @I149@ INDI
+1 NAME Berthe /de CORNOUAILLES/
+2 GIVN Berthe
+2 SPFX de
+2 SURN CORNOUAILLES
+1 _SOSADABOVILLE 2119693 G22
+1 SEX F
+1 BIRT
+1 DEAT
+2 DATE 1156
+1 TITL Duchesse de Bretagne
+1 FAMC @F91@
+1 FAMS @F83@
+1 FAMS @F86@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @I150@ INDI
+1 NAME /RENNES/
+2 SURN RENNES
+1 _SOSADABOVILLE 1059846-1 G20
+1 SEX U
+1 BIRT
+1 FAMC @F81@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @I151@ INDI
+1 NAME /RENNES/
+2 SURN RENNES
+1 _SOSADABOVILLE 1059846-2 G20
+1 SEX U
+1 BIRT
+1 FAMC @F81@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @I152@ INDI
+1 NAME Guillaume /RENNES/
+2 GIVN Guillaume
+2 SURN RENNES
+1 _SOSADABOVILLE 1059846-3 G20
+1 SEX M
+1 BIRT
+1 DEAT
+2 DATE AFT 1200
+1 FAMC @F81@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @I153@ INDI
+1 NAME Humphrey /de BOHUN/
+2 GIVN Humphrey
+2 SPFX de
+2 SURN BOHUN
+1 SEX M
+1 BIRT
+1 TITL Connétable d'Angleterre
+1 FAMS @F84@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @F84@ FAM
+1 HUSB @I153@
+1 WIFE @I144@
+1 CHAN
+2 DATE 25 MAR 2016
+3 TIME 22:18:11
+0 @I154@ INDI
+1 NAME Constance /RENNES/
+2 GIVN Constance
+2 NICK de Bretagne
+2 SURN RENNES
+1 _SOSADABOVILLE 2119692-1 G21
+1 SEX F
+1 BIRT
+1 DEAT
+2 DATE 1195
+1 FAMC @F83@
+1 FAMC @F83@
+1 FAMS @F85@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @F85@ FAM
+1 HUSB @I155@
+1 WIFE @I154@
+1 CHAN
+2 DATE 25 MAR 2016
+3 TIME 22:43:07
+0 @I155@ INDI
+1 NAME Alain /de ROHAN/
+2 GIVN Alain
+2 NICK III
+2 SPFX de
+2 SURN ROHAN
+1 SEX M
+1 TITL Vicomte
+1 FAMS @F85@
+1 CHAN
+2 DATE 29 MAR 2016
+3 TIME 00:36:37
+0 @I156@ INDI
+1 NAME Enoguen /PENTHIÈVRE/
+2 GIVN Enoguen
+2 SURN PENTHIÈVRE
+1 _SOSADABOVILLE 2119692-2 G21
+1 SEX F
+1 BIRT
+1 DEAT
+2 DATE 1187
+1 OCCU Abbesse
+2 DATE 1171
+2 PLAC Abbaye Saint-Sulpice, Rennes, 35238, Ille-et-Vilaine, Bretagne, FRANCE
+3 MAP
+4 LATI N48.11478
+4 LONG W1.67765
+1 FAMC @F83@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @I157@ INDI
+1 NAME Eudon /de PORHËT/
+2 GIVN Eudon
+2 NICK II
+2 SPFX de
+2 SURN PORHËT
+1 SEX M
+1 BIRT
+1 DEAT
+2 DATE 1186
+1 TITL Duc de Bretagne
+2 DATE 1148
+1 FAMS @F86@
+1 FAMS @F87@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @F86@ FAM
+1 HUSB @I157@
+1 WIFE @I149@
+1 CHIL @I164@
+1 CHIL @I165@
+1 CHIL @I166@
+1 CHAN
+2 DATE 25 MAR 2016
+3 TIME 23:55:24
+0 @F87@ FAM
+1 HUSB @I157@
+1 WIFE @I158@
+1 CHIL @I161@
+1 CHIL @I160@
+1 CHIL @I159@
+1 CHAN
+2 DATE 25 MAR 2016
+3 TIME 23:23:28
+0 @I158@ INDI
+1 NAME Jeanne ou Aliénor /de LÉON/
+2 GIVN Jeanne, ou, Aliénor
+2 SPFX de
+2 SURN LÉON
+1 SEX F
+1 FAMS @F87@
+1 CHAN
+2 DATE 25 MAR 2016
+3 TIME 22:59:47
+0 @I159@ INDI
+1 NAME Eudon /de PORHËT/
+2 GIVN Eudon
+2 NICK III
+2 SPFX de
+2 SURN PORHËT
+1 SEX M
+1 BIRT
+2 DATE ABT 1165
+1 DEAT
+2 DATE 1234
+1 FAMC @F87@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:00
+0 @I160@ INDI
+1 NAME Henri ou Hervé /PORHËT/
+2 GIVN Henri, ou, Hervé
+2 SURN PORHËT
+1 SEX M
+1 BIRT
+2 DATE BEF 1184
+1 FAMC @F87@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:00
+0 @I161@ INDI
+1 NAME Éléonore /PORHËT/
+2 GIVN Éléonore
+2 SURN PORHËT
+1 SEX F
+1 BIRT Y
+1 DEAT
+2 DATE AFT 1243
+2 NOTE un 3 mai
+1 FAMC @F87@
+1 FAMS @F88@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @F88@ FAM
+1 HUSB @I162@
+1 WIFE @I161@
+1 CHAN
+2 DATE 25 MAR 2016
+3 TIME 23:27:00
+0 @I162@ INDI
+1 NAME Conan /d' AVAUGOUR/
+2 GIVN Conan
+2 SPFX d'
+2 SURN AVAUGOUR
+1 SEX M
+1 FAMC @F89@
+1 FAMS @F88@
+1 CHAN
+2 DATE 25 MAR 2016
+3 TIME 23:27:18
+0 @F89@ FAM
+1 HUSB @I163@
+1 CHIL @I162@
+1 CHAN
+2 DATE 25 MAR 2016
+3 TIME 23:26:31
+0 @I163@ INDI
+1 NAME Henri /d' AVAUGOUR/
+2 GIVN Henri
+2 NICK I
+2 SPFX d'
+2 SURN AVAUGOUR
+1 SEX M
+1 FAMS @F89@
+1 CHAN
+2 DATE 25 MAR 2016
+3 TIME 23:26:31
+0 @I164@ INDI
+1 NAME Geoffroi /PORHËT/
+2 GIVN Geoffroi
+2 SURN PORHËT
+1 SEX M
+1 BIRT
+1 DEAT
+2 DATE AFT 1155
+1 FAMC @F86@
+1 FAMS @F90@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @I165@ INDI
+1 NAME Adélaïde /PORHËT/
+2 GIVN Adélaïde
+2 SURN PORHËT
+1 SEX F
+1 BIRT Y
+1 DEAT
+2 DATE 1244
+1 OCCU Abbesse
+2 DATE FROM 1228 TO 1244
+2 PLAC Abbaye, Fontevraud, 49140, Maine-et-Loire, Pays de la Loire, FRANCE
+3 MAP
+4 LATI N47.18106
+4 LONG E0.0521
+2 NOTE Semble apparaître sous Adèle ou Alix de Bretagne dans la liste affichée dans l'abbaye selon Wikipedia https://fr.wikipedia.org/wiki/Liste_des_abbesses_de_Fontevraud
+1 FAMC @F86@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @I166@ INDI
+1 NAME Alix /PORHËT/
+2 GIVN Alix
+2 SURN PORHËT
+1 SEX F
+1 BIRT Y
+1 EVEN
+2 TYPE
+2 DATE 1168
+2 NOTE Confiée comme otage en 1168, à Henri II d'Angleterre il en fait sa maitresse.
+1 FAMC @F86@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @I167@ INDI
+1 NAME Aliénor /DREUX/
+2 GIVN Aliénor
+2 SURN DREUX
+1 _SOSADABOVILLE 66240-2 G16
+1 SEX F
+1 BIRT
+1 DEAT
+2 DATE 1342
+1 OCCU Abbesse
+2 DATE FROM 1304 TO 1342
+2 PLAC Abbaye, Fontevraud, 49140, Maine-et-Loire, Pays de la Loire, FRANCE
+3 MAP
+4 LATI N47.18106
+4 LONG E0.0521
+1 FAMC @F68@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @I168@ INDI
+1 NAME Marie /MONTFORT/
+2 GIVN Marie
+2 SURN MONTFORT
+1 _SOSADABOVILLE 4140-2 G12
+1 SEX F
+1 BIRT
+1 DEAT
+2 DATE 1477
+1 OCCU Abbesse
+2 DATE FROM 1457 TO 1477
+1 FAMC @F40@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @I169@ INDI
+1 NAME /PORHËT/
+2 SURN PORHËT
+2 NOTE Descendance en 1990
+3 CONT Maison de GIBON
+1 SEX U
+1 BIRT
+1 FAMC @F90@
+1 OBJE
+2 TITL Blason maison Rohan-Gibon
+2 FILE photos/Maison de Rohan_Gibon.png
+3 FORM png
+2 NOTE
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @F90@ FAM
+1 HUSB @I164@
+1 WIFE @I170@
+1 CHIL @I169@
+1 CHAN
+2 DATE 26 MAR 2016
+3 TIME 00:10:29
+0 @I170@ INDI
+1 NAME
+1 SEX F
+1 BIRT
+1 FAMS @F90@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @I171@ INDI
+1 NAME Conan /CORNOUAILLES/
+2 GIVN Conan
+2 NICK III, le Gros
+2 SURN CORNOUAILLES
+1 _SOSADABOVILLE 4239386 G23
+1 SEX M
+1 BIRT
+2 DATE BET 1095 AND 1096
+1 DEAT
+2 DATE 17 SEP 1148
+1 TITL Duc de Bretagne
+2 DATE 1112
+1 TITL Comte de Rennes
+2 DATE FROM 1112 TO 1148
+1 FAMC @F92@
+1 FAMS @F91@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:00
+0 @F91@ FAM
+1 HUSB @I171@
+1 WIFE @I172@
+1 ENGA
+2 DATE ABT MAR 1113
+2 PLAC , Ormeteau-Ferré, , , , FRANCE
+1 MARR
+2 DATE BEF 1122
+1 CHIL @I149@
+1 CHIL @I173@
+1 CHIL @I175@
+1 CHAN
+2 DATE 26 MAR 2016
+3 TIME 01:46:43
+0 @I172@ INDI
+1 NAME Mathilde /d' ANGLETERRE/
+2 GIVN Mathilde
+2 SPFX d'
+2 SURN ANGLETERRE
+1 _SOSADABOVILLE 4239387 G23
+1 SEX F
+1 BIRT
+2 TYPE Illégitime
+1 FAMC @F94@
+1 FAMS @F91@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @I173@ INDI
+1 NAME Constance /CORNOUAILLES/
+2 GIVN Constance
+2 SURN CORNOUAILLES
+1 _SOSADABOVILLE 4239386-2 G22
+1 SEX F
+1 BIRT
+1 FAMC @F91@
+1 FAMS @F93@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @F93@ FAM
+1 HUSB @I174@
+1 WIFE @I173@
+1 CHAN
+2 DATE 26 MAR 2016
+3 TIME 01:43:10
+0 @I174@ INDI
+1 NAME Geoffroy /de MAYENNE/
+2 GIVN Geoffroy
+2 NICK III
+2 SPFX de
+2 SURN MAYENNE
+1 SEX M
+1 FAMS @F93@
+1 CHAN
+2 DATE 26 MAR 2016
+3 TIME 01:43:10
+0 @I175@ INDI
+1 NAME Hoël /CORNOUAILLES/
+2 GIVN Hoël
+2 NICK III
+2 SURN CORNOUAILLES
+2 NOTE Désavoué par son père sur son lit de mort le 17 septembre 1148
+1 _SOSADABOVILLE 4239386-3 G22
+1 SEX M
+1 BIRT
+1 FAMC @F91@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @I176@ INDI
+1 NAME Henri /BEAUCLERC/
+2 GIVN Henri
+2 NICK I
+2 SURN BEAUCLERC
+1 _SOSADABOVILLE 8478774 G24
+1 SEX M
+1 BIRT
+1 TITL Duc de Normandie
+1 TITL Roi d'Angleterre
+1 FAMS @F94@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @F94@ FAM
+1 HUSB @I176@
+1 WIFE @I177@
+1 CHIL @I172@
+1 CHAN
+2 DATE 26 MAR 2016
+3 TIME 01:52:20
+0 @I177@ INDI
+1 NAME
+1 _SOSADABOVILLE 8478775 G24
+1 SEX F
+1 BIRT
+1 FAMS @F94@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @I180@ INDI
+1 NAME Alain /de CORNOUAILLES/
+2 GIVN Alain
+2 NICK IV
+2 SPFX de
+2 SURN CORNOUAILLES
+1 _SOSADABOVILLE 8478772 G24
+1 SEX M
+1 BIRT
+2 TYPE
+2 DATE ABT 1060
+2 PLAC Chaeau, Chateaulin, 29026, Finistère, Bretagne, BRETAGNE
+3 MAP
+4 LATI N48.19577
+4 LONG W4.09897
+1 DEAT
+2 DATE 13 OCT 1119
+2 PLAC Abbaye Saint-Sauveur, Redon, 35236, Ille-et-Vilaine, Bretagne, FRANCE
+3 MAP
+4 LATI N48.11478
+4 LONG W1.67765
+1 TITL Comte de Cornouailles
+1 TITL Comte de Rennes
+1 TITL Comte de Nantes
+1 TITL Duc de Bretagne
+2 DATE BET 1084 AND 1112
+2 CAUS Décès de son père Abdication
+1 FAMC @F103@
+1 FAMS @F92@
+1 FAMS @F95@
+1 FAMS @F102@
+1 OBJE
+2 TITL Alain Fergent, tableau d'Édouard ODIER
+2 FILE photos/Alain_Fergent_duc_de_Bretagne.jpg
+3 FORM jpg
+1 OBJE
+2 TITL Dessin du XIX° siècle représentant Alain Fergent d'après un tableau disparu de l'abbaye de Redon
+2 FILE photos/Alain_Fergent.png
+3 FORM png
+1 OBJE
+2 TITL Sceau d'Alain IV selon Dom Morice
+2 FILE photos/Sceau_Alain_Fregent.jpg
+3 FORM jpg
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:25
+0 @F92@ FAM
+1 HUSB @I180@
+1 WIFE @I181@
+1 MARR
+2 DATE 1093
+1 CHIL @I171@
+1 CHIL @I190@
+1 CHIL @I191@
+1 CHAN
+2 DATE 28 MAR 2016
+3 TIME 21:47:12
+0 @I181@ INDI
+1 NAME Ermangarde /d' ANJOU/
+2 GIVN Ermangarde
+2 SPFX d'
+2 SURN ANJOU
+1 _SOSADABOVILLE 8478773 G24
+1 SEX F
+1 BIRT
+2 DATE 1072
+2 PLAC , Angers, 49007, Maine-et-Loire, Pays de la Loire, FRANCE
+3 MAP
+4 LATI N48.11478
+4 LONG W1.67765
+1 DEAT
+2 DATE 1 JUN 1146
+2 PLAC Abbaye Saint-Sauveur, Redon, 35236, Ille-et-Vilaine, Bretagne, FRANCE
+3 MAP
+4 LATI N48.11478
+4 LONG W1.67765
+2 NOTE Selon les nécrologies de ladite abbaye et celle de Saint-Maurice d'Angers
+3 CONT Certains historiens la pense décédée comme moniale du couvent Sainte-Anne à Jérusalem
+1 FAMC @F97@
+1 FAMS @F92@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:25
+0 @I182@ INDI
+1 NAME Constance /de NORMANDIE/
+2 GIVN Constance
+2 SPFX de
+2 SURN NORMANDIE
+1 SEX F
+1 BIRT
+1 FAMC @F96@
+1 FAMS @F95@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @F95@ FAM
+1 HUSB @I180@
+1 WIFE @I182@
+1 CHAN
+2 DATE 28 MAR 2016
+3 TIME 21:22:45
+0 @F96@ FAM
+1 HUSB @I183@
+1 CHIL @I182@
+1 CHAN
+2 DATE 28 MAR 2016
+3 TIME 21:24:50
+0 @I183@ INDI
+1 NAME Guillaume /de NORMANDIE/
+2 GIVN Guillaume
+2 NICK Le Conquérant
+2 SPFX de
+2 SURN NORMANDIE
+1 SEX M
+1 TITL Duc de Normandie
+1 TITL Roi d'Angleterre
+1 FAMS @F96@
+1 CHAN
+2 DATE 28 MAR 2016
+3 TIME 21:24:50
+0 @I184@ INDI
+1 NAME Foulque /d' ANJOU/
+2 GIVN Foulque
+2 NICK IV, le Réchin
+2 SPFX d'
+2 SURN ANJOU
+1 _SOSADABOVILLE 16957546 G25
+1 SEX M
+1 BIRT
+1 FAMC @F98@
+1 FAMS @F97@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @F97@ FAM
+1 HUSB @I184@
+1 WIFE @I185@
+1 CHIL @I181@
+1 CHAN
+2 DATE 28 MAR 2016
+3 TIME 21:25:30
+0 @I185@ INDI
+1 NAME
+1 _SOSADABOVILLE 16957547 G25
+1 SEX F
+1 BIRT
+1 FAMS @F97@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @I186@ INDI
+1 NAME /d' ANJOU/
+2 SPFX d'
+2 SURN ANJOU
+1 _SOSADABOVILLE 33915092 G26
+1 SEX M
+1 BIRT
+1 FAMC @F99@
+1 FAMS @F98@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @F98@ FAM
+1 HUSB @I186@
+1 WIFE @I187@
+1 CHIL @I184@
+1 CHAN
+2 DATE 28 MAR 2016
+3 TIME 21:27:20
+0 @I187@ INDI
+1 NAME
+1 _SOSADABOVILLE 33915093 G26
+1 SEX F
+1 BIRT
+1 FAMS @F98@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @I188@ INDI
+1 NAME Foulque Nerra /d' ANJOU/
+2 GIVN Foulque, Nerra
+2 SPFX d'
+2 SURN ANJOU
+1 _SOSADABOVILLE 67830184 G27
+1 SEX M
+1 BIRT
+1 FAMS @F99@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @F99@ FAM
+1 HUSB @I188@
+1 WIFE @I189@
+1 CHIL @I186@
+1 CHAN
+2 DATE 28 MAR 2016
+3 TIME 21:27:37
+0 @I189@ INDI
+1 NAME
+1 _SOSADABOVILLE 67830185 G27
+1 SEX F
+1 BIRT
+1 FAMS @F99@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @I190@ INDI
+1 NAME Geoffroi /de CORNOUAILLES/
+2 GIVN Geoffroi
+2 NICK Le Roux
+2 SPFX de
+2 SURN CORNOUAILLES
+1 _SOSADABOVILLE 8478772-c.1 G22
+1 SEX U
+1 BIRT
+1 DEAT
+2 DATE 1116
+2 PLAC , Jérusalem, , , Jerusalem, Israel
+3 MAP
+4 LATI N31.76904
+4 LONG E35.21633
+1 FAMC @F92@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @I191@ INDI
+1 NAME Agnès ou Havoïse /de CORNOUAILLES/
+2 GIVN Agnès, ou, Havoïse
+2 SPFX de
+2 SURN CORNOUAILLES
+1 _SOSADABOVILLE 8478772-c.2 G22
+1 NAME
+1 SEX F
+1 BIRT
+1 FAMC @F92@
+1 FAMS @F100@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @I192@ INDI
+1 NAME Beaudouin /de FLANDRE/
+2 GIVN Beaudouin
+2 NICK VII
+2 SPFX de
+2 SURN FLANDRE
+1 SEX M
+1 BIRT
+1 FAMC @F101@
+1 FAMS @F100@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @F100@ FAM
+1 HUSB @I192@
+1 WIFE @I191@
+1 MARR
+2 DATE ABT 1110
+1 CHAN
+2 DATE 28 MAR 2016
+3 TIME 21:52:54
+0 @F101@ FAM
+1 HUSB @I193@
+1 CHIL @I192@
+1 CHAN
+2 DATE 28 MAR 2016
+3 TIME 21:41:54
+0 @I193@ INDI
+1 NAME Robert /de FLANDRE/
+2 GIVN Robert
+2 NICK II
+2 SPFX de
+2 SURN FLANDRE
+1 SEX M
+1 FAMS @F101@
+1 CHAN
+2 DATE 28 MAR 2016
+3 TIME 21:41:54
+0 @I194@ INDI
+1 NAME
+1 SEX F
+1 BIRT
+1 FAMS @F102@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @F102@ FAM
+1 HUSB @I180@
+1 WIFE @I194@
+1 CHIL @I195@
+1 CHAN
+2 DATE 28 MAR 2016
+3 TIME 21:48:48
+0 @I195@ INDI
+1 NAME Brian /FITZCOUNT/
+2 GIVN Brian
+2 SURN FITZCOUNT
+1 _SOSADABOVILLE 8478772-b.1 G22
+1 SEX U
+1 BIRT
+1 DEAT
+2 DATE BET 1147 AND 1149
+1 TITL Lord de Wallingford
+1 NOTE Fervent supporter de Mathilde l'Emperesse dans la guerre civile dite l'Anarchie, pour le trône d'Angleterre.
+1 FAMC @F102@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @F103@ FAM
+1 HUSB @I196@
+1 WIFE @I197@
+1 MARR
+2 DATE BEF 1058
+1 CHIL @I180@
+1 CHIL @I198@
+1 CHIL @I199@
+1 CHIL @I200@
+1 CHIL @I201@
+1 CHAN
+2 DATE 28 MAR 2016
+3 TIME 22:26:08
+0 @I196@ INDI
+1 NAME Hoël /de CORNOUAILLES/
+2 GIVN Hoël
+2 NICK II
+2 SPFX de
+2 SURN CORNOUAILLES
+1 _SOSADABOVILLE 16957544 G25
+1 SEX M
+1 BIRT
+2 DATE ABT 1030
+1 DEAT
+2 DATE 13 APR 1084
+1 TITL Comte de Cornouailles
+2 DATE 1058
+2 CAUS Mort de son père
+1 TITL Comte de Nantes
+2 DATE 1063
+2 CAUS Mort de sa mère
+1 TITL Duc de Bretagne
+2 DATE 1058
+2 NOTE En fait Duc Consort
+1 FAMC @F104@
+1 FAMS @F103@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:25
+0 @I197@ INDI
+1 NAME Havoïse /de RENNES/
+2 GIVN Havoïse
+2 SPFX de
+2 SURN RENNES
+1 _SOSADABOVILLE 16957545 G25
+1 SEX F
+1 TITL Duchesse de Bretagne
+2 DATE 1066
+2 CAUS Décès de son oncle Conan II
+1 FAMS @F103@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:25
+0 @I198@ INDI
+1 NAME Mathias /de CORNOUAILLES/
+2 GIVN Mathias
+2 NICK II
+2 SPFX de
+2 SURN CORNOUAILLES
+1 _SOSADABOVILLE 16957544-1 G24
+1 SEX M
+1 BIRT
+1 TITL Comte de Nantes
+1 FAMC @F103@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @I199@ INDI
+1 NAME Eudon /de CORNOUAILLES/
+2 GIVN Eudon
+2 SPFX de
+2 SURN CORNOUAILLES
+1 _SOSADABOVILLE 16957544-2 G24
+1 SEX M
+1 BIRT
+1 EVEN
+2 TYPE Cité
+2 DATE 1089
+1 FAMC @F103@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @I200@ INDI
+1 NAME Adèle /de CORNOUAILLES/
+2 GIVN Adèle
+2 NICK II
+2 SPFX de
+2 SURN CORNOUAILLES
+1 _SOSADABOVILLE 16957544-3 G24
+1 SEX F
+1 BIRT
+1 DEAT
+2 DATE 14 OCT 1152
+2 PLAC Abbaye Saint-Georges, Rennes, 35238, Ille-et-Vilaine, Bretagne, FRANCE
+3 MAP
+4 LATI N48.11104
+4 LONG W1.67675
+1 OCCU Abbesse
+2 DATE FROM 1085 TO 14 OCT 1152
+2 PLAC Abbaye Saint-Georges, Rennes, 35238, Ille-et-Vilaine, Bretagne, FRANCE
+3 MAP
+4 LATI N48.11104
+4 LONG W1.67675
+1 FAMC @F103@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @I201@ INDI
+1 NAME Havoïse /de CORNOUAILLES/
+2 GIVN Havoïse
+2 SPFX de
+2 SURN CORNOUAILLES
+1 _SOSADABOVILLE 16957544-4 G24
+1 SEX U
+1 BIRT
+1 EVEN
+2 TYPE Cité
+2 DATE 1085
+2 PLAC Abbaye Saint-Georges, Rennes, 35238, Ille-et-Vilaine, Bretagne, FRANCE
+3 MAP
+4 LATI N48.11104
+4 LONG W1.67675
+1 FAMC @F103@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @I202@ INDI
+1 NAME Alain /de CORNOUAILLES/
+2 GIVN Alain
+2 NICK Cagnart
+2 SPFX de
+2 SURN CORNOUAILLES
+1 _SOSADABOVILLE 33915088 G26
+1 SEX M
+1 BIRT
+2 DATE ABT 1000
+1 TITL Comte de Cornouailles
+2 DATE FROM 1020 TO 1058
+1 FAMS @F104@
+1 OBJE
+2 TITL Vœu d'Alain Cahiart
+2 FILE photos/Un_vitrail_de_la_cathédral_Saint-Corentin_à_Quimper_-_016.JPG
+3 FORM JPG
+2 NOTE Vitrail de la cathédrale Saint-Corentin de Quimper
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:00
+0 @F104@ FAM
+1 HUSB @I202@
+1 WIFE @I203@
+1 CHIL @I196@
+1 CHIL @I212@
+1 CHIL @I213@
+1 CHIL @I214@
+1 CHIL @I215@
+1 CHIL @I216@
+1 CHIL @I219@
+1 CHAN
+2 DATE 29 MAR 2016
+3 TIME 00:24:42
+0 @I203@ INDI
+1 NAME Judith /de NANTES/
+2 GIVN Judith
+2 SPFX de
+2 SURN NANTES
+1 _SOSADABOVILLE 33915089 G26
+1 SEX F
+1 BIRT
+1 DEAT
+2 DATE 27 FEB 1063
+1 TITL Comtesse de Nantes
+2 DATE FROM 1051 TO 1063
+2 CAUS Décès de Mathias I son neveu
+1 FAMC @F105@
+1 FAMS @F104@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @I204@ INDI
+1 NAME /NANTES/
+2 SURN NANTES
+1 SEX U
+1 BIRT
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @I205@ INDI
+1 NAME Budic /de NANTES/
+2 GIVN Budic
+2 SPFX de
+2 SURN NANTES
+1 _SOSADABOVILLE 67830178-1 G26
+1 SEX M
+1 DEAT
+2 DATE 1038
+1 TITL Comte de Nantes
+2 DATE FROM 1005 TO 1038
+1 FAMC @F105@
+1 FAMS @F106@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:27
+0 @I206@ INDI
+1 NAME
+1 SEX F
+1 BIRT
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @F105@ FAM
+1 HUSB @I207@
+1 WIFE @I208@
+1 CHIL @I205@
+1 CHIL @I203@
+1 CHAN
+2 DATE 28 MAR 2016
+3 TIME 22:57:22
+0 @I207@ INDI
+1 NAME Judikaël /de NANTES/
+2 GIVN Judikaël
+2 SPFX de
+2 SURN NANTES
+1 _SOSADABOVILLE 67830178 G27
+1 SEX M
+1 BIRT
+2 TYPE Illégitime
+2 DATE ABT 979
+1 DEAT
+2 DATE 1004
+2 CAUS Assassiné
+1 TITL Comte de Nantes
+2 DATE FROM 992 TO 1004
+1 ORDN
+2 TYPE Évêque
+2 DATE 990
+1 EVEN
+2 TYPE Élection
+2 DATE 981
+2 CAUS Décès de son oncle Guérech
+2 NOTE Diocèse géré par Albert Le Grand
+1 FAMC @F117@
+1 FAMS @F105@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:00
+0 @I208@ INDI
+1 NAME Mélisende
+2 GIVN Mélisende
+1 _SOSADABOVILLE 67830179 G27
+1 SEX F
+1 BIRT
+1 FAMS @F105@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @I209@ INDI
+1 NAME Mathias /de NANTES/
+2 GIVN Mathias
+2 NICK I
+2 SPFX de
+2 SURN NANTES
+1 _SOSADABOVILLE 67830178-1.1 G25
+1 SEX U
+1 BIRT
+1 DEAT
+2 DATE 1051
+1 TITL Comte de Nantes
+2 DATE FROM 1038 TO 1051
+1 FAMC @F106@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @F106@ FAM
+1 HUSB @I205@
+1 WIFE @I210@
+1 CHIL @I209@
+1 CHIL @I211@
+1 CHAN
+2 DATE 28 MAR 2016
+3 TIME 23:08:15
+0 @I210@ INDI
+1 NAME Havoïse
+2 GIVN Havoïse
+1 SEX F
+1 BIRT
+1 FAMS @F106@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @I211@ INDI
+1 NAME Budic /de NANTES/
+2 GIVN Budic
+2 SPFX de
+2 SURN NANTES
+1 _SOSADABOVILLE 67830178-1.2 G25
+1 SEX U
+1 BIRT
+1 DEAT
+2 DATE BEF 1051
+1 FAMC @F106@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @I212@ INDI
+1 NAME Guerech ou Quiriac /de CORNOUAILLES/ de
+2 GIVN Guerech, ou, Quiriac
+2 SPFX de
+2 SURN CORNOUAILLES
+2 NSFX de
+1 _SOSADABOVILLE 33915088-7 G25
+1 SEX M
+1 BIRT
+2 TYPE
+2 DATE 1030
+1 DEAT
+2 TYPE
+2 DATE 1078
+2 NOTE Voir Annales de Sainte-Croix de Quimperlé
+1 TITL Évêque de Nantes
+2 TYPE Élection
+2 DATE 1059
+1 ORDN
+2 TYPE Éveque
+2 DATE 7 JAN 1061
+2 PLAC , Nantes, 44109, Loire-Atlantique, Bretagne, BRETAGNE
+3 MAP
+4 LATI N47.21725
+4 LONG W1.55336
+1 FAMC @F104@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:00
+0 @I213@ INDI
+1 NAME Budic /CORNOUAILLES/
+2 GIVN Budic
+2 SURN CORNOUAILLES
+1 _SOSADABOVILLE 33915088-1 G25
+1 SEX M
+1 BIRT
+2 TYPE
+1 DEAT
+2 TYPE
+2 DATE 1091
+1 FAMC @F104@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @I214@ INDI
+1 NAME Hodiern /CORNOUAILLES/
+2 GIVN Hodiern
+2 SURN CORNOUAILLES
+1 _SOSADABOVILLE 33915088-2 G25
+1 SEX F
+1 BIRT
+1 OCCU Abbesse
+2 PLAC Abbaye Locmaria, Quimper, 29232, Finistère, Bretagne, BRETAGNE
+3 MAP
+4 LATI N47.98836
+4 LONG W4.11215
+1 FAMC @F104@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @I215@ INDI
+1 NAME Benoît /de CORNOUAILLES/
+2 GIVN Benoît
+2 SPFX de
+2 SURN CORNOUAILLES
+1 _SOSADABOVILLE 33915088-3 G25
+1 SEX U
+1 BIRT
+1 DEAT
+2 DATE 1115
+1 OCCU Abbé
+2 DATE 1066
+2 PLAC Abbaye Sainte-Croix, Quimperlé, 29233, Finistère, Bretagne, BRETAGNE
+3 MAP
+4 LATI N47.87235
+4 LONG W3.54502
+1 TITL Évêque de Nantes
+2 TYPE Élection
+2 DATE 1079
+1 ORDN
+2 TYPE Évêque
+2 DATE FROM 1081 TO 1114
+2 PLAC , Nantes, 44109, Loire-Atlantique, Bretagne, BRETAGNE
+3 MAP
+4 LATI N47.21725
+4 LONG W1.55336
+2 NOTE Se retire en 1114
+1 FAMC @F104@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @F107@ FAM
+1 HUSB @I217@
+1 CHIL @I218@
+1 CHAN
+2 DATE 29 MAR 2016
+3 TIME 00:16:46
+0 @I217@ INDI
+1 NAME Éon /de PENTHIÈVRE/
+2 GIVN Éon
+2 NICK I
+2 SPFX de
+2 SURN PENTHIÈVRE
+1 _SOSADABOVILLE 4239384 G23
+1 SEX M
+1 FAMS @F107@
+1 FAMS @F108@
+1 FAMS @F109@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:26
+0 @I218@ INDI
+1 NAME Adèle /DE PENTHIÈVRE/
+2 GIVN Adèle
+2 SPFX DE
+2 SURN PENTHIÈVRE
+1 _SOSADABOVILLE 4239384-a.1 G21
+1 SEX U
+1 BIRT
+2 DATE 1035
+1 DEAT
+2 DATE AFT 1056
+1 FAMC @F107@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:26
+0 @F108@ FAM
+1 HUSB @I217@
+1 WIFE @I219@
+1 CHIL @I148@
+1 CHAN
+2 DATE 29 MAR 2016
+3 TIME 00:13:55
+0 @I219@ INDI
+1 NAME
+1 _SOSADABOVILLE 4239385 G23
+1 SEX F
+1 BIRT
+1 FAMC @F104@
+1 FAMS @F108@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @I216@ INDI
+1 NAME Orguen ou Agnès /de CORNOUAILLES/
+2 GIVN Orguen, ou, Agnès
+2 SPFX de
+2 SURN CORNOUAILLES
+1 _SOSADABOVILLE 33915088-4 G25
+1 SEX F
+1 BIRT
+1 FAMC @F104@
+1 FAMS @F109@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @F109@ FAM
+1 HUSB @I217@
+1 WIFE @I216@
+1 MARR
+2 DATE ABT 1035
+1 CHIL @I220@
+1 CHIL @I221@
+1 CHIL @I222@
+1 CHIL @I223@
+1 CHIL @I224@
+1 CHIL @I225@
+1 CHIL @I226@
+1 CHIL @I227@
+1 CHIL @I228@
+1 CHAN
+2 DATE 29 MAR 2016
+3 TIME 01:16:31
+0 @I220@ INDI
+1 NAME Adèle /de PENTHIÈVRE/
+2 GIVN Adèle
+2 SPFX de
+2 SURN PENTHIÈVRE
+1 _SOSADABOVILLE 4239384-c.7 G21
+1 SEX F
+1 BIRT
+2 DATE ABT 1035
+1 DEAT
+2 DATE AFT 1056
+1 FAMC @F109@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:26
+0 @I221@ INDI
+1 NAME Geoffroy /de PENTHIÈVRE/
+2 GIVN Geoffroy
+2 NICK I, Boterel
+2 SPFX de
+2 SURN PENTHIÈVRE
+1 _SOSADABOVILLE 4239384-c.1 G21
+1 SEX M
+1 DEAT
+2 DATE 1093
+1 FAMC @F109@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:26
+0 @I222@ INDI
+1 NAME Brian /de PENTHIÈVRE/
+2 GIVN Brian
+2 SPFX de
+2 SURN PENTHIÈVRE
+2 NOTE Honneur de Richmond
+1 _SOSADABOVILLE 4239384-c.2 G21
+1 SEX M
+1 DEAT
+2 DATE 1084
+1 NCHI 0
+1 FAMC @F109@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:26
+0 @I223@ INDI
+1 NAME Alain /de PENTHIÈVRE/
+2 GIVN Alain
+2 NICK Le Roux
+2 SPFX de
+2 SURN PENTHIÈVRE
+1 _SOSADABOVILLE 4239384-c.8 G21
+1 SEX M
+1 BIRT
+2 DATE 1040
+1 DEAT
+2 DATE 4 AUG 1093
+1 TITL Honneur de Richmond
+2 DATE FROM 1070 TO 1093
+1 FAMC @F109@
+1 OBJE
+2 TITL Portrait posthume d'Alain le Roux agenouillé devant Guillaume le Conquérant, Registrum honoris de Richmond (XV° siècle)
+2 FILE photos/William_the_Conqueror_Richmond.jpg
+3 FORM jpg
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:26
+0 @I224@ INDI
+1 NAME Guillaume /de PENTHIÈVRE/
+2 GIVN Guillaume
+2 SPFX de
+2 SURN PENTHIÈVRE
+1 _SOSADABOVILLE 4239384-c.3 G21
+1 SEX M
+1 DEAT
+2 DATE AFT 1055
+1 FAMC @F109@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:26
+0 @I225@ INDI
+1 NAME Robert /de PENTHIÈVRE/
+2 GIVN Robert
+2 SPFX de
+2 SURN PENTHIÈVRE
+1 _SOSADABOVILLE 4239384-c.4 G21
+1 SEX M
+1 DEAT
+2 DATE AFT 1055
+1 FAMC @F109@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:26
+0 @I226@ INDI
+1 NAME Richard /de PENTHIÈVRE/
+2 GIVN Richard
+2 SPFX de
+2 SURN PENTHIÈVRE
+1 _SOSADABOVILLE 4239384-c.5 G21
+1 SEX M
+1 DEAT
+2 DATE AFT 1056
+1 FAMC @F109@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:26
+0 @I227@ INDI
+1 NAME Alain /PENTHIÈVRE/
+2 GIVN Alain
+2 NICK Le Noir
+2 SURN PENTHIÈVRE
+1 _SOSADABOVILLE 4239384-c.6 G21
+1 SEX M
+1 DEAT
+2 DATE 1098
+1 TITL Honneur de Richmond
+2 DATE FROM 1093 TO 1098
+1 FAMC @F109@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:26
+0 @I228@ INDI
+1 NAME Étienne /de PENTHIÈVRE/
+2 GIVN Étienne
+2 SPFX de
+2 SURN PENTHIÈVRE
+1 _SOSADABOVILLE 4239384-c.9 G21
+1 SEX M
+1 BIRT
+2 DATE ABT 1055
+1 DEAT
+2 DATE 1137
+1 TITL Comte de Guingamp
+1 TITL Comte de Trégor
+2 DATE 1079
+1 TITL Seigneur de Goëlo
+2 DATE 1079
+1 TITL Comte de Penthièvre
+2 DATE 1093
+2 CAUS Décès de son frère aîné
+1 FAMC @F109@
+1 FAMS @F110@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:26
+0 @F110@ FAM
+1 HUSB @I228@
+1 WIFE @I229@
+1 CHIL @I230@
+1 CHIL @I148@
+1 CHIL @I237@
+1 CHIL @I239@
+1 CHIL @I242@
+1 CHIL @I244@
+1 CHIL @I245@
+1 CHAN
+2 DATE 29 MAR 2016
+3 TIME 13:24:12
+0 @I229@ INDI
+1 NAME Havoïse /de BLOIS/
+2 GIVN Havoïse
+2 SPFX de
+2 SURN BLOIS
+1 NAME Havoïse /de GUINGAMP/
+2 GIVN Havoïse
+2 SPFX de
+2 SURN GUINGAMP
+1 SEX F
+1 FAMS @F110@
+1 CHAN
+2 DATE 29 MAR 2016
+3 TIME 12:55:03
+0 @I230@ INDI
+1 NAME Geoffroy /de PENTHIÈVRE/
+2 GIVN Geoffroy
+2 NICK II, Botherel
+2 SPFX de
+2 SURN PENTHIÈVRE
+1 _SOSADABOVILLE 4239384-c.9.5 G20
+1 SEX M
+1 BIRT Y
+2 TYPE Avec les cités de Lamballe et de Moncontour
+1 DEAT
+2 DATE 1148
+1 TITL Comte de Penthièvre
+2 DATE FROM 1120 TO 1148
+1 FAMC @F110@
+1 FAMS @F111@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @F111@ FAM
+1 HUSB @I230@
+1 WIFE @I231@
+1 CHIL @I234@
+1 CHIL @I235@
+1 CHAN
+2 DATE 29 MAR 2016
+3 TIME 13:10:43
+0 @I231@ INDI
+1 NAME Havoïse /de DOL/
+2 GIVN Havoïse
+2 SPFX de
+2 SURN DOL
+1 SEX F
+1 FAMC @F112@
+1 FAMS @F111@
+1 CHAN
+2 DATE 29 MAR 2016
+3 TIME 13:09:14
+0 @F112@ FAM
+1 HUSB @I232@
+1 WIFE @I233@
+1 CHIL @I231@
+1 CHAN
+2 DATE 29 MAR 2016
+3 TIME 13:08:55
+0 @I232@ INDI
+1 NAME Jean /de DOL/
+2 GIVN Jean
+2 NICK I
+2 SPFX de
+2 SURN DOL
+1 SEX M
+1 FAMS @F112@
+1 CHAN
+2 DATE 29 MAR 2016
+3 TIME 13:08:18
+0 @I233@ INDI
+1 NAME Godehildes /de FOUGÈRES/
+2 GIVN Godehildes
+2 SPFX de
+2 SURN FOUGÈRES
+1 SEX F
+1 FAMS @F112@
+1 CHAN
+2 DATE 29 MAR 2016
+3 TIME 13:08:55
+0 @I234@ INDI
+1 NAME Étienne /de PENTHIÈVRE/
+2 GIVN Étienne
+2 NICK II
+2 SPFX de
+2 SURN PENTHIÈVRE
+1 _SOSADABOVILLE 4239384-c.9.5.1 G19
+1 SEX M
+1 FAMC @F111@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:26
+0 @I235@ INDI
+1 NAME Riwallon /de PENTHIÈVRE/
+2 GIVN Riwallon
+2 SPFX de
+2 SURN PENTHIÈVRE
+1 _SOSADABOVILLE 4239384-c.9.5.2 G19
+1 SEX M
+1 FAMC @F111@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:26
+0 @I236@ INDI
+1 NAME /PENTHIÈVRE/
+2 SURN PENTHIÈVRE
+1 SEX U
+1 CHAN
+2 DATE 29 MAR 2016
+3 TIME 13:12:15
+0 @I237@ INDI
+1 NAME Olive /de PENTHIÈVRE/
+2 GIVN Olive
+2 SPFX de
+2 SURN PENTHIÈVRE
+1 _SOSADABOVILLE 4239384-c.9.1 G20
+1 SEX F
+1 FAMC @F110@
+1 FAMS @F113@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:26
+0 @F113@ FAM
+1 HUSB @I238@
+1 WIFE @I237@
+1 CHAN
+2 DATE 29 MAR 2016
+3 TIME 13:15:19
+0 @I238@ INDI
+1 NAME Henri /de FOUGÈRES/
+2 GIVN Henri
+2 SPFX de
+2 SURN FOUGÈRES
+1 SEX M
+1 FAMS @F113@
+1 CHAN
+2 DATE 29 MAR 2016
+3 TIME 13:15:19
+0 @I239@ INDI
+1 NAME Mathilde /de PENTHIÈVRE/
+2 GIVN Mathilde
+2 SPFX de
+2 SURN PENTHIÈVRE
+1 _SOSADABOVILLE 4239384-c.9.2 G20
+1 SEX F
+1 FAMC @F110@
+1 FAMS @F114@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:26
+0 @F114@ FAM
+1 HUSB @I240@
+1 WIFE @I239@
+1 CHIL @I241@
+1 CHAN
+2 DATE 29 MAR 2016
+3 TIME 13:17:09
+0 @I240@ INDI
+1 NAME Gautier /de GAND/
+2 GIVN Gautier
+2 SPFX de
+2 SURN GAND
+1 SEX M
+1 FAMS @F114@
+1 CHAN
+2 DATE 29 MAR 2016
+3 TIME 13:16:48
+0 @I241@ INDI
+1 NAME Gilbert /de GAND/
+2 GIVN Gilbert
+2 SPFX de
+2 SURN GAND
+1 _SOSADABOVILLE 4239384-c.9.2.1 G19
+1 SEX M
+1 FAMC @F114@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:26
+0 @I242@ INDI
+1 NAME Tiphaine /de PENTHIÈVRE/
+2 GIVN Tiphaine
+2 SPFX de
+2 SURN PENTHIÈVRE
+1 _SOSADABOVILLE 4239384-c.9.3 G20
+1 SEX F
+1 FAMC @F110@
+1 FAMS @F115@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:26
+0 @F115@ FAM
+1 HUSB @I243@
+1 WIFE @I242@
+1 CHAN
+2 DATE 29 MAR 2016
+3 TIME 13:19:38
+0 @I243@ INDI
+1 NAME Rabel /de TANCARVILLE/
+2 GIVN Rabel
+2 SPFX de
+2 SURN TANCARVILLE
+1 SEX M
+1 FAMS @F115@
+1 CHAN
+2 DATE 29 MAR 2016
+3 TIME 13:19:38
+0 @I244@ INDI
+1 NAME Henri /d' AVAUGOUR/
+2 GIVN Henri
+2 NICK I
+2 SPFX d'
+2 SURN AVAUGOUR
+1 _SOSADABOVILLE 4239384-c.9.4 G20
+1 SEX M
+1 TITL Comte de Trégor
+2 TYPE Avec Guingamp
+1 TITL Seigneur de Goëlo
+1 FAMC @F110@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:26
+0 @I245@ INDI
+1 NOTE Selon l'Armorial d'Augustin du PAZ imprimé en 1619 mais non confirmé par d'autres sources
+1 NAME Agnonie /PENTHIÈVRE/
+2 GIVN Agnonie
+2 SURN PENTHIÈVRE
+1 _SOSADABOVILLE 4239384-c.9.7 G20
+1 SEX F
+1 BIRT
+2 DATE 1105
+1 DEAT
+2 DATE 1167
+1 FAMC @F110@
+1 FAMS @F116@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:26
+0 @F116@ FAM
+1 HUSB @I246@
+1 WIFE @I245@
+1 MARR
+2 DATE 1120
+1 CHAN
+2 DATE 29 MAR 2016
+3 TIME 13:24:01
+0 @I246@ INDI
+1 NAME Olivier /de DINAN/
+2 GIVN Olivier
+2 NICK II
+2 SPFX de
+2 SURN DINAN
+1 SEX M
+1 FAMS @F116@
+1 CHAN
+2 DATE 29 MAR 2016
+3 TIME 13:23:36
+0 @I247@ INDI
+1 NAME Hoël /de NANTES/
+2 GIVN Hoël
+2 SPFX de
+2 SURN NANTES
+1 _SOSADABOVILLE 135660356 G28
+1 SEX M
+1 BIRT
+2 TYPE Illégitime
+2 DATE ABT 930
+1 DEAT
+2 DATE 981
+2 CAUS Assassinat
+1 TITL Comte de Nantes
+2 DATE FROM 960 TO 981
+1 TITL Duc de Bretagne
+2 DATE FROM 960 TO 981
+1 FAMC @F118@
+1 FAMS @F117@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:25
+0 @F117@ FAM
+1 HUSB @I247@
+1 WIFE @I248@
+1 CHIL @I207@
+1 CHIL @I249@
+1 CHAN
+2 DATE 29 MAR 2016
+3 TIME 14:01:48
+0 @I248@ INDI
+1 NAME Judith
+2 GIVN Judith
+1 _SOSADABOVILLE 135660357 G28
+1 SEX F
+1 BIRT
+2 TYPE
+1 FAMC @F119@
+1 FAMS @F117@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @I249@ INDI
+1 NAME Hoël /de NANTES/
+2 GIVN Hoël
+2 SPFX de
+2 SURN NANTES
+1 _SOSADABOVILLE 135660356-1 G27
+1 SEX U
+1 BIRT
+1 FAMC @F117@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @I250@ INDI
+1 NAME Alain /de POHER/
+2 GIVN Alain
+2 NICK II, Barbetorte ou Al Houarn (Le Renard)
+2 SPFX de
+2 SURN POHER
+1 _SOSADABOVILLE 271320712 G29
+1 SEX M
+1 BIRT
+2 DATE ABT 900
+1 DEAT
+2 DATE 952
+2 PLAC , Nantes, 44109, Loire-Atlantique, Bretagne, BRETAGNE
+3 MAP
+4 LATI N47.21725
+4 LONG W1.55336
+1 TITL Comte de Poher
+1 TITL Duc de Bretagne
+2 DATE FROM 936 TO 952
+1 FAMC @F125@
+1 FAMS @F118@
+1 FAMS @F120@
+1 FAMS @F123@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:00
+0 @F118@ FAM
+1 HUSB @I250@
+1 WIFE @I251@
+1 CHIL @I247@
+1 CHIL @I264@
+1 CHAN
+2 DATE 29 MAR 2016
+3 TIME 15:16:31
+0 @I251@ INDI
+1 NAME
+1 _SOSADABOVILLE 271320713 G29
+1 SEX F
+1 BIRT
+1 FAMS @F118@
+1 FAMS @F124@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @I252@ INDI
+1 NAME Haimon ou Aymon /NANTES/
+2 GIVN Haimon, ou, Aymon
+2 SURN NANTES
+1 SEX U
+1 BIRT
+1 TITL Vicomte
+1 FAMC @F124@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @I253@ INDI
+1 NAME
+1 _SOSADABOVILLE 271320714 G29
+1 SEX M
+1 BIRT
+1 FAMS @F119@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @F119@ FAM
+1 HUSB @I253@
+1 WIFE @I254@
+1 CHIL @I248@
+1 CHAN
+2 DATE 29 MAR 2016
+3 TIME 14:14:25
+0 @I254@ INDI
+1 NAME Judith
+2 GIVN Judith
+1 _SOSADABOVILLE 271320715 G29
+1 SEX F
+1 FAMS @F119@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:25
+0 @F120@ FAM
+1 HUSB @I250@
+1 WIFE @I255@
+1 CHIL @I258@
+1 CHAN
+2 DATE 29 MAR 2016
+3 TIME 14:54:00
+0 @I255@ INDI
+1 NAME Roscille /d' ANJOU/
+2 GIVN Roscille
+2 SPFX d'
+2 SURN ANJOU
+1 SEX F
+1 FAMC @F121@
+1 FAMS @F120@
+1 CHAN
+2 DATE 29 MAR 2016
+3 TIME 14:44:17
+0 @F121@ FAM
+1 HUSB @I256@
+1 WIFE @I257@
+1 CHIL @I255@
+1 CHAN
+2 DATE 29 MAR 2016
+3 TIME 14:26:21
+0 @I256@ INDI
+1 NAME Foulque /d' ANJOU/
+2 GIVN Foulque
+2 NICK I
+2 SPFX d'
+2 SURN ANJOU
+1 SEX M
+1 TITL Comte d'Anjou
+1 FAMS @F121@
+1 CHAN
+2 DATE 29 MAR 2016
+3 TIME 14:25:06
+0 @I257@ INDI
+1 NAME Roscille /de LOCHES/
+2 GIVN Roscille
+2 SPFX de
+2 SURN LOCHES
+1 SEX F
+1 TITL Dame de Villandry
+1 FAMS @F121@
+1 CHAN
+2 DATE 29 MAR 2016
+3 TIME 14:26:21
+0 @I258@ INDI
+1 NAME Gerberge /POHER/
+2 GIVN Gerberge
+2 SURN POHER
+1 _SOSADABOVILLE 271320712-b.1 G27
+1 SEX F
+1 FAMC @F120@
+1 FAMS @F122@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:27
+0 @F122@ FAM
+1 HUSB @I259@
+1 WIFE @I258@
+1 CHIL @I260@
+1 CHAN
+2 DATE 29 MAR 2016
+3 TIME 14:51:24
+0 @I259@ INDI
+1 NAME Juhel Béranger /de RENNES/
+2 GIVN Juhel, Béranger
+2 SPFX de
+2 SURN RENNES
+1 SEX M
+1 DEAT
+2 DATE 970
+1 TITL Comte de Rennes
+1 FAMS @F122@
+1 CHAN
+2 DATE 29 MAR 2016
+3 TIME 22:45:18
+0 @I260@ INDI
+1 NAME Conan /de RENNES/
+2 GIVN Conan
+2 NICK I, Le tort
+2 SPFX de
+2 SURN RENNES
+1 _SOSADABOVILLE 271320712-b.1.1 G26
+1 SEX M
+1 DEAT
+2 DATE 992
+1 TITL Comte de Rennes
+1 TITL Duc de Bretagne
+2 DATE 958
+1 FAMC @F122@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:27
+0 @I261@ INDI
+1 NAME Roscille /de BLOIS/
+2 GIVN Roscille
+2 SPFX de
+2 SURN BLOIS
+1 SEX F
+1 FAMS @F123@
+1 CHAN
+2 DATE 29 MAR 2016
+3 TIME 14:57:56
+0 @F123@ FAM
+1 HUSB @I250@
+1 WIFE @I261@
+1 MARR
+2 DATE 948
+1 CHIL @I265@
+1 CHAN
+2 DATE 29 MAR 2016
+3 TIME 15:22:39
+0 @I262@ INDI
+1 NAME
+1 SEX M
+1 BIRT
+1 FAMS @F124@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @F124@ FAM
+1 HUSB @I262@
+1 WIFE @I251@
+1 CHIL @I252@
+1 CHAN
+2 DATE 29 MAR 2016
+3 TIME 15:08:46
+0 @I263@ INDI
+1 NAME /POHER/
+2 SURN POHER
+1 SEX U
+1 CHAN
+2 DATE 29 MAR 2016
+3 TIME 15:10:45
+0 @I264@ INDI
+1 NAME Guérech /de NANTES/
+2 GIVN Guérech
+2 SPFX de
+2 SURN NANTES
+1 _SOSADABOVILLE 271320712-a.2 G27
+1 SEX M
+1 BIRT
+2 DATE ABT 933
+1 TITL Duc de Bretagne
+1 FAMC @F118@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:27
+0 @I265@ INDI
+1 NAME Drogon /de NANTES/
+2 GIVN Drogon
+2 SPFX de
+2 SURN NANTES
+1 _SOSADABOVILLE 271320712-c.1 G27
+1 SEX M
+1 BIRT
+2 DATE ABT 950
+1 DEAT
+2 DATE ABT 958
+1 FAMC @F123@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:27
+0 @I266@ INDI
+1 NAME Mathedoï /de POHER/
+2 GIVN Mathedoï
+2 SPFX de
+2 SURN POHER
+1 _SOSADABOVILLE 542641424 G30
+1 SEX M
+1 BIRT
+1 DEAT
+2 DATE BEF 936
+1 TITL Comte de Poher
+1 FAMS @F125@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @F125@ FAM
+1 HUSB @I266@
+1 WIFE @I267@
+1 CHIL @I250@
+1 CHAN
+2 DATE 29 MAR 2016
+3 TIME 15:23:05
+0 @I267@ INDI
+1 NAME N /de BRETAGNE/
+2 GIVN N
+2 SPFX de
+2 SURN BRETAGNE
+1 _SOSADABOVILLE 542641425 G30
+1 SEX F
+1 BIRT
+1 TITL Reine de Bretagne
+2 DATE FROM 907 TO 937
+1 FAMC @F126@
+1 FAMS @F125@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @I268@ INDI
+1 NAME Alain /de BRETAGNE/
+2 GIVN Alain
+2 SPFX de
+2 SURN BRETAGNE
+1 _SOSADABOVILLE 1085282850 G31
+1 SEX M
+1 BIRT
+1 DEAT
+2 DATE 907
+1 TITL Roi de Bretagne
+2 DATE FROM 890 TO 907
+1 FAMC @F128@
+1 FAMS @F126@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @F126@ FAM
+1 HUSB @I268@
+1 WIFE @I303@
+1 MARR
+2 DATE BEF 899
+1 CHIL @I267@
+1 CHIL @I270@
+1 CHIL @I271@
+1 CHIL @I272@
+1 CHIL @I273@
+1 CHIL @I274@
+1 CHIL @I275@
+1 CHAN
+2 DATE 29 MAR 2016
+3 TIME 23:25:37
+0 @I269@ INDI
+1 NAME Oreguen ou Aourken
+2 GIVN Oreguen, ou, Aourken
+1 SEX F
+1 BIRT
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @I270@ INDI
+1 NAME Rudalt /de BRETAGNE/
+2 GIVN Rudalt
+2 SPFX de
+2 SURN BRETAGNE
+2 NOTE Ancre du lignage de Rieux
+1 _SOSADABOVILLE 1085282850-1 G30
+1 SEX M
+1 DEAT
+2 DATE 913
+1 TITL Comte de Vannes
+2 TYPE Postmortem
+2 DATE FROM 907 TO 913
+1 FAMC @F126@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:27
+0 @I271@ INDI
+1 NAME Guérech /de BRETAGNE/
+2 GIVN Guérech
+2 SPFX de
+2 SURN BRETAGNE
+1 _SOSADABOVILLE 1085282850-2 G30
+1 SEX M
+1 FAMC @F126@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:27
+0 @I272@ INDI
+1 NAME Pascweten /BRETAGNE/
+2 GIVN Pascweten
+2 SURN BRETAGNE
+1 _SOSADABOVILLE 1085282850-3 G30
+1 SEX M
+1 EVEN
+2 TYPE Vivant
+2 DATE 903
+1 FAMC @F126@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:27
+0 @I273@ INDI
+1 NAME Derrien /BRETAGNE/
+2 GIVN Derrien
+2 SURN BRETAGNE
+2 NOTE Ancêtre du lignage d'Elven et de Largoët
+1 _SOSADABOVILLE 1085282850-4 G30
+1 SEX M
+1 EVEN
+2 TYPE Cité
+2 DATE 903
+1 FAMC @F126@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:27
+0 @I274@ INDI
+1 NAME Budic /de BRETAGNE/
+2 GIVN Budic
+2 SPFX de
+2 SURN BRETAGNE
+1 _SOSADABOVILLE 1085282850-5 G30
+1 SEX M
+1 EVEN
+2 TYPE Vivant
+2 DATE 903
+1 FAMC @F126@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:27
+0 @I275@ INDI
+1 NAME /de BRETAGNE/
+2 SPFX de
+2 SURN BRETAGNE
+1 _SOSADABOVILLE 1085282850-6 G30
+1 SEX F
+1 FAMC @F126@
+1 FAMS @F127@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:27
+0 @F127@ FAM
+1 HUSB @I276@
+1 WIFE @I275@
+1 CHAN
+2 DATE 29 MAR 2016
+3 TIME 15:57:45
+0 @I276@ INDI
+1 NAME Tanguy
+2 GIVN Tanguy
+1 SEX M
+1 FAMS @F127@
+1 CHAN
+2 DATE 29 MAR 2016
+3 TIME 15:57:45
+0 @I277@ INDI
+1 NAME Ridoredh
+2 GIVN Ridoredh
+1 _SOSADABOVILLE 2170565700 G32
+1 SEX M
+1 BIRT
+1 FAMC @F132@
+1 FAMS @F128@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @F128@ FAM
+1 HUSB @I277@
+1 WIFE @I278@
+1 CHIL @I268@
+1 CHIL @I279@
+1 CHAN
+2 DATE 29 MAR 2016
+3 TIME 16:01:48
+0 @I278@ INDI
+1 NAME
+1 _SOSADABOVILLE 2170565701 G32
+1 SEX F
+1 BIRT
+1 FAMS @F128@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @I279@ INDI
+1 NAME Pascweten /BRETAGNE/
+2 GIVN Pascweten
+2 SURN BRETAGNE
+1 _SOSADABOVILLE 2170565700-2 G31
+1 SEX M
+1 BIRT Y
+1 DEAT
+2 DATE 876
+1 TITL Comte de Vannes
+2 NOTE @N5@
+1 FAMC @F128@
+1 FAMS @F129@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:50:31
+0 @N5@ NOTE Prétendant à la couronne de Bretagne
+1 CHAN
+2 DATE 29 MAR 2016
+3 TIME 21:57:47
+0 @F129@ FAM
+1 HUSB @I279@
+1 WIFE @I280@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:50:31
+0 @I280@ INDI
+1 NAME Prostlon
+2 GIVN Prostlon
+1 _SOSADABOVILLE 4341131400-2.1 G31
+1 SEX F
+1 DEAT
+2 DATE BEF 876
+1 FAMC @F130@
+1 FAMC @F131@
+1 FAMS @F129@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:50:31
+0 @F130@ FAM
+1 CHIL @I280@
+1 CHAN
+2 DATE 29 MAR 2016
+3 TIME 16:29:39
+0 @I281@ INDI
+1 NAME Salomon
+2 GIVN Salomon
+1 _SOSADABOVILLE 4341131400-2 G32
+1 SEX M
+1 BIRT
+2 DATE BET 810 AND 820
+1 DEAT
+2 DATE 25 JUN 874
+2 PLAC , La Martyre, 29144, Finistère, Bretagne, BRETAGNE
+3 MAP
+4 LATI N48.44897
+4 LONG W4.16
+2 CAUS Assassinat
+1 TITL Roi de Bretagne
+2 DATE FROM 857 TO 874
+1 BURI
+2 TYPE Corps transféré à Pithivier (église Saint-Salomon et Saint-Grégoire) Retour probable d'une partie des ossements en Bretagne notamment à Vannes dans l'église Saint-Salomon détruite à la Révolution
+2 DATE 932
+2 PLAC Monastère, Plélan-le-Grand, 35223, Ille-et-Vilaine, Bretagne, FRANCE
+3 MAP
+4 LATI N48.00198
+4 LONG W2.10182
+1 FAMC @F132@
+1 FAMS @F131@
+1 OBJE
+2 TITL Statue de Saint-Salomon dans l'église Saint-Pierre de Plouyé
+2 FILE photos/Plouyé_24_église_paroissiale_statue_de_Saint-Salomon.JPG
+3 FORM JPG
+1 OBJE
+2 TITL Portrait du roi Salomon de Bretagne
+2 FILE photos/King_Salomon_of_Brittany_-_2.jpg
+3 FORM jpg
+1 ASSO @I291@
+2 RELA Autre@@INDI:DEAT
+2 NOTE Assassin
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:48:15
+0 @F131@ FAM
+1 HUSB @I281@
+1 WIFE @I282@
+1 CHIL @I280@
+1 CHIL @I284@
+1 CHIL @I285@
+1 CHAN
+2 DATE 29 MAR 2016
+3 TIME 16:51:39
+0 @I282@ INDI
+1 NAME Wembrit
+2 GIVN Wembrit
+1 SEX F
+1 FAMS @F131@
+1 CHAN
+2 DATE 29 MAR 2016
+3 TIME 16:12:26
+0 @F132@ FAM
+1 HUSB @I283@
+1 CHIL @I281@
+1 CHIL @I277@
+1 CHAN
+2 DATE 29 MAR 2016
+3 TIME 17:27:23
+0 @I283@ INDI
+1 NAME Riwallon
+2 GIVN Riwallon
+1 _SOSADABOVILLE 4341131400 G33
+1 SEX M
+1 FAMC @F133@
+1 FAMS @F132@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:26
+0 @I284@ INDI
+1 NAME Riwallon
+2 GIVN Riwallon
+1 _SOSADABOVILLE 4341131400-2.2 G31
+1 SEX M
+1 DEAT
+2 DATE AFT 871
+1 FAMC @F131@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:27
+0 @I285@ INDI
+1 NAME Wigon
+2 GIVN Wigon
+1 _SOSADABOVILLE 4341131400-2.3 G31
+1 SEX M
+1 DEAT
+2 DATE ABT 874
+1 FAMC @F131@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:27
+0 @I286@ INDI
+1 NAME
+1 SEX U
+1 BIRT
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @I287@ INDI
+1 NAME Nominoë
+2 GIVN Nominoë
+1 _SOSADABOVILLE 8682262814 G34
+1 SEX M
+1 BIRT
+2 DATE ABT 800
+2 PLAC , Carhaix, 29024, Finistère, Bretagne, BRETAGNE
+3 MAP
+4 LATI N48.27594
+4 LONG W3.57326
+2 AGNC
+1 DEAT
+2 DATE 7 MAR 851
+2 PLAC , Vendôme, 41269, Loir-et-Cher, Centre, FRANCE
+3 MAP
+4 LATI N47.8
+4 LONG E1.06667
+1 TITL Gouverneur de Bretagne
+2 DATE FROM 830 TO 845
+1 TITL Prince indépendant de Bretagne
+2 DATE FROM 845 TO 7 MAR 851
+1 BURI Y
+2 PLAC Abbaye Saint-Sauveur, Redon, 35236, Ille-et-Vilaine, Bretagne, FRANCE
+3 MAP
+4 LATI N48.11478
+4 LONG W1.67765
+1 FAMC @F133@
+1 FAMS @F134@
+1 OBJE
+2 TITL Statue sur le parvis de la cathédrale Saint-Samson de Dol de Bretagne
+2 FILE photos/Nominoë_Dol.jpg
+3 FORM jpg
+2 NOTE
+1 OBJE
+2 TITL Nominoë dans L'Histoire de notre Bretagne (1922, Jeanne MALIVEL)
+2 FILE photos/Nominoë_Dol.jpg
+3 FORM jpg
+2 NOTE
+1 OBJE
+2 TITL Le serment de Nominoë (illustration du Barzaz Breizh)
+2 FILE photos/Nominoe.jpg
+3 FORM jpg
+2 NOTE
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:26
+0 @F133@ FAM
+1 HUSB @I288@
+1 WIFE @I289@
+1 CHIL @I287@
+1 CHIL @I283@
+1 CHIL @I299@
+1 CHAN
+2 DATE 29 MAR 2016
+3 TIME 22:07:15
+0 @I288@ INDI
+1 NAME Érispoë
+2 GIVN Érispoë
+1 _SOSADABOVILLE 17364525628 G35
+1 SEX M
+1 BIRT
+1 FAMS @F133@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @I289@ INDI
+1 NAME
+1 _SOSADABOVILLE 17364525629 G35
+1 SEX F
+1 BIRT
+1 FAMS @F133@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @F134@ FAM
+1 HUSB @I287@
+1 WIFE @I290@
+1 CHIL @I291@
+1 CHAN
+2 DATE 29 MAR 2016
+3 TIME 22:08:11
+0 @I290@ INDI
+1 NAME Argantaël
+2 GIVN Argantaël
+1 _SOSADABOVILLE 8682262815 G34
+1 SEX F
+1 FAMS @F134@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:26
+0 @I291@ INDI
+1 NAME Érispoë
+2 GIVN Érispoë
+1 _SOSADABOVILLE 4341131407 G33
+1 SEX M
+1 BIRT
+2 DATE ABT 820
+1 DEAT
+2 DATE NOV 857
+2 PLAC , Talensac, 35331, Ille-et-Vilaine, Bretagne, BRETAGNE
+3 MAP
+4 LATI N48.11104
+4 LONG W1.67675
+1 TITL Roi de Bretagne
+2 DATE FROM JUL 851 TO NOV 857
+2 NOTE En fait c'est sa victoire à Jengland (35) contre Charles le Chauve en mars 851 qui le place de fait avec ce titre
+1 FAMC @F134@
+1 FAMS @F135@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:50:50
+0 @F135@ FAM
+1 HUSB @I291@
+1 WIFE @I292@
+1 CHIL @I293@
+1 CHIL @I294@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:50:50
+0 @I292@ INDI
+1 NAME Marmohec
+2 GIVN Marmohec
+1 _SOSADABOVILLE 4341131406 G33
+1 SEX F
+1 FAMS @F135@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:50:50
+0 @I293@ INDI
+1 NAME Conan
+2 GIVN Conan
+1 _SOSADABOVILLE 4341131407-1 G32
+1 SEX M
+1 FAMC @F135@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:27
+0 @I294@ INDI
+1 NAME
+1 _SOSADABOVILLE 2170565703 G32
+1 SEX F
+1 FAMC @F135@
+1 FAMS @F136@
+1 FAMS @F138@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:25
+0 @F136@ FAM
+1 HUSB @I295@
+1 WIFE @I294@
+1 ENGA Y
+1 CHAN
+2 DATE 29 MAR 2016
+3 TIME 21:47:04
+0 @I295@ INDI
+1 NAME Louis
+2 GIVN Louis
+2 NICK II, Le Bègue
+1 SEX M
+1 BIRT
+2 DATE 1 NOV 846
+2 PLAC , Louviers, 27375, Eure, Normandie, FRANCE
+3 MAP
+4 LATI N49.21296
+4 LONG E1.17009
+1 DEAT
+2 DATE 11 APR 879
+1 TITL Roi de France
+2 TYPE Couronné le 8 décembre 877 à Compiègne, consacré une seconde fois par le pape Jean VIII lors du concile de Troyes le 8 septembre 878
+2 DATE 6 OCT 877
+1 FAMC @F137@
+1 FAMS @F136@
+1 CHAN
+2 DATE 29 MAR 2016
+3 TIME 21:54:01
+0 @F137@ FAM
+1 HUSB @I296@
+1 WIFE @I297@
+1 CHIL @I295@
+1 CHAN
+2 DATE 29 MAR 2016
+3 TIME 21:49:28
+0 @I296@ INDI
+1 NAME Charles
+2 GIVN Charles
+2 NICK II, Le Chauve
+1 SEX M
+1 BIRT
+2 DATE 823
+1 DEAT
+2 DATE 6 OCT 877
+1 TITL Roi de Francie occidentale
+2 DATE FROM 840 TO 6 OCT 877
+1 FAMS @F137@
+1 CHAN
+2 DATE 29 MAR 2016
+3 TIME 21:52:00
+0 @I297@ INDI
+1 NAME Ermentrude /d' ORLÉANS/
+2 GIVN Ermentrude
+2 SPFX d'
+2 SURN ORLÉANS
+1 SEX F
+1 FAMS @F137@
+1 CHAN
+2 DATE 29 MAR 2016
+3 TIME 21:49:28
+0 @F138@ FAM
+1 HUSB @I298@
+1 WIFE @I294@
+1 MARR Y
+1 CHIL @I301@
+1 CHIL @I302@
+1 CHIL @I303@
+1 CHAN
+2 DATE 29 MAR 2016
+3 TIME 23:02:36
+0 @I298@ INDI
+1 NAME Gurvan /de RENNES/
+2 GIVN Gurvan
+2 SPFX de
+2 SURN RENNES
+1 _SOSADABOVILLE 2170565702 G32
+1 SEX M
+1 TITL Comte de Rennes
+1 NOTE @N5@
+1 FAMC @F139@
+1 FAMS @F138@
+1 ASSO @I281@
+2 RELA Autre@@INDI:DEAT
+2 NOTE Assassin ou commanditaire
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:48:21
+0 @I299@ INDI
+1 NAME
+1 _SOSADABOVILLE 4341131404 G33
+1 SEX M
+1 BIRT
+1 FAMC @F133@
+1 FAMS @F139@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @F139@ FAM
+1 HUSB @I299@
+1 WIFE @I300@
+1 CHIL @I298@
+1 CHAN
+2 DATE 29 MAR 2016
+3 TIME 22:04:57
+0 @I300@ INDI
+1 NAME
+1 _SOSADABOVILLE 4341131405 G33
+1 SEX F
+1 BIRT
+1 FAMS @F139@
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:49:22
+0 @I301@ INDI
+1 NAME Judikaël /de RENNES/
+2 GIVN Judikaël
+2 SPFX de
+2 SURN RENNES
+1 _SOSADABOVILLE 2170565702-1 G31
+1 SEX M
+1 DEAT
+2 DATE 890
+2 PLAC , Saint-Lô, 50502, Manche, Normandie, BRETAGNE
+3 MAP
+4 LATI N49.21296
+4 LONG E1.17009
+1 TITL Prince de Poher
+2 DATE FROM 871 TO 890
+1 TITL Roi de Bretagne
+2 DATE FROM 877 TO 890
+1 FAMC @F138@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:27
+0 @I302@ INDI
+1 NAME Béranger /de RENNES/
+2 GIVN Béranger
+2 SPFX de
+2 SURN RENNES
+1 _SOSADABOVILLE 2170565702-2 G31
+1 SEX M
+1 DEAT
+2 DATE 907
+1 TITL Comte de Rennes
+1 FAMC @F138@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:27
+0 @I303@ INDI
+1 NAME Oreguen ou Aourken /RENNES/
+2 GIVN Oreguen, ou, Aourken
+2 SURN RENNES
+1 _SOSADABOVILLE 1085282851 G31
+1 SEX F
+1 FAMC @F138@
+1 FAMS @F126@
+1 CHAN
+2 DATE 4 FEB 2018
+3 TIME 20:42:25
+0 @I304@ INDI
+1 NAME /RENNES/
+2 SURN RENNES
+1 SEX F
+1 FAMS @F140@
+1 CHAN
+2 DATE 29 MAR 2016
+3 TIME 22:59:39
+0 @F140@ FAM
+1 WIFE @I304@
+1 NOTE Joëlle Quaghebeur La Cornouaille du IXe au XIIe siècle PUR Rennes (2002) (ISBN 2 868477437) p. 66-67
+1 CHAN
+2 DATE 29 MAR 2016
+3 TIME 23:01:23
+0 @I305@ INDI
+1 NAME Gourmaëlon /de CORNOUAILLES/
+2 GIVN Gourmaëlon
+2 SPFX de
+2 SURN CORNOUAILLES
+1 SEX U
+1 DEAT
+2 DATE AFT 25 OCT 913
+1 TITL Comte de Cornouailles
+1 TITL Prince de Bretagne
+2 DATE FROM 908 TO 913
+1 CHAN
+2 DATE 29 MAR 2016
+3 TIME 23:44:36
+0 TRLR

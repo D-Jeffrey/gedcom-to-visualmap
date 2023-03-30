@@ -1,0 +1,5859 @@
+﻿0 HEAD
+1 SUBM @B1@
+1 SOUR ANCESTRIS
+2 VERS 11.0.10690
+2 NAME Ancestris
+2 CORP Ancestris Team
+3 ADDR http://www.ancestris.org
+1 DEST ANY
+1 DATE 8 FEB 2021
+2 TIME 21:10:46
+1 FILE kennedy.ged
+1 GEDC
+2 VERS 5.5.1
+2 FORM LINEAGE-LINKED
+1 CHAR UTF-8
+1 LANG Anglo-Saxon
+1 PLAC
+2 FORM City, Zip_Code, County, State, Country
+0 @S2@ SOUR
+1 TITL
+1 TEXT
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:26:18
+0 @S3@ SOUR
+1 TITL
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:26:28
+0 @S4@ SOUR
+1 TITL
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:26:32
+0 @S5@ SOUR
+1 TITL
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:26:36
+0 @S6@ SOUR
+1 TITL
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:26:40
+0 @S7@ SOUR
+1 TITL
+1 TEXT p. 219, MVR 630:21 
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:26:44
+0 @S8@ SOUR
+1 TITL Arlington National Cemetery 
+1 CHAN
+2 DATE 8 SEP 2020
+3 TIME 21:14:33
+0 @S9@ SOUR
+1 TITL Assassinated 
+1 CHAN
+2 DATE 8 SEP 2020
+3 TIME 21:14:33
+0 @S10@ SOUR
+1 TEXT p. 221, MVR 212 [Amended Rec]:45 
+1 CHAN
+2 DATE 8 SEP 2020
+3 TIME 21:14:33
+0 @S11@ SOUR
+1 TITL Author of "The Fitzgeralds and the Kennedys" 
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:14:52
+0 @S12@ SOUR
+1 TITL Author of "The American Ancestry of John Fitzgerald Kennedy" 
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:15:16
+0 @S13@ SOUR
+1 OBJE @M00001@
+1 CHAN
+2 DATE 8 SEP 2020
+3 TIME 21:14:33
+0 @S14@ SOUR
+1 TITL
+1 TEXT p. 218, Holyhood Cemetery 
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:26:56
+0 @S15@ SOUR
+1 TITL
+1 TEXT p. 218, Most Holy Redeemer Church, Baptisms v. 4, p. 102 
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:27:00
+0 @S16@ SOUR
+1 TITL
+1 TEXT p. 218, MVR 1969:5:217 
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:27:05
+0 @S18@ SOUR
+1 TITL
+1 TEXT p. 146 
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:27:08
+0 @S19@ SOUR
+1 TITL
+1 TEXT p. 219, St. Coletta's School 
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:27:12
+0 @S20@ SOUR
+1 TITL
+1 TEXT p. 219 
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:28:22
+0 @S21@ SOUR
+1 TITL
+1 TEXT p. 219, MVR 1920:14:221 
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:28:27
+0 @S22@ SOUR
+1 TITL
+1 TEXT p. 220 
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:28:30
+0 @S23@ SOUR
+1 TITL
+1 TEXT p. 220, MVR 1921:13:160 
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:28:34
+0 @S24@ SOUR
+1 TITL
+1 TEXT p. 220, MVR 1924:14:230 
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:28:38
+0 @S25@ SOUR
+1 TITL
+1 TEXT p. 220, MVR 1925:15:51 
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:28:41
+0 @S26@ SOUR
+1 TITL
+1 TEXT p. 220, MVR 1928:1:62 
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:28:44
+0 @S27@ SOUR
+1 TITL
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:28:48
+0 @S28@ SOUR
+1 TITL
+1 TEXT p. 221 
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:28:51
+0 @S29@ SOUR
+1 TITL
+1 TEXT p. 221 
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:28:56
+0 @S30@ SOUR
+1 TITL
+1 TEXT p. 212, naturalization information 
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:28:59
+0 @S31@ SOUR
+1 TITL
+1 TEXT p. 212, Suffolk County Probate 
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:29:03
+0 @S32@ SOUR
+1 TITL
+1 TEXT p. 213, Cambridge Catholic Cem (Archives of Archdio. of Boston) 
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:29:06
+0 @S33@ SOUR
+1 TITL
+1 TEXT p. 211, MVR 120:80; of consumption 
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:29:09
+0 @S34@ SOUR
+1 TITL
+1 TEXT p. 211 
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:29:13
+0 @S35@ SOUR
+1 TITL
+1 TEXT p. 213, Holy Cross Cemetery 
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:29:17
+0 @S36@ SOUR
+1 TITL
+1 TEXT p. 211, MVR 393:427 
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:29:22
+0 @S37@ SOUR
+1 TITL
+1 TEXT p. 213, church records, vol. 1, p. 92, Archdiocese of Boston 
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:29:28
+0 @S38@ SOUR
+1 TITL
+1 TEXT p. 213, MVR 1926:1:171 
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:29:32
+0 @S39@ SOUR
+1 TITL
+1 TEXT p. 213, MVR 53:93 
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:29:35
+0 @S40@ SOUR
+1 TITL
+1 TEXT p. 214, Holy Cross Cemetery 
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:29:39
+0 @S41@ SOUR
+1 TITL
+1 TEXT p. 214, St. Nicholas Church, Church Rec v. 2, p. 35 
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:29:42
+0 @S42@ SOUR
+1 TITL
+1 TEXT p. 214, MVR 1926:71:279 
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:30:14
+0 @S43@ SOUR
+1 TITL
+1 TEXT p. 214, baptismal records 
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:30:15
+0 @S44@ SOUR
+1 TITL
+1 TEXT p. 215, Cambridge Catholic Cemetery, Burials 1852-1866 
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:30:15
+0 @S45@ SOUR
+1 TITL
+1 TEXT p. 215, St. Nicholas Church, Church Rec, v. 2, p. 75 
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:30:16
+0 @S46@ SOUR
+1 TITL
+1 TEXT p. 215, MVR 95:69, cholera infantum 
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:30:16
+0 @S47@ SOUR
+1 TITL
+1 TEXT p. 215, church records 
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:30:17
+0 @S48@ SOUR
+1 TITL
+1 TEXT p. 215, Holy Cross Cemetery 
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:30:17
+0 @S49@ SOUR
+1 TITL
+1 TEXT p. 215, St. Nicholas Church, Church Rec, v. 2, p. 140 
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:30:18
+0 @S50@ SOUR
+1 TITL
+1 TEXT p. 215, MVR 1929:64:275 
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:30:19
+0 @S51@ SOUR
+1 TITL
+1 TEXT p. 215, MVR 92:86, church records give 18 Jul 
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:30:18
+0 @S52@ SOUR
+1 TITL
+1 TEXT p. 216, Holy Cross Cemetery 
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:30:20
+0 @S53@ SOUR
+1 TITL
+1 TEXT p. 216, Most Holy Redeemer Church, Church Rec 2:226 
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:30:19
+0 @S54@ SOUR
+1 TITL
+1 TEXT p. 216, MVR 1929:1:414 
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:28:13
+0 @S55@ SOUR
+1 TITL
+1 TEXT p. 216, MVR 116:14 
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:28:08
+0 @S56@ SOUR
+1 TITL
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:28:02
+0 @S57@ SOUR
+1 TITL
+1 TEXT p. 748, St. Joseph's Cemetery 
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:28:05
+0 @S58@ SOUR
+1 TITL
+1 TEXT p. 6, St. Stephen's Church Baptisms, AAB 
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:27:57
+0 @S59@ SOUR
+1 TITL
+1 TEXT p. 747 
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:27:53
+0 @S60@ SOUR
+1 TITL
+1 TEXT p. 1 
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:27:48
+0 @S61@ SOUR
+1 TITL
+1 TEXT p. 81; p. 146 
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:27:45
+0 @S62@ SOUR
+1 TITL Authors of JF Kennedy and JL Bouvier Ancestry 
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:19:23
+0 @S63@ SOUR
+1 TITL Complied original material for COMMSOFT's "Kennedy Family History" 
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:13:39
+0 @S64@ SOUR
+1 TEXT p. 221, St. Mary's Church, by Archbishop Richard Cushing 
+1 CHAN
+2 DATE 8 SEP 2020
+3 TIME 21:14:33
+0 @S65@ SOUR
+1 TITL
+1 TEXT p. 89, St. Bernards's Catholic Church 
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:27:38
+0 @S66@ SOUR
+1 TITL
+1 TEXT p. 60, Holy Cross Cemetery 
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:27:35
+0 @S67@ SOUR
+1 TITL
+1 TEXT p. 59, MVR Death Rec Vol. 231, p. 59 
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:27:32
+0 @S68@ SOUR
+1 TITL
+1 TEXT p. 13 
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:27:28
+0 @S69@ SOUR
+1 TITL
+1 TEXT Frontpiece 
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:27:25
+0 @S70@ SOUR
+1 TITL
+1 TEXT p. 88 
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:27:22
+0 @S72@ SOUR
+1 TITL
+1 TEXT p. 218, MVR 387:222, 
+2 CONT this is a test 
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:27:17
+0 @I105@ INDI
+1 NAME Joseph Patrick /Kennedy/
+2 GIVN Joseph, Patrick
+2 SURN KENNEDY
+1 SEX M
+1 OBJE
+2 TITL Joseph KENNEDY
+2 FILE photos/Joseph_Patrick_Kennedy.jpg
+3 FORM jpg
+2 NOTE
+1 SOUR @S13@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 BIRT
+2 DATE 6 SEP 1888
+2 PLAC East Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.3751
+4 LONG W71.03922
+2 SOUR @S72@
+3 QUAY 2
+1 DEAT
+2 DATE 18 NOV 1969
+2 PLAC Hyannis Port, , Barnstable County, MA, USA
+3 MAP
+4 LATI N41.65289
+4 LONG W70.2828
+2 SOUR @S16@
+3 QUAY 2
+1 CHR
+2 DATE 9 SEP 1888
+2 PLAC East Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.3751
+4 LONG W71.03922
+2 SOUR @S15@
+3 QUAY 2
+1 BURI
+2 DATE AFT 18 NOV 1969
+2 PLAC Brookline, , Norfolk County, MA, USA
+3 MAP
+4 LATI N42.33176
+4 LONG W71.12116
+2 SOUR @S14@
+3 QUAY 2
+1 OCCU Ambassador
+1 REFN KENNJP88
+1 FAMS @F0@
+1 FAMC @F33@
+1 NOTE Born in 1888, the grandson of an Irish immigrant, Joseph Patrick
+2 CONT Kennedy had an enormous drive to acquire both fame and fortune.  His
+2 CONT often cited goal was to be a millionaire by the age of 35.  Within a
+2 CONT year and a half of graduating from Harvard College, he had progressed
+2 CONT from bank clerk through bank  examiner to bank president and was on
+2 CONT his way.  Publicity from being the youngest U. S. bank president
+2 CONT opened doors to other opportunities. Soon his financial enterprises
+2 CONT embraced real estate, the stock market and motion pictures.  Kennedy's
+2 CONT accumulated wealth by 1929 enabled him to establish one million dollar
+2 CONT trust funds for each of his children.  In the 1930's he began to put
+2 CONT his intelligence, personality and money into politics.  His
+2 CONT involvement in Roosevelt's inner circle during the presidential
+2 CONT campaign led him to believe he would receive a cabinet post. Although
+2 CONT that never materialized, he was chosen to head the newly created
+2 CONT Securities and Exchange Commission, the regulatory body set up to
+2 CONT govern the financial community.  Later, he headed the Maritime
+2 CONT Commission. However, his most famous appointment was that of
+2 CONT ambassador to the Court of Saint James.  He served from 1937 until
+2 CONT 1940 when he retired from public service and returned to the business
+2 CONT world. In 1961 he suffered a debilitating stroke followed by relapses
+2 CONT and heart attacks that left him virtually incapacitated until his
+2 CONT death in 1969.
+0 @I66@ INDI
+1 NAME Rose Elizabeth /Fitzgerald/
+2 GIVN Rose, Elizabeth
+2 SURN FITZGERALD
+1 SEX F
+1 OBJE
+2 TITL Rose KENNEDY et son fils John
+2 FILE photos/Rose-kennedy.jpg
+3 FORM jpg
+2 NOTE
+1 SOUR @S13@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 BIRT
+2 DATE 22 JUL 1890
+2 PLAC Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.35843
+4 LONG W71.05977
+2 SOUR @S18@
+3 QUAY 2
+1 DEAT
+2 DATE 22 JAN 1995
+2 PLAC Hyannis, , , MA, USA
+3 MAP
+4 LATI N41.65289
+4 LONG W70.2828
+1 RESI
+2 PLAC Hyannis Port, , Barnstable County, MA, USA
+3 MAP
+4 LATI N41.65289
+4 LONG W70.2828
+1 REFN FITZRE90
+1 FAMS @F0@
+1 FAMC @F48@
+0 @I91@ INDI
+1 NAME Joseph Patrick /Kennedy/ Jr.
+2 GIVN Joseph, Patrick
+2 SURN KENNEDY
+2 NSFX Jr.
+1 SEX M
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 BIRT
+2 DATE 25 JUL 1915
+2 PLAC Hull, , Plymouth County, MA, USA
+3 MAP
+4 LATI N42.30204
+4 LONG W70.90782
+2 SOUR @S7@
+3 QUAY 2
+1 DEAT
+2 DATE 12 AUG 1944
+2 PLAC the air, , Suffolk, Angleterre, England
+3 MAP
+4 LATI N52.16667
+4 LONG E1.0
+1 OCCU Lieutenant
+1 REFN KENNJP15
+1 FAMC @F0@
+1 NOTE Joseph Patrick Kennedy, Jr. was the eldest and favorite son of Joseph
+2 CONT Kennedy. Always considered the strongest and the bravest, he was
+2 CONT extremely competitive and seemed to feel the keenest competition with
+2 CONT Jack.  His tendency for heroism and daring made him enter into some
+2 CONT life threatening activities such as swimming the freezing and swift
+2 CONT McClound River or taking a first time bobsled ride down a run on which
+2 CONT experienced bobsledders had lost their lives.  During World War II, he
+2 CONT enlisted in the Navy, eager to fly and see action. Completing his tour
+2 CONT of duty in 1944, he was packed to go home when he volunteered for a
+2 CONT top-secret and dangerous mission without learning any of the details.
+2 CONT Half an hour after take-off his plane exploded in mid-air.
+0 @I104@ INDI
+1 NAME John Fitzgerald /KENNEDY/
+2 GIVN John, Fitzgerald
+2 SURN KENNEDY
+1 SEX M
+1 OBJE
+2 TITL John Fitzgerald KENNEDY
+2 FILE photos/John-kennedy.jpg
+3 FORM jpg
+2 NOTE
+1 SOUR @S13@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 BIRT
+2 DATE 29 MAY 1917
+2 PLAC Brookline, , Norfolk County, MA, USA
+3 MAP
+4 LATI N42.33176
+4 LONG W71.12116
+2 SOUR @S10@
+3 QUAY 2
+1 DEAT
+2 DATE 22 NOV 1963
+2 PLAC Dallas, , Dallas County, TX, USA
+3 MAP
+4 LATI N32.78306
+4 LONG W96.80667
+2 SOUR @S9@
+3 QUAY 2
+2 OBJE
+3 TITL Consequences of the assassination of John KENNEDY
+3 FILE documents/Herald-Tribune.jpg
+4 FORM jpg
+3 NOTE
+1 BURI
+2 DATE 25 NOV 1963
+2 PLAC Arlington, 22209, Arlington County, VA, USA
+3 MAP
+4 LATI N38.88101
+4 LONG W77.10428
+2 SOUR @S8@
+3 QUAY 2
+1 OCCU US President #35
+2 DATE FROM 20 JAN 1961 TO 22 NOV 1963
+1 REFN KENNJF17
+1 FAMC @F0@
+1 FAMS @F8@
+1 NOTE John F. Kennedy's charismatic personality was evident from early
+2 CONT childhood, as was his competitiveness.  His love of books and history,
+2 CONT capacity for introspection and curiosity about ideas developed largely
+2 CONT from the many hours he spent in bed with illnesses, starting with a
+2 CONT particularly virulent attack of scarlet fever when he was two and
+2 CONT one-half years old.  Although he was often absent from school and
+2 CONT illness forced him to drop out of a preparatory school and later,
+2 CONT Princeton University, he graduated cum laude from Harvard University
+2 CONT in 1940.
+1 NOTE With the 1944 death of his brother Joe, the family's political
+2 CONT ambitions transferred to Jack.  His road to the White House began with
+2 CONT his election to Congress in 1946.  Three terms there and he was ready
+2 CONT to wrest a Senate seat from the popular Republican Henry Cabot Lodge,
+2 CONT Jr.
+1 NOTE Jack's foray into presidential politics started with his narrow
+2 CONT defeat for nomination to be the vice presidential candidate on the
+2 CONT 1956 ticket with Adlai Stevenson, Jr.  In 1960 he sought and won the
+2 CONT presidential nomination and subsequently, the election.  When he took
+2 CONT his oath of office on the old family Bible that had belonged to the
+2 CONT first Fitzgerald to come to America, he was affirming the immigrant
+2 CONT belief in America.
+1 NOTE On November, 22, 1963, John F. Kennedy was assassinated by Lee Harvey
+2 CONT Oswald in Dallas, Texas.
+0 @I127@ INDI
+1 NAME Rosemary (Rose Marie) /Kennedy/
+2 GIVN Rosemary, (Rose, Marie)
+2 SURN KENNEDY
+1 SEX F
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 BIRT
+2 DATE 20 FEB 1920
+2 PLAC Brookline, , Norfolk County, MA, USA
+3 MAP
+4 LATI N42.33176
+4 LONG W71.12116
+1 RESI
+2 PLAC Jefferson, , Jefferson County, WI, USA
+3 MAP
+4 LATI N43.00556
+4 LONG W88.80733
+2 SOUR @S19@
+3 QUAY 2
+1 REFN KENNRM20
+1 FAMC @F0@
+0 @I107@ INDI
+1 NAME Kathleen "Kick" /Kennedy/
+2 GIVN Kathleen, "Kick"
+2 SURN KENNEDY
+1 SEX F
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 BIRT
+2 DATE 20 FEB 1920
+2 PLAC Brookline, , Norfolk County, MA, USA
+3 MAP
+4 LATI N42.33176
+4 LONG W71.12116
+2 SOUR @S21@
+3 QUAY 2
+1 DEAT
+2 DATE 13 MAY 1948
+2 PLAC Saint-Bauzile, , , Ardeche, France
+3 MAP
+4 LATI N44.67616
+4 LONG E4.67382
+2 SOUR @S20@
+3 QUAY 1
+1 BURI
+2 DATE AFT 13 MAY 1948
+2 PLAC Chatsworth, , Derbyshire, Angleterre, England
+3 MAP
+4 LATI N53.21667
+4 LONG W1.6
+2 SOUR @S20@
+3 QUAY 1
+1 REFN KENNKA20
+1 FAMC @F0@
+1 FAMS @F69@
+1 NOTE Kathleen Kennedy was considered the most lively and vivacious of the
+2 CONT Kennedy sisters.  Nicknamed "Kick" by her father, the name seemed to
+2 CONT reflect her love of life.  While in England during her father's time
+2 CONT as Ambassador, she fell in love with William Cavendish, the Marquess
+2 CONT of Hartington.  Though her family strongly opposed, they were married
+2 CONT in 1944.  Only her brother Joe attended from her side of the family.
+2 CONT Kick's new husband was killed just 5 weeks later.  After she began
+2 CONT dating again she met Peter Fitzwilliam, another aristocratic
+2 CONT Protestant. Because he was already married they kept their affair
+2 CONT secret.  In May of 1948 they decided to fly to Cannes for a long
+2 CONT weekend.  They ignored the pilot's warning that the weather was bad
+2 CONT and they should cancel their trip.  While flying over the Rhone
+2 CONT valley, a storm pushed the small plane into the side of a mountain,
+2 CONT killing all aboard.
+0 @I99@ INDI
+1 NAME Eunice Mary /Kennedy/
+2 GIVN Eunice, Mary
+2 SURN KENNEDY
+1 SEX F
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 BIRT
+2 DATE 10 JUL 1921
+2 PLAC Brookline, , Norfolk County, MA, USA
+3 MAP
+4 LATI N42.33176
+4 LONG W71.12116
+2 SOUR @S23@
+3 QUAY 2
+1 RESI
+2 PLAC Washington, , , DC, USA
+3 MAP
+4 LATI N38.89511
+4 LONG W77.03637
+2 SOUR @S22@
+3 QUAY 1
+1 REFN KENNEM21
+1 FAMC @F0@
+1 FAMS @F1@
+0 @I177@ INDI
+1 NAME Robert Sargent /Shriver/ Jr.
+2 GIVN Robert, Sargent
+2 SURN SHRIVER
+2 NSFX Jr.
+1 SEX M
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 BIRT
+2 DATE 9 NOV 1915
+2 PLAC Westminster, , Carroll County, MD, USA
+3 MAP
+4 LATI N39.57538
+4 LONG W76.99581
+1 RESI
+2 PLAC Washington, , , DC, USA
+3 MAP
+4 LATI N38.89511
+4 LONG W77.03637
+1 OCCU Politics
+1 REFN SHRIRS15
+1 FAMS @F1@
+0 @I119@ INDI
+1 NAME Patricia /Kennedy/
+2 GIVN Patricia
+2 SURN KENNEDY
+1 SEX F
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 BIRT
+2 DATE 6 MAY 1924
+2 PLAC Brookline, , Norfolk County, MA, USA
+3 MAP
+4 LATI N42.33176
+4 LONG W71.12116
+2 SOUR @S24@
+3 QUAY 2
+1 RESI
+2 PLAC New York City, , , NY, USA
+3 MAP
+4 LATI N40.71427
+4 LONG W74.00597
+2 SOUR @S22@
+3 QUAY 1
+1 REFN KENNPA24
+1 FAMC @F0@
+1 FAMS @F2@
+0 @I129@ INDI
+1 NAME Peter /Lawford/
+2 GIVN Peter
+2 SURN LAWFORD
+1 SEX M
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 BIRT
+2 DATE 7 SEP 1923
+2 PLAC London, , , , England
+3 MAP
+4 LATI N51.50853
+4 LONG W0.12574
+1 DEAT
+2 DATE 24 DEC 1984
+2 PLAC Los Angeles, , Los Angeles County, CA, USA
+3 MAP
+4 LATI N34.05223
+4 LONG W118.24368
+1 OCCU actor
+1 REFN LAWFPE23
+1 FAMS @F2@
+0 @I125@ INDI
+1 NAME Robert Francis /Kennedy/
+2 GIVN Robert, Francis
+2 SURN KENNEDY
+1 SEX M
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 BIRT
+2 DATE 20 NOV 1925
+2 PLAC Brookline, , Norfolk County, MA, USA
+3 MAP
+4 LATI N42.33176
+4 LONG W71.12116
+2 SOUR @S25@
+3 QUAY 2
+1 DEAT
+2 DATE 6 JUN 1968
+2 PLAC Los Angeles, , Los Angeles County, CA, USA
+3 MAP
+4 LATI N34.05223
+4 LONG W118.24368
+2 SOUR @S9@
+3 QUAY 3
+1 BURI
+2 DATE AFT 6 JUN 1968
+2 PLAC Arlington, 22209, Arlington County, VA, USA
+3 MAP
+4 LATI N38.88101
+4 LONG W77.10428
+2 SOUR @S8@
+3 QUAY 3
+1 OCCU US Senator
+1 REFN KENNRF25
+1 FAMC @F0@
+1 FAMS @F9@
+1 NOTE Robert F. Kennedy was intense and introverted with a black-and-white
+2 CONT philosophy of life. Things, ideas and people were either good or evil
+2 CONT and his purpose was to expiate the evil.  Very religious, at one point
+2 CONT he considered entering the priesthood. After graduation from Harvard
+2 CONT University and the University of Virginia Law School, he worked for
+2 CONT McCarthy's subcommittee on internal security and then for the
+2 CONT committee of inquiry into racketeering and corruption in the labor
+2 CONT movement.  Based on these hearings he wrote his book on union
+2 CONT corruption, The Enemy Within. Bobby played an instrumental part in
+2 CONT Jack's presidential election, and was subsequently appointed Attorney
+2 CONT General despite adverse public reaction.  He presided over the
+2 CONT Department of Justice for 44 months, gaining respect as he dealt
+2 CONT firmly with civil rights and labor issues. After JFK's assassination
+2 CONT Bobby became the head of the Kennedy clan and the inheritor of the
+2 CONT Kennedy legacy.  Elected to the Senate from New York in 1964, he used
+2 CONT that office to gear up for a 1968 presidential bid.  He became the
+2 CONT champion of the dispossessed and tried to forge a coalition of the
+2 CONT young, the poor, blacks and intellectuals.  He was well on his way to
+2 CONT the nomination when he was assassinated by Sirhan Bishara Sirhan June
+2 CONT 5, 1968.
+0 @I101@ INDI
+1 NAME Jean Ann /Kennedy/
+2 GIVN Jean, Ann
+2 SURN KENNEDY
+1 SEX F
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 BIRT
+2 DATE 20 FEB 1928
+2 PLAC Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.35843
+4 LONG W71.05977
+2 SOUR @S26@
+3 QUAY 2
+1 REFN KENNJA28
+1 FAMC @F0@
+1 FAMS @F6@
+0 @I98@ INDI
+1 NAME Edward Moore /Kennedy/
+2 GIVN Edward, Moore
+2 SURN KENNEDY
+1 SEX M
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 BIRT
+2 DATE 22 FEB 1932
+2 PLAC Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.35843
+4 LONG W71.05977
+2 SOUR @S22@
+3 QUAY 1
+1 RESI
+2 DATE 1988
+2 PLAC Washington, , , DC, USA
+3 MAP
+4 LATI N38.89511
+4 LONG W77.03637
+1 OCCU US Senator
+1 REFN KENNEM32
+1 FAMC @F0@
+1 FAMS @F7@
+1 NOTE Edward M. Kennedy is the only surviving Kennedy brother.  Following
+2 CONT family tradition, he graduated from Harvard University.  After
+2 CONT receiving a law degree from the University of Virginia, he worked on
+2 CONT JFK's campaign. In 1962, at age 30, he won the Massachussets Senate
+2 CONT seat once held by JFK.  With one brother the President and the other
+2 CONT the Attorney General, Teddy's political future seemed assured. After
+2 CONT Bobby's assassination in 1968, Teddy became a substitute father to
+2 CONT Bobby's children and the focal point of the Kennedy family:  the one
+2 CONT to carry on the political legacy.  The 1969 Chappaquidick Island
+2 CONT incident, resulting in the death of Mary Jo Kopechne, ended his
+2 CONT presidential possibilities for the 1972 election.  He is currently
+2 CONT (1988) a U. S. Senator from Massachusetts.
+0 @I13@ INDI
+1 NAME Virginia Joan /Bennett/
+2 GIVN Virginia, Joan
+2 SURN BENNETT
+1 SEX F
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 BIRT
+2 DATE 9 SEP 1936
+2 PLAC Riverdale, , , NY, USA
+3 MAP
+4 LATI N40.90056
+4 LONG W73.90639
+1 REFN BENNVJ36
+1 FAMS @F7@
+1 FAMC @F67@
+0 @I128@ INDI
+1 NAME Christopher Kennedy /Lawford/
+2 GIVN Christopher, Kennedy
+2 SURN LAWFORD
+1 SEX M
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 BIRT
+2 DATE 29 MAR 1955
+2 PLAC Santa Monica, , Los Angeles County, CA, USA
+3 MAP
+4 LATI N34.01945
+4 LONG W118.49119
+1 OCCU actor
+1 REFN LAWFCK55
+1 FAMC @F2@
+1 FAMS @F3@
+1 NOTE Disowned by parents in 1961.
+0 @I131@ INDI
+1 NAME Sydney Maleia /Lawford/
+2 GIVN Sydney, Maleia
+2 SURN LAWFORD
+1 SEX F
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 BIRT
+2 DATE 25 AUG 1956
+2 PLAC Santa Monica, , Los Angeles County, CA, USA
+3 MAP
+4 LATI N34.01945
+4 LONG W118.49119
+1 RESI
+2 PLAC Baltimore, , Baltimore County, MD, USA
+3 MAP
+4 LATI N39.29047
+4 LONG W76.61076
+1 REFN LAWFSM56
+1 FAMC @F2@
+1 FAMS @F4@
+0 @I132@ INDI
+1 NAME Victoria Francis /Lawford/
+2 GIVN Victoria, Francis
+2 SURN LAWFORD
+1 SEX F
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 BIRT
+2 DATE 4 NOV 1958
+2 PLAC Santa Monica, , Los Angeles County, CA, USA
+3 MAP
+4 LATI N34.01945
+4 LONG W118.49119
+1 OCCU public-service
+1 REFN LAWFVF58
+1 FAMC @F2@
+0 @I130@ INDI
+1 NAME Robin Elizabeth /Lawford/
+2 GIVN Robin, Elizabeth
+2 SURN LAWFORD
+1 SEX F
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 BIRT
+2 DATE 2 JUL 1961
+2 PLAC Santa Monica, , Los Angeles County, CA, USA
+3 MAP
+4 LATI N34.01945
+4 LONG W118.49119
+1 REFN LAWFRE61
+1 FAMC @F2@
+0 @I163@ INDI
+1 NAME Jean Edith /Olsson/
+2 GIVN Jean, Edith
+2 SURN OLSSON
+1 SEX F
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 BIRT
+2 DATE 24 JAN 1955
+2 PLAC Seoul, , , , Korea
+3 MAP
+4 LATI N37.5554
+4 LONG E126.9781
+1 REFN OLSSJE55
+1 FAMS @F3@
+0 @I151@ INDI
+1 NAME James Peter /McKelvey/
+2 GIVN James, Peter
+2 SURN MCKELVEY
+1 SEX M
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 BIRT
+2 DATE 4 APR 1955
+2 PLAC Pittsburgh, , Allegheny County, PA, USA
+3 MAP
+4 LATI N40.44062
+4 LONG W79.99589
+1 REFN MCKEJP55
+1 FAMS @F4@
+0 @I176@ INDI
+1 NAME Robert Sargent /Shriver/ III
+2 GIVN Robert, Sargent
+2 SURN SHRIVER
+2 NSFX III
+1 SEX M
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 BIRT
+2 DATE 28 APR 1954
+2 PLAC Chicago, , Cook County, IL, USA
+3 MAP
+4 LATI N41.85003
+4 LONG W87.65005
+1 REFN SHRIRS54
+1 FAMC @F1@
+0 @I179@ INDI
+1 NAME Maria Owings /Shriver/
+2 GIVN Maria, Owings
+2 SURN SHRIVER
+1 SEX F
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 BIRT
+2 DATE 6 NOV 1955
+2 PLAC Chicago, , Cook County, IL, USA
+3 MAP
+4 LATI N41.85003
+4 LONG W87.65005
+1 RESI
+2 PLAC Santa Monica, , Los Angeles County, CA, USA
+3 MAP
+4 LATI N34.01945
+4 LONG W118.49119
+1 OCCU Broadcasting
+1 REFN SHRIMO55
+1 FAMC @F1@
+1 FAMS @F5@
+0 @I181@ INDI
+1 NAME Timothy Perry /Shriver/
+2 GIVN Timothy, Perry
+2 SURN SHRIVER
+1 SEX M
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 BIRT
+2 DATE 29 AUG 1959
+2 PLAC Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.35843
+4 LONG W71.05977
+1 REFN SHRITP59
+1 FAMC @F1@
+1 NOTE Disappeared from the family in 1899 and never heard from again.
+0 @I180@ INDI
+1 NAME Mark Kennedy /Shriver/
+2 GIVN Mark, Kennedy
+2 SURN SHRIVER
+1 SEX M
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 BIRT
+2 DATE 17 FEB 1964
+2 PLAC Washington, , , DC, USA
+3 MAP
+4 LATI N38.89511
+4 LONG W77.03637
+1 REFN SHRIMK64
+1 FAMC @F1@
+0 @I178@ INDI
+1 NAME Anthony Paul /Shriver/
+2 GIVN Anthony, Paul
+2 SURN SHRIVER
+1 SEX M
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 BIRT
+2 DATE 20 JUL 1965
+2 PLAC Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.35843
+4 LONG W71.05977
+1 REFN SHRIAP65
+1 FAMC @F1@
+0 @I182@ INDI
+1 NAME Arnold /Shwarzenegger/
+2 GIVN Arnold
+2 SURN SHWARZENEGGER
+1 SEX M
+1 SOUR @S27@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 BIRT
+2 DATE ABT 1955
+1 OCCU Actor
+1 REFN SHWAAR55
+1 FAMS @F5@
+0 @I194@ INDI
+1 NAME Stephen Edward /Smith/
+2 GIVN Stephen, Edward
+2 SURN SMITH
+1 SEX M
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 BIRT
+2 DATE 24 SEP 1927
+2 PLAC Brooklyn, , Kings County, NY, USA
+3 MAP
+4 LATI N40.6501
+4 LONG W73.94958
+1 REFN SMITSE27
+1 FAMS @F6@
+0 @I191@ INDI
+1 NAME Stephen Edward /Smith/ Jr.
+2 GIVN Stephen, Edward
+2 SURN SMITH
+2 NSFX Jr.
+1 SEX M
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 BIRT
+2 DATE 28 JUN 1957
+1 REFN SMITSE57
+1 FAMC @F6@
+0 @I195@ INDI
+1 NAME William Kennedy /Smith/
+2 GIVN William, Kennedy
+2 SURN SMITH
+1 SEX M
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 BIRT
+2 DATE 4 SEP 1960
+2 PLAC Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.35843
+4 LONG W71.05977
+1 REFN SMITWK60
+1 FAMC @F6@
+0 @I192@ INDI
+1 NAME Amanda Mary /Smith/
+2 GIVN Amanda, Mary
+2 SURN SMITH
+1 SEX F
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 BIRT
+2 DATE 30 APR 1967
+1 REFN SMITAM67
+1 FAMC @F6@
+0 @I193@ INDI
+1 NAME Kym Marie /Smith/
+2 GIVN Kym, Marie
+2 SURN SMITH
+1 SEX F
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 BIRT
+2 DATE 29 NOV 1972
+2 PLAC , , , , Vietnam
+1 REFN SMITKM72
+1 FAMC @F6@
+0 @I106@ INDI
+1 NAME Kara Ann /Kennedy/
+2 GIVN Kara, Ann
+2 SURN KENNEDY
+1 SEX F
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 BIRT
+2 DATE 27 FEB 1960
+2 PLAC Bronxville, , Westchester County, NY, USA
+3 MAP
+4 LATI N40.93815
+4 LONG W73.83208
+1 REFN KENNKA60
+1 FAMC @F7@
+0 @I89@ INDI
+1 NAME Edward Moore /Kennedy/ Jr.
+2 GIVN Edward, Moore
+2 SURN KENNEDY
+2 NSFX Jr.
+1 SEX M
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 BIRT
+2 DATE 26 SEP 1961
+2 PLAC Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.35843
+4 LONG W71.05977
+1 RESI
+2 PLAC Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.35843
+4 LONG W71.05977
+1 REFN KENNEM61
+1 FAMC @F7@
+0 @I124@ INDI
+1 NAME Patrick Joseph /Kennedy/
+2 GIVN Patrick, Joseph
+2 SURN KENNEDY
+1 SEX M
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 BIRT
+2 DATE 14 JUL 1967
+2 PLAC Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.35843
+4 LONG W71.05977
+1 OCCU student
+1 REFN KENNPJ67
+1 FAMC @F7@
+0 @I22@ INDI
+1 NAME Jacqueline Lee /Bouvier/
+2 GIVN Jacqueline, Lee
+2 SURN BOUVIER
+1 SEX F
+1 OBJE
+2 TITL Jacqueline BOUVIER
+2 FILE photos/jacqueline-bouvier.jpg
+3 FORM jpg
+2 NOTE
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 BIRT
+2 DATE 28 JUL 1929
+2 PLAC Southampton, , Long Island, NY, USA
+3 MAP
+4 LATI N40.88833
+4 LONG W72.44306
+2 SOUR @S28@
+3 QUAY 1
+1 OCCU Editor
+1 REFN BOUVJL29
+1 FAMS @F8@
+1 FAMC @F62@
+1 FAMS @F70@
+0 @I94@ INDI
+1 NAME Caroline Bouvier /Kennedy/
+2 GIVN Caroline, Bouvier
+2 SURN KENNEDY
+1 SEX F
+1 OBJE
+2 TITL Caroline KENNEDY
+2 FILE photos/caroline_kennedy.jpg
+3 FORM jpg
+2 NOTE
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 BIRT
+2 DATE 27 NOV 1957
+2 PLAC New York City, , , NY, USA
+3 MAP
+4 LATI N40.71427
+4 LONG W74.00597
+2 SOUR @S29@
+3 QUAY 2
+1 REFN KENNCB57
+1 DESI MEDIUM
+1 FAMC @F8@
+1 FAMS @F68@
+1 NOTE Caroline Lee Kennedy Schlossberg was only 3 years old when her father
+2 CONT was elected 35th President of the United States.  After his death in
+2 CONT 1963 her mother, Jacqueline Bouvier Kennedy, fiercely guarded her and
+2 CONT brother John's privacy to ensure as normal an upbringing as possible
+2 CONT away from continuous public scrutiny.
+1 NOTE  She attended the Brearly School in New York, Concord Academy and
+2 CONT Radcliffe College in Massachusetts as well as Sotheby's fine arts
+2 CONT training school in London. She is an accomplished horsewoman, poet,
+2 CONT painter and photographer.
+0 @I90@ INDI
+1 NAME John Fitzgerald /Kennedy/ Jr.
+2 GIVN John, Fitzgerald
+2 SURN KENNEDY
+2 NSFX Jr.
+1 SEX M
+1 OBJE
+2 TITL John Fitzgerald KENNEDY Junior
+2 FILE photos/john-f.-kennedy-jr.jpg
+3 FORM jpg
+2 NOTE
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 BIRT
+2 DATE 25 NOV 1960
+2 PLAC Washington, , , DC, USA
+3 MAP
+4 LATI N38.89511
+4 LONG W77.03637
+2 SOUR @S28@
+3 QUAY 2
+1 DEAT
+2 DATE 16 JUL 1999
+2 PLAC Martha's Vineyard, , , MA, USA
+3 MAP
+4 LATI N41.41678
+4 LONG W70.61614
+1 RESI
+2 PLAC New York City, , , NY, USA
+3 MAP
+4 LATI N40.71427
+4 LONG W74.00597
+1 REFN KENNJF60
+1 DESI MEDIUM
+1 FAMC @F8@
+1 NOTE John Fitzgerald Kennedy, Jr. was born to a newly elected President of
+2 CONT the United States as an entire country waited in anticipation.  The
+2 CONT toddler who was known for playing "hide and seek" in the oval office
+2 CONT says he has no recollection of those years. It was John Jr.'s 3rd
+2 CONT birthday when he stood by his mother and sister and saluted his
+2 CONT father's flag-draped coffin.
+1 NOTE John attended Philips Academy and Boston College. He has an active
+2 CONT interest in the theater and appeared in school productions.  He made
+2 CONT his New York debut in August of 1985 in an invitation only production
+2 CONT of "Winners" where he played the male lead.
+0 @I122@ INDI
+1 NAME Patrick Bouvier /Kennedy/
+2 GIVN Patrick, Bouvier
+2 SURN KENNEDY
+1 SEX M
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 BIRT
+2 DATE 7 AUG 1963
+2 PLAC Falmouth, , Barnstable County, MA, USA
+3 MAP
+4 LATI N41.5515
+4 LONG W70.61475
+1 DEAT
+2 DATE 9 AUG 1963
+2 PLAC Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.35843
+4 LONG W71.05977
+1 BURI
+2 PLAC Brookline, , Norfolk County, MA, USA
+3 MAP
+4 LATI N42.33176
+4 LONG W71.12116
+1 REFN KENNPB63
+1 FAMC @F8@
+0 @I185@ INDI
+1 NAME Ethel /Skakel/
+2 GIVN Ethel
+2 SURN SKAKEL
+1 SEX F
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 BIRT
+2 DATE 11 APR 1928
+2 PLAC Chicago, , Cook County, IL, USA
+3 MAP
+4 LATI N41.85003
+4 LONG W87.65005
+1 RESI
+2 PLAC McLean, , Fairfax County, VA, USA
+3 MAP
+4 LATI N38.93428
+4 LONG W77.17748
+1 REFN SKAKET28
+1 FAMS @F9@
+1 FAMC @F66@
+0 @I108@ INDI
+1 NAME Kathleen Hartington /Kennedy/
+2 GIVN Kathleen, Hartington
+2 SURN KENNEDY
+1 SEX F
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 BIRT
+2 DATE 4 JUL 1951
+2 PLAC Greenwich, , Fairfield County, CT, USA
+3 MAP
+4 LATI N41.02649
+4 LONG W73.62846
+1 REFN KENNKH51
+1 FAMC @F9@
+1 FAMS @F10@
+1 NOTE Kathleen Hartington Kennedy Townsend is the oldest child of Robert and
+2 CONT Ethel Kennedy.  She is currently making a bid for the congressional
+2 CONT seat in her district in Maryland.  Her campaign stresses community
+2 CONT service.  She is an ardent feminist and social activist.  She is the
+2 CONT first Kennedy woman to continue the political legacy of her family.
+1 NOTE Kathleen is a graduate of Harvard University where she met her husband
+2 CONT David Lee Townsend, then a doctoral student in English and American
+2 CONT history there. After their marriage in 1973 they moved to New Mexico
+2 CONT where David taught classics and Kathleen attended Law School.  They
+2 CONT returned to Boston and both completed law degrees at Yale University.
+1 NOTE Kathleen has taught English to Navaho children and worked with Eskimos
+2 CONT in Alaska as well as campaigning for George McGovern's presidential
+2 CONT bid and as campaign director for her Uncle Ted's Senate race.
+0 @I86@ INDI
+1 NAME Joseph Patrick /Kennedy/ II
+2 GIVN Joseph, Patrick
+2 SURN KENNEDY
+2 NSFX II
+1 SEX M
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 BIRT
+2 DATE 24 SEP 1952
+2 PLAC Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.35843
+4 LONG W71.05977
+1 OCCU politics
+1 REFN KENNJP52
+1 FAMC @F9@
+1 FAMS @F11@
+0 @I93@ INDI
+1 NAME Robert Francis /Kennedy/ Jr.
+2 GIVN Robert, Francis
+2 SURN KENNEDY
+2 NSFX Jr.
+1 SEX M
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 BIRT
+2 DATE 17 JAN 1954
+2 PLAC Washington, , , DC, USA
+3 MAP
+4 LATI N38.89511
+4 LONG W77.03637
+1 OCCU Lawyer
+1 REFN KENNRF54
+1 FAMC @F9@
+1 FAMS @F12@
+0 @I96@ INDI
+1 NAME David Anthony /Kennedy/
+2 GIVN David, Anthony
+2 SURN KENNEDY
+1 SEX M
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 BIRT
+2 DATE 15 JUN 1955
+2 PLAC Washington, , , DC, USA
+3 MAP
+4 LATI N38.89511
+4 LONG W77.03637
+1 DEAT
+2 DATE 25 APR 1984
+2 PLAC Palm Beach, , Palm Beach County, FL, USA
+3 MAP
+4 LATI N26.71534
+4 LONG W80.05337
+1 BURI
+2 DATE AFT 25 APR 1984
+2 PLAC Brookline, , Norfolk County, MA, USA
+3 MAP
+4 LATI N42.33176
+4 LONG W71.12116
+1 REFN KENNDA55
+1 FAMC @F9@
+1 NOTE David Anthony Kennedy was 13 years old when he witnessed his father's
+2 CONT assassination while watching television in his hotel room.  He never
+2 CONT fully recovered from the shock and went from an introverted
+2 CONT adolescence to a troubled youth increasingly experimenting with drugs
+2 CONT and alcohol.  He was in and out of rehabilitation centers at least 5
+2 CONT times and was arrested for drunk driving twice.  It was after being
+2 CONT released from St. Mary's Rehabilitation Center and flying to Florida
+2 CONT for a family gathering that he was found dead in his hotel room of an
+2 CONT overdose of cocaine and Demerol.
+0 @I112@ INDI
+1 NAME Mary Courtney /Kennedy/
+2 GIVN Mary, Courtney
+2 SURN KENNEDY
+1 SEX F
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 BIRT
+2 DATE 9 SEP 1956
+2 PLAC Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.35843
+4 LONG W71.05977
+1 RESI
+2 PLAC , , , NY, USA
+1 REFN KENNMC56
+1 FAMC @F9@
+1 FAMS @F13@
+1 NOTE Mary Courtney Kennedy Ruhe has been active in many youth projects.  It
+2 CONT was through her work at the Childrens Television Network that she met
+2 CONT her husband Jeffrey Ruhe, a sports producer.
+0 @I118@ INDI
+1 NAME Michael LeMoyne /Kennedy/
+2 GIVN Michael, LeMoyne
+2 SURN KENNEDY
+1 SEX M
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 BIRT
+2 DATE 27 FEB 1958
+2 PLAC Washington, , , DC, USA
+3 MAP
+4 LATI N38.89511
+4 LONG W77.03637
+1 OCCU VP-CEC
+1 REFN KENNML58
+1 FAMC @F9@
+1 FAMS @F14@
+1 NOTE Michael LeMoyne Kennedy is currently Vice-President of his brother
+2 CONT Joe's Citizens Energy Corporation and is doing fund-raising for his
+2 CONT campaign.  His wife Victoria's father is the well known sportscaster
+2 CONT and former running back for the Giants football team.  They met while
+2 CONT working as interns for Ted Kennedy.
+0 @I113@ INDI
+1 NAME Mary Kerry /Kennedy/
+2 GIVN Mary, Kerry
+2 SURN KENNEDY
+1 SEX F
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 BIRT
+2 DATE 8 SEP 1959
+2 PLAC Washington, , , DC, USA
+3 MAP
+4 LATI N38.89511
+4 LONG W77.03637
+1 REFN KENNMK59
+1 FAMC @F9@
+0 @I95@ INDI
+1 NAME Christopher George /Kennedy/
+2 GIVN Christopher, George
+2 SURN KENNEDY
+1 SEX M
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 BIRT
+2 DATE 4 JUL 1963
+2 PLAC Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.35843
+4 LONG W71.05977
+1 REFN KENNCG63
+1 FAMC @F9@
+0 @I116@ INDI
+1 NAME Matthew Maxwell Taylor /Kennedy/
+2 GIVN Matthew, Maxwell, Taylor
+2 SURN KENNEDY
+1 SEX M
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 BIRT
+2 DATE 9 JAN 1965
+2 PLAC New York City, , , NY, USA
+3 MAP
+4 LATI N40.71427
+4 LONG W74.00597
+1 REFN KENNMM65
+1 FAMC @F9@
+0 @I97@ INDI
+1 NAME Douglas Harriman /Kennedy/
+2 GIVN Douglas, Harriman
+2 SURN KENNEDY
+1 SEX M
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 BIRT
+2 DATE 24 MAR 1967
+2 PLAC Washington, , , DC, USA
+3 MAP
+4 LATI N38.89511
+4 LONG W77.03637
+1 OCCU student
+1 REFN KENNDH67
+1 FAMC @F9@
+0 @I126@ INDI
+1 NAME Rory Elizabeth Katherine /Kennedy/
+2 GIVN Rory, Elizabeth, Katherine
+2 SURN KENNEDY
+1 SEX F
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 BIRT
+2 DATE 12 DEC 1968
+2 PLAC Washington, , , DC, USA
+3 MAP
+4 LATI N38.89511
+4 LONG W77.03637
+1 REFN KENNRE68
+1 FAMC @F9@
+0 @I198@ INDI
+1 NAME David Lee /Townsend/
+2 GIVN David, Lee
+2 SURN TOWNSEND
+1 SEX M
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 BIRT
+2 DATE 17 NOV 1947
+2 PLAC Baltimore, , Baltimore County, MD, USA
+3 MAP
+4 LATI N39.29047
+4 LONG W76.61076
+1 REFN TOWNDL47
+1 FAMS @F10@
+0 @I200@ INDI
+1 NAME Meaghan Anne Kennedy /Townsend/
+2 GIVN Meaghan, Anne, Kennedy
+2 SURN TOWNSEND
+1 SEX F
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 BIRT
+2 DATE 7 NOV 1977
+2 PLAC Santa Fe, , Santa Fe County, NM, USA
+3 MAP
+4 LATI N35.68698
+4 LONG W105.9378
+1 REFN TOWNMA77
+1 FAMC @F10@
+0 @I199@ INDI
+1 NAME Maeve Fahey Kennedy /Townsend/
+2 GIVN Maeve, Fahey, Kennedy
+2 SURN TOWNSEND
+1 SEX F
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 BIRT
+2 DATE 1 NOV 1979
+2 PLAC New Haven, , New Haven County, CT, USA
+3 MAP
+4 LATI N41.30815
+4 LONG W72.92816
+1 REFN TOWNMF79
+1 FAMC @F10@
+0 @I201@ INDI
+1 NAME Rose Katherine Kennedy /Townsend/
+2 GIVN Rose, Katherine, Kennedy
+2 SURN TOWNSEND
+1 SEX F
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 BIRT
+2 DATE 17 DEC 1983
+2 PLAC Weston, , Middlesex County, MA, USA
+3 MAP
+4 LATI N42.36676
+4 LONG W71.30311
+1 REFN TOWNRK83
+1 FAMC @F10@
+0 @I168@ INDI
+1 NAME Sheila Brewster /Rauch/
+2 GIVN Sheila, Brewster
+2 SURN RAUCH
+1 SEX F
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 BIRT
+2 DATE 22 MAR 1949
+2 PLAC Bryn Mawr, , Montgomery County, PA, USA
+3 MAP
+4 LATI N40.01983
+4 LONG W75.30463
+1 REFN RAUCSB49
+1 FAMS @F11@
+0 @I117@ INDI
+1 NAME Matthew Rauch /Kennedy/
+2 GIVN Matthew, Rauch
+2 SURN KENNEDY
+1 SEX M
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 BIRT
+2 DATE 4 OCT 1980
+2 PLAC Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.35843
+4 LONG W71.05977
+1 REFN KENNMR80
+1 FAMC @F11@
+0 @I87@ INDI
+1 NAME Joseph Patrick /Kennedy/ III
+2 GIVN Joseph, Patrick
+2 SURN KENNEDY
+2 NSFX III
+1 SEX M
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 BIRT
+2 DATE 4 FEB 1980
+2 PLAC Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.35843
+4 LONG W71.05977
+1 REFN KENNJP80
+1 FAMC @F11@
+0 @I15@ INDI
+1 NAME Emily Ruth /Black/
+2 GIVN Emily, Ruth
+2 SURN BLACK
+1 SEX F
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 BIRT
+2 DATE 15 OCT 1957
+2 PLAC Bedford, , Lawrence County, IN, USA
+3 MAP
+4 LATI N38.86116
+4 LONG W86.48721
+1 REFN BLACER57
+1 FAMS @F12@
+0 @I88@ INDI
+1 NAME Robert Francis /Kennedy/ III
+2 GIVN Robert, Francis
+2 SURN KENNEDY
+2 NSFX III
+1 SEX M
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 BIRT
+2 DATE 2 SEP 1984
+2 PLAC Mt. Kisco, , Westchester County, NY, USA
+3 MAP
+4 LATI N41.21951
+4 LONG W73.72342
+1 REFN KENNRF84
+1 FAMC @F12@
+0 @I171@ INDI
+1 NAME Jeffrey Robert /Ruhe/
+2 GIVN Jeffrey, Robert
+2 SURN RUHE
+1 SEX M
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 BIRT
+2 DATE 21 FEB 1952
+2 PLAC La Porte, , La Porte County, IN, USA
+3 MAP
+4 LATI N41.57154
+4 LONG W86.73753
+1 REFN RUHEJR52
+1 FAMS @F13@
+0 @I69@ INDI
+1 NAME Victoria Denise /Gifford/
+2 GIVN Victoria, Denise
+2 SURN GIFFORD
+1 SEX F
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 BIRT
+2 DATE 20 FEB 1957
+2 PLAC Bakersfield, 93380, Kern County, CA, USA
+3 MAP
+4 LATI N35.37329
+4 LONG W119.01871
+1 REFN GIFFVD57
+1 FAMS @F14@
+0 @I92@ INDI
+1 NAME Michael LeMoyne /KENNEDY/ Jr.
+2 GIVN Michael, LeMoyne
+2 SURN KENNEDY
+2 NSFX Jr.
+1 SEX M
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 BIRT
+2 DATE 9 JAN 1983
+2 PLAC Charlottesville, , Albemarle County, VA, USA
+3 MAP
+4 LATI N38.03153
+4 LONG W78.48029
+1 REFN KENNML83
+1 FAMC @F14@
+0 @I109@ INDI
+1 NAME Kyle Frances /Kennedy/
+2 GIVN Kyle, Frances
+2 SURN KENNEDY
+1 SEX M
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 BIRT
+2 DATE 6 JUL 1984
+2 PLAC Washington, , , DC, USA
+3 MAP
+4 LATI N38.89511
+4 LONG W77.03637
+1 REFN KENNKF84
+1 FAMC @F14@
+0 @I120@ INDI
+1 NAME Patrick /Kennedy/
+2 GIVN Patrick
+2 SURN KENNEDY
+1 SEX M
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 BIRT
+2 PLAC , , , , Ireland
+1 DEAT
+2 PLAC , , , , Ireland
+1 OCCU farmer
+1 REFN KENNPA
+1 ANCI HIGH
+1 FAMS @F15@
+0 @I4@ INDI
+1 NAME Mary Johanna /(-----)/
+2 GIVN Mary, Johanna
+2 SURN (-----)
+1 SEX F
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 BIRT
+2 PLAC , , , , Ireland
+1 DEAT
+2 PLAC , , , , Ireland
+1 REFN KENNMJ
+1 FAMS @F15@
+0 @I121@ INDI
+1 NAME Patrick /Kennedy/
+2 GIVN Patrick
+2 SURN KENNEDY
+1 SEX M
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 BIRT
+2 DATE ABT 1823
+2 PLAC Dunganstown, , County Wexford, , Ireland
+3 MAP
+4 LATI N52.34278
+4 LONG W6.97444
+2 SOUR @S34@
+3 QUAY 1
+1 DEAT
+2 DATE 22 NOV 1858
+2 PLAC Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.35843
+4 LONG W71.05977
+2 SOUR @S33@
+3 QUAY 2
+1 BURI
+2 DATE 23 NOV 1858
+2 PLAC Cambridge, , Middlesex County, MA, USA
+3 MAP
+4 LATI N42.3751
+4 LONG W71.10561
+2 SOUR @S32@
+3 QUAY 2
+1 PROB
+2 DATE 13 DEC 1858
+2 PLAC Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.35843
+4 LONG W71.05977
+2 SOUR @S31@
+3 QUAY 2
+1 IMMI
+2 DATE ABT 1847
+2 PLAC Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.35843
+4 LONG W71.05977
+2 SOUR @S30@
+3 QUAY 3
+1 OCCU cooper
+1 REFN KENNPA23
+1 ANCI HIGH
+1 FAMC @F15@
+1 FAMS @F17@
+1 NOTE Patrick Kennedy was the son of a prosperous farmer from County
+2 CONT Wexford, Ireland. He emmigrated to America at the age of 26 to improve
+2 CONT his fortunes. He left a country in the middle of a devastating famine
+2 CONT and arrived in an immigrant ghetto where thousands of his countrymen
+2 CONT had fled to escape near certain death.  On board he had met Bridget
+2 CONT Murphy, also from County Wexford and soon married her. He worked as a
+2 CONT cooper and died of consumption in 1858.  He only survived 9 years in
+2 CONT this country.
+0 @I160@ INDI
+1 NAME Richard /Murphy/
+2 GIVN Richard
+2 SURN MURPHY
+1 SEX M
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 DEAT
+1 REFN MURPRI
+1 FAMS @F16@
+0 @I3@ INDI
+1 NAME Mary /(-----)/
+2 GIVN Mary
+2 SURN (-----)
+1 SEX F
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 DEAT
+1 REFN MURPMA
+1 FAMS @F16@
+0 @I158@ INDI
+1 NAME Bridget /Murphy/
+2 GIVN Bridget
+2 SURN MURPHY
+1 SEX F
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 BIRT
+2 DATE 1821
+2 PLAC Dunganstown, , County Wexford, , Ireland
+3 MAP
+4 LATI N52.34278
+4 LONG W6.97444
+2 SOUR @S34@
+3 QUAY 1
+1 DEAT
+2 DATE 20 DEC 1888
+2 PLAC Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.35843
+4 LONG W71.05977
+2 SOUR @S36@
+3 QUAY 2
+1 BURI
+2 PLAC Malden, , Middlesex County, MA, USA
+3 MAP
+4 LATI N42.4251
+4 LONG W71.06616
+2 SOUR @S35@
+3 QUAY 2
+1 IMMI
+2 DATE ABT 1847
+2 PLAC Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.35843
+4 LONG W71.05977
+1 REFN MURPBR21
+1 ANCI HIGH
+1 FAMC @F16@
+1 FAMS @F17@
+0 @I114@ INDI
+1 NAME Mary L. /Kennedy/
+2 GIVN Mary, L.
+2 SURN KENNEDY
+1 SEX F
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 BIRT
+2 DATE 9 AUG 1851
+2 PLAC East Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.3751
+4 LONG W71.03922
+2 SOUR @S39@
+3 QUAY 2
+1 DEAT
+2 DATE 7 MAR 1926
+2 PLAC Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.35843
+4 LONG W71.05977
+2 SOUR @S38@
+3 QUAY 2
+1 CHR
+2 DATE 10 AUG 1851
+2 PLAC East Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.3751
+4 LONG W71.03922
+2 SOUR @S37@
+3 QUAY 2
+1 BURI
+2 DATE AFT 7 MAR 1926
+2 PLAC Malden, , Middlesex County, MA, USA
+3 MAP
+4 LATI N42.4251
+4 LONG W71.06616
+2 SOUR @S35@
+3 QUAY 2
+1 OCCU skirtmaker
+1 REFN KENNML51
+1 FAMC @F17@
+1 FAMS @F19@
+0 @I102@ INDI
+1 NAME Joanna L. /Kennedy/
+2 GIVN Joanna, L.
+2 SURN KENNEDY
+1 SEX F
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 BIRT
+2 DATE 27 NOV 1852
+2 PLAC East Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.3751
+4 LONG W71.03922
+2 SOUR @S43@
+3 QUAY 2
+1 DEAT
+2 DATE 23 FEB 1926
+2 PLAC Revere, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.40843
+4 LONG W71.01199
+2 SOUR @S42@
+3 QUAY 2
+1 CHR
+2 DATE 4 DEC 1852
+2 PLAC East Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.3751
+4 LONG W71.03922
+2 SOUR @S41@
+3 QUAY 2
+1 BURI
+2 DATE AFT 23 FEB 1926
+2 PLAC Malden, , Middlesex County, MA, USA
+3 MAP
+4 LATI N42.4251
+4 LONG W71.06616
+2 SOUR @S40@
+3 QUAY 2
+1 REFN KENNJL52
+1 FAMC @F17@
+1 FAMS @F21@
+0 @I103@ INDI
+1 NAME John /Kennedy/
+2 GIVN John
+2 SURN KENNEDY
+1 SEX M
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 BIRT
+2 DATE 4 JAN 1854
+2 PLAC East Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.3751
+4 LONG W71.03922
+2 SOUR @S47@
+3 QUAY 1
+1 DEAT
+2 DATE 24 SEP 1855
+2 PLAC Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.35843
+4 LONG W71.05977
+2 SOUR @S46@
+3 QUAY 2
+1 CHR
+2 DATE 5 JAN 1854
+2 PLAC East Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.3751
+4 LONG W71.03922
+2 SOUR @S45@
+3 QUAY 2
+1 BURI
+2 PLAC Cambridge, , Middlesex County, MA, USA
+3 MAP
+4 LATI N42.3751
+4 LONG W71.10561
+2 SOUR @S44@
+3 QUAY 2
+1 REFN KENNJO54
+1 FAMC @F17@
+0 @I111@ INDI
+1 NAME Margaret M. /Kennedy/
+2 GIVN Margaret, M.
+2 SURN KENNEDY
+1 SEX F
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 BIRT
+2 DATE JUL 1855
+2 PLAC East Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.3751
+4 LONG W71.03922
+2 SOUR @S51@
+3 QUAY 2
+1 DEAT
+2 DATE 2 APR 1929
+2 PLAC Revere, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.40843
+4 LONG W71.01199
+2 SOUR @S50@
+3 QUAY 2
+1 CHR
+2 DATE 22 JUL 1855
+2 PLAC East Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.3751
+4 LONG W71.03922
+2 SOUR @S49@
+3 QUAY 2
+1 BURI
+2 PLAC Malden, , Middlesex County, MA, USA
+3 MAP
+4 LATI N42.4251
+4 LONG W71.06616
+2 SOUR @S48@
+3 QUAY 2
+1 REFN KENNMM55
+1 FAMC @F17@
+1 FAMS @F25@
+0 @I123@ INDI
+1 NAME Patrick Joseph /Kennedy/
+2 GIVN Patrick, Joseph
+2 SURN KENNEDY
+1 SEX M
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 BIRT
+2 DATE 14 JAN 1858
+2 PLAC East Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.3751
+4 LONG W71.03922
+2 SOUR @S55@
+3 QUAY 2
+1 DEAT
+2 DATE 18 MAY 1929
+2 PLAC Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.35843
+4 LONG W71.05977
+2 SOUR @S54@
+3 QUAY 2
+1 CHR
+2 DATE 16 JAN 1858
+2 PLAC East Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.3751
+4 LONG W71.03922
+2 SOUR @S53@
+3 QUAY 2
+1 BURI
+2 PLAC Malden, , Middlesex County, MA, USA
+3 MAP
+4 LATI N42.4251
+4 LONG W71.06616
+2 SOUR @S52@
+3 QUAY 2
+1 OCCU politician
+1 REFN KENNPJ58
+1 FAMC @F17@
+1 FAMS @F33@
+1 NOTE Patrick Joseph Kennedy was the first Kennedy to enter into politics
+2 CONT during an era of ward bosses that controlled the political machinery
+2 CONT of Boston.  In 1886 he was elected to the State Senate for his ward
+2 CONT and served three terms.  He married Mary Augusta Hickey, the daughter
+2 CONT of a prosperous businessman.
+0 @I85@ INDI
+1 NAME Philip /Kane/
+2 GIVN Philip
+2 SURN KANE
+1 SEX M
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 BIRT
+2 DATE BEF 1858
+2 PLAC , , , , Ireland
+1 REFN KANEPH58
+1 FAMS @F18@
+0 @I159@ INDI
+1 NAME Margaret /Murphy/
+2 GIVN Margaret
+2 SURN MURPHY
+1 SEX F
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 BIRT
+2 DATE BEF 1858
+2 PLAC , , , , Ireland
+1 REFN MURPMA58
+1 FAMS @F18@
+0 @I83@ INDI
+1 NAME Lawrence M. /Kane/
+2 GIVN Lawrence, M.
+2 SURN KANE
+1 SEX M
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 BIRT
+2 DATE 29 NOV 1858
+2 PLAC Loch Garman, , County Wexford, Leinster, Ireland
+3 MAP
+4 LATI N52.33417
+4 LONG W6.4575
+1 DEAT
+2 DATE 19 JUL 1905
+2 PLAC East Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.3751
+4 LONG W71.03922
+1 BURI
+2 PLAC Malden, , Middlesex County, MA, USA
+3 MAP
+4 LATI N42.4251
+4 LONG W71.06616
+1 IMMI
+2 DATE 15 MAY 1876
+2 PLAC New York City, , , NY, USA
+3 MAP
+4 LATI N40.71427
+4 LONG W74.00597
+1 OCCU laborer
+1 REFN KANELM58
+1 FAMC @F18@
+1 FAMS @F19@
+0 @I82@ INDI
+1 NAME Joseph Lawrence /Kane/
+2 GIVN Joseph, Lawrence
+2 SURN KANE
+1 SEX M
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 BIRT
+2 DATE 29 NOV 1883
+2 PLAC East Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.3751
+4 LONG W71.03922
+1 DEAT
+2 DATE 19 MAR 1967
+2 PLAC Brookline, , Norfolk County, MA, USA
+3 MAP
+4 LATI N42.33176
+4 LONG W71.12116
+1 CHR
+2 DATE 2 DEC 1883
+2 PLAC East Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.3751
+4 LONG W71.03922
+1 OCCU politician
+1 REFN KANEJL83
+1 FAMC @F19@
+0 @I84@ INDI
+1 NAME Mary Margaret /Kane/
+2 GIVN Mary, Margaret
+2 SURN KANE
+1 SEX F
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 BIRT
+2 DATE 25 AUG 1885
+2 PLAC East Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.3751
+4 LONG W71.03922
+1 DEAT
+2 DATE 14 SEP 1885
+2 PLAC East Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.3751
+4 LONG W71.03922
+1 CHR
+2 DATE 30 AUG 1885
+2 PLAC East Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.3751
+4 LONG W71.03922
+1 REFN KANEMM85
+1 FAMC @F19@
+0 @I80@ INDI
+1 NAME George Philip /Kane/
+2 GIVN George, Philip
+2 SURN KANE
+1 SEX M
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 BIRT
+2 DATE 8 SEP 1888
+2 PLAC East Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.3751
+4 LONG W71.03922
+1 DEAT
+2 DATE 6 JUL 1954
+2 PLAC Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.35843
+4 LONG W71.05977
+1 CHR
+2 DATE 16 SEP 1888
+2 PLAC East Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.3751
+4 LONG W71.03922
+1 OCCU sign painter
+1 REFN KANEGP88
+1 FAMC @F19@
+0 @I81@ INDI
+1 NAME Gertrude Margaret /Kane/
+2 GIVN Gertrude, Margaret
+2 SURN KANE
+1 SEX F
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 BIRT
+2 DATE 26 MAY 1890
+2 PLAC East Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.3751
+4 LONG W71.03922
+1 DEAT
+2 DATE 14 JAN 1969
+2 PLAC Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.35843
+4 LONG W71.05977
+1 CHR
+2 DATE 1 JUN 1890
+2 PLAC East Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.3751
+4 LONG W71.03922
+1 REFN KANEGM90
+1 FAMC @F19@
+1 FAMS @F20@
+0 @I156@ INDI
+1 NAME Charles Everett /Metcalf/
+2 GIVN Charles, Everett
+2 SURN METCALF
+1 SEX M
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 BIRT
+2 DATE 1 NOV 1891
+2 PLAC Chelsea, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.40843
+4 LONG W71.01199
+1 DEAT
+2 DATE 2 JUL 1955
+2 PLAC Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.35843
+4 LONG W71.05977
+1 OCCU shipwright
+1 REFN METCCE91
+1 FAMS @F20@
+0 @I79@ INDI
+1 NAME Frederick /Kane/
+2 GIVN Frederick
+2 SURN KANE
+1 SEX M
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 BIRT
+2 DATE 1892
+2 PLAC East Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.3751
+4 LONG W71.03922
+1 DEAT
+2 DATE 15 OCT 1897
+2 PLAC Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.35843
+4 LONG W71.05977
+1 BURI
+2 PLAC Malden, , Middlesex County, MA, USA
+3 MAP
+4 LATI N42.4251
+4 LONG W71.06616
+1 REFN KANEFR92
+1 FAMC @F19@
+0 @I146@ INDI
+1 NAME Humphrey Charles /Mahoney/
+2 GIVN Humphrey, Charles
+2 SURN MAHONEY
+1 SEX M
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 BIRT
+2 DATE 12 DEC 1847
+2 PLAC Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.35843
+4 LONG W71.05977
+1 DEAT
+2 DATE 25 AUG 1928
+2 PLAC Saratoga Springs, , Saratoga County, NY, USA
+3 MAP
+4 LATI N43.08313
+4 LONG W73.78457
+1 BURI
+2 DATE AFT 25 AUG 1928
+2 PLAC Malden, , Middlesex County, MA, USA
+3 MAP
+4 LATI N42.4251
+4 LONG W71.06616
+1 OCCU custodian
+1 REFN MAHOHC47
+1 FAMS @F21@
+0 @I141@ INDI
+1 NAME Daniel /Mahoney/
+2 GIVN Daniel
+2 SURN MAHONEY
+1 SEX M
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 BIRT
+2 DATE 14 OCT 1873
+2 PLAC East Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.3751
+4 LONG W71.03922
+1 DEAT
+2 DATE 20 NOV 1875
+2 PLAC East Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.3751
+4 LONG W71.03922
+1 CHR
+2 DATE 19 OCT 1873
+2 PLAC East Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.3751
+4 LONG W71.03922
+1 BURI
+2 PLAC Cambridge, , Middlesex County, MA, USA
+3 MAP
+4 LATI N42.3751
+4 LONG W71.10561
+1 REFN MAHODA73
+1 FAMC @F21@
+0 @I147@ INDI
+1 NAME Mary E. /Mahoney/
+2 GIVN Mary, E.
+2 SURN MAHONEY
+1 SEX F
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 BIRT
+2 DATE 18 OCT 1875
+2 PLAC East Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.3751
+4 LONG W71.03922
+1 DEAT
+2 DATE 7 DEC 1875
+2 PLAC East Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.3751
+4 LONG W71.03922
+1 CHR
+2 DATE 20 OCT 1875
+2 PLAC East Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.3751
+4 LONG W71.03922
+1 BURI
+2 PLAC Cambridge, , Middlesex County, MA, USA
+3 MAP
+4 LATI N42.3751
+4 LONG W71.10561
+1 REFN MAHOME75
+1 FAMC @F21@
+0 @I148@ INDI
+1 NAME William Henry /Mahoney/
+2 GIVN William, Henry
+2 SURN MAHONEY
+1 SEX M
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 BIRT
+2 DATE 17 MAY 1878
+2 PLAC East Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.3751
+4 LONG W71.03922
+1 DEAT
+2 DATE 10 MAY 1879
+2 PLAC East Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.3751
+4 LONG W71.03922
+1 CHR
+2 DATE 19 MAY 1878
+2 PLAC East Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.3751
+4 LONG W71.03922
+1 REFN MAHOWH78
+1 FAMC @F21@
+0 @I142@ INDI
+1 NAME Frances Josephine /Mahoney/
+2 GIVN Frances, Josephine
+2 SURN MAHONEY
+1 SEX F
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 BIRT
+2 DATE 2 MAR 1880
+2 PLAC East Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.3751
+4 LONG W71.03922
+1 DEAT
+2 DATE 13 APR 1963
+2 PLAC Lynn, , Essex County, MA, USA
+3 MAP
+4 LATI N42.46676
+4 LONG W70.94949
+1 CHR
+2 DATE 7 MAR 1880
+2 PLAC East Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.3751
+4 LONG W71.03922
+1 REFN MAHOFJ80
+1 FAMC @F21@
+1 FAMS @F22@
+0 @I204@ INDI
+1 NAME Louis Leo /Twomey/
+2 GIVN Louis, Leo
+2 SURN TWOMEY
+1 SEX M
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 BIRT
+2 DATE 12 DEC 1879
+2 PLAC East Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.3751
+4 LONG W71.03922
+1 DEAT
+2 DATE 14 JAN 1965
+2 PLAC Lynn, , Essex County, MA, USA
+3 MAP
+4 LATI N42.46676
+4 LONG W70.94949
+1 OCCU custodian
+1 REFN TWOMLL79
+1 FAMS @F22@
+0 @I140@ INDI
+1 NAME Annie /Mahoney/
+2 GIVN Annie
+2 SURN MAHONEY
+1 SEX F
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 BIRT
+2 DATE 13 FEB 1883
+2 PLAC East Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.3751
+4 LONG W71.03922
+1 DEAT
+2 DATE 7 MAY 1889
+2 PLAC East Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.3751
+4 LONG W71.03922
+1 CHR
+2 DATE 18 FEB 1883
+2 PLAC East Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.3751
+4 LONG W71.03922
+1 BURI
+2 DATE AFT 17 MAY 1889
+2 PLAC Malden, , Middlesex County, MA, USA
+3 MAP
+4 LATI N42.4251
+4 LONG W71.06616
+1 REFN MAHOAN83
+1 FAMC @F21@
+0 @I145@ INDI
+1 NAME Henry Joseph /Mahoney/
+2 GIVN Henry, Joseph
+2 SURN MAHONEY
+1 SEX M
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 BIRT
+2 DATE 15 OCT 1884
+2 PLAC East Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.3751
+4 LONG W71.03922
+1 DEAT
+2 DATE 3 FEB 1961
+2 PLAC Brookline, , Norfolk County, MA, USA
+3 MAP
+4 LATI N42.33176
+4 LONG W71.12116
+1 CHR
+2 DATE 19 OCT 1884
+2 PLAC East Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.3751
+4 LONG W71.03922
+1 OCCU custodian
+1 REFN MAHOHJ84
+1 FAMC @F21@
+1 FAMS @F23@
+0 @I144@ INDI
+1 NAME Gertrude /Mahoney/
+2 GIVN Gertrude
+2 SURN MAHONEY
+1 SEX F
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 BIRT
+2 DATE 7 OCT 1886
+2 PLAC East Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.3751
+4 LONG W71.03922
+1 DEAT
+2 DATE 27 JUL 1887
+2 PLAC East Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.3751
+4 LONG W71.03922
+1 CHR
+2 DATE 10 OCT 1886
+2 PLAC East Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.3751
+4 LONG W71.03922
+1 REFN MAHOGE86
+1 FAMC @F21@
+0 @I143@ INDI
+1 NAME Frederick Louis /Mahoney/
+2 GIVN Frederick, Louis
+2 SURN MAHONEY
+1 SEX M
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 BIRT
+2 DATE 21 AUG 1890
+2 PLAC East Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.3751
+4 LONG W71.03922
+1 DEAT
+2 DATE 26 OCT 1965
+2 PLAC Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.35843
+4 LONG W71.05977
+1 CHR
+2 DATE 28 AUG 1890
+2 PLAC East Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.3751
+4 LONG W71.03922
+1 OCCU school-submaster
+1 REFN MAHOFL90
+1 FAMC @F21@
+0 @I57@ INDI
+1 NAME Mary Elizabeth /Farley/
+2 GIVN Mary, Elizabeth
+2 SURN FARLEY
+1 SEX F
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 BIRT
+2 DATE 15 OCT 1884
+2 PLAC McKeesport, , Allegheny County, PA, USA
+3 MAP
+4 LATI N40.34785
+4 LONG W79.86422
+1 DEAT
+2 DATE 23 APR 1949
+2 PLAC Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.35843
+4 LONG W71.05977
+1 REFN FARLME84
+1 FAMS @F23@
+0 @I41@ INDI
+1 NAME John Thomas /Caulfield/
+2 GIVN John, Thomas
+2 SURN CAULFIELD
+1 SEX M
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 BIRT
+2 DATE JAN 1861
+2 PLAC Weymouth, , Norfolk County, MA, USA
+3 MAP
+4 LATI N42.22093
+4 LONG W70.93977
+1 DEAT
+2 DATE 12 JUL 1937
+2 PLAC Lynn, , Essex County, MA, USA
+3 MAP
+4 LATI N42.46676
+4 LONG W70.94949
+1 BURI
+2 PLAC Malden, , Middlesex County, MA, USA
+3 MAP
+4 LATI N42.4251
+4 LONG W71.06616
+1 OCCU purchasing
+1 REFN CAULJT61
+1 FAMS @F24@
+1 FAMS @F25@
+0 @I42@ INDI
+1 NAME Mary Frances /Caulfield/
+2 GIVN Mary, Frances
+2 SURN CAULFIELD
+1 SEX F
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 BIRT
+2 DATE 8 FEB 1884
+2 PLAC East Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.3751
+4 LONG W71.03922
+1 DEAT
+2 DATE 14 JUN 1938
+2 PLAC Revere, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.40843
+4 LONG W71.01199
+1 CHR
+2 DATE 10 FEB 1884
+2 PLAC East Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.3751
+4 LONG W71.03922
+1 REFN CAULMF84
+1 FAMC @F25@
+1 FAMS @F26@
+0 @I37@ INDI
+1 NAME Frederick /Caulfield/
+2 GIVN Frederick
+2 SURN CAULFIELD
+1 SEX M
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 BIRT
+2 DATE 20 JUN 1886
+2 PLAC New York City, , , NY, USA
+3 MAP
+4 LATI N40.71427
+4 LONG W74.00597
+1 DEAT
+1 REFN CAULFR86
+1 FAMC @F25@
+0 @I34@ INDI
+1 NAME Edith M. /Caulfield/
+2 GIVN Edith, M.
+2 SURN CAULFIELD
+1 SEX F
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 BIRT
+2 DATE 8 APR 1888
+2 PLAC New York City, , , NY, USA
+3 MAP
+4 LATI N40.71427
+4 LONG W74.00597
+1 DEAT
+2 DATE 6 APR 1943
+2 PLAC Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.35843
+4 LONG W71.05977
+1 REFN CAULEM88
+1 FAMC @F25@
+1 FAMS @F27@
+0 @I38@ INDI
+1 NAME Henry R. /Caulfield/
+2 GIVN Henry, R.
+2 SURN CAULFIELD
+1 SEX M
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 BIRT
+2 DATE MAY 1889
+2 PLAC New York City, , , NY, USA
+3 MAP
+4 LATI N40.71427
+4 LONG W74.00597
+1 DEAT
+2 DATE 27 APR 1925
+2 PLAC Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.35843
+4 LONG W71.05977
+1 REFN CAULHR89
+1 FAMC @F25@
+0 @I36@ INDI
+1 NAME Florence J. /Caulfield/
+2 GIVN Florence, J.
+2 SURN CAULFIELD
+1 SEX F
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 BIRT
+2 DATE 19 NOV 1891
+2 PLAC New York City, , , NY, USA
+3 MAP
+4 LATI N40.71427
+4 LONG W74.00597
+1 DEAT
+2 DATE 10 AUG 1892
+2 PLAC East Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.3751
+4 LONG W71.03922
+1 BURI
+2 PLAC Malden, , Middlesex County, MA, USA
+3 MAP
+4 LATI N42.4251
+4 LONG W71.06616
+1 REFN CAULFJ91
+1 FAMC @F25@
+0 @I35@ INDI
+1 NAME Elsie G. /Caulfield/
+2 GIVN Elsie, G.
+2 SURN CAULFIELD
+1 SEX F
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 BIRT
+2 DATE OCT 1894
+2 PLAC Bayonne, , Hudson County, NJ, USA
+3 MAP
+4 LATI N40.66871
+4 LONG W74.11431
+1 DEAT
+2 DATE 8 FEB 1914
+2 PLAC Revere, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.40843
+4 LONG W71.01199
+1 REFN CAULEG94
+1 FAMC @F25@
+0 @I39@ INDI
+1 NAME Jeanette Dorothea /Caulfield/
+2 GIVN Jeanette, Dorothea
+2 SURN CAULFIELD
+1 SEX F
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 BIRT
+2 DATE FEB 1896
+2 PLAC Bayonne, , Hudson County, NJ, USA
+3 MAP
+4 LATI N40.66871
+4 LONG W74.11431
+1 DEAT
+2 DATE 1 JUN 1953
+2 PLAC Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.35843
+4 LONG W71.05977
+1 REFN CAULJD96
+1 FAMC @F25@
+1 FAMS @F28@
+0 @I40@ INDI
+1 NAME John Theodore /Caulfield/
+2 GIVN John, Theodore
+2 SURN CAULFIELD
+1 SEX M
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 BIRT
+2 DATE 3 JUN 1899
+2 PLAC Winthrop, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.3751
+4 LONG W70.98283
+1 DEAT
+2 DATE 18 AUG 1966
+2 PLAC Saugus, , Essex County, MA, USA
+3 MAP
+4 LATI N42.46676
+4 LONG W70.94949
+1 REFN CAULJT99
+1 FAMC @F25@
+1 FAMS @F29@
+0 @I52@ INDI
+1 NAME Alexander G. /Crawford/
+2 GIVN Alexander, G.
+2 SURN CRAWFORD
+1 SEX M
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 BIRT
+2 DATE ABT 1882
+2 PLAC Liverpool, , , , England
+3 MAP
+4 LATI N53.41058
+4 LONG W2.97794
+1 IMMI
+2 DATE ABT 1887
+1 OCCU riveter
+1 REFN CRAWAG82
+1 FAMS @F26@
+0 @I10@ INDI
+1 NAME Julius /Baker/
+2 GIVN Julius
+2 SURN BAKER
+1 SEX M
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 BIRT
+2 DATE FEB 1891
+2 PLAC Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.35843
+4 LONG W71.05977
+1 DEAT
+2 DATE 2 DEC 1928
+2 PLAC Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.35843
+4 LONG W71.05977
+1 OCCU electric supply
+1 REFN BAKEJU91
+1 FAMS @F27@
+0 @I60@ INDI
+1 NAME Frank William /Finkfelt/
+2 GIVN Frank, William
+2 SURN FINKFELT
+1 SEX M
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 BIRT
+2 DATE 16 NOV 1894
+2 PLAC Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.35843
+4 LONG W71.05977
+1 DEAT
+2 DATE 3 FEB 1960
+2 PLAC Revere, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.40843
+4 LONG W71.01199
+1 REFN FINKFW94
+1 FAMS @F28@
+0 @I9@ INDI
+1 NAME Hazel Elizabeth /Baker/
+2 GIVN Hazel, Elizabeth
+2 SURN BAKER
+1 SEX F
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 BIRT
+2 DATE 29 NOV 1902
+2 PLAC Lynn, , Essex County, MA, USA
+3 MAP
+4 LATI N42.46676
+4 LONG W70.94949
+1 DEAT
+2 DATE 15 JUL 1968
+2 PLAC Lynn, , Essex County, MA, USA
+3 MAP
+4 LATI N42.46676
+4 LONG W70.94949
+1 REFN BAKEHE02
+1 FAMS @F29@
+0 @I59@ INDI
+1 NAME Patrick /Field/
+2 GIVN Patrick
+2 SURN FIELD
+1 SEX M
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 REFN FIELPA
+1 FAMS @F30@
+0 @I175@ INDI
+1 NAME Mary /Sheehy/
+2 GIVN Mary
+2 SURN SHEEHY
+1 SEX F
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 REFN SHEEMA
+1 FAMS @F30@
+0 @I58@ INDI
+1 NAME Margaret M. /Field/
+2 GIVN Margaret, M.
+2 SURN FIELD
+1 SEX F
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 BIRT
+2 DATE ABT 1836
+1 DEAT
+2 DATE 5 JUN 1911
+2 PLAC Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.35843
+4 LONG W71.05977
+1 REFN FIELMM36
+1 FAMC @F30@
+1 FAMS @F32@
+0 @I77@ INDI
+1 NAME Michael /Hickey/
+2 GIVN Michael
+2 SURN HICKEY
+1 SEX M
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 DEAT
+1 REFN HICKMI
+1 FAMS @F31@
+0 @I74@ INDI
+1 NAME Catherine /Hassett/
+2 GIVN Catherine
+2 SURN HASSETT
+1 SEX F
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 DEAT
+1 REFN HASSCA
+1 FAMS @F31@
+0 @I75@ INDI
+1 NAME James /Hickey/
+2 GIVN James
+2 SURN HICKEY
+1 SEX M
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 BIRT
+2 DATE 1836
+2 PLAC Cork, , Cork County, Munster Province, Ireland
+3 MAP
+4 LATI N52.25
+4 LONG W8.58333
+1 DEAT
+2 DATE 22 NOV 1900
+2 PLAC Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.35843
+4 LONG W71.05977
+1 REFN HICKJA36
+1 FAMC @F31@
+1 FAMS @F32@
+0 @I76@ INDI
+1 NAME Mary Augusta /Hickey/
+2 GIVN Mary, Augusta
+2 SURN HICKEY
+1 SEX F
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 BIRT
+2 DATE 6 DEC 1857
+2 PLAC Winthrop, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.3751
+4 LONG W70.98283
+1 DEAT
+2 DATE 20 MAY 1923
+2 PLAC Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.35843
+4 LONG W71.05977
+1 BURI
+2 PLAC Malden, , Middlesex County, MA, USA
+3 MAP
+4 LATI N42.4251
+4 LONG W71.06616
+1 REFN HICKMA57
+1 FAMC @F32@
+1 FAMS @F33@
+0 @I100@ INDI
+1 NAME Francis Benedict /Kennedy/
+2 GIVN Francis, Benedict
+2 SURN KENNEDY
+1 SEX M
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 BIRT
+2 DATE 11 MAR 1891
+2 PLAC East Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.3751
+4 LONG W71.03922
+1 DEAT
+2 DATE 14 JUN 1892
+2 PLAC East Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.3751
+4 LONG W71.03922
+1 CHR
+2 DATE 22 MAR 1891
+2 PLAC East Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.3751
+4 LONG W71.03922
+1 BURI
+2 PLAC Malden, , Middlesex County, MA, USA
+3 MAP
+4 LATI N42.4251
+4 LONG W71.06616
+1 REFN KENNFB91
+1 FAMC @F33@
+0 @I115@ INDI
+1 NAME Mary Loretta /Kennedy/
+2 GIVN Mary, Loretta
+2 SURN KENNEDY
+1 SEX F
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 BIRT
+2 DATE 6 AUG 1892
+2 PLAC East Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.3751
+4 LONG W71.03922
+1 DEAT
+2 DATE 18 NOV 1972
+2 PLAC Winfield, , Du Page County, IL, USA
+3 MAP
+4 LATI N41.88475
+4 LONG W88.20396
+1 CHR
+2 DATE 18 AUG 1892
+2 PLAC East Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.3751
+4 LONG W71.03922
+1 REFN KENNML92
+1 FAMC @F33@
+1 FAMS @F35@
+0 @I110@ INDI
+1 NAME Margaret Louise /Kennedy/
+2 GIVN Margaret, Louise
+2 SURN KENNEDY
+1 SEX F
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 BIRT
+2 DATE 22 OCT 1898
+2 PLAC East Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.3751
+4 LONG W71.03922
+1 DEAT
+2 DATE 14 NOV 1974
+2 PLAC Brookline, , Norfolk County, MA, USA
+3 MAP
+4 LATI N42.33176
+4 LONG W71.12116
+1 CHR
+2 DATE 30 OCT 1898
+2 PLAC East Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.3751
+4 LONG W71.03922
+1 BURI
+2 PLAC Malden, , Middlesex County, MA, USA
+3 MAP
+4 LATI N42.4251
+4 LONG W71.06616
+1 REFN KENNML98
+1 FAMC @F33@
+1 FAMS @F38@
+0 @I49@ INDI
+1 NAME Michael John /Connelly/
+2 GIVN Michael, John
+2 SURN CONNELLY
+1 SEX M
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 REFN CONNMJ
+1 FAMS @F34@
+0 @I55@ INDI
+1 NAME Margaret Elizabeth /Driscoll/
+2 GIVN Margaret, Elizabeth
+2 SURN DRISCOLL
+1 SEX F
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 REFN DRISME
+1 FAMS @F34@
+0 @I47@ INDI
+1 NAME George William /Connelly/
+2 GIVN George, William
+2 SURN CONNELLY
+1 SEX M
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 BIRT
+2 DATE 10 JUN 1898
+2 PLAC East Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.3751
+4 LONG W71.03922
+1 DEAT
+2 DATE 29 AUG 1971
+2 PLAC St. Augustine, , Saint Johns County, FL, USA
+3 MAP
+4 LATI N29.89469
+4 LONG W81.31452
+1 REFN CONNGW98
+1 FAMC @F34@
+1 FAMS @F35@
+0 @I48@ INDI
+1 NAME Mary Louise /Connelly/
+2 GIVN Mary, Louise
+2 SURN CONNELLY
+1 SEX F
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 BIRT
+2 DATE 21 OCT 1928
+2 PLAC Winthrop, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.3751
+4 LONG W70.98283
+1 REFN CONNML28
+1 FAMC @F35@
+1 FAMS @F36@
+0 @I150@ INDI
+1 NAME Matthew James /McCarthy/
+2 GIVN Matthew, James
+2 SURN MCCARTHY
+1 SEX M
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 BIRT
+2 DATE 8 FEB 1926
+2 PLAC Chicago, , Cook County, IL, USA
+3 MAP
+4 LATI N41.85003
+4 LONG W87.65005
+1 RESI
+2 PLAC St. Augustine, , Saint Johns County, FL, USA
+3 MAP
+4 LATI N29.89469
+4 LONG W81.31452
+1 REFN MCCAMJ26
+1 FAMS @F36@
+0 @I32@ INDI
+1 NAME Thomas Francis /Burke/
+2 GIVN Thomas, Francis
+2 SURN BURKE
+1 SEX M
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 REFN BURKTF
+1 FAMS @F37@
+0 @I149@ INDI
+1 NAME Alicia Augusta /Mann/
+2 GIVN Alicia, Augusta
+2 SURN MANN
+1 SEX F
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 REFN MANNAA
+1 FAMS @F37@
+0 @I30@ INDI
+1 NAME Charles Joseph /Burke/
+2 GIVN Charles, Joseph
+2 SURN BURKE
+1 SEX M
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 BIRT
+2 DATE 23 AUG 1899
+2 PLAC Medford, , Middlesex County, MA, USA
+3 MAP
+4 LATI N42.41843
+4 LONG W71.10616
+1 DEAT
+2 DATE 5 APR 1967
+2 PLAC Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.35843
+4 LONG W71.05977
+1 BURI
+2 PLAC Winthrop, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.3751
+4 LONG W70.98283
+1 REFN BURKCJ99
+1 FAMC @F37@
+1 FAMS @F38@
+0 @I31@ INDI
+1 NAME Margaret Louise /Burke/
+2 GIVN Margaret, Louise
+2 SURN BURKE
+1 SEX F
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 BIRT
+2 DATE 2 APR 1926
+2 PLAC Winthrop, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.3751
+4 LONG W70.98283
+1 RESI
+2 PLAC Ann Arbor, 48109, Washtenaw County, MI, USA
+3 MAP
+4 LATI N42.27756
+4 LONG W83.74088
+1 REFN BURKML26
+1 FAMC @F38@
+1 FAMS @F39@
+0 @I29@ INDI
+1 NAME Charles Joseph /Burke/ Jr.
+2 GIVN Charles, Joseph
+2 SURN BURKE
+2 NSFX Jr.
+1 SEX M
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 BIRT
+2 DATE 5 MAY 1928
+2 PLAC Winthrop, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.3751
+4 LONG W70.98283
+1 RESI
+2 PLAC Wellesley Hills, , Norfolk County, MA, USA
+3 MAP
+4 LATI N42.30843
+4 LONG W71.27867
+1 REFN BURKCJ28
+1 FAMC @F38@
+1 FAMS @F40@
+0 @I28@ INDI
+1 NAME Thomas Francis /Burke/ II
+2 GIVN Thomas, Francis
+2 SURN BURKE
+2 NSFX II
+1 SEX M
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 BIRT
+2 DATE 25 MAY 1933
+2 PLAC Winthrop, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.3751
+4 LONG W70.98283
+1 RESI
+2 PLAC Newton, , Middlesex County, MA, USA
+3 MAP
+4 LATI N42.33704
+4 LONG W71.20922
+1 REFN BURKTF33
+1 FAMC @F38@
+1 FAMS @F41@
+0 @I54@ INDI
+1 NAME John Bernard /DeVine/
+2 GIVN John, Bernard
+2 SURN DEVINE
+1 SEX M
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 BIRT
+2 DATE 5 FEB 1920
+2 PLAC Ann Arbor, 48109, Washtenaw County, MI, USA
+3 MAP
+4 LATI N42.27756
+4 LONG W83.74088
+1 RESI
+2 PLAC Ann Arbor, 48109, Washtenaw County, MI, USA
+3 MAP
+4 LATI N42.27756
+4 LONG W83.74088
+1 REFN DEVIJB20
+1 FAMS @F39@
+0 @I46@ INDI
+1 NAME Claire /Colton/
+2 GIVN Claire
+2 SURN COLTON
+1 SEX F
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 BIRT
+2 DATE 11 NOV 1935
+2 PLAC Malden, , Middlesex County, MA, USA
+3 MAP
+4 LATI N42.4251
+4 LONG W71.06616
+1 RESI
+2 PLAC Wellesley Hills, , Norfolk County, MA, USA
+3 MAP
+4 LATI N42.30843
+4 LONG W71.27867
+1 REFN COLTCL35
+1 FAMS @F40@
+0 @I157@ INDI
+1 NAME Gertrude Ann /Miller/
+2 GIVN Gertrude, Ann
+2 SURN MILLER
+1 SEX F
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 BIRT
+2 DATE 10 OCT 1936
+2 PLAC Waltham, , Middlesex County, MA, USA
+3 MAP
+4 LATI N42.37649
+4 LONG W71.23561
+1 RESI
+2 PLAC Newton, , Middlesex County, MA, USA
+3 MAP
+4 LATI N42.33704
+4 LONG W71.20922
+1 REFN MILLGA36
+1 FAMS @F41@
+0 @I65@ INDI
+1 NAME Michael /Fitzgerald/
+2 GIVN Michael
+2 SURN FITZGERALD
+1 SEX M
+1 SOUR @S13@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 DEAT
+1 REFN FITZMI
+1 FAMS @F43@
+1 FAMC @F72@
+0 @I208@ INDI
+1 NAME Thomas /Wilmouth/
+2 GIVN Thomas
+2 SURN WILMOUTH
+1 SEX M
+1 SOUR @S56@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 REFN WILMTH
+1 ANCI HIGH
+1 FAMS @F42@
+0 @I1@ INDI
+1 NAME Bridget /(-----)/
+2 GIVN Bridget
+2 SURN (-----)
+1 SEX F
+1 SOUR @S56@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 DEAT
+1 REFN WILMBR
+1 ANCI HIGH
+1 FAMS @F42@
+0 @I207@ INDI
+1 NAME Ellen /Wilmouth/
+2 GIVN Ellen
+2 SURN WILMOUTH
+1 SEX F
+1 SOUR @S56@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 BIRT
+2 DATE 1797
+1 DEAT
+2 DATE 16 NOV 1875
+2 PLAC Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.35843
+4 LONG W71.05977
+1 REFN WILMEL97
+1 ANCI HIGH
+1 FAMC @F42@
+1 FAMS @F43@
+0 @I67@ INDI
+1 NAME Thomas /Fitzgerald/
+2 GIVN Thomas
+2 SURN FITZGERALD
+1 SEX M
+1 SOUR @S13@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 DEAT
+2 DATE 19 MAY 1885
+2 PLAC Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.35843
+4 LONG W71.05977
+1 REFN FITZTH
+1 FAMC @F43@
+1 FAMS @F45@
+0 @I50@ INDI
+1 NAME Philip /Cox/
+2 GIVN Philip
+2 SURN COX
+1 SEX M
+1 SOUR @S56@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 REFN COXPH
+1 ANCI HIGH
+1 FAMS @F44@
+0 @I2@ INDI
+1 NAME Mary /(-----)/
+2 GIVN Mary
+2 SURN (-----)
+1 SEX F
+1 SOUR @S56@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 REFN COXMA
+1 FAMS @F44@
+0 @I51@ INDI
+1 NAME Rosanna /Cox/
+2 GIVN Rosanna
+2 SURN COX
+1 SEX F
+1 SOUR @S13@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 BIRT
+2 DATE ABT 1836
+2 SOUR @S68@
+3 QUAY 1
+1 DEAT
+2 DATE 12 MAR 1879
+2 PLAC Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.35843
+4 LONG W71.05977
+2 SOUR @S67@
+3 QUAY 1
+1 BURI
+2 PLAC Malden, , Middlesex County, MA, USA
+3 MAP
+4 LATI N42.4251
+4 LONG W71.06616
+2 SOUR @S66@
+3 QUAY 2
+1 REFN COXRO
+1 ANCI HIGH
+1 FAMC @F44@
+1 FAMS @F45@
+0 @I63@ INDI
+1 NAME John Francis "Honey Fitz" /Fitzgerald/
+2 GIVN John, Francis, "Honey, Fitz"
+2 SURN FITZGERALD
+1 SEX M
+1 SOUR @S13@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 BIRT
+2 DATE 11 FEB 1863
+2 PLAC Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.35843
+4 LONG W71.05977
+2 SOUR @S60@
+3 QUAY 1
+1 DEAT
+2 DATE 3 OCT 1950
+2 PLAC Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.35843
+4 LONG W71.05977
+2 SOUR @S59@
+3 QUAY 1
+1 BAPM
+2 DATE 12 FEB 1863
+2 PLAC Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.35843
+4 LONG W71.05977
+2 SOUR @S58@
+3 QUAY 1
+1 BURI
+2 DATE 5 OCT 1950
+2 PLAC West Roxbury, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.27926
+4 LONG W71.1495
+2 SOUR @S57@
+3 QUAY 2
+1 OCCU Boston Mayor
+1 REFN FITZJF63
+1 FAMC @F45@
+1 FAMS @F48@
+0 @I71@ INDI
+1 NAME John /Hannon/
+2 GIVN John
+2 SURN HANNON
+1 SEX M
+1 SOUR @S56@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 REFN HANNJO
+1 FAMS @F46@
+0 @I161@ INDI
+1 NAME Ellen /Noonan/
+2 GIVN Ellen
+2 SURN NOONAN
+1 SEX F
+1 SOUR @S56@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 BIRT
+2 DATE 1793
+1 DEAT
+2 DATE 28 NOV 1877
+2 PLAC Town of Acton, , Middlesex County, MA, USA
+3 MAP
+4 LATI N42.48509
+4 LONG W71.43284
+1 REFN NOONEL93
+1 FAMS @F46@
+0 @I73@ INDI
+1 NAME Michael /Hannon/
+2 GIVN Michael
+2 SURN HANNON
+1 SEX M
+1 SOUR @S56@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 BIRT
+2 DATE 30 SEP 1832
+1 DEAT
+2 DATE 1 FEB 1900
+2 PLAC Town of Acton, , Middlesex County, MA, USA
+3 MAP
+4 LATI N42.48509
+4 LONG W71.43284
+2 SOUR @S18@
+3 QUAY 1
+1 REFN HANNMI32
+1 FAMC @F46@
+1 FAMS @F47@
+0 @I64@ INDI
+1 NAME Mary Ann /Fitzgerald/
+2 GIVN Mary, Ann
+2 SURN FITZGERALD
+1 SEX F
+1 SOUR @S13@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 BIRT
+2 DATE ABT 1832
+1 DEAT
+1 REFN FITZMA54
+1 FAMS @F47@
+1 FAMC @F71@
+0 @I72@ INDI
+1 NAME Mary Josephine /Hannon/
+2 GIVN Mary, Josephine
+2 SURN HANNON
+1 SEX F
+1 SOUR @S13@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 BIRT
+2 DATE 31 OCT 1865
+2 PLAC Town of Acton, , Middlesex County, MA, USA
+3 MAP
+4 LATI N42.48509
+4 LONG W71.43284
+2 SOUR @S61@
+3 QUAY 1
+1 DEAT
+2 DATE 8 AUG 1964
+2 PLAC Dorchester, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.33343
+4 LONG W71.04949
+2 SOUR @S18@
+3 QUAY 1
+1 REFN HANNMJ65
+1 FAMC @F47@
+1 FAMS @F48@
+1 NOTE Mary Josephine's family tried to discourage her marriage to John
+2 CONT Fitzgerald. As second cousins they needed a dispensation from the
+2 CONT Catholic Church.  (Canon law at the time forbid marriages which fell
+2 CONT within the third degree of consanguinity.)  The underlying reason was
+2 CONT probably the fear that Josie, as she was called, and John would risk
+2 CONT producing retarded children.  However, the love match prevailed as
+2 CONT records show that the dispensation was granted on September 7 and the
+2 CONT marriage took place September 18.
+0 @I21@ INDI
+1 NAME George /Bouvier/
+2 GIVN George
+2 SURN BOUVIER
+1 SEX M
+1 SOUR @S3@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 REFN BOUVGE
+1 FAMS @F73@
+0 @I20@ INDI
+1 NAME Francois /Bouvier/
+2 GIVN Francois
+2 SURN BOUVIER
+1 SEX M
+1 SOUR @S3@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 BIRT
+2 DATE BET 30 JAN 1727 AND 30 JAN 1728
+2 PLAC , , , , France
+1 DEAT
+1 REFN BOUVFR28
+1 FAMS @F49@
+1 FAMC @F73@
+0 @I169@ INDI
+1 NAME Benoite /Repelin/
+2 GIVN Benoite
+2 SURN REPELIN
+1 SEX F
+1 SOUR @S3@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 DEAT
+1 REFN REPEBE
+1 FAMS @F49@
+0 @I19@ INDI
+1 NAME Eustache /Bouvier/
+2 GIVN Eustache
+2 SURN BOUVIER
+1 SEX M
+1 SOUR @S3@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 BIRT
+2 DATE 29 MAY 1758
+2 PLAC Grenoble, , , Isere, France
+3 MAP
+4 LATI N45.17155
+4 LONG E5.72239
+1 DEAT
+2 DATE 1835
+1 REFN BOUVEU58
+1 FAMC @F49@
+1 FAMS @F52@
+0 @I153@ INDI
+1 NAME Melkior /Mercier/
+2 GIVN Melkior
+2 SURN MERCIER
+1 SEX M
+1 SOUR @S3@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 DEAT
+1 REFN MERCME
+1 FAMS @F74@
+0 @I152@ INDI
+1 NAME Joseph /Mercier/
+2 GIVN Joseph
+2 SURN MERCIER
+1 SEX M
+1 SOUR @S3@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 BIRT
+2 DATE ABT 1740
+1 DEAT
+1 REFN MERCJO
+1 FAMS @F51@
+1 FAMC @F74@
+0 @I203@ INDI
+1 NAME Jean /Trintignant/
+2 GIVN Jean
+2 SURN TRINTIGNANT
+1 SEX M
+1 SOUR @S3@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 DEAT
+1 REFN TRINJE
+1 FAMS @F50@
+0 @I165@ INDI
+1 NAME Therese /Paulin/
+2 GIVN Therese
+2 SURN PAULIN
+1 SEX F
+1 SOUR @S3@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 DEAT
+1 REFN PAULTH
+1 FAMS @F50@
+0 @I202@ INDI
+1 NAME Anne /Trintignant/
+2 GIVN Anne
+2 SURN TRINTIGNANT
+1 SEX F
+1 SOUR @S3@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 DEAT
+1 REFN TRINAN
+1 FAMC @F50@
+1 FAMS @F51@
+0 @I154@ INDI
+1 NAME Therese /Mercier/
+2 GIVN Therese
+2 SURN MERCIER
+1 SEX F
+1 SOUR @S3@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 BIRT
+2 DATE 12 AUG 1766
+1 DEAT
+2 DATE EST 1815
+1 REFN MERCTH66
+1 FAMC @F51@
+1 FAMS @F52@
+0 @I25@ INDI
+1 NAME Michel /Bouvier/
+2 GIVN Michel
+2 SURN BOUVIER
+1 SEX M
+1 SOUR @S3@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 BIRT
+2 DATE 2 FEB 1792
+2 PLAC Pont-Saint-Esprit, , , Gard, France
+3 MAP
+4 LATI N44.25494
+4 LONG E4.64736
+1 DEAT
+2 DATE 1874
+1 IMMI
+2 DATE 1815
+1 OCCU carpenter
+1 REFN BOUVMI92
+1 FAMC @F52@
+1 FAMS @F55@
+0 @I138@ INDI
+1 NAME William Alexander /Lindsay/
+2 GIVN William, Alexander
+2 SURN LINDSAY
+1 SEX M
+1 SOUR @S3@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 DEAT
+1 REFN LINDSA
+1 FAMS @F53@
+0 @I45@ INDI
+1 NAME Elizabeth /Clifford/
+2 GIVN Elizabeth
+2 SURN CLIFFORD
+1 SEX F
+1 SOUR @S3@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 DEAT
+1 REFN CLIFEL
+1 FAMS @F53@
+0 @I137@ INDI
+1 NAME Elizabeth Clifford /Lindsay/
+2 GIVN Elizabeth, Clifford
+2 SURN LINDSAY
+1 SEX F
+1 SOUR @S3@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 DEAT
+1 REFN LINDEC
+1 FAMC @F53@
+1 FAMS @F54@
+0 @I205@ INDI
+1 NAME John /Vernou/
+2 GIVN John
+2 SURN VERNOU
+1 SEX M
+1 SOUR @S3@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 DEAT
+1 REFN VERNJO
+1 FAMS @F54@
+0 @I206@ INDI
+1 NAME Louise C. /Vernou/
+2 GIVN Louise, C.
+2 SURN VERNOU
+1 SEX F
+1 SOUR @S3@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 DEAT
+1 REFN VERNLC
+1 FAMC @F54@
+1 FAMS @F55@
+0 @I23@ INDI
+1 NAME John Vernou /Bouvier/
+2 GIVN John, Vernou
+2 SURN BOUVIER
+1 SEX M
+1 SOUR @S3@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 BIRT
+2 DATE 1843
+1 DEAT
+2 DATE 1926
+1 REFN BOUVJV43
+1 FAMC @F55@
+1 FAMS @F56@
+0 @I56@ INDI
+1 NAME Caroline Maslin /Ewing/
+2 GIVN Caroline, Maslin
+2 SURN EWING
+1 SEX F
+1 SOUR @S3@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 DEAT
+1 REFN EWINCM
+1 FAMS @F56@
+0 @I17@ INDI
+1 NAME John Vernou /Bouvier/ Jr.
+2 GIVN John, Vernou
+2 SURN BOUVIER
+2 NSFX Jr.
+1 SEX M
+1 SOUR @S3@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 BIRT
+2 DATE 1865
+1 DEAT
+2 DATE 14 JAN 1948
+1 REFN BOUVJV65
+1 FAMC @F56@
+1 FAMS @F58@
+0 @I174@ INDI
+1 NAME William R. /Sergeant/
+2 GIVN William, R.
+2 SURN SERGEANT
+1 SEX M
+1 SOUR @S3@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 DEAT
+1 REFN SERGWR
+1 FAMS @F57@
+0 @I133@ INDI
+1 NAME Edith /Leaman/
+2 GIVN Edith
+2 SURN LEAMAN
+1 SEX F
+1 SOUR @S3@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 DEAT
+1 REFN LEAMED
+1 FAMS @F57@
+0 @I173@ INDI
+1 NAME Maud Frances /Sergeant/
+2 GIVN Maud, Frances
+2 SURN SERGEANT
+1 SEX F
+1 SOUR @S3@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 DEAT
+2 DATE 3 APR 1940
+1 REFN SERGMF
+1 FAMC @F57@
+1 FAMS @F58@
+0 @I16@ INDI
+1 NAME John Vernou /Bouvier/ III
+2 GIVN John, Vernou
+2 SURN BOUVIER
+2 NSFX III
+1 SEX M
+1 OBJE
+2 TITL John Vernou BOUVIER III
+2 FILE photos/John_Bouvier_III.jpg
+3 FORM jpg
+2 NOTE
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 BIRT
+2 DATE 19 MAY 1891
+2 PLAC Easthampton, , Hampshire County, MA, USA
+3 MAP
+4 LATI N42.26676
+4 LONG W72.66898
+1 DEAT
+2 DATE 2 AUG 1957
+2 PLAC New York City, , , NY, USA
+3 MAP
+4 LATI N40.71427
+4 LONG W74.00597
+1 BURI
+2 PLAC Easthampton, , Hampshire County, MA, USA
+3 MAP
+4 LATI N42.26676
+4 LONG W72.66898
+1 REFN BOUVJV91
+1 FAMC @F58@
+1 FAMS @F62@
+0 @I26@ INDI
+1 NAME William Sergeant (Bud) /Bouvier/
+2 GIVN William, Sergeant, (Bud)
+2 SURN BOUVIER
+1 SEX M
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 BIRT
+2 DATE 1893
+2 PLAC Easthampton, , Hampshire County, MA, USA
+3 MAP
+4 LATI N42.26676
+4 LONG W72.66898
+1 DEAT
+2 DATE 8 OCT 1929
+2 PLAC Los Olivos, , Santa Barbara County, CA, USA
+3 MAP
+4 LATI N34.66776
+4 LONG W120.11487
+1 BURI
+2 DATE 15 OCT 1929
+1 REFN BOUVWS93
+1 FAMC @F58@
+1 FAMS @F59@
+0 @I197@ INDI
+1 NAME Emma Louise /Stone/
+2 GIVN Emma, Louise
+2 SURN STONE
+1 SEX F
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 DEAT
+1 REFN STONEL
+1 FAMS @F59@
+0 @I24@ INDI
+1 NAME Michel /Bouvier/
+2 GIVN Michel
+2 SURN BOUVIER
+1 SEX M
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 DEAT
+1 REFN BOUVMI
+1 FAMC @F59@
+0 @I134@ INDI
+1 NAME Dr. James /Lee/
+2 GIVN Dr., James
+2 SURN LEE
+1 SEX M
+1 SOUR @S3@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 DEAT
+1 REFN LEEDJ
+1 FAMS @F60@
+0 @I162@ INDI
+1 NAME Mary /Norton/
+2 GIVN Mary
+2 SURN NORTON
+1 SEX F
+1 SOUR @S3@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 DEAT
+1 REFN NORTMA
+1 FAMS @F60@
+0 @I135@ INDI
+1 NAME James Thomas /Lee/
+2 GIVN James, Thomas
+2 SURN LEE
+1 SEX M
+1 SOUR @S3@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 BIRT
+2 DATE 1877
+1 DEAT
+1 REFN LEEJT77
+1 FAMC @F60@
+1 FAMS @F61@
+0 @I155@ INDI
+1 NAME Margaret A. /Merritt/
+2 GIVN Margaret, A.
+2 SURN MERRITT
+1 SEX F
+1 SOUR @S3@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 DEAT
+1 REFN MERRMA
+1 FAMS @F61@
+0 @I136@ INDI
+1 NAME Janet Norton /Lee/
+2 GIVN Janet, Norton
+2 SURN LEE
+1 SEX F
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 BIRT
+2 DATE 3 DEC 1907
+1 DEAT
+2 DATE 22 JUL 1989
+1 REFN LEEJN06
+1 FAMC @F61@
+1 FAMS @F62@
+1 FAMS @F65@
+0 @I18@ INDI
+1 NAME Caroline Lee /Bouvier/
+2 GIVN Caroline, Lee
+2 SURN BOUVIER
+1 SEX F
+1 SOUR @S4@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 BIRT
+2 DATE 1933
+2 PLAC Southampton, , Long Island, NY, USA
+3 MAP
+4 LATI N40.88833
+4 LONG W72.44306
+1 CHR
+2 DATE 29 JUL 1933
+2 PLAC New York City, , , NY, USA
+3 MAP
+4 LATI N40.71427
+4 LONG W74.00597
+1 REFN BOUVCL33
+1 FAMC @F62@
+1 FAMS @F63@
+1 FAMS @F64@
+0 @I14@ INDI
+1 NAME Stephen /Birmingham/
+2 GIVN Stephen
+2 SURN BIRMINGHAM
+1 SEX M
+1 SOUR @S3@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+0 @I5@ INDI
+1 NAME R. Jackson A. Polson S._Jackson
+2 GIVN R., Jackson, A., Polson, S._Jackson
+1 SEX M
+1 SOUR @S62@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+0 @I33@ INDI
+1 NAME Michael /Canfield/
+2 GIVN Michael
+2 SURN CANFIELD
+1 SEX M
+1 SOUR @S4@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 REFN CANFMI
+1 FAMS @F63@
+0 @I167@ INDI
+1 NAME Prince Stanislaus /Radziwill/
+2 GIVN Prince, Stanislaus
+2 SURN RADZIWILL
+1 SEX M
+1 SOUR @S4@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 REFN RADZPS
+1 FAMS @F64@
+0 @I166@ INDI
+1 NAME Anna Christina /Radziwill/
+2 GIVN Anna, Christina
+2 SURN RADZIWILL
+1 SEX F
+1 SOUR @S4@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 BIRT
+2 DATE MAR 1959
+1 REFN RADZAC59
+1 FAMC @F64@
+0 @I6@ INDI
+1 NAME Hugh D. /Auchincloss/
+2 GIVN Hugh, D.
+2 SURN AUCHINCLOSS
+1 SEX M
+1 SOUR @S4@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 REFN AUCHHD--
+1 FAMS @F65@
+0 @I8@ INDI
+1 NAME Janet Jennings /Auchincloss/
+2 GIVN Janet, Jennings
+2 SURN AUCHINCLOSS
+1 SEX F
+1 SOUR @S4@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 BIRT
+2 DATE 1945
+1 REFN AUCHJJ45
+1 FAMC @F65@
+0 @I7@ INDI
+1 NAME James Lee /Auchincloss/
+2 GIVN James, Lee
+2 SURN AUCHINCLOSS
+1 SEX M
+1 SOUR @S4@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 BIRT
+2 DATE 1947
+1 REFN AUCHJL47
+1 FAMC @F65@
+0 @I53@ INDI
+1 NAME Lester /David/
+2 GIVN Lester
+2 SURN DAVID
+1 SEX M
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+0 @I186@ INDI
+1 NAME George /Skakel/
+2 GIVN George
+2 SURN SKAKEL
+1 SEX M
+1 SOUR @S5@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 BIRT
+2 DATE 1892
+2 PLAC Chicago, , Cook County, IL, USA
+3 MAP
+4 LATI N41.85003
+4 LONG W87.65005
+1 DEAT
+2 DATE 1955
+2 PLAC , , , OK, USA
+1 OCCU manufacturing
+1 REFN SKAKGE92
+1 FAMS @F66@
+0 @I27@ INDI
+1 NAME Ann /Brannack/
+2 GIVN Ann
+2 SURN BRANNACK
+1 SEX F
+1 SOUR @S5@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 BIRT
+2 DATE ABT 1892
+1 DEAT
+2 DATE 1955
+2 PLAC , , , OK, USA
+1 REFN BRANAN92
+1 FAMS @F66@
+0 @I187@ INDI
+1 NAME Georgeanne /Skakel/
+2 GIVN Georgeanne
+2 SURN SKAKEL
+1 SEX F
+1 SOUR @S5@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 BIRT
+2 DATE BEF 1928
+1 REFN SKAKGE28
+1 FAMC @F66@
+0 @I188@ INDI
+1 NAME James /Skakel/
+2 GIVN James
+2 SURN SKAKEL
+1 SEX M
+1 SOUR @S5@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 BIRT
+2 DATE BEF 1928
+1 REFN SKAKJA28
+1 FAMC @F66@
+0 @I183@ INDI
+1 NAME George /Skakel/ Jr.
+2 GIVN George
+2 SURN SKAKEL
+2 NSFX Jr.
+1 SEX M
+1 SOUR @S5@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 BIRT
+2 DATE BEF 1928
+1 REFN SKAKGE28
+1 FAMC @F66@
+0 @I190@ INDI
+1 NAME Rushton /Skakel/
+2 GIVN Rushton
+2 SURN SKAKEL
+1 SEX M
+1 SOUR @S5@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 BIRT
+2 DATE BEF 1928
+1 REFN SKAKRU28
+1 FAMC @F66@
+0 @I189@ INDI
+1 NAME Patricia /Skakel/
+2 GIVN Patricia
+2 SURN SKAKEL
+1 SEX F
+1 SOUR @S5@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 BIRT
+2 DATE BEF 1928
+1 REFN SKAKPA28
+1 FAMC @F66@
+0 @I184@ INDI
+1 NAME Ann /Skakel/
+2 GIVN Ann
+2 SURN SKAKEL
+1 SEX F
+1 SOUR @S5@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 BIRT
+2 DATE AFT 1928
+1 REFN SKAKAN28
+1 FAMC @F66@
+0 @I44@ INDI
+1 NAME Marcia /Chellis/
+2 GIVN Marcia
+2 SURN CHELLIS
+1 SEX M
+1 SOUR @S5@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+0 @I12@ INDI
+1 NAME Harry Wiggin /Bennett/
+2 GIVN Harry, Wiggin
+2 SURN BENNETT
+1 SEX M
+1 SOUR @S6@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 OCCU advertising
+1 REFN BENNHW
+1 FAMS @F67@
+0 @I196@ INDI
+1 NAME Virginia Joan /Stead/
+2 GIVN Virginia, Joan
+2 SURN STEAD
+1 SEX F
+1 SOUR @S6@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 REFN STEAVJ
+1 FAMS @F67@
+0 @I11@ INDI
+1 NAME Candace /Bennett/
+2 GIVN Candace
+2 SURN BENNETT
+1 SEX F
+1 SOUR @S6@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 BIRT
+2 DATE 1939
+2 PLAC Riverdale, , , NY, USA
+3 MAP
+4 LATI N40.90056
+4 LONG W73.90639
+1 REFN BENNCA39
+1 FAMC @F67@
+0 @I172@ INDI
+1 NAME Edwin /Schlossberg/
+2 GIVN Edwin
+2 SURN SCHLOSSBERG
+1 SEX M
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 BIRT
+2 DATE ABT 1945
+1 REFN SCHLED45
+1 FAMS @F68@
+0 @I43@ INDI
+1 NAME William John Robert /Cavendish/
+2 GIVN William, John, Robert
+2 SURN CAVENDISH
+1 SEX M
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 BIRT
+2 DATE 10 DEC 1917
+1 DEAT
+2 DATE 10 SEP 1944
+2 PLAC Heppen, , , , Belgium
+3 MAP
+4 LATI N51.10934
+4 LONG E5.22898
+1 OCCU Marquess
+1 REFN CAVEWJ17
+1 FAMS @F69@
+0 @I164@ INDI
+1 NAME Aristotle Socrates /Onassis/
+2 GIVN Aristotle, Socrates
+2 SURN ONASSIS
+1 SEX M
+1 SOUR @S2@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 DEAT
+2 DATE 15 MAR 1975
+1 OCCU tycoon
+1 REFN ONASAS75
+1 FAMS @F70@
+0 @I68@ INDI
+1 NAME Edward L. /Galvin/
+2 GIVN Edward, L.
+2 SURN GALVIN
+1 SEX M
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+0 @I78@ INDI
+1 NAME Linda /HOLMES/
+2 GIVN Linda
+2 SURN HOLMES
+1 SEX F
+1 SOUR @S63@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+0 @I70@ INDI
+1 NAME Doris Kearns /Goodwin/
+2 GIVN Doris, Kearns
+2 SURN GOODWIN
+1 SEX F
+1 SOUR @S11@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 RESI
+2 PLAC Near Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.35843
+4 LONG W71.05977
+1 OCCU Writer
+0 @I170@ INDI
+1 NAME Gary Boyd /Roberts/
+2 GIVN Gary, Boyd
+2 SURN ROBERTS
+1 SEX M
+1 SOUR @S12@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 OCCU Writer
+0 @I62@ INDI
+1 NAME James /Fitzgerald/
+2 GIVN James
+2 SURN FITZGERALD
+1 SEX M
+1 SOUR @S13@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 DEAT
+1 ANCI HIGH
+1 FAMS @F72@
+0 @I61@ INDI
+1 NAME Edmond (Edward) /Fitzgerald/
+2 GIVN Edmond, (Edward)
+2 SURN FITZGERALD
+1 SEX M
+1 SOUR @S13@
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:50
+1 BIRT
+2 DATE 1798
+2 PLAC , , , , Ireland
+2 SOUR @S69@
+3 QUAY 1
+1 DEAT
+2 DATE 1883
+2 SOUR @S69@
+3 QUAY 1
+1 FAMS @F71@
+1 FAMC @F72@
+0 @I139@ INDI
+1 NAME Mary /Linnehan/
+2 GIVN Mary
+2 SURN LINNEHAN
+1 SEX F
+1 CHAN
+2 DATE 8 FEB 2021
+3 TIME 20:09:51
+1 DEAT
+1 ANCI HIGH
+1 FAMS @F71@
+0 @F0@ FAM
+1 SOUR @S2@
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:07:52
+1 MARR
+2 DATE 7 OCT 1914
+2 PLAC Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.35843
+4 LONG W71.05977
+1 ENGA
+2 DATE 1914
+2 PLAC Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.35843
+4 LONG W71.05977
+1 HUSB @I105@
+1 WIFE @I66@
+1 CHIL @I91@
+1 CHIL @I104@
+1 CHIL @I127@
+1 CHIL @I107@
+1 CHIL @I99@
+1 CHIL @I119@
+1 CHIL @I125@
+1 CHIL @I101@
+1 CHIL @I98@
+0 @F1@ FAM
+1 SOUR @S2@
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:19:50
+1 MARR
+2 DATE 23 MAY 1953
+2 PLAC New York City, , , NY, USA
+3 MAP
+4 LATI N40.71427
+4 LONG W74.00597
+1 HUSB @I177@
+1 WIFE @I99@
+1 CHIL @I176@
+1 CHIL @I179@
+1 CHIL @I181@
+1 CHIL @I180@
+1 CHIL @I178@
+0 @F2@ FAM
+1 SOUR @S2@
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:19:50
+1 MARR
+2 DATE 24 APR 1954
+2 PLAC New York City, , , NY, USA
+3 MAP
+4 LATI N40.71427
+4 LONG W74.00597
+1 DIV
+2 DATE 1966
+1 HUSB @I129@
+1 WIFE @I119@
+1 CHIL @I128@
+1 CHIL @I131@
+1 CHIL @I132@
+1 CHIL @I130@
+0 @F3@ FAM
+1 SOUR @S2@
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:02:43
+1 MARR
+2 DATE DEC 1984
+2 PLAC Bequia, , , , West Indies
+1 HUSB @I128@
+1 WIFE @I163@
+0 @F4@ FAM
+1 SOUR @S2@
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:06:11
+1 MARR
+2 DATE 17 SEP 1983
+2 PLAC Centerville, , Barnstable County, MA, USA
+3 MAP
+4 LATI N41.64872
+4 LONG W70.34808
+1 HUSB @I151@
+1 WIFE @I131@
+0 @F5@ FAM
+1 SOUR @S24@
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:16:23
+1 MARR
+2 DATE 25 APR 1986
+2 PLAC Hyannis Port, , Barnstable County, MA, USA
+3 MAP
+4 LATI N41.65289
+4 LONG W70.2828
+1 HUSB @I182@
+1 WIFE @I179@
+0 @F6@ FAM
+1 SOUR @S2@
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:19:50
+1 MARR
+2 DATE 19 MAY 1956
+2 PLAC New York City, , , NY, USA
+3 MAP
+4 LATI N40.71427
+4 LONG W74.00597
+1 HUSB @I194@
+1 WIFE @I101@
+1 CHIL @I191@
+1 CHIL @I195@
+1 CHIL @I192@
+1 CHIL @I193@
+0 @F7@ FAM
+1 SOUR @S2@
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:04:36
+1 MARR
+2 DATE 30 NOV 1958
+2 PLAC Bronxville, , Westchester County, NY, USA
+3 MAP
+4 LATI N40.93815
+4 LONG W73.83208
+1 DIV
+2 DATE 1984
+1 HUSB @I98@
+1 WIFE @I13@
+1 CHIL @I106@
+1 CHIL @I89@
+1 CHIL @I124@
+0 @F8@ FAM
+1 OBJE
+2 TITL John and Jacqueline KENNEDY
+2 FILE photos/JFK_Jacqueline-BOUVIER.jpg
+3 FORM jpg
+2 NOTE
+1 SOUR @S2@
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:19:38
+1 MARR
+2 DATE 12 SEP 1953
+2 PLAC Newport, , Newport County, RI, USA
+3 MAP
+4 LATI N41.4901
+4 LONG W71.31283
+2 SOUR @S64@
+3 QUAY 2
+1 HUSB @I104@
+1 WIFE @I22@
+1 CHIL @I94@
+1 CHIL @I90@
+1 CHIL @I122@
+0 @F9@ FAM
+1 SOUR @S2@
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:13:27
+1 MARR
+2 DATE 17 JUN 1950
+2 PLAC Greenwich, , Fairfield County, CT, USA
+3 MAP
+4 LATI N41.02649
+4 LONG W73.62846
+1 HUSB @I125@
+1 WIFE @I185@
+1 CHIL @I108@
+1 CHIL @I86@
+1 CHIL @I93@
+1 CHIL @I96@
+1 CHIL @I112@
+1 CHIL @I118@
+1 CHIL @I113@
+1 CHIL @I95@
+1 CHIL @I116@
+1 CHIL @I97@
+1 CHIL @I126@
+0 @F10@ FAM
+1 SOUR @S2@
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:22:32
+1 MARR
+2 DATE 17 NOV 1973
+2 PLAC Washington, , , DC, USA
+3 MAP
+4 LATI N38.89511
+4 LONG W77.03637
+1 HUSB @I198@
+1 WIFE @I108@
+1 CHIL @I200@
+1 CHIL @I199@
+1 CHIL @I201@
+0 @F11@ FAM
+1 SOUR @S2@
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:02:43
+1 MARR
+2 DATE 3 FEB 1979
+2 PLAC Gladwyne, , Unk County, PA, USA
+1 HUSB @I86@
+1 WIFE @I168@
+1 CHIL @I87@
+1 CHIL @I117@
+0 @F12@ FAM
+1 SOUR @S2@
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:07:58
+1 MARR
+2 DATE 3 APR 1982
+2 PLAC Bloomington, , Monroe County, IN, USA
+3 MAP
+4 LATI N39.16533
+4 LONG W86.52639
+1 HUSB @I93@
+1 WIFE @I15@
+1 CHIL @I88@
+0 @F13@ FAM
+1 SOUR @S2@
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:22:32
+1 MARR
+2 DATE 14 JUN 1980
+2 PLAC Washington, , , DC, USA
+3 MAP
+4 LATI N38.89511
+4 LONG W77.03637
+1 HUSB @I171@
+1 WIFE @I112@
+0 @F14@ FAM
+1 SOUR @S2@
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:19:50
+1 MARR
+2 DATE 14 MAR 1981
+2 PLAC New York City, , , NY, USA
+3 MAP
+4 LATI N40.71427
+4 LONG W74.00597
+1 HUSB @I118@
+1 WIFE @I69@
+1 CHIL @I92@
+1 CHIL @I109@
+0 @F15@ FAM
+1 SOUR @S2@
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:02:43
+1 MARR
+2 PLAC , , , , Ireland
+1 HUSB @I120@
+1 WIFE @I4@
+1 CHIL @I121@
+0 @F16@ FAM
+1 SOUR @S2@
+1 CHAN
+2 DATE 9 SEP 2011
+3 TIME 14:39:08
+1 MARR
+1 HUSB @I160@
+1 WIFE @I3@
+1 CHIL @I158@
+0 @F17@ FAM
+1 SOUR @S2@
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:07:52
+1 MARR
+2 DATE 26 SEP 1849
+2 PLAC Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.35843
+4 LONG W71.05977
+1 HUSB @I121@
+1 WIFE @I158@
+1 CHIL @I114@
+1 CHIL @I102@
+1 CHIL @I103@
+1 CHIL @I111@
+1 CHIL @I123@
+0 @F18@ FAM
+1 SOUR @S2@
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:02:43
+1 MARR
+2 PLAC , , , , Ireland
+1 HUSB @I85@
+1 WIFE @I159@
+1 CHIL @I83@
+0 @F19@ FAM
+1 SOUR @S2@
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:07:52
+1 MARR
+2 DATE 1 JAN 1883
+2 PLAC Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.35843
+4 LONG W71.05977
+1 HUSB @I83@
+1 WIFE @I114@
+1 CHIL @I82@
+1 CHIL @I84@
+1 CHIL @I80@
+1 CHIL @I81@
+1 CHIL @I79@
+0 @F20@ FAM
+1 SOUR @S2@
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:07:52
+1 MARR
+2 DATE 29 DEC 1918
+2 PLAC Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.35843
+4 LONG W71.05977
+1 HUSB @I156@
+1 WIFE @I81@
+0 @F21@ FAM
+1 SOUR @S2@
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:07:52
+1 MARR
+2 DATE 22 SEP 1872
+2 PLAC Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.35843
+4 LONG W71.05977
+1 HUSB @I146@
+1 WIFE @I102@
+1 CHIL @I141@
+1 CHIL @I147@
+1 CHIL @I148@
+1 CHIL @I142@
+1 CHIL @I140@
+1 CHIL @I145@
+1 CHIL @I144@
+1 CHIL @I143@
+0 @F22@ FAM
+1 SOUR @S2@
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:07:52
+1 MARR
+2 DATE 20 JUN 1916
+2 PLAC Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.35843
+4 LONG W71.05977
+1 HUSB @I204@
+1 WIFE @I142@
+0 @F23@ FAM
+1 SOUR @S2@
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:10:12
+1 MARR
+2 DATE 30 JUN 1912
+2 PLAC Chelsea, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.40843
+4 LONG W71.01199
+1 HUSB @I145@
+1 WIFE @I57@
+0 @F24@ FAM
+1 SOUR @S2@
+1 CHAN
+2 DATE 9 SEP 2011
+3 TIME 14:42:16
+1 MARR
+1 HUSB @I41@
+0 @F25@ FAM
+1 SOUR @S2@
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:07:52
+1 MARR
+2 DATE 21 FEB 1882
+2 PLAC Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.35843
+4 LONG W71.05977
+1 HUSB @I41@
+1 WIFE @I111@
+1 CHIL @I42@
+1 CHIL @I37@
+1 CHIL @I34@
+1 CHIL @I38@
+1 CHIL @I36@
+1 CHIL @I35@
+1 CHIL @I39@
+1 CHIL @I40@
+0 @F26@ FAM
+1 SOUR @S2@
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:07:52
+1 MARR
+2 DATE 16 APR 1906
+2 PLAC Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.35843
+4 LONG W71.05977
+1 HUSB @I52@
+1 WIFE @I42@
+0 @F27@ FAM
+1 SOUR @S2@
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:07:52
+1 MARR
+2 DATE 17 FEB 1920
+2 PLAC Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.35843
+4 LONG W71.05977
+1 HUSB @I10@
+1 WIFE @I34@
+0 @F28@ FAM
+1 SOUR @S2@
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:20:12
+1 MARR
+2 DATE 4 JAN 1928
+2 PLAC Revere, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.40843
+4 LONG W71.01199
+1 HUSB @I60@
+1 WIFE @I39@
+0 @F29@ FAM
+1 SOUR @S2@
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:20:12
+1 MARR
+2 DATE 29 AUG 1931
+2 PLAC Revere, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.40843
+4 LONG W71.01199
+1 HUSB @I40@
+1 WIFE @I9@
+0 @F30@ FAM
+1 SOUR @S53@
+1 CHAN
+2 DATE 9 SEP 2011
+3 TIME 14:46:30
+1 MARR
+1 HUSB @I59@
+1 WIFE @I175@
+1 CHIL @I58@
+0 @F31@ FAM
+1 SOUR @S53@
+1 CHAN
+2 DATE 9 SEP 2011
+3 TIME 14:46:37
+1 MARR
+1 HUSB @I77@
+1 WIFE @I74@
+1 CHIL @I75@
+0 @F32@ FAM
+1 SOUR @S2@
+1 CHAN
+2 DATE 9 SEP 2011
+3 TIME 14:46:33
+1 MARR
+1 HUSB @I75@
+1 WIFE @I58@
+1 CHIL @I76@
+0 @F33@ FAM
+1 SOUR @S2@
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:07:52
+1 MARR
+2 DATE 23 NOV 1887
+2 PLAC Boston, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.35843
+4 LONG W71.05977
+1 HUSB @I123@
+1 WIFE @I76@
+1 CHIL @I105@
+1 CHIL @I100@
+1 CHIL @I115@
+1 CHIL @I110@
+0 @F34@ FAM
+1 SOUR @S2@
+1 CHAN
+2 DATE 9 SEP 2011
+3 TIME 14:46:40
+1 MARR
+1 HUSB @I49@
+1 WIFE @I55@
+1 CHIL @I47@
+0 @F35@ FAM
+1 SOUR @S2@
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:24:00
+1 MARR
+2 DATE 12 OCT 1927
+2 PLAC Winthrop, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.3751
+4 LONG W70.98283
+1 HUSB @I47@
+1 WIFE @I115@
+1 CHIL @I48@
+0 @F36@ FAM
+1 SOUR @S2@
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:21:18
+1 MARR
+2 DATE 29 DEC 1951
+2 PLAC St. Augustine, , Saint Johns County, FL, USA
+3 MAP
+4 LATI N29.89469
+4 LONG W81.31452
+1 HUSB @I150@
+1 WIFE @I48@
+0 @F37@ FAM
+1 SOUR @S2@
+1 CHAN
+2 DATE 9 SEP 2011
+3 TIME 14:46:23
+1 MARR
+1 HUSB @I32@
+1 WIFE @I149@
+1 CHIL @I30@
+0 @F38@ FAM
+1 SOUR @S2@
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:24:00
+1 MARR
+2 DATE 14 JUN 1924
+2 PLAC Winthrop, , Suffolk County, MA, USA
+3 MAP
+4 LATI N42.3751
+4 LONG W70.98283
+1 DIV
+1 HUSB @I30@
+1 WIFE @I110@
+1 CHIL @I31@
+1 CHIL @I29@
+1 CHIL @I28@
+0 @F39@ FAM
+1 SOUR @S2@
+1 CHAN
+2 DATE 9 SEP 2011
+3 TIME 14:46:27
+1 MARR
+1 HUSB @I54@
+1 WIFE @I31@
+0 @F40@ FAM
+1 SOUR @S2@
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:19:43
+1 MARR
+2 DATE 4 FEB 1976
+2 PLAC Newton, , Middlesex County, MA, USA
+3 MAP
+4 LATI N42.33704
+4 LONG W71.20922
+1 HUSB @I29@
+1 WIFE @I46@
+0 @F41@ FAM
+1 SOUR @S2@
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:22:38
+1 MARR
+2 DATE 18 JUN 1960
+2 PLAC Watertown, , Middlesex County, MA, USA
+3 MAP
+4 LATI N42.37093
+4 LONG W71.18283
+1 HUSB @I28@
+1 WIFE @I157@
+0 @F42@ FAM
+1 SOUR @S53@
+1 CHAN
+2 DATE 9 SEP 2011
+3 TIME 14:36:30
+1 MARR
+1 HUSB @I208@
+1 WIFE @I1@
+1 CHIL @I207@
+0 @F43@ FAM
+1 SOUR @S53@
+1 CHAN
+2 DATE 9 SEP 2011
+3 TIME 14:36:27
+1 MARR
+1 HUSB @I65@
+1 WIFE @I207@
+1 CHIL @I67@
+0 @F44@ FAM
+1 SOUR @S53@
+1 CHAN
+2 DATE 9 SEP 2011
+3 TIME 14:36:23
+1 MARR
+1 HUSB @I50@
+1 WIFE @I2@
+1 CHIL @I51@
+0 @F45@ FAM
+1 SOUR @S13@
+1 CHAN
+2 DATE 9 SEP 2011
+3 TIME 14:36:19
+1 MARR
+2 DATE 15 NOV 1857
+1 HUSB @I67@
+1 WIFE @I51@
+1 CHIL @I63@
+0 @F46@ FAM
+1 SOUR @S53@
+1 CHAN
+2 DATE 9 SEP 2011
+3 TIME 14:36:14
+1 MARR
+1 HUSB @I71@
+1 WIFE @I161@
+1 CHIL @I73@
+0 @F47@ FAM
+1 SOUR @S13@
+1 CHAN
+2 DATE 9 SEP 2011
+3 TIME 14:36:08
+1 MARR
+2 DATE 12 FEB 1854
+1 HUSB @I73@
+1 WIFE @I64@
+1 CHIL @I72@
+0 @F48@ FAM
+1 SOUR @S2@
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:10:26
+1 MARR
+2 DATE 18 SEP 1889
+2 PLAC Concord, , Middlesex County, MA, USA
+3 MAP
+4 LATI N42.46037
+4 LONG W71.34895
+2 SOUR @S65@
+3 QUAY 2
+1 HUSB @I63@
+1 WIFE @I72@
+1 CHIL @I66@
+0 @F49@ FAM
+1 SOUR @S59@
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:02:43
+1 MARR
+2 DATE 26 APR 1753
+2 PLAC , , , , France
+1 HUSB @I20@
+1 WIFE @I169@
+1 CHIL @I19@
+0 @F50@ FAM
+1 SOUR @S59@
+1 CHAN
+2 DATE 9 SEP 2011
+3 TIME 14:40:26
+1 MARR
+1 HUSB @I203@
+1 WIFE @I165@
+1 CHIL @I202@
+0 @F51@ FAM
+1 SOUR @S59@
+1 CHAN
+2 DATE 9 SEP 2011
+3 TIME 14:40:33
+1 MARR
+2 DATE JUL 1765
+1 HUSB @I152@
+1 WIFE @I202@
+1 CHIL @I154@
+0 @F52@ FAM
+1 SOUR @S59@
+1 CHAN
+2 DATE 9 SEP 2011
+3 TIME 14:40:30
+1 MARR
+2 DATE 3 FEB 1789
+1 HUSB @I19@
+1 WIFE @I154@
+1 CHIL @I25@
+0 @F53@ FAM
+1 SOUR @S59@
+1 CHAN
+2 DATE 9 SEP 2011
+3 TIME 14:40:15
+1 MARR
+1 HUSB @I138@
+1 WIFE @I45@
+1 CHIL @I137@
+0 @F54@ FAM
+1 SOUR @S59@
+1 CHAN
+2 DATE 9 SEP 2011
+3 TIME 14:40:12
+1 MARR
+1 HUSB @I205@
+1 WIFE @I137@
+1 CHIL @I206@
+0 @F55@ FAM
+1 SOUR @S59@
+1 CHAN
+2 DATE 9 SEP 2011
+3 TIME 14:40:23
+1 MARR
+1 HUSB @I25@
+1 WIFE @I206@
+1 CHIL @I23@
+0 @F56@ FAM
+1 SOUR @S59@
+1 CHAN
+2 DATE 9 SEP 2011
+3 TIME 14:40:19
+1 MARR
+1 HUSB @I23@
+1 WIFE @I56@
+1 CHIL @I17@
+0 @F57@ FAM
+1 SOUR @S59@
+1 CHAN
+2 DATE 9 SEP 2011
+3 TIME 14:39:48
+1 MARR
+1 HUSB @I174@
+1 WIFE @I133@
+1 CHIL @I173@
+0 @F58@ FAM
+1 SOUR @S59@
+1 CHAN
+2 DATE 9 SEP 2011
+3 TIME 14:39:38
+1 MARR
+1 HUSB @I17@
+1 WIFE @I173@
+1 CHIL @I16@
+1 CHIL @I26@
+0 @F59@ FAM
+1 SOUR @S59@
+1 CHAN
+2 DATE 9 SEP 2011
+3 TIME 14:40:03
+1 MARR
+2 DATE 1917
+1 DIV
+2 DATE 1925
+1 HUSB @I26@
+1 WIFE @I197@
+1 CHIL @I24@
+0 @F60@ FAM
+1 SOUR @S59@
+1 CHAN
+2 DATE 9 SEP 2011
+3 TIME 14:41:54
+1 MARR
+1 HUSB @I134@
+1 WIFE @I162@
+1 CHIL @I135@
+0 @F61@ FAM
+1 SOUR @S59@
+1 CHAN
+2 DATE 9 SEP 2011
+3 TIME 14:42:01
+1 MARR
+1 HUSB @I135@
+1 WIFE @I155@
+1 CHIL @I136@
+0 @F62@ FAM
+1 SOUR @S59@
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:11:30
+1 MARR
+2 DATE 7 JUL 1928
+2 PLAC East Hampton, , Long Island, NY, USA
+3 MAP
+4 LATI N37.03737
+4 LONG W76.33161
+1 DIV
+2 DATE 1938
+1 HUSB @I16@
+1 WIFE @I136@
+1 CHIL @I22@
+1 CHIL @I18@
+0 @F63@ FAM
+1 SOUR @S60@
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:22:32
+1 MARR
+2 DATE APR 1953
+2 PLAC Washington, , , DC, USA
+3 MAP
+4 LATI N38.89511
+4 LONG W77.03637
+1 ANUL
+1 HUSB @I33@
+1 WIFE @I18@
+0 @F64@ FAM
+1 SOUR @S60@
+1 CHAN
+2 DATE 9 SEP 2011
+3 TIME 14:42:32
+1 MARR
+2 DATE MAR 1959
+1 HUSB @I167@
+1 WIFE @I18@
+1 CHIL @I166@
+0 @F65@ FAM
+1 SOUR @S60@
+1 CHAN
+2 DATE 9 SEP 2011
+3 TIME 14:45:08
+1 MARR
+2 DATE JUN 1942
+1 ENGA
+2 DATE 1942
+1 HUSB @I6@
+1 WIFE @I136@
+1 CHIL @I8@
+1 CHIL @I7@
+0 @F66@ FAM
+1 SOUR @S61@
+1 CHAN
+2 DATE 9 SEP 2011
+3 TIME 14:42:20
+1 MARR
+2 DATE 1918
+1 HUSB @I186@
+1 WIFE @I27@
+1 CHIL @I185@
+1 CHIL @I187@
+1 CHIL @I188@
+1 CHIL @I183@
+1 CHIL @I190@
+1 CHIL @I189@
+1 CHIL @I184@
+0 @F67@ FAM
+1 SOUR @S3@
+1 CHAN
+2 DATE 9 SEP 2011
+3 TIME 14:42:29
+1 MARR
+1 HUSB @I12@
+1 WIFE @I196@
+1 CHIL @I13@
+1 CHIL @I11@
+0 @F68@ FAM
+1 SOUR @S2@
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:06:11
+1 MARR
+2 DATE 19 JUL 1986
+2 PLAC Centerville, , Barnstable County, MA, USA
+3 MAP
+4 LATI N41.64872
+4 LONG W70.34808
+1 HUSB @I172@
+1 WIFE @I94@
+0 @F69@ FAM
+1 SOUR @S2@
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:17:42
+1 MARR
+2 DATE 6 MAY 1944
+2 PLAC London, , , , England
+3 MAP
+4 LATI N51.50853
+4 LONG W0.12574
+1 HUSB @I43@
+1 WIFE @I107@
+0 @F70@ FAM
+1 SOUR @S60@
+1 CHAN
+2 DATE 25 MAR 2018
+3 TIME 20:21:05
+1 MARR
+2 DATE 22 OCT 1968
+2 PLAC Skorpios, , , , Greece
+3 MAP
+4 LATI N38.69228
+4 LONG E20.74558
+1 HUSB @I164@
+1 WIFE @I22@
+0 @F71@ FAM
+1 CHAN
+2 DATE 9 SEP 2011
+3 TIME 14:46:07
+1 MARR
+2 SOUR @S70@
+1 HUSB @I61@
+1 WIFE @I139@
+1 CHIL @I64@
+0 @F72@ FAM
+1 HUSB @I62@
+1 CHIL @I65@
+1 CHIL @I61@
+0 @F73@ FAM
+1 HUSB @I21@
+1 CHIL @I20@
+0 @F74@ FAM
+1 HUSB @I153@
+1 CHIL @I152@
+0 @B1@ SUBM
+1 NAME Ancestris
+1 CHAN
+2 DATE 9 SEP 2011
+3 TIME 13:32:30
+0 @S71@ SOUR
+1 NOTE 190
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:04:35
+1 TITL JF Kennedy and JL Bouvier_Ancestry
+1 PUBL (Bountiful, UT: AIS, Inc.)
+1 ABBR Jackson, ANCESTRY
+0 @S73@ SOUR
+1 NOTE CALN : 921 On5821
+2 CONT Numb: 191
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:07:53
+1 TITL Jacqueline Bouvier Kennedy Onassis
+1 PUBL (NY, NY: Grs't/Dunlap, 1978)
+1 ABBR Birmingham, ONASSIS
+0 @S74@ SOUR
+1 NOTE CALN: 921 K363
+2 CONT NUMB: 202
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:07:01
+1 TITL Ethel
+1 PUBL (NY, Cleveland, World Publishing, 1971)
+1 ABBR David, ETHEL
+0 @S75@ SOUR
+1 NOTE CALN: 921 K352
+2 CONT NUMB: 212
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:09:02
+1 TITL Living with the Kennedys
+1 PUBL (NY, NY, Simon & Shuster, 1987)
+1 ABBR Chellis, KENNEDYS
+0 @S76@ SOUR
+1 NOTE NUMB: 224
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:09:47
+1 TITL The Fitzgeralds and the Kennedys
+1 PUBL (NY, NY, Simon & Schuster, 1987)
+1 ABBR Goodwin, KENNEDYS
+0 @S77@ SOUR
+1 NOTE CALN: Vol. 53, no. 3, July 1977, pp. 145-146
+2 CONT NUMB: 226
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:10:48
+1 TITL "The_American Ancestry_of_John Fitzgerald Kennedy," TAG
+1 PUBL (Des Moines, IA: TAG)
+1 ABBR "Ancestry," TAG
+0 @S78@ SOUR
+1 NOTE vol 25, no. 19, 12 May 1986, pp. 53-56
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:11:30
+1 TITL "A Hyannis Hitching," People Weekly
+1 PUBL (Chicago, IL: Time-Life)
+1 ABBR "Hitching," WEEKLY
+0 @S79@ SOUR
+1 NOTE SERS: CXXXIX, July 1985, pp. 211-224
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:12:01
+1 TITL "The Kennedys of Massachusetts," NEHGR
+1 PUBL (Boston, MA: NEHGS)
+1 ABBR "Kennedys," NEHGR
+0 @S80@ SOUR
+1 NOTE SERS: vol. 55, no. 1, January 1979, pp. 46-52
+2 CONT NUMB: 231
+1 CHAN
+2 DATE 11 MAY 2020
+3 TIME 18:13:04
+1 TITL "American Presidential Ancestry:_A Bibliography," TAG
+1 PUBL (Des Moines, IA: TAG)
+1 ABBR "Bibliography," TAG
+0 @M00001@ OBJE
+1 FILE documents/Kennedy-Wins-Nixon-Concedes-1960-election-Evening-Sun-Baltimore.jpg
+2 FORM jpg
+2 TITL Evening Sun Journal, November 9, 1960
+1 CHAN
+2 DATE 8 SEP 2020
+3 TIME 21:14:33
+0 TRLR

@@ -10,6 +10,8 @@
 #!/usr/bin/env python
 
 import os
+import subprocess
+import sys
 import os.path
 import time
 import re
@@ -1075,18 +1077,42 @@ class VisualMapPanel(wx.Panel):
     def OpenCSV(self):
 
         csvfile = self.gO.get('gpsfile')
-        csvprogram = self.gO.get('csvprogram')
-        
         if csvfile and csvfile != '':
-            logger.debug  (csvprogram + " " + csvfile)
-            wx.Execute(csvprogram + " " + csvfile, wx.EXEC_ASYNC)
-        pass
+            if sys.platform == 'win32':
+                os.startfile(csvfile)
+            elif sys.platform == 'darwin':
+                subprocess.run(['open', csvfile])
+            else:
+                logger.error("Error: Unsupported platform, can not open CSV file")
+
     def OpenBrowser(self):
         if self.gO.get('ResultHTML'):
             webbrowser.open(os.path.join(self.gO.resultpath, self.gO.Result), new = 0, autoraise = True)
         else:
             webbrowser.open(KMLMAPSURL, new = 0, autoraise = True)
-            
+#################################################
+#TODO FIX ME UP            
+
+    def open_html_file(html_path):
+        # Open the HTML file in a new tab and store the web browser instance
+        browser = webbrowser.get()
+        browser_tab = browser.open_new_tab(html_path)
+    
+        # Wait for the page to load
+        time.sleep(1)
+    
+        # Find the browser window that contains the tab and activate it
+        for window in browser.windows():
+            for tab in window.tabs:
+                if tab == browser_tab:
+                    window.activate()
+                    break
+            else:
+                continue
+            break
+    
+        # Reload the tab
+        browser_tab.reload()
     def OnCloseWindow(self, evt):
         busy = wx.BusyInfo("One moment please, waiting for threads to die...")
         wx.Yield()

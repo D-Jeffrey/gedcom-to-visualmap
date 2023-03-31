@@ -36,7 +36,7 @@ python gedcomVisualGUI.py
 Alternate 3. Start the command line  (Not recommended as there are so many options)
 ```
 cd gedcom-to-map
-python gedcom-to-map.py myhertitagetree.ged myTree -main "@I500003@" 
+python gedcom-to-map.py /users/darren/documents/myhertitagetree.ged myTree -main "@I500003@" 
 ```
 
 ## GUI
@@ -49,14 +49,14 @@ Set your options in the GUI interface
 
 Once you have selected your options, 
 - click the `Load` button and it will start to load the GED and then resolve the addresses.
-- `Draw Update` button is a 'Save' button.  For HTML it will trying and open the file with your web browser automatically.  For KML, it will save the file so you can load it onto a map.  (See below)
+- `Draw Update` button is a 'Save' button.  For HTML it will try and open the file with your web browser automatically.  For KML, it will save the file so you can load it onto a map.  (See below)
 - `Open GPS` button will open the CSV file in Excel if you have it... (I'm thinking that does not work on a Mac)  Make sure you close it before running again, or it may not be able to update the CSV file.
-- `Stop` will allow you to abort the Load/ Resolving of addresses without killing the GUI, allowing your to pick different options.
+- `Stop` will allow you to abort the Load/ Resolving of addresses without killing the GUI, allowing you to pick different options.
 - Using the left mouse click to select the starting person in (Star)
 - Use the right click on list of people to bring up some known details and how it was geocoded
 - When the people are loaded you can sort by the various columns by clicking on the column.  When the list of people is selected for display it is relative to this starting person, unless you select the `Map all people`
 - You can resize the window (larger or maximized) to see more details about the people.
-- When display people on the HTML map, you can choose to list them as single people, as a group by the last name or by their parent
+- When displaying people on the HTML map, you can choose to list them as single people, as a group by the last name or by their parent
 
 ## Output to HTML using folium
 
@@ -105,7 +105,7 @@ KML processing:
   -death                use place born for mapping
 ```
 It produces a HTML file which is interactive and shows relationships betwenn childern and parents and where people lived 
-over the years.  It includes a heatmap to show busiey places.  If you zoom in enough you can see the different markers 
+over the years.  It includes a heatmap to show busier places.  If you zoom in enough you can see the different markers 
 which are overlayed on each other.
 
 
@@ -127,7 +127,7 @@ python ..\gedcom-to-map\gedcom-to-map.py input.ged out -main "@I0000@" -format K
 Go to https://www.google.ca/maps/about/mymaps  
 - Click on `Getting Started`
 - Click `Create a New Map`
-- On Untitled map click on the `Import` options and open the your KML file
+- On `Untitled map` click on the `Import` options and open the your KML file
 #### Note this does not work in Google Earth as the lines don't appear, not sure about other KML viewers.
 
 The *`geodat-address-cache.csv`* file can be edited to feed back in new Addresses for GeoCoding.  Just edit or clear any column except the *Name* column to have it re-lookup that address.  Especially useful if you want to make a bad or old style name resolve to a new name/location.
@@ -160,7 +160,7 @@ python ..\gedcom-to-map\gedcom-to-map.py pres2020.ged pres2020-2 -main "@I676@" 
 ![img](samples/msedge_2022-02-02_22-33-16.gif)
 
 ## TODO
-- Add a treed hierachary selector to enable people as groups
+- Add a treed hierarchy selector to enable people as groups and add expand/collapse to navigation
 - more troubleshooting on the address lookup
 - option to remove 'lines' to not core points (such as RESI or other)
 - Sort the Last Name by the highest number of people first or by distance from star
@@ -175,15 +175,18 @@ python ..\gedcom-to-map\gedcom-to-map.py pres2020.ged pres2020-2 -main "@I676@" 
 ### GUI
 - Sorting does not work correctly
 - Cache Only checkboxes is not working
-- Need to seperate the Load and GPS resolve steps
+- Need to separate the Load and GPS resolve steps
 - Need to better detect change to the GPS cache file
 - could be memory leak issues
 - need to determine how do deal with very large HTML files
+- logging panel leaks over the people grid
+
 
 ## Releases
 ### v0.2.1
 - more issues with cache, the first time you run it in the new directory
 - added Kennedy samples
+- improved setup.py
 ### v0.2.0
 - fixed requirements.txt
 - Add highlighting of people used in the draw

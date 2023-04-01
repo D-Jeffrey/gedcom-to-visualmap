@@ -238,14 +238,14 @@ source gedcom-to-visualmap/bin/activate
 pip install -U attrdict3
 pip install wxPython
 pip install git+https://github.com/D-Jeffrey/gedcom-to-visualmap.git#egg=gedcom-to-visualmap
-
-
-
 ```
 
 ## Releases
 ### v0.2.2
 - corrected imports (removed gedcom package dependacy) and requirements.txt (again)
+- on Linux sample
+- more pylint
+- fixed sorting of people
 
 ### v0.2.1
 - Added support for Windows and Mac open of CSV

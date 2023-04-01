@@ -113,7 +113,7 @@ class LifeEvent:
             return self.where if self.where else ""
         elif attr == 'what':
             return self.what if self.what else ""
-        logger.warning("Life Event attr: %s' object has no attribute '%s'" "Life Event attr: %s", type(self).__name__, attr)    
+        logger.warning("Life Event attr: %s' object has no attribute '%s'", type(self).__name__, attr)    
         return None
 
     def __str__(self):

@@ -1,7 +1,6 @@
 from creator.Creator import Creator
 from creator.Creator import LifetimeCreator
-from ged4py import GedcomReader
-# from gedcom.GedcomParser import GedcomParser
+from gedcom.GedcomParser import GedcomParser
 from kml.KmlExporter import KmlExporter
 from kml.foliumExp import foliumExporter
 from kml.gpslookup import GEDComGPSLookup

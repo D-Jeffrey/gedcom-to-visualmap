@@ -50,8 +50,8 @@ class gvOptions:
         self.Referenced = None
         
     def setstatic(self,  GEDCOMinput:str, Result:str, ResultHTML: bool, Main=None, MaxMissing:int = 0, MaxLineWeight:int = 20, UseGPS:bool = True, CacheOnly:bool = False,  AllEntities:bool = False, PlaceType = {'native':'native'}):
-        self.setInput(GEDCOMinput)
         self.setResults(Result, ResultHTML)
+        self.setInput(GEDCOMinput)
         self.Main = Main
         self.Name = None
         self.MaxMissing = MaxMissing

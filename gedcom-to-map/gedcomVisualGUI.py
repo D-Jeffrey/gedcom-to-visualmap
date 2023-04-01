@@ -14,7 +14,6 @@ import subprocess
 import sys
 import os.path
 import time
-import re
 import wx
 # pylint: disable=no-member
 import wx.lib.anchors as anchors
@@ -28,7 +27,6 @@ import logging.config
 from const import NAME, VERSION, LOG_CONFIG, KMLMAPSURL
 from gedcomoptions import gvOptions
 from gedcomvisual import doKML, doHTML, ParseAndGPS
-from models.Human import Human, LifeEvent
 
 logger = logging.getLogger(__name__)
 
@@ -114,7 +112,7 @@ class Ids():
     def __init__(self):
         self.CLR_BTN_PRESS = wx.Colour(255, 230, 200, 255)
         self.CLR_BTN_DONE = wx.Colour(255, 255, 255, 255)
-        pass
+        
 
 
 #=============================================================
@@ -320,8 +318,8 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin):
 
 
 class PeopleListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
-    def __init__(self, parent, humans):
-
+    def __init__(self, parent, humans,  *args, **kw):
+        super(PeopleListCtrlPanel, self).__init__(*args, **kw)
         wx.Panel.__init__(self, parent, -1, style=wx.WANTS_CHARS)
 
         self.gO = None
@@ -453,13 +451,13 @@ class PeopleListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
                             self.list.GetItemText(self.currentItem, 1),
                             self.list.GetItemText(self.currentItem, 2))
         if self.gO:
-           self.gO.set('Main', self.list.GetItemText(self.currentItem, 2))
+            self.gO.set('Main', self.list.GetItemText(self.currentItem, 2))
         event.Skip()
         
            
 
         dialog = PersonDialog(None, panel.threads[0].humans[self.list.GetItemText(self.currentItem, 2)])
-        result = dialog.ShowModal()
+        dialog.ShowModal()
         dialog.Destroy()
 
     def OnItemDeselected(self, event):
@@ -473,7 +471,7 @@ class PeopleListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
         self.currentItem = event.Index
         logger.debug("%s TopItem: %s", self.list.GetItemText(self.currentItem), self.list.GetTopItem())
         if self.gO:
-           self.gO.set('Main', self.list.GetItemText(self.currentItem, 2))
+            self.gO.set('Main', self.list.GetItemText(self.currentItem, 2))
 
     def OnBeginEdit(self, event):
 
@@ -924,7 +922,6 @@ class VisualMapPanel(wx.Panel):
             if filen == "":
                 self.d.BTNLoad.Disable()
                 self.d.BTNUpdate.Disable()
-
             else:
                 self.d.BTNLoad.Enable()
                 self.d.BTNUpdate.Enable()
@@ -936,7 +933,8 @@ class VisualMapPanel(wx.Panel):
             status = 'Ready'
             self.OnBusyStop(-1)
         self.frame.SetStatusText(status)
-        
+        if self.threads[0].updateinfo != '':
+            self.OnUpdate(evt)
         wx.Yield()
         
 
@@ -1068,11 +1066,15 @@ class VisualMapPanel(wx.Panel):
         self.threads[0].Trigger(1)
         pass
     def DrawGEDCOM(self):
-        self.OnBusyStart(-1)
+
+        if not self.gO.get('Result') or self.gO.get('Result') == '':
+            logger.error("Error: Not output file name set")
+            self.threads[0].AddInfo(f"Error: Please set the Output file name")
+        else:
+            self.OnBusyStart(-1)
       
-        self.threads[0].Trigger(2 | 4)
+            self.threads[0].Trigger(2 | 4)
         
-        pass
     
     def OpenCSV(self):
 

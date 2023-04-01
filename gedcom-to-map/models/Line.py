@@ -58,12 +58,7 @@ class Line:
         if attr == 'parentofhuman' and self.parentofhuman is None:
             return ''
         raise AttributeError(f"'{type(self).__name__}' object has no attribute '{attr}'")
-
-    def __str__(self, attr):
-        if attr == 'parentofhuman' and self.parentofhuman is None:
-            return ''
-        raise AttributeError(f"'{type(self).__name__}' object has no attribute '{attr}'")
-        
+    
     
     
     

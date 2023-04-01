@@ -18,13 +18,16 @@ This contains two interfaces: command-line and GUI (only tested on Windows)
 
 1. Clone the repository:
 ```
-$ git clone @github.com:D-Jeffrey/gedcom-to-visualmap
+$ git clone yourname@github.com:D-Jeffrey/gedcom-to-visualmap
 ```
  - or -
 1. Alternative if you don't have a github account (after you have installed Python https://github.com/PackeTsar/Install-Python#readme)
 
-```
-pip install git+https://github.com/D-Jeffrey/gedcom-to-visualmap/gedcom-to-visualmap.git#egg=gedcom-to-visualmap
+Download the zip package of the latest release and unzip the package into a directory (such as gedcom-to-visualmap)
+1. 2nd alternative
+``` 
+WIP - does not fully work yet
+pip install git+https://github.com/D-Jeffrey/gedcom-to-visualmap.git#egg=gedcom-to-visualmap
 ```
 
 2. Install dependencies:
@@ -46,7 +49,7 @@ python gedcom-to-map.py /users/darren/documents/myhertitagetree.ged myTree -main
 ```
 
 ## GUI
-![img](samples/pythonw3.9_2022-02-20a.png)
+![img](samples/pythonw3.9_2023-04-01.png)
 
 To use the GUI version, `File- > Open` and select your .ged file.
 Set your options in the GUI interface  
@@ -161,9 +164,21 @@ python ..\gedcom-to-map\gedcom-to-map.py pres2020.ged pres2020-2 -main "@I676@" 
 python ..\gedcom-to-map\gedcom-to-map.py pres2020.ged pres2020-2 -main "@I676@" -format KML
 ```
 
-
 ## Complex Export of MyHeritage - intereactive map
 ![img](samples/msedge_2022-02-02_22-33-16.gif)
+
+##Running on Linux (WSL)
+Using the steps of download and unzip release 0.2.1
+``
+pip install -U attrdict3
+pip install wxPython
+cd gedcom-to-visualmap
+pip install -r requirements.txt
+python3 gedcomVisualGUI.py 
+```
+![img](samples/WSL-2023-04-01-bash.png)
+
+![img](samples/WSL-2023-03-31.png)
 
 ## TODO
 - Add a treed hierarchy selector to enable people as groups and add expand/collapse to navigation
@@ -187,6 +202,47 @@ python ..\gedcom-to-map\gedcom-to-map.py pres2020.ged pres2020-2 -main "@I676@" 
 - need to determine how do deal with very large HTML files
 - logging panel leaks over the people grid
 
+## Linux (WSL - WSL version: 1.1.3.0)
+  (Some assistance from https://askubuntu.com/questions/1252007/opening-ubuntu-20-04-desktop-on-wsl2/1365455#1365455)
+```
+sudo apt-get update
+sudo apt install python3-pip
+sudo apt install pkg-config
+sudo apt install libgtk-3-dev 
+
+sudo apt install xrdp xfce4
+# If asked, select lightdm, although it probably doesn't matter
+
+# Optionally, back up the default config
+sudo cp /etc/xrdp/xrdp.ini /etc/xrdp/xrdp.ini.bak
+# Windows Pro and higher are often already running RDP on 3389
+# Prevent conflicts:
+sudo sed -i 's/3389/3390/g' /etc/xrdp/xrdp.ini
+
+# Prevent Wayland from being used in Xrdp
+echo "export WAYLAND_DISPLAY=" > ~/.xsessionrc
+
+# Optional, if you only have one desktop environment installed
+echo startxfce4 > ~/.xsession 
+sudo service xrdp start
+
+# login using RDP to localhost:3390
+# open Terminal session on X-windows
+
+sudo apt-get install python3-venv
+
+# do this in advance so insure that it gets installed correctly and you can quickly troubleshoot
+
+
+python3 -m venv gedcom-to-visualmap
+source gedcom-to-visualmap/bin/activate
+pip install -U attrdict3
+pip install wxPython
+pip install git+https://github.com/D-Jeffrey/gedcom-to-visualmap.git#egg=gedcom-to-visualmap
+
+
+
+```
 
 ## Releases
 ### v0.2.2

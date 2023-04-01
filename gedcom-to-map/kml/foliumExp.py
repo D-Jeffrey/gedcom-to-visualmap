@@ -3,7 +3,8 @@ __all__ = ['MyMarkClusters', 'foliumExporter']
 import math
 import random
 import folium 
-# import simplekml as simplekml
+from folium.plugins import GroupedLayerControl
+
 from models.Line import Line
 from models.Pos import Pos
 from render.Referenced import Referenced
@@ -390,13 +391,19 @@ class foliumExporter:
             if newfg:
                 fg.layer_name = fg.layer_name + " ({})".format(len(fm_line) + 1 if diftb else 0 + 1 if diftb else 0)     
                 fm.add_child(fg)
-
+        fglc = []
         for fgn in sorted(self.fglastname.keys(), key=lambda x: self.fglastname[x][2], reverse = False ):
             logger.debug ("]]%s : %s", fgn, self.fglastname[fgn][1])
             self.fglastname[fgn][0].layer_name = "{} : {}".format(fgn, self.fglastname[fgn][1])          
             fm.add_child(self.fglastname[fgn][0])
+            fglc.append(self.fglastname[fgn][0])
         sc = False if self.gOptions.showLayerControl else True
         
+        # folium.plugins.GroupedLayerControl(
+        #    groups={'People': fglc},
+        #    exclusive_groups=False,
+        #    collapsed=False,
+        #    ).add_to(fm)
         folium.map.LayerControl('topleft', collapsed= sc).add_to(fm)
 
         if main and main.birth and main.birth.pos and main.birth.pos.lat:         
@@ -406,7 +413,7 @@ class foliumExporter:
         else:
             logger.warning ("No GPS locations to generate a map.")
         
-        # TODO Add a legend
+        # Add a legend
         FloatImage(legend_file, bottom=0, left=86).add_to(fm)
         if SortByLast:
             logger.info ("Number of FG lastName: %i", len(self.fglastname))

@@ -1090,8 +1090,8 @@ class VisualMapPanel(wx.Panel):
             webbrowser.open(os.path.join(self.gO.resultpath, self.gO.Result), new = 0, autoraise = True)
         else:
             webbrowser.open(KMLMAPSURL, new = 0, autoraise = True)
-#################################################
-#TODO FIX ME UP            
+    #################################################
+    #TODO FIX ME UP            
 
     def open_html_file(html_path):
         # Open the HTML file in a new tab and store the web browser instance

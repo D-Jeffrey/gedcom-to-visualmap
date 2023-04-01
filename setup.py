@@ -13,10 +13,11 @@ setup(
         ]
     },
     install_requires=[
-        'Pillow>=8.2.0',
-        'networkx>=2.5',
-        'gedcompy>=0.3.2',
-        'pycairo>=1.20.1'
+        'ged4py>=0.4.4',
+        'simplekml>=1.3.6',
+        'geopy>=2.3.0',
+        'folium>=0.14.0',
+        'wxPython>=4.1.0',
     ],
     author='D-Jeffrey',
     description='A Python package to convert GEDCOM files to visual maps',

@@ -18,12 +18,18 @@ This contains two interfaces: command-line and GUI (only tested on Windows)
 
 1. Clone the repository:
 ```
-$ git clone git@github.com:D-Jeffrey/gedcom-to-visualmap
-$ cd gedcom-to-visualmap
+$ git clone @github.com:D-Jeffrey/gedcom-to-visualmap
+```
+ - or -
+1. Alternative if you don't have a github account (after you have installed Python https://github.com/PackeTsar/Install-Python#readme)
+
+```
+pip install git+https://github.com/D-Jeffrey/gedcom-to-visualmap/gedcom-to-visualmap.git#egg=gedcom-to-visualmap
 ```
 
 2. Install dependencies:
 ```
+$ cd gedcom-to-visualmap
 $ pip install -r requirements.txt
 ```
 
@@ -183,7 +189,11 @@ python ..\gedcom-to-map\gedcom-to-map.py pres2020.ged pres2020-2 -main "@I676@" 
 
 
 ## Releases
+### v0.2.2
+- corrected imports (removed gedcom package dependacy) and requirements.txt (again)
+
 ### v0.2.1
+- Added support for Windows and Mac open of CSV
 - more issues with cache, the first time you run it in the new directory
 - added Kennedy samples
 - improved setup.py

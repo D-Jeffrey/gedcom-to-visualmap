@@ -1,5 +1,5 @@
 [![GitHub Activity][releases-shield]][releases]
-[![License][license-shield]]([lisense])
+[![License][license-shield]]([license])
 ![Project Maintenance][maintenance-shield]
 [![GitHub Activity][commits-shield]][commits]
 
@@ -16,19 +16,18 @@ This contains two interfaces: command-line and GUI (only tested on Windows)
 
 # How to Run
 
+Assuming you have Python installed otherwise... https://github.com/PackeTsar/Install-Python#readme
+
 1. Clone the repository:
 ```
-$ git clone yourname@github.com:D-Jeffrey/gedcom-to-visualmap
+$ git clone https://github.com/D-Jeffrey/gedcom-to-visualmap
 ```
  - or -
-1. Alternative if you don't have a github account (after you have installed Python https://github.com/PackeTsar/Install-Python#readme)
 
-Download the zip package of the latest release and unzip the package into a directory (such as gedcom-to-visualmap)
-1. 2nd alternative
-``` 
-WIP - does not fully work yet
-pip install git+https://github.com/D-Jeffrey/gedcom-to-visualmap.git#egg=gedcom-to-visualmap
-```
+Alternatively download the zip package of the latest [release](https://github.com/D-Jeffrey/gedcom-to-visualmap/releases) and unzip the package into a directory (such as gedcom-to-visualmap)
+
+[//]: # (1. 2nd alternative)
+[//]: # (pip install git+https://github.com/D-Jeffrey/gedcom-to-visualmap.git#egg=gedcom-to-visualmap)
 
 2. Install dependencies:
 ```
@@ -169,7 +168,7 @@ python ..\gedcom-to-map\gedcom-to-map.py pres2020.ged pres2020-2 -main "@I676@" 
 
 ##Running on Linux (WSL)
 Using the steps of download and unzip release 0.2.1
-``
+```
 pip install -U attrdict3
 pip install wxPython
 cd gedcom-to-visualmap

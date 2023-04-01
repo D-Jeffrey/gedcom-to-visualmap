@@ -17,7 +17,7 @@ setup(
         'simplekml>=1.3.6',
         'geopy>=2.3.0',
         'folium>=0.14.0',
-        'attrdict>=2.0.1'
+        'attrdict>=2.0.1',
         'wxPython>=4.1.0',
         
     ],

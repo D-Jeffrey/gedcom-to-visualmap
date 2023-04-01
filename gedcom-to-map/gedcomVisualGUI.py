@@ -1278,12 +1278,13 @@ class BackgroundActions:
                     logger.info("start do 2")
                     if (self.gOptions.parsed):
                         logger.info("doHTML or doKML")
+                        fname = self.gOptions.Result
                         if (self.gOptions.ResultHTML):
                             doHTML(self.gOptions, self.humans)
-                            self.AddInfo(f"HTML generated resulting in {self.gOptions.totalpeople} people")
+                            self.AddInfo(f"HTML generated for {self.gOptions.totalpeople} people ({fname})")
                         else: 
                             doKML(self.gOptions, self.humans)
-                            self.AddInfo(f"KML File generated for {self.gOptions.totalpeople} people in %s", self.gOptions.get('Result'))
+                            self.AddInfo(f"KML file generated for {self.gOptions.totalpeople} people/points ({fname})")
                     else:
                         logger.info("not parsed")
                     logger.info("done draw")

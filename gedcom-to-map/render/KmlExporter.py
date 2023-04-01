@@ -22,6 +22,7 @@ class KmlExporter:
         self.gOp.Referenced = Referenced()
         random.seed()
         self.driftOn = True
+        self.gOp.totalpeople = 0
 
     def driftPos(self, l : Pos):
         if not l or not self.driftOn:
@@ -41,8 +42,8 @@ class KmlExporter:
             kml = simplekml.Kml()
             self.kml = kml
         if main:
-            
             kml.newpoint(name=(self.gOp.Name  + ntag),coords=[ (main.lon, main.lat) ])
+            self.gOp.totalpeople += 1
         else:
             logger.error ("No GPS locations to generate a map.")
 
@@ -53,9 +54,11 @@ class KmlExporter:
             if (line.a.lon and line.a.lat):
                 kml.newpoint(name=line.name  + ntag, coords=[self.driftPos(line.a)])
                 self.gOp.Referenced.add(line.human.xref_id, 'kml-a')
+                self.gOp.totalpeople += 1
             if (line.b.lon and line.b.lat):
                 kml.newpoint(name=line.name  + ntag, coords=[self.driftPos(line.b)])
                 self.gOp.Referenced.add(line.human.xref_id, 'kml-b')
+                self.gOp.totalpeople += 1
             if (line.a.lon and line.a.lat and line.b.lon and line.b.lat):
                 kml_line = kml.newlinestring(name=line.name, coords=[self.driftPos(line.a), self.driftPos(line.b)])
                 kml_line.linestyle.color = line.color.to_hexa()

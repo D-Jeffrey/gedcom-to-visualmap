@@ -8,10 +8,14 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 import argparse
 import logging
+import logging
+import logging.config
 
 from gedcomoptions import gvOptions
 from gedcomvisual import gedcom_to_map, Geoheatmap
-from const import NAME, VERSION, LOG_CONFIG
+from const import NAME, VERSION, LOG_CONFIG, KMLMAPSURL
+
+logger = logging.getLogger(__name__)
 
 class ArgParse(argparse.ArgumentParser):
     def __init__(self):
@@ -58,10 +62,11 @@ if __name__ == '__main__':
     arg_parse = ArgParse()
     
     
-    
     logging.config.dictConfig(LOG_CONFIG)
-    logger = logging.getLogger("")
+
+    logger.setLevel(logging.DEBUG)
     logger.info("Starting up %s %s", NAME, VERSION)
+    
     logging.basicConfig(level=logging.INFO)
     
     myGeoOptions = gvOptions    (BornMark = not arg_parse.args.bornmarksoff, MarksOn = not arg_parse.args.marksoff, 

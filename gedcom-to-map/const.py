@@ -1,6 +1,6 @@
 """Constants for gedcom-to-visualmap"""
 
-VERSION = "0.2.0"
+VERSION = "0.2.3"
 NAME = "gedcom-to-visualmap"
 
 GV_COUNTRIES_JSON = 'https://raw.githubusercontent.com/nnjeim/world/master/resources/json/countries.json'
@@ -20,7 +20,7 @@ LOG_CONFIG = {
     },
     'handlers': { 
         'default': { 
-            'level': 'WARNING',                        # This one matters
+            'level': 'INFO',                        # This one matters
             'formatter': 'standard',
             'class': 'logging.StreamHandler',
             'stream': 'ext://sys.stdout',  # Default is stderr

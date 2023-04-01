@@ -21,16 +21,16 @@ class Referenced:
     def new(self):
         self.__init__()
     
-    def add(self, item, type = None):
+    def add(self, item, locationtype = None):
         if item in self.items:
             self.items[item]["count"] += 1
         else:
             self.items[item] = {"value": item, "count": 1}
-        if type:
-            if type in self.types:
-                self.types[type]["count"] += 1
+        if locationtype:
+            if locationtype in self.types:
+                self.types[locationtype]["count"] += 1
             else:
-                self.types[type] = {"value": type, "count": 1}
+                self.types[locationtype] = {"value": locationtype, "count": 1}
     
     def exists(self, item):
         return item in self.items

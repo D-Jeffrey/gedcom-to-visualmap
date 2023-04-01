@@ -340,10 +340,6 @@ class PeopleListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
                                  #| wx.BORDER_SUNKEN
                                  | wx.BORDER_NONE
                                  # | wx.LC_EDIT_LABELS
-                                 #| wx.LC_SORT_ASCENDING    # disabling initial auto sort gives a
-                                 #| wx.LC_NO_HEADER         # better illustration of col-click sorting
-                                 # | wx.LC_VRULES
-                                 # | wx.LC_HRULES
                                   | wx.LC_SINGLE_SEL
                                  ,size=wx.Size(600,600))
 
@@ -404,10 +400,10 @@ class PeopleListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
         self.list.DeleteAllItems()
         for key, data in items:
             index = self.list.InsertItem(self.list.GetItemCount(), data[0]) # , self.idx1)
-            self.list.SetItem(index, 1, data[1])
-            self.list.SetItem(index, 2, data[2])
-            self.list.SetItem(index, 3, data[3])
-            self.list.SetItem(index, 4, data[4])
+            self.list.SetItem(index, 1, data[1]) # Year
+            self.list.SetItem(index, 2, data[2]) # ID
+            self.list.SetItem(index, 3, data[3]) # GeoCode
+            self.list.SetItem(index, 4, data[4]) # Location
             self.list.SetItemData(index, key)
             if self.gO.Referenced:
                 if self.gO.Referenced.exists(data[2]):
@@ -544,7 +540,9 @@ class VisualMapPanel(wx.Panel):
         self.SetMinSize((800,800))
         self.frame = self.TopLevelParent        
         self.gO : gvOptions = None
-        
+        self.ai = None
+        self.d = dict()
+        self.config = None
         self.SetAutoLayout(True)
         
         
@@ -773,19 +771,18 @@ class VisualMapPanel(wx.Panel):
 
     def NeedRedraw(self):
         self.d.BTNUpdate.SetBackgroundColour(self.d.CLR_BTN_PRESS)
-        pass
 
     def setInputFile(self, path):
-            # set the state variables
-            self.gO.setInput(path)
-            d, filen = os.path.split(self.gO.get('GEDCOMinput'))
-            # set the form field
-            self.d.TEXTGEDCOMinput.SetValue(filen)
-            self.config.Write("GEDCOMinput", path)
-            #TODO Fix this
-            self.gO.set('Main', None)
-            #TODO Fix this
-            self.NeedReload()
+        # set the state variables
+        self.gO.setInput(path)
+        _, filen = os.path.split(self.gO.get('GEDCOMinput'))
+        # set the form field
+        self.d.TEXTGEDCOMinput.SetValue(filen)
+        self.config.Write("GEDCOMinput", path)
+        #TODO Fix this
+        self.gO.set('Main', None)
+        #TODO Fix this
+        self.NeedReload()
 
     def EvtRadioBox(self, event):
 
@@ -882,7 +879,7 @@ class VisualMapPanel(wx.Panel):
 
         eventid = event.GetId()
         logger.debug('%s, %s, %s', event.GetString(), event.IsSelection(), event.GetSelection())                            
-        lb = event.GetEventObject()
+        _ = event.GetEventObject()
         if eventid ==  ID_LISTPlaceType:
             places = {}
             for cstr in event.EventObject.CheckedStrings:
@@ -915,10 +912,10 @@ class VisualMapPanel(wx.Panel):
                 if panel.gO.stepinfo:
                     status = status + ' (' + panel.gO.stepinfo +')'
             if self.gO.ShouldStop():
-                    self.d.BTNUpdate.Enable()
-                    status = status + ' - please wait.. Stopping'
+                self.d.BTNUpdate.Enable()
+                status = status + ' - please wait.. Stopping'
 
-            mydir, filen = os.path.split(panel.gO.get('GEDCOMinput'))
+            _, filen = os.path.split(panel.gO.get('GEDCOMinput'))
             if filen == "":
                 self.d.BTNLoad.Disable()
                 self.d.BTNUpdate.Disable()
@@ -1062,14 +1059,13 @@ class VisualMapPanel(wx.Panel):
 
     def LoadGEDCOM(self):
         self.OnBusyStart(-1)
-        
         self.threads[0].Trigger(1)
-        pass
+        
     def DrawGEDCOM(self):
 
         if not self.gO.get('Result') or self.gO.get('Result') == '':
             logger.error("Error: Not output file name set")
-            self.threads[0].AddInfo(f"Error: Please set the Output file name")
+            self.threads[0].AddInfo("Error: Please set the Output file name")
         else:
             self.OnBusyStart(-1)
       
@@ -1083,7 +1079,7 @@ class VisualMapPanel(wx.Panel):
             if sys.platform == 'win32':
                 os.startfile(csvfile)
             elif sys.platform == 'darwin':
-                subprocess.run(['open', csvfile])
+                subprocess.run(['open', csvfile], check=False)
             else:
                 logger.error("Error: Unsupported platform, can not open CSV file")
 
@@ -1216,6 +1212,9 @@ class BackgroundActions:
         self.threadnum = threadnum
         self.updategrid = False
         self.updateinfo = ''
+        self.keepGoing = True
+        self.running = True
+        self.do = -1
 
     def DefgOps(self, gOps):
         self.gOptions = gOps
@@ -1284,6 +1283,7 @@ class BackgroundActions:
                             self.AddInfo(f"HTML generated resulting in {self.gOptions.totalpeople} people")
                         else: 
                             doKML(self.gOptions, self.humans)
+                            self.AddInfo(f"KML File generated for {self.gOptions.totalpeople} people in %s", self.gOptions.get('Result'))
                     else:
                         logger.info("not parsed")
                     logger.info("done draw")

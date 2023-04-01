@@ -3,7 +3,7 @@ __all__ = ['Line']
 from models.Color import Color
 from models.Pos import Pos
 from models.Human import Human, LifeEvent 
-from datetime import datetime
+#TODO need to improved this subclass
 from ged4py.date import DateValueVisitor
 
 
@@ -14,7 +14,7 @@ class Line:
     human - reference to themeselves, 
     """
     def __init__(self, name: str, a: Pos, b: Pos, color: Color, prof: int, style : str = '', parentofhuman : Human = None, 
-                        midpoints:[]=None, human=None, when: int =None, tag:str='', type=''):
+                        midpoints:[]=None, human=None, when: int =None, tag:str='', linetype=''):
         self.name = name
         # TODO we need to use id to avoid problems with duplicate names
         # BUG
@@ -35,7 +35,7 @@ class Line:
             self.when= self.valueWhen(when[0])
         else:
             self.when= self.valueWhen(when)
-        self.type = type
+        self.linetype = linetype
         
 
     def __repr__(self):
@@ -50,7 +50,7 @@ class Line:
     def updateWhen(self, newwhen):
         newwhen = self.valueWhen(newwhen)
         if newwhen and not self.when:
-           self.when = newwhen
+            self.when = newwhen
         if self.when and newwhen and newwhen < self.when:
             self.when = newwhen
 

@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<head>    
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    
+        <script>
+            L_NO_TOUCH = false;
+            L_DISABLE_3D = false;
+        </script>
+    
+    <style>html, body {width: 100%;height: 100%;margin: 0;padding: 0;}</style>
+    <style>#map {position:absolute;top:0;bottom:0;right:0;left:0;}</style>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.6.0/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <script src="https://use.fontawesome.com/releases/v5.15.4/js/all.js" data-auto-replace-svg="nest"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.6.0/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+    
+            <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <style>
+                #map_1303571a681246839750209b15591f7b {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+            </style>
+        
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-minimap/3.6.1/Control.MiniMap.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-minimap/3.6.1/Control.MiniMap.css"/>
+    <script src="https://cdn.jsdelivr.net/gh/python-visualization/folium@master/folium/templates/leaflet_heat.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet-ant-path@1.1.2/dist/leaflet-ant-path.min.js"></script>
+</head>
+<body>    
+    
+            <div class="folium-map" id="map_1303571a681246839750209b15591f7b" ></div>
+        
+</body>
+<script>    
+    
+            var map_1303571a681246839750209b15591f7b = L.map(
+                "map_1303571a681246839750209b15591f7b",
+                {
+                    center: [0.0, 0.0],
+                    crs: L.CRS.EPSG3857,
+                    zoom: 2,
+                    zoomControl: true,
+                    preferCanvas: false,
+                }
+            );
+
+            
+
+        
+    
+            var tile_layer_2c81ae32ffdc48249c9d7c4451d9c44f = L.tileLayer(
+                "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                {"attribution": "Data by \u0026copy; \u003ca href=\"http://openstreetmap.org\"\u003eOpenStreetMap\u003c/a\u003e, under \u003ca href=\"http://www.openstreetmap.org/copyright\"\u003eODbL\u003c/a\u003e.", "detectRetina": false, "maxNativeZoom": 18, "maxZoom": 18, "minZoom": 0, "noWrap": false, "opacity": 1, "subdomains": "abc", "tms": false}
+            ).addTo(map_1303571a681246839750209b15591f7b);
+        
+    
+            var tile_layer_f541b3acb74b4814a3dc99c064b0815c = L.tileLayer(
+                "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                {"attribution": "Data by \u0026copy; \u003ca href=\"http://openstreetmap.org\"\u003eOpenStreetMap\u003c/a\u003e, under \u003ca href=\"http://www.openstreetmap.org/copyright\"\u003eODbL\u003c/a\u003e.", "detectRetina": false, "maxNativeZoom": 18, "maxZoom": 18, "minZoom": 0, "noWrap": false, "opacity": 1, "subdomains": "abc", "tms": false}
+            ).addTo(map_1303571a681246839750209b15591f7b);
+        
+    
+            var tile_layer_6e9ca6fe0533492b8bfb0aa3b3324366 = L.tileLayer(
+                "https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}.jpg",
+                {"attribution": "Map tiles by \u003ca href=\"http://stamen.com\"\u003eStamen Design\u003c/a\u003e, under \u003ca href=\"http://creativecommons.org/licenses/by/3.0\"\u003eCC BY 3.0\u003c/a\u003e. Data by \u0026copy; \u003ca href=\"http://openstreetmap.org\"\u003eOpenStreetMap\u003c/a\u003e, under \u003ca href=\"http://creativecommons.org/licenses/by-sa/3.0\"\u003eCC BY SA\u003c/a\u003e.", "detectRetina": false, "maxNativeZoom": 18, "maxZoom": 18, "minZoom": 0, "noWrap": false, "opacity": 1, "subdomains": "abc", "tms": false}
+            ).addTo(map_1303571a681246839750209b15591f7b);
+        
+    
+            var tile_layer_8248a10257084accacf8615ce3bc1d45 = L.tileLayer(
+                "https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png",
+                {"attribution": "\u0026copy; \u003ca href=\"http://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors \u0026copy; \u003ca href=\"http://cartodb.com/attributions\"\u003eCartoDB\u003c/a\u003e, CartoDB \u003ca href =\"http://cartodb.com/attributions\"\u003eattributions\u003c/a\u003e", "detectRetina": false, "maxNativeZoom": 18, "maxZoom": 18, "minZoom": 0, "noWrap": false, "opacity": 1, "subdomains": "abc", "tms": false}
+            ).addTo(map_1303571a681246839750209b15591f7b);
+        
+    
+            var tile_layer_f14dc3e3f4cd4e4e8fcd82fd899234bf = L.tileLayer(
+                "https://stamen-tiles-{s}.a.ssl.fastly.net/toner/{z}/{x}/{y}.png",
+                {"attribution": "Map tiles by \u003ca href=\"http://stamen.com\"\u003eStamen Design\u003c/a\u003e, under \u003ca href=\"http://creativecommons.org/licenses/by/3.0\"\u003eCC BY 3.0\u003c/a\u003e. Data by \u0026copy; \u003ca href=\"http://openstreetmap.org\"\u003eOpenStreetMap\u003c/a\u003e, under \u003ca href=\"http://www.openstreetmap.org/copyright\"\u003eODbL\u003c/a\u003e.", "detectRetina": false, "maxNativeZoom": 18, "maxZoom": 18, "minZoom": 0, "noWrap": false, "opacity": 1, "subdomains": "abc", "tms": false}
+            ).addTo(map_1303571a681246839750209b15591f7b);
+        
+    
+            var tile_layer_33f9e11a4cce43edb69803bee4369f2f = L.tileLayer(
+                "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                {"attribution": "Data by \u0026copy; \u003ca href=\"http://openstreetmap.org\"\u003eOpenStreetMap\u003c/a\u003e, under \u003ca href=\"http://www.openstreetmap.org/copyright\"\u003eODbL\u003c/a\u003e.", "detectRetina": false, "maxNativeZoom": 18, "maxZoom": 18, "minZoom": 0, "noWrap": false, "opacity": 1, "subdomains": "abc", "tms": false}
+            );
+            var mini_map_f8d497ea3f5f4f8cb210cc4c352ea6e7 = new L.Control.MiniMap(
+                tile_layer_33f9e11a4cce43edb69803bee4369f2f,
+                {"autoToggleDisplay": false, "centerFixed": false, "collapsedHeight": 25, "collapsedWidth": 25, "height": 150, "minimized": false, "position": "bottomright", "toggleDisplay": true, "width": 150, "zoomAnimation": false, "zoomLevelOffset": -5}
+            );
+            map_1303571a681246839750209b15591f7b.addControl(mini_map_f8d497ea3f5f4f8cb210cc4c352ea6e7);
+        
+    
+            var feature_group_4102aa9e05ce4df3b1fa6dbe5201b952 = L.featureGroup(
+                {}
+            ).addTo(map_1303571a681246839750209b15591f7b);
+        
+    
+            var heat_map_b6340eb25269459ebb248fc31d04d0bf = L.heatLayer(
+                [[52.1927885, -1.7063668, 5]],
+                {"blur": 15, "maxOpacity": 0.8, "maxZoom": 18, "minOpacity": 0.5, "radius": 25}
+            ).addTo(feature_group_4102aa9e05ce4df3b1fa6dbe5201b952);
+        
+    
+            var feature_group_9ce05bc15a874036a8220c0f82c2aeed = L.featureGroup(
+                {}
+            ).addTo(map_1303571a681246839750209b15591f7b);
+        
+    
+            var marker_d5e6c0cd41e04719b6f39d20212eebb2 = L.marker(
+                [52.19253678947478, -1.7064919225656232],
+                {"opacity": 0.5}
+            ).addTo(feature_group_9ce05bc15a874036a8220c0f82c2aeed);
+        
+    
+            var icon_5c2734d96146493e9d7cf542f3a18946 = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "child", "iconColor": "white", "markerColor": "orange", "prefix": "fa"}
+            );
+            marker_d5e6c0cd41e04719b6f39d20212eebb2.setIcon(icon_5c2734d96146493e9d7cf542f3a18946);
+        
+    
+        var popup_3cd33687039b458c96cdf4c8b6766531 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_5fcaa596e4694bad9a6ad3e00c92c04f = $(`<div id="html_5fcaa596e4694bad9a6ad3e00c92c04f" style="width: 100.0%; height: 100.0%;">         William ShakespeareLife of William Shakespeare<br>Born 1564 Died 1616</div>`)[0];
+            popup_3cd33687039b458c96cdf4c8b6766531.setContent(html_5fcaa596e4694bad9a6ad3e00c92c04f);
+        
+
+        marker_d5e6c0cd41e04719b6f39d20212eebb2.bindPopup(popup_3cd33687039b458c96cdf4c8b6766531)
+        ;
+
+        
+    
+    
+            marker_d5e6c0cd41e04719b6f39d20212eebb2.bindTooltip(
+                `<div>
+                     Life of          William Shakespeare
+                 </div>`,
+                {"sticky": true}
+            );
+        
+    
+            var marker_026eda56716b4946a192f99a2d9913d0 = L.marker(
+                [52.19255183993969, -1.7063830413689973],
+                {"opacity": 0.5}
+            ).addTo(feature_group_9ce05bc15a874036a8220c0f82c2aeed);
+        
+    
+            var icon_601800746a90498a965eece3208a7635 = L.AwesomeMarkers.icon(
+                {"extraClasses": "fas", "icon": "cross", "iconColor": "white", "markerColor": "gray", "prefix": "fa"}
+            );
+            marker_026eda56716b4946a192f99a2d9913d0.setIcon(icon_601800746a90498a965eece3208a7635);
+        
+    
+        var popup_a45aaa9e3ce349ee81a53dcc45e4ded8 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_063b2ed84b024d75abd3659a3179e264 = $(`<div id="html_063b2ed84b024d75abd3659a3179e264" style="width: 100.0%; height: 100.0%;">         William ShakespeareLife of William Shakespeare<br>Born 1564 Died 1616</div>`)[0];
+            popup_a45aaa9e3ce349ee81a53dcc45e4ded8.setContent(html_063b2ed84b024d75abd3659a3179e264);
+        
+
+        marker_026eda56716b4946a192f99a2d9913d0.bindPopup(popup_a45aaa9e3ce349ee81a53dcc45e4ded8)
+        ;
+
+        
+    
+    
+            marker_026eda56716b4946a192f99a2d9913d0.bindTooltip(
+                `<div>
+                     Life of          William Shakespeare
+                 </div>`,
+                {"sticky": true}
+            );
+        
+    
+            ant_path_ddbb8f3f7223404682ae2dc35c990ba4 = L.polyline.antPath(
+              [[52.19253678947478, -1.7064919225656232], [52.19304937573376, -1.7059121045301435], [52.19255183993969, -1.7063830413689973]],
+              {"bubblingMouseEvents": true, "color": "gray", "dashArray": [10, 20], "dashOffset": null, "delay": 400, "fill": false, "fillColor": "gray", "fillOpacity": 0.2, "fillRule": "evenodd", "hardwareAcceleration": false, "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.7, "paused": false, "pulseColor": "#FFFFFF", "reverse": false, "smoothFactor": 1.0, "stroke": true, "weight": 12}
+        ).addTo(feature_group_9ce05bc15a874036a8220c0f82c2aeed);
+        
+    
+        var popup_ed25f8f032d94088b03d1bf2b615586d = L.popup({"maxWidth": "100%"});
+
+        
+            var html_95d5313567f0416bad417780b76234c3 = $(`<div id="html_95d5313567f0416bad417780b76234c3" style="width: 100.0%; height: 100.0%;">         William ShakespeareLife of William Shakespeare<br>Born 1564 Died 1616</div>`)[0];
+            popup_ed25f8f032d94088b03d1bf2b615586d.setContent(html_95d5313567f0416bad417780b76234c3);
+        
+
+        ant_path_ddbb8f3f7223404682ae2dc35c990ba4.bindPopup(popup_ed25f8f032d94088b03d1bf2b615586d)
+        ;
+
+        
+    
+    
+            ant_path_ddbb8f3f7223404682ae2dc35c990ba4.bindTooltip(
+                `<div>
+                     William Shakespeare
+                 </div>`,
+                {"sticky": true}
+            );
+        
+    
+            var feature_group_918e3a72c6d44659b6e8e92223987f61 = L.featureGroup(
+                {}
+            ).addTo(map_1303571a681246839750209b15591f7b);
+        
+    
+            var marker_047c1f4fe93f4782b6e4f1360a96b772 = L.marker(
+                [52.19261353716916, -1.7061231578273175],
+                {"opacity": 0.5}
+            ).addTo(feature_group_918e3a72c6d44659b6e8e92223987f61);
+        
+    
+            var icon_f96ffd1d8c88443c81c9b97e10350620 = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "baby", "iconColor": "white", "markerColor": "green", "prefix": "fa"}
+            );
+            marker_047c1f4fe93f4782b6e4f1360a96b772.setIcon(icon_f96ffd1d8c88443c81c9b97e10350620);
+        
+    
+        var popup_f6b006b373194d8a974da5548e65e8f0 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_75f3dc450ade42c2bb42d4e1b6a0a124 = $(`<div id="html_75f3dc450ade42c2bb42d4e1b6a0a124" style="width: 100.0%; height: 100.0%;">0        John Shakespearefather of William Shakespeare<br>Born 1531 Died 1601</div>`)[0];
+            popup_f6b006b373194d8a974da5548e65e8f0.setContent(html_75f3dc450ade42c2bb42d4e1b6a0a124);
+        
+
+        marker_047c1f4fe93f4782b6e4f1360a96b772.bindPopup(popup_f6b006b373194d8a974da5548e65e8f0)
+        ;
+
+        
+    
+    
+            marker_047c1f4fe93f4782b6e4f1360a96b772.bindTooltip(
+                `<div>
+                     0        John Shakespeare father of William Shakespeare
+                 </div>`,
+                {"sticky": true}
+            );
+        
+    
+            var feature_group_79bfe67ad8fe4298a878b9861d32cb1c = L.featureGroup(
+                {}
+            ).addTo(map_1303571a681246839750209b15591f7b);
+        
+    
+            var marker_22d4b06a121d4212b67c767e1fc9c936 = L.marker(
+                [52.192402732412965, -1.7062984844456366],
+                {"opacity": 0.5}
+            ).addTo(feature_group_79bfe67ad8fe4298a878b9861d32cb1c);
+        
+    
+            var icon_efbe13606cf64e55b03113991a478cfe = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "baby", "iconColor": "white", "markerColor": "green", "prefix": "fa"}
+            );
+            marker_22d4b06a121d4212b67c767e1fc9c936.setIcon(icon_efbe13606cf64e55b03113991a478cfe);
+        
+    
+        var popup_726849e247e14bc4aaf98c66e0e22349 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_9a62103e8c6b4b48b999830c54560ee2 = $(`<div id="html_9a62103e8c6b4b48b999830c54560ee2" style="width: 100.0%; height: 100.0%;">1        Mary Ardenmother of William Shakespeare<br>Born 1537 Died 1608</div>`)[0];
+            popup_726849e247e14bc4aaf98c66e0e22349.setContent(html_9a62103e8c6b4b48b999830c54560ee2);
+        
+
+        marker_22d4b06a121d4212b67c767e1fc9c936.bindPopup(popup_726849e247e14bc4aaf98c66e0e22349)
+        ;
+
+        
+    
+    
+            marker_22d4b06a121d4212b67c767e1fc9c936.bindTooltip(
+                `<div>
+                     1        Mary Arden mother of William Shakespeare
+                 </div>`,
+                {"sticky": true}
+            );
+        
+    
+            var layer_control_f219ae0bd88f41e8898edd649baca93b = {
+                base_layers : {
+                    "openstreetmap" : tile_layer_2c81ae32ffdc48249c9d7c4451d9c44f,
+                    "Open Street Map" : tile_layer_f541b3acb74b4814a3dc99c064b0815c,
+                    "Stamen Terrain" : tile_layer_6e9ca6fe0533492b8bfb0aa3b3324366,
+                    "CartoDB Positron" : tile_layer_8248a10257084accacf8615ce3bc1d45,
+                    "Stamen Toner" : tile_layer_f14dc3e3f4cd4e4e8fcd82fd899234bf,
+                },
+                overlays :  {
+                    "\u003cspan style=\"color: black;\"\u003eHeatmap\u003c/span\u003e" : feature_group_4102aa9e05ce4df3b1fa6dbe5201b952,
+                    "\u003cspan style=\"color: #ffd800;\"\u003e1 William Shakespeare\u003c/span\u003e (4)" : feature_group_9ce05bc15a874036a8220c0f82c2aeed,
+                    "\u003cspan style=\"color: #2b8cbe;\"\u003e 0        John Shakespea...\u003c/span\u003e (0)" : feature_group_918e3a72c6d44659b6e8e92223987f61,
+                    "\u003cspan style=\"color: pink;\"\u003e10 1        Mary Arden\u003c/span\u003e (0)" : feature_group_79bfe67ad8fe4298a878b9861d32cb1c,
+                },
+            };
+            L.control.layers(
+                layer_control_f219ae0bd88f41e8898edd649baca93b.base_layers,
+                layer_control_f219ae0bd88f41e8898edd649baca93b.overlays,
+                {"autoZIndex": true, "collapsed": false, "position": "topleft"}
+            ).addTo(map_1303571a681246839750209b15591f7b);
+            tile_layer_f541b3acb74b4814a3dc99c064b0815c.remove();
+            tile_layer_6e9ca6fe0533492b8bfb0aa3b3324366.remove();
+            tile_layer_8248a10257084accacf8615ce3bc1d45.remove();
+            tile_layer_f14dc3e3f4cd4e4e8fcd82fd899234bf.remove();
+            feature_group_9ce05bc15a874036a8220c0f82c2aeed.remove();
+            feature_group_918e3a72c6d44659b6e8e92223987f61.remove();
+            feature_group_79bfe67ad8fe4298a878b9861d32cb1c.remove();
+        
+    
+            var marker_5a6d90f62a584c6e809b5f703da088e5 = L.marker(
+                [52.1924137900589, -1.7065991259580724],
+                {"opacity": 0.5}
+            ).addTo(map_1303571a681246839750209b15591f7b);
+        
+    
+            var icon_864e48a798db4653a85243ffd8a4e554 = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "star", "iconColor": "white", "iconSize": ["50%", "50%"], "markerColor": "lightred", "prefix": "fa"}
+            );
+            marker_5a6d90f62a584c6e809b5f703da088e5.setIcon(icon_864e48a798db4653a85243ffd8a4e554);
+        
+    
+            marker_5a6d90f62a584c6e809b5f703da088e5.bindTooltip(
+                `<div>
+                     William Shakespeare
+                 </div>`,
+                {"sticky": true}
+            );
+        
+</script>

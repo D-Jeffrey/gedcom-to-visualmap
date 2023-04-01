@@ -5,7 +5,6 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-from models.Color import Color
 from models.Human import Human, LifeEvent
 from models.Line import Line
 from models.Pos import Pos

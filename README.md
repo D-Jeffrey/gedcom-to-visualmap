@@ -26,9 +26,6 @@ $ git clone https://github.com/D-Jeffrey/gedcom-to-visualmap
 
 Alternatively download the zip package of the latest [release](https://github.com/D-Jeffrey/gedcom-to-visualmap/releases) and unzip the package into a directory (such as gedcom-to-visualmap)
 
-[//]: # (1. 2nd alternative)
-[//]: # (pip install git+https://github.com/D-Jeffrey/gedcom-to-visualmap.git#egg=gedcom-to-visualmap)
-
 2. Install dependencies:
 ```
 $ cd gedcom-to-visualmap
@@ -38,17 +35,17 @@ $ pip install -r requirements.txt
 3. Run the GUI interface:
 ```
 cd gedcom-to-map
-python gedcomVisualGUI.py 
+python3 gedcomVisualGUI.py 
 ```
 
 Alternate 3. Start the command line  (Not recommended as there are so many options)
 ```
 cd gedcom-to-map
-python gedcom-to-map.py /users/darren/documents/myhertitagetree.ged myTree -main "@I500003@" 
+python3 gedcom-to-map.py /users/darren/documents/myhertitagetree.ged myTree -main "@I500003@" 
 ```
 
 ## GUI
-![img](samples/pythonw3.9_2023-04-01.png)
+![img](docs/pythonw3.9_2023-04-01.png)
 
 To use the GUI version, `File- > Open` and select your .ged file.
 Set your options in the GUI interface  
@@ -119,17 +116,16 @@ which are overlayed on each other.
 
 
 ```
-pip install -r requirements.txt
 cd samples
-python ..\gedcom-to-map\gedcom-to-map.py input.ged out  -format HTML -groupby 1
-python ..\gedcom-to-map\gedcom-to-map.py input.ged out -main "@I0000@" -format KML
+python3 ..\gedcom-to-map\gedcom-to-map.py input.ged output  -format HTML -groupby 1
+python3 ..\gedcom-to-map\gedcom-to-map.py input.ged output -main "@I0000@" -format KML
 
 ```
 
-* HTML Output : [samples/output.html](samples/output.html)
+* HTML Output : [docs/output.html](docs/output.html)
 
 ## KML Example revised
-![img](samples/msedge_2022-01-02_12-36-33.png)
+![img](docs/msedge_output.kml.png)
 * KML Output  : [samples/output.kml](samples/output.kml)
 
 Go to https://www.google.ca/maps/about/mymaps  
@@ -146,38 +142,27 @@ If you do not have GPS location in your GEDCOM file, then use -born or -born -de
 
 
 
-![img](samples/pres2020.png)
+![img](docs/pres2020.png)
 ```
-cd samples
-python ..\gedcom-to-map\gedcom-to-map.py pres2020.ged pres2020 -main "@I1@" -format HTML -groupby 1 -nomarkstar -antpath
+cd 
+python3 ..\gedcom-to-map\gedcom-to-map.py pres2020.ged pres2020 -main "@I1@" -format HTML -groupby 1 -nomarkstar -antpath
 ```
-* HTML Output  : [samples/pres2020-2.html](samples/pres2020-2.html)
 
-![img](samples/pres2020-2.png)
+![img](docs/pres2020-2.png)
 ```
-python ..\gedcom-to-map\gedcom-to-map.py pres2020.ged pres2020-2 -main "@I676@" -format HTML -groupby 1 -nomarkstar -antpath
+python3 ..\gedcom-to-map\gedcom-to-map.py pres2020.ged pres2020-2 -main "@I676@" -format HTML -groupby 1 -nomarkstar -antpath
 ```
 
 * KML Output  : [samples/pres2020-2.kml](samples/pres2020-2.kml)
 ```
-python ..\gedcom-to-map\gedcom-to-map.py pres2020.ged pres2020-2 -main "@I676@" -format KML
+python3 ..\gedcom-to-map\gedcom-to-map.py pres2020.ged pres2020-2 -main "@I676@" -format KML
 ```
 
 ## Complex Export of MyHeritage - intereactive map
-![img](samples/msedge_2022-02-02_22-33-16.gif)
+![img](docs/msedge_2022-02-02_22-33-16.gif)
 
-##Running on Linux (WSL)
-Using the steps of download and unzip release 0.2.1
-```
-pip install -U attrdict3
-pip install wxPython
-cd gedcom-to-visualmap
-pip install -r requirements.txt
-python3 gedcomVisualGUI.py 
-```
-![img](samples/WSL-2023-04-01-bash.png)
-
-![img](samples/WSL-2023-03-31.png)
+## Running on Linux
+- [See Running on WSL](docs/running-on-wsl.md)
 
 ## TODO
 - Add a treed hierarchy selector to enable people as groups and add expand/collapse to navigation
@@ -187,60 +172,23 @@ python3 gedcomVisualGUI.py
 - create a marker animation by year (in time steps)
 - better save the state of the options for next use
 - in Person dialog show something for people still alive (vs None or Unknown)
-- allow sorting by last name in List box
-
+- reduce loop cycle on idle
 
 ## Issues
 - Marriage is not read correctly all the time, does not deal with multiple marriages
 ### GUI
-- Sorting does not work correctly
-- Cache Only checkboxes is not working
 - Need to separate the Load and GPS resolve steps
 - Need to better detect change to the GPS cache file
 - could be memory leak issues
 - need to determine how do deal with very large HTML files
 - logging panel leaks over the people grid
 
-## Linux (WSL - WSL version: 1.1.3.0)
-  (Some assistance from https://askubuntu.com/questions/1252007/opening-ubuntu-20-04-desktop-on-wsl2/1365455#1365455)
-```
-sudo apt-get update
-sudo apt install python3-pip
-sudo apt install pkg-config
-sudo apt install libgtk-3-dev 
 
-sudo apt install xrdp xfce4
-# If asked, select lightdm, although it probably doesn't matter
-
-# Optionally, back up the default config
-sudo cp /etc/xrdp/xrdp.ini /etc/xrdp/xrdp.ini.bak
-# Windows Pro and higher are often already running RDP on 3389
-# Prevent conflicts:
-sudo sed -i 's/3389/3390/g' /etc/xrdp/xrdp.ini
-
-# Prevent Wayland from being used in Xrdp
-echo "export WAYLAND_DISPLAY=" > ~/.xsessionrc
-
-# Optional, if you only have one desktop environment installed
-echo startxfce4 > ~/.xsession 
-sudo service xrdp start
-
-# login using RDP to localhost:3390
-# open Terminal session on X-windows
-
-sudo apt-get install python3-venv
-
-# do this in advance so insure that it gets installed correctly and you can quickly troubleshoot
-
-
-python3 -m venv gedcom-to-visualmap
-source gedcom-to-visualmap/bin/activate
-pip install -U attrdict3
-pip install wxPython
-pip install git+https://github.com/D-Jeffrey/gedcom-to-visualmap.git#egg=gedcom-to-visualmap
-```
 
 ## Releases
+### v0.2.3
+- re-org the project files
+
 ### v0.2.2
 - corrected imports (removed gedcom package dependacy) and requirements.txt (again)
 - on Linux sample

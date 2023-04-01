@@ -75,7 +75,7 @@ class gvOptions:
             self.ResultType = "html"
         else:
             self.ResultType = "kml"
-        pathname, extension = os.path.splitext(self.Result)
+        _, extension = os.path.splitext(self.Result)
         if extension == "" and self.Result != "":
             self.Result = self.Result + "." + self.ResultType
 
@@ -84,7 +84,7 @@ class gvOptions:
         org = self.GEDCOMinput
         self.GEDCOMinput= GEDCOMinput
 
-        pathname, extension = os.path.splitext(self.GEDCOMinput)
+        _, extension = os.path.splitext(self.GEDCOMinput)
         if extension == "" and self.GEDCOMinput != "":
             self.GEDCOMinput = self.GEDCOMinput + ".ged"
         self.resultpath = os.path.dirname(self.GEDCOMinput)

@@ -1,9 +1,9 @@
-from creator.Creator import Creator
-from creator.Creator import LifetimeCreator
+from models.Creator import Creator
+from models.Creator import LifetimeCreator
 from gedcom.GedcomParser import GedcomParser
-from kml.KmlExporter import KmlExporter
-from kml.foliumExp import foliumExporter
-from kml.gpslookup import GEDComGPSLookup
+from render.KmlExporter import KmlExporter
+from render.foliumExp import foliumExporter
+from gedcom.gpslookup import GEDComGPSLookup
 from models.Pos import Pos
 from gedcomoptions import gvOptions
 import webbrowser

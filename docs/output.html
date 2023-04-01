@@ -1,0 +1,1529 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    
+        <script>
+            L_NO_TOUCH = false;
+            L_DISABLE_3D = false;
+        </script>
+    
+    <style>html, body {width: 100%;height: 100%;margin: 0;padding: 0;}</style>
+    <style>#map {position:absolute;top:0;bottom:0;right:0;left:0;}</style>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <script src="https://use.fontawesome.com/releases/v5.15.4/js/all.js" data-auto-replace-svg="nest"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/all.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+    
+            <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <style>
+                #map_36df8d3998a38802d36d52183b3b8735 {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+                .leaflet-container { font-size: 1rem; }
+            </style>
+        
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-minimap/3.6.1/Control.MiniMap.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-minimap/3.6.1/Control.MiniMap.css"/>
+    <script src="https://cdn.jsdelivr.net/gh/python-visualization/folium@main/folium/templates/leaflet_heat.min.js"></script>
+    
+                <style>
+                    #float_image_ce17dda67644491d839ba0951855f251 {
+                        position: absolute;
+                        bottom: 0%;
+                        left: 86%;
+                        }
+                </style>
+            
+</head>
+<body>
+    
+    
+            <div class="folium-map" id="map_36df8d3998a38802d36d52183b3b8735" ></div>
+        
+    
+            <img id="float_image_ce17dda67644491d839ba0951855f251" alt="float_image"
+                 src="legend.png"
+                 style="z-index: 999999">
+            </img>
+            
+</body>
+<script>
+    
+    
+            var map_36df8d3998a38802d36d52183b3b8735 = L.map(
+                "map_36df8d3998a38802d36d52183b3b8735",
+                {
+                    center: [0.0, 0.0],
+                    crs: L.CRS.EPSG3857,
+                    zoom: 2,
+                    zoomControl: true,
+                    preferCanvas: false,
+                }
+            );
+
+            
+
+        
+    
+            var tile_layer_1187c63c88762314a5ad99cc3bfafe4d = L.tileLayer(
+                "https://stamen-tiles-{s}.a.ssl.fastly.net/toner/{z}/{x}/{y}.png",
+                {"attribution": "Map tiles by \u003ca target=\"_blank\" href=\"http://stamen.com\"\u003eStamen Design\u003c/a\u003e, under \u003ca target=\"_blank\" href=\"http://creativecommons.org/licenses/by/3.0\"\u003eCC BY 3.0\u003c/a\u003e. Data by \u0026copy; \u003ca target=\"_blank\" href=\"http://openstreetmap.org\"\u003eOpenStreetMap\u003c/a\u003e, under \u003ca target=\"_blank\" href=\"http://www.openstreetmap.org/copyright\"\u003eODbL\u003c/a\u003e.", "detectRetina": false, "maxNativeZoom": 18, "maxZoom": 18, "minZoom": 0, "noWrap": false, "opacity": 1, "subdomains": "abc", "tms": false}
+            ).addTo(map_36df8d3998a38802d36d52183b3b8735);
+        
+    
+            var tile_layer_e305d5eeedea7cfd6d9153c98ad21b93 = L.tileLayer(
+                "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                {"attribution": "Data by \u0026copy; \u003ca target=\"_blank\" href=\"http://openstreetmap.org\"\u003eOpenStreetMap\u003c/a\u003e, under \u003ca target=\"_blank\" href=\"http://www.openstreetmap.org/copyright\"\u003eODbL\u003c/a\u003e.", "detectRetina": false, "maxNativeZoom": 18, "maxZoom": 18, "minZoom": 0, "noWrap": false, "opacity": 1, "subdomains": "abc", "tms": false}
+            ).addTo(map_36df8d3998a38802d36d52183b3b8735);
+        
+    
+            var tile_layer_5779f2ff6acc62efbd6d93ecb90e5837 = L.tileLayer(
+                "https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}.jpg",
+                {"attribution": "Map tiles by \u003ca target=\"_blank\" href=\"http://stamen.com\"\u003eStamen Design\u003c/a\u003e, under \u003ca target=\"_blank\" href=\"http://creativecommons.org/licenses/by/3.0\"\u003eCC BY 3.0\u003c/a\u003e. Data by \u0026copy; \u003ca target=\"_blank\" href=\"http://openstreetmap.org\"\u003eOpenStreetMap\u003c/a\u003e, under \u003ca target=\"_blank\" href=\"http://creativecommons.org/licenses/by-sa/3.0\"\u003eCC BY SA\u003c/a\u003e.", "detectRetina": false, "maxNativeZoom": 18, "maxZoom": 18, "minZoom": 0, "noWrap": false, "opacity": 1, "subdomains": "abc", "tms": false}
+            ).addTo(map_36df8d3998a38802d36d52183b3b8735);
+        
+    
+            var tile_layer_6bc23578b159d20a268a00bcff864d1d = L.tileLayer(
+                "https://stamen-tiles-{s}.a.ssl.fastly.net/toner/{z}/{x}/{y}.png",
+                {"attribution": "Map tiles by \u003ca target=\"_blank\" href=\"http://stamen.com\"\u003eStamen Design\u003c/a\u003e, under \u003ca target=\"_blank\" href=\"http://creativecommons.org/licenses/by/3.0\"\u003eCC BY 3.0\u003c/a\u003e. Data by \u0026copy; \u003ca target=\"_blank\" href=\"http://openstreetmap.org\"\u003eOpenStreetMap\u003c/a\u003e, under \u003ca target=\"_blank\" href=\"http://www.openstreetmap.org/copyright\"\u003eODbL\u003c/a\u003e.", "detectRetina": false, "maxNativeZoom": 18, "maxZoom": 18, "minZoom": 0, "noWrap": false, "opacity": 1, "subdomains": "abc", "tms": false}
+            ).addTo(map_36df8d3998a38802d36d52183b3b8735);
+        
+    
+            var tile_layer_92cb41e1062783a4f097742dcf2f8334 = L.tileLayer(
+                "https://stamen-tiles-{s}.a.ssl.fastly.net/watercolor/{z}/{x}/{y}.jpg",
+                {"attribution": "Map tiles by \u003ca target=\"_blank\" href=\"http://stamen.com\"\u003eStamen Design\u003c/a\u003e, under \u003ca target=\"_blank\" href=\"http://creativecommons.org/licenses/by/3.0\"\u003eCC BY 3.0\u003c/a\u003e. Data by \u0026copy; \u003ca target=\"_blank\" href=\"http://openstreetmap.org\"\u003eOpenStreetMap\u003c/a\u003e, under \u003ca target=\"_blank\" href=\"http://creativecommons.org/licenses/by-sa/3.0\"\u003eCC BY SA\u003c/a\u003e.", "detectRetina": false, "maxNativeZoom": 18, "maxZoom": 18, "minZoom": 0, "noWrap": false, "opacity": 1, "subdomains": "abc", "tms": false}
+            ).addTo(map_36df8d3998a38802d36d52183b3b8735);
+        
+    
+            var tile_layer_3dd2669fc743a105f9e2e9d824f75b72 = L.tileLayer(
+                "https://cartodb-basemaps-{s}.global.ssl.fastly.net/dark_all/{z}/{x}/{y}.png",
+                {"attribution": "\u0026copy; \u003ca target=\"_blank\" href=\"http://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors \u0026copy; \u003ca target=\"_blank\" href=\"http://cartodb.com/attributions\"\u003eCartoDB\u003c/a\u003e, CartoDB \u003ca target=\"_blank\" href =\"http://cartodb.com/attributions\"\u003eattributions\u003c/a\u003e", "detectRetina": false, "maxNativeZoom": 18, "maxZoom": 18, "minZoom": 0, "noWrap": false, "opacity": 1, "subdomains": "abc", "tms": false}
+            ).addTo(map_36df8d3998a38802d36d52183b3b8735);
+        
+    
+            var tile_layer_8f36b2de98b3cac095cce33a731291bc = L.tileLayer(
+                "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                {"attribution": "Data by \u0026copy; \u003ca target=\"_blank\" href=\"http://openstreetmap.org\"\u003eOpenStreetMap\u003c/a\u003e, under \u003ca target=\"_blank\" href=\"http://www.openstreetmap.org/copyright\"\u003eODbL\u003c/a\u003e.", "detectRetina": false, "maxNativeZoom": 18, "maxZoom": 18, "minZoom": 0, "noWrap": false, "opacity": 1, "subdomains": "abc", "tms": false}
+            );
+            var mini_map_e6733ac60755660aa6806e2583071fc7 = new L.Control.MiniMap(
+                tile_layer_8f36b2de98b3cac095cce33a731291bc,
+                {"autoToggleDisplay": false, "centerFixed": false, "collapsedHeight": 25, "collapsedWidth": 25, "height": 150, "minimized": false, "position": "bottomright", "toggleDisplay": true, "width": 150, "zoomAnimation": false, "zoomLevelOffset": -5}
+            );
+            map_36df8d3998a38802d36d52183b3b8735.addControl(mini_map_e6733ac60755660aa6806e2583071fc7);
+        
+    
+            var feature_group_262278893dd3852eaa8efe468705b5dd = L.featureGroup(
+                {}
+            ).addTo(map_36df8d3998a38802d36d52183b3b8735);
+        
+    
+            var heat_map_d36bd9bac427c8ccabab92e4d534ca17 = L.heatLayer(
+                [[45.7578137, 4.8320114, 3], [45.4401467, 4.3873058, 10], [45.6886292, 5.9146362, 2], [45.1875602, 5.7357819, 2], [45.8992348, 6.1288847, 4], [46.0338359, 6.1069469, 4], [46.1066771, 6.2676644, 2], [46.0190661, 5.9293421, 2], [45.9756168, 6.229819726831506, 2]],
+                {"blur": 15, "maxOpacity": 0.8, "maxZoom": 18, "minOpacity": 0.5, "radius": 25}
+            ).addTo(feature_group_262278893dd3852eaa8efe468705b5dd);
+        
+    
+            var feature_group_3f942e0e87442fb043c443d14c24f633 = L.featureGroup(
+                {}
+            ).addTo(map_36df8d3998a38802d36d52183b3b8735);
+        
+    
+            var marker_9b9d921066074f71cbd43c73e8fcb5bd = L.marker(
+                [45.75759659645885, 4.832191053872918],
+                {"opacity": 0.5}
+            ).addTo(feature_group_3f942e0e87442fb043c443d14c24f633);
+        
+    
+            var icon_ee3d99c149f7b25c0295ae4720568f18 = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "child", "iconColor": "white", "markerColor": "orange", "prefix": "fa"}
+            );
+            marker_9b9d921066074f71cbd43c73e8fcb5bd.setIcon(icon_ee3d99c149f7b25c0295ae4720568f18);
+        
+    
+        var popup_81ad5fd4f4f5ccaa0efe0234654f6dc5 = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_d97c0fed6c6a06ce264145735d2ac597 = $(`<div id="html_d97c0fed6c6a06ce264145735d2ac597" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>Life of          Pierre MARTIN</div></div>`)[0];
+                popup_81ad5fd4f4f5ccaa0efe0234654f6dc5.setContent(html_d97c0fed6c6a06ce264145735d2ac597);
+            
+        
+
+        marker_9b9d921066074f71cbd43c73e8fcb5bd.bindPopup(popup_81ad5fd4f4f5ccaa0efe0234654f6dc5)
+        ;
+
+        
+    
+    
+            marker_9b9d921066074f71cbd43c73e8fcb5bd.bindTooltip(
+                `<div>
+                     Life of          Pierre MARTIN
+                 </div>`,
+                {"sticky": true}
+            );
+        
+    
+            var marker_fd14c0d1e37ea11ce9176df86eb166d4 = L.marker(
+                [45.440592568078685, 4.387230258397656],
+                {"opacity": 0.5}
+            ).addTo(feature_group_3f942e0e87442fb043c443d14c24f633);
+        
+    
+            var icon_245637fb323681b033f872a02ae42bc7 = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "child", "iconColor": "white", "markerColor": "orange", "prefix": "fa"}
+            );
+            marker_fd14c0d1e37ea11ce9176df86eb166d4.setIcon(icon_245637fb323681b033f872a02ae42bc7);
+        
+    
+        var popup_071dde691c5fd6143ed28ece7a5c92b0 = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_4bdd4b7d3378a1706426a9234052464b = $(`<div id="html_4bdd4b7d3378a1706426a9234052464b" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>Life of 0        Antoine MARTIN</div></div>`)[0];
+                popup_071dde691c5fd6143ed28ece7a5c92b0.setContent(html_4bdd4b7d3378a1706426a9234052464b);
+            
+        
+
+        marker_fd14c0d1e37ea11ce9176df86eb166d4.bindPopup(popup_071dde691c5fd6143ed28ece7a5c92b0)
+        ;
+
+        
+    
+    
+            marker_fd14c0d1e37ea11ce9176df86eb166d4.bindTooltip(
+                `<div>
+                     Life of 0        Antoine MARTIN
+                 </div>`,
+                {"sticky": true}
+            );
+        
+    
+            var marker_f125aac29ac46dc327a42a535be5edb1 = L.marker(
+                [45.440550764545335, 4.387005379362079],
+                {"opacity": 0.5}
+            ).addTo(feature_group_3f942e0e87442fb043c443d14c24f633);
+        
+    
+            var icon_0e49f50859f37ecc49606f0c7ca22c3e = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "child", "iconColor": "white", "markerColor": "orange", "prefix": "fa"}
+            );
+            marker_f125aac29ac46dc327a42a535be5edb1.setIcon(icon_0e49f50859f37ecc49606f0c7ca22c3e);
+        
+    
+        var popup_f1a8a42a8e977e4f6023c6e5026de1e2 = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_c34da289f3d31ea3af8c77c512525e9e = $(`<div id="html_c34da289f3d31ea3af8c77c512525e9e" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>Life of 00       Gabriel MARTIN</div></div>`)[0];
+                popup_f1a8a42a8e977e4f6023c6e5026de1e2.setContent(html_c34da289f3d31ea3af8c77c512525e9e);
+            
+        
+
+        marker_f125aac29ac46dc327a42a535be5edb1.bindPopup(popup_f1a8a42a8e977e4f6023c6e5026de1e2)
+        ;
+
+        
+    
+    
+            marker_f125aac29ac46dc327a42a535be5edb1.bindTooltip(
+                `<div>
+                     Life of 00       Gabriel MARTIN
+                 </div>`,
+                {"sticky": true}
+            );
+        
+    
+            var marker_b8058bf1c6ae162f53862b1b97469fc3 = L.marker(
+                [45.43979827277164, 4.387308924482301],
+                {"opacity": 0.5}
+            ).addTo(feature_group_3f942e0e87442fb043c443d14c24f633);
+        
+    
+            var icon_2f7ac5dfbbabe9e4cd81c15bf9ed31f6 = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "baby", "iconColor": "white", "markerColor": "green", "prefix": "fa"}
+            );
+            marker_b8058bf1c6ae162f53862b1b97469fc3.setIcon(icon_2f7ac5dfbbabe9e4cd81c15bf9ed31f6);
+        
+    
+        var popup_7c66201c8318705102c8f89ea56869d5 = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_dfea9c91a2783c184b5a2a5daa05967e = $(`<div id="html_dfea9c91a2783c184b5a2a5daa05967e" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>000      Jean-Baptiste MARTIN father of Gabriel MARTIN</div></div>`)[0];
+                popup_7c66201c8318705102c8f89ea56869d5.setContent(html_dfea9c91a2783c184b5a2a5daa05967e);
+            
+        
+
+        marker_b8058bf1c6ae162f53862b1b97469fc3.bindPopup(popup_7c66201c8318705102c8f89ea56869d5)
+        ;
+
+        
+    
+    
+            marker_b8058bf1c6ae162f53862b1b97469fc3.bindTooltip(
+                `<div>
+                     000      Jean-Baptiste MARTIN father of Gabriel MARTIN
+                 </div>`,
+                {"sticky": true}
+            );
+        
+    
+            var marker_cddd4d471e013c0bee4a26eec88a76ce = L.marker(
+                [45.43982133021885, 4.387658050318294],
+                {"opacity": 0.5}
+            ).addTo(feature_group_3f942e0e87442fb043c443d14c24f633);
+        
+    
+            var icon_2f10a8c324670e0d8a0596fcb2a686d1 = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "baby", "iconColor": "white", "markerColor": "green", "prefix": "fa"}
+            );
+            marker_cddd4d471e013c0bee4a26eec88a76ce.setIcon(icon_2f10a8c324670e0d8a0596fcb2a686d1);
+        
+    
+        var popup_250c1e79944b5af61902aebd871fca1e = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_948448ba4caa0a6e84e60dd1661c3f71 = $(`<div id="html_948448ba4caa0a6e84e60dd1661c3f71" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>00       Gabriel MARTIN father of Antoine MARTIN</div></div>`)[0];
+                popup_250c1e79944b5af61902aebd871fca1e.setContent(html_948448ba4caa0a6e84e60dd1661c3f71);
+            
+        
+
+        marker_cddd4d471e013c0bee4a26eec88a76ce.bindPopup(popup_250c1e79944b5af61902aebd871fca1e)
+        ;
+
+        
+    
+    
+            marker_cddd4d471e013c0bee4a26eec88a76ce.bindTooltip(
+                `<div>
+                     00       Gabriel MARTIN father of Antoine MARTIN
+                 </div>`,
+                {"sticky": true}
+            );
+        
+    
+            var marker_8aa655de03e0b64b97df236f9eecd9c5 = L.marker(
+                [45.43971151514998, 4.3869671873224885],
+                {"opacity": 0.5}
+            ).addTo(feature_group_3f942e0e87442fb043c443d14c24f633);
+        
+    
+            var icon_5274e33e65124248f457ab82d7d0ced2 = L.AwesomeMarkers.icon(
+                {"extraClasses": "fas", "icon": "male", "iconColor": "white", "markerColor": "blue", "prefix": "fa"}
+            );
+            marker_8aa655de03e0b64b97df236f9eecd9c5.setIcon(icon_5274e33e65124248f457ab82d7d0ced2);
+        
+    
+        var popup_ff175dddd5849f5282ce45a79102d92f = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_287108ee54dc788d7f89cd40125c8ca1 = $(`<div id="html_287108ee54dc788d7f89cd40125c8ca1" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>00       Gabriel MARTIN father of Antoine MARTIN</div></div>`)[0];
+                popup_ff175dddd5849f5282ce45a79102d92f.setContent(html_287108ee54dc788d7f89cd40125c8ca1);
+            
+        
+
+        marker_8aa655de03e0b64b97df236f9eecd9c5.bindPopup(popup_ff175dddd5849f5282ce45a79102d92f)
+        ;
+
+        
+    
+    
+            marker_8aa655de03e0b64b97df236f9eecd9c5.bindTooltip(
+                `<div>
+                     00       Gabriel MARTIN father of Antoine MARTIN
+                 </div>`,
+                {"sticky": true}
+            );
+        
+    
+            var poly_line_1489de5bcfad8388747672460b16aa1e = L.polyline(
+                [[45.43982133021885, 4.387658050318294], [45.43971151514998, 4.3869671873224885]],
+                {"bubblingMouseEvents": true, "color": "#2b8cbe", "dashArray": [5, 5], "dashOffset": null, "fill": false, "fillColor": "#2b8cbe", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "arcs", "noClip": false, "opacity": 1, "smoothFactor": 1.0, "stroke": true, "weight": 7}
+            ).addTo(feature_group_3f942e0e87442fb043c443d14c24f633);
+        
+    
+        var popup_f70e343cfb726808f942c6e7c45268c0 = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_61ef4ddedfb39f69462b9ba77e3e80f6 = $(`<div id="html_61ef4ddedfb39f69462b9ba77e3e80f6" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>00       Gabriel MARTIN father of Antoine MARTIN</div></div>`)[0];
+                popup_f70e343cfb726808f942c6e7c45268c0.setContent(html_61ef4ddedfb39f69462b9ba77e3e80f6);
+            
+        
+
+        poly_line_1489de5bcfad8388747672460b16aa1e.bindPopup(popup_f70e343cfb726808f942c6e7c45268c0)
+        ;
+
+        
+    
+    
+            poly_line_1489de5bcfad8388747672460b16aa1e.bindTooltip(
+                `<div>
+                     00       Gabriel MARTIN
+                 </div>`,
+                {"sticky": true}
+            );
+        
+    
+            var marker_fcc1a923f0975016997b0e511a5c1b56 = L.marker(
+                [45.75778260808422, 4.832157191090383],
+                {"opacity": 0.5}
+            ).addTo(feature_group_3f942e0e87442fb043c443d14c24f633);
+        
+    
+            var icon_aaf7da11f444952952a4aa741e69c4f4 = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "baby", "iconColor": "white", "markerColor": "green", "prefix": "fa"}
+            );
+            marker_fcc1a923f0975016997b0e511a5c1b56.setIcon(icon_aaf7da11f444952952a4aa741e69c4f4);
+        
+    
+        var popup_243caff2341e695d08bcc28932c15113 = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_e2c838f75a560165026e95649156943d = $(`<div id="html_e2c838f75a560165026e95649156943d" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>0        Antoine MARTIN father of Pierre MARTIN</div></div>`)[0];
+                popup_243caff2341e695d08bcc28932c15113.setContent(html_e2c838f75a560165026e95649156943d);
+            
+        
+
+        marker_fcc1a923f0975016997b0e511a5c1b56.bindPopup(popup_243caff2341e695d08bcc28932c15113)
+        ;
+
+        
+    
+    
+            marker_fcc1a923f0975016997b0e511a5c1b56.bindTooltip(
+                `<div>
+                     0        Antoine MARTIN father of Pierre MARTIN
+                 </div>`,
+                {"sticky": true}
+            );
+        
+    
+            var marker_c6994c6cf658ac1b4d85182be979363f = L.marker(
+                [45.44006704527695, 4.387730327015937],
+                {"opacity": 0.5}
+            ).addTo(feature_group_3f942e0e87442fb043c443d14c24f633);
+        
+    
+            var icon_67fa0b6e3cc5e9010c1ffc518f03d78f = L.AwesomeMarkers.icon(
+                {"extraClasses": "fas", "icon": "male", "iconColor": "white", "markerColor": "blue", "prefix": "fa"}
+            );
+            marker_c6994c6cf658ac1b4d85182be979363f.setIcon(icon_67fa0b6e3cc5e9010c1ffc518f03d78f);
+        
+    
+        var popup_416d09ab4c993c569e093fa3c2fa62d7 = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_c613182976d8b956c31ee502c915c351 = $(`<div id="html_c613182976d8b956c31ee502c915c351" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>0        Antoine MARTIN father of Pierre MARTIN</div></div>`)[0];
+                popup_416d09ab4c993c569e093fa3c2fa62d7.setContent(html_c613182976d8b956c31ee502c915c351);
+            
+        
+
+        marker_c6994c6cf658ac1b4d85182be979363f.bindPopup(popup_416d09ab4c993c569e093fa3c2fa62d7)
+        ;
+
+        
+    
+    
+            marker_c6994c6cf658ac1b4d85182be979363f.bindTooltip(
+                `<div>
+                     0        Antoine MARTIN father of Pierre MARTIN
+                 </div>`,
+                {"sticky": true}
+            );
+        
+    
+            var poly_line_941149a7f918e9c4230dca6801fc98b8 = L.polyline(
+                [[45.75778260808422, 4.832157191090383], [45.44006704527695, 4.387730327015937]],
+                {"bubblingMouseEvents": true, "color": "#2b8cbe", "dashArray": [5, 5], "dashOffset": null, "fill": false, "fillColor": "#2b8cbe", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "arcs", "noClip": false, "opacity": 1, "smoothFactor": 1.0, "stroke": true, "weight": 12}
+            ).addTo(feature_group_3f942e0e87442fb043c443d14c24f633);
+        
+    
+        var popup_9910102ced5b70b24eaf2bc56ed43234 = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_e633c272ef82172c22dbd974dc04b2d1 = $(`<div id="html_e633c272ef82172c22dbd974dc04b2d1" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>0        Antoine MARTIN father of Pierre MARTIN</div></div>`)[0];
+                popup_9910102ced5b70b24eaf2bc56ed43234.setContent(html_e633c272ef82172c22dbd974dc04b2d1);
+            
+        
+
+        poly_line_941149a7f918e9c4230dca6801fc98b8.bindPopup(popup_9910102ced5b70b24eaf2bc56ed43234)
+        ;
+
+        
+    
+    
+            poly_line_941149a7f918e9c4230dca6801fc98b8.bindTooltip(
+                `<div>
+                     0        Antoine MARTIN
+                 </div>`,
+                {"sticky": true}
+            );
+        
+    
+            var feature_group_f774f83b39268bbf16cd51c613d73613 = L.featureGroup(
+                {}
+            ).addTo(map_36df8d3998a38802d36d52183b3b8735);
+        
+    
+            var marker_a201f4422e122b2c56c0d2e84ea85e26 = L.marker(
+                [45.89902154123299, 6.128384991874728],
+                {"opacity": 0.5}
+            ).addTo(feature_group_f774f83b39268bbf16cd51c613d73613);
+        
+    
+            var icon_a6b65155b1713d691af8ee048e7d66d3 = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "child", "iconColor": "white", "markerColor": "orange", "prefix": "fa"}
+            );
+            marker_a201f4422e122b2c56c0d2e84ea85e26.setIcon(icon_a6b65155b1713d691af8ee048e7d66d3);
+        
+    
+        var popup_1cc45fc3b5d531477ff2679c399cffa9 = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_bc06c9c7dd0b47e9dd29d2d44f818294 = $(`<div id="html_bc06c9c7dd0b47e9dd29d2d44f818294" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>Life of 1        C©♭line BERNARD</div></div>`)[0];
+                popup_1cc45fc3b5d531477ff2679c399cffa9.setContent(html_bc06c9c7dd0b47e9dd29d2d44f818294);
+            
+        
+
+        marker_a201f4422e122b2c56c0d2e84ea85e26.bindPopup(popup_1cc45fc3b5d531477ff2679c399cffa9)
+        ;
+
+        
+    
+    
+            marker_a201f4422e122b2c56c0d2e84ea85e26.bindTooltip(
+                `<div>
+                     Life of 1        C©♭line BERNARD
+                 </div>`,
+                {"sticky": true}
+            );
+        
+    
+            var marker_4116654d2f3658f7b5e20eef091711bd = L.marker(
+                [46.0339319575233, 6.1068706083967745],
+                {"opacity": 0.5}
+            ).addTo(feature_group_f774f83b39268bbf16cd51c613d73613);
+        
+    
+            var icon_50f3bd540d8e999aa46bbff7b4aad75e = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "child", "iconColor": "white", "markerColor": "orange", "prefix": "fa"}
+            );
+            marker_4116654d2f3658f7b5e20eef091711bd.setIcon(icon_50f3bd540d8e999aa46bbff7b4aad75e);
+        
+    
+        var popup_5d94ef02253a0c85611b014311888580 = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_f60e38ee9ffb7157da6bc3a90c676788 = $(`<div id="html_f60e38ee9ffb7157da6bc3a90c676788" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>Life of 10       Pierre BERNARD</div></div>`)[0];
+                popup_5d94ef02253a0c85611b014311888580.setContent(html_f60e38ee9ffb7157da6bc3a90c676788);
+            
+        
+
+        marker_4116654d2f3658f7b5e20eef091711bd.bindPopup(popup_5d94ef02253a0c85611b014311888580)
+        ;
+
+        
+    
+    
+            marker_4116654d2f3658f7b5e20eef091711bd.bindTooltip(
+                `<div>
+                     Life of 10       Pierre BERNARD
+                 </div>`,
+                {"sticky": true}
+            );
+        
+    
+            var marker_695c148a7b99f301c6df8d821676fe0b = L.marker(
+                [46.10647080181351, 6.267449979743183],
+                {"opacity": 0.5}
+            ).addTo(feature_group_f774f83b39268bbf16cd51c613d73613);
+        
+    
+            var icon_6ab1f8b462311e4eab879a4e2c6374e8 = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "child", "iconColor": "white", "markerColor": "orange", "prefix": "fa"}
+            );
+            marker_695c148a7b99f301c6df8d821676fe0b.setIcon(icon_6ab1f8b462311e4eab879a4e2c6374e8);
+        
+    
+        var popup_1995af00ad459e92f9723e69a441cad8 = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_f2ea76b2817cd15e32ff158f1e0e6a76 = $(`<div id="html_f2ea76b2817cd15e32ff158f1e0e6a76" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>Life of 100      Charles BERNARD</div></div>`)[0];
+                popup_1995af00ad459e92f9723e69a441cad8.setContent(html_f2ea76b2817cd15e32ff158f1e0e6a76);
+            
+        
+
+        marker_695c148a7b99f301c6df8d821676fe0b.bindPopup(popup_1995af00ad459e92f9723e69a441cad8)
+        ;
+
+        
+    
+    
+            marker_695c148a7b99f301c6df8d821676fe0b.bindTooltip(
+                `<div>
+                     Life of 100      Charles BERNARD
+                 </div>`,
+                {"sticky": true}
+            );
+        
+    
+            var marker_60bc084edc8abec13c24aa3ff131669e = L.marker(
+                [46.033567032983264, 6.106816503746704],
+                {"opacity": 0.5}
+            ).addTo(feature_group_f774f83b39268bbf16cd51c613d73613);
+        
+    
+            var icon_0cc8d223d7320abcd46791331880166e = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "baby", "iconColor": "white", "markerColor": "green", "prefix": "fa"}
+            );
+            marker_60bc084edc8abec13c24aa3ff131669e.setIcon(icon_0cc8d223d7320abcd46791331880166e);
+        
+    
+        var popup_8ceed6686a9c5803d84c4a8ca795d94f = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_133c843fc6e0009a5ff7b3110c69006c = $(`<div id="html_133c843fc6e0009a5ff7b3110c69006c" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>100      Charles BERNARD father of Pierre BERNARD</div></div>`)[0];
+                popup_8ceed6686a9c5803d84c4a8ca795d94f.setContent(html_133c843fc6e0009a5ff7b3110c69006c);
+            
+        
+
+        marker_60bc084edc8abec13c24aa3ff131669e.bindPopup(popup_8ceed6686a9c5803d84c4a8ca795d94f)
+        ;
+
+        
+    
+    
+            marker_60bc084edc8abec13c24aa3ff131669e.bindTooltip(
+                `<div>
+                     100      Charles BERNARD father of Pierre BERNARD
+                 </div>`,
+                {"sticky": true}
+            );
+        
+    
+            var marker_9ec2a4688beee411e054120a9f4a1a7c = L.marker(
+                [46.107091295798035, 6.267575888235183],
+                {"opacity": 0.5}
+            ).addTo(feature_group_f774f83b39268bbf16cd51c613d73613);
+        
+    
+            var icon_7d5d5483c9ee20db6b234d9ce788e30a = L.AwesomeMarkers.icon(
+                {"extraClasses": "fas", "icon": "male", "iconColor": "white", "markerColor": "blue", "prefix": "fa"}
+            );
+            marker_9ec2a4688beee411e054120a9f4a1a7c.setIcon(icon_7d5d5483c9ee20db6b234d9ce788e30a);
+        
+    
+        var popup_e38172be64976369f3f9f3e8539a9461 = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_b24a66787121c8429063aad523457a41 = $(`<div id="html_b24a66787121c8429063aad523457a41" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>100      Charles BERNARD father of Pierre BERNARD</div></div>`)[0];
+                popup_e38172be64976369f3f9f3e8539a9461.setContent(html_b24a66787121c8429063aad523457a41);
+            
+        
+
+        marker_9ec2a4688beee411e054120a9f4a1a7c.bindPopup(popup_e38172be64976369f3f9f3e8539a9461)
+        ;
+
+        
+    
+    
+            marker_9ec2a4688beee411e054120a9f4a1a7c.bindTooltip(
+                `<div>
+                     100      Charles BERNARD father of Pierre BERNARD
+                 </div>`,
+                {"sticky": true}
+            );
+        
+    
+            var poly_line_401c9a5b21a7a8e60d452ac047e5fe31 = L.polyline(
+                [[46.033567032983264, 6.106816503746704], [46.107091295798035, 6.267575888235183]],
+                {"bubblingMouseEvents": true, "color": "#2b8cbe", "dashArray": [5, 5], "dashOffset": null, "fill": false, "fillColor": "#2b8cbe", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "arcs", "noClip": false, "opacity": 1, "smoothFactor": 1.0, "stroke": true, "weight": 4}
+            ).addTo(feature_group_f774f83b39268bbf16cd51c613d73613);
+        
+    
+        var popup_61f046420600b739519a218a58c6aec4 = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_e14406cf311d13785be0c6ce0221368b = $(`<div id="html_e14406cf311d13785be0c6ce0221368b" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>100      Charles BERNARD father of Pierre BERNARD</div></div>`)[0];
+                popup_61f046420600b739519a218a58c6aec4.setContent(html_e14406cf311d13785be0c6ce0221368b);
+            
+        
+
+        poly_line_401c9a5b21a7a8e60d452ac047e5fe31.bindPopup(popup_61f046420600b739519a218a58c6aec4)
+        ;
+
+        
+    
+    
+            poly_line_401c9a5b21a7a8e60d452ac047e5fe31.bindTooltip(
+                `<div>
+                     100      Charles BERNARD
+                 </div>`,
+                {"sticky": true}
+            );
+        
+    
+            var marker_4de39bc93d6059c73d688ec7e2a39e63 = L.marker(
+                [45.899606893747496, 6.129184656043106],
+                {"opacity": 0.5}
+            ).addTo(feature_group_f774f83b39268bbf16cd51c613d73613);
+        
+    
+            var icon_520330fb1b74bc281261749eab345c54 = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "baby", "iconColor": "white", "markerColor": "green", "prefix": "fa"}
+            );
+            marker_4de39bc93d6059c73d688ec7e2a39e63.setIcon(icon_520330fb1b74bc281261749eab345c54);
+        
+    
+        var popup_a4f22e1b323141dbcc21d4cb1abe66d0 = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_acb2e24ec24bea83bef8ea41192097fd = $(`<div id="html_acb2e24ec24bea83bef8ea41192097fd" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>10       Pierre BERNARD father of C©♭line BERNARD</div></div>`)[0];
+                popup_a4f22e1b323141dbcc21d4cb1abe66d0.setContent(html_acb2e24ec24bea83bef8ea41192097fd);
+            
+        
+
+        marker_4de39bc93d6059c73d688ec7e2a39e63.bindPopup(popup_a4f22e1b323141dbcc21d4cb1abe66d0)
+        ;
+
+        
+    
+    
+            marker_4de39bc93d6059c73d688ec7e2a39e63.bindTooltip(
+                `<div>
+                     10       Pierre BERNARD father of C©♭line BERNARD
+                 </div>`,
+                {"sticky": true}
+            );
+        
+    
+            var marker_a8d90db807aa57e0bc664768fa8b8795 = L.marker(
+                [46.03371645458407, 6.107185704634649],
+                {"opacity": 0.5}
+            ).addTo(feature_group_f774f83b39268bbf16cd51c613d73613);
+        
+    
+            var icon_9689f51fd5e8a2dc9b2ccce4f257176e = L.AwesomeMarkers.icon(
+                {"extraClasses": "fas", "icon": "male", "iconColor": "white", "markerColor": "blue", "prefix": "fa"}
+            );
+            marker_a8d90db807aa57e0bc664768fa8b8795.setIcon(icon_9689f51fd5e8a2dc9b2ccce4f257176e);
+        
+    
+        var popup_84c10277a029f32ad59fc4cbf44ff21f = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_7f5572da08d4786f6bb639e4fc65f1bf = $(`<div id="html_7f5572da08d4786f6bb639e4fc65f1bf" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>10       Pierre BERNARD father of C©♭line BERNARD</div></div>`)[0];
+                popup_84c10277a029f32ad59fc4cbf44ff21f.setContent(html_7f5572da08d4786f6bb639e4fc65f1bf);
+            
+        
+
+        marker_a8d90db807aa57e0bc664768fa8b8795.bindPopup(popup_84c10277a029f32ad59fc4cbf44ff21f)
+        ;
+
+        
+    
+    
+            marker_a8d90db807aa57e0bc664768fa8b8795.bindTooltip(
+                `<div>
+                     10       Pierre BERNARD father of C©♭line BERNARD
+                 </div>`,
+                {"sticky": true}
+            );
+        
+    
+            var poly_line_e570d7d0cbeb078c1cf7a9f30b7e435c = L.polyline(
+                [[45.899606893747496, 6.129184656043106], [46.03371645458407, 6.107185704634649]],
+                {"bubblingMouseEvents": true, "color": "#2b8cbe", "dashArray": [5, 5], "dashOffset": null, "fill": false, "fillColor": "#2b8cbe", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "arcs", "noClip": false, "opacity": 1, "smoothFactor": 1.0, "stroke": true, "weight": 7}
+            ).addTo(feature_group_f774f83b39268bbf16cd51c613d73613);
+        
+    
+        var popup_02b0c3e0e10ab33619c87d48f91166f3 = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_cc2b9bc4eee9f614c43736891ce60f53 = $(`<div id="html_cc2b9bc4eee9f614c43736891ce60f53" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>10       Pierre BERNARD father of C©♭line BERNARD</div></div>`)[0];
+                popup_02b0c3e0e10ab33619c87d48f91166f3.setContent(html_cc2b9bc4eee9f614c43736891ce60f53);
+            
+        
+
+        poly_line_e570d7d0cbeb078c1cf7a9f30b7e435c.bindPopup(popup_02b0c3e0e10ab33619c87d48f91166f3)
+        ;
+
+        
+    
+    
+            poly_line_e570d7d0cbeb078c1cf7a9f30b7e435c.bindTooltip(
+                `<div>
+                     10       Pierre BERNARD
+                 </div>`,
+                {"sticky": true}
+            );
+        
+    
+            var marker_50fe8895eb163d05a727ed5fc1826be2 = L.marker(
+                [45.75743512167249, 4.83195201751822],
+                {"opacity": 0.5}
+            ).addTo(feature_group_f774f83b39268bbf16cd51c613d73613);
+        
+    
+            var icon_d4310b0ab6d5dc895982561480c2477b = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "baby", "iconColor": "white", "markerColor": "green", "prefix": "fa"}
+            );
+            marker_50fe8895eb163d05a727ed5fc1826be2.setIcon(icon_d4310b0ab6d5dc895982561480c2477b);
+        
+    
+        var popup_8ce62031eba129c64aee4cbc27a5f6eb = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_ef2d0d1b5d29adf7b28b2d53a5f3b8c2 = $(`<div id="html_ef2d0d1b5d29adf7b28b2d53a5f3b8c2" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>1        C©♭line BERNARD mother of Pierre MARTIN</div></div>`)[0];
+                popup_8ce62031eba129c64aee4cbc27a5f6eb.setContent(html_ef2d0d1b5d29adf7b28b2d53a5f3b8c2);
+            
+        
+
+        marker_50fe8895eb163d05a727ed5fc1826be2.bindPopup(popup_8ce62031eba129c64aee4cbc27a5f6eb)
+        ;
+
+        
+    
+    
+            marker_50fe8895eb163d05a727ed5fc1826be2.bindTooltip(
+                `<div>
+                     1        C©♭line BERNARD mother of Pierre MARTIN
+                 </div>`,
+                {"sticky": true}
+            );
+        
+    
+            var marker_d39cbbc26289f16127cf3bb0c78c0d32 = L.marker(
+                [45.89927693241576, 6.129380756436424],
+                {"opacity": 0.5}
+            ).addTo(feature_group_f774f83b39268bbf16cd51c613d73613);
+        
+    
+            var icon_8c4fdaf8e363e14eda292268b541f5d3 = L.AwesomeMarkers.icon(
+                {"extraClasses": "fas", "icon": "female", "iconColor": "white", "markerColor": "pink", "prefix": "fa"}
+            );
+            marker_d39cbbc26289f16127cf3bb0c78c0d32.setIcon(icon_8c4fdaf8e363e14eda292268b541f5d3);
+        
+    
+        var popup_8d3ccb04e9f7e44c141742a880e18874 = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_194c5c01aa8455a293c1d7568a3c6911 = $(`<div id="html_194c5c01aa8455a293c1d7568a3c6911" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>1        C©♭line BERNARD mother of Pierre MARTIN</div></div>`)[0];
+                popup_8d3ccb04e9f7e44c141742a880e18874.setContent(html_194c5c01aa8455a293c1d7568a3c6911);
+            
+        
+
+        marker_d39cbbc26289f16127cf3bb0c78c0d32.bindPopup(popup_8d3ccb04e9f7e44c141742a880e18874)
+        ;
+
+        
+    
+    
+            marker_d39cbbc26289f16127cf3bb0c78c0d32.bindTooltip(
+                `<div>
+                     1        C©♭line BERNARD mother of Pierre MARTIN
+                 </div>`,
+                {"sticky": true}
+            );
+        
+    
+            var poly_line_1d582257bf48d9c410ed839b3bc70a81 = L.polyline(
+                [[45.75743512167249, 4.83195201751822], [45.89927693241576, 6.129380756436424]],
+                {"bubblingMouseEvents": true, "color": "pink", "dashArray": [5, 5], "dashOffset": null, "fill": false, "fillColor": "pink", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "arcs", "noClip": false, "opacity": 1, "smoothFactor": 1.0, "stroke": true, "weight": 12}
+            ).addTo(feature_group_f774f83b39268bbf16cd51c613d73613);
+        
+    
+        var popup_70f344aa6ae9325480b2b4ff05165972 = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_3548fc3cea6a2376425b3d1fec2b4a55 = $(`<div id="html_3548fc3cea6a2376425b3d1fec2b4a55" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>1        C©♭line BERNARD mother of Pierre MARTIN</div></div>`)[0];
+                popup_70f344aa6ae9325480b2b4ff05165972.setContent(html_3548fc3cea6a2376425b3d1fec2b4a55);
+            
+        
+
+        poly_line_1d582257bf48d9c410ed839b3bc70a81.bindPopup(popup_70f344aa6ae9325480b2b4ff05165972)
+        ;
+
+        
+    
+    
+            poly_line_1d582257bf48d9c410ed839b3bc70a81.bindTooltip(
+                `<div>
+                     1        C©♭line BERNARD
+                 </div>`,
+                {"sticky": true}
+            );
+        
+    
+            var feature_group_a6cb220df319aace11d501184e583950 = L.featureGroup(
+                {}
+            ).addTo(map_36df8d3998a38802d36d52183b3b8735);
+        
+    
+            var marker_21e1e976b4b4d679ece21f97cfad8472 = L.marker(
+                [45.688534516825186, 5.914476314229866],
+                {"opacity": 0.5}
+            ).addTo(feature_group_a6cb220df319aace11d501184e583950);
+        
+    
+            var icon_29062ab985b118788d05486633a1d514 = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "child", "iconColor": "white", "markerColor": "orange", "prefix": "fa"}
+            );
+            marker_21e1e976b4b4d679ece21f97cfad8472.setIcon(icon_29062ab985b118788d05486633a1d514);
+        
+    
+        var popup_b88c950bebff7b560751037c8a6e65fe = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_ab86428c08eda224edf268602c9dd466 = $(`<div id="html_ab86428c08eda224edf268602c9dd466" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>Life of 010      Jean-Pierre MARIE</div></div>`)[0];
+                popup_b88c950bebff7b560751037c8a6e65fe.setContent(html_ab86428c08eda224edf268602c9dd466);
+            
+        
+
+        marker_21e1e976b4b4d679ece21f97cfad8472.bindPopup(popup_b88c950bebff7b560751037c8a6e65fe)
+        ;
+
+        
+    
+    
+            marker_21e1e976b4b4d679ece21f97cfad8472.bindTooltip(
+                `<div>
+                     Life of 010      Jean-Pierre MARIE
+                 </div>`,
+                {"sticky": true}
+            );
+        
+    
+            var marker_28daca21cb2cfa3c7cff2a961304d053 = L.marker(
+                [45.68862670322688, 5.9147664815296865],
+                {"opacity": 0.5}
+            ).addTo(feature_group_a6cb220df319aace11d501184e583950);
+        
+    
+            var icon_654dbd3753383e45388f218a9575ed72 = L.AwesomeMarkers.icon(
+                {"extraClasses": "fas", "icon": "male", "iconColor": "white", "markerColor": "blue", "prefix": "fa"}
+            );
+            marker_28daca21cb2cfa3c7cff2a961304d053.setIcon(icon_654dbd3753383e45388f218a9575ed72);
+        
+    
+        var popup_211ba1e169609771d5be9e3908dd0059 = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_907d38c45d1cf51c3d41c6e2e7ec4c11 = $(`<div id="html_907d38c45d1cf51c3d41c6e2e7ec4c11" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>010      Jean-Pierre MARIE father of Henriette MARIE</div></div>`)[0];
+                popup_211ba1e169609771d5be9e3908dd0059.setContent(html_907d38c45d1cf51c3d41c6e2e7ec4c11);
+            
+        
+
+        marker_28daca21cb2cfa3c7cff2a961304d053.bindPopup(popup_211ba1e169609771d5be9e3908dd0059)
+        ;
+
+        
+    
+    
+            marker_28daca21cb2cfa3c7cff2a961304d053.bindTooltip(
+                `<div>
+                     010      Jean-Pierre MARIE father of Henriette MARIE
+                 </div>`,
+                {"sticky": true}
+            );
+        
+    
+            var marker_cf78589a7b55c7c847b03d5d88cedae0 = L.marker(
+                [45.43973067446289, 4.387645343030488],
+                {"opacity": 0.5}
+            ).addTo(feature_group_a6cb220df319aace11d501184e583950);
+        
+    
+            var icon_79c6e71d57f3415419518486cbd1c25d = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "baby", "iconColor": "white", "markerColor": "green", "prefix": "fa"}
+            );
+            marker_cf78589a7b55c7c847b03d5d88cedae0.setIcon(icon_79c6e71d57f3415419518486cbd1c25d);
+        
+    
+        var popup_bd734d94f68a59846c5b12bb6d216a2b = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_03609653291bda7f0920388096e612a9 = $(`<div id="html_03609653291bda7f0920388096e612a9" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>01       Henriette MARIE mother of Antoine MARTIN</div></div>`)[0];
+                popup_bd734d94f68a59846c5b12bb6d216a2b.setContent(html_03609653291bda7f0920388096e612a9);
+            
+        
+
+        marker_cf78589a7b55c7c847b03d5d88cedae0.bindPopup(popup_bd734d94f68a59846c5b12bb6d216a2b)
+        ;
+
+        
+    
+    
+            marker_cf78589a7b55c7c847b03d5d88cedae0.bindTooltip(
+                `<div>
+                     01       Henriette MARIE mother of Antoine MARTIN
+                 </div>`,
+                {"sticky": true}
+            );
+        
+    
+            var feature_group_ddeefdafcb47de937c4f29f1a410ddde = L.featureGroup(
+                {}
+            ).addTo(map_36df8d3998a38802d36d52183b3b8735);
+        
+    
+            var marker_529210b8d870bb5d7b8f192c99080c50 = L.marker(
+                [45.89935018631757, 6.129143685989607],
+                {"opacity": 0.5}
+            ).addTo(feature_group_ddeefdafcb47de937c4f29f1a410ddde);
+        
+    
+            var icon_d288a6f0df94648185c47edae2e00f26 = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "baby", "iconColor": "white", "markerColor": "green", "prefix": "fa"}
+            );
+            marker_529210b8d870bb5d7b8f192c99080c50.setIcon(icon_d288a6f0df94648185c47edae2e00f26);
+        
+    
+        var popup_5ee0538dd1f0640e522d138225e1d532 = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_e079eb27f06ff813ba4f0bf0f62af460 = $(`<div id="html_e079eb27f06ff813ba4f0bf0f62af460" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>11       Jeanne THOMAS mother of C©♭line BERNARD</div></div>`)[0];
+                popup_5ee0538dd1f0640e522d138225e1d532.setContent(html_e079eb27f06ff813ba4f0bf0f62af460);
+            
+        
+
+        marker_529210b8d870bb5d7b8f192c99080c50.bindPopup(popup_5ee0538dd1f0640e522d138225e1d532)
+        ;
+
+        
+    
+    
+            marker_529210b8d870bb5d7b8f192c99080c50.bindTooltip(
+                `<div>
+                     11       Jeanne THOMAS mother of C©♭line BERNARD
+                 </div>`,
+                {"sticky": true}
+            );
+        
+    
+            var feature_group_a229b05f392cf145851087fbfa006abf = L.featureGroup(
+                {}
+            ).addTo(map_36df8d3998a38802d36d52183b3b8735);
+        
+    
+            var marker_1fc9f80fa426b3749c5dff056ae40d26 = L.marker(
+                [45.440633728012, 4.386865165932821],
+                {"opacity": 0.5}
+            ).addTo(feature_group_a229b05f392cf145851087fbfa006abf);
+        
+    
+            var icon_095f8fa1bbad593fd1dbf249799cc968 = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "child", "iconColor": "white", "markerColor": "orange", "prefix": "fa"}
+            );
+            marker_1fc9f80fa426b3749c5dff056ae40d26.setIcon(icon_095f8fa1bbad593fd1dbf249799cc968);
+        
+    
+        var popup_ddb6210503f1d008c327eb5cfe796d0f = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_a5dfdae97befc4d3e434ff6a6f6bbc84 = $(`<div id="html_a5dfdae97befc4d3e434ff6a6f6bbc84" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>Life of 001      Camille FRAMBOISIER</div></div>`)[0];
+                popup_ddb6210503f1d008c327eb5cfe796d0f.setContent(html_a5dfdae97befc4d3e434ff6a6f6bbc84);
+            
+        
+
+        marker_1fc9f80fa426b3749c5dff056ae40d26.bindPopup(popup_ddb6210503f1d008c327eb5cfe796d0f)
+        ;
+
+        
+    
+    
+            marker_1fc9f80fa426b3749c5dff056ae40d26.bindTooltip(
+                `<div>
+                     Life of 001      Camille FRAMBOISIER
+                 </div>`,
+                {"sticky": true}
+            );
+        
+    
+            var marker_1e89a15aa142dc38c14defdb740e6b74 = L.marker(
+                [45.440629105190474, 4.387238366812207],
+                {"opacity": 0.5}
+            ).addTo(feature_group_a229b05f392cf145851087fbfa006abf);
+        
+    
+            var icon_b468828209521495dd925920fcbdb266 = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "baby", "iconColor": "white", "markerColor": "green", "prefix": "fa"}
+            );
+            marker_1e89a15aa142dc38c14defdb740e6b74.setIcon(icon_b468828209521495dd925920fcbdb266);
+        
+    
+        var popup_93d6e8a898ec0643bd108d53f51f5c4a = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_4897a7425b4aa606a6a75737cb62842e = $(`<div id="html_4897a7425b4aa606a6a75737cb62842e" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>001      Camille FRAMBOISIER mother of Gabriel MARTIN</div></div>`)[0];
+                popup_93d6e8a898ec0643bd108d53f51f5c4a.setContent(html_4897a7425b4aa606a6a75737cb62842e);
+            
+        
+
+        marker_1e89a15aa142dc38c14defdb740e6b74.bindPopup(popup_93d6e8a898ec0643bd108d53f51f5c4a)
+        ;
+
+        
+    
+    
+            marker_1e89a15aa142dc38c14defdb740e6b74.bindTooltip(
+                `<div>
+                     001      Camille FRAMBOISIER mother of Gabriel MARTIN
+                 </div>`,
+                {"sticky": true}
+            );
+        
+    
+            var marker_bf852376fc3cf4e448e2a0b6d62f67a7 = L.marker(
+                [45.43974509949276, 4.387034219824912],
+                {"opacity": 0.5}
+            ).addTo(feature_group_a229b05f392cf145851087fbfa006abf);
+        
+    
+            var icon_0b771d840cd47989e77c7b600eecef61 = L.AwesomeMarkers.icon(
+                {"extraClasses": "fas", "icon": "female", "iconColor": "white", "markerColor": "pink", "prefix": "fa"}
+            );
+            marker_bf852376fc3cf4e448e2a0b6d62f67a7.setIcon(icon_0b771d840cd47989e77c7b600eecef61);
+        
+    
+        var popup_774b5c338343f75ec1ca96b78321224a = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_6b5a89fdd07ad4862fe2163c9d49801b = $(`<div id="html_6b5a89fdd07ad4862fe2163c9d49801b" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>001      Camille FRAMBOISIER mother of Gabriel MARTIN</div></div>`)[0];
+                popup_774b5c338343f75ec1ca96b78321224a.setContent(html_6b5a89fdd07ad4862fe2163c9d49801b);
+            
+        
+
+        marker_bf852376fc3cf4e448e2a0b6d62f67a7.bindPopup(popup_774b5c338343f75ec1ca96b78321224a)
+        ;
+
+        
+    
+    
+            marker_bf852376fc3cf4e448e2a0b6d62f67a7.bindTooltip(
+                `<div>
+                     001      Camille FRAMBOISIER mother of Gabriel MARTIN
+                 </div>`,
+                {"sticky": true}
+            );
+        
+    
+            var poly_line_0137f12fbf22be1f515aec72656f0881 = L.polyline(
+                [[45.440629105190474, 4.387238366812207], [45.43974509949276, 4.387034219824912]],
+                {"bubblingMouseEvents": true, "color": "pink", "dashArray": [5, 5], "dashOffset": null, "fill": false, "fillColor": "pink", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "arcs", "noClip": false, "opacity": 1, "smoothFactor": 1.0, "stroke": true, "weight": 4}
+            ).addTo(feature_group_a229b05f392cf145851087fbfa006abf);
+        
+    
+        var popup_47992237d15e0e8bff8512ff7ab5e7dc = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_0d03be02cd83ba49d3f9a2252d6d06b8 = $(`<div id="html_0d03be02cd83ba49d3f9a2252d6d06b8" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>001      Camille FRAMBOISIER mother of Gabriel MARTIN</div></div>`)[0];
+                popup_47992237d15e0e8bff8512ff7ab5e7dc.setContent(html_0d03be02cd83ba49d3f9a2252d6d06b8);
+            
+        
+
+        poly_line_0137f12fbf22be1f515aec72656f0881.bindPopup(popup_47992237d15e0e8bff8512ff7ab5e7dc)
+        ;
+
+        
+    
+    
+            poly_line_0137f12fbf22be1f515aec72656f0881.bindTooltip(
+                `<div>
+                     001      Camille FRAMBOISIER
+                 </div>`,
+                {"sticky": true}
+            );
+        
+    
+            var feature_group_9d3c817c121924cce2aac06e1a5f52c7 = L.featureGroup(
+                {}
+            ).addTo(map_36df8d3998a38802d36d52183b3b8735);
+        
+    
+            var marker_55e2e5b3a11a7817a990bb012f9955dd = L.marker(
+                [45.18744406022157, 5.735430313648658],
+                {"opacity": 0.5}
+            ).addTo(feature_group_9d3c817c121924cce2aac06e1a5f52c7);
+        
+    
+            var icon_54b7322848386e8bb26a840ba3859c75 = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "child", "iconColor": "white", "markerColor": "orange", "prefix": "fa"}
+            );
+            marker_55e2e5b3a11a7817a990bb012f9955dd.setIcon(icon_54b7322848386e8bb26a840ba3859c75);
+        
+    
+        var popup_f04398fa27d699f0c6ea92c4385cba00 = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_d762c96da542709f6cb18b4f48199cbd = $(`<div id="html_d762c96da542709f6cb18b4f48199cbd" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>Life of 011      Anne CORLIC</div></div>`)[0];
+                popup_f04398fa27d699f0c6ea92c4385cba00.setContent(html_d762c96da542709f6cb18b4f48199cbd);
+            
+        
+
+        marker_55e2e5b3a11a7817a990bb012f9955dd.bindPopup(popup_f04398fa27d699f0c6ea92c4385cba00)
+        ;
+
+        
+    
+    
+            marker_55e2e5b3a11a7817a990bb012f9955dd.bindTooltip(
+                `<div>
+                     Life of 011      Anne CORLIC
+                 </div>`,
+                {"sticky": true}
+            );
+        
+    
+            var marker_2692bb2fa71d2fa4c54b8c223b3ee456 = L.marker(
+                [45.18776580387145, 5.736275431174342],
+                {"opacity": 0.5}
+            ).addTo(feature_group_9d3c817c121924cce2aac06e1a5f52c7);
+        
+    
+            var icon_c160a2b4bd89d831bd421b8db0af572d = L.AwesomeMarkers.icon(
+                {"extraClasses": "fas", "icon": "female", "iconColor": "white", "markerColor": "pink", "prefix": "fa"}
+            );
+            marker_2692bb2fa71d2fa4c54b8c223b3ee456.setIcon(icon_c160a2b4bd89d831bd421b8db0af572d);
+        
+    
+        var popup_d8369c4da342e8bc761fd155794781f4 = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_91ad573b66e3fca2f18dfc9624431708 = $(`<div id="html_91ad573b66e3fca2f18dfc9624431708" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>011      Anne CORLIC mother of Henriette MARIE</div></div>`)[0];
+                popup_d8369c4da342e8bc761fd155794781f4.setContent(html_91ad573b66e3fca2f18dfc9624431708);
+            
+        
+
+        marker_2692bb2fa71d2fa4c54b8c223b3ee456.bindPopup(popup_d8369c4da342e8bc761fd155794781f4)
+        ;
+
+        
+    
+    
+            marker_2692bb2fa71d2fa4c54b8c223b3ee456.bindTooltip(
+                `<div>
+                     011      Anne CORLIC mother of Henriette MARIE
+                 </div>`,
+                {"sticky": true}
+            );
+        
+    
+            var feature_group_99fe1fc037d10a31b3b8f2182087c359 = L.featureGroup(
+                {}
+            ).addTo(map_36df8d3998a38802d36d52183b3b8735);
+        
+    
+            var marker_d8c7cf13bc93d7e005e1a77ff70de586 = L.marker(
+                [46.01943641440242, 5.929803110320671],
+                {"opacity": 0.5}
+            ).addTo(feature_group_99fe1fc037d10a31b3b8f2182087c359);
+        
+    
+            var icon_cecc05b6c79f7ea18a7a6606cdcd636d = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "child", "iconColor": "white", "markerColor": "orange", "prefix": "fa"}
+            );
+            marker_d8c7cf13bc93d7e005e1a77ff70de586.setIcon(icon_cecc05b6c79f7ea18a7a6606cdcd636d);
+        
+    
+        var popup_3678eb5e16ebc15fc8a2db10d23d113e = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_46457e55dba2bf787e74249388be5e59 = $(`<div id="html_46457e55dba2bf787e74249388be5e59" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>Life of 101      Annie VERSAIRE</div></div>`)[0];
+                popup_3678eb5e16ebc15fc8a2db10d23d113e.setContent(html_46457e55dba2bf787e74249388be5e59);
+            
+        
+
+        marker_d8c7cf13bc93d7e005e1a77ff70de586.bindPopup(popup_3678eb5e16ebc15fc8a2db10d23d113e)
+        ;
+
+        
+    
+    
+            marker_d8c7cf13bc93d7e005e1a77ff70de586.bindTooltip(
+                `<div>
+                     Life of 101      Annie VERSAIRE
+                 </div>`,
+                {"sticky": true}
+            );
+        
+    
+            var marker_e231615bf5ea093a81798ffafa396f6e = L.marker(
+                [46.03402559625719, 6.107424315813823],
+                {"opacity": 0.5}
+            ).addTo(feature_group_99fe1fc037d10a31b3b8f2182087c359);
+        
+    
+            var icon_b98a82919981977442fb80259d0d77f8 = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "baby", "iconColor": "white", "markerColor": "green", "prefix": "fa"}
+            );
+            marker_e231615bf5ea093a81798ffafa396f6e.setIcon(icon_b98a82919981977442fb80259d0d77f8);
+        
+    
+        var popup_c5ab4ca3035513e8fc8972a1519513a7 = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_4c4b328330966acd21c4ea1b77719e3e = $(`<div id="html_4c4b328330966acd21c4ea1b77719e3e" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>101      Annie VERSAIRE mother of Pierre BERNARD</div></div>`)[0];
+                popup_c5ab4ca3035513e8fc8972a1519513a7.setContent(html_4c4b328330966acd21c4ea1b77719e3e);
+            
+        
+
+        marker_e231615bf5ea093a81798ffafa396f6e.bindPopup(popup_c5ab4ca3035513e8fc8972a1519513a7)
+        ;
+
+        
+    
+    
+            marker_e231615bf5ea093a81798ffafa396f6e.bindTooltip(
+                `<div>
+                     101      Annie VERSAIRE mother of Pierre BERNARD
+                 </div>`,
+                {"sticky": true}
+            );
+        
+    
+            var marker_8811f790edf2d4518b5d6b39dd869648 = L.marker(
+                [46.01945938327924, 5.9297019198267895],
+                {"opacity": 0.5}
+            ).addTo(feature_group_99fe1fc037d10a31b3b8f2182087c359);
+        
+    
+            var icon_888a1ad0f06e75292a11891e80b9723d = L.AwesomeMarkers.icon(
+                {"extraClasses": "fas", "icon": "female", "iconColor": "white", "markerColor": "pink", "prefix": "fa"}
+            );
+            marker_8811f790edf2d4518b5d6b39dd869648.setIcon(icon_888a1ad0f06e75292a11891e80b9723d);
+        
+    
+        var popup_2538076c18e621d8cf6bad2ac1ff3ef9 = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_2adc9da2b82f0182e18e43574150a853 = $(`<div id="html_2adc9da2b82f0182e18e43574150a853" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>101      Annie VERSAIRE mother of Pierre BERNARD</div></div>`)[0];
+                popup_2538076c18e621d8cf6bad2ac1ff3ef9.setContent(html_2adc9da2b82f0182e18e43574150a853);
+            
+        
+
+        marker_8811f790edf2d4518b5d6b39dd869648.bindPopup(popup_2538076c18e621d8cf6bad2ac1ff3ef9)
+        ;
+
+        
+    
+    
+            marker_8811f790edf2d4518b5d6b39dd869648.bindTooltip(
+                `<div>
+                     101      Annie VERSAIRE mother of Pierre BERNARD
+                 </div>`,
+                {"sticky": true}
+            );
+        
+    
+            var poly_line_0028ef29fb9f294a245aaff0c35fa81c = L.polyline(
+                [[46.03402559625719, 6.107424315813823], [46.01945938327924, 5.9297019198267895]],
+                {"bubblingMouseEvents": true, "color": "pink", "dashArray": [5, 5], "dashOffset": null, "fill": false, "fillColor": "pink", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "arcs", "noClip": false, "opacity": 1, "smoothFactor": 1.0, "stroke": true, "weight": 4}
+            ).addTo(feature_group_99fe1fc037d10a31b3b8f2182087c359);
+        
+    
+        var popup_f3118856c2901752fb4564d238f6c18e = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_45c80f2f572c39ab3c6a8fb3a256b460 = $(`<div id="html_45c80f2f572c39ab3c6a8fb3a256b460" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>101      Annie VERSAIRE mother of Pierre BERNARD</div></div>`)[0];
+                popup_f3118856c2901752fb4564d238f6c18e.setContent(html_45c80f2f572c39ab3c6a8fb3a256b460);
+            
+        
+
+        poly_line_0028ef29fb9f294a245aaff0c35fa81c.bindPopup(popup_f3118856c2901752fb4564d238f6c18e)
+        ;
+
+        
+    
+    
+            poly_line_0028ef29fb9f294a245aaff0c35fa81c.bindTooltip(
+                `<div>
+                     101      Annie VERSAIRE
+                 </div>`,
+                {"sticky": true}
+            );
+        
+    
+            var feature_group_fb620d60bf8a314ec5d59c6bbbf1490a = L.featureGroup(
+                {}
+            ).addTo(map_36df8d3998a38802d36d52183b3b8735);
+        
+    
+            var marker_ce13c9b98704ead4c4d4933b9cf5505c = L.marker(
+                [45.97541283041153, 6.230135911351224],
+                {"opacity": 0.5}
+            ).addTo(feature_group_fb620d60bf8a314ec5d59c6bbbf1490a);
+        
+    
+            var icon_7f6050bba435c0a287775b4262f7a787 = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "child", "iconColor": "white", "markerColor": "orange", "prefix": "fa"}
+            );
+            marker_ce13c9b98704ead4c4d4933b9cf5505c.setIcon(icon_7f6050bba435c0a287775b4262f7a787);
+        
+    
+        var popup_dce7575fbcd21945e7a0dfeb417d584c = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_085b1008ab4f470bd8fd57ddc807b715 = $(`<div id="html_085b1008ab4f470bd8fd57ddc807b715" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>Life of 111      Bernadette COULEUVRE</div></div>`)[0];
+                popup_dce7575fbcd21945e7a0dfeb417d584c.setContent(html_085b1008ab4f470bd8fd57ddc807b715);
+            
+        
+
+        marker_ce13c9b98704ead4c4d4933b9cf5505c.bindPopup(popup_dce7575fbcd21945e7a0dfeb417d584c)
+        ;
+
+        
+    
+    
+            marker_ce13c9b98704ead4c4d4933b9cf5505c.bindTooltip(
+                `<div>
+                     Life of 111      Bernadette COULEUVRE
+                 </div>`,
+                {"sticky": true}
+            );
+        
+    
+            var marker_b9c391af2a57a0410c88d9e8cc7fa276 = L.marker(
+                [45.97540403723595, 6.230307803454973],
+                {"opacity": 0.5}
+            ).addTo(feature_group_fb620d60bf8a314ec5d59c6bbbf1490a);
+        
+    
+            var icon_04cbb6734980759072951f3ca207c1cd = L.AwesomeMarkers.icon(
+                {"extraClasses": "fas", "icon": "female", "iconColor": "white", "markerColor": "pink", "prefix": "fa"}
+            );
+            marker_b9c391af2a57a0410c88d9e8cc7fa276.setIcon(icon_04cbb6734980759072951f3ca207c1cd);
+        
+    
+        var popup_4989cde1943331c05c03f27f31acf8ab = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_aafc77cf83ae7fc4d47ced133a041173 = $(`<div id="html_aafc77cf83ae7fc4d47ced133a041173" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>111      Bernadette COULEUVRE mother of Jeanne THOMAS</div></div>`)[0];
+                popup_4989cde1943331c05c03f27f31acf8ab.setContent(html_aafc77cf83ae7fc4d47ced133a041173);
+            
+        
+
+        marker_b9c391af2a57a0410c88d9e8cc7fa276.bindPopup(popup_4989cde1943331c05c03f27f31acf8ab)
+        ;
+
+        
+    
+    
+            marker_b9c391af2a57a0410c88d9e8cc7fa276.bindTooltip(
+                `<div>
+                     111      Bernadette COULEUVRE mother of Jeanne THOMAS
+                 </div>`,
+                {"sticky": true}
+            );
+        
+    
+            var layer_control_d7264635a0e63c992db6c9c4eed91b46 = {
+                base_layers : {
+                    "stamentoner" : tile_layer_1187c63c88762314a5ad99cc3bfafe4d,
+                    "OpenStreetMap" : tile_layer_e305d5eeedea7cfd6d9153c98ad21b93,
+                    "Stamen Terrain" : tile_layer_5779f2ff6acc62efbd6d93ecb90e5837,
+                    "Stamen Toner" : tile_layer_6bc23578b159d20a268a00bcff864d1d,
+                    "Stamen Watercolor" : tile_layer_92cb41e1062783a4f097742dcf2f8334,
+                    "Cartodbdark_matter" : tile_layer_3dd2669fc743a105f9e2e9d824f75b72,
+                },
+                overlays :  {
+                    "\u003cspan style=\"color: black;\"\u003eHeatmap\u003c/span\u003e" : feature_group_262278893dd3852eaa8efe468705b5dd,
+                    "MARTIN : 10" : feature_group_3f942e0e87442fb043c443d14c24f633,
+                    "BERNARD : 12" : feature_group_f774f83b39268bbf16cd51c613d73613,
+                    "MARIE : 3" : feature_group_a6cb220df319aace11d501184e583950,
+                    "THOMAS : 1" : feature_group_ddeefdafcb47de937c4f29f1a410ddde,
+                    "FRAMBOISIER : 4" : feature_group_a229b05f392cf145851087fbfa006abf,
+                    "CORLIC : 2" : feature_group_9d3c817c121924cce2aac06e1a5f52c7,
+                    "VERSAIRE : 4" : feature_group_99fe1fc037d10a31b3b8f2182087c359,
+                    "COULEUVRE : 2" : feature_group_fb620d60bf8a314ec5d59c6bbbf1490a,
+                },
+            };
+            L.control.layers(
+                layer_control_d7264635a0e63c992db6c9c4eed91b46.base_layers,
+                layer_control_d7264635a0e63c992db6c9c4eed91b46.overlays,
+                {"autoZIndex": true, "collapsed": false, "position": "topleft"}
+            ).addTo(map_36df8d3998a38802d36d52183b3b8735);
+            tile_layer_e305d5eeedea7cfd6d9153c98ad21b93.remove();
+            tile_layer_5779f2ff6acc62efbd6d93ecb90e5837.remove();
+            tile_layer_6bc23578b159d20a268a00bcff864d1d.remove();
+            tile_layer_92cb41e1062783a4f097742dcf2f8334.remove();
+            tile_layer_3dd2669fc743a105f9e2e9d824f75b72.remove();
+            feature_group_3f942e0e87442fb043c443d14c24f633.remove();
+            feature_group_f774f83b39268bbf16cd51c613d73613.remove();
+            feature_group_a6cb220df319aace11d501184e583950.remove();
+            feature_group_ddeefdafcb47de937c4f29f1a410ddde.remove();
+            feature_group_a229b05f392cf145851087fbfa006abf.remove();
+            feature_group_9d3c817c121924cce2aac06e1a5f52c7.remove();
+            feature_group_99fe1fc037d10a31b3b8f2182087c359.remove();
+            feature_group_fb620d60bf8a314ec5d59c6bbbf1490a.remove();
+        
+    
+            var marker_e21192bdf180257837e69940023d734d = L.marker(
+                [45.75747893921738, 4.831764301747169],
+                {"opacity": 0.5}
+            ).addTo(map_36df8d3998a38802d36d52183b3b8735);
+        
+    
+            var icon_2c58a8c472897d3e355d4f9c79967507 = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "star", "iconColor": "white", "iconSize": ["50%", "50%"], "markerColor": "lightred", "prefix": "fa"}
+            );
+            marker_e21192bdf180257837e69940023d734d.setIcon(icon_2c58a8c472897d3e355d4f9c79967507);
+        
+    
+            marker_e21192bdf180257837e69940023d734d.bindTooltip(
+                `<div>
+                     Pierre MARTIN
+                 </div>`,
+                {"sticky": true}
+            );
+        
+</script>
+</html>

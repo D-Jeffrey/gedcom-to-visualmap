@@ -43,6 +43,7 @@ class Human:
         return bestyear
 
     def bestlocation(self):
+        # TODO Best Location should consider if in KML mode and what is selected
         best = ["Unknown", ""]
         if self.birth and self.birth.pos:
             best = [str(self.birth.pos), "Born " + self.birth.where if self.birth.where else "Unknown"]

@@ -20,6 +20,7 @@ from gedcomoptions import gvOptions
 
 logger = logging.getLogger(__name__)
 
+# TODO This needs to be moved into it's out JSON driven configuration
 fixuplist   = {r'\bof\s': '',
                r'\spart of\s' : ' ', 
                r'po box [0-9]+\s' : ' ', 
@@ -82,19 +83,20 @@ class WordXlator(Xlator):
           r'\b'+r'\b|\b'.join(map(re.escape, self.keys(  )))+r'\b')
     
 class GEDComGPSLookup:
-    def __init__(self, humans,  gvOptions: gvOptions):
+    def __init__(self, humans,  gvO: gvOptions):
 
         self.addresses = None
         self.addresslist = None
-        self.usecacheonly = gvOptions.get('CacheOnly')
-        self.gOptions = gvOptions 
+        self.usecacheonly = gvO.get('CacheOnly')
+        self.gOptions = gvO 
         self.orgMD5 = None
         self.humans = humans
         self.countrieslist = None
+        self.Geoapp = None
       
         # This pulls from the same directory as GEDCOM file
-        if gvOptions.resultpath:
-            cachefile = os.path.join(gvOptions.resultpath, cache_filename[0])
+        if gvO.resultpath:
+            cachefile = os.path.join(gvO.resultpath, cache_filename[0])
             self.gOptions.set('gpsfile', cachefile )     
             if os.path.exists(cachefile):
           
@@ -112,7 +114,7 @@ class GEDComGPSLookup:
                         logger.error  ('Error reading GPS cache file %s, line %d: %s', cache_filename[0], readfrom.line_num, e)
              
         if (self.addresslist):
-            gvOptions.step('Loading Geocode Cache')
+            gvO.step('Loading Geocode Cache')
             self.addresses = dict()
             
             self.addressalt = dict()
@@ -120,8 +122,7 @@ class GEDComGPSLookup:
             for a in range(0,len(self.addresslist)):
                 if self.addresslist[a]['name'] !='': 
                     
-                    # self.addresslist[a]['name'] = bytearray(self.addresslist[a]['name'],encoding='utf-8').decode('unicode_escape').strip("'") 
-                    # self.addresslist[a]['alt'] = bytearray(self.addresslist[a]['alt'],encoding='utf-8').decode('unicode_escape').strip("'") 
+                    # due to values being Ascii or unicode or utl-8, the file and data needs to be treated carefully
                     self.addresslist[a]['boundry'] = None if self.addresslist[a]['boundry'] == '' else eval(self.addresslist[a]['boundry'])
                     if hasattr(self.addresslist[a], 'size'):
                         self.addresslist[a]['size'] = 0 if self.addresslist[a]['size'] == '' else float(self.addresslist[a]['size'])
@@ -196,24 +197,26 @@ class GEDComGPSLookup:
         if self.addresses:
             resultpath = self.gOptions.resultpath
             self.gOptions.step("Saving GPS Cache")
-            
+            n[0] = os.path.join(resultpath,cache_filename[0])                        
+            n[1] = os.path.join(resultpath,cache_filename[1])
+            n[2] = os.path.join(resultpath,cache_filename[2])
             if (os.path.exists(os.path.join(resultpath,cache_filename[0]))):
                 if (os.path.exists(os.path.join(resultpath,cache_filename[1]))):
                     if (os.path.exists(os.path.join(resultpath,cache_filename[2]))):
                         try:
-                            os.remove(os.path.join(resultpath,cache_filename[2]))
+                            os.remove(n[2])
                         except:
-                            logger.error("removing {}".format(os.path.join(resultpath,cache_filename[2])))
+                            logger.error("removing %s", n[2])
                     try:
-                        os.rename(os.path.join(resultpath,cache_filename[1]), os.path.join(resultpath,cache_filename[2]))
+                        os.rename(n[1], n[2])
                     except:
-                        logger.error("renaming {}".format(os.path.join(resultpath,cache_filename[1])))
+                        logger.error("renaming %s", n[1])
                 try:
-                    os.rename(os.path.join(resultpath,cache_filename[0]), os.path.join(resultpath,cache_filename[1]))
+                    os.rename(n[0], n[1])
                 except:
-                    logger.error("renaming {}".format(os.path.join(resultpath,cache_filename[0])))
-            self.gOptions.set('gpsfile', os.path.join(resultpath,cache_filename[0]))     
-            with open(os.path.join(resultpath,cache_filename[0]), "w", newline='', encoding='utf-8') as csvfile:
+                    logger.error("renaming %s", n[0])
+            self.gOptions.set('gpsfile', n[0])     
+            with open(n[0], "w", newline='', encoding='utf-8') as csvfile:
                 
                 csvwriter = csv.writer(csvfile, dialect='excel' )
                 csvwriter.writerow(csvheader)
@@ -229,7 +232,7 @@ class GEDComGPSLookup:
                             self.addresses[xaddr]['size'] = abs(boundrybox[1]-boundrybox[0]) * abs(boundrybox[3]-boundrybox[2])*1000000
                         else:
                             self.addresses[xaddr]['size'] = None
-                    # TODO deal with Unicode names
+                    # TODO deal with Unicode names???
 
                     r = [self.addresses[xaddr]['name'], 
                          self.addresses[xaddr]['alt'], 
@@ -254,8 +257,8 @@ class GEDComGPSLookup:
                         totaladdr += self.addresses[xaddr]['used']
                         if (self.addresses[xaddr]['lat'] is None): usedNone += 1
 
-        logger.info("Unique addresses: {} and {} have missing GPS for a Total of {}".format(used, usedNone, totaladdr))   
-        self.gOptions.step(f"Saved {totaladdr} addresses")  
+        logger.info("Unique addresses: %d with %d have missing GPS for a Total of %d",used, usedNone, totaladdr)   
+        self.gOptions.step(f"Cache Table is {totaladdr} addresses")  
 
         
     def improveaddress(self,theaddress, thecountry= None):
@@ -270,7 +273,7 @@ class GEDComGPSLookup:
         # Check for the state name, if that is found, then add country to the geocoding to get the right country
         # Loop thru twice for countries with two words
         for i in (0,1):
-            lastwords = re.findall(r"[\s,]((\w+){"+ str(i) + "}\s?\w+)$",theaddress.strip())
+            lastwords = re.findall(r"[\s,]((\w+){"+ str(i) + r"}\s?\w+)$",theaddress.strip())
         
             # the last word should be the country
             if not lastwords:
@@ -359,7 +362,7 @@ class GEDComGPSLookup:
                  
                         # Try using an alternate name from the cache
                     if self.addresses[addressindex]['name'].lower() == self.addresses[addressindex]['alt'].lower():
-                            return self.returnandcount(addressindex)
+                        return self.returnandcount(addressindex)
             trycountry = None
             if (self.usecacheonly):
                 theaddress = myaddress

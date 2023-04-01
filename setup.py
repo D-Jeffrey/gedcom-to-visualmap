@@ -18,7 +18,6 @@ setup(
         'geopy>=2.3.0',
         'folium>=0.14.0',
         'wxPython>=4.1.0',
-        
     ],
     author='D-Jeffrey',
     description='A Python package to convert GEDCOM files to visual maps',
@@ -29,4 +28,3 @@ setup(
     ],
     python_requires='>=3.6',
 )
-

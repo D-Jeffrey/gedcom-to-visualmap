@@ -58,7 +58,7 @@ logger = logging.getLogger(__name__)
     ID_BTNUpdate,
     ID_BTNCSV,
     ID_BTNSTOP,
-    ID_BTNBROWSER
+    ID_BTNBROWSER,
  ] = wx.NewIdRef(29)
 
 
@@ -79,7 +79,7 @@ IDtoAttr = {ID_CBMarksOn : ('MarksOn', 'Redraw'),
     ID_TEXTMain : ('Main',  'Reload'),
     ID_TEXTName : ('Name',  ''),
     ID_INTMaxMissing : ('MaxMissing', 'Reload'),
-    ID_INTMaxLineWeight : ('MaxMissing', 'Reload'),
+    ID_INTMaxLineWeight : ('MaxLineWeight', 'Reload'),
     ID_CBUseGPS : ('UseGPS', 'Reload'),
     ID_CBCacheOnly : ('CacheOnly', 'Reload'),
     ID_CBAllEntities: ('AllEntities', 'Redraw'),
@@ -324,9 +324,9 @@ class PeopleListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
 
         self.gO = None
         tID = wx.NewIdRef()
-
+        # TODO This box defination still have a scroll overlap problem
         sizer = wx.BoxSizer(wx.VERTICAL)
-        self.InfoBox = wx.StaticText(parent, -1, "Select a file, Load it and Draw Update\nor change type to KML\nOpen Geo Table to edit addresses", size=wx.Size(500,2))
+        self.InfoBox = wx.StaticText(parent, -1, "Select a file, Load it and Draw Update\nor change type to KML\nOpen Geo Table to edit addresses", size=wx.Size(500,100))
         self.InfoBox.SetFont(wx.FFont(10, wx.FONTFAMILY_SWISS ))
         sizer.Add(self.InfoBox, -1, wx.FIXED_MINSIZE | wx.LEFT)
 
@@ -336,12 +336,8 @@ class PeopleListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
         self.sm_dn = self.il.Add(SmallDnArrow.GetBitmap())
 
         self.list = PeopleListCtrl(parent, tID,
-                                 style=wx.LC_REPORT
-                                 #| wx.BORDER_SUNKEN
-                                 | wx.BORDER_NONE
-                                 # | wx.LC_EDIT_LABELS
-                                  | wx.LC_SINGLE_SEL
-                                 ,size=wx.Size(600,600))
+                        style=wx.LC_REPORT | wx.BORDER_SUNKEN | wx.LC_SINGLE_SEL,
+                        size=wx.Size(600,600))
 
         self.list.SetImageList(self.il, wx.IMAGE_LIST_SMALL)
         sizer.Add(self.list, -1, wx.EXPAND)
@@ -356,8 +352,6 @@ class PeopleListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
         
         self.PopulateList(humans, None)
         self.currentItem = 0
-
-
 
         parent.SetSizer(sizer)
         # self.SetAutoLayout(True)
@@ -386,6 +380,8 @@ class PeopleListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
         popdata = {}
         selectperson = 0
         i = 1
+        if (not humans):
+            return
         for h in humans:
             if hasattr(humans[h], 'name'):
                 d = humans[h].refyear()
@@ -584,7 +580,7 @@ class VisualMapPanel(wx.Panel):
 
         # Top of the Panel
         box = wx.BoxSizer(wx.VERTICAL)
-        title = wx.StaticText(panel, -1, "Visual Mapping Options")#, (10, 10))
+        title = wx.StaticText(panel, 1, "Visual Mapping Options")#, (10, 10))
         title.SetFont(wx.FFont(16, wx.FONTFAMILY_SWISS, wx.FONTFLAG_BOLD))
         box.Add(title, 0, wx.ALIGN_CENTER|wx.ALL, 5)
         box.Add(wx.StaticLine(panel), 0, wx.EXPAND)
@@ -594,10 +590,10 @@ class VisualMapPanel(wx.Panel):
         self.d.TEXTGEDCOMinput = wx.TextCtrl(panel, ID_TEXTGEDCOMinput, "", size=(200,20))
         self.d.TEXTGEDCOMinput.Enable(False) 
         txtoutfile = wx.StaticText(panel, -1, "Output file name: ")
-        self.d.TEXTResult = wx.TextCtrl(panel, ID_TEXTResult, "")
+        self.d.TEXTResult = wx.TextCtrl(panel, ID_TEXTResult, "", size=(200,20))
         
         l1 = wx.BoxSizer(wx.HORIZONTAL)
-        l1.AddMany([txtinfile,      (0,20),     self.d.TEXTGEDCOMinput])
+        l1.AddMany([txtinfile,      (6,20),     self.d.TEXTGEDCOMinput])
         l2 = wx.BoxSizer(wx.HORIZONTAL)
         l2.AddMany([txtoutfile,     (0,20), self.d.TEXTResult])
         box.AddMany([l1, (4,4,), l2])
@@ -609,6 +605,19 @@ class VisualMapPanel(wx.Panel):
         self.d.CBUseGPS = wx.CheckBox(panel, ID_CBUseGPS, "Use GPS lookup (uncheck if GPS is in file)")#,  wx.NO_BORDER)
         self.d.CBCacheOnly = wx.CheckBox(panel, ID_CBCacheOnly, "Cache Only, do not lookup addresses")#, , wx.NO_BORDER)
         self.d.CBAllEntities = wx.CheckBox(panel, ID_CBAllEntities, "Map all people")#, wx.NO_BORDER)
+        if False:
+            txtMissing = wx.StaticText(panel, -1,  "Max generation missing: ") 
+            self.d.INTMaxMissing = wx.TextCtrl(panel, ID_INTMaxMissing, "", size=(20,20))
+            txtLine = wx.StaticText(panel, -1,  "Line maximum weight: ") 
+            self.d.INTMaxLineWeight = wx.TextCtrl(panel, ID_INTMaxLineWeight, "", size=(20,20))
+            l1 = wx.BoxSizer(wx.HORIZONTAL)
+            l1.AddMany([txtMissing,      (0,20),     self.d.INTMaxMissing])
+            l2 = wx.BoxSizer(wx.HORIZONTAL)
+            l2.AddMany([txtLine,      (0,20),     self.d.INTMaxLineWeight])
+            box.AddMany([l1, (4,4,), l2])
+        # ID_INTMaxMissing  'MaxMissing'
+        # ID_INTMaxLineWeight  'MaxLineWeight'
+        
         self.d.ai = wx.ActivityIndicator(panel)
         
         
@@ -635,11 +644,11 @@ class VisualMapPanel(wx.Panel):
         self.d.CBMarkStarOn = wx.CheckBox(hbox, ID_CBMarkStarOn, "Marker starter with Star")
         
         self.d.CBHeatMap = wx.CheckBox(hbox, ID_CBHeatMap, "Heatmap", style = wx.NO_BORDER)
-        self.d.CBHeatMapTimeLine = wx.CheckBox(hbox, ID_CBHeatMapTimeLine, "Heatmap Timeline")
+        self.d.CBHeatMapTimeLine = wx.CheckBox(hbox, ID_CBHeatMapTimeLine, "Heatmap Timeline Steps")
         self.d.CBUseAntPath = wx.CheckBox(hbox, ID_CBUseAntPath, "Ant paths")
         
         TimeStepVal = 5
-        self.d.LISTHeatMapTimeStep = wx.Slider(hbox, ID_LISTHeatMapTimeStep, TimeStepVal,1, 100, size=(250, -1),
+        self.d.LISTHeatMapTimeStep = wx.Slider(hbox, ID_LISTHeatMapTimeStep, TimeStepVal,1, 100, size=(250, 45),
                 style=wx.SL_HORIZONTAL | wx.SL_AUTOTICKS | wx.SL_LABELS )
         self.d.LISTHeatMapTimeStep.SetTickFreq(5)
         self.d.RBGroupBy  = wx.RadioBox(hbox, ID_RBGroupBy, "Group by:", 
@@ -658,7 +667,6 @@ class VisualMapPanel(wx.Panel):
                         self.d.CBMarkStarOn,
                         self.d.CBUseAntPath,
                         self.d.CBHeatMap,
-                        (0,5),
                         self.d.CBHeatMapTimeLine, 
                         (0,5),
                         self.d.LISTHeatMapTimeStep,
@@ -682,8 +690,8 @@ class VisualMapPanel(wx.Panel):
         kbox.SetSizer(ksizer)
         self.kbox = kbox
         
-        box.Add(hbox, 1, wx.EXPAND|wx.ALL, 15)
-        box.Add(kbox, 1, wx.EXPAND|wx.ALL, 15)
+        box.Add(hbox, 1, wx.EXPAND|wx.ALL, 5)
+        box.Add(kbox, 1, wx.EXPAND|wx.ALL, 5)
         
 
         l1 = wx.BoxSizer(wx.HORIZONTAL)
@@ -698,10 +706,10 @@ class VisualMapPanel(wx.Panel):
         box.Add(l1, 0, wx.EXPAND | wx.ALL,0)
         l1 = wx.BoxSizer(wx.HORIZONTAL)
         l1.Add (self.d.ai, 0, wx.EXPAND | wx.ALL | wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 5)
-        l1.Add (self.d.BTNSTOP, 0, wx.EXPAND | wx.LEFT, 30)
+        l1.Add (self.d.BTNSTOP, 0, wx.EXPAND | wx.LEFT, 20)
         l1.AddSpacer(20)
         l1.Add (self.d.BTNBROWSER, wx.EXPAND | wx.ALL, 5)
-        l1.AddSpacer(30)
+        l1.AddSpacer(20)
         box.Add((0,10))
         box.Add(l1, 0, wx.EXPAND | wx.ALL,0)
  
@@ -710,8 +718,6 @@ class VisualMapPanel(wx.Panel):
     
     ID_TEXTMain,
     ID_TEXTName,
-    ID_INTMaxMissing,
-    ID_INTMaxLineWeight,
         """
         
         # panel.SetSizeHints(box)
@@ -901,7 +907,8 @@ class VisualMapPanel(wx.Panel):
         status = ''
         if self.gO:
             if self.gO.ShouldStop() or not self.gO.running:
-                self.d.BTNSTOP.Disable()
+                if self.d.BTNSTOP.IsEnabled():
+                    self.d.BTNSTOP.Disable()
             else:
                 self.d.BTNSTOP.Enable()
             status = self.gO.state
@@ -920,12 +927,15 @@ class VisualMapPanel(wx.Panel):
                 self.d.BTNLoad.Disable()
                 self.d.BTNUpdate.Disable()
             else:
-                self.d.BTNLoad.Enable()
-                self.d.BTNUpdate.Enable()
+                if not self.d.BTNLoad.IsEnabled():
+                    self.d.BTNLoad.Enable()
+                if not self.d.BTNLoad.IsEnabled():
+                    self.d.BTNUpdate.Enable()
             if self.gO.get('gpsfile') == '':
                 self.d.BTNCSV.Disable()
             else:
-                self.d.BTNCSV.Enable()
+                if not self.d.BTNCSV.IsEnabled():
+                    self.d.BTNCSV.Enable()
         if not status or status == '':
             status = 'Ready'
             self.OnBusyStop(-1)
@@ -1044,7 +1054,7 @@ class VisualMapPanel(wx.Panel):
         
         self.d.TEXTResult.SetValue(self.gO.get('Result'))
 
-        mydir, filen = os.path.split(self.gO.get('GEDCOMinput'))
+        _, filen = os.path.split(self.gO.get('GEDCOMinput'))
         self.d.TEXTGEDCOMinput.SetValue(filen)
         self.SetupButtonState()
 
@@ -1091,7 +1101,7 @@ class VisualMapPanel(wx.Panel):
     #################################################
     #TODO FIX ME UP            
 
-    def open_html_file(html_path):
+    def open_html_file(self, html_path):
         # Open the HTML file in a new tab and store the web browser instance
         browser = webbrowser.get()
         browser_tab = browser.open_new_tab(html_path)
@@ -1259,20 +1269,22 @@ class BackgroundActions:
                             self.gOptions.humans = None
                     logger.info("ParseAndGPS")
                     self.humans = ParseAndGPS(self.gOptions, 1)
-                    self.updategrid = True
-                    evt = UpdateBackgroundEvent(value='busy')
-                    wx.PostEvent(self.win, evt)
-                    time.sleep(0.25)
+                    if self.humans:                            
+                        self.updategrid = True
+                        evt = UpdateBackgroundEvent(value='busy')
+                        wx.PostEvent(self.win, evt)
+                        time.sleep(0.25)
                     
 
-                    logger.info("human count %d", len(self.humans))
-                    self.humans = ParseAndGPS(self.gOptions, 2)
-                    self.updategrid = True
+                        logger.info("human count %d", len(self.humans))
+                        self.humans = ParseAndGPS(self.gOptions, 2)
+                        self.updategrid = True
                     
-                    self.AddInfo(f"Loaded {len(self.humans)} people")
-                    if self.gOptions.Main:
-                        self.AddInfo(f" with '{self.gOptions.Main}' as starting person", False)
-                    
+                        self.AddInfo(f"Loaded {len(self.humans)} people")
+                        if self.gOptions.Main:
+                            self.AddInfo(f" with '{self.gOptions.Main}' as starting person", False)
+                    else:
+                        self.AddInfo("File could not be read as a GEDCOM file", False)
                     
                 if self.do & 2:
                     logger.info("start do 2")

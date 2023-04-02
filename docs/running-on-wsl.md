@@ -83,3 +83,40 @@ sudo apt install xubuntu-desktop
 
 ```
 
+Output from a download and run
+```
+dj@DESKTOP-R3PSDBU:~/gv$ tar -xf  ../Downloads/gedcom-to-visualmap-0.2.3.1.tar.gz 
+dj@DESKTOP-R3PSDBU:~/gv$ ls
+gedcom-to-visualmap-0.2.3.1
+dj@DESKTOP-R3PSDBU:~/gv$ cd gedcom-to-visualmap-0.2.3.1/
+dj@DESKTOP-R3PSDBU:~/gv/gedcom-to-visualmap-0.2.3.1$ ls
+LICENSE    docs           gedcom-to-map.pyproj  img               samples
+README.md  gedcom-to-map  gedcom-to-map.sln     requirements.txt  setup.py
+dj@DESKTOP-R3PSDBU:~/gv/gedcom-to-visualmap-0.2.3.1$ pip install -r requirements.txt 
+Requirement already satisfied: ged4py>=0.4.4 in /home/dj/.local/lib/python3.8/site-packages (from -r requirements.txt (line 1)) (0.4.4)
+Requirement already satisfied: simplekml>=1.3.6 in /home/dj/.local/lib/python3.8/site-packages (from -r requirements.txt (line 2)) (1.3.6)
+Requirement already satisfied: geopy>=2.3.0 in /home/dj/.local/lib/python3.8/site-packages (from -r requirements.txt (line 3)) (2.3.0)
+Requirement already satisfied: folium>=0.14.0 in /home/dj/.local/lib/python3.8/site-packages (from -r requirements.txt (line 4)) (0.14.0)
+Requirement already satisfied: wxPython>=4.1.0 in /home/dj/.local/lib/python3.8/site-packages (from -r requirements.txt (line 5)) (4.2.0)
+Requirement already satisfied: convertdate in /home/dj/.local/lib/python3.8/site-packages (from ged4py>=0.4.4->-r requirements.txt (line 1)) (2.4.0)
+Requirement already satisfied: ansel in /home/dj/.local/lib/python3.8/site-packages (from ged4py>=0.4.4->-r requirements.txt (line 1)) (1.0.0)
+Requirement already satisfied: geographiclib<3,>=1.52 in /home/dj/.local/lib/python3.8/site-packages (from geopy>=2.3.0->-r requirements.txt (line 3)) (2.0)
+Requirement already satisfied: requests in /usr/lib/python3/dist-packages (from folium>=0.14.0->-r requirements.txt (line 4)) (2.22.0)
+Requirement already satisfied: numpy in /home/dj/.local/lib/python3.8/site-packages (from folium>=0.14.0->-r requirements.txt (line 4)) (1.24.2)
+Requirement already satisfied: jinja2>=2.9 in /usr/lib/python3/dist-packages (from folium>=0.14.0->-r requirements.txt (line 4)) (2.10.1)
+Requirement already satisfied: branca>=0.6.0 in /home/dj/.local/lib/python3.8/site-packages (from folium>=0.14.0->-r requirements.txt (line 4)) (0.6.0)
+Requirement already satisfied: six in /usr/lib/python3/dist-packages (from wxPython>=4.1.0->-r requirements.txt (line 5)) (1.14.0)
+Requirement already satisfied: pillow in /home/dj/.local/lib/python3.8/site-packages (from wxPython>=4.1.0->-r requirements.txt (line 5)) (9.4.0)
+Requirement already satisfied: pymeeus<=1,>=0.3.13 in /home/dj/.local/lib/python3.8/site-packages (from convertdate->ged4py>=0.4.4->-r requirements.txt (line 1)) (0.5.12)
+dj@DESKTOP-R3PSDBU:~/gv/gedcom-to-visualmap-0.2.3.1$ pwd
+/home/dj/gv/gedcom-to-visualmap-0.2.3.1
+dj@DESKTOP-R3PSDBU:~/gv/gedcom-to-visualmap-0.2.3.1$ ls
+LICENSE    docs           gedcom-to-map.pyproj  img               samples
+README.md  gedcom-to-map  gedcom-to-map.sln     requirements.txt  setup.py
+dj@DESKTOP-R3PSDBU:~/gv/gedcom-to-visualmap-0.2.3.1$ python3 gedcom-to-map/gedcomVisualGUI.py 
+01-04-2023 06:29:51 : INFO : gedcomVisualGUI : <module> : 1315 : Starting up gedcom-to-visualmap 0.2.3
+01-04-2023 06:29:51 : INFO : gedcomVisualGUI : <module> : 1315 : Starting up gedcom-to-visualmap 0.2.3
+
+
+```
+

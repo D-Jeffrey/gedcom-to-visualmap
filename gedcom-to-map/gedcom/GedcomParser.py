@@ -11,6 +11,7 @@ from ged4py.date import DateValueVisitor
 from models.Human import Human, LifeEvent
 from models.Pos import Pos
 from gedcomoptions import gvOptions
+from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
@@ -88,7 +89,14 @@ class GedcomParser:
         if self.file_path == '':
             self.gOp.step("no file to Parse")
         else:
-            self.gOp.step("GEDCOM Parsing")
+            fpath = Path(self.file_path)
+            if fpath.is_file():
+                self.gOp.step("GEDCOM Parsing")
+            else:
+                self.gOp.step("file does not exist")
+                logger.warning ("File %s does not exist to read.", self.file_path)
+
+            
         self.gOp.parsed = False
 
 
@@ -221,7 +229,9 @@ class GedcomParser:
     def create_humans(self) -> Dict[str, Human]:
         if self.file_path == '':
             return None
-       
+        fpath = Path(self.file_path)
+        if not fpath.is_file():
+            return None
         with GedcomReader(self.file_path) as parser:
             return self.__create_humans(parser.records0)
         

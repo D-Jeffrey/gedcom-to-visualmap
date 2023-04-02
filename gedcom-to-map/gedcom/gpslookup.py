@@ -194,6 +194,7 @@ class GEDComGPSLookup:
         used = 0
         usedNone = 0
         totaladdr = 0
+        n = ['','','']
         if self.addresses:
             resultpath = self.gOptions.resultpath
             self.gOptions.step("Saving GPS Cache")

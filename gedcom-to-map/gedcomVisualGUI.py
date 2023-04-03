@@ -24,7 +24,7 @@ import webbrowser
 import logging
 import logging.config
 
-from const import NAME, VERSION, LOG_CONFIG, KMLMAPSURL
+from const import NAME, VERSION, LOG_CONFIG, KMLMAPSURL, GVFONTSIZE, GVFONT
 from gedcomoptions import gvOptions
 from gedcomvisual import doKML, doHTML, ParseAndGPS
 
@@ -130,6 +130,11 @@ class VisualMapFrame(wx.Frame):
         self.makeMenuBar()
         # and a status bar
         self.SetStatusText("Visual Mapping ready")
+        self.myFont = wx.Font(wx.FontInfo(GVFONTSIZE).FaceName(GVFONT))
+        # TODO Check for Arial and change it
+        if not self.myFont:
+            self.myFont = wx.Font(wx.FontInfo(10).FaceName('Verdana'))
+        wx.Frame.SetFont(self, self.myFont)
         
 
 
@@ -327,7 +332,7 @@ class PeopleListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
         # TODO This box defination still have a scroll overlap problem
         sizer = wx.BoxSizer(wx.VERTICAL)
         self.InfoBox = wx.StaticText(parent, -1, "Select a file, Load it and Draw Update\nor change type to KML\nOpen Geo Table to edit addresses", size=wx.Size(500,100))
-        self.InfoBox.SetFont(wx.FFont(10, wx.FONTFAMILY_SWISS ))
+        self.InfoBox.SetFont(self.TopLevelParent.myFont)
         sizer.Add(self.InfoBox, -1, wx.FIXED_MINSIZE | wx.LEFT)
 
         self.il = wx.ImageList(16, 16)
@@ -581,7 +586,11 @@ class VisualMapPanel(wx.Panel):
         # Top of the Panel
         box = wx.BoxSizer(wx.VERTICAL)
         title = wx.StaticText(panel, 1, "Visual Mapping Options")#, (10, 10))
-        title.SetFont(wx.FFont(16, wx.FONTFAMILY_SWISS, wx.FONTFLAG_BOLD))
+        titleFont = wx.Font(wx.FontInfo(GVFONTSIZE+6).FaceName(GVFONT).Bold())
+        # TODO Check for Arial and change it
+        if not titleFont:
+            titleFont  = wx.Font(wx.FontInfo(16).FaceName('Verdana').Bold())
+        title.SetFont(titleFont)
         box.Add(title, 0, wx.ALIGN_CENTER|wx.ALL, 5)
         box.Add(wx.StaticLine(panel), 0, wx.EXPAND)
         self.d = Ids()

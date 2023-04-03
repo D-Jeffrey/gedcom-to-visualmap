@@ -186,9 +186,10 @@ python3 ..\gedcom-to-map\gedcom-to-map.py pres2020.ged pres2020-2 -main "@I676@"
 
 
 ## Releases
+### v0.2.3.3
+- Adjustable GUI Font (See const.py to set it)
 ### v0.2.3
 - re-org the project files
-
 ### v0.2.2
 - corrected imports (removed gedcom package dependacy) and requirements.txt (again)
 - on Linux sample

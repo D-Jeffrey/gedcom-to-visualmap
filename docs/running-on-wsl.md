@@ -11,33 +11,16 @@ sudo apt-get update
 sudo apt install python3-pip
 ```
 
-This is to sets up and and installed X-Windows for WSL using xfce4 using the 
-guidance from https://askubuntu.com/questions/1252007/opening-ubuntu-20-04-desktop-on-wsl2/1365455#1365455
 
+This seems to work best...
 ```
-sudo apt install pkg-config
-sudo apt install libgtk-3-dev 
-
-sudo apt install xrdp xfce4
-# If asked, select lightdm, although it probably doesn't matter
-
-# Optionally, back up the default config
-sudo cp /etc/xrdp/xrdp.ini /etc/xrdp/xrdp.ini.bak
-# Windows Pro and higher are often already running RDP on 3389
-# Prevent conflicts:
-sudo sed -i 's/3389/3390/g' /etc/xrdp/xrdp.ini
-
-# Prevent Wayland from being used in Xrdp
-echo "export WAYLAND_DISPLAY=" > ~/.xsessionrc
-
-# Optional, if you only have one desktop environment installed
-echo startxfce4 > ~/.xsession 
-sudo service xrdp start
-
+sudo apt install xubuntu-desktop
 ```
-Now that you have X installed you can access it by logging into it view a Remote Desktop Connection to `localhost:3390`
 
-You will be prompted for you WSL username and password.  (I login the Xorg as the Session type)
+Then you can use UXTerm from the Ubuntu menu of your windows Desktop (Slick)
+I'm not sure if any of the steps below (Saved for reference) are required or they are covered by the desktop install
+
+This seems to be the way people are going on Linux...
 
 ```
 sudo apt-get install python3-venv
@@ -120,3 +103,39 @@ dj@DESKTOP-R3PSDBU:~/gv/gedcom-to-visualmap-0.2.3.1$ python3 gedcom-to-map/gedco
 
 ```
 
+## Side by side
+Windows and Linux (WSL) running on Windows 11 - WSL 1.1.3.0 - Ubuntu 
+![img](Windows+wsl.png)
+
+
+# Saved for reference
+
+I'm not sure if these steps are still required
+
+This is to sets up and and installed X-Windows for WSL using xfce4 using the 
+guidance from https://askubuntu.com/questions/1252007/opening-ubuntu-20-04-desktop-on-wsl2/1365455#1365455
+
+```
+sudo apt install pkg-config
+sudo apt install libgtk-3-dev 
+
+sudo apt install xrdp xfce4
+# If asked, select lightdm, although it probably doesn't matter
+
+# Optionally, back up the default config
+sudo cp /etc/xrdp/xrdp.ini /etc/xrdp/xrdp.ini.bak
+# Windows Pro and higher are often already running RDP on 3389
+# Prevent conflicts:
+sudo sed -i 's/3389/3390/g' /etc/xrdp/xrdp.ini
+
+# Prevent Wayland from being used in Xrdp
+echo "export WAYLAND_DISPLAY=" > ~/.xsessionrc
+
+# Optional, if you only have one desktop environment installed
+echo startxfce4 > ~/.xsession 
+sudo service xrdp start
+
+```
+Now that you have X installed you can access it by logging into it view a Remote Desktop Connection to `localhost:3390`
+
+You will be prompted for you WSL username and password.  (I login the Xorg as the Session type)

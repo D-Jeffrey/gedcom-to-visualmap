@@ -8,12 +8,11 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 import argparse
 import logging
-import logging
 import logging.config
 
 from gedcomoptions import gvOptions
 from gedcomvisual import gedcom_to_map, Geoheatmap
-from const import NAME, VERSION, LOG_CONFIG, KMLMAPSURL
+from const import NAME, VERSION, LOG_CONFIG
 
 logger = logging.getLogger(__name__)
 

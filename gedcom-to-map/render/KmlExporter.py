@@ -67,6 +67,6 @@ class KmlExporter:
                     1
                 )
             else:
-                logger.warning ("skipping {} ({},{}) ({},{})".format(line.name, line.a.lon, line.a.lat, line.b.lon, line.b.lat) )
+                logger.warning ("skipping %s (%f,%f) (%f,%f)", line.name, line.a.lon, line.a.lat, line.b.lon, line.b.lat)
         self.Done()
    

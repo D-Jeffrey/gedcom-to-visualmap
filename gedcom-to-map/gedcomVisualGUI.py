@@ -460,7 +460,7 @@ class PeopleListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
     def OnItemDeselected(self, event):
 
         item = event.GetItem()
-        logger.debug("OnItemDeselected %d" % event.Index)
+        logger.debug("OnItemDeselected %d", event.Index)
 
      
     def OnItemActivated(self, event):
@@ -486,7 +486,7 @@ class PeopleListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
 
     def OnColClick(self, event):
 
-        logger.debug("%s" % event.GetColumn())
+        logger.debug("%s", event.GetColumn())
 
         event.Skip()
 
@@ -869,25 +869,25 @@ class VisualMapPanel(wx.Panel):
 
 
     def EvtButton(self, event):
-        id = event.GetId() 
-        logger.debug("Click! (%d)", id)
-        if id == ID_BTNLoad:
+        myid = event.GetId() 
+        logger.debug("Click! (%d)", myid)
+        if myid == ID_BTNLoad:
             self.LoadGEDCOM()
                 
-        elif id == ID_BTNUpdate:
+        elif myid == ID_BTNUpdate:
             self.DrawGEDCOM()
                                 
-        elif id == ID_BTNCSV:
+        elif myid == ID_BTNCSV:
             self.OpenCSV()
-        elif id == ID_BTNSTOP:
+        elif myid == ID_BTNSTOP:
             self.gO.set('stopping', True)
             self.gO.set('parsed', False)
             self.NeedRedraw()
             self.NeedReload()
-        elif id == ID_BTNBROWSER:
+        elif myid == ID_BTNBROWSER:
             self.OpenBrowser()
         else:
-            logger.error("uncontrolled ID")
+            logger.error("uncontrolled ID : %d", myid)
     
 
     def EvtListBox(self, event):
@@ -1268,7 +1268,7 @@ class BackgroundActions:
             # We communicate with the UI by sending events to it. There can be
             # no manipulation of UI objects from the worker thread.
             if self.do != 0:
-                logger.info(f"triggered thread {self.do}")
+                logger.info("triggered thread %d", self.do)
                 self.gOptions.stopping = False
                 if self.do & 1 or (self.do & 4 and not self.gOptions.parsed):
                     logger.info("start ParseAndGPS")

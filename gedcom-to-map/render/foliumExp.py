@@ -15,8 +15,8 @@ from gedcomoptions import gvOptions
 from folium.plugins import FloatImage, AntPath, MiniMap, HeatMapWithTime
 
 logger = logging.getLogger(__name__)
-# TODO need to create this Legend to explain things
-legend_file = 'legend.png'
+# TODO need to create this Legend to explain things HACK
+legend_file = 'file://' + __file__ + '/../legend.png'
 lgd_txt = '<span style="color: {col};">{txt}</span>'
 
 # --------------------------------------------------------------------------------------------------

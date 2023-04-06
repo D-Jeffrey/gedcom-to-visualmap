@@ -333,7 +333,7 @@ class GEDComGPSLookup:
 
        
         if myaddress:
-            logger.debug("### {} {}".format( addressdepth, myaddress))
+            logger.debug("### %d %s", addressdepth, myaddress)
             if self.addresses:
                 # straight up, is it a valid existing cached address?
                 if myaddress.lower() in self.addresses.keys():
@@ -346,7 +346,7 @@ class GEDComGPSLookup:
                     if (ps.lat and ps.lon):
                         # Do we need to look this up?
                         if (not self.addresses[self.addressalt[myaddress.lower()].lower()]['lat']):
-                            logger.debug ("##* Updated POS\t{}\t{} {},{}".format(a['name'], self.addressalt[myaddress.lower()].lower(), ps.lat, ps.lon))
+                            logger.debug ("##* Updated POS\t%s\t%s %f,%f", a['name'], self.addressalt[myaddress.lower()].lower(), ps.lat, ps.lon)
                     (self.addresses[self.addressalt[myaddress.lower()].lower()]['lat'] , self.addresses[self.addressalt[myaddress.lower()].lower()]['long']) = (ps.lat, ps.lon)
                     (self.addresses[a['name'].lower()]['lat'], self.addresses[a['name'].lower()]['lon']) = (ps.lat, ps.lon)
                     
@@ -389,7 +389,7 @@ class GEDComGPSLookup:
                     ps = (self.lookupaddresses(a, addressdepth+1))
                     if (ps.lat and ps.lon):
                         (self.addresses[addressindex]['lat'] , self.addresses[addressindex]['long']) = (ps.lat, ps.lon)
-                    logger.debug ("## Updated POS\t{} {},{}".format(self.addresses[addressindex]['name'], ps.lat, ps.lon))
+                    logger.debug ("## Updated POS\t%s %f,%f", self.addresses[addressindex]['name'], ps.lat, ps.lon)
                  
                     return ps
 
@@ -409,7 +409,7 @@ class GEDComGPSLookup:
                     # The user gave a new address???
                     theaddress = self.addresses[myaddress.lower()]['alt'].lower()
             if self.addresses and theaddress.lower() in self.addresses.keys():
-                logger.debug ("#BBefore ??? {}\n\t{}\n\t{}".format(theaddress.lower() in self.addresses.keys(), self.addresses[addressindex]['name'], self.addresses[addressindex]['alt']))          
+                logger.debug ("#BBefore ??? %s\n\t%s\n\t%s", theaddress.lower() in self.addresses.keys(), self.addresses[addressindex]['name'], self.addresses[addressindex]['alt'])
             if (self.usecacheonly):
                 return (Pos(None,None))
             if (len(theaddress)>0):
@@ -450,7 +450,7 @@ class GEDComGPSLookup:
                 self.addresses=dict()
                 self.addressalt=dict()
             if locrec['name'].lower() in self.addresses.keys():
-                logger.debug ("#UU={} Changed\n\t{}\n\t{}".format(self.addresses[locrec['name'].lower()]['used'], myaddress, theaddress))
+                logger.debug ("#UU=%s Changed\n\t%s\n\t%s", self.addresses[locrec['name'].lower()]['used'], myaddress, theaddress)
 
             self.addresses[locrec['name'].lower()]= locrec
             self.addressalt[locrec['alt'].lower()]= locrec['name'].lower()

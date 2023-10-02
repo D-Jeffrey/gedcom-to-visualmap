@@ -173,6 +173,7 @@ python3 ..\gedcom-to-map\gedcom-to-map.py pres2020.ged pres2020-2 -main "@I676@"
 - better save the state of the options for next use
 - in Person dialog show something for people still alive (vs None or Unknown)
 - reduce loop cycle on idle
+- better error checking for badly formed GED files 
 
 ## Issues
 - Marriage is not read correctly all the time, does not deal with multiple marriages
@@ -186,6 +187,9 @@ python3 ..\gedcom-to-map\gedcom-to-map.py pres2020.ged pres2020-2 -main "@I676@"
 
 
 ## Releases
+### v0.2.3.4
+- Added dynamic highlighting based on main selection for HTML
+- Added Statistics menu under Actions
 ### v0.2.3.3
 - Adjustable GUI Font (See const.py to set it)
 ### v0.2.3

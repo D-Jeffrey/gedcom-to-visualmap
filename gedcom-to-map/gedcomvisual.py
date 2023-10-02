@@ -74,9 +74,9 @@ def doKML(gOp : gvOptions, humans):
 def Geoheatmap(gOp : gvOptions):
     
     humans = ParseAndGPS(gOp)
-    doHTML(gOp, humans)
+    doHTML(gOp, humans, True)
 
-def doHTML(gOp : gvOptions, humans):
+def doHTML(gOp : gvOptions, humans, fullresult ):
     if (not humans):
         return
     lifeline = LifetimeCreator(humans, gOp.MaxMissing)    
@@ -91,8 +91,9 @@ def doHTML(gOp : gvOptions, humans):
         lifeline.createothers(creator)
         logger.info ("Total of %i people.", len(creator))   
     gOp.totalpeople = len(creator)
-    foliumExporter(gOp).export(humans[gOp.Main], creator)
-    webbrowser.open(os.path.join(gOp.resultpath, gOp.Result), new = 0, autoraise = True)
+    foliumExporter(gOp).export(humans[gOp.Main], creator, fullresult)
+    if (fullresult):
+            webbrowser.open(os.path.join(gOp.resultpath, gOp.Result), new = 0, autoraise = True)
         
     
 

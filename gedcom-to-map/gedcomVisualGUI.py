@@ -170,13 +170,14 @@ class VisualMapFrame(wx.Frame):
         optionsMenu.Append(wx.ID_SETUP, "&Configuration")
         
         self.ActionMenu = ActionMenu =  wx.Menu()
+        ActionMenu.Append(wx.ID_INFO, "Statistic")
         ActionMenu.Append(ID_BTNBROWSER,    "Open Result in &Browser")
         ActionMenu.Append(ID_BTNCSV, "Open &CSV")
 
 
         # Now a help menu for the about item
         helpMenu = wx.Menu()
-        helpMenu.Append(wx.ID_ABOUT)
+        helpMenu.Append(wx.ID_ABOUT, "About")
 
    
 
@@ -194,6 +195,7 @@ class VisualMapFrame(wx.Frame):
         
         self.Bind(wx.EVT_MENU, self.OnFileOpenDialog, id=wx.ID_OPEN)
         self.Bind(wx.EVT_MENU, self.OnExit,   id=wx.ID_EXIT)
+        self.Bind(wx.EVT_MENU, self.OnInfo, id=wx.ID_INFO)
         self.Bind(wx.EVT_MENU, self.OnAbout, id=wx.ID_ABOUT)
         self.Bind(wx.EVT_MENU_RANGE, self.OnFileHistory, id=wx.ID_FILE1, id2=wx.ID_FILE9)
         self.Bind(wx.EVT_MENU, self.onOptionsReset, id=wx.ID_REVERT)
@@ -260,6 +262,21 @@ class VisualMapFrame(wx.Frame):
         wx.MessageBox("Visual GEDCOM mapping\n see Githib Repository\n\n https://github.com/D-Jeffrey/gedcom-to-visualmap",
                       "About gedcom-to-visualmap "+ VERSION,
                       wx.OK|wx.ICON_INFORMATION)
+    def OnInfo(self, event):
+        """Display an Staticis Info Dialog"""
+        msg = ""
+        if hasattr(panel.gO, 'humans') and panel.gO.humans:
+            msg = f'Total People :\t{len(panel.gO.humans)}'
+        else:
+            msg = "No people loaded yet"
+        msg = msg + '\n'
+        if hasattr(panel.gO, 'lookup') and hasattr(panel.gO.lookup, 'addresses') and panel.gO.lookup.addresses:
+            msg = msg + f'Total addresses :\t{len(panel.gO.lookup.addresses)}'
+        else:
+            msg = msg + "No address in cache"
+            
+        wx.MessageBox (msg, 'Statistic', wx.OK|wx.ICON_INFORMATION)
+
 
 
     
@@ -399,6 +416,8 @@ class PeopleListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
         items = popdata.items()
 
         self.list.DeleteAllItems()
+        if self.gO:
+            self.gO.selectedpeople = 0
         for key, data in items:
             index = self.list.InsertItem(self.list.GetItemCount(), data[0]) # , self.idx1)
             self.list.SetItem(index, 1, data[1]) # Year
@@ -406,9 +425,13 @@ class PeopleListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
             self.list.SetItem(index, 3, data[3]) # GeoCode
             self.list.SetItem(index, 4, data[4]) # Location
             self.list.SetItemData(index, key)
-            if self.gO.Referenced:
+            if self.gO.ResultHTML and self.gO.Referenced:
                 if self.gO.Referenced.exists(data[2]):
-                    self.list.SetItemBackgroundColour(index, "LIME GREEN")
+                    self.gO.selectedpeople = self.gO.selectedpeople + 1
+                    if mainperson == data[2]:
+                        self.list.SetItemBackgroundColour(index, "GREY")
+                    else:
+                        self.list.SetItemBackgroundColour(index, "LIME GREEN")
 
 
         self.list.SetColumnWidth(0, wx.LIST_AUTOSIZE_USEHEADER)
@@ -469,6 +492,12 @@ class PeopleListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
         logger.debug("%s TopItem: %s", self.list.GetItemText(self.currentItem), self.list.GetTopItem())
         if self.gO:
             self.gO.set('Main', self.list.GetItemText(self.currentItem, 2))
+            if panel.threads[0].updategridmain:
+                doHTML(self.gO, self.gO.humans, False)
+                panel.threads[0].updategridmain = False
+                panel.peopleList.PopulateList(self.gO.humans, self.gO.get('Main'))
+                panel.threads[0].updategridmain = self.gO.ResultHTML
+            
 
     def OnBeginEdit(self, event):
 
@@ -706,7 +735,7 @@ class VisualMapPanel(wx.Panel):
         l1 = wx.BoxSizer(wx.HORIZONTAL)
         self.d.BTNLoad = wx.Button(panel, ID_BTNLoad, "Load")
         self.d.BTNUpdate = wx.Button(panel, ID_BTNUpdate, "Draw & Update")
-        self.d.BTNCSV = wx.Button(panel, ID_BTNCSV, "Open Geo Table")
+        self.d.BTNCSV = wx.Button(panel, ID_BTNCSV, "Geo Table")
         self.d.BTNSTOP = wx.Button(panel, ID_BTNSTOP, "Stop")
         self.d.BTNBROWSER = wx.Button(panel, ID_BTNBROWSER, "Browser")
         l1.Add (self.d.BTNLoad, 0, wx.EXPAND | wx.ALL, 5)
@@ -807,6 +836,7 @@ class VisualMapPanel(wx.Panel):
             filename = self.gO.get('Result')
             newname = filename
             if self.gO.get('ResultHTML'):
+                panel.threads[0].updategridmain = True
                 if '.kml' in filename.lower():
                     newname = self.gO.get('Result').replace('.kml', '.html', -1)
             else:
@@ -946,7 +976,10 @@ class VisualMapPanel(wx.Panel):
                 if not self.d.BTNCSV.IsEnabled():
                     self.d.BTNCSV.Enable()
         if not status or status == '':
-            status = 'Ready'
+            if panel.gO.selectedpeople and self.gO.ResultHTML:
+                status = f'Ready - {panel.gO.selectedpeople} people selected'
+            else:
+                status = 'Ready'
             self.OnBusyStop(-1)
         self.frame.SetStatusText(status)
         if self.threads[0].updateinfo != '':
@@ -1230,6 +1263,7 @@ class BackgroundActions:
         self.humans = None
         self.threadnum = threadnum
         self.updategrid = False
+        self.updategridmain = True
         self.updateinfo = ''
         self.keepGoing = True
         self.running = True
@@ -1301,7 +1335,8 @@ class BackgroundActions:
                         logger.info("doHTML or doKML")
                         fname = self.gOptions.Result
                         if (self.gOptions.ResultHTML):
-                            doHTML(self.gOptions, self.humans)
+                            doHTML(self.gOptions, self.humans, True)
+                            self.updategridmain = True
                             self.AddInfo(f"HTML generated for {self.gOptions.totalpeople} people ({fname})")
                         else: 
                             doKML(self.gOptions, self.humans)

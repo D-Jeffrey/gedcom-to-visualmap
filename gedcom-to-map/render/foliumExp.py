@@ -75,6 +75,7 @@ class foliumExporter:
         self.max_line_weight = gOptions.MaxLineWeight
         self.gOptions = gOptions
         self.fglastname = dict()
+        self.saveresult = False
         
         backTypes = ('OpenStreetMap', 'Stamen Terrain', 'CartoDB Positron', 'Stamen Toner',  'Stamen Watercolor', 'Cartodbdark_matter')
         if (self.gOptions.MapStyle < 1 or self.gOptions.MapStyle > len(backTypes)):
@@ -96,7 +97,8 @@ class foliumExporter:
         return
 
     def Done(self):
-        self.fm.save(self.file_name)
+        if self.saveresult:
+            self.fm.save(self.file_name)
         self.gOptions.stop()
         # self.fm = None
 
@@ -113,10 +115,11 @@ class foliumExporter:
         #    Export results into HTML   
         # ***************************** 
 
-    def export(self, main: Pos, lines: [Line], ntag =""):
+    def export(self, main: Pos,  lines: [Line], saveresult = True):
         SortByLast = (self.gOptions.GroupBy == 1)
         SortByPerson = (self.gOptions.GroupBy == 2)
         fm = self.fm
+        self.saveresult = saveresult
         
         self.gOptions.step("Preparing")
         self.fglastname = dict()

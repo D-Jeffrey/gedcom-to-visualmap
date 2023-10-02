@@ -48,6 +48,7 @@ class gvOptions:
         self.lastmax = self.counter
         self.humans = None
         self.Referenced = None
+        self.selectedpeople = 0
         
     def setstatic(self,  GEDCOMinput:str, Result:str, ResultHTML: bool, Main=None, MaxMissing:int = 0, MaxLineWeight:int = 20, UseGPS:bool = True, CacheOnly:bool = False,  AllEntities:bool = False, PlaceType = {'native':'native'}):
         self.setResults(Result, ResultHTML)

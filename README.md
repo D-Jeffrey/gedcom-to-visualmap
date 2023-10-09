@@ -170,7 +170,7 @@ python3 ..\gedcom-to-map\gedcom-to-map.py pres2020.ged pres2020-2 -main "@I676@"
 ## Comparing MyHeritage PedigreeMap Heatmap and GedcomVisual Heatmap
 I noticed that the MyHeritage has added a heatmap a year or so ago and it has a lot of overlap with the GedcomVisual heatmap.
 
-![img](docs/MyHeritage-2023-10-09.png) and ![img](docs/GedcomVisual-2023-10-09.png)
+![img](docs/MyHeritage-2023-10-09.png) and ![img](docs/gedcomVisual-2023-10-09.png)
 
 
 ## TODO

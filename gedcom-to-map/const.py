@@ -1,7 +1,8 @@
 """Constants for gedcom-to-visualmap"""
 
-VERSION = "0.2.3.4"
+VERSION = "0.2.3.5"
 NAME = "gedcom-to-visualmap"
+GUINAME = 'GEDCOM Visual Map'
 
 GV_COUNTRIES_JSON = 'https://raw.githubusercontent.com/nnjeim/world/master/resources/json/countries.json'
 GV_STATES_JSON = 'https://raw.githubusercontent.com/nnjeim/world/master/resources/json/states.json'

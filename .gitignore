@@ -4,6 +4,9 @@ myTree.html
 myTree.kml
 .vs/
 other/
+geodat-address-cache-1.csv
+geodat-address-cache-2.csv
+*.user
 
 
 # Byte-compiled / optimized / DLL files
@@ -135,3 +138,10 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+/gedcom-to-map/webdrive.py
+/samples/sample-bourbon
+/samples/sample-kennedy
+/samples/shakespeare.html
+/Tree.html
+/Tree.kml
+*.pyperf

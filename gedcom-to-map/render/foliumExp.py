@@ -294,8 +294,8 @@ class foliumExporter:
             gn = lgd_txt.format( txt=labelname, col= lc)
             fm_line = []
           
-            bextra = "Born {}".format(line.human.birth.whenyear()) if line.human.birth and line.human.birth.when else ''
-            dextra = "Died {}".format(line.human.death.whenyear()) if line.human.death and line.human.death.when else ''
+            bextra = "{} (Born)".format(line.human.birth.whenyear()) if line.human.birth and line.human.birth.when else ''
+            dextra = "{} (Died)".format(line.human.death.whenyear()) if line.human.death and line.human.death.when else ''
             fancyname = fancyname + "<br>" + bextra +" "+ dextra if (bextra != '') or (dextra != '') else fancyname
             fancypopup = f"<div style='min-width: 150px'>{fancyname}</div>" 
             if line.human.photo:

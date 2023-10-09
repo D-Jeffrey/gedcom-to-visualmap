@@ -164,6 +164,15 @@ python3 ..\gedcom-to-map\gedcom-to-map.py pres2020.ged pres2020-2 -main "@I676@"
 ## Running on Linux
 - [See Running on WSL](docs/running-on-wsl.md)
 
+## Other Ideas
+- [See Exploring Family trees](docs/otherlearnings.md)
+
+## Comparing MyHeritage PedigreeMap Heatmap and GedcomVisual Heatmap
+I noticed that the MyHeritage has added a heatmap a year or so ago and it has a lot of overlap with the GedcomVisual heatmap.
+
+![img](docs/MyHeritage-2023-10-09.png) and ![img](docs/GedcomVisual-2023-10-09.png)
+
+
 ## TODO
 - Add a treed hierarchy selector to enable people as groups and add expand/collapse to navigation
 - more troubleshooting on the address lookup
@@ -172,21 +181,27 @@ python3 ..\gedcom-to-map\gedcom-to-map.py pres2020.ged pres2020-2 -main "@I676@"
 - create a marker animation by year (in time steps)
 - better save the state of the options for next use
 - in Person dialog show something for people still alive (vs None or Unknown)
-- reduce loop cycle on idle
-- better error checking for badly formed GED files 
+- remember the starting person next time the same GED is opened
 
 ## Issues
 - Marriage is not read correctly all the time, does not deal with multiple marriages
+
 ### GUI
 - Need to separate the Load and GPS resolve steps
 - Need to better detect change to the GPS cache file
+- need better interaction with buttons and menu selections
 - could be memory leak issues
 - need to determine how do deal with very large HTML files
 - logging panel leaks over the people grid
 
 
-
 ## Releases
+### v0.2.3.5
+- Adjusted Sorting for People list, adjusted adddress and year value for unknown.
+- Try and fix the busy icon
+- Error catching for parsing input of Gedcom files
+- fixed - Uses the correct cache file from the Selected input GED directory
+- file selection dialog automatically opens file
 ### v0.2.3.4
 - Added dynamic highlighting based on main selection for HTML
 - Added Statistics menu under Actions

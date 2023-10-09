@@ -33,22 +33,22 @@ class Human:
             
             
     def refyear(self):
-        bestyear = "Unknown"
+        bestyear = "?Unknown"
         if self.birth and self.birth.when:
             year = self.birth.whenyear()
-            bestyear = "Born " + self.birth.whenyear() if year else "Unknown"
+            bestyear = self.birth.whenyear() + " (Born)" if year else "?Unknown"
         elif self.death and self.death.when:
             year = self.death.whenyear()
-            bestyear = "Died " + self.death.whenyear() if year else "Unknown"
+            bestyear = self.death.whenyear() + " (Died)" if year else "?Unknown"
         return bestyear
 
     def bestlocation(self):
         # TODO Best Location should consider if in KML mode and what is selected
         best = ["Unknown", ""]
         if self.birth and self.birth.pos:
-            best = [str(self.birth.pos), "Born " + self.birth.where if self.birth.where else "Unknown"]
+            best = [str(self.birth.pos), self.birth.where + " (Born)" if self.birth.where else ""]
         elif self.death and self.death.pos:
-            best = [str(self.death.pos), "Died " + self.death.where if self.death.where else "Unknown"]
+            best = [str(self.death.pos), self.death.where + " (Died)" if self.death.where else ""]
         return best
 
 

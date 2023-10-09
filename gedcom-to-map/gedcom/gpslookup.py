@@ -24,14 +24,18 @@ logger = logging.getLogger(__name__)
 fixuplist   = {r'\bof\s': '',
                r'\spart of\s' : ' ', 
                r'po box [0-9]+\s' : ' ', 
+               r'\([\w\s\.]+\)' : '',
                '(town)' : '', 
                '(town/ville)' : '',
+               '(west/ouest)' : '',
                'Upper Canada, British Colonial America': 'Ontario, Canada',
                'Lower Canada, British Colonial America': 'Quebec, Canada',
                'British Colonial America': 'Canada'} 
 wordfixlist = {'of': '',
                r'co\.' : 'county', 
-               r'twp\.': 'township'}
+               r'twp\.': 'township',
+               r'tp\.': 'township', 
+               r'tp': 'township'}
 
 geoapp = None
 cache_filename = (r"geodat-address-cache.csv", r"geodat-address-cache-1.csv", r"geodat-address-cache-2.csv")
@@ -41,7 +45,7 @@ debug = False
 
 defaultcountry = "CA"
 
-   
+# The cache files should not change, but they might in the future.  There should be an option to clear the cache files.   #TODO
 def readCachedURL(cfile, url):
     nfile = os.path.join(tempfile.gettempdir() , cfile)
     if not os.path.exists(nfile):
@@ -93,6 +97,10 @@ class GEDComGPSLookup:
         self.humans = humans
         self.countrieslist = None
         self.Geoapp = None
+        self.stats = ""
+        self.used = 0
+        self.usedNone = 0
+        self.totaladdr = 0
       
         # This pulls from the same directory as GEDCOM file
         if gvO.resultpath:
@@ -175,6 +183,23 @@ class GEDComGPSLookup:
                 self.states[(self.stateslist[c]['name']).lower()] = self.stateslist[c]
             self.wordxlat = WordXlator(wordfixlist)
             self.xlat = Xlator(fixuplist)
+        self.updatestats()
+    
+        
+    def updatestats(self):
+        self.used = 0
+        self.usedNone = 0
+        self.totaladdr = 0
+        if hasattr(self, 'addresses') and self.addresses:
+            for xaddr in self.addresses.keys():
+                
+                if (self.addresses[xaddr]['used'] > 0): 
+                    self.used += 1
+                    self.totaladdr += self.addresses[xaddr]['used']
+                    if (self.addresses[xaddr]['lat'] is None): self.usedNone += 1
+        
+        self.stats = f"Unique addresses: {self.used} with unresolvable: {self.usedNone}"
+        
 
     def saveAddressCache(self):
         if self.usecacheonly or self.gOptions.ShouldStop():
@@ -191,9 +216,6 @@ class GEDComGPSLookup:
                 return
         else:
             logger.warning("No Addresses in addresslist")
-        used = 0
-        usedNone = 0
-        totaladdr = 0
         n = ['','','']
         if self.addresses:
             resultpath = self.gOptions.resultpath
@@ -251,15 +273,12 @@ class GEDComGPSLookup:
                          ]
                     
                     csvwriter.writerow(r)
-                for xaddr in self.addresses.keys():
                 
-                    if (self.addresses[xaddr]['used'] > 0): 
-                        used += 1
-                        totaladdr += self.addresses[xaddr]['used']
-                        if (self.addresses[xaddr]['lat'] is None): usedNone += 1
-
-        logger.info("Unique addresses: %d with %d have missing GPS for a Total of %d",used, usedNone, totaladdr)   
-        self.gOptions.step(f"Cache Table is {totaladdr} addresses")  
+                
+        self.updatestats()
+        logger.info("Unique addresses: %d with %d have missing GPS for a Total of %d",self.used, self.usedNone, self.totaladdr)   
+        
+        self.gOptions.step(f"Cache Table is {self.totaladdr} addresses")  
 
         
     def improveaddress(self,theaddress, thecountry= None):
@@ -477,5 +496,10 @@ class GEDComGPSLookup:
             if (humans[human].death and humans[human].death.where):
                 humans[human].death.pos = self.lookupaddresses(humans[human].death.where)
                 logger.debug ("{:30} @ D {:60} = {}".format(humans[human].name, humans[human].death.where, humans[human].death.pos ))
+        self.updatestats()
+
+
+
+        
             
    

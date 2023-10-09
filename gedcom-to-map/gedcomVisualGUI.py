@@ -14,6 +14,7 @@ import subprocess
 import sys
 import os.path
 import time
+from warnings import catch_warnings
 import wx
 # pylint: disable=no-member
 import wx.lib.anchors as anchors
@@ -24,7 +25,7 @@ import webbrowser
 import logging
 import logging.config
 
-from const import NAME, VERSION, LOG_CONFIG, KMLMAPSURL, GVFONTSIZE, GVFONT
+from const import NAME, VERSION, GUINAME, LOG_CONFIG, KMLMAPSURL, GVFONTSIZE, GVFONT
 from gedcomoptions import gvOptions
 from gedcomvisual import doKML, doHTML, ParseAndGPS
 
@@ -240,6 +241,8 @@ class VisualMapFrame(wx.Frame):
             self.filehistory.Save(panel.config)
 
         dlg.Destroy()
+        wx.Yield()
+        panel.LoadGEDCOM()
 
     def Cleanup(self, *args):
         # A little extra cleanup is required for the FileHistory control
@@ -256,6 +259,8 @@ class VisualMapFrame(wx.Frame):
         # add it back to the history so it will be moved up the list
         self.filehistory.AddFileToHistory(path)
         panel.setInputFile(path)
+        wx.Yield()
+        panel.LoadGEDCOM()
 
     def OnAbout(self, event):
         """Display an About Dialog"""
@@ -264,14 +269,21 @@ class VisualMapFrame(wx.Frame):
                       wx.OK|wx.ICON_INFORMATION)
     def OnInfo(self, event):
         """Display an Staticis Info Dialog"""
+
+        withoutaddr = 0
         msg = ""
         if hasattr(panel.gO, 'humans') and panel.gO.humans:
+            # for xh in panel.gO.humans.keys():
+            #    if (panel.gO.humans[xh].bestlocation() == ''): 
+            #        withoutaddr += 1
+            # msg = f'Total People :\t{len(panel.gO.humans)}\n People without any address {withoutaddr}'
             msg = f'Total People :\t{len(panel.gO.humans)}'
         else:
             msg = "No people loaded yet"
         msg = msg + '\n'
         if hasattr(panel.gO, 'lookup') and hasattr(panel.gO.lookup, 'addresses') and panel.gO.lookup.addresses:
-            msg = msg + f'Total addresses :\t{len(panel.gO.lookup.addresses)}'
+            msg = msg + f'Total addresses :\t{len(panel.gO.lookup.addresses)}' + '\n' + panel.gO.lookup.stats
+            
         else:
             msg = msg + "No address in cache"
             
@@ -438,7 +450,7 @@ class PeopleListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
         self.list.SetColumnWidth(1, wx.LIST_AUTOSIZE_USEHEADER)
         self.list.SetColumnWidth(2, wx.LIST_AUTOSIZE_USEHEADER)
         self.list.SetColumnWidth(3, wx.LIST_AUTOSIZE_USEHEADER)
-        self.list.SetColumnWidth(4, 60)
+        self.list.SetColumnWidth(4, wx.LIST_AUTOSIZE_USEHEADER)
 
         # show how to select an item
    
@@ -990,10 +1002,12 @@ class VisualMapPanel(wx.Panel):
     def OnBusyStart(self, evt):
         self.d.ai.Start()
         self.d.ai.Show()
+        wx.Yield()
             
     def OnBusyStop(self, evt):
         self.d.ai.Stop()
         self.d.ai.Hide()
+        wx.Yield()
 
     def OnUpdate(self, evt):
         # proces evt state hand off
@@ -1110,8 +1124,22 @@ class VisualMapPanel(wx.Panel):
         pass
 
     def LoadGEDCOM(self):
-        self.OnBusyStart(-1)
-        self.threads[0].Trigger(1)
+        #TODO stop the previous actions and then do the load... need to be improved
+        if self.threads[0].IsTriggered(): 
+            self.gO.stopping = True
+        else:
+            self.OnBusyStart(-1)
+            time.sleep(0.1)
+        
+            cachepath, _ = os.path.split(self.gO.get('GEDCOMinput'))
+            if self.gO.get('gpsfile'):
+                sourcepath, _ = os.path.split(self.gO.get('gpsfile'))
+            else:
+                sourcepath = None
+            if self.gO.lookup and cachepath != sourcepath:
+                del self.gO.lookup
+                self.gO.lookup = None
+            self.threads[0].Trigger(1)    
         
     def DrawGEDCOM(self):
 
@@ -1281,8 +1309,12 @@ class BackgroundActions:
     def Stop(self):
         self.keepGoing = False
 
+
     def IsRunning(self):
         return self.running
+
+    def IsTriggered(self):
+        return self.do != 0
 
     def Trigger(self, dolevel):
         if dolevel & 1 or dolevel & 4:
@@ -1304,21 +1336,37 @@ class BackgroundActions:
             if self.do != 0:
                 logger.info("triggered thread %d", self.do)
                 self.gOptions.stopping = False
+                wx.Yield()
                 if self.do & 1 or (self.do & 4 and not self.gOptions.parsed):
+                    evt = UpdateBackgroundEvent(value='busy')
+                    wx.PostEvent(self.win, evt)
+                    wx.Yield()
                     logger.info("start ParseAndGPS")
                     if hasattr(self, 'humans'):
                         if self.humans:                            
                             del self.humans
                             self.gOptions.humans = None
+                            self.humans = None
                     logger.info("ParseAndGPS")
-                    self.humans = ParseAndGPS(self.gOptions, 1)
-                    if self.humans:                            
-                        self.updategrid = True
-                        evt = UpdateBackgroundEvent(value='busy')
-                        wx.PostEvent(self.win, evt)
-                        time.sleep(0.25)
+                    try:
+                        self.humans = ParseAndGPS(self.gOptions, 1)
                     
-
+                    except Exception as e:
+                        # Capture other exceptions
+                        if hasattr(self, 'humans'):
+                            if self.humans:                            
+                                del self.humans
+                                self.humans = None
+                        self.do = 0
+                        self.gOptions.stopping = False
+                        self.AddInfo(str(e), True)
+                        logger.info(str(e))
+                        
+                    self.updategrid = True
+                    evt = UpdateBackgroundEvent(value='busy')
+                    wx.PostEvent(self.win, evt)
+                    wx.Yield()
+                    if hasattr (self, 'humans') and self.humans:                            
                         logger.info("human count %d", len(self.humans))
                         self.humans = ParseAndGPS(self.gOptions, 2)
                         self.updategrid = True
@@ -1327,7 +1375,7 @@ class BackgroundActions:
                         if self.gOptions.Main:
                             self.AddInfo(f" with '{self.gOptions.Main}' as starting person", False)
                     else:
-                        self.AddInfo("File could not be read as a GEDCOM file", False)
+                        self.AddInfo("File could not be read as a GEDCOM file", True)
                     
                 if self.do & 2:
                     logger.info("start do 2")
@@ -1370,7 +1418,7 @@ if __name__ == '__main__':
     logger.setLevel(logging.DEBUG)
     logger.info("Starting up %s %s", NAME, VERSION)
     app = wx.App()
-    frm = VisualMapFrame(None, title='GEDCOM Visual Map', size=(800, 800), style = wx.DEFAULT_FRAME_STYLE)
+    frm = VisualMapFrame(None, title=GUINAME, size=(1024, 800), style = wx.DEFAULT_FRAME_STYLE)
     panel = VisualMapPanel(frm)
     panel.SetupOptions()
     frm.filehistory.Load(panel.config)

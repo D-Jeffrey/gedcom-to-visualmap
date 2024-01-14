@@ -1,15 +1,15 @@
 __all__ = ['KmlExporter']
 
-import math
-
-import simplekml as simplekml
-from models.Line import Line
-from models.Pos import Pos
-from gedcomoptions import gvOptions
-from render.Referenced import Referenced
 import logging
+import math
 import os.path
 import random
+
+import simplekml as simplekml
+from gedcomoptions import gvOptions
+from models.Line import Line
+from models.Pos import Pos
+from render.Referenced import Referenced
 
 logger = logging.getLogger(__name__)
 

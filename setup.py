@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 
-from setuptools import setup, find_packages
+from setuptools import find_packages, setup
 
 setup(
     name='gedcom-to-visualmap',
-    version='0.2.1',
+    version='0.2.4.0',
     packages=find_packages(),
     entry_points={
         'console_scripts': [
@@ -18,6 +18,7 @@ setup(
         'geopy>=2.3.0',
         'folium>=0.14.0',
         'wxPython>=4.1.0',
+        
     ],
     author='D-Jeffrey',
     description='A Python package to convert GEDCOM files to visual maps',
@@ -26,5 +27,5 @@ setup(
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
     ],
-    python_requires='>=3.6',
+    python_requires='>=3.10',
 )

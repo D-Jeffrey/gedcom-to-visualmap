@@ -1,29 +1,57 @@
 __all__ = ['gvOptions']
+from calendar import c
+import logging
 import os
+import platform
 import time
 
-class gvOptions:
-    def __init__ (self, MarksOn = True, HeatMap = False, MarkStarOn = True, BornMark = True, DieMark = True, MapStyle = 3, GroupBy=2, AntPath=False, HeatMapTimeLine=False, HeatMapTimeStep=1, HomeMarker=False):
+import configparser
+from pathlib import Path
+from xmlrpc.client import boolean
+from wx import LogGeneric
+from models.Human import Human, Pos
 
-        self.MarksOn = MarksOn
-        self.HeatMap = HeatMap
-        self.BornMark = BornMark
-        self.DieMark = DieMark
-        self.MapStyle = MapStyle
-        self.MarkStarOn = MarkStarOn
-        self.GroupBy = GroupBy
-        self.UseAntPath = AntPath
-        self.HeatMapTimeLine = HeatMapTimeLine
-        self.HeatMapTimeStep = HeatMapTimeStep
-        self.HomeMarker = HomeMarker
+
+logger = logging.getLogger(__name__)
+
+def settings_file_pathname(file_name):
+    # Get the operating system name
+    os_name = platform.system()
+
+    # Define the settings file path based on the operating system
+    if os_name == 'Windows':
+        settings_file_path = os.path.join(os.getenv('LOCALAPPDATA'), 'gedcomvisual\\')
+    elif os_name == 'Darwin':
+        settings_file_path = os.path.join(os.path.expanduser('~'), 'Library', 'Application Support')
+    elif os_name == 'Linux':
+        settings_file_path = os.path.join(os.path.expanduser('~'), '.config')
+    else:
+        logger.error (f"Unsupported operating system: {os_name}")
+        return file_name
+    Path(settings_file_path).mkdir(parents=True, exist_ok=True)
+    settings_file_path = os.path.join(settings_file_path, file_name)
+    
+    logger.debug (f"Settings file location: {settings_file_path}")
+    return settings_file_path
+    
+
+
+class gvOptions:
+    def __init__ (self):
+
+        self.gvConfig = None
+        self.defaults()
+        self.settingsfile = settings_file_pathname("gedcom-visualmap.ini")
 
         self.GEDCOMinput= None
         self.resultpath = None
-        self.Result = None      # output file (could be of resulttype .html or .kml)
+        self.Result = ''      # output file (could be of resulttype .html or .kml)
         self.ResultType = "html"
         self.ResultHTML = True
         self.Main = None
+        self.mainHuman = None
         self.Name = None
+        self.mainHumanPos = Pos(None, None)
         self.MaxMissing = 0
         self.MaxLineWeight = 20
         self.UseGPS = True
@@ -49,8 +77,49 @@ class gvOptions:
         self.humans = None
         self.Referenced = None
         self.selectedpeople = 0
+        # Types 0 - boolean, 1: int, 2: str
+        self.html_keys = {'MarksOn':0, 'HeatMap':0, 'BornMark':0, 'DieMark':0, 'MapStyle':1, 'MarkStarOn':0, 'GroupBy':1, 
+                          'UseAntPath':0, 'HeatMapTimeLine':0, 'HeatMapTimeStep':1, 'HomeMarker':0, 'showLayerControl':0, 
+                          'mapMini':0}
+        self.core_keys = {'UseGPS':0, 'CacheOnly':0, 'AllEntities':0}
+        self.logging_keys = ['gedcomvisualgui', 'gedcom.gpslookup', 'ged4py.parser', '__main__', 'gedcomoptions']
         
-    def setstatic(self,  GEDCOMinput:str, Result:str, ResultHTML: bool, Main=None, MaxMissing:int = 0, MaxLineWeight:int = 20, UseGPS:bool = True, CacheOnly:bool = False,  AllEntities:bool = False, PlaceType = {'native':'native'}):
+        if os.path.exists(self.settingsfile):
+            self.loadsettings()            
+
+    def defaults(self):
+        
+        self.MarksOn = True
+        self.HeatMap = False
+        self.BornMark = True
+        self.DieMark = True
+        self.MapStyle = 3
+        self.MarkStarOn = True
+        self.GroupBy = 2
+        self.UseAntPath = False
+        self.HeatMapTimeLine = False
+        self.HeatMapTimeStep = 10
+        self.HomeMarker = False
+
+    def setmarkers (self, MarksOn = True, HeatMap = False, MarkStarOn = True, BornMark = True, DieMark = True, MapStyle = 3, GroupBy=2, UseAntPath=False, HeatMapTimeLine=False, HeatMapTimeStep=1, HomeMarker=False):
+        
+        self.MarksOn = MarksOn
+        self.HeatMap = HeatMap
+        self.BornMark = BornMark
+        self.DieMark = DieMark
+        self.MapStyle = MapStyle
+        self.MarkStarOn = MarkStarOn
+        self.GroupBy = GroupBy
+        self.UseAntPath = UseAntPath
+        self.HeatMapTimeLine = HeatMapTimeLine
+        self.HeatMapTimeStep = HeatMapTimeStep
+        self.HomeMarker = HomeMarker
+    
+
+
+
+        
+    def setstatic(self,  GEDCOMinput:2, Result:2, ResultHTML: bool, Main=None, MaxMissing:1 = 0, MaxLineWeight:1 = 20, UseGPS:bool = True, CacheOnly:bool = False,  AllEntities:bool = False, PlaceType = {'native':'native'}):
         self.setResults(Result, ResultHTML)
         self.setInput(GEDCOMinput)
         self.Main = Main
@@ -61,36 +130,117 @@ class gvOptions:
         self.CacheOnly = CacheOnly
         self.AllEntities = AllEntities             # generte output of everyone in the system
         self.PlaceType = PlaceType                 # Dict add/replace with multiple 'native', 'born' & 'death'
-                
+
+                    
+    def loadsettings(self):
+        self.gvConfig = configparser.ConfigParser()
+        self.gvConfig.read(self.settingsfile)
+        if not 'Core' in self.gvConfig.sections():
+            self.gvConfig['Core'] = {}
+        if not 'HTML' in self.gvConfig.sections():
+            self.gvConfig['HTML'] = {}
+        if not 'Logging' in self.gvConfig.sections():
+            self.gvConfig['Logging'] = {}
+        if not 'Gedcom.Main' in self.gvConfig.sections():
+            self.gvConfig['Gedcom.Main'] = {}
+        
+        for key, typ in self.html_keys.items():
+            if typ == 0:
+                setattr(self, key, self.gvConfig['HTML'][key].lower() in ['true'])
+            elif typ == 1:
+                setattr(self, key, int(self.gvConfig['HTML'][key]))
+            else: # typ == 2
+                setattr(self, key, self.gvConfig['HTML'][key])
+        for key, typ in self.core_keys.items():
+            if typ == 0:
+                setattr(self, key, self.gvConfig['Core'][key].lower() in ['true'])
+            elif typ == 1:
+                setattr(self, key, int(self.gvConfig['Core'][key]))
+            else: # typ == 2
+                setattr(self, key, self.gvConfig['Core'][key])
+        
+        self.GEDCOMinput = self.gvConfig['Core']['InputFile']
+        if self.GEDCOMinput == '':
+            self.GEDCOMinput = None
+        else:
+            self.setInput(self.GEDCOMinput)
+        self.Result = self.gvConfig['Core']['OutputFile']
+        ResultHTML = not ('.kml' in self.Result.lower())
+        self.setResults(self.Result, ResultHTML)
         
         
-    def setMainName(self, name):
+        
+        self.Name = None
+        # TODO this does not set the right logger
+        for itm, lvl in self.gvConfig.items('Logging'):
+            alogger = logging.getLogger(itm)
+            if alogger:
+                alogger.setLevel(lvl)
+
+    def getLastMain(self):
+        if self.GEDCOMinput:
+            name = Path(self.GEDCOMinput).stem
+            self.Main = self.gvConfig.get('Gedcom.Main', name, fallback=None)
+        
+
+            
+    def savesettings(self):
+        if not self.gvConfig:
+            self.gvConfig = configparser.ConfigParser()
+            self.gvConfig['Core'] = {}
+            self.gvConfig['HTML'] = {}
+            self.gvConfig['Gedcom.Main'] = {}
+            self.gvConfig['Logging'] = {}
+            # self.gvConfig['Gedcom'] = {}
+        for key in self.core_keys:
+            self.gvConfig['Core'][key] = str(getattr(self, key))
+        for key in self.html_keys:
+            self.gvConfig['HTML'][key] =  str(getattr(self, key))
+            
+        self.gvConfig['Core']['InputFile'] =  self.GEDCOMinput
+        self.gvConfig['Core']['OutputFile'] = self.Result
+        
+        if self.GEDCOMinput and self.Main:
+            name = Path(self.GEDCOMinput).stem
+            self.gvConfig['Gedcom.Main'][name] = str(self.Main)
+        #TODO
+        for key in self.logging_keys:
+            self.gvConfig['Logging'][key] = logging.getLevelName(logging.getLogger(key).getEffectiveLevel())
+        with open(self.settingsfile, 'w') as configfile:
+            self.gvConfig.write(configfile)
+    
+            
+    def setMainHuman(self, mainhuman: Human):
         """ Set the name of the starting person """
-        self.Name = name
+        self.mainHuman = mainhuman 
+        self.Name = mainhuman.name
+        self.mainHumanPos = mainhuman.bestPos()
 
     def setResults(self, Result, isResultHTML):
-        """ Set the Results Output file and type """
-        self.Result = Result                  # output file (could be of resulttype .html or .kml)
+        """ Set the Output file and type """
         self.ResultHTML = isResultHTML
         if (isResultHTML):
             self.ResultType = "html"
         else:
             self.ResultType = "kml"
-        _, extension = os.path.splitext(self.Result)
-        if extension == "" and self.Result != "":
+        self.Result, extension = os.path.splitext(Result)                   # output file (could be of resulttype .html or .kml)
+        if self.Result != "":
             self.Result = self.Result + "." + self.ResultType
 
     def setInput(self, GEDCOMinput):
-        """ Set the Results Output file and type """
+        """ Set the input file, update output file """
         org = self.GEDCOMinput
         self.GEDCOMinput= GEDCOMinput
-
-        _, extension = os.path.splitext(self.GEDCOMinput)
-        if extension == "" and self.GEDCOMinput != "":
-            self.GEDCOMinput = self.GEDCOMinput + ".ged"
-        self.resultpath = os.path.dirname(self.GEDCOMinput)
+        if self.GEDCOMinput:
+            _, extension = os.path.splitext(self.GEDCOMinput)
+            if extension == "" and self.GEDCOMinput != "":
+                self.GEDCOMinput = self.GEDCOMinput + ".ged"
+            self.resultpath = os.path.dirname(self.GEDCOMinput)
+            if org != self.GEDCOMinput:
+                # Force the output to match the name and location of the input
+                self.setResults(self.resultpath, self.ResultHTML)
         if org != self.GEDCOMinput:
-            self.parsed = False
+                self.parsed = False            
 
     def KeepGoing(self):
         return not self.ShouldStop()
@@ -98,29 +248,44 @@ class gvOptions:
     def ShouldStop(self):
         return self.stopping
 
+    def stopstep(self, state):
+        """ Update the counter used to show progress to the end user """
+        """ return true if we should stop stepping """
+        self.state = state
+            
+        return True
+    
     def step(self, state = None, info=None):
+        """ Update the counter used to show progress to the end user """
+        """ return true if we should stop stepping """
         if state:
             self.state = state
             self.counter = 0
+            self.running = True
         else:
             self.counter = self.counter+1
             self.stepinfo = info
-        self.running = True
+        # logging.debug(">>>>>> stepped %d", self.counter)
         return self.ShouldStop()
                 
         
     def stop(self):        
+        self.running = False
+        self.stopping = False
+        time.sleep(.1)
         self.lastmax = self.counter
         self.time = time.ctime()
         self.counter = 0
-        self.running = False
         self.state = ""
+        self.running = False        # Race conditions
         self.stopping = False
 
     def get (self, attribute):
+        """ check an gOptions attribute """
         return getattr(self,attribute)
 
     def set(self, attribute, value):
+        """ set an gOptions attribute """
         if not hasattr(self, attribute):
             raise ValueError(f'attempting to set an attribute : {attribute} which does not exist')
         setattr (self, attribute, value)

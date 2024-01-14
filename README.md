@@ -170,21 +170,26 @@ python3 ..\gedcom-to-map\gedcom-to-map.py pres2020.ged pres2020-2 -main "@I676@"
 ## Comparing MyHeritage PedigreeMap Heatmap and GedcomVisual Heatmap
 I noticed that the MyHeritage has added a heatmap a year or so ago and it has a lot of overlap with the GedcomVisual heatmap.
 
-![img](docs/MyHeritage-2023-10-09.png) and ![img](docs/GedcomVisual-2023-10-09.png)
+![img](docs/MyHeritage-2023-10-09.png) and ![img](docs/gedcomVisual-2023-10-09.png)
 
 
 ## TODO
 - Add a treed hierarchy selector to enable people as groups and add expand/collapse to navigation
+- add search to people grid
 - more troubleshooting on the address lookup
+  - better way to interact and refine the address resolution hints
+  - move address hints in a configuration file
 - option to remove 'lines' to not core points (such as RESI or other)
 - Sort the Last Name by the highest number of people first or by distance from star
 - create a marker animation by year (in time steps)
 - better save the state of the options for next use
 - in Person dialog show something for people still alive (vs None or Unknown)
 - remember the starting person next time the same GED is opened
+- add histical timeline and reference events in the area from https://www.vizgr.org/historical-events/ & https://github.com/dh3968mlq/hdtimelines/
 
 ## Issues
 - Marriage is not read correctly all the time, does not deal with multiple marriages
+- Sorting does not work after the graph is created
 
 ### GUI
 - Need to separate the Load and GPS resolve steps
@@ -196,6 +201,19 @@ I noticed that the MyHeritage has added a heatmap a year or so ago and it has a 
 
 
 ## Releases
+### v0.2.4
+- Change the HTML layer to deal with license changes to Leaflet map layers
+- Added save state to config file
+- finally got error messages in color
+- improved logging
+### v0.2.4
+- Major performance increases
+- Improved sorting for Last Name, People and None
+- May have fixed busy icon
+- Code refactors
+- fine tune person dialog
+- #bug - loading pres2020.ged and sorting on ID, may be other cases
+- Improved Statistics Summary
 ### v0.2.3.5
 - Adjusted Sorting for People list, adjusted adddress and year value for unknown.
 - Try and fix the busy icon

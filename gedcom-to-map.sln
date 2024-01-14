@@ -1,8 +1,9 @@
+﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
-VisualStudioVersion = 16.0.32002.261
+VisualStudioVersion = 16.0.33328.57
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "gedcomvisualmap", "gedcomvisualmap.pyproj", "{588881E5-ACD3-413B-9A45-7DB0BCB4A3CB}"
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "gedcom-to-map ", "gedcom-to-map .pyproj", "{588881E5-ACD3-413B-9A45-7DB0BCB4A3CB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,6 +18,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {526E0305-6C10-4A57-81D3-923CB5515F64}
+		SolutionGuid = {6FD69353-747D-456F-A333-FAA50690829A}
 	EndGlobalSection
 EndGlobal

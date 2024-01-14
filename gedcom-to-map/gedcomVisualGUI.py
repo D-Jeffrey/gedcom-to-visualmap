@@ -9,25 +9,28 @@
 
 #!/usr/bin/env python
 
+import _thread
+import logging
+import logging.config
 import os
+import os.path
 import subprocess
 import sys
-import os.path
 import time
+import webbrowser
 from warnings import catch_warnings
+import configparser
 import wx
 # pylint: disable=no-member
 import wx.lib.anchors as anchors
-import wx.lib.newevent
 import wx.lib.mixins.listctrl as listmix
-import _thread
-import webbrowser
-import logging
-import logging.config
-
-from const import NAME, VERSION, GUINAME, LOG_CONFIG, KMLMAPSURL, GVFONTSIZE, GVFONT
+import wx.lib.newevent
+from const import (GUINAME, GVFONT, GVFONTSIZE, KMLMAPSURL, LOG_CONFIG, NAME,
+                   VERSION)
 from gedcomoptions import gvOptions
-from gedcomvisual import doKML, doHTML, ParseAndGPS
+from gedcomvisual import ParseAndGPS, doHTML, doKML
+
+__all__ = ['gvOptions', 'gvConfig']
 
 logger = logging.getLogger(__name__)
 
@@ -93,10 +96,13 @@ IDtoAttr = {ID_CBMarksOn : ('MarksOn', 'Redraw'),
     ID_BTNSTOP: "Stop",
     ID_BTNBROWSER: "OpenBrowser"}
 
+InfoBoxLines = 8
+
 # This creates a new Event class and a EVT binder function
 (UpdateBackgroundEvent, EVT_UPDATE_STATE) = wx.lib.newevent.NewEvent()
 
 from wx.lib.embeddedimage import PyEmbeddedImage
+
 SmallUpArrow = PyEmbeddedImage(
     b"iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAADxJ"
     b"REFUOI1jZGRiZqAEMFGke2gY8P/f3/9kGwDTjM8QnAaga8JlCG3CAJdt2MQxDCAUaOjyjKMp"
@@ -113,6 +119,11 @@ class Ids():
     def __init__(self):
         self.CLR_BTN_PRESS = wx.Colour(255, 230, 200, 255)
         self.CLR_BTN_DONE = wx.Colour(255, 255, 255, 255)
+        self.InfoBoxBackColor = wx.TheColourDatabase.FindColour('GOLDENROD')
+        self.InfoBoxForeColor = wx.TheColourDatabase.FindColour('BLACK')
+        self.InfoBoxBackErrColor = wx.TheColourDatabase.FindColour('RED')
+        self.InfoBoxForeErrColor = wx.TheColourDatabase.FindColour('WHITE')
+
         
 
 
@@ -171,7 +182,7 @@ class VisualMapFrame(wx.Frame):
         optionsMenu.Append(wx.ID_SETUP, "&Configuration")
         
         self.ActionMenu = ActionMenu =  wx.Menu()
-        ActionMenu.Append(wx.ID_INFO, "Statistic")
+        ActionMenu.Append(wx.ID_INFO, "Statistics Sumary")
         ActionMenu.Append(ID_BTNBROWSER,    "Open Result in &Browser")
         ActionMenu.Append(ID_BTNCSV, "Open &CSV")
 
@@ -210,6 +221,8 @@ class VisualMapFrame(wx.Frame):
         
     def OnExit(self, event):
         """Close the frame, terminating the application."""
+        panel.gO.savesettings()
+        logger.info('Finishing')
         self.Close(True)
 
     def OnOpenCSV(self, event):
@@ -277,25 +290,29 @@ class VisualMapFrame(wx.Frame):
             #    if (panel.gO.humans[xh].bestlocation() == ''): 
             #        withoutaddr += 1
             # msg = f'Total People :\t{len(panel.gO.humans)}\n People without any address {withoutaddr}'
-            msg = f'Total People :\t{len(panel.gO.humans)}'
+            msg = f'Total People :{len(panel.gO.humans)}'
         else:
             msg = "No people loaded yet"
         msg = msg + '\n'
         if hasattr(panel.gO, 'lookup') and hasattr(panel.gO.lookup, 'addresses') and panel.gO.lookup.addresses:
-            msg = msg + f'Total addresses :\t{len(panel.gO.lookup.addresses)}' + '\n' + panel.gO.lookup.stats
+            msg = msg + f'Total cached addresses :{len(panel.gO.lookup.addresses)}' + '\n' + panel.gO.lookup.stats
             
         else:
             msg = msg + "No address in cache"
+        
             
-        wx.MessageBox (msg, 'Statistic', wx.OK|wx.ICON_INFORMATION)
+        wx.MessageBox (msg, 'Statistics', wx.OK|wx.ICON_INFORMATION)
 
 
 
     
     def onOptionsReset(self, event):
-        wx.MessageBox("Does nothing",
-                      "reset options",
+        wx.MessageBox("Reset settings",
+                      "Options reset to default",
                       wx.OK|wx.ICON_INFORMATION)
+        panel.gO.defaults()
+        panel.gO.savesettings()
+        panel.SetupOptions()
         
     def onOptionsSetup(self, event):
         dialog = ConfigDialog(None, title='Configuration')
@@ -360,10 +377,17 @@ class PeopleListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
         tID = wx.NewIdRef()
         # TODO This box defination still have a scroll overlap problem
         sizer = wx.BoxSizer(wx.VERTICAL)
-        self.InfoBox = wx.StaticText(parent, -1, "Select a file, Load it and Draw Update\nor change type to KML\nOpen Geo Table to edit addresses", size=wx.Size(500,100))
-        self.InfoBox.SetFont(self.TopLevelParent.myFont)
-        sizer.Add(self.InfoBox, -1, wx.FIXED_MINSIZE | wx.LEFT)
-
+        self.messagelog = "  Select a file, Load it and Draw Update\n   or change type to KML\n  Open Geo Table to edit addresses"
+        self.InfoBox = []
+        for i in range(InfoBoxLines):
+            self.InfoBox.append(wx.StaticText(parent, -1, ' '))
+            
+            # self.InfoBox.append(wx.Button(self, wx.ID_ANY, ""))
+            
+            self.InfoBox[i].SetFont(self.TopLevelParent.myFont)
+            sizer.Add(self.InfoBox[i], 0, wx.LEFT,5)
+            # self.InfoBox[i].SetLabelMarkup(f"<b>what you looking at</b>")
+        
         self.il = wx.ImageList(16, 16)
         
         self.sm_up = self.il.Add(SmallUpArrow.GetBitmap())
@@ -391,7 +415,8 @@ class PeopleListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
         # self.SetAutoLayout(True)
 
         parent.Bind(wx.EVT_LIST_ITEM_RIGHT_CLICK, self.OnItemRightClick, self.list)
-        parent.Bind(wx.EVT_LIST_ITEM_SELECTED, self.OnItemActivated, self.list)
+        # parent.Bind(wx.EVT_LIST_ITEM_SELECTED, self.OnItemActivated, self.list)
+        parent.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.OnItemActivated, self.list)
         parent.Bind(wx.EVT_LIST_COL_CLICK, self.OnColClick, self.list)
         #self.Bind(wx.EVT_LIST_COL_RIGHT_CLICK, self.OnColRightClick, self.list)
         parent.Bind(wx.EVT_LIST_COL_BEGIN_DRAG, self.OnColBeginDrag, self.list)
@@ -509,6 +534,7 @@ class PeopleListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
                 panel.threads[0].updategridmain = False
                 panel.peopleList.PopulateList(self.gO.humans, self.gO.get('Main'))
                 panel.threads[0].updategridmain = self.gO.ResultHTML
+                panel.threads[0].AddInfo(f"Using '{self.gO.Main}' as starting person", False)
             
 
     def OnBeginEdit(self, event):
@@ -585,6 +611,8 @@ class VisualMapPanel(wx.Panel):
         self.ai = None
         self.d = dict()
         self.config = None
+        self.busystate = 0
+        self.busycounthack = 0
         self.SetAutoLayout(True)
         
         
@@ -592,7 +620,7 @@ class VisualMapPanel(wx.Panel):
         
         self.panelA = wx.Panel(self, -1, size=(760,420),style=wx.SIMPLE_BORDER  )
         # https://docs.wxpython.org/wx.ColourDatabase.html#wx-colourdatabase
-        self.panelA.SetBackgroundColour(wx.TheColourDatabase.FindColour('GOLDENROD'))
+        self.panelA.SetBackgroundColour(Ids().InfoBoxBackColor)
 
         lc = wx.LayoutConstraints()
         lc.top.SameAs( self, wx.Top, 5)
@@ -623,7 +651,7 @@ class VisualMapPanel(wx.Panel):
 
 
     def LayoutOptions(self, panel):
-
+        """ Layout the panels in the proper nested manner """
         # Top of the Panel
         box = wx.BoxSizer(wx.VERTICAL)
         title = wx.StaticText(panel, 1, "Visual Mapping Options")#, (10, 10))
@@ -764,10 +792,9 @@ class VisualMapPanel(wx.Panel):
         box.Add(l1, 0, wx.EXPAND | wx.ALL,0)
  
         """    
-    ID_LISTMapStyle,
-    
-    ID_TEXTMain,
-    ID_TEXTName,
+            ID_LISTMapStyle,
+            ID_TEXTMain,
+            ID_TEXTName,
         """
         
         # panel.SetSizeHints(box)
@@ -837,6 +864,7 @@ class VisualMapPanel(wx.Panel):
         self.config.Write("GEDCOMinput", path)
         #TODO Fix this
         self.gO.set('Main', None)
+        self.gO.getLastMain()
         #TODO Fix this
         self.NeedReload()
 
@@ -863,7 +891,7 @@ class VisualMapPanel(wx.Panel):
         elif event.GetId() ==  ID_RBGroupBy:
             self.gO.GroupBy = event.GetSelection()
         else:
-            logger.debug.error('We have a Problem')
+            logger.error('We have a Problem')
         
 
     def EvtText(self, event):
@@ -992,21 +1020,36 @@ class VisualMapPanel(wx.Panel):
                 status = f'Ready - {panel.gO.selectedpeople} people selected'
             else:
                 status = 'Ready'
-            self.OnBusyStop(-1)
+            # self.OnBusyStop(-1)
         self.frame.SetStatusText(status)
-        if self.threads[0].updateinfo != '':
+        if self.threads[0].updateinfo or self.threads[0].errorinfo:
             self.OnUpdate(evt)
+        if self.busystate != self.gO.running:
+            logging.info("Busy %d not Running %d", self.busystate, self.gO.running)
+            if self.gO.running:
+                self.OnBusyStart(-1)
+            else:
+                self.OnBusyStop(-1)
+        if not self.gO.running:
+           ++self.busycounthack
+           if self.busycounthack > 40:
+                self.OnBusyStop(-1)
         wx.Yield()
         
 
     def OnBusyStart(self, evt):
+        """ show the spinning Busy graphic """
+        self.busystate = True
         self.d.ai.Start()
         self.d.ai.Show()
         wx.Yield()
             
     def OnBusyStop(self, evt):
+        """ remove the spinning Busy graphic """
         self.d.ai.Stop()
         self.d.ai.Hide()
+        self.busystate = False
+        self.busycounthack = 0
         wx.Yield()
 
     def OnUpdate(self, evt):
@@ -1014,17 +1057,37 @@ class VisualMapPanel(wx.Panel):
         if self.threads[0].updategrid:
             self.threads[0].updategrid = False
             self.peopleList.PopulateList(self.threads[0].humans, self.gO.get('Main'))
+        newinfo = None
         if self.threads[0].updateinfo:
-            messages = self.peopleList.InfoBox.GetLabel()
             logger.debug("Infobox: %s", self.threads[0].updateinfo)
-            lines = messages.split("\n")
-            if len(lines) > 15:
-                messages = "\n".join(lines[:15])
-            self.peopleList.InfoBox.SetLabel(self.threads[0].updateinfo + '\n' + messages)
+            newinfo = self.threads[0].updateinfo
+            self.threads[0].updateinfo = None
+        if self.threads[0].errorinfo:
+            logger.debug("Infobox-Err: %s", self.threads[0].errorinfo)
+            einfo = f"<span foreground='red'><b>" + self.threads[0].errorinfo + f"</b></span>"
+            newinfo = newinfo + '\n' + einfo if newinfo else einfo
+            self.threads[0].errorinfo = None
+        if (newinfo):
+            lines = (newinfo+'\n'+self.peopleList.messagelog).split("\n")
+            for i in range(InfoBoxLines):
+                if i >= len(lines):
+                    self.peopleList.InfoBox[i].SetLabelMarkup('')
+                else:
+                    self.peopleList.InfoBox[i].SetLabelMarkup(lines[i]+ ' ')
+                    # Work around to the Windows bug where it can not set rich labels
+                    if '<b>' in lines[i]:
+                        self.peopleList.InfoBox[i].SetBackgroundColour(Ids().InfoBoxBackErrColor)
+                        self.peopleList.InfoBox[i].SetForegroundColour(Ids().InfoBoxForeErrColor)
+                    else:
+                        self.peopleList.InfoBox[i].SetBackgroundColour(Ids().InfoBoxBackColor)
+                        self.peopleList.InfoBox[i].SetForegroundColour(Ids().InfoBoxForeColor)
+            self.peopleList.messagelog = "\n".join(lines[:InfoBoxLines])
+              
 
-            self.threads[0].updateinfo = ''
-    
+            
+
     def SetupButtonState(self):
+        """ based on the type of file output, enable/disable the interface """
         ResultTypeHTML = self.gO.get('ResultHTML')
         # Always enabled
             # self.d.CBUseGPS
@@ -1032,8 +1095,8 @@ class VisualMapPanel(wx.Panel):
             # self.d.CBCacheOnly
             
         if ResultTypeHTML:
-            # self.kbox.SetBackgroundColour((230, 230, 230, 255))
-            # self.hbox.SetBackgroundColour((255, 255, 255, 255)) 
+            # self.panelB.Sizer.Children[1].Window.SetBackgroundColour((0, 230, 230, 255))
+            # self.panelB.Sizer.Children[5].Window.SetBackgroundColour((255, 255, 255, 255)) 
             for ctrl in list([self.d.CBMarksOn,
                 self.d.CBMapControl,
                 self.d.CBMapMini,
@@ -1058,8 +1121,8 @@ class VisualMapPanel(wx.Panel):
                 self.d.CBHomeMarker.Disable()
                 
         else:
-            # self.kbox.SetBackgroundColour((255, 255, 255, 255)) 
-            # self.hbox.SetBackgroundColour((230, 230, 230, 255))
+            # self.panelB.Sizer.Children[6].Window.SetBackgroundColour((255, 0, 255, 255)) 
+            # self.panelB.Sizer.Children[7].Window.SetBackgroundColour((230, 230, 230, 255))
             for ctrl in list([self.d.CBMarksOn, 
                 self.d.CBMapControl,
                 self.d.CBMapMini,
@@ -1081,7 +1144,7 @@ class VisualMapPanel(wx.Panel):
         
         
         self.gO = gvOptions()
-        self.gO.setstatic( self.config.Read("GEDCOMinput"), self.config.Read("Result"), True, None)
+        # self.gO.setstatic( self.config.Read("GEDCOMinput"), self.config.Read("Result"), True, None)
 
         self.peopleList.setGOp(self.gO)
 
@@ -1129,6 +1192,7 @@ class VisualMapPanel(wx.Panel):
             self.gO.stopping = True
         else:
             self.OnBusyStart(-1)
+            self.gO.savesettings()
             time.sleep(0.1)
         
             cachepath, _ = os.path.split(self.gO.get('GEDCOMinput'))
@@ -1145,10 +1209,10 @@ class VisualMapPanel(wx.Panel):
 
         if not self.gO.get('Result') or self.gO.get('Result') == '':
             logger.error("Error: Not output file name set")
-            self.threads[0].AddInfo("Error: Please set the Output file name")
+            self.threads[0].AddErrorInfo("Error: Please set the Output file name")
         else:
             self.OnBusyStart(-1)
-      
+            self.gO.savesettings()
             self.threads[0].Trigger(2 | 4)
         
     
@@ -1229,10 +1293,10 @@ class PersonDialog(wx.Dialog):
         home_label = wx.StaticText(self, label="Homes: ")
 
         self.name_textctrl = wx.TextCtrl(self, style=wx.TE_READONLY, size=(350,-1))
-        self.father_textctrl = wx.TextCtrl(self, style=wx.TE_READONLY|wx.TE_MULTILINE)
-        self.mother_textctrl = wx.TextCtrl(self, style=wx.TE_READONLY|wx.TE_MULTILINE)
-        self.birth_textctrl = wx.TextCtrl(self, style=wx.TE_READONLY)
-        self.death_textctrl = wx.TextCtrl(self, style=wx.TE_READONLY)
+        self.father_textctrl = wx.TextCtrl(self, style=wx.TE_READONLY)
+        self.mother_textctrl = wx.TextCtrl(self, style=wx.TE_READONLY)
+        self.birth_textctrl = wx.TextCtrl(self, style=wx.TE_READONLY|wx.TE_MULTILINE)
+        self.death_textctrl = wx.TextCtrl(self, style=wx.TE_READONLY|wx.TE_MULTILINE)
         self.sex_textctrl = wx.TextCtrl(self, style=wx.TE_READONLY)
         self.marriage_textctrl = wx.TextCtrl(self, style=wx.TE_READONLY|wx.TE_MULTILINE)
         self.home_textctrl = wx.TextCtrl(self, style=wx.TE_READONLY|wx.TE_MULTILINE)
@@ -1240,9 +1304,9 @@ class PersonDialog(wx.Dialog):
         # layout the UI controls using a grid sizer
         
         sizer = wx.FlexGridSizer(cols=2, hgap=5, vgap=5)
-        # sizer = wx.StaticBoxSizer(wx.VERTICAL, self, "Person Details")
+        
         sizer.Add(name_label, 0, wx.LEFT|wx.TOP, border=5)
-        sizer.Add(self.name_textctrl, 0, wx.EXPAND|wx.LEFT|wx.RIGHT|wx.BOTTOM, border=5)
+        sizer.Add(self.name_textctrl, 0, wx.EXPAND, border=5)
         sizer.Add(father_label, 0, wx.LEFT|wx.TOP, border=5)
         sizer.Add(self.father_textctrl, 1, wx.EXPAND)
         sizer.Add(mother_label, 0, wx.LEFT|wx.TOP, border=5)
@@ -1254,20 +1318,22 @@ class PersonDialog(wx.Dialog):
         sizer.Add(sex_label, 0, wx.LEFT|wx.TOP, border=5)
         sizer.Add(self.sex_textctrl, 0, wx.EXPAND)
         sizer.Add(marriage_label, 0, wx.LEFT|wx.TOP, border=5)
-        sizer.Add(self.marriage_textctrl, 1, wx.EXPAND|wx.LEFT|wx.RIGHT|wx.BOTTOM, border=5)
+        sizer.Add(self.marriage_textctrl, 1, wx.EXPAND, border=5)
         sizer.Add(home_label, 0, wx.LEFT|wx.TOP, border=5)
-        sizer.Add(self.home_textctrl, 1, wx.EXPAND|wx.LEFT|wx.RIGHT|wx.BOTTOM, border=5)
+        sizer.Add(self.home_textctrl, 1, wx.EXPAND, border=5)
         # self.SetSizer(sizer)
 
         # set the person's data in the UI controls
-        self.name_textctrl.SetValue(str(human.surname))
+        self.name_textctrl.SetValue(str(human.first + " " + human.surname))
       
         self.father_textctrl.SetValue(str(humans[human.father].first + " " + str(humans[human.father].surname)) if human.father else "<none>")
         self.mother_textctrl.SetValue(str(humans[human.mother].first + " " + str(humans[human.mother].surname)) if human.mother else "<none>")
         self.birth_textctrl.SetValue(str(human.birth))
         self.death_textctrl.SetValue(str(human.death))
         self.sex_textctrl.SetValue(str(human.sex) if human.sex else "")
+        # TODO multiple marriages
         self.marriage_textctrl.SetValue(str(human.marriage))
+        # TODO multiple homes
         self.home_textctrl.SetValue(str(human.home))
 
         # create the OK button
@@ -1275,7 +1341,7 @@ class PersonDialog(wx.Dialog):
         btn_sizer = wx.StdDialogButtonSizer()
         btn_sizer.AddButton(ok_btn)
         btn_sizer.Realize()
-        sizer.Add(btn_sizer, flag=wx.ALIGN_CENTER|wx.BOTTOM, border=10)
+        sizer.Add(btn_sizer, 0, wx.RIGHT|wx.BOTTOM, border=10)
         self.SetSizer(sizer)
         self.SetBackgroundColour(wx.TheColourDatabase.FindColour('WHITE'))
         self.Fit()
@@ -1292,26 +1358,29 @@ class BackgroundActions:
         self.threadnum = threadnum
         self.updategrid = False
         self.updategridmain = True
-        self.updateinfo = ''
+        self.updateinfo = ''  # This will prime the update
+        self.errorinfo = None
         self.keepGoing = True
-        self.running = True
+        self.threadrunning = True
         self.do = -1
 
     def DefgOps(self, gOps):
         self.gOptions = gOps
 
     def Start(self):
-        self.keepGoing = self.running = True
+        self.keepGoing = self.threadrunning = True
         
         self.do = 0
+        logging.info("Started thread %d from thread %d", self.threadnum, _thread.get_ident())
         _thread.start_new_thread(self.Run, ())
+        
 
     def Stop(self):
         self.keepGoing = False
 
 
     def IsRunning(self):
-        return self.running
+        return self.threadrunning
 
     def IsTriggered(self):
         return self.do != 0
@@ -1326,15 +1395,26 @@ class BackgroundActions:
     def AddInfo(self, line, newline= True):
         if newline and self.updateinfo and self.updateinfo != '':
             self.updateinfo = self.updateinfo + "\n"
-        self.updateinfo = self.updateinfo + line
+        if self.updateinfo:
+            self.updateinfo = self.updateinfo + line
+        else:
+            self.updateinfo = line
+        
+    def AddErrorInfo(self, line, newline= True):
+        if newline and self.errorinfo and self.errorinfo != '':
+            self.errorinfo = self.errorinfo + "\n"
+        if self.errorinfo:
+            self.errorinfo = self.errorinfo + line
+        else:
+            self.errorinfo = line
         
     def Run(self):
-
+        self.AddInfo(' ',True)      # prime the InfoBox
         while self.keepGoing:
             # We communicate with the UI by sending events to it. There can be
             # no manipulation of UI objects from the worker thread.
             if self.do != 0:
-                logger.info("triggered thread %d", self.do)
+                logger.info("triggered thread %d (Thread# %d / %d)", self.do, self.threadnum, _thread.get_ident())
                 self.gOptions.stopping = False
                 wx.Yield()
                 if self.do & 1 or (self.do & 4 and not self.gOptions.parsed):
@@ -1358,9 +1438,11 @@ class BackgroundActions:
                                 del self.humans
                                 self.humans = None
                         self.do = 0
+                        logger.warning(str(e))
                         self.gOptions.stopping = False
-                        self.AddInfo(str(e), True)
-                        logger.info(str(e))
+                        self.AddErrorInfo('Failed to Parse', True)
+                        self.AddErrorInfo(str(e), True)
+                        
                         
                     self.updategrid = True
                     evt = UpdateBackgroundEvent(value='busy')
@@ -1372,10 +1454,11 @@ class BackgroundActions:
                         self.updategrid = True
                     
                         self.AddInfo(f"Loaded {len(self.humans)} people")
+                        self.gOptions.getLastMain()
                         if self.gOptions.Main:
                             self.AddInfo(f" with '{self.gOptions.Main}' as starting person", False)
                     else:
-                        self.AddInfo("File could not be read as a GEDCOM file", True)
+                        self.AddErrorInfo("File could not be read as a GEDCOM file", True)
                     
                 if self.do & 2:
                     logger.info("start do 2")
@@ -1394,7 +1477,7 @@ class BackgroundActions:
                     logger.info("done draw")
                     self.updategrid = True
 
-                
+                logger.debug("=======================GOING TO IDLE %d", self.threadnum)
                 self.do = 0
                 self.gOptions.stop()
                 evt = UpdateBackgroundEvent(value='done')
@@ -1402,8 +1485,9 @@ class BackgroundActions:
                 
             else:
                 time.sleep(0.25)
+                # logger.info("background Do:%d  &  Running:%d  %d", self.do , self.gOptions.running, self.gOptions.counter)
 
-        self.running = False
+        self.threadrunning = False
 
 
 
@@ -1413,9 +1497,9 @@ if __name__ == '__main__':
     # When this module is run (not imported) then create the app, the
     # frame, show it, and start the event loop.
 
-    logging.config.dictConfig(LOG_CONFIG)
 
-    logger.setLevel(logging.DEBUG)
+    # logger.setLevel(logging.DEBUG)
+    logging.config.dictConfig(LOG_CONFIG)
     logger.info("Starting up %s %s", NAME, VERSION)
     app = wx.App()
     frm = VisualMapFrame(None, title=GUINAME, size=(1024, 800), style = wx.DEFAULT_FRAME_STYLE)
@@ -1425,5 +1509,6 @@ if __name__ == '__main__':
         
     frm.Show()
     app.MainLoop()
+    panel.gO.savesettings()
     logger.info('Finished')
     exit(0)

@@ -1,6 +1,6 @@
 """Constants for gedcom-to-visualmap"""
 
-VERSION = "0.2.3.5"
+VERSION = "0.2.4.0"
 NAME = "gedcom-to-visualmap"
 GUINAME = 'GEDCOM Visual Map'
 
@@ -18,44 +18,41 @@ LOG_CONFIG = {
         'standard': { 
             #'format': '%(asctime)s [%(levelname)s] %(name)s: %(message)s',
             # "format": "%(asctime)s : %(levelname)s : %(module)s : %(funcName)s : %(lineno)d : (Process Details : (%(process)d, %(processName)s), Thread Details : (%(thread)d, %(threadName)s))\nLog : %(message)s",
-            "format": "%(asctime)s : %(levelname)s : %(module)s : %(funcName)s : %(lineno)d : %(message)s",
+            "format": "%(asctime)s : %(levelname)s : %(name)s : %(module)s : %(funcName)s : %(lineno)d : %(message)s",
             "datefmt":"%d-%m-%Y %I:%M:%S"
         },
     },
+    # TODO: figure out how do properly do logging
     'handlers': { 
-        'default': { 
-            'level': 'INFO',                        # This one matters
-            'formatter': 'standard',
-            'class': 'logging.StreamHandler',
-            'stream': 'ext://sys.stdout',  # Default is stderr
-        },
-        'general': { 
-            'level': 'INFO',
+        'stdout': { 
+            'level': 'DEBUG',                        # This one matters
             'formatter': 'standard',
             'class': 'logging.StreamHandler',
             'stream': 'ext://sys.stdout',  # Default is stderr
         },
     },
     'loggers': { 
-        '': {  # root logger
-            'handlers': ['default'],
+        'root': {  # root logger
+            'handlers': ['stdout'],
             'level': 'DEBUG',
-            'propagate': True
         },
-        'parser': { 
-            'handlers': ['general'],
-            'level': 'INFO',
-            'propagate': False
-        },
+    # These are moving to the INI file
         'gedcomVisualGUI': { 
-            'handlers': ['default'],
+            'handlers': ['stdout'],
             'level': 'DEBUG',
-            'propagate': True
+        },
+        'gedcom.gpslookup': { 
+            'handlers': ['stdout'],
+            'level': 'DEBUG',
+        },
+        'ged4py.parser': { 
+            'handlers': ['stdout'],
+            'level': 'INFO',
         },
         '__main__': {  
-            'handlers': ['default'],
-            'level': 'DEBUG',
-            'propagate': True
+            'handlers': ['stdout'],
+            'level': 'INFO',
+            
         },
     } 
 }

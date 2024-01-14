@@ -1,17 +1,16 @@
 __all__ = ['GedcomParser', 'DateFormatter']
 
-from typing import Dict
-from datetime import datetime
 import logging
+from datetime import datetime
+from pathlib import Path
+from typing import Dict
 
 from ged4py import GedcomReader
-from ged4py.model import Record, NameRec
 from ged4py.date import DateValueVisitor
-
+from ged4py.model import NameRec, Record
+from gedcomoptions import gvOptions
 from models.Human import Human, LifeEvent
 from models.Pos import Pos
-from gedcomoptions import gvOptions
-from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
@@ -87,13 +86,13 @@ class GedcomParser:
         global thisgvOps
         thisgvOps= gOp
         if self.file_path == '':
-            self.gOp.step("no file to Parse")
+            self.gOp.stopstep("no file to Parse")
         else:
             fpath = Path(self.file_path)
             if fpath.is_file():
                 self.gOp.step("GEDCOM Parsing")
             else:
-                self.gOp.step("file does not exist")
+                self.gOp.stopstep("file does not exist")
                 logger.warning ("File %s does not exist to read.", self.file_path)
 
             
@@ -141,7 +140,7 @@ class GedcomParser:
         human.death = deathtag.event 
         
         # Last Possible is death (or birth)
-        if human.death and (human.death.pos != Pos(None, None)):
+        if human.death and Pos.hasLocation(human.death.pos):
             human.pos = human.death.pos
         
         homes = {}

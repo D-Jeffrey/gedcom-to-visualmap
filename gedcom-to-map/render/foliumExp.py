@@ -1,18 +1,19 @@
 __all__ = ['MyMarkClusters', 'foliumExporter']
 
+import logging
 import math
+import os.path
 import random
-import folium 
-from folium.plugins import GroupedLayerControl
 
+import folium
+from folium.plugins import (AntPath, FloatImage, GroupedLayerControl,
+                            HeatMapWithTime, MiniMap)
+from gedcomoptions import gvOptions
 from models.Line import Line
 from models.Pos import Pos
 from render.Referenced import Referenced
-import os.path
-import logging
+from models.Creator import DELTA
 
-from gedcomoptions import gvOptions
-from folium.plugins import FloatImage, AntPath, MiniMap, HeatMapWithTime
 
 logger = logging.getLogger(__name__)
 # TODO need to create this Legend to explain things HACK
@@ -67,8 +68,51 @@ class MyMarkClusters:
                 self.markercluster[markname] = folium.plugins.MarkerCluster(name).add_to(self.mymap)
                 return self.markercluster[markname]
 
+# Dervived fromm https://github.com/leaflet-extras/leaflet-providers/blob/master/leaflet-providers.js 
+#  See https://leaflet-extras.github.io/leaflet-providers/preview/ for alternate map layers        
+backTypes = ( 'OpenStreetMap', 'Stamen Toner', 'Stadia.StamenTonerLite',  'Stadia.StamenWatercolor',  'OpenTopoMap', 'ESRI.WorldImagery',  'CartoBD Voyager', 'CartoDB Positron' )        
 
+def backTypeSettings (ms):        
+
+    subdomains = None
+    match ms:
+        case 1: #OpenStreetMap
+            attribution ='&copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a>'
+            tileurl = backTypes[ms]
+        case 2: #Stamen Toner
+            attribution = ( '&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> ' 
+							'&copy; <a href="https://www.stamen.com/" target="_blank">Stamen Design</a> ' 
+							'&copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> ' 
+							'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors')
+            tileurl = "https://tiles.stadiamaps.com/tiles/stamen_toner/{z}/{x}/{y}{r}.png"
+        case 3: # Stadia.StamenTonerLite
+            attribution = ( '&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a>'
+                           ' &copy; <a href="https://www.stamen.com/" target="_blank">Stamen Design</a>'
+                           ' &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a>'
+                           ' &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors')
+            tileurl = 'https://tiles.stadiamaps.com/tiles/stamen_toner_lite/{z}/{x}/{y}{r}.png'
+        case 4: # Stadia.StamenWatercolor
+            attribution = ( '&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> ' 
+							'&copy; <a href="https://www.stamen.com/" target="_blank">Stamen Design</a> ' 
+							'&copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> ' 
+                            '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors')
+            tileurl = 'https://tiles.stadiamaps.com/tiles/stamen_watercolor/{z}/{x}/{y}.jpg'
+            
+        case 5: # OpenTopoMap
+            attribution =  ('Map data: {attribution.OpenStreetMap}, <a href="http://viewfinderpanoramas.org">SRTM</a> ' 
+                            '| Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)' )
+            tileurl = 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png'
+        case 6: # ESRI.WorldImagery
+            attribution =  ('{attribution.Esri} &mdash; ' 
+							'Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community' )
+            tileurl = 'https://server.arcgisonline.com/ArcGIS/rest/services/WorldImagery/MapServer/tile/{z}/{y}/{x}'
+        case 7|8: # CartoBD Voyager / CartoDB Positron
+            attribution ='&copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a>'
+            tileurl = backTypes[ms]
+            subdomain = 'abcd' 
         
+    return (attribution, tileurl, subdomains) 
+    
 class foliumExporter:
     def __init__(self, gOptions : gvOptions):
         self.file_name = os.path.join(gOptions.resultpath, gOptions.Result)
@@ -76,22 +120,10 @@ class foliumExporter:
         self.gOptions = gOptions
         self.fglastname = dict()
         self.saveresult = False
+        self.fm = None
         
-        backTypes = ('OpenStreetMap', 'Stamen Terrain', 'CartoDB Positron', 'Stamen Toner',  'Stamen Watercolor', 'Cartodbdark_matter')
-        if (self.gOptions.MapStyle < 1 or self.gOptions.MapStyle > len(backTypes)):
-            self.gOptions.MapStyle = 3
 
-        self.fm = folium.Map(location=[0, 0], zoom_start=2, tiles=backTypes[self.gOptions.MapStyle])
-        for bt in range(0,len(backTypes)):
-            if bt + 1 !=  self.gOptions.MapStyle:
-                folium.raster_layers.TileLayer(backTypes[bt], name=backTypes[bt]).add_to(self.fm)
-        if (self.gOptions.mapMini):
-            folium.plugins.MiniMap(toggle_display=True).add_to(self.fm)
-        
-        random.seed()
-        self.gOptions.step()
-        self.gOptions.Referenced = Referenced()
-
+    
     def setoptions(self):
 
         return
@@ -116,6 +148,38 @@ class foliumExporter:
         # ***************************** 
 
     def export(self, main: Pos,  lines: [Line], saveresult = True):
+        
+        if not self.fm:
+            if (self.gOptions.MapStyle < 1 or self.gOptions.MapStyle > len(backTypes)):
+                self.gOptions.MapStyle = 3
+
+            if (self.gOptions.humans and self.gOptions.mainHumanPos and self.gOptions.mainHumanPos.isNone()):
+                self.fm = folium.Map(location=[0, 0], zoom_start=4)
+            else:
+                lat = float(self.gOptions.mainHumanPos.lat)
+                lon = float(self.gOptions.mainHumanPos.lon)
+                self.fm = folium.Map(location=[lat,lon], zoom_start=4)
+            
+                
+            for bt in range(1,len(backTypes)):
+                (attribution, tileurl,subdomains) = backTypeSettings(bt)
+                if subdomains:
+                    folium.raster_layers.TileLayer( tiles=tileurl, attr=attribution, subdomains = subdomains , name = backTypes[bt]).add_to(self.fm)
+                else:
+                    folium.raster_layers.TileLayer( tiles=tileurl, attr=attribution,  name = backTypes[bt]).add_to(self.fm)
+            if (self.gOptions.mapMini):
+                folium.plugins.MiniMap(toggle_display=True).add_to(self.fm)
+        
+            random.seed()
+
+            self.gOptions.Referenced = Referenced()
+            logger.debug  ("Building Referenced - quick only: %s", not saveresult)
+            for line in lines:
+                if (hasattr(line,'style') and line.style == 'Life'):
+                    self.gOptions.Referenced.add(line.human.xref_id, 'quick')
+            if (not saveresult):
+                return
+
         SortByLast = (self.gOptions.GroupBy == 1)
         SortByPerson = (self.gOptions.GroupBy == 2)
         fm = self.fm
@@ -143,7 +207,7 @@ class foliumExporter:
                 if (self.gOptions.step()):
                     break
                 if (hasattr(line,'style') and line.style == 'Life'):
-                    Referenced.add(line.human.xref_id, 'heat')
+                    self.gOptions.Referenced.add(line.human.xref_id, 'heat')
                     if line.human.birth and line.human.birth.pos:
                         mycluster.mark(line.human.birth.pos, line.human.birth.whenyear())
                         minyear = line.human.birth.whenyearnum()
@@ -235,7 +299,7 @@ class foliumExporter:
             
         #My to use the jquery hack to MAGIC HACK fix the Folium code to use Font Awesome! 
         # missing tag a the end on purpose
-        fm.default_js.append(['hack.js', 'https://use.fontawesome.com/releases/v5.15.4/js/all.js" data-auto-replace-svg="nest'])
+        fm.default_js.append(['hack.js', 'https://use.fontawesome.com/releases/v6.5.1/js/all.js" data-auto-replace-svg="nest'])
     
         """ ***************************** """ 
         """     Line Drawing Section      """ 
@@ -247,10 +311,14 @@ class foliumExporter:
         if SortByLast:
             lines_sorted = lines
         else:
-            lines_sorted = sorted(lines, key=lambda x: x.prof)
+            lines_sorted = sorted(lines, key=lambda x: x.prof * ((x.branch/DELTA)+1)+ x.prof)
+        for line in (list(filter (lambda line: hasattr(line,'style'), lines_sorted))):
+            logger.info("{:8f} {:8}  {:.8f} {:2} {:20} from {:20}".format((line.prof * ((line.branch/DELTA)+1)+ line.prof),  line.path, line.branch, line.prof, (line.parentofhuman.name if line.parentofhuman else "" ), line.name))
+            
         for line in (list(filter (lambda line: hasattr(line,'style'), lines_sorted))):
             self.gOptions.step()
             i += 1
+            logger.debug("{:8}  {:.10f} {:2} {:20} from {:20}".format(line.path, line.branch, line.prof, (line.parentofhuman.name if line.parentofhuman else "" ), line.name))
             self.gOptions.Referenced.add(line.human.xref_id, 'line')        # Line ID
             if ( line.style == 'Life'):
                 flc = flp                                                   # Feature Group Class   (To create a Hierachary NOT USED)
@@ -268,7 +336,7 @@ class foliumExporter:
             else: 
                 flc = flr
                 aicc = 'green'
-                aici = 'baby'
+                aici = 'baby-carriage'
                 bicc = 'green'
                 lc = 'green'
                 da = [5,5]
@@ -313,7 +381,7 @@ class foliumExporter:
                         if SortByLast:
                             fg = self.getFeatureGroup(line.human.surname, line.prof)
                         if SortByPerson:
-                            parentname = line.parentofhuman.name if line.parentofhuman else ''
+                            parentname = line.parentofhuman.name if line.parentofhuman else line.human.name
                             fg = self.getFeatureGroup(parentname , line.prof)
                         if (not fg):
                             fg = folium.FeatureGroup(name= gn, show=False)
@@ -327,7 +395,7 @@ class foliumExporter:
                     if SortByLast:
                         fg = self.getFeatureGroup(line.human.surname, line.prof)
                     if SortByPerson:
-                        parentname = line.parentofhuman.name if line.parentofhuman else ''
+                        parentname = line.parentofhuman.name if line.parentofhuman else line.human.name
                         fg = self.getFeatureGroup(parentname, line.prof)
                         
                     if (not fg):
@@ -378,8 +446,9 @@ class foliumExporter:
                     if SortByLast:
                         fg = self.getFeatureGroup(line.human.surname, line.prof)
                     if SortByPerson:
-                        parentname = line.parentofhuman.name if line.parentofhuman else ''
+                        parentname = line.parentofhuman.name if line.parentofhuman else line.human.name
                         fg = self.getFeatureGroup(parentname, line.prof)
+                        
                         
               
                     if (not fg):
@@ -387,7 +456,7 @@ class foliumExporter:
 
                         newfg = True
                     fg.add_child(pl)
-            parentname = line.parentofhuman.name if line.parentofhuman else ''
+            parentname = line.parentofhuman.name if line.parentofhuman else line.human.name
             logger.info(f"Name:{line.human.name:30};\tParent:{parentname:30};\tStyle:{line.style};\tfrom:{line.a}; to:{line.b}")
 
             # Did we just create a feature group for this person?
@@ -417,7 +486,11 @@ class foliumExporter:
             logger.warning ("No GPS locations to generate a map.")
         
         # Add a legend
-        FloatImage(legend_file, bottom=0, left=86).add_to(fm)
+        if self.gOptions.HeatMapTimeLine: 
+            ImgBottom = 6
+        else:
+            ImgBottom = 2
+        FloatImage(legend_file, bottom=ImgBottom, left=10).add_to(fm)
         if SortByLast:
             logger.info ("Number of FG lastName: %i", len(self.fglastname))
             

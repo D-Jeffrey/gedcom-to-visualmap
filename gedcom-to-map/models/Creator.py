@@ -1,7 +1,8 @@
-__all__ = ['Creator', 'LifetimeCreator']
+__all__ = ['Creator', 'LifetimeCreator', 'DELTA', 'SPACE']
 
-from typing import Dict
 import logging
+from typing import Dict
+
 from models.Human import Human, LifeEvent
 from models.Line import Line
 from models.Pos import Pos
@@ -10,8 +11,8 @@ from models.Rainbow import Rainbow
 logger = logging.getLogger(__name__)
 
 
-SPACE = 2.5
-DELTA = 1.5
+SPACE = 2.5     # These values drive how colors are selected
+DELTA = 1.5     # These values drive how colors are selected
 
 def getattrif(obj, attname, attvaluename):
     if obj:
@@ -32,7 +33,7 @@ class Creator:
         if current.pos:
             color = (branch + DELTA / 2) / (SPACE ** prof)
             logger.info("{:8} {:8} {:2} {:.10f} {} {:20}".format(path, branch, prof, color, self.rainbow.get(color).to_hexa(), current.name))
-            line = Line("{:8} {}".format(path, current.name), pos, current.pos, self.rainbow.get(color), prof, human=current)
+            line = Line("{:8} {}".format(path, current.name), pos, current.pos, self.rainbow.get(color), path, branch,prof, human=current)
             return self.link(current.pos, current, branch, prof, 0, path) + [line]
         else:
             if self.max_missing != 0 and miss >= self.max_missing:
@@ -83,7 +84,7 @@ class LifetimeCreator:
             wyear = None
         bp = current.birth.pos if current.birth else None
         bd = current.death.pos if current.death else None
-        line = Line("{:8} {}".format(path, current.name), bp, bd, self.rainbow.get(color), prof, 'Life', 
+        line = Line("{:8} {}".format(path, current.name), bp, bd, self.rainbow.get(color), path, branch, prof, 'Life', 
                     None, midpoints, current, wyear)
         if current.birth: 
             line.updateWhen(current.birth.whenyear())
@@ -98,7 +99,7 @@ class LifetimeCreator:
         if hasattr(parent, 'birth') and parent.birth:
             color = (branch + DELTA / 2) / (SPACE ** prof)
             logger.info("{:8} {:8} {:2} {:.10f} {} {:20} from {:20}".format(path, branch, prof, color, self.rainbow.get(color).to_hexa(), parent.name, forhuman.name))
-            line = Line("{:8} {}".format(path, parent.name), pos, parent.birth.pos, self.rainbow.get(color), prof, linestyle,  
+            line = Line("{:8} {}".format(path, parent.name), pos, parent.birth.pos, self.rainbow.get(color), path, branch, prof, linestyle,  
                             forhuman,  human=parent, when= (parent.birth.whenyear(), getattrif(parent, 'death','whenyear')))
             return self.link(parent.birth.pos, parent, branch, prof, 0, path) + [line]
         else:
@@ -111,8 +112,8 @@ class LifetimeCreator:
         
     def link(self, pos: Pos, current: Human, branch=0, prof=0, miss=0, path="") -> [Line]:
         return (self.selfline(current, branch*SPACE, prof+1, miss, path)) \
-               + (self.line(pos, self.humans[current.father], branch*SPACE, prof+1, miss, path + "0",'father', current) if current.father else []) \
-               + (self.line(pos, self.humans[current.mother], branch*SPACE+DELTA, prof+1, miss, path + "1", 'mother', current) if current.mother else [])
+               + (self.line(pos, self.humans[current.father], branch*SPACE, prof+1, miss, path + "F",'father', current) if current.father else []) \
+               + (self.line(pos, self.humans[current.mother], branch*SPACE+DELTA, prof+1, miss, path + "M", 'mother', current) if current.mother else [])
 
     def create(self, main_id: str):
         if main_id not in self.humans.keys():

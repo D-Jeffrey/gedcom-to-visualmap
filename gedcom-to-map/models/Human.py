@@ -1,7 +1,8 @@
 __all__ = ['Human', 'LifeEvent']
 
-import re
 import logging
+import re
+
 from models.Pos import Pos
 
 logger = logging.getLogger(__name__)
@@ -12,16 +13,16 @@ class Human:
         self.name = None
         self.father : Human = None
         self.mother : Human = None
-        self.pos = None
+        self.pos : Pos = None           # save the best postion
         self.birth : LifeEvent = None
         self.death : LifeEvent = None
         # TODO need to deal with multiple mariages
         self.marriage = None
-        # multiple homes
+        # TODO multiple homes
         self.home : LifeEvent = None
-        self.map = None   # used to save the orginal pos values
-        self.first = None
-        self.surname = None
+        self.map : Pos = None           # used to save the orginal pos values
+        self.first = None               # First Name
+        self.surname = None             # Last Name
         self.maiden: None
         self.sex: None
 
@@ -49,6 +50,18 @@ class Human:
             best = [str(self.birth.pos), self.birth.where + " (Born)" if self.birth.where else ""]
         elif self.death and self.death.pos:
             best = [str(self.death.pos), self.death.where + " (Died)" if self.death.where else ""]
+        return best
+    
+    def bestPos(self):
+        # TODO Best Location should consider if in KML mode and what is selected  
+        # If the location is set in the GED, using MAP attribute then that will be the best
+        best = Pos(None,None)
+        if self.map and self.map.hasLocation():
+            best = self.map
+        elif self.birth and self.birth.pos and self.birth.pos.hasLocation():
+            best = self.birth.pos
+        elif self.death and self.death.pos and self.death.pos.hasLocation():
+            best = self.death.pos
         return best
 
 

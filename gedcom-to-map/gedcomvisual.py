@@ -1,14 +1,14 @@
-from models.Creator import Creator
-from models.Creator import LifetimeCreator
-from gedcom.GedcomParser import GedcomParser
-from render.KmlExporter import KmlExporter
-from render.foliumExp import foliumExporter
-from gedcom.gpslookup import GEDComGPSLookup
-from models.Pos import Pos
-from gedcomoptions import gvOptions
-import webbrowser
-import os.path
 import logging
+import os.path
+import webbrowser
+
+from gedcom.GedcomParser import GedcomParser
+from gedcom.gpslookup import GEDComGPSLookup
+from gedcomoptions import gvOptions
+from models.Creator import Creator, LifetimeCreator
+from models.Pos import Pos
+from render.foliumExp import foliumExporter
+from render.KmlExporter import KmlExporter
 
 logger = logging.getLogger(__name__)
 
@@ -57,9 +57,9 @@ def doKML(gOp : gvOptions, humans):
 
         if gOp.Main not in humans:
             logger.error  ("Could not find your starting person: %s", gOp.Main)
-            gOp.step('Error could not fine first person')
+            gOp.stopstep('Error could not find first person')
             return
-        gOp.setMainName(humans[gOp.Main].name)
+        gOp.setMainHuman(humans [gOp.Main])
         if (not kmlInstance):
             kmlInstance = KmlExporter(gOp)
 
@@ -79,28 +79,34 @@ def Geoheatmap(gOp : gvOptions):
 def doHTML(gOp : gvOptions, humans, fullresult ):
     if (not humans):
         return
+    logger.debug  ("Creating Lifeline (fullresult:%s)", fullresult)
     lifeline = LifetimeCreator(humans, gOp.MaxMissing)    
+    logger.debug  ("Creating Humans ")
     creator = lifeline.create(gOp.Main)    
     if gOp.Main not in humans:
         logger.error ("Could not find your starting person: %s", gOp.Main)
-        gOp.step('Error could not fine first person')
+        gOp.stopstep('Error could not find first person')
         return
-    gOp.setMainName(humans[gOp.Main].name)
+    gOp.setMainHuman(humans[gOp.Main])
     if gOp.AllEntities:
         gOp.step('Creating life line for everyone')
         lifeline.createothers(creator)
-        logger.info ("Total of %i people.", len(creator))   
+        logger.info ("Total of %i people & events.", len(creator))   
     gOp.totalpeople = len(creator)
+
     foliumExporter(gOp).export(humans[gOp.Main], creator, fullresult)
     if (fullresult):
-            webbrowser.open(os.path.join(gOp.resultpath, gOp.Result), new = 0, autoraise = True)
+        webbrowser.open(os.path.join(gOp.resultpath, gOp.Result), new = 0, autoraise = True)
         
     
 
 
 def ParseAndGPS(gOp: gvOptions, stage: int = 0 ):
-    logger.info ("Starting parsing of GEDCOM : %s", gOp.GEDCOMinput)
+    logger.info ("Starting parsing of GEDCOM : %s (stage: %d)", gOp.GEDCOMinput, stage)
     if (stage == 0 or stage == 1):
+        if gOp.humans:
+            del gOp.humans
+            gOp.humans = None
         humans = GedcomParser(gOp).create_humans()
         gOp.humans = humans
     gOp.parsed = True
@@ -122,8 +128,8 @@ def ParseAndGPS(gOp: gvOptions, stage: int = 0 ):
         lookupresults.saveAddressCache()
         logger.info ("Completed resolves")
     
-    if humans and not gOp.Main:
-        gOp.set('Main', list(humans.keys())[0])
-        logger.info ("Using starting person: %s (%s)", humans[gOp.Main].name, gOp.Main)
-    gOp.step('Creating life line')
+    if humans and (not gOp.Main or not gOp.Main in list(humans.keys())):
+            gOp.set('Main', list(humans.keys())[0])
+            logger.info ("Using starting person: %s (%s)", humans[gOp.Main].name, gOp.Main)
+    
     return humans

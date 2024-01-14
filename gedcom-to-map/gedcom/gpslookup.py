@@ -1,22 +1,21 @@
 __all__ = ['Xlator', 'WordXlator', 'GEDComGPSLookup']
 
-import time
 import csv
-import os.path
-import tempfile
-import json
-import urllib.request
-import re
 import hashlib
+import json
 import logging
+import os.path
+import re
+import tempfile
+import time
+import urllib.request
 
-
-from models.Human import Human, LifeEvent
-from models.Pos import Pos
 from const import GV_COUNTRIES_JSON, GV_STATES_JSON
-from geopy.geocoders import Nominatim
 #  from pprint import pprint
 from gedcomoptions import gvOptions
+from geopy.geocoders import Nominatim
+from models.Human import Human, LifeEvent
+from models.Pos import Pos
 
 logger = logging.getLogger(__name__)
 
@@ -273,7 +272,7 @@ class GEDComGPSLookup:
                          ]
                     
                     csvwriter.writerow(r)
-                
+            logger.debug("GPS Cache saved")    
                 
         self.updatestats()
         logger.info("Unique addresses: %d with %d have missing GPS for a Total of %d",self.used, self.usedNone, self.totaladdr)   
@@ -431,9 +430,11 @@ class GEDComGPSLookup:
                 logger.debug ("#BBefore ??? %s\n\t%s\n\t%s", theaddress.lower() in self.addresses.keys(), self.addresses[addressindex]['name'], self.addresses[addressindex]['alt'])
             if (self.usecacheonly):
                 return (Pos(None,None))
+            usedGeocode = False
             if (len(theaddress)>0):
                 logger.debug(":Lookup: %s +within+ %s::", theaddress, trycountry)
                 try:
+                    usedGeocode = True
                     location = self.Geoapp.geocode(theaddress, country_codes=trycountry, timeout=5)
                 except:
                     logger.error("Error: Geocode %s", theaddress)
@@ -442,6 +443,7 @@ class GEDComGPSLookup:
             else:
                 logger.info(":Lookup: %s ::", myaddress)
                 try:
+                    usedGeocode = True
                     location = self.Geoapp.geocode(myaddress)
                 except:
                     logger.error("Error: Geocode %s", myaddress)
@@ -460,9 +462,10 @@ class GEDComGPSLookup:
                 logger.info("----none---- for %s", myaddress)
                 locrec = {'name': myaddress, 'alt' : theaddress, 'country' : trycountry, 'type': None, 'class':None, 'icon':None,'place_id': None,'lat': None, 'long': None, 'boundry' : None, 'importance': None, 'size': None, 'used' : 0}
 
-            # https://operations.osmfoundation.org/policies/nominatim/
-            #       "No heavy uses (an absolute maximum of 1 request per second)."
-            time.sleep(1)         # Go slow so since Nominatim limits the speed for a free service
+            if usedGeocode:
+                # https://operations.osmfoundation.org/policies/nominatim/
+                #       "No heavy uses (an absolute maximum of 1 request per second)."
+                time.sleep(1)         # Go slow so since Nominatim limits the speed for a free service
                         
           
             if not self.addresses:

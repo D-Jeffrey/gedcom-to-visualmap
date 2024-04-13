@@ -37,25 +37,31 @@ class Human:
         bestyear = "?Unknown"
         if self.birth and self.birth.when:
             year = self.birth.whenyear()
-            bestyear = self.birth.whenyear() + " (Born)" if year else "?Unknown"
+            bestyear = f"{self.birth.whenyear()} (Born)" if year else "?Unknown"
         elif self.death and self.death.when:
             year = self.death.whenyear()
-            bestyear = self.death.whenyear() + " (Died)" if year else "?Unknown"
+            bestyear = f"{self.death.whenyear()} (Died)" if year else "?Unknown"
         return bestyear
 
     def bestlocation(self):
         # TODO Best Location should consider if in KML mode and what is selected
         best = ["Unknown", ""]
         if self.birth and self.birth.pos:
-            best = [str(self.birth.pos), self.birth.where + " (Born)" if self.birth.where else ""]
+            best = [
+                str(self.birth.pos),
+                f"{self.birth.where} (Born)" if self.birth.where else "",
+            ]
         elif self.death and self.death.pos:
-            best = [str(self.death.pos), self.death.where + " (Died)" if self.death.where else ""]
+            best = [
+                str(self.death.pos),
+                f"{self.death.where} (Died)" if self.death.where else "",
+            ]
         return best
     
     def bestPos(self):
         # TODO Best Location should consider if in KML mode and what is selected  
         # If the location is set in the GED, using MAP attribute then that will be the best
-        best = Pos(None,None)
+        best = Pos(None, None)
         if self.map and self.map.hasLocation():
             best = self.map
         elif self.birth and self.birth.pos and self.birth.pos.hasLocation():
@@ -92,7 +98,7 @@ class LifeEvent:
                     if re.search(r"[0-9]{4}", self.when.value.phrase):
                         try:
                             return re.search(r"[0-9]{4}", self.when.value.phrase)[0]
-                        except:
+                        except Exception:
                             return None
                     else:
                         if hasattr(self.when.value, 'name') :
@@ -111,18 +117,15 @@ class LifeEvent:
         w = self.whenyear(last)
         if not w:
             w = 0
-        else:
-            # TODO this is a range date hack
-            if len(w)>3:
-                w = int(w[0:4])
-        
+        elif len(w)>3:
+            w = int(w[:4])
         return w
 
     def getattr(self, attr):
         if attr == 'pos':
             return self.pos
         elif attr == 'when':
-            return self.whenyear()
+            return self.what or ""
         elif attr == 'where':
             return self.where if self.where else ""
         elif attr == 'what':
@@ -132,5 +135,3 @@ class LifeEvent:
 
     def __str__(self):
         return f"{self.getattr('where')} : {self.getattr('when')} - {self.getattr('pos')} {self.getattr('what')}"
-        
-    

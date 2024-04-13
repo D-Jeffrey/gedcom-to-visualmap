@@ -19,10 +19,9 @@ import sys
 import time
 import webbrowser
 from warnings import catch_warnings
-import configparser
+
 import wx
 # pylint: disable=no-member
-import wx.lib.anchors as anchors
 import wx.lib.mixins.listctrl as listmix
 import wx.lib.newevent
 from const import (GUINAME, GVFONT, GVFONTSIZE, KMLMAPSURL, LOG_CONFIG, NAME,
@@ -30,103 +29,94 @@ from const import (GUINAME, GVFONT, GVFONTSIZE, KMLMAPSURL, LOG_CONFIG, NAME,
 from gedcomoptions import gvOptions
 from gedcomvisual import ParseAndGPS, doHTML, doKML
 
-__all__ = ['gvOptions', 'gvConfig']
-
 logger = logging.getLogger(__name__)
 
-[   ID_CBMarksOn,
-    ID_CBHeatMap,
-    ID_CBBornMark,
-    ID_CBDieMark,
-    ID_LISTMapStyle,
-    ID_CBMarkStarOn,
-    ID_RBGroupBy,
-    ID_CBUseAntPath,
-    ID_CBHeatMapTimeLine,
-    ID_CBHomeMarker,
-    ID_LISTHeatMapTimeStep,
-    ID_TEXTGEDCOMinput,
-    ID_TEXTResult,
-    ID_RBResultHTML,
-    ID_TEXTMain,
-    ID_TEXTName,
-    ID_INTMaxMissing,
-    ID_INTMaxLineWeight,
-    ID_CBUseGPS,
-    ID_CBCacheOnly,
-    ID_CBAllEntities,
-    ID_LISTPlaceType,
-    ID_CBMapControl,
-    ID_CBMapMini,
-    ID_BTNLoad,
-    ID_BTNUpdate,
-    ID_BTNCSV,
-    ID_BTNSTOP,
-    ID_BTNBROWSER,
- ] = wx.NewIdRef(29)
 
 
-IDtoAttr = {ID_CBMarksOn : ('MarksOn', 'Redraw'), 
-    ID_CBHeatMap    : ('HeatMap', ''),
-    ID_CBBornMark   : ('BornMark', 'Redraw'), 
-    ID_CBDieMark    : ('DieMark', 'Redraw'),
-    ID_LISTMapStyle : ('MapStyle', ''),
-    ID_CBMarkStarOn : ('MarkStarOn', 'Redraw'),
-    ID_RBGroupBy  : ('GroupBy', 'Redraw'),
-    ID_CBUseAntPath : ('UseAntPath', 'Redraw'),
-    ID_CBHeatMapTimeLine : ('HeatMapTimeLine', 'Redraw'),
-    ID_CBHomeMarker : ('HomeMarker', 'Redraw'),
-    ID_LISTHeatMapTimeStep : ('HeatMapTimeLine', 'Redraw'),
-    ID_TEXTGEDCOMinput : ('GEDCOMinput', 'Reload'),
-    ID_TEXTResult : ('Result', 'Redraw'),
-    ID_RBResultHTML : ('ResultHTML',  'Redraw'),
-    ID_TEXTMain : ('Main',  'Reload'),
-    ID_TEXTName : ('Name',  ''),
-    ID_INTMaxMissing : ('MaxMissing', 'Reload'),
-    ID_INTMaxLineWeight : ('MaxLineWeight', 'Reload'),
-    ID_CBUseGPS : ('UseGPS', 'Reload'),
-    ID_CBCacheOnly : ('CacheOnly', 'Reload'),
-    ID_CBAllEntities: ('AllEntities', 'Redraw'),
-    ID_LISTPlaceType : ('PlaceType', 'Redraw'),
-    ID_CBMapControl : ('showLayerControl',  'Redraw'),
-    ID_CBMapMini : ('mapMini',  'Redraw'),
-    ID_BTNLoad : 'Load',
-    ID_BTNUpdate : 'Update',
-    ID_BTNCSV : 'OpenCSV',
-    ID_BTNSTOP: "Stop",
-    ID_BTNBROWSER: "OpenBrowser"}
+
 
 InfoBoxLines = 8
-
 # This creates a new Event class and a EVT binder function
 (UpdateBackgroundEvent, EVT_UPDATE_STATE) = wx.lib.newevent.NewEvent()
 
 from wx.lib.embeddedimage import PyEmbeddedImage
 
-SmallUpArrow = PyEmbeddedImage(
-    b"iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAADxJ"
-    b"REFUOI1jZGRiZqAEMFGke2gY8P/f3/9kGwDTjM8QnAaga8JlCG3CAJdt2MQxDCAUaOjyjKMp"
-    b"cRAYAABS2CPsss3BWQAAAABJRU5ErkJggg==")
 
-#----------------------------------------------------------------------
-SmallDnArrow = PyEmbeddedImage(
-    b"iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAEhJ"
-    b"REFUOI1jZGRiZqAEMFGke9QABgYGBgYWdIH///7+J6SJkYmZEacLkCUJacZqAD5DsInTLhDR"
-    b"bcPlKrwugGnCFy6Mo3mBAQChDgRlP4RC7wAAAABJRU5ErkJggg==")
 
 
 class Ids():
     def __init__(self):
         self.CLR_BTN_PRESS = wx.Colour(255, 230, 200, 255)
         self.CLR_BTN_DONE = wx.Colour(255, 255, 255, 255)
-        self.InfoBoxBackColor = wx.TheColourDatabase.FindColour('GOLDENROD')
-        self.InfoBoxForeColor = wx.TheColourDatabase.FindColour('BLACK')
-        self.InfoBoxBackErrColor = wx.TheColourDatabase.FindColour('RED')
-        self.InfoBoxForeErrColor = wx.TheColourDatabase.FindColour('WHITE')
+        [   self.ID_CBMarksOn,
+            self.ID_CBHeatMap,
+            self.ID_CBBornMark,
+            self.ID_CBDieMark,
+            self.ID_LISTMapStyle,
+            self.ID_CBMarkStarOn,
+            self.ID_RBGroupBy,
+            self.ID_CBUseAntPath,
+            self.ID_CBHeatMapTimeLine,
+            self.ID_CBHomeMarker,
+            self.ID_LISTHeatMapTimeStep,
+            self.ID_TEXTGEDCOMinput,
+            self.ID_TEXTResult,
+            self.ID_RBResultHTML,
+            self.ID_TEXTMain,
+            self.ID_TEXTName,
+            self.ID_INTMaxMissing,
+            self.ID_INTMaxLineWeight,
+            self.ID_CBUseGPS,
+            self.ID_CBCacheOnly,
+            self.ID_CBAllEntities,
+            self.ID_LISTPlaceType,
+            self.ID_CBMapControl,
+            self.ID_CBMapMini,
+            self.ID_BTNLoad,
+            self.ID_BTNUpdate,
+            self.ID_BTNCSV,
+            self.ID_BTNSTOP,
+            self.ID_BTNBROWSER,
+        ] = wx.NewIdRef(29)
+        self.IDtoAttr = {self.ID_CBMarksOn : ('MarksOn', 'Redraw'), 
+            self.ID_CBHeatMap    : ('HeatMap', ''),
+            self.ID_CBBornMark   : ('BornMark', 'Redraw'), 
+            self.ID_CBDieMark    : ('DieMark', 'Redraw'),
+            self.ID_LISTMapStyle : ('MapStyle', ''),
+            self.ID_CBMarkStarOn : ('MarkStarOn', 'Redraw'),
+            self.ID_RBGroupBy  : ('GroupBy', 'Redraw'),
+            self.ID_CBUseAntPath : ('UseAntPath', 'Redraw'),
+            self.ID_CBHeatMapTimeLine : ('HeatMapTimeLine', 'Redraw'),
+            self.ID_CBHomeMarker : ('HomeMarker', 'Redraw'),
+            self.ID_LISTHeatMapTimeStep : ('HeatMapTimeLine', 'Redraw'),
+            self.ID_TEXTGEDCOMinput : ('GEDCOMinput', 'Reload'),
+            self.ID_TEXTResult : ('Result', 'Redraw'),
+            self.ID_RBResultHTML : ('ResultHTML',  'Redraw'),
+            self.ID_TEXTMain : ('Main',  'Reload'),
+            self.ID_TEXTName : ('Name',  ''),
+            self.ID_INTMaxMissing : ('MaxMissing', 'Reload'),
+            self.ID_INTMaxLineWeight : ('MaxLineWeight', 'Reload'),
+            self.ID_CBUseGPS : ('UseGPS', 'Reload'),
+            self.ID_CBCacheOnly : ('CacheOnly', 'Reload'),
+            self.ID_CBAllEntities: ('AllEntities', 'Redraw'),
+            self.ID_LISTPlaceType : ('PlaceType', 'Redraw'),
+            self.ID_CBMapControl : ('showLayerControl',  'Redraw'),
+            self.ID_CBMapMini : ('mapMini',  'Redraw'),
+            self.ID_BTNLoad : 'Load',
+            self.ID_BTNUpdate : 'Update',
+            self.ID_BTNCSV : 'OpenCSV',
+            self.ID_BTNSTOP: "Stop",
+            self.ID_BTNBROWSER: "OpenBrowser"}
+        self.SmallUpArrow = PyEmbeddedImage(
+        b"iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAADxJ"
+        b"REFUOI1jZGRiZqAEMFGke2gY8P/f3/9kGwDTjM8QnAaga8JlCG3CAJdt2MQxDCAUaOjyjKMp"
+        b"cRAYAABS2CPsss3BWQAAAABJRU5ErkJggg==")
+        self.SmallDnArrow = PyEmbeddedImage(
+        b"iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAEhJ"
+        b"REFUOI1jZGRiZqAEMFGke9QABgYGBgYWdIH///7+J6SJkYmZEacLkCUJacZqAD5DsInTLhDR"
+        b"bcPlKrwugGnCFy6Mo3mBAQChDgRlP4RC7wAAAABJRU5ErkJggg==")
 
-        
-
-
+        self.m = {1: (),}
 #=============================================================
 class VisualMapFrame(wx.Frame):
 
@@ -147,8 +137,7 @@ class VisualMapFrame(wx.Frame):
         if not self.myFont:
             self.myFont = wx.Font(wx.FontInfo(10).FaceName('Verdana'))
         wx.Frame.SetFont(self, self.myFont)
-        
-
+    
 
     def makeMenuBar(self):
         """
@@ -162,6 +151,7 @@ class VisualMapFrame(wx.Frame):
         # that the next letter is the "mnemonic" for the menu item. On the
         # platforms that support it those letters are underlined and can be
         # triggered from the keyboard.
+        self.d = Ids()
         self.menuBar = menuBar = wx.MenuBar()
         self.fileMenu = fileMenu =  wx.Menu()
         fileMenu.Append(wx.ID_OPEN,    "&Open...\tCtrl-O", "Select a GEDCOM file")
@@ -183,15 +173,12 @@ class VisualMapFrame(wx.Frame):
         
         self.ActionMenu = ActionMenu =  wx.Menu()
         ActionMenu.Append(wx.ID_INFO, "Statistics Sumary")
-        ActionMenu.Append(ID_BTNBROWSER,    "Open Result in &Browser")
-        ActionMenu.Append(ID_BTNCSV, "Open &CSV")
-
+        ActionMenu.Append(self.d.ID_BTNBROWSER,    "Open Result in &Browser")
+        ActionMenu.Append(self.d.ID_BTNCSV, "Open &CSV")
 
         # Now a help menu for the about item
         helpMenu = wx.Menu()
         helpMenu.Append(wx.ID_ABOUT, "About")
-
-   
 
         menuBar.Append(self.fileMenu, "&File")
         menuBar.Append(ActionMenu, "&Actions")
@@ -212,17 +199,12 @@ class VisualMapFrame(wx.Frame):
         self.Bind(wx.EVT_MENU_RANGE, self.OnFileHistory, id=wx.ID_FILE1, id2=wx.ID_FILE9)
         self.Bind(wx.EVT_MENU, self.onOptionsReset, id=wx.ID_REVERT)
         self.Bind(wx.EVT_MENU, self.onOptionsSetup, id=wx.ID_SETUP)
-        self.Bind(wx.EVT_MENU, self.OnOpenCSV, id = ID_BTNCSV)
-        self.Bind(wx.EVT_MENU, self.OnOpenBrowser, id = ID_BTNBROWSER)
-    
+        self.Bind(wx.EVT_MENU, self.OnOpenCSV, id = self.d.ID_BTNCSV)
+        self.Bind(wx.EVT_MENU, self.OnOpenBrowser, id = self.d.ID_BTNBROWSER)
         # More BIND below in main
 
-        
-        
     def OnExit(self, event):
         """Close the frame, terminating the application."""
-        panel.gO.savesettings()
-        logger.info('Finishing')
         self.Close(True)
 
     def OnOpenCSV(self, event):
@@ -230,7 +212,6 @@ class VisualMapFrame(wx.Frame):
     def OnOpenBrowser(self, event):
         panel.OpenBrowser()
 
-    
     def OnFileOpenDialog(self, evt):
 
         dDir = os.getcwd()
@@ -299,20 +280,13 @@ class VisualMapFrame(wx.Frame):
             
         else:
             msg = msg + "No address in cache"
-        
             
         wx.MessageBox (msg, 'Statistics', wx.OK|wx.ICON_INFORMATION)
-
-
-
     
     def onOptionsReset(self, event):
-        wx.MessageBox("Reset settings",
-                      "Options reset to default",
+        wx.MessageBox("Does nothing",
+                      "reset options",
                       wx.OK|wx.ICON_INFORMATION)
-        panel.gO.defaults()
-        panel.gO.savesettings()
-        panel.SetupOptions()
         
     def onOptionsSetup(self, event):
         dialog = ConfigDialog(None, title='Configuration')
@@ -342,7 +316,7 @@ class ConfigDialog(wx.Dialog):
         button_box.Add(ok_button, 0, wx.ALL, 5)
         button_box.Add(cancel_button, 0, wx.ALL, 5)
 
-        message = wx.StaticText(self, label='This does not work yet.  It does not correctly adjust the log level')
+        message = wx.StaticText(self, label='Adjust the log level')
         message.SetForegroundColour(wx.Colour(255, 0, 0))
 
         main_box = wx.BoxSizer(wx.VERTICAL)
@@ -358,8 +332,6 @@ class ConfigDialog(wx.Dialog):
     def get_logging_level(self):
         return self.radio_box.GetStringSelection()
 
-        
-
 #=============================================================
 class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin):
     def __init__(self, parent, ID, pos=wx.DefaultPosition,
@@ -367,31 +339,44 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin):
         wx.ListCtrl.__init__(self, parent, ID, pos, size, style)
         listmix.ListCtrlAutoWidthMixin.__init__(self)
 
-
 class PeopleListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
     def __init__(self, parent, humans,  *args, **kw):
+        """    Initializes the PeopleListCtrlPanel.
+
+    Args:
+        parent: The parent window.
+        humans: The list of humans.
+        *args: Variable length argument list.
+        **kw: Arbitrary keyword arguments.
+
+    Returns:
+        None
+
+    Raises:
+        None
+        """
+
         super(PeopleListCtrlPanel, self).__init__(*args, **kw)
         wx.Panel.__init__(self, parent, -1, style=wx.WANTS_CHARS)
 
         self.gO = None
         tID = wx.NewIdRef()
+        self.d = Ids()
         # TODO This box defination still have a scroll overlap problem
         sizer = wx.BoxSizer(wx.VERTICAL)
         self.messagelog = "  Select a file, Load it and Draw Update\n   or change type to KML\n  Open Geo Table to edit addresses"
         self.InfoBox = []
         for i in range(InfoBoxLines):
             self.InfoBox.append(wx.StaticText(parent, -1, ' '))
-            
             # self.InfoBox.append(wx.Button(self, wx.ID_ANY, ""))
-            
-            self.InfoBox[i].SetFont(self.TopLevelParent.myFont)
+            # self.InfoBox[i].SetFont(self.TopLevelParent.myFont)
             sizer.Add(self.InfoBox[i], 0, wx.LEFT,5)
             # self.InfoBox[i].SetLabelMarkup(f"<b>what you looking at</b>")
         
         self.il = wx.ImageList(16, 16)
         
-        self.sm_up = self.il.Add(SmallUpArrow.GetBitmap())
-        self.sm_dn = self.il.Add(SmallDnArrow.GetBitmap())
+        self.sm_up = self.il.Add(self.d.SmallUpArrow.GetBitmap())
+        self.sm_dn = self.il.Add(self.d.SmallDnArrow.GetBitmap())
 
         self.list = PeopleListCtrl(parent, tID,
                         style=wx.LC_REPORT | wx.BORDER_SUNKEN | wx.LC_SINGLE_SEL,
@@ -425,12 +410,11 @@ class PeopleListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
         # parent.Bind(wx.EVT_LIST_BEGIN_LABEL_EDIT, self.OnBeginEdit, self.list)
         # parent.Bind(wx.EVT_LIST_END_LABEL_EDIT, self.OnEndEdit, self.list)
 
-        
-
     def setGOp(self, gOp):
         self.gO = gOp
 
     def OnUseNative(self, event):
+        
         wx.SystemOptions.SetOption("mac.listctrl.always_use_generic", not event.IsChecked())
         wx.GetApp().GetTopWindow().LoadDemo("ListCtrl")
 
@@ -462,13 +446,12 @@ class PeopleListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
             self.list.SetItem(index, 3, data[3]) # GeoCode
             self.list.SetItem(index, 4, data[4]) # Location
             self.list.SetItemData(index, key)
-            if self.gO.ResultHTML and self.gO.Referenced:
-                if self.gO.Referenced.exists(data[2]):
-                    self.gO.selectedpeople = self.gO.selectedpeople + 1
-                    if mainperson == data[2]:
-                        self.list.SetItemBackgroundColour(index, "GREY")
-                    else:
-                        self.list.SetItemBackgroundColour(index, "LIME GREEN")
+            if self.gO.ResultHTML and self.gO.Referenced and self.gO.Referenced.exists(data[2]):
+                self.gO.selectedpeople = self.gO.selectedpeople + 1
+                if mainperson == data[2]:
+                    self.list.SetItemBackgroundColour(index, "GREY")
+                else:
+                    self.list.SetItemBackgroundColour(index, "LIME GREEN")
 
 
         self.list.SetColumnWidth(0, wx.LIST_AUTOSIZE_USEHEADER)
@@ -510,8 +493,6 @@ class PeopleListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
         if self.gO:
             self.gO.set('Main', self.list.GetItemText(self.currentItem, 2))
         event.Skip()
-        
-           
 
         dialog = PersonDialog(None, panel.threads[0].humans[self.list.GetItemText(self.currentItem, 2)])
         dialog.ShowModal()
@@ -521,7 +502,6 @@ class PeopleListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
 
         item = event.GetItem()
         logger.debug("OnItemDeselected %d", event.Index)
-
      
     def OnItemActivated(self, event):
 
@@ -535,48 +515,39 @@ class PeopleListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
                 panel.peopleList.PopulateList(self.gO.humans, self.gO.get('Main'))
                 panel.threads[0].updategridmain = self.gO.ResultHTML
                 panel.threads[0].AddInfo(f"Using '{self.gO.Main}' as starting person", False)
-            
 
     def OnBeginEdit(self, event):
-
         logger.debug("")
         event.Allow()
 
     def OnEndEdit(self, event):
-
         logger.debug(event.GetText())
         event.Allow()
 
     def OnItemDelete(self, event):
-
         logger.debug("")
 
     def OnColClick(self, event):
-
         logger.debug("%s", event.GetColumn())
 
         event.Skip()
 
     def OnColRightClick(self, event):
-
         item = self.list.GetColumn(event.GetColumn())
         logger.debug("%s %s", event.GetColumn(), (item.GetText(), item.GetAlign(), item.GetWidth(), item.GetImage()))
         if self.list.HasColumnOrderSupport():
             logger.debug("column order: %s", self.list.GetColumnOrder(event.GetColumn()))
 
     def OnColBeginDrag(self, event):
-
         logger.debug("")
         ## Show how to not allow a column to be resized
         #if event.GetColumn() == 0:
         #    event.Veto()
 
     def OnColDragging(self, event):
-
         logger.debug("")
 
     def OnColEndDrag(self, event):
-
         logger.debug("")
 
     
@@ -587,12 +558,7 @@ class PeopleListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
         itemschecked = [i for i in range(itemcount) if self.list.IsItemChecked(item=i)]
         logger.debug("%s ",  itemschecked)
 
-    
 
-        
-
-m = {1: (),
-     }
 
 class VisualMapPanel(wx.Panel):
     """
@@ -609,18 +575,17 @@ class VisualMapPanel(wx.Panel):
         self.frame = self.TopLevelParent        
         self.gO : gvOptions = None
         self.ai = None
-        self.d = dict()
+        self.d = {}
         self.config = None
         self.busystate = 0
         self.busycounthack = 0
         self.SetAutoLayout(True)
-        
+        self.d = Ids()
         
         # create a panel in the frame
-        
         self.panelA = wx.Panel(self, -1, size=(760,420),style=wx.SIMPLE_BORDER  )
         # https://docs.wxpython.org/wx.ColourDatabase.html#wx-colourdatabase
-        self.panelA.SetBackgroundColour(Ids().InfoBoxBackColor)
+        self.panelA.SetBackgroundColour(wx.TheColourDatabase.FindColour('GOLDENROD'))
 
         lc = wx.LayoutConstraints()
         lc.top.SameAs( self, wx.Top, 5)
@@ -638,17 +603,11 @@ class VisualMapPanel(wx.Panel):
         lc.left.RightOf( self.panelA, 5)
         self.panelB.SetConstraints(lc)
 
-        self.peopleList = PeopleListCtrlPanel(self.panelA, m)
-                                              
-        
+        self.peopleList = PeopleListCtrlPanel(self.panelA, self.d.m)
+
         self.LayoutOptions(self.panelB)
 
-        
         self.Layout()
-    
-   
-   
-
 
     def LayoutOptions(self, panel):
         """ Layout the panels in the proper nested manner """
@@ -662,79 +621,74 @@ class VisualMapPanel(wx.Panel):
         title.SetFont(titleFont)
         box.Add(title, 0, wx.ALIGN_CENTER|wx.ALL, 5)
         box.Add(wx.StaticLine(panel), 0, wx.EXPAND)
-        self.d = Ids()
+        
         
         txtinfile = wx.StaticText(panel, -1,  "Input file name:  ") 
-        self.d.TEXTGEDCOMinput = wx.TextCtrl(panel, ID_TEXTGEDCOMinput, "", size=(200,20))
+        self.d.TEXTGEDCOMinput = wx.TextCtrl(panel, self.d.ID_TEXTGEDCOMinput, "", size=(200,20))
         self.d.TEXTGEDCOMinput.Enable(False) 
         txtoutfile = wx.StaticText(panel, -1, "Output file name: ")
-        self.d.TEXTResult = wx.TextCtrl(panel, ID_TEXTResult, "", size=(200,20))
-        
+        self.d.TEXTResult = wx.TextCtrl(panel, self.d.ID_TEXTResult, "", size=(200,20))
+
         l1 = wx.BoxSizer(wx.HORIZONTAL)
         l1.AddMany([txtinfile,      (6,20),     self.d.TEXTGEDCOMinput])
         l2 = wx.BoxSizer(wx.HORIZONTAL)
         l2.AddMany([txtoutfile,     (0,20), self.d.TEXTResult])
         box.AddMany([l1, (4,4,), l2])
 
+# sourcery skip: use-or-for-fallback
         # First select controls
-        self.d.RBResultHTML =  wx.RadioBox(panel, ID_RBResultHTML, "Result Type", 
+        self.d.RBResultHTML =  wx.RadioBox(panel, self.d.ID_RBResultHTML, "Result Type", 
                                            choices = ['HTML', 'KML'] , majorDimension= 2)
 
-        self.d.CBUseGPS = wx.CheckBox(panel, ID_CBUseGPS, "Use GPS lookup (uncheck if GPS is in file)")#,  wx.NO_BORDER)
-        self.d.CBCacheOnly = wx.CheckBox(panel, ID_CBCacheOnly, "Cache Only, do not lookup addresses")#, , wx.NO_BORDER)
-        self.d.CBAllEntities = wx.CheckBox(panel, ID_CBAllEntities, "Map all people")#, wx.NO_BORDER)
+        self.d.CBUseGPS = wx.CheckBox(panel, self.d.ID_CBUseGPS, "Use GPS lookup (uncheck if GPS is in file)")#,  wx.NO_BORDER)
+        self.d.CBCacheOnly = wx.CheckBox(panel, self.d.ID_CBCacheOnly, "Cache Only, do not lookup addresses")#, , wx.NO_BORDER)
+        self.d.CBAllEntities = wx.CheckBox(panel, self.d.ID_CBAllEntities, "Map all people")#, wx.NO_BORDER)
         if False:
             txtMissing = wx.StaticText(panel, -1,  "Max generation missing: ") 
-            self.d.INTMaxMissing = wx.TextCtrl(panel, ID_INTMaxMissing, "", size=(20,20))
+            self.d.INTMaxMissing = wx.TextCtrl(panel, self.d.ID_INTMaxMissing, "", size=(20,20))
             txtLine = wx.StaticText(panel, -1,  "Line maximum weight: ") 
-            self.d.INTMaxLineWeight = wx.TextCtrl(panel, ID_INTMaxLineWeight, "", size=(20,20))
+            self.d.INTMaxLineWeight = wx.TextCtrl(panel, self.d.ID_INTMaxLineWeight, "", size=(20,20))
             l1 = wx.BoxSizer(wx.HORIZONTAL)
             l1.AddMany([txtMissing,      (0,20),     self.d.INTMaxMissing])
             l2 = wx.BoxSizer(wx.HORIZONTAL)
             l2.AddMany([txtLine,      (0,20),     self.d.INTMaxLineWeight])
             box.AddMany([l1, (4,4,), l2])
-        # ID_INTMaxMissing  'MaxMissing'
-        # ID_INTMaxLineWeight  'MaxLineWeight'
+        # self.d.ID_INTMaxMissing  'MaxMissing'
+        # self.d.ID_INTMaxLineWeight  'MaxLineWeight'
         
         self.d.ai = wx.ActivityIndicator(panel)
-        
-        
-        box.AddMany( [ self.d.RBResultHTML,
+        box.AddMany([ self.d.RBResultHTML,
                        self.d.CBUseGPS,
                        self.d.CBCacheOnly,
                        self.d.CBAllEntities])
-                       
-        #
-        # HTML select controls in a Box
-        #
+        """
+          HTML select controls in a Box
+        """
         hbox = wx.StaticBox( panel, -1, "HTML Options")
         hTopBorder, hOtherBorder = hbox.GetBordersForSizer()
         hsizer = wx.BoxSizer(wx.VERTICAL)
         hsizer.AddSpacer(hTopBorder)
         hboxIn = wx.BoxSizer(wx.VERTICAL)
-        self.d.CBMapControl = wx.CheckBox(hbox, ID_CBMapControl, "Open Map Controls",name='MapControl') 
-        self.d.CBMapMini = wx.CheckBox(hbox, ID_CBMapMini, "Add Mini Map",name='MapMini') 
-        self.d.CBMarksOn = wx.CheckBox(hbox, ID_CBMarksOn, "Markers",name='MarksOn')
+        self.d.CBMapControl = wx.CheckBox(hbox, self.d.ID_CBMapControl, "Open Map Controls",name='MapControl') 
+        self.d.CBMapMini = wx.CheckBox(hbox, self.d.ID_CBMapMini, "Add Mini Map",name='MapMini') 
+        self.d.CBMarksOn = wx.CheckBox(hbox, self.d.ID_CBMarksOn, "Markers",name='MarksOn')
         
-        self.d.CBBornMark = wx.CheckBox(hbox, ID_CBBornMark, "Marker for when Born")
-        self.d.CBDieMark = wx.CheckBox(hbox, ID_CBDieMark, "Marker for when Died")
-        self.d.CBHomeMarker = wx.CheckBox(hbox, ID_CBHomeMarker, "Marker point or homes")
-        self.d.CBMarkStarOn = wx.CheckBox(hbox, ID_CBMarkStarOn, "Marker starter with Star")
+        self.d.CBBornMark = wx.CheckBox(hbox, self.d.ID_CBBornMark, "Marker for when Born")
+        self.d.CBDieMark = wx.CheckBox(hbox, self.d.ID_CBDieMark, "Marker for when Died")
+        self.d.CBHomeMarker = wx.CheckBox(hbox, self.d.ID_CBHomeMarker, "Marker point or homes")
+        self.d.CBMarkStarOn = wx.CheckBox(hbox, self.d.ID_CBMarkStarOn, "Marker starter with Star")
         
-        self.d.CBHeatMap = wx.CheckBox(hbox, ID_CBHeatMap, "Heatmap", style = wx.NO_BORDER)
-        self.d.CBHeatMapTimeLine = wx.CheckBox(hbox, ID_CBHeatMapTimeLine, "Heatmap Timeline Steps")
-        self.d.CBUseAntPath = wx.CheckBox(hbox, ID_CBUseAntPath, "Ant paths")
+        self.d.CBHeatMap = wx.CheckBox(hbox, self.d.ID_CBHeatMap, "Heatmap", style = wx.NO_BORDER)
+        self.d.CBHeatMapTimeLine = wx.CheckBox(hbox, self.d.ID_CBHeatMapTimeLine, "Heatmap Timeline Steps")
+        self.d.CBUseAntPath = wx.CheckBox(hbox, self.d.ID_CBUseAntPath, "Ant paths")
         
         TimeStepVal = 5
-        self.d.LISTHeatMapTimeStep = wx.Slider(hbox, ID_LISTHeatMapTimeStep, TimeStepVal,1, 100, size=(250, 45),
+        self.d.LISTHeatMapTimeStep = wx.Slider(hbox, self.d.ID_LISTHeatMapTimeStep, TimeStepVal,1, 100, size=(250, 45),
                 style=wx.SL_HORIZONTAL | wx.SL_AUTOTICKS | wx.SL_LABELS )
         self.d.LISTHeatMapTimeStep.SetTickFreq(5)
-        self.d.RBGroupBy  = wx.RadioBox(hbox, ID_RBGroupBy, "Group by:", 
+        self.d.RBGroupBy  = wx.RadioBox(hbox, self.d.ID_RBGroupBy, "Group by:", 
                                        choices = ['None', 'Last Name', 'Person'], majorDimension= 3)
-        
-
-
-        hboxIn.AddMany( [ 
+        hboxIn.AddMany([ 
                         self.d.RBGroupBy, 
                         self.d.CBMapControl,
                         self.d.CBMapMini,
@@ -749,7 +703,7 @@ class VisualMapPanel(wx.Panel):
                         (0,5),
                         self.d.LISTHeatMapTimeStep,
                         (0,5)
-                         ])
+                        ])
         hsizer.Add( hboxIn, wx.EXPAND|wx.BOTTOM|wx.LEFT|wx.RIGHT, hOtherBorder+10)
         
         hbox.SetSizer(hsizer)
@@ -762,7 +716,7 @@ class VisualMapPanel(wx.Panel):
         ksizer = wx.BoxSizer(wx.VERTICAL)
         ksizer.AddSpacer(kTopBorder)
         kboxIn = wx.BoxSizer(wx.VERTICAL)
-        self.d.LISTPlaceType = wx.CheckListBox(kbox, ID_LISTPlaceType,  choices=['native','born','death'])
+        self.d.LISTPlaceType = wx.CheckListBox(kbox, self.d.ID_LISTPlaceType,  choices=['native','born','death'])
         kboxIn.AddMany( [self.d.LISTPlaceType])
         ksizer.Add( kboxIn, wx.EXPAND|wx.BOTTOM|wx.LEFT|wx.RIGHT, kOtherBorder+10)
         kbox.SetSizer(ksizer)
@@ -773,11 +727,11 @@ class VisualMapPanel(wx.Panel):
         
 
         l1 = wx.BoxSizer(wx.HORIZONTAL)
-        self.d.BTNLoad = wx.Button(panel, ID_BTNLoad, "Load")
-        self.d.BTNUpdate = wx.Button(panel, ID_BTNUpdate, "Draw & Update")
-        self.d.BTNCSV = wx.Button(panel, ID_BTNCSV, "Geo Table")
-        self.d.BTNSTOP = wx.Button(panel, ID_BTNSTOP, "Stop")
-        self.d.BTNBROWSER = wx.Button(panel, ID_BTNBROWSER, "Browser")
+        self.d.BTNLoad = wx.Button(panel, self.d.ID_BTNLoad, "Load")
+        self.d.BTNUpdate = wx.Button(panel, self.d.ID_BTNUpdate, "Draw & Update")
+        self.d.BTNCSV = wx.Button(panel, self.d.ID_BTNCSV, "Geo Table")
+        self.d.BTNSTOP = wx.Button(panel, self.d.ID_BTNSTOP, "Stop")
+        self.d.BTNBROWSER = wx.Button(panel, self.d.ID_BTNBROWSER, "Browser")
         l1.Add (self.d.BTNLoad, 0, wx.EXPAND | wx.ALL, 5)
         l1.Add (self.d.BTNUpdate, 0, wx.EXPAND | wx.ALL, 5)
         l1.Add (self.d.BTNCSV, 0, wx.EXPAND | wx.ALL, 5)
@@ -792,51 +746,43 @@ class VisualMapPanel(wx.Panel):
         box.Add(l1, 0, wx.EXPAND | wx.ALL,0)
  
         """    
-            ID_LISTMapStyle,
-            ID_TEXTMain,
-            ID_TEXTName,
+            self.d.ID_LISTMapStyle,
+            self.d.ID_TEXTMain,
+            self.d.ID_TEXTName,
         """
         
         # panel.SetSizeHints(box)
         panel.SetSizer(box)
-        
-
-
-        self.Bind(wx.EVT_RADIOBOX, self.EvtRadioBox, id = ID_RBResultHTML)
-    
-        self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = ID_CBMapControl)
-        self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = ID_CBMapMini)
-        self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = ID_CBMarksOn)
-        self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = ID_CBBornMark)
-        self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = ID_CBDieMark)
-        self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = ID_CBHomeMarker)
-        self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = ID_CBMarkStarOn)
-        self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = ID_CBHeatMap)
-        self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = ID_CBHeatMapTimeLine)
-        self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = ID_CBUseAntPath)
-        self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = ID_CBUseGPS)
-        self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = ID_CBCacheOnly)
-        self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = ID_CBAllEntities)
-        self.Bind(wx.EVT_CHECKLISTBOX, self.EvtListBox, id = ID_LISTPlaceType)
-        self.Bind(wx.EVT_BUTTON, self.EvtButton, id = ID_BTNLoad)
-        self.Bind(wx.EVT_BUTTON, self.EvtButton, id = ID_BTNUpdate)
-        self.Bind(wx.EVT_BUTTON, self.EvtButton, id = ID_BTNCSV)
-        self.Bind(wx.EVT_BUTTON, self.EvtButton, id = ID_BTNSTOP)
-        self.Bind(wx.EVT_BUTTON, self.EvtButton, id = ID_BTNBROWSER)
-        self.Bind(wx.EVT_TEXT, self.EvtText, id = ID_TEXTResult)
+        self.Bind(wx.EVT_RADIOBOX, self.EvtRadioBox, id = self.d.ID_RBResultHTML)
+        self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.d.ID_CBMapControl)
+        self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.d.ID_CBMapMini)
+        self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.d.ID_CBMarksOn)
+        self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.d.ID_CBBornMark)
+        self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.d.ID_CBDieMark)
+        self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.d.ID_CBHomeMarker)
+        self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.d.ID_CBMarkStarOn)
+        self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.d.ID_CBHeatMap)
+        self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.d.ID_CBHeatMapTimeLine)
+        self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.d.ID_CBUseAntPath)
+        self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.d.ID_CBUseGPS)
+        self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.d.ID_CBCacheOnly)
+        self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.d.ID_CBAllEntities)
+        self.Bind(wx.EVT_CHECKLISTBOX, self.EvtListBox, id = self.d.ID_LISTPlaceType)
+        self.Bind(wx.EVT_BUTTON, self.EvtButton, id = self.d.ID_BTNLoad)
+        self.Bind(wx.EVT_BUTTON, self.EvtButton, id = self.d.ID_BTNUpdate)
+        self.Bind(wx.EVT_BUTTON, self.EvtButton, id = self.d.ID_BTNCSV)
+        self.Bind(wx.EVT_BUTTON, self.EvtButton, id = self.d.ID_BTNSTOP)
+        self.Bind(wx.EVT_BUTTON, self.EvtButton, id = self.d.ID_BTNBROWSER)
+        self.Bind(wx.EVT_TEXT, self.EvtText, id = self.d.ID_TEXTResult)
         self.OnBusyStop(-1)
-        
-        self.Bind(wx.EVT_RADIOBOX, self.EvtRadioBox, id = ID_RBGroupBy)
-        self.Bind(wx.EVT_SLIDER, self.EvtSlider, id = ID_LISTHeatMapTimeStep)
+        self.Bind(wx.EVT_RADIOBOX, self.EvtRadioBox, id = self.d.ID_RBGroupBy)
+        self.Bind(wx.EVT_SLIDER, self.EvtSlider, id = self.d.ID_LISTHeatMapTimeStep)
         self.NeedReload()
         self.NeedRedraw()
-        
         self.Bind(wx.EVT_CLOSE, self.OnCloseWindow)
         self.Bind(EVT_UPDATE_STATE, self.OnUpdate)
-        
         self.threads = []
         self.threads.append(BackgroundActions(self, 0))
-        
         for t in self.threads:
             t.Start()
 
@@ -864,14 +810,13 @@ class VisualMapPanel(wx.Panel):
         self.config.Write("GEDCOMinput", path)
         #TODO Fix this
         self.gO.set('Main', None)
-        self.gO.getLastMain()
         #TODO Fix this
         self.NeedReload()
 
     def EvtRadioBox(self, event):
 
         logger.debug('%d is %d',  event.GetId(), event.GetInt())
-        if event.GetId() == ID_RBResultHTML:
+        if event.GetId() == self.d.ID_RBResultHTML:
             self.gO.set('ResultHTML', event.GetInt() == 0)
             filename = self.gO.get('Result')
             newname = filename
@@ -888,7 +833,7 @@ class VisualMapPanel(wx.Panel):
 
            
             self.SetupButtonState()
-        elif event.GetId() ==  ID_RBGroupBy:
+        elif event.GetId() ==  self.d.ID_RBGroupBy:
             self.gO.GroupBy = event.GetSelection()
         else:
             logger.error('We have a Problem')
@@ -896,7 +841,7 @@ class VisualMapPanel(wx.Panel):
 
     def EvtText(self, event):
 
-        if event.GetId() == ID_TEXTResult:
+        if event.GetId() == self.d.ID_TEXTResult:
             event.GetString()
             self.gO.set('Result', event.GetString())
             logger.debug("Result %s", self.gO.get('Result') )
@@ -910,62 +855,63 @@ class VisualMapPanel(wx.Panel):
         if cb.Is3State():
             logger.debug("3StateValue: %s", cb.Get3StateValue())
         cbid = event.GetId()
-        logger.debug('set %s to %s (%s)', IDtoAttr[cbid][0], cb.GetValue(), IDtoAttr[cbid][1] )
-        panel.gO.set(IDtoAttr[cbid][0], cb.GetValue())
-        if cbid == ID_CBHeatMap or cbid == ID_CBHeatMapTimeLine or cbid == ID_CBMarksOn:
+        logger.debug('set %s to %s (%s)', self.d.IDtoAttr[cbid][0], cb.GetValue(), self.d.IDtoAttr[cbid][1] )
+        panel.gO.set( self.d.IDtoAttr[cbid][0], cb.GetValue())
+        if cbid == self.d.ID_CBHeatMap or cbid == self.d.ID_CBHeatMapTimeLine or cbid == self.d.ID_CBMarksOn:
             self.SetupButtonState()
-        if (IDtoAttr[cbid][1] == 'Redraw'):
+        if ( self.d.IDtoAttr[cbid][1] == 'Redraw'):
             self.NeedRedraw()
-        elif (IDtoAttr[cbid][1] == 'Reload'):
+        elif ( self.d.IDtoAttr[cbid][1] == 'Reload'):
             self.NeedReload()
-        elif (IDtoAttr[cbid][1] == ''):
+        elif ( self.d.IDtoAttr[cbid][1] == ''):
             pass # Nothing to do for this one
         else:
-            logger.error("uncontrolled CB %d with '%s'", cbid,  IDtoAttr[cbid][1])
-        if cbid == ID_CBAllEntities and cb.GetValue():
-            dlg = None
+            logger.error("uncontrolled CB %d with '%s'", cbid,   self.d.IDtoAttr[cbid][1])
+        if cbid == self.d.ID_CBAllEntities and cb.GetValue():
             # TODO Fix this up
-            if hasattr(self.threads[0], 'humans') and self.threads[0].humans:
-                if len(self.threads[0].humans) > 200:
-                    dlg = wx.MessageDialog(self, f'Caution, {len(self.threads[0].humans)} people in your tree\n it may create very large HTML files and may not open in the browser',
-                               'Warning', wx.OK | wx.ICON_WARNING)
-            else:
-                dlg = wx.MessageDialog(self, 'Caution, if you load a GEDCOM with lots of people in your tree\n it may create very large HTML files and may not open in the browser',
-                               'Warning', wx.OK | wx.ICON_WARNING)
+            if self.gO.get('ResultHTML'):
+                dlg = None
+                if hasattr(self.threads[0], 'humans') and self.threads[0].humans:
+                    if len(self.threads[0].humans) > 200:
+                        dlg = wx.MessageDialog(self, f'Caution, {len(self.threads[0].humans)} people in your tree\n it may create very large HTML files and may not open in the browser',
+                                   'Warning', wx.OK | wx.ICON_WARNING)
+                else:
+                    dlg = wx.MessageDialog(self, 'Caution, if you load a GEDCOM with lots of people in your tree\n it may create very large HTML files and may not open in the browser',
+                                   'Warning', wx.OK | wx.ICON_WARNING)
 
-            if dlg:                    
-                dlg.ShowModal()
-                dlg.Destroy()
-
+                if dlg:                    
+                    dlg.ShowModal()
+                    dlg.Destroy()
 
     def EvtButton(self, event):
         myid = event.GetId() 
         logger.debug("Click! (%d)", myid)
-        if myid == ID_BTNLoad:
+        # TODO HACK
+        self.SetupOptions()
+        if myid == self.d.ID_BTNLoad:
             self.LoadGEDCOM()
                 
-        elif myid == ID_BTNUpdate:
+        elif myid == self.d.ID_BTNUpdate:
             self.DrawGEDCOM()
                                 
-        elif myid == ID_BTNCSV:
+        elif myid == self.d.ID_BTNCSV:
             self.OpenCSV()
-        elif myid == ID_BTNSTOP:
+        elif myid == self.d.ID_BTNSTOP:
             self.gO.set('stopping', True)
             self.gO.set('parsed', False)
             self.NeedRedraw()
             self.NeedReload()
-        elif myid == ID_BTNBROWSER:
+        elif myid == self.d.ID_BTNBROWSER:
             self.OpenBrowser()
         else:
             logger.error("uncontrolled ID : %d", myid)
-    
 
     def EvtListBox(self, event):
 
         eventid = event.GetId()
         logger.debug('%s, %s, %s', event.GetString(), event.IsSelection(), event.GetSelection())                            
         _ = event.GetEventObject()
-        if eventid ==  ID_LISTPlaceType:
+        if eventid ==  self.d.ID_LISTPlaceType:
             places = {}
             for cstr in event.EventObject.CheckedStrings:
                 places[cstr] = cstr
@@ -1073,18 +1019,8 @@ class VisualMapPanel(wx.Panel):
                 if i >= len(lines):
                     self.peopleList.InfoBox[i].SetLabelMarkup('')
                 else:
-                    self.peopleList.InfoBox[i].SetLabelMarkup(lines[i]+ ' ')
-                    # Work around to the Windows bug where it can not set rich labels
-                    if '<b>' in lines[i]:
-                        self.peopleList.InfoBox[i].SetBackgroundColour(Ids().InfoBoxBackErrColor)
-                        self.peopleList.InfoBox[i].SetForegroundColour(Ids().InfoBoxForeErrColor)
-                    else:
-                        self.peopleList.InfoBox[i].SetBackgroundColour(Ids().InfoBoxBackColor)
-                        self.peopleList.InfoBox[i].SetForegroundColour(Ids().InfoBoxForeColor)
+                    self.peopleList.InfoBox[i].SetLabelMarkup(lines[i])  
             self.peopleList.messagelog = "\n".join(lines[:InfoBoxLines])
-              
-
-            
 
     def SetupButtonState(self):
         """ based on the type of file output, enable/disable the interface """
@@ -1119,7 +1055,7 @@ class VisualMapPanel(wx.Panel):
                 self.d.CBBornMark.Disable()
                 self.d.CBDieMark.Disable()
                 self.d.CBHomeMarker.Disable()
-                
+
         else:
             # self.panelB.Sizer.Children[6].Window.SetBackgroundColour((255, 0, 255, 255)) 
             # self.panelB.Sizer.Children[7].Window.SetBackgroundColour((230, 230, 230, 255))
@@ -1140,13 +1076,14 @@ class VisualMapPanel(wx.Panel):
 
     def SetupOptions(self):
 
-        self.config = wx.Config("gedcomVisualGUI")
+        if not self.config:
+            self.config = wx.Config("gedcomVisualGUI")
         
-        
-        self.gO = gvOptions()
-        # self.gO.setstatic( self.config.Read("GEDCOMinput"), self.config.Read("Result"), True, None)
+        if not self.gO:
+            self.gO = gvOptions()
+            self.gO.setstatic( self.config.Read("GEDCOMinput"), self.config.Read("Result"), True, None)
 
-        self.peopleList.setGOp(self.gO)
+            self.peopleList.setGOp(self.gO)
 
         self.d.RBResultHTML.SetSelection(0 if self.gO.get('ResultHTML') else 1)
         
@@ -1177,11 +1114,8 @@ class VisualMapPanel(wx.Panel):
         self.d.TEXTGEDCOMinput.SetValue(filen)
         self.SetupButtonState()
 
-
         for t in self.threads:
             t.DefgOps(self.gO)
-        
-        
 
     def updateOptions(self):
         pass
@@ -1192,7 +1126,6 @@ class VisualMapPanel(wx.Panel):
             self.gO.stopping = True
         else:
             self.OnBusyStart(-1)
-            self.gO.savesettings()
             time.sleep(0.1)
         
             cachepath, _ = os.path.split(self.gO.get('GEDCOMinput'))
@@ -1212,7 +1145,6 @@ class VisualMapPanel(wx.Panel):
             self.threads[0].AddErrorInfo("Error: Please set the Output file name")
         else:
             self.OnBusyStart(-1)
-            self.gO.savesettings()
             self.threads[0].Trigger(2 | 4)
         
     
@@ -1280,7 +1212,7 @@ class VisualMapPanel(wx.Panel):
 class PersonDialog(wx.Dialog):
     def __init__(self, parent, human):
         super().__init__(parent, title="Person Details", size=(400, 300))
-        
+
         humans = panel.threads[0].humans
         # create the UI controls to display the person's data
         name_label = wx.StaticText(self, label="Name: ")
@@ -1302,9 +1234,9 @@ class PersonDialog(wx.Dialog):
         self.home_textctrl = wx.TextCtrl(self, style=wx.TE_READONLY|wx.TE_MULTILINE)
 
         # layout the UI controls using a grid sizer
-        
+
         sizer = wx.FlexGridSizer(cols=2, hgap=5, vgap=5)
-        
+
         sizer.Add(name_label, 0, wx.LEFT|wx.TOP, border=5)
         sizer.Add(self.name_textctrl, 0, wx.EXPAND, border=5)
         sizer.Add(father_label, 0, wx.LEFT|wx.TOP, border=5)
@@ -1325,9 +1257,21 @@ class PersonDialog(wx.Dialog):
 
         # set the person's data in the UI controls
         self.name_textctrl.SetValue(str(human.first + " " + human.surname))
-      
-        self.father_textctrl.SetValue(str(humans[human.father].first + " " + str(humans[human.father].surname)) if human.father else "<none>")
-        self.mother_textctrl.SetValue(str(humans[human.mother].first + " " + str(humans[human.mother].surname)) if human.mother else "<none>")
+
+        self.father_textctrl.SetValue(
+            str(
+                f"{humans[human.father].first} {str(humans[human.father].surname)}"
+            )
+            if human.father
+            else "<none>"
+        )
+        self.mother_textctrl.SetValue(
+            str(
+                f"{humans[human.mother].first} {str(humans[human.mother].surname)}"
+            )
+            if human.mother
+            else "<none>"
+        )
         self.birth_textctrl.SetValue(str(human.birth))
         self.death_textctrl.SetValue(str(human.death))
         self.sex_textctrl.SetValue(str(human.sex) if human.sex else "")
@@ -1351,6 +1295,12 @@ class PersonDialog(wx.Dialog):
 
 
 class BackgroundActions:
+    """
+This runs the backgrund tasks on another thread.
+This includes update messages, running of load, calling gpslookups, 
+and generating the output so that the GUI can continue to be responsive
+
+"""
     def __init__(self, win, threadnum):
         self.win = win
         self.gOptions = None
@@ -1395,18 +1345,12 @@ class BackgroundActions:
     def AddInfo(self, line, newline= True):
         if newline and self.updateinfo and self.updateinfo != '':
             self.updateinfo = self.updateinfo + "\n"
-        if self.updateinfo:
-            self.updateinfo = self.updateinfo + line
-        else:
-            self.updateinfo = line
+        self.updateinfo = self.updateinfo + line if self.updateinfo else line
         
     def AddErrorInfo(self, line, newline= True):
         if newline and self.errorinfo and self.errorinfo != '':
             self.errorinfo = self.errorinfo + "\n"
-        if self.errorinfo:
-            self.errorinfo = self.errorinfo + line
-        else:
-            self.errorinfo = line
+        self.errorinfo = self.errorinfo + line if self.errorinfo else line
         
     def Run(self):
         self.AddInfo(' ',True)      # prime the InfoBox
@@ -1452,9 +1396,10 @@ class BackgroundActions:
                         logger.info("human count %d", len(self.humans))
                         self.humans = ParseAndGPS(self.gOptions, 2)
                         self.updategrid = True
-                    
-                        self.AddInfo(f"Loaded {len(self.humans)} people")
-                        self.gOptions.getLastMain()
+                        if self.humans:
+                            self.AddInfo(f"Loaded {len(self.humans)} people")
+                        else:
+                            self.AddInfo(f"Cancelled loading people")
                         if self.gOptions.Main:
                             self.AddInfo(f" with '{self.gOptions.Main}' as starting person", False)
                     else:
@@ -1497,9 +1442,9 @@ if __name__ == '__main__':
     # When this module is run (not imported) then create the app, the
     # frame, show it, and start the event loop.
 
+    logging.config.dictConfig(LOG_CONFIG)
 
     # logger.setLevel(logging.DEBUG)
-    logging.config.dictConfig(LOG_CONFIG)
     logger.info("Starting up %s %s", NAME, VERSION)
     app = wx.App()
     frm = VisualMapFrame(None, title=GUINAME, size=(1024, 800), style = wx.DEFAULT_FRAME_STYLE)
@@ -1509,6 +1454,5 @@ if __name__ == '__main__':
         
     frm.Show()
     app.MainLoop()
-    panel.gO.savesettings()
     logger.info('Finished')
     exit(0)

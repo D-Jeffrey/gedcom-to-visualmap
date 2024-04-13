@@ -1,6 +1,16 @@
 __all__ = ['Color']
 
 class Color:
+    """
+Initializes a Color object.
+
+Args:
+    r (int): The red component of the color (0-255).
+    g (int): The green component of the color (0-255).
+    b (int): The blue component of the color (0-255).
+    a (int): The alpha component of the color (0-255).
+
+"""
     def __init__(self, r=255, g=0, b=0, a=255):
         self.r = r
         self.g = g

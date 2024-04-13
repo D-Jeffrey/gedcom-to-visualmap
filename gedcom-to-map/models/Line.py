@@ -42,12 +42,12 @@ class Line:
         
 
     def __repr__(self):
-        return "( {}, {} )".format(self.a, self.b)
+        return f"( {self.a}, {self.b} )"
 
-    def valueWhen (self, newwhen):
+    def valueWhen(self, newwhen):
         if type(newwhen) == type(" "):
             # TODO this is a range date hack
-            newwhen = int(newwhen[0:4])
+            newwhen = int(newwhen[:4])
         return newwhen
 
     def updateWhen(self, newwhen):

@@ -43,9 +43,9 @@ class gvOptions:
         self.defaults()
         self.settingsfile = settings_file_pathname("gedcom-visualmap.ini")
 
-        self.GEDCOMinput= None
-        self.resultpath = None
-        self.Result = ''      # output file (could be of resulttype .html or .kml)
+        self.GEDCOMinput = None
+        self.resultpath = None              # directory for .Result
+        self.Result = ''                    # output file (could be of resulttype .html or .kml)
         self.ResultType = "html"
         self.ResultHTML = True
         self.Main = None
@@ -120,8 +120,9 @@ class gvOptions:
 
         
     def setstatic(self,  GEDCOMinput:2, Result:2, ResultHTML: bool, Main=None, MaxMissing:1 = 0, MaxLineWeight:1 = 20, UseGPS:bool = True, CacheOnly:bool = False,  AllEntities:bool = False, PlaceType = {'native':'native'}):
-        self.setResults(Result, ResultHTML)
+        
         self.setInput(GEDCOMinput)
+        self.setResults(Result, ResultHTML)
         self.Main = Main
         self.Name = None
         self.MaxMissing = MaxMissing
@@ -159,12 +160,8 @@ class gvOptions:
             else: # typ == 2
                 setattr(self, key, self.gvConfig['Core'][key])
         
-        self.GEDCOMinput = self.gvConfig['Core']['InputFile']
-        if self.GEDCOMinput == '':
-            self.GEDCOMinput = None
-        else:
-            self.setInput(self.GEDCOMinput)
-        self.Result = self.gvConfig['Core']['OutputFile']
+        self.setInput(self.gvConfig['Core']['InputFile'])
+        self.resultpath, self.Result = os.path.split(self.gvConfig['Core']['OutputFile'])
         ResultHTML = not ('.kml' in self.Result.lower())
         self.setResults(self.Result, ResultHTML)
         
@@ -198,7 +195,7 @@ class gvOptions:
             self.gvConfig['HTML'][key] =  str(getattr(self, key))
             
         self.gvConfig['Core']['InputFile'] =  self.GEDCOMinput
-        self.gvConfig['Core']['OutputFile'] = self.Result
+        self.gvConfig['Core']['OutputFile'] = os.path.join(self.resultpath, self.Result)
         
         if self.GEDCOMinput and self.Main:
             name = Path(self.GEDCOMinput).stem
@@ -217,7 +214,7 @@ class gvOptions:
         self.mainHumanPos = mainhuman.bestPos()
 
     def setResults(self, Result, isResultHTML):
-        """ Set the Output file and type """
+        """ Set the Output file and type (Only the file name) """
         self.ResultHTML = isResultHTML
         if (isResultHTML):
             self.ResultType = "html"
@@ -227,18 +224,22 @@ class gvOptions:
         if self.Result != "":
             self.Result = self.Result + "." + self.ResultType
 
-    def setInput(self, GEDCOMinput):
+    def setInput(self, theInput):
         """ Set the input file, update output file """
         org = self.GEDCOMinput
-        self.GEDCOMinput= GEDCOMinput
+        self.GEDCOMinput = theInput
         if self.GEDCOMinput:
-            _, extension = os.path.splitext(self.GEDCOMinput)
+            filen, extension = os.path.splitext(self.GEDCOMinput)
             if extension == "" and self.GEDCOMinput != "":
                 self.GEDCOMinput = self.GEDCOMinput + ".ged"
-            self.resultpath = os.path.dirname(self.GEDCOMinput)
+            #TODO needs refinement
+            
             if org != self.GEDCOMinput:
+                self.resultpath = os.path.dirname(self.GEDCOMinput)
                 # Force the output to match the name and location of the input
-                self.setResults(self.resultpath, self.ResultHTML)
+                self.setResults(filen, self.ResultHTML)
+        else:
+            self.resultpath = None
         if org != self.GEDCOMinput:
                 self.parsed = False            
 

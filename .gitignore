@@ -147,3 +147,5 @@ dmypy.json
 *.pyperf
 /env11
 /env8
+/env1
+/Scripts

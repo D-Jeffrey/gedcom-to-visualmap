@@ -4,15 +4,14 @@
 [![GitHub Activity][commits-shield]][commits]
 
 # gedcom-to-visualmap
-### WIP, looking for feedback
-
-Orginally forked from [https://github.com/lmallez/gedcom-to-map]
 
 Read a GEDCOM file and translate the locations into GPS addresses.
 The produces different KML map types which should timelines and movements around the earth.
 The produces HTML file which is interactive..
 
 This contains two interfaces: command-line and GUI (only tested on Windows)
+
+Orginally forked from [https://github.com/lmallez/gedcom-to-map]
 
 # How to Run
 
@@ -193,25 +192,23 @@ I noticed that the MyHeritage has added a heatmap a year or so ago and it has a 
 
 ### GUI
 - Need to separate the Load and GPS resolve steps
-- Need to better detect change to the GPS cache file
 - need better interaction with buttons and menu selections
 - could be memory leak issues
 - need to determine how do deal with very large HTML files
-- logging panel leaks over the people grid
-
 
 ## Releases
+### v0.2.4.1
+- Converted it back to Python 3.8 from 3.10
 ### v0.2.4
+- Major performance increases
+- Improved sorting for Last Name, People and None
 - Change the HTML layer to deal with license changes to Leaflet map layers
 - Added save state to config file
 - finally got error messages in color
 - improved logging
-### v0.2.4
-- Major performance increases
-- Improved sorting for Last Name, People and None
+- fine tune person dialog
 - May have fixed busy icon
 - Code refactors
-- fine tune person dialog
 - #bug - loading pres2020.ged and sorting on ID, may be other cases
 - Improved Statistics Summary
 ### v0.2.3.5

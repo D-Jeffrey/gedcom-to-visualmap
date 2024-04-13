@@ -75,38 +75,37 @@ backTypes = ( 'OpenStreetMap', 'Stamen Toner', 'Stadia.StamenTonerLite',  'Stadi
 def backTypeSettings (ms):        
 
     subdomains = None
-    match ms:
-        case 1: #OpenStreetMap
+    if ms == 1: #OpenStreetMap
             attribution ='&copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a>'
             tileurl = backTypes[ms]
-        case 2: #Stamen Toner
+    elif ms == 2: #Stamen Toner
             attribution = ( '&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> ' 
 							'&copy; <a href="https://www.stamen.com/" target="_blank">Stamen Design</a> ' 
 							'&copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> ' 
 							'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors')
             tileurl = "https://tiles.stadiamaps.com/tiles/stamen_toner/{z}/{x}/{y}{r}.png"
-        case 3: # Stadia.StamenTonerLite
+    elif ms == 3: # Stadia.StamenTonerLite
             attribution = ( '&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a>'
                            ' &copy; <a href="https://www.stamen.com/" target="_blank">Stamen Design</a>'
                            ' &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a>'
                            ' &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors')
             tileurl = 'https://tiles.stadiamaps.com/tiles/stamen_toner_lite/{z}/{x}/{y}{r}.png'
-        case 4: # Stadia.StamenWatercolor
+    elif ms ==  4: # Stadia.StamenWatercolor
             attribution = ( '&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> ' 
 							'&copy; <a href="https://www.stamen.com/" target="_blank">Stamen Design</a> ' 
 							'&copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> ' 
                             '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors')
             tileurl = 'https://tiles.stadiamaps.com/tiles/stamen_watercolor/{z}/{x}/{y}.jpg'
             
-        case 5: # OpenTopoMap
+    elif ms ==  5: # OpenTopoMap
             attribution =  ('Map data: {attribution.OpenStreetMap}, <a href="http://viewfinderpanoramas.org">SRTM</a> ' 
                             '| Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)' )
             tileurl = 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png'
-        case 6: # ESRI.WorldImagery
+    elif ms ==  6: # ESRI.WorldImagery
             attribution =  ('{attribution.Esri} &mdash; ' 
 							'Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community' )
             tileurl = 'https://server.arcgisonline.com/ArcGIS/rest/services/WorldImagery/MapServer/tile/{z}/{y}/{x}'
-        case 7|8: # CartoBD Voyager / CartoDB Positron
+    elif ms ==  7 or ms == 8: # CartoBD Voyager / CartoDB Positron
             attribution ='&copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a>'
             tileurl = backTypes[ms]
             subdomain = 'abcd' 

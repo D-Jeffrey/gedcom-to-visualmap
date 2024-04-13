@@ -1,9 +1,8 @@
 __all__ = ['Pos']
 
 class Pos:
-    """ Creater a Position value with a of Lat and Llon  """
+    """ Creater a Position value with a of Lat and Lon  """
     def __init__(self, lat, lon):
-           
         if lat and lat[0].isalpha():
             lat = lat[1:] if lat[0] == 'N' else f'-{lat[1:]}'
         if lon and lon[0].isalpha():
@@ -14,10 +13,7 @@ class Pos:
 
     def hasLocation(self):
         """ Does this Position have a actual value """
-        if hasattr(self, "lat"):
-            if self.lat != None and self.lon:
-                return True
-        return False
+        return bool(hasattr(self, "lat") and (self.lat != None and self.lon))
         
     
     def isNone(self):

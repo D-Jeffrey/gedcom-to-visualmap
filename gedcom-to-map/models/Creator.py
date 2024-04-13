@@ -30,18 +30,19 @@ class Creator:
         self.max_missing = max_missing
 
     def line(self, pos: Pos, current: Human, branch, prof, miss, path="") -> [Line]:
-        if current.pos:
-            color = (branch + DELTA / 2) / (SPACE ** prof)
-            logger.info("{:8} {:8} {:2} {:.10f} {} {:20}".format(path, branch, prof, color, self.rainbow.get(color).to_hexa(), current.name))
-            line = Line("{:8} {}".format(path, current.name), pos, current.pos, self.rainbow.get(color), path, branch,prof, human=current)
-            return self.link(current.pos, current, branch, prof, 0, path) + [line]
-        else:
-            if self.max_missing != 0 and miss >= self.max_missing:
-                return []
-            return self.link(pos, current, branch, prof, miss+1, path)
+        if not current.pos:
+            return (
+                []
+                if self.max_missing != 0 and miss >= self.max_missing
+                else self.link(pos, current, branch, prof, miss + 1, path)
+            )
+        color = (branch + DELTA / 2) / (SPACE ** prof)
+        logger.info("{:8} {:8} {:2} {:.10f} {} {:20}".format(path, branch, prof, color, self.rainbow.get(color).to_hexa(), current.name))
+        line = Line("{:8} {}".format(path, current.name), pos, current.pos, self.rainbow.get(color), path, branch,prof, human=current)
+        return self.link(current.pos, current, branch, prof, 0, path) + [line]
 
     def link(self, pos: Pos, current: Human, branch=0, prof=0, miss=0, path="") -> [Line]:
-        return (self.line(pos, self.humans[current.father], branch*SPACE, prof+1, miss, path + "0") if current.father else []) \
+        return (self.line(pos, self.humans[current.father], branch*SPACE, prof+1, miss, f"{path}0") if current.father else []) \
                + (self.line(pos, self.humans[current.mother], branch*SPACE+DELTA, prof+1, miss, path + "1") if current.mother else [])
 
     def create(self, main_id: str):
@@ -55,7 +56,7 @@ class Creator:
     def createothers(self,listof):
         for human in self.humans:
             c = [creates.human.xref_id for creates in listof]
-            if not human in c:
+            if human not in c:
                 logger.debug("Others: + %s (%s) (%d)", self.humans[human].name, human, len(listof))
                 listof.extend(self.line(self.humans[human].pos, self.humans[human], len(listof)/10, 5, 0, path=""))
 
@@ -74,14 +75,12 @@ class LifetimeCreator:
             else:
                 logger.info("{:8} {:8} {:2} {:.10f} {} Self {:20}".format(" ", " ", " ", 0, "-SKIP-", current.name))
         midpoints = []
+        wyear = None
         if current.home:
-            wyear = None
             for h in (range(0,len(current.home))):
                 if (current.home[h].pos and current.home[h].pos.lat != None):
                     midpoints.append(LifeEvent(current.home[h].where, current.home[h].whenyear(), current.home[h].pos, current.home[h].what))
                     wyear = wyear if wyear else current.home[h].whenyear()
-        else:
-            wyear = None
         bp = current.birth.pos if current.birth else None
         bd = current.death.pos if current.death else None
         line = Line("{:8} {}".format(path, current.name), bp, bd, self.rainbow.get(color), path, branch, prof, 'Life', 
@@ -126,7 +125,7 @@ class LifetimeCreator:
     def createothers(self,listof):
         for human in self.humans:
             c = [creates.human.xref_id for creates in listof]
-            if not human in c:
+            if human not in c:
                 logger.debug ("Others: + %s(%s) (%d)", self.humans[human].name, human, len(listof))
                 listof.extend(self.selfline(self.humans[human], len(listof)/10, len(listof)/10, 5, path=""))
                

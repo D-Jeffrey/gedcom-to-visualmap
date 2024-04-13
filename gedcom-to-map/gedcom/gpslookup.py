@@ -407,8 +407,9 @@ class GEDComGPSLookup:
                     ps = (self.lookupaddresses(a, addressdepth+1))
                     if (ps.lat and ps.lon):
                         (self.addresses[addressindex]['lat'] , self.addresses[addressindex]['long']) = (ps.lat, ps.lon)
-                    logger.debug ("## Updated POS\t%s %f,%f", self.addresses[addressindex]['name'], ps.lat, ps.lon)
-                 
+                        logger.debug ("## Updated POS\t%s %f,%f", self.addresses[addressindex]['name'], ps.lat, ps.lon)
+                    else: 
+                        logger.debug ("## Cannot resolve address\t%s", self.addresses[addressindex]['name'])
                     return ps
 
                   

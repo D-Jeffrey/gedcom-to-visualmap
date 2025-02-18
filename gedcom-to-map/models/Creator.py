@@ -22,7 +22,6 @@ def getattrif(obj, attname, attvaluename):
                 return getattr(a, attvaluename)
     return None
     
-
 class Creator:
     def __init__(self, humans: Dict[str, Human], max_missing=0):
         self.humans = humans
@@ -65,9 +64,11 @@ class LifetimeCreator:
         self.humans = humans
         self.rainbow = Rainbow()
         self.max_missing = max_missing
+        self.alltheseids= {}
 
     def selfline(self, current: Human, branch, prof, miss, path="") -> [Line]:
         # We can not draw a line from Birth to death without both ends  --- or can we???
+        self.alltheseids[current.xref_id] = current.xref_id
         color = (branch + DELTA / 2) / (SPACE ** prof)
         if current.birth and current.death:
             if current.birth.pos and current.death.pos:
@@ -95,6 +96,10 @@ class LifetimeCreator:
     # Draw a line from the parents birth to the child birth location
                             
     def line(self, pos: Pos, parent: Human, branch, prof, miss, path="", linestyle="", forhuman: Human = None ) -> [Line]:
+        # Check to make sure we are not looping and have been here before
+        if parent.xref_id in self.alltheseids:
+            logger.error("Looping Problem: {:2} -LOOP STOP- {} {} -Looping= {:20}".format(  prof, parent.name, parent.xref_id, path))
+            return []
         if hasattr(parent, 'birth') and parent.birth:
             color = (branch + DELTA / 2) / (SPACE ** prof)
             logger.info("{:8} {:8} {:2} {:.10f} {} {:20} from {:20}".format(path, branch, prof, color, self.rainbow.get(color).to_hexa(), parent.name, forhuman.name))
@@ -110,9 +115,14 @@ class LifetimeCreator:
 
         
     def link(self, pos: Pos, current: Human, branch=0, prof=0, miss=0, path="") -> [Line]:
-        return (self.selfline(current, branch*SPACE, prof+1, miss, path)) \
+        # Maximun recursion depth.  This should never happen
+        if prof < 480: 
+            return (self.selfline(current, branch*SPACE, prof+1, miss, path)) \
                + (self.line(pos, self.humans[current.father], branch*SPACE, prof+1, miss, path + "F",'father', current) if current.father else []) \
                + (self.line(pos, self.humans[current.mother], branch*SPACE+DELTA, prof+1, miss, path + "M", 'mother', current) if current.mother else [])
+        else:
+            logger.warning("{:8} {:8} {:2} {} {} {:20}".format(" ", " ", prof, " ", "-TOO DEEP-", current.name))
+            return (self.selfline(current, branch*SPACE, prof+1, miss, path)) + [] + []
 
     def create(self, main_id: str):
         if main_id not in self.humans.keys():

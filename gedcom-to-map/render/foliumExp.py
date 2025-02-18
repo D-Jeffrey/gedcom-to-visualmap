@@ -46,7 +46,7 @@ class MyMarkClusters:
             cnt = 1
             if (when):
                 # TODO this is a range date hack
-                if type(when) == type (" "):
+                if isinstance(type(when), str):
                     when = when[0:4]
                 when = int(when) - (int(when) % self.step)
                 markname = str(spot.lat)+ str(spot.lon)  + str(when)
@@ -145,7 +145,7 @@ class foliumExporter:
         # ***************************** 
         #    Export results into HTML   
         # ***************************** 
-
+        # lines are from creator
     def export(self, main: Pos,  lines: [Line], saveresult = True):
         
         if not self.fm:
@@ -176,6 +176,10 @@ class foliumExporter:
             for line in lines:
                 if (hasattr(line,'style') and line.style == 'Life'):
                     self.gOptions.Referenced.add(line.human.xref_id, 'quick')
+            self.gOptions.lastlines = {}
+            # make a Dict array of lines 
+            for line in lines:
+                self.gOptions.lastlines[line.human.xref_id] = line
             if (not saveresult):
                 return
 
@@ -208,7 +212,7 @@ class foliumExporter:
                 if (hasattr(line,'style') and line.style == 'Life'):
                     self.gOptions.Referenced.add(line.human.xref_id, 'heat')
                     if line.human.birth and line.human.birth.pos:
-                        mycluster.mark(line.human.birth.pos, line.human.birth.whenyear())
+                        mycluster.mark(line.human.birth.pos, line.human.birth.whenyearnum())
                         minyear = line.human.birth.whenyearnum()
                     else:
                         minyear = None
@@ -217,13 +221,13 @@ class foliumExporter:
                     else:
                         maxyear = None
                         for mids in (line.midpoints):
-                            y = mids.whenyear()
+                            y = mids.whenyearnum()
                             if y:
                                 if minyear:
                                     minyear = min(int(y), minyear)
                                 else:
                                     minyear = int(y)
-                            y = mids.whenyear(True)
+                            y = mids.whenyearnum(True)
                             if y: 
                                 if maxyear:
                                     maxyear = max(int(y), maxyear)
@@ -244,7 +248,7 @@ class foliumExporter:
             years= []
             for marker in mycluster.pmarker:
                 self.gOptions.step()
-                if type(mycluster.pmarker[marker][3]) == type(' '):
+                if isinstance(mycluster.pmarker[marker][3], str):
                     logger.debug (mycluster.pmarker[marker])
                 theyear = mycluster.pmarker[marker][3]
                 if theyear and not theyear in years: 
@@ -329,8 +333,8 @@ class foliumExporter:
                 da = []
                 ln = line.name                                              # Line Name
                 g = ""
-                markertipname = "Life of " + line.name                      # Marker Tool Tip
-                fancyname = line.style + " of " + line.name                 # the line represents and name for Tool Tip
+                markertipname = f"Life of {line.name}"                      # Marker Tool Tip
+                fancyname = f"{line.style} of {line.name}"                 # the line represents and name for Tool Tip
                 markhome = 'house'                                          # Icon to put at the Start  (NOT USED)
             else: 
                 flc = flr
@@ -351,8 +355,8 @@ class foliumExporter:
                     bicc = 'pink'
                 ln = line.name
                 g = line.name.split(' ',2)[0] 
-                markertipname = line.name +  " " + line.style + " of "+ (line.parentofhuman.name if line.parentofhuman else '')
-                fancyname = line.name + " " + line.style + " of "+ (line.parentofhuman.name if line.parentofhuman else '')
+                markertipname = f"{line.name} {line.style} of " + (line.parentofhuman.name if line.parentofhuman else '')
+                fancyname = f"{line.name} {line.style} of " + (line.parentofhuman.name if line.parentofhuman else '')
             fg = None
             newfg = False
             # labelname = str(i) +' '+ ln
@@ -364,7 +368,7 @@ class foliumExporter:
             bextra = "{} (Born)".format(line.human.birth.whenyear()) if line.human.birth and line.human.birth.when else ''
             dextra = "{} (Died)".format(line.human.death.whenyear()) if line.human.death and line.human.death.when else ''
             fancyname = fancyname + "<br>" + bextra +" "+ dextra if (bextra != '') or (dextra != '') else fancyname
-            fancypopup = f"<div style='min-width: 150px'>{fancyname}</div>" 
+            fancypopup = f"<div style='min-width: 150px'>{fancyname}</div>"
             if line.human.photo:
                 fancypopup = fancypopup + "<img src='{}' width='150'>".format(line.human.photo)
             difta = diftb = None

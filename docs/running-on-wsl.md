@@ -7,8 +7,17 @@
 ## Linux (WSL - WSL version: 1.1.3.0)
   
 ```
+sudo add-apt-repository ppa:deadsnakes/ppa
 sudo apt-get update
+sudo apt install python3.11
+sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 1
+sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.10 2
+sudo update-alternatives --config python3
 sudo apt install python3-pip
+sudo apt install python3.10-venv
+pip install -U six wheel setuptools
+pip install --upgrade pip
+
 ```
 
 
@@ -33,10 +42,11 @@ Do the install of `wxPython` to make sure it gets configured and setup correctly
 modules as above like (libgtk-3-dev).  I read that you should *not* every run `pip` with `sudo`
 
 ```
+pip install wheel
 # this attrdict3 is only required for WSL because of issues in the image
 pip install -U attrdict3
 pip install wxPython
-pip install git+https://github.com/D-Jeffrey/gedcom-to-visualmap.git@v0.2.3
+pip install git+https://github.com/D-Jeffrey/gedcom-to-visualmap.git
 ```
 
 I have not figured out how to use `venv` properly yet, so this a work in progres.

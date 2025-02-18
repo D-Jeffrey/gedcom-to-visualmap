@@ -7,6 +7,23 @@ from models.Pos import Pos
 
 logger = logging.getLogger(__name__)
 
+def DateFromField(field):
+    if field:
+        # BC or B.C
+        if field.lower().find("bc") > 0 or field.lower().find("b.c") > 0:
+                return -int(field[:field.lower().find("b")])
+        if len(field) > 3 and field[3].isdigit():
+            return int(field[:4])
+        try:
+            return int(field)
+        except:
+            digits = ''
+            for char in field:
+                if char.isdigit():
+                    digits += char
+            return int(digits) if digits else None
+    return None
+
 class Human:
     def __init__(self, xref_id):
         self.xref_id = xref_id
@@ -31,8 +48,7 @@ class Human:
         
     def __repr__(self):
         return f"[ {self.xref_id} : {self.name} - {self.father} & {self.mother} - {self.pos} ]"
-            
-            
+
     def refyear(self):
         bestyear = "?Unknown"
         if self.birth and self.birth.when:
@@ -57,7 +73,7 @@ class Human:
                 f"{self.death.where} (Died)" if self.death.where else "",
             ]
         return best
-    
+
     def bestPos(self):
         # TODO Best Location should consider if in KML mode and what is selected  
         # If the location is set in the GED, using MAP attribute then that will be the best
@@ -70,22 +86,19 @@ class Human:
             best = self.death.pos
         return best
 
-
 class LifeEvent:
     def __init__(self, place :str, atime, position : Pos = None, what = None):  # atime is a Record
         self.where = place
         self.when = atime
         self.pos = position
         self.what = what
-        
 
     def __repr__(self):
         return f"[ {self.when} : {self.where} is {self.what}]"
 
     def whenyear(self, last = False):
-        
         if self.when:
-            if (type(self.when) == type(' ')):
+            if (isinstance(self.when, str)):
                 return (self.when)
             else:
                 if self.when.value.kind.name == "RANGE" or self.when.value.kind.name == "PERIOD":
@@ -102,24 +115,19 @@ class LifeEvent:
                             return None
                     else:
                         if hasattr(self.when.value, 'name') :
-                            logger.warning ("when year %s as %s", self.when.value.name, self.when.value.phrase)
+                            logger.warning ("'when' year %s as %s", self.when.value.name, self.when.value.phrase)
                         else:
-                            logger.warning ("unknown when name %s ", self.when.value)
+                            logger.warning ("unknown 'when' name %s ", self.when.value)
                         return None
                 else:
                     return self.when.value.date.year_str
         return None
 
     def whenyearnum(self, last = False):
-        """ 
+        """
         Return 0 if None
         """
-        w = self.whenyear(last)
-        if not w:
-            w = 0
-        elif len(w)>3:
-            w = int(w[:4])
-        return w
+        return DateFromField(self.whenyear(last))
 
     def getattr(self, attr):
         if attr == 'pos':

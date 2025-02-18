@@ -1,7 +1,8 @@
 """Constants for gedcom-to-visualmap"""
 
-VERSION = "0.2.4.1"
+VERSION = "0.2.5.0"
 NAME = "gedcom-to-visualmap"
+GEOCODEUSERAGENT = NAME + "/" + VERSION + " GEDCOM-to-map-folium"
 GUINAME = 'GEDCOM Visual Map'
 
 GV_COUNTRIES_JSON = 'https://raw.githubusercontent.com/nnjeim/world/master/resources/json/countries.json'
@@ -9,12 +10,39 @@ GV_STATES_JSON = 'https://raw.githubusercontent.com/nnjeim/world/master/resource
 KMLMAPSURL = "https://www.google.ca/maps/about/mymaps"
 ABOUTLINK = "https://github.com/D-Jeffrey/"
 
-GVFONT = 'Verdana'
-GVFONTSIZE = 9
-
+GVFONT = ('Verdana', 8)                 # General Font family and size (suggested range 8 to 11)
+ABOUTFONT = ('Garamond', 13)            # About Font family and size (suggested range 8 to 14)
 LOG_CONFIG = {
     'version': 1,
     'disable_existing_loggers': False,
+
+    # NOTE the following values are supperceded by the values in "AppData\Local\gedcomvisual\gedcom-visualmap.ini"
+    # Clear those values if you want to set loggers values here
+    'loggers': {
+        'models.Human' : {
+            'level': 'ERROR' # Works
+        },
+        'gedcom.gpslookup' : {
+            'level': 'INFO' # NOT Work
+        },
+        'models.Creator' : {
+            'level': 'ERROR'    # Works
+        },
+        'render.foliumExp' : {
+            'level': 'ERROR'    # Works
+        },
+        'gedcomvisual': {
+            'level': 'DEBUG' # Works
+        },
+        'ged4py.parser': {
+            'level': 'INFO' #NO work
+        }
+    }
+
+}
+
+BROKEN = {
+    
     'formatters': {
         'standard': {
             #'format': '%(asctime)s [%(levelname)s] %(name)s: %(message)s',
@@ -26,16 +54,10 @@ LOG_CONFIG = {
     # TODO: figure out how do properly do logging
     'handlers': {
         'stdout': {
-            'level': 'INFO',                        # This one matters
+            'level': 'WARNING',                        # This one matters
             'formatter': 'standard',
             'class': 'logging.StreamHandler',
             'stream': 'ext://sys.stdout',  # Default is stderr
         },
-    },
-    'loggers': {
-        'root': {  # root logger
-             'level': 'DEBUG',
-        },
     }
-
 }

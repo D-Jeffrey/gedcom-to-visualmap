@@ -44,7 +44,7 @@ python3 gedcom-to-map.py /users/darren/documents/myhertitagetree.ged myTree -mai
 ```
 
 ## GUI
-![img](docs/pythonw3.9_2023-04-01.png)
+![img](docs/python_2025-02.png)
 
 To use the GUI version, `File- > Open` and select your .ged file.
 Set your options in the GUI interface  
@@ -56,16 +56,26 @@ Once you have selected your options,
 - `Draw Update` button is a 'Save' button.  For HTML it will try and open the file with your web browser automatically.  For KML, it will save the file so you can load it onto a map.  (See below)
 - `Open GPS` button will open the CSV file in Excel if you have it... (I'm thinking that does not work on a Mac)  Make sure you close it before running again, or it may not be able to update the CSV file.
 - `Stop` will allow you to abort the Load/ Resolving of addresses without killing the GUI, allowing you to pick different options.
-- Using the left mouse click to select the starting person in (Star)
-- Use the right click on list of people to bring up some known details and how it was geocoded
+- Using the `double-left-click` to select the starting person in (Star)
+- Use the `right-click` on list of people to bring up some known details and how it 
+was geocoded
+- `Geo Table` open the CSV file for the resolved and cached names.  You can edit the fields and change the `alt` column so substatute in a new name for alternate look up.
+TODO Needs more description.
+- `Trace` Craete a list of the individuals from the starting person.  See below
+- `Browser` Open the web browser using the last current output html file
+
 - When the people are loaded you can sort by the various columns by clicking on the column.  When the list of people is selected for display it is relative to this starting person, unless you select the `Map all people`
 - You can resize the window (larger or maximized) to see more details about the people.
-- When displaying people on the HTML map, you can choose to list them as single people, as a group by the last name or by their parent
+- When displaying people on the HTML map, you can choose to list them as 
+  - single people, 
+  - as a group by the last name 
+  - or by their parent
 
 ## Output to HTML using folium
 
  ### Usage
  
+ *Deprecated functionality*
  ```
  usage: gedcom-to-map.py [-h] [-main MAIN] [-format {HTML,KML}] [-max_missing MAX_MISSING] [-max_line_weight MAX_LINE_WEIGHT] [-everyone] [-gpscache] [-nogps] [-nomarker] [-nobornmarker] [-noheatmap]
                         [-maptiletype {1,2,3,4,5,6,7}] [-nomarkstar] [-groupby {0,1,2}] [-antpath] [-heattime] [-heatstep HEATSTEP] [-homemarker] [-born] [-death]
@@ -157,6 +167,12 @@ python3 ..\gedcom-to-map\gedcom-to-map.py pres2020.ged pres2020-2 -main "@I676@"
 python3 ..\gedcom-to-map\gedcom-to-map.py pres2020.ged pres2020-2 -main "@I676@" -format KML
 ```
 
+## Trace button
+Load your GED file.  Make sure that you have set an output file (click on the `Output File` label for quick access to the Save As).  Make sure you have selecte HTML mode (not KML).  Double click on a person to trace from that person back.  Then all the traced individuals will light up as green (with the starting person in grey).  Then click on the Trace button.  
+This will product a text file and the name will be shown be show in the Information section of the top left.  (Same directory as the output but with a different name '.trace.txt. instead of .HTML).  If you open this in Excel, you can reformat the last columns and then use that to identify the number of generations. 
+
+![img](docs/EXCEL_2025-02.png)
+
 ## Complex Export of MyHeritage - intereactive map
 ![img](docs/msedge_2022-02-02_22-33-16.gif)
 
@@ -174,7 +190,7 @@ I noticed that the MyHeritage has added a heatmap a year or so ago and it has a 
 
 ## TODO
 - Add a treed hierarchy selector to enable people as groups and add expand/collapse to navigation
-- add search to people grid
+- add `search/Find` to people grid
 - more troubleshooting on the address lookup
   - better way to interact and refine the address resolution hints
   - move address hints in a configuration file
@@ -185,18 +201,31 @@ I noticed that the MyHeritage has added a heatmap a year or so ago and it has a 
 - in Person dialog show something for people still alive (vs None or Unknown)
 - remember the starting person next time the same GED is opened
 - add histical timeline and reference events in the area from https://www.vizgr.org/historical-events/ & https://github.com/dh3968mlq/hdtimelines/
+- need to determine how do deal with very large HTML files.  Could use a limit of the number of people included in the selection
+- show only selected people in grid
 
 ## Issues
 - Marriage is not read correctly all the time, does not deal with multiple marriages
-- Sorting does not work after the graph is created
+- Sorting does not work after the graph is created (memory corruption?)
+- Sorting the grid does not work properly after loaded a new file (memory corruption?)
+- Sort by year sorts using string instead of number & BC
 
 ### GUI
-- Need to separate the Load and GPS resolve steps
-- need better interaction with buttons and menu selections
-- could be memory leak issues
-- need to determine how do deal with very large HTML files
+- Need to separate the Load and GPS resolve steps (currently loads after 5 minutes of looking up values)
 
 ## Releases
+### v0.2.5
+- Performance increased, feedback, corrected double grid load
+- Added detection for family loops
+- Fixed Logging options so they work
+- Added `Trace` to trace from selected person and dump to a text file
+- Added `Save As` Dialog
+- Enriched Help About
+- Now tracking time
+- Estimating the number of addresses to resolve
+- Periodic saving of Address resolution (ever 5 minutes or 500 addresses)
+### v0.2.4.2
+- Refactoring
 ### v0.2.4.1
 - Converted it back to Python 3.8 from 3.10
 ### v0.2.4
@@ -229,7 +258,6 @@ I noticed that the MyHeritage has added a heatmap a year or so ago and it has a 
 - on Linux sample
 - more pylint
 - fixed sorting of people
-
 ### v0.2.1
 - Added support for Windows and Mac open of CSV
 - more issues with cache, the first time you run it in the new directory
@@ -242,19 +270,10 @@ I noticed that the MyHeritage has added a heatmap a year or so ago and it has a 
 - improved feedback loop on loading in Visual
 - Fixed issue with selection (broken in 0.1.2), fix issue with caching
 - Added Legend (Needs work)
-### v0.1.2
+### v0.1.x
 - New details dialog about people, fixed issues with GPS lookup, options 
-- adjusted logging (Need more work)
-- lots of linting work, bug fixes for addresses. 
-- Still needs a lot work.
-### v0.1.1
 - Folded in GUI bugs from @rajeeshp & @frankbracq
-### v0.1.0 
-- Adjusted GUI and saving of cache file location
-- Fixed issue if the cache did not already exist results in a ```
-line 166, in saveAddressCache for a in range(0,len(self.addresslist)): 
-TypeError: object of type 'NoneType' has no len()```
-
+- Adjusted GUI and saving of cache file location, Fixed issue if the cache file
 
 [license-shield]: https://img.shields.io/github/license/D-Jeffrey/gedcom-to-visualmap.svg?style=for-the-badge
 [license]: LICENSE

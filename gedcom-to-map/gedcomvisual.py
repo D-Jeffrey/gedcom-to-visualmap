@@ -10,7 +10,7 @@ from models.Pos import Pos
 from render.foliumExp import foliumExporter
 from render.KmlExporter import KmlExporter
 
-logger = logging.getLogger(__name__)
+_log = logging.getLogger(__name__)
 
 def gedcom_to_map(gOp : gvOptions):
     
@@ -30,7 +30,7 @@ def doKML(gOp : gvOptions, humans):
         if (p == 'native'):
             for h in humans.keys():
                 humans[h].pos = humans[h].map
-            logger.info ("KML native")
+            _log.info ("KML native")
             nametag = ''
         if (p == 'born'):
             for h in humans.keys():
@@ -38,7 +38,7 @@ def doKML(gOp : gvOptions, humans):
                 if humans[h].birth:
                     if humans[h].birth.pos:
                         humans[h].pos = humans[h].birth.pos
-            logger.info  ("KML born")
+            _log.info  ("KML born")
             nametag = ' (b)'
         if (p == 'death'):
             for h in humans.keys():
@@ -46,17 +46,17 @@ def doKML(gOp : gvOptions, humans):
                 if humans[h].death:
                     if humans[h].death.pos:
                         humans[h].pos = humans[h].death.pos
-            logger.info  ("KML death")
+            _log.info  ("KML death")
             nametag = ' (d)'
         
         lifeline = Creator(humans, gOp.MaxMissing) 
         creator = lifeline.create(gOp.Main)
         if gOp.AllEntities:
             lifeline.createothers(creator)
-            logger.info  ("Total of %i people.", len(creator))  
+            _log.info  ("Total of %i people.", len(creator))  
 
         if gOp.Main not in humans:
-            logger.error  ("Could not find your starting person: %s", gOp.Main)
+            _log.error  ("Could not find your starting person: %s", gOp.Main)
             gOp.stopstep('Error could not find first person')
             return
         gOp.setMainHuman(humans [gOp.Main])
@@ -77,21 +77,22 @@ def Geoheatmap(gOp : gvOptions):
     doHTML(gOp, humans, True)
 
 def doHTML(gOp : gvOptions, humans, fullresult ):
+    
     if (not humans):
         return
-    logger.debug  ("Creating Lifeline (fullresult:%s)", fullresult)
+    _log.debug  ("Creating Lifeline (fullresult:%s)", fullresult)
     lifeline = LifetimeCreator(humans, gOp.MaxMissing)    
-    logger.debug  ("Creating Humans ")
+    _log.debug  ("Creating Humans ")
     creator = lifeline.create(gOp.Main)    
     if gOp.Main not in humans:
-        logger.error ("Could not find your starting person: %s", gOp.Main)
+        _log.error ("Could not find your starting person: %s", gOp.Main)
         gOp.stopstep('Error could not find first person')
         return
     gOp.setMainHuman(humans[gOp.Main])
     if gOp.AllEntities:
         gOp.step('Creating life line for everyone')
         lifeline.createothers(creator)
-        logger.info ("Total of %i people & events.", len(creator))   
+        _log.info ("Total of %i people & events.", len(creator))   
     gOp.totalpeople = len(creator)
 
     foliumExporter(gOp).export(humans[gOp.Main], creator, fullresult)
@@ -100,9 +101,8 @@ def doHTML(gOp : gvOptions, humans, fullresult ):
         
     
 
-
 def ParseAndGPS(gOp: gvOptions, stage: int = 0 ):
-    logger.info ("Starting parsing of GEDCOM : %s (stage: %d)", gOp.GEDCOMinput, stage)
+    _log.info ("Starting parsing of GEDCOM : %s (stage: %d)", gOp.GEDCOMinput, stage)
     if (stage == 0 or stage == 1):
         if gOp.humans:
             del gOp.humans
@@ -114,22 +114,22 @@ def ParseAndGPS(gOp: gvOptions, stage: int = 0 ):
     if (stage == 2):
         humans = gOp.humans
     if (humans and gOp.UseGPS and (stage == 0 or stage == 2)):
-        logger.info ("Starting Address to GPS resolution")
+        _log.info ("Starting Address to GPS resolution")
         # TODO This could cause issues
         # Check for change in the datetime of CSV
         if gOp.lookup:
             lookupresults = gOp.lookup
         else:
             lookupresults = GEDComGPSLookup(humans, gOp)
-            logger.info ("Completed Geocode")
+            _log.info ("Completed Geocode")
             gOp.lookup = lookupresults
-        lookupresults.resolveaddresses(humans)
+        lookupresults.resolve_addresses(humans)
         gOp.step('Saving Address Cache')
         lookupresults.saveAddressCache()
-        logger.info ("Completed resolves")
+        _log.info ("Completed resolves")
     
     if humans and (not gOp.Main or not gOp.Main in list(humans.keys())):
             gOp.set('Main', list(humans.keys())[0])
-            logger.info ("Using starting person: %s (%s)", humans[gOp.Main].name, gOp.Main)
+            _log.info ("Using starting person: %s (%s)", humans[gOp.Main].name, gOp.Main)
     
     return humans

@@ -1,23 +1,27 @@
 __all__ = ['Xlator', 'WordXlator', 'GEDComGPSLookup']
 
+import logging
+_log = logging.getLogger(__name__)
+
 import csv
 import hashlib
 import json
-import logging
 import os.path
 import re
 import tempfile
 import time
 import urllib.request
+import platform
+from datetime import datetime
 
-from const import GV_COUNTRIES_JSON, GV_STATES_JSON
+from const import GV_COUNTRIES_JSON, GV_STATES_JSON, GEOCODEUSERAGENT
 #  from pprint import pprint
 from gedcomoptions import gvOptions
 from geopy.geocoders import Nominatim
 from models.Human import Human, LifeEvent
 from models.Pos import Pos
 
-logger = logging.getLogger(__name__)
+
 
 # TODO This needs to be moved into it's out JSON driven configuration
 fixuplist   = {r'\bof\s': '',
@@ -38,20 +42,17 @@ wordfixlist = {'of': '',
 
 geoapp = None
 cache_filename = (r"geodat-address-cache.csv", r"geodat-address-cache-1.csv", r"geodat-address-cache-2.csv")
-
 csvheader = ['name','alt','country','type','class','icon', 'place_id','lat','long', 'boundry', 'size', 'importance', 'used']
-debug = False
-
 defaultcountry = "CA"
 
 # The cache files should not change, but they might in the future.  There should be an option to clear the cache files.   #TODO
 def readCachedURL(cfile, url):
     nfile = os.path.join(tempfile.gettempdir() , cfile)
     if not os.path.exists(nfile):
-        logger.debug("Attempting to request %s as %s", url, nfile)
+        _log.debug("Attempting to request %s as %s", url, nfile)
         webUrl  = urllib.request.urlopen(url)
         data = webUrl.read()
-        logger.debug("request read, saving to %s", nfile)
+        _log.debug("request read, saving to %s", nfile)
         with open(nfile, 'wb') as file:
             file.write(data)
         
@@ -96,6 +97,13 @@ class GEDComGPSLookup:
         self.humans = humans
         self.countrieslist = None
         self.Geoapp = None
+        # Get OS and architecture details
+        os_name = platform.system()
+        os_version = platform.release()
+        arch = platform.machine()
+
+        # Build the user agent string
+        self.geocodeUserAgent = f"{GEOCODEUSERAGENT} ({os_name} {os_version}; {arch})"
         self.stats = ""
         self.used = 0
         self.usedNone = 0
@@ -118,7 +126,7 @@ class GEDComGPSLookup:
                                 self.addresslist = [line]
                         
                     except csv.Error as e:
-                        logger.error  ('Error reading GPS cache file %s, line %d: %s', cache_filename[0], readfrom.line_num, e)
+                        _log.error  ('Error reading GPS cache file %s, line %d: %s', cache_filename[0], readfrom.line_num, e)
              
         if (self.addresslist):
             gvO.step('Loading Geocode Cache')
@@ -141,7 +149,7 @@ class GEDComGPSLookup:
                     self.addresslist[a]['used'] = 0
                     self.addresses[self.addresslist[a]['name'].lower()]= self.addresslist[a]
                     self.addressalt[self.addresslist[a]['alt'].lower()]= self.addresslist[a]['name']
-            logger.info ("Loaded %d cached records", len(self.addresses))
+            _log.info ("Loaded %d cached records", len(self.addresses))
             #
             # Make the checksum for checking later to see if the table has changed
             #
@@ -153,7 +161,7 @@ class GEDComGPSLookup:
             self.gOptions.step("Loaded {} cached records".format(len(self.addresses)))
             self.addresslist = None
         else:
-            logger.info ("No GPS cached addresses to use")
+            _log.info ("No GPS cached addresses to use")
             self.gOptions.step("No GPS cached addresses")
         
         
@@ -211,14 +219,14 @@ class GEDComGPSLookup:
                     newMD5.update((self.addresses[a]['name'] +  self.addresses[a]['alt'] +  
                              str(self.addresses[a]['lat']) +  str(self.addresses[a]['long'])).encode(errors='ignore'))
             if self.orgMD5 and newMD5.hexdigest() == self.orgMD5.hexdigest():
-                logger.debug("GPS Cache has not changed")
+                _log.debug("GPS Cache has not changed")
                 return
         else:
-            logger.warning("No Addresses in addresslist")
+            _log.warning("No Addresses in addresslist")
         n = ['','','']
         if self.addresses:
             resultpath = self.gOptions.resultpath
-            self.gOptions.step("Saving GPS Cache")
+            self.gOptions.step("Saving GPS Cache", resetCounter=False)
             n[0] = os.path.join(resultpath,cache_filename[0])                        
             n[1] = os.path.join(resultpath,cache_filename[1])
             n[2] = os.path.join(resultpath,cache_filename[2])
@@ -228,15 +236,15 @@ class GEDComGPSLookup:
                         try:
                             os.remove(n[2])
                         except:
-                            logger.error("removing %s", n[2])
+                            _log.error("removing %s", n[2])
                     try:
                         os.rename(n[1], n[2])
                     except:
-                        logger.error("renaming %s", n[1])
+                        _log.error("renaming %s", n[1])
                 try:
                     os.rename(n[0], n[1])
                 except:
-                    logger.error("renaming %s", n[0])
+                    _log.error("renaming %s", n[0])
             self.gOptions.set('gpsfile', n[0])     
             with open(n[0], "w", newline='', encoding='utf-8') as csvfile:
                 
@@ -272,12 +280,12 @@ class GEDComGPSLookup:
                          ]
                     
                     csvwriter.writerow(r)
-            logger.debug("GPS Cache saved")    
+            _log.debug("GPS Cache saved")    
                 
         self.updatestats()
-        logger.info("Unique addresses: %d with %d have missing GPS for a Total of %d",self.used, self.usedNone, self.totaladdr)   
+        _log.info("Unique addresses: %d with %d have missing GPS for a Total of %d",self.used, self.usedNone, self.totaladdr)   
         
-        self.gOptions.step(f"Cache Table is {self.totaladdr} addresses")  
+        self.gOptions.step(f"Cache Table is {self.totaladdr} addresses", resetCounter=False)  
 
         
     def improveaddress(self,theaddress, thecountry= None):
@@ -337,13 +345,13 @@ class GEDComGPSLookup:
     def returnandcount(self, name):
         name = name.lower()
         # if self.addresses[name]['size'] and self.addresses[name]['used'] == 0 and self.addresses[name]['size'] > 100000:
-        #        logger.debug(" !Large location for: {} ({})".format(self.addresses[name]['name'], self.addresses[name]['size']))
+        #        _log.debug(" !Large location for: {} ({})".format(self.addresses[name]['name'], self.addresses[name]['size']))
         self.addresses[name]['used'] += 1
         # This large areas maps the trace look wrong, because they are most likely a state or provience.  Flag them to the user.
         return Pos(self.addresses[name]['lat'], self.addresses[name]['long'])
     
     def lookupaddresses(self, myaddress, addressdepth=0):
-        self.gOptions.step(info=myaddress)  
+        self.gOptions.step(info=myaddress, resetCounter=False)  
         self.usecacheonly = self.gOptions.get('CacheOnly')          # Refresh as it could have changed since _init_
         addressindex = None
         theaddress = None
@@ -351,7 +359,7 @@ class GEDComGPSLookup:
 
        
         if myaddress:
-            logger.debug("### %d %s", addressdepth, myaddress)
+            _log.debug("### %d %s", addressdepth, myaddress)
             if self.addresses:
                 # straight up, is it a valid existing cached address?
                 if myaddress.lower() in self.addresses.keys():
@@ -364,7 +372,7 @@ class GEDComGPSLookup:
                     if (ps.lat and ps.lon):
                         # Do we need to look this up?
                         if (not self.addresses[self.addressalt[myaddress.lower()].lower()]['lat']):
-                            logger.debug ("##* Updated POS\t%s\t%s %f,%f", a['name'], self.addressalt[myaddress.lower()].lower(), ps.lat, ps.lon)
+                            _log.debug ("##* Updated POS\t%s\t%s %f,%f", a['name'], self.addressalt[myaddress.lower()].lower(), ps.lat, ps.lon)
                     (self.addresses[self.addressalt[myaddress.lower()].lower()]['lat'] , self.addresses[self.addressalt[myaddress.lower()].lower()]['long']) = (ps.lat, ps.lon)
                     (self.addresses[a['name'].lower()]['lat'], self.addresses[a['name'].lower()]['lon']) = (ps.lat, ps.lon)
                     
@@ -407,9 +415,9 @@ class GEDComGPSLookup:
                     ps = (self.lookupaddresses(a, addressdepth+1))
                     if (ps.lat and ps.lon):
                         (self.addresses[addressindex]['lat'] , self.addresses[addressindex]['long']) = (ps.lat, ps.lon)
-                        logger.debug ("## Updated POS\t%s %f,%f", self.addresses[addressindex]['name'], ps.lat, ps.lon)
+                        _log.debug ("## Updated POS\t%s %f,%f", self.addresses[addressindex]['name'], ps.lat, ps.lon)
                     else: 
-                        logger.debug ("## Cannot resolve address\t%s", self.addresses[addressindex]['name'])
+                        _log.debug ("## Cannot resolve address\t%s", self.addresses[addressindex]['name'])
                     return ps
 
                   
@@ -428,31 +436,31 @@ class GEDComGPSLookup:
                     # The user gave a new address???
                     theaddress = self.addresses[myaddress.lower()]['alt'].lower()
             if self.addresses and theaddress.lower() in self.addresses.keys():
-                logger.debug ("#BBefore ??? %s\n\t%s\n\t%s", theaddress.lower() in self.addresses.keys(), self.addresses[addressindex]['name'], self.addresses[addressindex]['alt'])
+                _log.debug ("#BBefore ??? %s\n\t%s\n\t%s", theaddress.lower() in self.addresses.keys(), self.addresses[addressindex]['name'], self.addresses[addressindex]['alt'])
             if (self.usecacheonly):
                 return (Pos(None,None))
             usedGeocode = False
             if (len(theaddress)>0):
-                logger.debug(":Lookup: %s +within+ %s::", theaddress, trycountry)
+                _log.debug(":Lookup: %s +within+ %s::", theaddress, trycountry)
                 try:
                     usedGeocode = True
                     location = self.Geoapp.geocode(theaddress, country_codes=trycountry, timeout=5)
                 except:
-                    logger.error("Error: Geocode %s", theaddress)
+                    _log.error("Error: Geocode %s", theaddress)
                     time.sleep(1)  # extra sleep time
                     location = None
             else:
-                logger.info(":Lookup: %s ::", myaddress)
+                _log.info(":Lookup: %s ::", myaddress)
                 try:
                     usedGeocode = True
                     location = self.Geoapp.geocode(myaddress)
                 except:
-                    logger.error("Error: Geocode %s", myaddress)
+                    _log.error("Error: Geocode %s", myaddress)
                     time.sleep(1)     # extra sleep time
                     location = None
             if location:
                 location = location.raw
-                logger.info(location['display_name'])
+                _log.info(location['display_name'])
                 boundrybox = getattr(location, 'boundingbox')
                 bsize = abs(float(boundrybox[1])-float(boundrybox[0])) * abs(float(boundrybox[3])-float(boundrybox[2]))*1000000
                 locrec = {'name': myaddress, 'alt' : getattr(location, 'display_name'), 'country' : trycountry, 'type': getattr(location, 'type'), 'class': getattr(location,'class'), 'icon': getattr(location,'icon'),
@@ -460,7 +468,7 @@ class GEDComGPSLookup:
                                 'long': getattr(location, 'lon'), 'boundry' : boundrybox, 'importance': getattr(location, 'importance'), 'size': bsize, 'used' : 0}
               
             else:
-                logger.info("----none---- for %s", myaddress)
+                _log.info("----none---- for %s", myaddress)
                 locrec = {'name': myaddress, 'alt' : theaddress, 'country' : trycountry, 'type': None, 'class':None, 'icon':None,'place_id': None,'lat': None, 'long': None, 'boundry' : None, 'importance': None, 'size': None, 'used' : 0}
 
             if usedGeocode:
@@ -473,7 +481,7 @@ class GEDComGPSLookup:
                 self.addresses=dict()
                 self.addressalt=dict()
             if locrec['name'].lower() in self.addresses.keys():
-                logger.debug ("#UU=%s Changed\n\t%s\n\t%s", self.addresses[locrec['name'].lower()]['used'], myaddress, theaddress)
+                _log.debug ("#UU=%s Changed\n\t%s\n\t%s", self.addresses[locrec['name'].lower()]['used'], myaddress, theaddress)
 
             self.addresses[locrec['name'].lower()]= locrec
             self.addressalt[locrec['alt'].lower()]= locrec['name'].lower()
@@ -483,24 +491,57 @@ class GEDComGPSLookup:
         return Pos(None,None)
      
    
-    def resolveaddresses(self, humans):
-        self.Geoapp = Nominatim(user_agent="GEDCOM-to-map-folium")  
+    def resolve_addresses(self, humans):
+        donesome = 0
+        nowis =  datetime.now()
+        # Update the Grid in 60 seconds if we are still doing this loop
+        startis = nowis.timestamp() + 60
+        if hasattr(self, 'addresses') and self.addresses:
+            donesome = len(self.addresses)
+        self.Geoapp = Nominatim(user_agent=self.geocodeUserAgent)  
         self.gOptions.step("Lookup addresses")
+        target = 0
+        for human in humans:
+            ho = humans[human]
+            if ho:
+                target += (1 if (ho.birth and ho.birth.where) else 0) + (1 if ho.death and ho.death.where else 0)
+                if ho.home:
+                    target += len(ho.home)
+        self.gOptions.step("Lookup addresses", target=target)
         for human in humans:
             if self.gOptions.ShouldStop():
+                self.saveAddressCache()
                 break
-            if (humans[human].birth and humans[human].birth.where):
-                humans[human].birth.pos = self.lookupaddresses(humans[human].birth.where)
-                logger.debug("{:30} @ B {:60} = {}".format(humans[human].name, humans[human].birth.where if humans[human].birth.where else '??', humans[human].birth.pos ))
-            if (humans[human].home):
-                for homs in (range(0,len(humans[human].home))):
-                    homeOfhome = humans[human].home[homs]
-                    if (homeOfhome.where):
-                        homeOfhome.pos = self.lookupaddresses(homeOfhome.where)
-            if (humans[human].death and humans[human].death.where):
-                humans[human].death.pos = self.lookupaddresses(humans[human].death.where)
-                logger.debug ("{:30} @ D {:60} = {}".format(humans[human].name, humans[human].death.where, humans[human].death.pos ))
+
+            human_obj = humans[human]
+        
+            # Resolve birth address
+            if human_obj.birth and human_obj.birth.where:
+                human_obj.birth.pos = self.lookupaddresses(human_obj.birth.where)
+                _log.debug(f"{human_obj.name:30} @ B {human_obj.birth.where:60} = {human_obj.birth.pos}")
+        
+            # Resolve home address
+            if human_obj.home:
+                for home in human_obj.home:
+                    if home.where:
+                        home.pos = self.lookupaddresses(home.where)
+        
+            # Resolve death address
+            if human_obj.death and human_obj.death.where:
+                human_obj.death.pos = self.lookupaddresses(human_obj.death.where)
+                _log.debug(f"{human_obj.name:30} @ D {human_obj.death.where:60} = {human_obj.death.pos}")
+            if len(self.addresses) - donesome > 512 or datetime.now().timestamp() - nowis.timestamp() > 300:  # Every 5 minutes or 512 addresses save Addresses
+                _log.info(f"************** Saving cache {donesome} {len(self.addresses)}")
+                self.saveAddressCache()
+                donesome = len(self.addresses)
+                nowis =  datetime.now()
+            if startis > datetime.now().timestamp():
+                self.gOptions.panel.threads[0].updategrid = True
+                self.gOptions.panel.threads[0].updateinfo= f"Updating Grid while resolving addresses - {len(self.addresses)}" 
+                startis = datetime.now().timestamp() + 300  # update again in 5 minutes
+
         self.updatestats()
+        self.gOptions.step("Resolved addresses", target=0)
 
 
 

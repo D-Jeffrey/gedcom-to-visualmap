@@ -62,7 +62,10 @@ class gvOptions:
         self.showLayerControl = True
         self.mapMini = True
         self.counter = 0
+        self.countertarget = 0
         self.running = False
+        self.runningLast = 0
+        self.runingSince = 0
         self.commandline = False
         self.time = time.ctime()
         self.parsed = False
@@ -76,7 +79,10 @@ class gvOptions:
         self.lastmax = self.counter
         self.humans = None
         self.Referenced = None
+        self.panel = None
         self.selectedpeople = 0
+        self.lastlines = None
+
         # Types 0 - boolean, 1: int, 2: str
         self.html_keys = {'MarksOn':0, 'HeatMap':0, 'BornMark':0, 'DieMark':0, 'MapStyle':1, 'MarkStarOn':0, 'GroupBy':1, 
                           'UseAntPath':0, 'HeatMapTimeLine':0, 'HeatMapTimeStep':1, 'HomeMarker':0, 'showLayerControl':0, 
@@ -162,13 +168,12 @@ class gvOptions:
         
         self.setInput(self.gvConfig['Core']['InputFile'])
         self.resultpath, self.Result = os.path.split(self.gvConfig['Core']['OutputFile'])
-        ResultHTML = not ('.kml' in self.Result.lower())
-        self.setResults(self.Result, ResultHTML)
+        self.setResults(self.Result, not ('.kml' in self.Result.lower()))
         
         
         
         self.Name = None
-        # TODO this does not set the right logger
+        # TODO this does not set the right logger  This is in conflicit with the values in const.py
         for itm, lvl in self.gvConfig.items('Logging'):
             alogger = logging.getLogger(itm)
             if alogger:
@@ -213,16 +218,17 @@ class gvOptions:
         self.Name = mainhuman.name
         self.mainHumanPos = mainhuman.bestPos()
 
-    def setResults(self, Result, isResultHTML):
+    def setResults(self, Result, useHTML):
         """ Set the Output file and type (Only the file name) """
-        self.ResultHTML = isResultHTML
-        if (isResultHTML):
+        self.ResultHTML = useHTML
+        if (useHTML):
             self.ResultType = "html"
         else:
             self.ResultType = "kml"
         self.Result, extension = os.path.splitext(Result)                   # output file (could be of resulttype .html or .kml)
         if self.Result != "":
             self.Result = self.Result + "." + self.ResultType
+        # TODO Update Visual value
 
     def setInput(self, theInput):
         """ Set the input file, update output file """
@@ -241,7 +247,7 @@ class gvOptions:
         else:
             self.resultpath = None
         if org != self.GEDCOMinput:
-                self.parsed = False            
+            self.parsed = False            
 
     def KeepGoing(self):
         return not self.ShouldStop()
@@ -256,17 +262,20 @@ class gvOptions:
             
         return True
     
-    def step(self, state = None, info=None):
+    def step(self, state = None, info=None, target=-1, resetCounter=True):
         """ Update the counter used to show progress to the end user """
         """ return true if we should stop stepping """
         if state:
             self.state = state
-            self.counter = 0
+            if resetCounter:
+                self.counter = 0
             self.running = True
         else:
-            self.counter = self.counter+1
+            self.counter += 1
             self.stepinfo = info
-        # logging.debug(">>>>>> stepped %d", self.counter)
+        if target>-1:
+            self.countertarget = target
+            # logging.debug(">>>>>> stepped %d", self.counter)
         return self.ShouldStop()
                 
         

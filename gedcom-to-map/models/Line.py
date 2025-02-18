@@ -3,7 +3,7 @@ __all__ = ['Line']
 #TODO need to improved this subclass
 from ged4py.date import DateValueVisitor
 from models.Color import Color
-from models.Human import Human, LifeEvent
+from models.Human import Human, LifeEvent, DateFromField
 from models.Pos import Pos
 
 
@@ -45,10 +45,7 @@ class Line:
         return f"( {self.a}, {self.b} )"
 
     def valueWhen(self, newwhen):
-        if type(newwhen) == type(" "):
-            # TODO this is a range date hack
-            newwhen = int(newwhen[:4])
-        return newwhen
+        return DateFromField(newwhen)
 
     def updateWhen(self, newwhen):
         newwhen = self.valueWhen(newwhen)
@@ -61,9 +58,3 @@ class Line:
         if attr == 'parentofhuman' and self.parentofhuman is None:
             return ''
         raise AttributeError(f"'{type(self).__name__}' object has no attribute '{attr}'")
-    
-    
-    
-    
-
-

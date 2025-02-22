@@ -279,6 +279,6 @@ I noticed that the MyHeritage has added a heatmap a year or so ago and it has a 
 [license]: LICENSE
 [commits]: https://github.com/D-Jeffrey/gedcom-to-visualmap/commits
 [commits-shield]: https://img.shields.io/github/commit-activity/y/D-Jeffrey/gedcom-to-visualmap?style=for-the-badge
-[maintenance-shield]: https://img.shields.io/maintenance/yes/2023.svg?style=for-the-badge
+[maintenance-shield]: https://img.shields.io/maintenance/yes/2025.svg?style=for-the-badge
 [releases-shield]: https://img.shields.io/github/v/release/D-Jeffrey/gedcom-to-visualmap.svg?style=for-the-badge
 [releases]: https://github.com/crowbarz/D-Jeffrey/gedcom-to-visualmap/releases

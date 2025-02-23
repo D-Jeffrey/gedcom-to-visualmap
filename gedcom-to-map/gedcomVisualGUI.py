@@ -30,7 +30,7 @@ import wx.grid
 
 from const import (GUINAME, GVFONT, KMLMAPSURL, LOG_CONFIG, NAME,
                    VERSION, ABOUTFONT)
-from gedcomoptions import gvOptions
+from gedcomoptions import gvOptions, AllPlaceType
 from gedcomvisual import ParseAndGPS, doHTML, doKML
 import gedcom.gpslookup 
 
@@ -128,7 +128,6 @@ class VisualMapFrame(wx.Frame):
             self.myFont = wx.Font(wx.FontInfo(10).FaceName('Verdana'))
         wx.Frame.SetFont(self, self.myFont)
         self.inTimer = False
-    
 
     def makeMenuBar(self):
         """
@@ -157,7 +156,7 @@ class VisualMapFrame(wx.Frame):
 
         optionsMenu = wx.Menu()
         optionsMenu.Append(wx.ID_REVERT, "&Reset to Default")
-        optionsMenu.Append(wx.ID_SETUP, "&Logging Setup")
+        optionsMenu.Append(wx.ID_SETUP, "&Options Setup")
         
         self.ActionMenu = ActionMenu =  wx.Menu()
         ActionMenu.Append(wx.ID_INFO, "Statistics Sumary")
@@ -183,6 +182,7 @@ class VisualMapFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.OnFileOpenDialog, id=wx.ID_OPEN)
         self.Bind(wx.EVT_MENU, self.OnFileResultDialog, id=wx.ID_SAVEAS)
         self.Bind(wx.EVT_MENU, self.OnExit,   id=wx.ID_EXIT)
+        self.Bind(wx.EVT_CLOSE, self.OnExit)
         self.Bind(wx.EVT_MENU, self.OnInfo, id=wx.ID_INFO)
         self.Bind(wx.EVT_MENU, self.OnAbout, id=wx.ID_ABOUT)
         self.Bind(wx.EVT_MENU_RANGE, self.OnFileHistory, id=wx.ID_FILE1, id2=wx.ID_FILE9)
@@ -195,7 +195,12 @@ class VisualMapFrame(wx.Frame):
     def OnExit(self, event):
         """Close the frame, terminating the application."""
         panel.gO.savesettings()
-        self.Close(True)
+        if event.GetEventType() == wx.EVT_CLOSE.typeId:
+            self.Destroy()
+        else:
+            self.Close(True)
+
+
         
 
     def OnOpenCSV(self, event):
@@ -318,7 +323,7 @@ class VisualMapFrame(wx.Frame):
                       wx.OK|wx.ICON_INFORMATION)
         
     def onOptionsSetup(self, event):
-        dialog = ConfigDialog(None, title='Logging Configuration')
+        dialog = ConfigDialog(None, title='Configuration Options')
         
 
 class HtmlDialog(wx.Dialog):
@@ -383,71 +388,87 @@ For more details and to contribute, visit the <a href="https://github.com/D-Jeff
 #==============================================================
 class ConfigDialog(wx.Frame):
     def __init__(self, parent, title):
-        super(ConfigDialog, self).__init__(parent, title=title, size=(400, 400))
+        super(ConfigDialog, self).__init__(parent, title=title, size=(420, 450))
 
         includeNOTSET = False               # DEFAULT Disabled with False
         self.loggerNames = list(logging.root.manager.loggerDict.keys())
-        panel = wx.Panel(self)
-        grid = wx.grid.Grid(panel)
+        cfgpanel = wx.Panel(self,style=wx.SIMPLE_BORDER  )
+        TEXTkmlcmdlinelbl = wx.StaticText(cfgpanel, -1,  " KML Command line:   ") 
+        self.TEXTkmlcmdline = wx.TextCtrl(cfgpanel, wx.ID_FILE1, "", size=(250,20))
+        if panel.gO.KMLcmdline:
+            self.TEXTkmlcmdline.SetValue(panel.gO.KMLcmdline)
+        GRIDctl = wx.grid.Grid(cfgpanel)
         if includeNOTSET:
             gridlen = len(logging.root.manager.loggerDict)
         else:
             gridlen =  sum(1 for erow, loggerName in enumerate(self.loggerNames) if logging.getLogger(loggerName).level != 0)     # Hack NOTSET
 
-        grid.CreateGrid(gridlen, 2)
-        grid.SetColLabelValue(0, "Logger Name")
-        grid.SetColLabelValue(1, "Log Level")
+        GRIDctl.CreateGrid(gridlen, 2)
+        GRIDctl.SetColLabelValue(0, "Logger Name")
+        GRIDctl.SetColLabelValue(1, "Log Level")
 
         self.logging_levels = ['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL']
         row = 0
         for erow, loggerName in enumerate(self.loggerNames):
             _log = logging.getLogger(loggerName)
             if logging.getLevelName(_log.level) != "NOTSET":
-                grid.SetCellValue(row, 0, loggerName)
-                grid.SetCellValue(row, 1, logging.getLevelName(_log.level))
-                grid.SetCellEditor(row, 1, wx.grid.GridCellChoiceEditor(self.logging_levels))
-                grid.SetReadOnly(row, 0)
+                GRIDctl.SetCellValue(row, 0, loggerName)
+                GRIDctl.SetCellBackgroundColour(row, 0, wx.LIGHT_GREY)
+                GRIDctl.SetCellValue(row, 1, logging.getLevelName(_log.level))
+                GRIDctl.SetCellEditor(row, 1, wx.grid.GridCellChoiceEditor(self.logging_levels))
+                GRIDctl.SetReadOnly(row, 0)
                 row += 1
         # The following only is relavent for modules that could have `logging`` added to them
         if includeNOTSET:
             for erow, loggerName in enumerate(self.loggerNames):
                 _log = logging.getLogger(loggerName)
                 if logging.getLevelName(_log.level) == "NOTSET":
-                    grid.SetCellValue(row, 0, loggerName)
-                    grid.SetCellValue(row, 1, logging.getLevelName(_log.level))
-                    grid.SetCellBackgroundColour(row, 0, wx.LIGHT_GREY)
-                    grid.SetCellBackgroundColour(row, 1, wx.LIGHT_GREY)
-                    grid.SetReadOnly(row, 0)
-                    grid.SetReadOnly(row, 1)
+                    GRIDctl.SetCellValue(row, 0, loggerName)
+                    GRIDctl.SetCellValue(row, 1, logging.getLevelName(_log.level))
+                    GRIDctl.SetCellBackgroundColour(row, 0, wx.LIGHT_GREY)
+                    GRIDctl.SetCellBackgroundColour(row, 1, wx.LIGHT_GREY)
+                    GRIDctl.SetReadOnly(row, 0)
+                    GRIDctl.SetReadOnly(row, 1)
                     row += 1 
             
-        grid.AutoSizeColumn(0,False)
-        grid.AutoSizeColumn(1,False)
+        GRIDctl.AutoSizeColumn(0,False)
+        GRIDctl.AutoSizeColumn(1,False)
         
 
-        saveBTN = wx.Button(panel, label="Save Changes")
+        saveBTN = wx.Button(cfgpanel, label="Save Changes")
         saveBTN.Bind(wx.EVT_BUTTON, self.onSave)
-        cancelBTN = wx.Button(panel, label="Cancel")
+        cancelBTN = wx.Button(cfgpanel, label="Cancel")
         cancelBTN.Bind(wx.EVT_BUTTON, self.onCancel)
 
         sizer = wx.BoxSizer(wx.VERTICAL)
-        sizer.Add(grid, 1, wx.EXPAND | wx.ALL, 5)
+        l1 = wx.BoxSizer(wx.HORIZONTAL)
+        l1.AddMany([TEXTkmlcmdlinelbl,      (6,20),     self.TEXTkmlcmdline])
+        sizer.AddSpacer(5)
+        sizer.Add(l1)
+        sizer.Add( wx.StaticText(cfgpanel, -1,  "(Use   $n  for the name of the file that was created in the command line)"))   
+        sizer.AddSpacer(20)
+        sizer.Add(wx.StaticText(cfgpanel, -1,  " Logging Options:"))
+        l2 = wx.BoxSizer(wx.HORIZONTAL)
+        l2.AddMany([(20,20),      GRIDctl,     (20,20)])
+        
+        sizer.Add(l2)
         buttonsizer = wx.BoxSizer(wx.HORIZONTAL)
         buttonsizer.Add(saveBTN, 0, wx.ALIGN_CENTER | wx.ALL, 5)
         buttonsizer.Add(cancelBTN, 0, wx.ALIGN_CENTER | wx.ALL, 5)
         sizer.Add(buttonsizer, 0, wx.ALIGN_CENTER | wx.ALL, 5)
 
-        panel.SetSizer(sizer)
-        self.grid = grid
+        cfgpanel.SetSizer(sizer)
+        self.GRIDctl = GRIDctl
         self.Show(True)
 
     def onSave(self, event):
-        for row in range(self.grid.GetNumberRows()):
-            loggerName = self.grid.GetCellValue(row, 0)
-            logLevel = self.grid.GetCellValue(row, 1)
+        for row in range(self.GRIDctl.GetNumberRows()):
+            loggerName = self.GRIDctl.GetCellValue(row, 0)
+            logLevel = self.GRIDctl.GetCellValue(row, 1)
             _log = logging.getLogger(loggerName)
             _log.setLevel(getattr(logging, logLevel))
-        # wx.MessageBox("Log levels updated successfully!", "Info", wx.OK | wx.ICON_INFORMATION)
+        panel.gO.KMLcmdline = self.TEXTkmlcmdline.GetValue()
+        panel.gO.savesettings()
         self.Close()
         self.DestroyLater()
 
@@ -584,7 +605,7 @@ class PeopleListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
                 else:
                     index = key - 1
                 self.list.SetItemData(index, key)
-                if self.gO.ResultHTML and self.gO.Referenced:
+                if self.gO.Referenced:
                     if self.gO.Referenced.exists(data[2]):
                         self.gO.selectedpeople = self.gO.selectedpeople + 1
                         if mainperson == data[2]:
@@ -603,7 +624,8 @@ class PeopleListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
             listmix.ColumnSorterMixin.__init__(self, 5)
             #self.SortListItems(0, True)
             # self.list.CheckItem(item=selectperson, check=True)
-            self.gO.running = wasrunning
+            if self.gO.running:
+                self.gO.running = wasrunning
             wx.Yield()
         self.list.SetColumnWidth(0, wx.LIST_AUTOSIZE_USEHEADER)
         self.list.SetColumnWidth(1, wx.LIST_AUTOSIZE_USEHEADER)
@@ -868,7 +890,7 @@ class VisualMapPanel(wx.Panel):
         ksizer = wx.BoxSizer(wx.VERTICAL)
         ksizer.AddSpacer(kTopBorder)
         kboxIn = wx.BoxSizer(wx.VERTICAL)
-        self.d.LISTPlaceType = wx.CheckListBox(kbox, self.d.IDs['ID_LISTPlaceType'],  choices=['native','born','death'])
+        self.d.LISTPlaceType = wx.CheckListBox(kbox, self.d.IDs['ID_LISTPlaceType'],  choices=AllPlaceType)
         kboxIn.AddMany( [self.d.LISTPlaceType])
         ksizer.Add( kboxIn, wx.EXPAND|wx.BOTTOM|wx.LEFT|wx.RIGHT, kOtherBorder+10)
         kbox.SetSizer(ksizer)
@@ -964,7 +986,6 @@ class VisualMapPanel(wx.Panel):
         self.d.TEXTGEDCOMinput.SetValue(filen)
         self.config.Write("GEDCOMinput", path)
         #TODO Fix this
-        self.gO.set('Main', None)
         #TODO Fix this
         self.d.TEXTResult.SetValue(self.gO.get('Result'))
         self.NeedReload()
@@ -1258,7 +1279,6 @@ class VisualMapPanel(wx.Panel):
         
         if not self.gO:
             self.gO = gvOptions()
-            self.gO.setstatic( self.config.Read("GEDCOMinput"), self.config.Read("Result"), True, None)
             self.gO.panel = self
             self.peopleList.setGOp(self.gO)
 
@@ -1289,6 +1309,7 @@ class VisualMapPanel(wx.Panel):
 
         _, filen = os.path.split(self.gO.get('GEDCOMinput'))
         self.d.TEXTGEDCOMinput.SetValue(filen)
+        self.d.LISTPlaceType.SetCheckedStrings(self.gO.PlaceType)
         self.SetupButtonState()
 
         for t in self.threads:

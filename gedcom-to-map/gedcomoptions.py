@@ -12,7 +12,7 @@ from wx import LogGeneric
 from models.Human import Human, Pos
 
 
-logger = logging.getLogger(__name__)
+_log = logging.getLogger(__name__)
 
 def settings_file_pathname(file_name):
     # Get the operating system name
@@ -26,15 +26,15 @@ def settings_file_pathname(file_name):
     elif os_name == 'Linux':
         settings_file_path = os.path.join(os.path.expanduser('~'), '.config')
     else:
-        logger.error (f"Unsupported operating system: {os_name}")
+        _log.error (f"Unsupported operating system: {os_name}")
         return file_name
     Path(settings_file_path).mkdir(parents=True, exist_ok=True)
     settings_file_path = os.path.join(settings_file_path, file_name)
     
-    logger.debug (f"Settings file location: {settings_file_path}")
+    _log.debug (f"Settings file location: {settings_file_path}")
     return settings_file_path
     
-
+AllPlaceType = ['native','born','death']
 
 class gvOptions:
     def __init__ (self):
@@ -66,7 +66,6 @@ class gvOptions:
         self.running = False
         self.runningLast = 0
         self.runingSince = 0
-        self.commandline = False
         self.time = time.ctime()
         self.parsed = False
         self.goodmain = False
@@ -82,13 +81,14 @@ class gvOptions:
         self.panel = None
         self.selectedpeople = 0
         self.lastlines = None
+        self.KMLcmdline = "notepad $n"
 
         # Types 0 - boolean, 1: int, 2: str
         self.html_keys = {'MarksOn':0, 'HeatMap':0, 'BornMark':0, 'DieMark':0, 'MapStyle':1, 'MarkStarOn':0, 'GroupBy':1, 
                           'UseAntPath':0, 'HeatMapTimeLine':0, 'HeatMapTimeStep':1, 'HomeMarker':0, 'showLayerControl':0, 
                           'mapMini':0}
-        self.core_keys = {'UseGPS':0, 'CacheOnly':0, 'AllEntities':0}
-        self.logging_keys = ['gedcomvisualgui', 'gedcom.gpslookup', 'ged4py.parser', '__main__', 'gedcomoptions']
+        self.core_keys = {'UseGPS':0, 'CacheOnly':0, 'AllEntities':0, 'KMLcmdline':''}
+        self.logging_keys = ['gedcomvisualgui', 'gedcom.gpslookup', 'ged4py.parser', '__main__', 'gedcomoptions','models.Human','models.Creator','render.foiumExp']
         
         if os.path.exists(self.settingsfile):
             self.loadsettings()            
@@ -142,70 +142,69 @@ class gvOptions:
     def loadsettings(self):
         self.gvConfig = configparser.ConfigParser()
         self.gvConfig.read(self.settingsfile)
-        if not 'Core' in self.gvConfig.sections():
-            self.gvConfig['Core'] = {}
-        if not 'HTML' in self.gvConfig.sections():
-            self.gvConfig['HTML'] = {}
-        if not 'Logging' in self.gvConfig.sections():
-            self.gvConfig['Logging'] = {}
-        if not 'Gedcom.Main' in self.gvConfig.sections():
-            self.gvConfig['Gedcom.Main'] = {}
         
+        # Ensure all necessary sections exist
+        for section in ['Core', 'HTML', 'Logging', 'Gedcom.Main', 'KML']:
+            if section not in self.gvConfig.sections():
+                self.gvConfig[section] = {}
+        
+        # Load HTML settings
         for key, typ in self.html_keys.items():
-            if typ == 0:
-                setattr(self, key, self.gvConfig['HTML'][key].lower() in ['true'])
-            elif typ == 1:
-                setattr(self, key, int(self.gvConfig['HTML'][key]))
-            else: # typ == 2
-                setattr(self, key, self.gvConfig['HTML'][key])
+            value = self.gvConfig['HTML'].get(key, None)
+            if value is not None:
+                if typ == 0:  # Boolean
+                    setattr(self, key, value.lower() == 'true')
+                elif typ == 1:  # int
+                    setattr(self, key, int(value))
+                else:  # str
+                    setattr(self, key, value)
+        
+        # Load Core settings
         for key, typ in self.core_keys.items():
-            if typ == 0:
-                setattr(self, key, self.gvConfig['Core'][key].lower() in ['true'])
-            elif typ == 1:
-                setattr(self, key, int(self.gvConfig['Core'][key]))
-            else: # typ == 2
-                setattr(self, key, self.gvConfig['Core'][key])
+            value = self.gvConfig['Core'].get(key, None)
+            if value is not None:
+                if typ == 0:  # Boolean
+                    setattr(self, key, value.lower() == 'true')
+                elif typ == 1:  # int
+                    setattr(self, key, int(value))
+                else:  # str
+                    setattr(self, key, value)
         
-        self.setInput(self.gvConfig['Core']['InputFile'])
-        self.resultpath, self.Result = os.path.split(self.gvConfig['Core']['OutputFile'])
+        self.setInput(self.gvConfig['Core'].get('InputFile', ''), generalRequest=False)
+        self.resultpath, self.Result = os.path.split(self.gvConfig['Core'].get('OutputFile', ''))
         self.setResults(self.Result, not ('.kml' in self.Result.lower()))
-        
-        
-        
-        self.Name = None
-        # TODO this does not set the right logger  This is in conflicit with the values in const.py
+        self.KMLcmdline = self.gvConfig['Core'].get('KMLcmdline', '')
+        self.PlaceType = []
+        for key in AllPlaceType:
+            if self.gvConfig['KML'][key].lower() == 'true':
+                self.PlaceType.append(key)
+
+        # Load logging settings
         for itm, lvl in self.gvConfig.items('Logging'):
             alogger = logging.getLogger(itm)
             if alogger:
                 alogger.setLevel(lvl)
-
-    def getLastMain(self):
-        if self.GEDCOMinput:
-            name = Path(self.GEDCOMinput).stem
-            self.Main = self.gvConfig.get('Gedcom.Main', name, fallback=None)
-        
-
-            
+               
     def savesettings(self):
         if not self.gvConfig:
             self.gvConfig = configparser.ConfigParser()
-            self.gvConfig['Core'] = {}
-            self.gvConfig['HTML'] = {}
-            self.gvConfig['Gedcom.Main'] = {}
-            self.gvConfig['Logging'] = {}
-            # self.gvConfig['Gedcom'] = {}
+            for section in ['Core', 'HTML', 'Logging', 'Gedcom.Main', 'KML']:
+                self.gvConfig[section] = {}
+            
         for key in self.core_keys:
             self.gvConfig['Core'][key] = str(getattr(self, key))
         for key in self.html_keys:
             self.gvConfig['HTML'][key] =  str(getattr(self, key))
             
+        for key in AllPlaceType:
+            self.gvConfig['KML'][key] =  str(key in self.PlaceType)
+            
         self.gvConfig['Core']['InputFile'] =  self.GEDCOMinput
         self.gvConfig['Core']['OutputFile'] = os.path.join(self.resultpath, self.Result)
-        
+        self.gvConfig['Core']['KMLcmdline'] =  self.KMLcmdline
         if self.GEDCOMinput and self.Main:
             name = Path(self.GEDCOMinput).stem
             self.gvConfig['Gedcom.Main'][name] = str(self.Main)
-        #TODO
         for key in self.logging_keys:
             self.gvConfig['Logging'][key] = logging.getLevelName(logging.getLogger(key).getEffectiveLevel())
         with open(self.settingsfile, 'w') as configfile:
@@ -230,10 +229,21 @@ class gvOptions:
             self.Result = self.Result + "." + self.ResultType
         # TODO Update Visual value
 
-    def setInput(self, theInput):
+    def setInput(self, theInput, generalRequest=True):
         """ Set the input file, update output file """
         org = self.GEDCOMinput
+        # Before we lose track, let's do savesettings (unless we are being called from savesettings)
+        if self.gvConfig and generalRequest and org:
+            if org != theInput:
+                self.savesettings()
         self.GEDCOMinput = theInput
+        if self.gvConfig and self.GEDCOMinput:
+            name = Path(self.GEDCOMinput).stem
+            if self.gvConfig['Gedcom.Main'].get(name):
+                self.Main = self.gvConfig['Gedcom.Main'].get(name)
+            else:
+                self.Main = None
+
         if self.GEDCOMinput:
             filen, extension = os.path.splitext(self.GEDCOMinput)
             if extension == "" and self.GEDCOMinput != "":
@@ -299,5 +309,5 @@ class gvOptions:
         if not hasattr(self, attribute):
             raise ValueError(f'attempting to set an attribute : {attribute} which does not exist')
         setattr (self, attribute, value)
-        
-             
+
+

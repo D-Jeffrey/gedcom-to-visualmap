@@ -14,7 +14,7 @@ from const import LOG_CONFIG, NAME, VERSION
 from gedcomoptions import gvOptions
 from gedcomvisual import Geoheatmap, gedcom_to_map
 
-logger = logging.getLogger(__name__)
+_log = logging.getLogger(__name__)
 
 class ArgParse(argparse.ArgumentParser):
     def __init__(self):
@@ -63,8 +63,8 @@ if __name__ == '__main__':
     
     logging.config.dictConfig(LOG_CONFIG)
 
-    logger.setLevel(logging.DEBUG)
-    logger.info("Starting up %s %s", NAME, VERSION)
+    _log.setLevel(logging.DEBUG)
+    _log.info("Starting up %s %s", NAME, VERSION)
     
     logging.basicConfig(level=logging.INFO)
     
@@ -95,6 +95,6 @@ if __name__ == '__main__':
         Geoheatmap(myGeoOptions)
     elif arg_parse.args.format =='KML': 
         gedcom_to_map(myGeoOptions)
-    logger.info('Finished')
+    _log.info('Finished')
     exit(0)
         

@@ -1,5 +1,7 @@
 import logging
 import os.path
+import os
+import subprocess
 import webbrowser
 
 from gedcom.GedcomParser import GedcomParser
@@ -68,8 +70,28 @@ def doKML(gOp : gvOptions, humans):
     # TODO restore keys (this is a patch that needs to be changed)
     for h in humans.keys():
         humans[h].pos = humans[h].map
-
-
+    if gOp.KMLcmdline:
+        if gOp.KMLcmdline.startswith('http'):
+            webbrowser.open(gOp.KMLcmdline, new = 0, autoraise = True)
+        else:
+            # TODO
+            cmdline = gOp.KMLcmdline.replace("$n", os.path.join(gOp.resultpath, gOp.Result))
+            _log.info(f"KML Running command line : '{cmdline}'") 
+            gOp.panel.threads[0].AddInfo(f"KML output to : {os.path.join(gOp.resultpath, gOp.Result)}") 
+            try:
+                if os.name == 'posix':
+                    subprocess.Popen(["/bin/sh" , cmdline])
+                elif os.name == 'nt':
+                    cmd = os.environ.get("SystemRoot") + "\\system32\\cmd.exe"
+                    subprocess.Popen([cmd, "/c", cmdline])
+                else:
+                    _log.error(f"Unknwon OS to run command-line: '{cmdline}'")
+                    
+            except FileNotFoundError:
+                _log.error(f"command errored: '{cmdline}'") 
+            except Exception as e:
+                _log.error(f"command errored as: {e} : '{cmdline}'") 
+            
 
 def Geoheatmap(gOp : gvOptions):
     

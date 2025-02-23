@@ -12,7 +12,7 @@ from gedcomoptions import gvOptions
 from models.Human import Human, LifeEvent
 from models.Pos import Pos
 
-logger = logging.getLogger(__name__)
+_log = logging.getLogger(__name__)
 
 homelocationtags = ('OCCU', 'CENS', 'EDUC')
 otherlocationtags = ('CHR', 'BAPM', 'BASM', 'BAPL', 'IMMI', 'NATU', 'ORDN','ORDI', 'RETI', 
@@ -40,7 +40,7 @@ def getgdate (gstr):
             #TODO need to fix up
             y = y 
         else:
-            logger.warning ("Date type; %s", gstr.value.kind.name)
+            _log.warning ("Date type; %s", gstr.value.kind.name)
         y = (y, 1000) [y == None]
         m = (m, 1) [m == None]
         d = (d, 1) [d == None]
@@ -93,7 +93,7 @@ class GedcomParser:
                 self.gOp.step("GEDCOM Parsing")
             else:
                 self.gOp.stopstep("file does not exist")
-                logger.warning ("File %s does not exist to read.", self.file_path)
+                _log.warning ("File %s does not exist to read.", self.file_path)
 
             
         self.gOp.parsed = False
@@ -158,7 +158,7 @@ class GedcomParser:
                     if alladdr != '':
                         homedate = getgdate(hom.sub_tag("DATE"))
                         if homedate in homes:
-                            logger.debug ("**Double RESI location for : %s on %s @ %s", human.name, homedate , alladdr)
+                            _log.debug ("**Double RESI location for : %s on %s @ %s", human.name, homedate , alladdr)
                         homes[homedate] = LifeEvent(alladdr, hom.sub_tag("DATE"))
         for tags in (homelocationtags):
             allhomes=record.sub_tags(tags)

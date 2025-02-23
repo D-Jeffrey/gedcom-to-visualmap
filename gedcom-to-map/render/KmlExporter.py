@@ -11,7 +11,7 @@ from models.Line import Line
 from models.Pos import Pos
 from render.Referenced import Referenced
 
-logger = logging.getLogger(__name__)
+_log = logging.getLogger(__name__)
 
 class KmlExporter:
     def __init__(self, gOp: gvOptions):
@@ -45,7 +45,7 @@ class KmlExporter:
             kml.newpoint(name=(self.gOp.Name  + ntag),coords=[ (main.lon, main.lat) ])
             self.gOp.totalpeople += 1
         else:
-            logger.error ("No GPS locations to generate a map.")
+            _log.error ("No GPS locations to generate a map.")
 
         self.gOp.step("Generating KML")
         sorted_lines = sorted(lines, key=lambda x: x.prof)
@@ -67,6 +67,6 @@ class KmlExporter:
                     1
                 )
             else:
-                logger.warning ("skipping %s (%f,%f) (%f,%f)", line.name, line.a.lon, line.a.lat, line.b.lon, line.b.lat)
+                _log.warning (f"skipping {line.name} ({line.a.lon}, {line.a.lat}) ({line.b.lon}, {line.b.lat})")
         self.Done()
    

@@ -3,6 +3,7 @@
 ![Project Maintenance][maintenance-shield]
 [![GitHub Activity][commits-shield]][commits]
 
+
 # gedcom-to-visualmap
 
 Read a GEDCOM file and translate the locations into GPS addresses.
@@ -214,6 +215,10 @@ I noticed that the MyHeritage has added a heatmap a year or so ago and it has a 
 - Need to separate the Load and GPS resolve steps (currently loads after 5 minutes of looking up values)
 
 ## Releases
+### v0.2.5.1
+- Worked on KML version of family loop detection
+- Added option to open program for KML (or use a http address)
+- Better saving of previous options, remembers selection Main person
 ### v0.2.5
 - Performance increased, feedback, corrected double grid load
 - Added detection for family loops
@@ -279,6 +284,6 @@ I noticed that the MyHeritage has added a heatmap a year or so ago and it has a 
 [license]: LICENSE
 [commits]: https://github.com/D-Jeffrey/gedcom-to-visualmap/commits
 [commits-shield]: https://img.shields.io/github/commit-activity/y/D-Jeffrey/gedcom-to-visualmap?style=for-the-badge
-[maintenance-shield]: https://img.shields.io/maintenance/yes/2023.svg?style=for-the-badge
+[maintenance-shield]: https://img.shields.io/maintenance/yes/2025.svg?style=for-the-badge
 [releases-shield]: https://img.shields.io/github/v/release/D-Jeffrey/gedcom-to-visualmap.svg?style=for-the-badge
 [releases]: https://github.com/crowbarz/D-Jeffrey/gedcom-to-visualmap/releases

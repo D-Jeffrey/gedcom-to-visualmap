@@ -15,7 +15,7 @@ from render.Referenced import Referenced
 from models.Creator import DELTA
 
 
-logger = logging.getLogger(__name__)
+_log = logging.getLogger(__name__)
 # TODO need to create this Legend to explain things HACK
 legend_file = 'file://' + __file__ + '/../legend.png'
 lgd_txt = '<span style="color: {col};">{txt}</span>'
@@ -172,7 +172,7 @@ class foliumExporter:
             random.seed()
 
             self.gOptions.Referenced = Referenced()
-            logger.debug  ("Building Referenced - quick only: %s", not saveresult)
+            _log.debug  ("Building Referenced - quick only: %s", not saveresult)
             for line in lines:
                 if (hasattr(line,'style') and line.style == 'Life'):
                     self.gOptions.Referenced.add(line.human.xref_id, 'quick')
@@ -203,7 +203,7 @@ class foliumExporter:
         # ***************************** 
         
         if self.gOptions.HeatMapTimeLine:
-            logger.info("building clusters")    
+            _log.info("building clusters")    
            
             self.gOptions.step("Building Heatmap Clusters")
             for line in lines:
@@ -249,7 +249,7 @@ class foliumExporter:
             for marker in mycluster.pmarker:
                 self.gOptions.step()
                 if isinstance(mycluster.pmarker[marker][3], str):
-                    logger.debug (mycluster.pmarker[marker])
+                    _log.debug (mycluster.pmarker[marker])
                 theyear = mycluster.pmarker[marker][3]
                 if theyear and not theyear in years: 
                     years.append(theyear)
@@ -316,12 +316,12 @@ class foliumExporter:
         else:
             lines_sorted = sorted(lines, key=lambda x: x.prof * ((x.branch/DELTA)+1)+ x.prof)
         for line in (list(filter (lambda line: hasattr(line,'style'), lines_sorted))):
-            logger.info("{:8f} {:8}  {:.8f} {:2} {:20} from {:20}".format((line.prof * ((line.branch/DELTA)+1)+ line.prof),  line.path, line.branch, line.prof, (line.parentofhuman.name if line.parentofhuman else "" ), line.name))
+            _log.info("{:8f} {:8}  {:.8f} {:2} {:20} from {:20}".format((line.prof * ((line.branch/DELTA)+1)+ line.prof),  line.path, line.branch, line.prof, (line.parentofhuman.name if line.parentofhuman else "" ), line.name))
             
         for line in (list(filter (lambda line: hasattr(line,'style'), lines_sorted))):
             self.gOptions.step()
             i += 1
-            logger.debug("{:8}  {:.10f} {:2} {:20} from {:20}".format(line.path, line.branch, line.prof, (line.parentofhuman.name if line.parentofhuman else "" ), line.name))
+            _log.debug("{:8}  {:.10f} {:2} {:20} from {:20}".format(line.path, line.branch, line.prof, (line.parentofhuman.name if line.parentofhuman else "" ), line.name))
             self.gOptions.Referenced.add(line.human.xref_id, 'line')        # Line ID
             if ( line.style == 'Life'):
                 flc = flp                                                   # Feature Group Class   (To create a Hierachary NOT USED)
@@ -460,7 +460,7 @@ class foliumExporter:
                         newfg = True
                     fg.add_child(pl)
             parentname = line.parentofhuman.name if line.parentofhuman else line.human.name
-            logger.info(f"Name:{line.human.name:30};\tParent:{parentname:30};\tStyle:{line.style};\tfrom:{line.a}; to:{line.b}")
+            _log.info(f"Name:{line.human.name:30};\tParent:{parentname:30};\tStyle:{line.style};\tfrom:{line.a}; to:{line.b}")
 
             # Did we just create a feature group for this person?
             if newfg:
@@ -468,7 +468,7 @@ class foliumExporter:
                 fm.add_child(fg)
         fglc = []
         for fgn in sorted(self.fglastname.keys(), key=lambda x: self.fglastname[x][2], reverse = False ):
-            logger.debug ("]]%s : %s", fgn, self.fglastname[fgn][1])
+            _log.debug ("]]%s : %s", fgn, self.fglastname[fgn][1])
             self.fglastname[fgn][0].layer_name = "{} : {}".format(fgn, self.fglastname[fgn][1])          
             fm.add_child(self.fglastname[fgn][0])
             fglc.append(self.fglastname[fgn][0])
@@ -486,7 +486,7 @@ class foliumExporter:
             if self.gOptions.MarkStarOn:
                 folium.Marker([dift(main.birth.pos.lat), dift(main.birth.pos.lon)], tooltip = main.name, opacity=0.5, icon=folium.Icon(color='lightred',icon='star', prefix='fa', iconSize = ['50%', '50%'])).add_to(fm)
         else:
-            logger.warning ("No GPS locations to generate a map.")
+            _log.warning ("No GPS locations to generate a map.")
         
         # Add a legend
         if self.gOptions.HeatMapTimeLine: 
@@ -495,7 +495,7 @@ class foliumExporter:
             ImgBottom = 2
         FloatImage(legend_file, bottom=ImgBottom, left=10).add_to(fm)
         if SortByLast:
-            logger.info ("Number of FG lastName: %i", len(self.fglastname))
+            _log.info ("Number of FG lastName: %i", len(self.fglastname))
             
         self.Done()
         return

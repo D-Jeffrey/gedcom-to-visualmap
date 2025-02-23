@@ -5,7 +5,7 @@ import re
 
 from models.Pos import Pos
 
-logger = logging.getLogger(__name__)
+_log = logging.getLogger(__name__)
 
 def DateFromField(field):
     if field:
@@ -115,9 +115,9 @@ class LifeEvent:
                             return None
                     else:
                         if hasattr(self.when.value, 'name') :
-                            logger.warning ("'when' year %s as %s", self.when.value.name, self.when.value.phrase)
+                            _log.warning ("'when' year %s as %s", self.when.value.name, self.when.value.phrase)
                         else:
-                            logger.warning ("unknown 'when' name %s ", self.when.value)
+                            _log.warning ("unknown 'when' name %s ", self.when.value)
                         return None
                 else:
                     return self.when.value.date.year_str
@@ -138,7 +138,7 @@ class LifeEvent:
             return self.where if self.where else ""
         elif attr == 'what':
             return self.what if self.what else ""
-        logger.warning("Life Event attr: %s' object has no attribute '%s'", type(self).__name__, attr)    
+        _log.warning("Life Event attr: %s' object has no attribute '%s'", type(self).__name__, attr)    
         return None
 
     def __str__(self):

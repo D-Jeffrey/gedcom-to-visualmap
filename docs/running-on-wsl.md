@@ -64,9 +64,9 @@ pip install -r requirements.txt
 python3 gedcomVisualGUI.py 
 ```
 
-![img](WSL-2023-04-01-bash.png)
+![img](img/WSL-2023-04-01-bash.png)
 
-![img](WSL-2023-03-31.png)
+![img](img/WSL-2023-03-31.png)
 
 
 Trying an alternate approach of:
@@ -115,7 +115,7 @@ dj@DESKTOP-R3PSDBU:~/gv/gedcom-to-visualmap-0.2.3.1$ python3 gedcom-to-map/gedco
 
 ## Side by side
 Windows and Linux (WSL) running on Windows 11 - WSL 1.1.3.0 - Ubuntu 
-![img](Windows+wsl.png)
+![img](img/Windows+wsl.png)
 
 
 # Saved for reference

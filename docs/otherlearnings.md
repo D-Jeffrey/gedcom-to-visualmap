@@ -2,7 +2,7 @@
 See you family tree as a graph branches by loading your gedcom into 
 
 https://learnforeverlearn.com/ancestors/
-![img](Exploring-Family-Trees.png)
+![img](img/Exploring-Family-Trees.png)
 
 Visualizing my ancestry on a map (Dec 2020) this is an interesting approach
 https://yannickbrouwer.medium.com/visualizing-my-ancestry-on-a-map-7af6a2354db0

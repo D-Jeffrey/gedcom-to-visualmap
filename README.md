@@ -45,7 +45,7 @@ python3 gedcom-to-map.py /users/darren/documents/myhertitagetree.ged myTree -mai
 ```
 
 ## GUI
-![img](docs/python_2025-02.png)
+![img](docs/img/python_2025-02.png)
 
 To use the GUI version, `File- > Open` and select your .ged file.
 Set your options in the GUI interface  
@@ -135,7 +135,7 @@ python3 ..\gedcom-to-map\gedcom-to-map.py input.ged output -main "@I0000@" -form
 * HTML Output : [docs/output.html](docs/output.html)
 
 ## KML Example revised
-![img](docs/msedge_output.kml.png)
+![img](docs/img/msedge_output.kml.png)
 * KML Output  : [samples/output.kml](samples/output.kml)
 
 Go to https://www.google.ca/maps/about/mymaps  
@@ -152,13 +152,13 @@ If you do not have GPS location in your GEDCOM file, then use -born or -born -de
 
 
 
-![img](docs/pres2020.png)
+![img](docs/img/pres2020.png)
 ```
 cd 
 python3 ..\gedcom-to-map\gedcom-to-map.py pres2020.ged pres2020 -main "@I1@" -format HTML -groupby 1 -nomarkstar -antpath
 ```
 
-![img](docs/pres2020-2.png)
+![img](docs/img/pres2020-2.png)
 ```
 python3 ..\gedcom-to-map\gedcom-to-map.py pres2020.ged pres2020-2 -main "@I676@" -format HTML -groupby 1 -nomarkstar -antpath
 ```
@@ -172,10 +172,10 @@ python3 ..\gedcom-to-map\gedcom-to-map.py pres2020.ged pres2020-2 -main "@I676@"
 Load your GED file.  Make sure that you have set an output file (click on the `Output File` label for quick access to the Save As).  Make sure you have selecte HTML mode (not KML).  Double click on a person to trace from that person back.  Then all the traced individuals will light up as green (with the starting person in grey).  Then click on the Trace button.  
 This will product a text file and the name will be shown be show in the Information section of the top left.  (Same directory as the output but with a different name '.trace.txt. instead of .HTML).  If you open this in Excel, you can reformat the last columns and then use that to identify the number of generations. 
 
-![img](docs/EXCEL_2025-02.png)
+![img](docs/img/EXCEL_2025-02.png)
 
 ## Complex Export of MyHeritage - intereactive map
-![img](docs/msedge_2022-02-02_22-33-16.gif)
+![img](docs/img/msedge_2022-02-02_22-33-16.gif)
 
 ## Running on Linux
 - [See Running on WSL](docs/running-on-wsl.md)
@@ -186,7 +186,7 @@ This will product a text file and the name will be shown be show in the Informat
 ## Comparing MyHeritage PedigreeMap Heatmap and GedcomVisual Heatmap
 I noticed that the MyHeritage has added a heatmap a year or so ago and it has a lot of overlap with the GedcomVisual heatmap.
 
-![img](docs/MyHeritage-2023-10-09.png) and ![img](docs/gedcomVisual-2023-10-09.png)
+![img](docs/img/MyHeritage-2023-10-09.png) and ![img](docs/img/gedcomVisual-2023-10-09.png)
 
 
 ## TODO

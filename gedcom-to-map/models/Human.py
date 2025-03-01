@@ -24,6 +24,13 @@ def DateFromField(field):
             return int(digits) if digits else None
     return None
 
+class Partner:
+    def __init__(self, xref_id, pos):
+        self.xref_id = xref_id
+        self.pos :Pos = pos
+    def __str__(self):
+        return f"Human(id={self.xref_id}, Pos={self.pos})"
+ 
 class Human:
     def __init__(self, xref_id):
         self.xref_id = xref_id

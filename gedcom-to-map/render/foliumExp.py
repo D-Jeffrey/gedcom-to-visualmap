@@ -322,7 +322,6 @@ class foliumExporter:
             self.gOptions.step()
             i += 1
             _log.debug("{:8}  {:.10f} {:2} {:20} from {:20}".format(line.path, line.branch, line.prof, (line.parentofhuman.name if line.parentofhuman else "" ), line.name))
-            self.gOptions.Referenced.add(line.human.xref_id, 'line')        # Line ID
             if ( line.style == 'Life'):
                 flc = flp                                                   # Feature Group Class   (To create a Hierachary NOT USED)
                 aicc = 'orange'                                             # Start Point Icon color
@@ -357,6 +356,7 @@ class foliumExporter:
                 g = line.name.split(' ',2)[0] 
                 markertipname = f"{line.name} {line.style} of " + (line.parentofhuman.name if line.parentofhuman else '')
                 fancyname = f"{line.name} {line.style} of " + (line.parentofhuman.name if line.parentofhuman else '')
+            self.gOptions.Referenced.add(line.human.xref_id, 'line', ln)        # Line ID
             fg = None
             newfg = False
             # labelname = str(i) +' '+ ln

@@ -1,6 +1,6 @@
 """Constants for gedcom-to-visualmap"""
 
-VERSION = "0.2.5.1"
+VERSION = "0.2.5.2"
 NAME = "gedcom-to-visualmap"
 GEOCODEUSERAGENT = NAME + "/" + VERSION + " GEDCOM-to-map-folium"
 GUINAME = 'GEDCOM Visual Map'
@@ -19,24 +19,9 @@ LOG_CONFIG = {
     # NOTE the following values are supperceded by the values in "AppData\Local\gedcomvisual\gedcom-visualmap.ini"
     # Clear those values if you want to set loggers values here
     'loggers': {
-        'models.Human' : {
-            'level': 'ERROR' # Works
-        },
-        'gedcom.gpslookup' : {
-            'level': 'INFO' # NOT Work
-        },
-        'models.Creator' : {
-            'level': 'ERROR'    # Works
-        },
-        'render.foliumExp' : {
-            'level': 'ERROR'    # Works
-        },
         'gedcomvisual': {
             'level': 'DEBUG' # Works
         },
-        'ged4py.parser': {
-            'level': 'INFO' #NO work
-        }
     }
 
 }

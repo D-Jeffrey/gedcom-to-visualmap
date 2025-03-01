@@ -7,10 +7,11 @@ import webbrowser
 from gedcom.GedcomParser import GedcomParser
 from gedcom.gpslookup import GEDComGPSLookup
 from gedcomoptions import gvOptions
-from models.Creator import Creator, LifetimeCreator
+from models.Creator import Creator, LifetimeCreator, CreatorTrace
 from models.Pos import Pos
 from render.foliumExp import foliumExporter
 from render.KmlExporter import KmlExporter
+from render.Referenced import Referenced
 
 _log = logging.getLogger(__name__)
 
@@ -155,3 +156,27 @@ def ParseAndGPS(gOp: gvOptions, stage: int = 0 ):
             _log.info ("Using starting person: %s (%s)", humans[gOp.Main].name, gOp.Main)
     
     return humans
+
+def doTrace(gOp : gvOptions):
+    
+    gOp.Referenced = Referenced()
+    gOp.totalpeople = 0
+    
+    if not gOp.humans:
+        _log.error ("Trace:References no humans.")
+        return
+    humans = gOp.humans
+    if gOp.Main not in humans:
+        _log.error  ("Trace:Could not find your starting person: %s", gOp.Main)
+        return
+
+    lifeline = CreatorTrace(humans)
+    #for h in humans.keys():
+    creator = lifeline.create(gOp.Main)
+
+    _log.info  ("Trace:Total of %i people.", len(creator)) 
+    if  creator:
+        for c in creator:
+            gOp.Referenced.add(c.human.xref_id,tag=c.path)
+                    
+

@@ -10,7 +10,7 @@ __all__ = ['Referenced']
 #   The new function resets the items dictionary to an empty dictionary, effectively starting the list over
 #
 #
-    
+
 class Referenced:
     """referenced keeps track of a list of strings """
 
@@ -21,11 +21,12 @@ class Referenced:
     def new(self):
         self.__init__()
     
-    def add(self, item, locationtype = None):
+    def add(self, item, locationtype = None, tag = None):
         if item in self.items:
             self.items[item]["count"] += 1
+            self.items[item]["tag"] = tag
         else:
-            self.items[item] = {"value": item, "count": 1}
+            self.items[item] = {"value": item, "count": 1, "tag": tag}
         if locationtype:
             if locationtype in self.types:
                 self.types[locationtype]["count"] += 1
@@ -35,6 +36,10 @@ class Referenced:
     def exists(self, item):
         return item in self.items
     
+    def item(self, item):
+        return self.items[item]
+    def gettag(self, item):
+        return self.items[item]['tag']
     def getcount(self, item):
         if item in self.items:
             return self.items[item]["count"]
@@ -47,3 +52,5 @@ class Referenced:
     
     def __repr__(self):
         return f"Referenced({self.items})"
+
+

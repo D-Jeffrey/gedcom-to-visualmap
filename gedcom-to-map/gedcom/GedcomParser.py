@@ -63,8 +63,10 @@ class GetPosFromTag:
         self.place = None
         self.pos = Pos(None, None)
         self.event = None
-
-        subtag = gedcomtag.sub_tag(tag)
+        if tag:
+            subtag = gedcomtag.sub_tag(tag)
+        else:
+            subtag = gedcomtag
         if subtag:
             self.place = getplace(subtag)
             self.when = subtag.sub_tag("DATE")
@@ -211,15 +213,28 @@ class GedcomParser:
                 thisgvOps.step(info=f"Family loop {familyloop}")  
             husband = record.sub_tag("HUSB")
             wife = record.sub_tag("WIFE")
+            for marry in record.sub_tags("MARR"):
+                marryevent = GetPosFromTag(marry, None).event
+                if husband and wife:
+                    if humans[husband.xref_id].marriage:
+                        humans[husband.xref_id].marriage.append((wife.xref_id, marryevent))
+                    else:
+                        humans[husband.xref_id].marriage = [(wife.xref_id, marryevent)]
+                    if humans[wife.xref_id].marriage :
+                        humans[wife.xref_id].marriage.append((husband.xref_id, marryevent))
+                    else:
+                        humans[wife.xref_id].marriage = [(husband.xref_id, marryevent)]
             for chil in record.sub_tags("CHIL"):
                 if chil.xref_id not in humans.keys():
                     continue
                 if husband:
                     humans[chil.xref_id].father = husband.xref_id
-                    humans[husband.xref_id].marriage = GetPosFromTag(record, "MARR").event
+                    
                 if wife:
                     humans[chil.xref_id].mother = wife.xref_id
-                    humans[wife.xref_id].marriage = GetPosFromTag(record, "MARR").event
+                    
+
+                    
             
             
 

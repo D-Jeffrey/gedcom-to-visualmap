@@ -64,6 +64,43 @@ class Creator:
                 _log.debug("Others: + %s (%s) (%d)", self.humans[human].name, human, len(listof))
                 listof.extend(self.line(self.humans[human].pos, self.humans[human], len(listof)/10, 5, 0, path=""))
 
+class CreatorTrace:
+    def __init__(self, humans: Dict[str, Human], max_missing=0):
+        self.humans = humans
+        self.rainbow = Rainbow()
+        self.max_missing = max_missing
+        self.alltheseids= {}
+
+    def line(self, current: Human, branch, prof, path="") -> [Line]:
+        if current.xref_id in self.alltheseids:
+            _log.error("Looping Trace Problem: {:2} -LOOP STOP - {} {} -Tracing= {:20}".format(  prof, self.humans[current.xref_id].name, current.xref_id, path))
+            return []
+        self.alltheseids[current.xref_id] = current.xref_id
+        
+        _log.info("{:8} {:8} {:2} {:20}".format(path, branch, prof, current.name))
+        line = Line("{:8} {}".format(path, current.name), None, None, None, path, branch,prof, human=current)
+        return self.link(current, branch, prof, path) + [line]
+
+    def link(self, current: Human, branch=0, prof=0,  path="") -> [Line]:
+        return (self.line(self.humans[current.father],  0, prof+1,  f"{path}0") if current.father else []) \
+               + (self.line(self.humans[current.mother], 0, prof+1,  path + "1") if current.mother else [])
+
+    def create(self, main_id: str):
+        if main_id not in self.humans.keys():
+            _log.error("Could not find your starting person: %s", main_id)
+            raise IndexError(f"Missing starting person {main_id}")
+
+        current = self.humans[main_id]
+        return self.link(current)
+    
+    def createothers(self,listof):
+        for human in self.humans:
+            c = [creates.human.xref_id for creates in listof]
+            if human not in c:
+                _log.debug("Others: + %s (%s) (%d)", self.humans[human].name, human, len(listof))
+                listof.extend(self.line(self.humans[human], len(listof)/10, 5, path=""))
+
+
 class LifetimeCreator:
     def __init__(self, humans: Dict[str, Human], max_missing=0):
         self.humans = humans

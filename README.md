@@ -215,6 +215,12 @@ I noticed that the MyHeritage has added a heatmap a year or so ago and it has a 
 - Need to separate the Load and GPS resolve steps (currently loads after 5 minutes of looking up values)
 
 ## Releases
+### v0.2.5.2
+- Improved Person info, now should delta between Active and displayed person
+- Finally fixed the Sort issue (mostly).
+- Sorts all dates include BC/B.C.
+- Added a Find found to search names.
+- Provides information about relation to selected person
 ### v0.2.5.1
 - Worked on KML version of family loop detection
 - Added option to open program for KML (or use a http address)

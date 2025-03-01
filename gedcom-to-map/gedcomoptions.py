@@ -48,9 +48,9 @@ class gvOptions:
         self.Result = ''                    # output file (could be of resulttype .html or .kml)
         self.ResultType = "html"
         self.ResultHTML = True
-        self.Main = None
-        self.mainHuman = None
-        self.Name = None
+        self.Main = None                    # xref_id
+        self.mainHuman = None               # point to Human
+        self.Name = None                    # name of human
         self.mainHumanPos = Pos(None, None)
         self.MaxMissing = 0
         self.MaxLineWeight = 20
@@ -210,12 +210,22 @@ class gvOptions:
         with open(self.settingsfile, 'w') as configfile:
             self.gvConfig.write(configfile)
     
-            
+    def setMain(self, Main: str):
+        self.Main = Main
+        if self.humans and Main in self.humans:
+            self.setMainHuman(self.humans[Main])
+        else:
+            self.setMainHuman(None)
     def setMainHuman(self, mainhuman: Human):
         """ Set the name of the starting person """
         self.mainHuman = mainhuman 
-        self.Name = mainhuman.name
-        self.mainHumanPos = mainhuman.bestPos()
+        if mainhuman:
+            self.Name = mainhuman.name
+            self.mainHumanPos = mainhuman.bestPos()
+        else:
+            self.Name = "<not selected>"
+            self.mainHumanPos = None
+            
 
     def setResults(self, Result, useHTML):
         """ Set the Output file and type (Only the file name) """
@@ -240,9 +250,9 @@ class gvOptions:
         if self.gvConfig and self.GEDCOMinput:
             name = Path(self.GEDCOMinput).stem
             if self.gvConfig['Gedcom.Main'].get(name):
-                self.Main = self.gvConfig['Gedcom.Main'].get(name)
+                self.setMain(self.gvConfig['Gedcom.Main'].get(name))
             else:
-                self.Main = None
+                self.setMain(None)
 
         if self.GEDCOMinput:
             filen, extension = os.path.splitext(self.GEDCOMinput)
@@ -307,7 +317,11 @@ class gvOptions:
     def set(self, attribute, value):
         """ set an gOptions attribute """
         if not hasattr(self, attribute):
+            _log.error(f'attempting to set an attribute : {attribute} which does not exist')
             raise ValueError(f'attempting to set an attribute : {attribute} which does not exist')
-        setattr (self, attribute, value)
+        if attribute == "Main":
+            self.setMain(value)
+        else:
+            setattr (self, attribute, value)
 
 

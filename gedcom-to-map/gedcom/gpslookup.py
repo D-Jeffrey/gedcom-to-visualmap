@@ -537,7 +537,7 @@ class GEDComGPSLookup:
                 nowis =  datetime.now()
             if startis > datetime.now().timestamp():
                 self.gOptions.panel.threads[0].updategrid = True
-                self.gOptions.panel.threads[0].updateinfo= f"Updating Grid while resolving addresses - {len(self.addresses)}" 
+                self.gOptions.panel.threads[0].updateinfo= f"Updating with {len(humans)} people while resolving some addresses ({len(self.addresses)})" 
                 startis = datetime.now().timestamp() + 300  # update again in 5 minutes
 
         self.updatestats()

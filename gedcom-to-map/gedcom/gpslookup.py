@@ -15,12 +15,13 @@ import platform
 from datetime import datetime
 
 from const import GV_COUNTRIES_JSON, GV_STATES_JSON, GEOCODEUSERAGENT
-#  from pprint import pprint
 from gedcomoptions import gvOptions
 from geopy.geocoders import Nominatim
 from models.Human import Human, LifeEvent
 from models.Pos import Pos
 
+
+BackgroundProcess = None
 
 
 # TODO This needs to be moved into it's out JSON driven configuration
@@ -101,6 +102,8 @@ class GEDComGPSLookup:
         os_name = platform.system()
         os_version = platform.release()
         arch = platform.machine()
+        global BackgroundProcess
+        BackgroundProcess = gvO.BackgroundProcess
 
         # Build the user agent string
         self.geocodeUserAgent = f"{GEOCODEUSERAGENT} ({os_name} {os_version}; {arch})"
@@ -536,8 +539,8 @@ class GEDComGPSLookup:
                 donesome = len(self.addresses)
                 nowis =  datetime.now()
             if startis > datetime.now().timestamp():
-                self.gOptions.panel.threads[0].updategrid = True
-                self.gOptions.panel.threads[0].updateinfo= f"Updating with {len(humans)} people while resolving some addresses ({len(self.addresses)})" 
+                BackgroundProcess.updategrid = True
+                BackgroundProcess.updateinfo= f"Updating with {len(humans)} people while resolving some addresses ({len(self.addresses)})" 
                 startis = datetime.now().timestamp() + 300  # update again in 5 minutes
 
         self.updatestats()

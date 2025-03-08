@@ -7,11 +7,14 @@ import webbrowser
 from gedcom.GedcomParser import GedcomParser
 from gedcom.gpslookup import GEDComGPSLookup
 from gedcomoptions import gvOptions
-from models.Creator import Creator, LifetimeCreator, CreatorTrace
+from models.Creator import Creator, LifetimeCreator, CreatorTrace, Human
 from models.Pos import Pos
 from render.foliumExp import foliumExporter
 from render.KmlExporter import KmlExporter
 from render.Referenced import Referenced
+
+# Thread for controlling the background processes Created in gedcomVisualGUI.py
+# BackgroundProcess
 
 _log = logging.getLogger(__name__)
 
@@ -20,7 +23,7 @@ def gedcom_to_map(gOp : gvOptions):
     humans = ParseAndGPS(gOp)
     doKML(gOp, humans)
 
-def doKML(gOp : gvOptions, humans):
+def doKML(gOp : gvOptions, humans: list[Human]):
     if (not humans):
         return
     kmlInstance = None
@@ -78,7 +81,7 @@ def doKML(gOp : gvOptions, humans):
             # TODO
             cmdline = gOp.KMLcmdline.replace("$n", os.path.join(gOp.resultpath, gOp.Result))
             _log.info(f"KML Running command line : '{cmdline}'") 
-            gOp.panel.threads[0].AddInfo(f"KML output to : {os.path.join(gOp.resultpath, gOp.Result)}") 
+            BackgroundProcess.SayInfoMessage(f"KML output to : {os.path.join(gOp.resultpath, gOp.Result)}") 
             try:
                 if os.name == 'posix':
                     subprocess.Popen(["/bin/sh" , cmdline])
@@ -169,7 +172,7 @@ def doTrace(gOp : gvOptions):
     if gOp.Main not in humans:
         _log.error  ("Trace:Could not find your starting person: %s", gOp.Main)
         return
-
+    gOp.Referenced.add(gOp.Main)
     lifeline = CreatorTrace(humans)
     #for h in humans.keys():
     creator = lifeline.create(gOp.Main)
@@ -178,5 +181,31 @@ def doTrace(gOp : gvOptions):
     if  creator:
         for c in creator:
             gOp.Referenced.add(c.human.xref_id,tag=c.path)
-                    
 
+# Trace from the main person to this ID
+def doTraceTo(gOp : gvOptions, ToID : Human):
+    if not gOp.Referenced:
+        doTrace(gOp)
+    humans = gOp.humans
+    heritage = []
+    heritage = [("", gOp.mainHuman.name, gOp.mainHuman.refyear()[0], gOp.mainHuman.xref_id)]
+    if gOp.Referenced.exists(ToID.xref_id):
+        personRelated = gOp.Referenced.gettag(ToID.xref_id)
+        humanTrace = gOp.mainHuman
+        if personRelated:    
+            for r in personRelated:
+                if r == "0":
+                    humanTrace = humans[humanTrace.father]
+                    tag = "Father"
+                elif r == "1":
+                    humanTrace = humans[humanTrace.mother]
+                    tag = "Mother"
+                else:
+                    _log.error("doTrace - neither Father or Mother, how did we get here?")
+                    tag = "?????"
+                heritage.append((f"[{tag}]",humanTrace.name, humanTrace.refyear()[0], humanTrace.xref_id))
+    else:
+        heritage.append([("NotDirect", ToID.name)])
+    gOp.heritage = heritage
+    return heritage
+    

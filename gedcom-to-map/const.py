@@ -1,6 +1,6 @@
 """Constants for gedcom-to-visualmap"""
 
-VERSION = "0.2.5.2"
+VERSION = "0.2.5.3"
 NAME = "gedcom-to-visualmap"
 GEOCODEUSERAGENT = NAME + "/" + VERSION + " GEDCOM-to-map-folium"
 GUINAME = 'GEDCOM Visual Map'
@@ -12,6 +12,7 @@ ABOUTLINK = "https://github.com/D-Jeffrey/"
 
 GVFONT = ('Verdana', 8)                 # General Font family and size (suggested range 8 to 11)
 ABOUTFONT = ('Garamond', 13)            # About Font family and size (suggested range 8 to 14)
+
 LOG_CONFIG = {
     'version': 1,
     'disable_existing_loggers': False,

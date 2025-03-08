@@ -58,7 +58,8 @@ class gvOptions:
         self.CacheOnly = False
         self.AllEntities = False
         self.PlaceType = {'native':'native'}        # Dict add/replace with multiple 'native', 'born' & 'death'
-        
+        self.GridView = False
+
         self.showLayerControl = True
         self.mapMini = True
         self.counter = 0
@@ -82,6 +83,8 @@ class gvOptions:
         self.selectedpeople = 0
         self.lastlines = None
         self.KMLcmdline = "notepad $n"
+        self.BackgroundProcess = None     # Background Thread for processing set later
+        self.heritage = None
 
         # Types 0 - boolean, 1: int, 2: str
         self.html_keys = {'MarksOn':0, 'HeatMap':0, 'BornMark':0, 'DieMark':0, 'MapStyle':1, 'MarkStarOn':0, 'GroupBy':1, 
@@ -210,12 +213,7 @@ class gvOptions:
         with open(self.settingsfile, 'w') as configfile:
             self.gvConfig.write(configfile)
     
-    def setMain(self, Main: str):
-        self.Main = Main
-        if self.humans and Main in self.humans:
-            self.setMainHuman(self.humans[Main])
-        else:
-            self.setMainHuman(None)
+    
     def setMainHuman(self, mainhuman: Human):
         """ Set the name of the starting person """
         self.mainHuman = mainhuman 
@@ -225,7 +223,19 @@ class gvOptions:
         else:
             self.Name = "<not selected>"
             self.mainHumanPos = None
-            
+         
+        self.selectedpeople = 0
+        self.lastlines = None
+        self.heritage = None
+        self.Referenced = None
+        self.GridView = False
+
+    def setMain(self, Main: str):
+        self.Main = Main
+        if self.humans and Main in self.humans:
+            self.setMainHuman(self.humans[Main])
+        else:
+            self.setMainHuman(None)
 
     def setResults(self, Result, useHTML):
         """ Set the Output file and type (Only the file name) """

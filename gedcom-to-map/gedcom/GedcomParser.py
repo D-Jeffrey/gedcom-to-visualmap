@@ -118,7 +118,7 @@ class GedcomParser:
             human.first = "Unknown"
             human.surname = "Unknown"
             human.maiden = "Unknown"
-            human.name = "Unknown"
+            8
         
         # Grab a link to the photo
         obj = record.sub_tag("OBJE")
@@ -224,6 +224,13 @@ class GedcomParser:
                         humans[wife.xref_id].marriage.append((husband.xref_id, marryevent))
                     else:
                         humans[wife.xref_id].marriage = [(husband.xref_id, marryevent)]
+            if husband:
+                if humans[husband.xref_id].name == "Unknown":
+                    humans[husband.xref_id].name = "Unknown [Father]"
+            if wife:
+                if humans[wife.xref_id].name == "Unknown":
+                    humans[wife.xref_id].name = "Unknown [Mother]"
+            
             for chil in record.sub_tags("CHIL"):
                 if chil.xref_id not in humans.keys():
                     continue

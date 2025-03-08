@@ -56,15 +56,18 @@ class Human:
     def __repr__(self):
         return f"[ {self.xref_id} : {self.name} - {self.father} & {self.mother} - {self.pos} ]"
 
+    # return "year (Born)" or "year (Died)" or "? (Unknown)" along with year as a string or None
+    # Example "2010 (Born)", "2010" or "1150 (Died)", "1150" or "? (Unknown)"
     def refyear(self):
-        bestyear = "?Unknown"
+        bestyear = "? (Unknown)"
+        year = None
         if self.birth and self.birth.when:
             year = self.birth.whenyear()
-            bestyear = f"{self.birth.whenyear()} (Born)" if year else "?Unknown"
+            bestyear = f"{self.birth.whenyear()} (Born)" if year else bestyear
         elif self.death and self.death.when:
             year = self.death.whenyear()
-            bestyear = f"{self.death.whenyear()} (Died)" if year else "?Unknown"
-        return bestyear
+            bestyear = f"{self.death.whenyear()} (Died)" if year else bestyear
+        return (bestyear, year)
 
     def bestlocation(self):
         # TODO Best Location should consider if in KML mode and what is selected

@@ -45,7 +45,7 @@ python3 gedcom-to-map.py /users/darren/documents/myhertitagetree.ged myTree -mai
 ```
 
 ## GUI
-![img](docs/img/python_2025-02.png)
+![img](docs/img/python_2025-03.png)
 
 To use the GUI version, `File- > Open` and select your .ged file.
 Set your options in the GUI interface  
@@ -215,6 +215,11 @@ I noticed that the MyHeritage has added a heatmap a year or so ago and it has a 
 - Need to separate the Load and GPS resolve steps (currently loads after 5 minutes of looking up values)
 
 ## Releases
+### v0.2.5.3
+- Update Colors, and centralize code for color choices
+- Person show list of all direct F/M + ancestors + years
+- View only direct ancestors
+- Sort code re-write
 ### v0.2.5.2
 - Improved Person info, now should delta between Active and displayed person
 - Finally fixed the Sort issue (mostly).

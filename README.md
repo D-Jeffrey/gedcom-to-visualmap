@@ -58,11 +58,11 @@ Once you have selected your options,
 - `Open GPS` button will open the CSV file in Excel if you have it... (I'm thinking that does not work on a Mac)  Make sure you close it before running again, or it may not be able to update the CSV file.
 - `Stop` will allow you to abort the Load/ Resolving of addresses without killing the GUI, allowing you to pick different options.
 - Using the `double-left-click` to select the starting person in (Star)
-- Use the `right-click` on list of people to bring up some known details and how it 
+- Use the `right-click` on the list of people to bring up some known details and how it 
 was geocoded
 - `Geo Table` open the CSV file for the resolved and cached names.  You can edit the fields and change the `alt` column so substatute in a new name for alternate look up.
 TODO Needs more description.
-- `Trace` Craete a list of the individuals from the starting person.  See below
+- `Trace` Create a list of the individuals from the starting person.  See below
 - `Browser` Open the web browser using the last current output html file
 
 - When the people are loaded you can sort by the various columns by clicking on the column.  When the list of people is selected for display it is relative to this starting person, unless you select the `Map all people`
@@ -70,7 +70,7 @@ TODO Needs more description.
 - When displaying people on the HTML map, you can choose to list them as 
   - single people, 
   - as a group by the last name 
-  - or by their parent
+  - or by their parents
 
 ## Output to HTML using folium
 
@@ -119,8 +119,8 @@ KML processing:
   -born                 use place born for mapping
   -death                use place born for mapping
 ```
-It produces a HTML file which is interactive and shows relationships betwenn childern and parents and where people lived 
-over the years.  It includes a heatmap to show busier places.  If you zoom in enough you can see the different markers 
+It produces a HTML file which is interactive and shows relationships betwenn childern and parents and where people live 
+over the years.  It includes a heatmap to show busier places.  If you zoom in enough, you can see the different markers 
 which are overlayed on each other.
 
 
@@ -141,10 +141,10 @@ python3 ..\gedcom-to-map\gedcom-to-map.py input.ged output -main "@I0000@" -form
 Go to https://www.google.ca/maps/about/mymaps  
 - Click on `Getting Started`
 - Click `Create a New Map`
-- On `Untitled map` click on the `Import` options and open the your KML file
+- On `Untitled map` click on the `Import` options and open your KML file
 #### Note this does not work in Google Earth as the lines don't appear, not sure about other KML viewers.
 
-The *`geodat-address-cache.csv`* file can be edited to feed back in new Addresses for GeoCoding.  Just edit or clear any column except the *Name* column to have it re-lookup that address.  Especially useful if you want to make a bad or old style name resolve to a new name/location.
+The *`geodat-address-cache.csv`* file can be edited to feed back in new Addresses for GeoCoding.  Just edit or clear any column except the *Name* column to have it re-lookup that address.  Especially useful if you want to make a bad or old-style name resolve to a new name/location.
 If you do not have GPS location in your GEDCOM file, then use -born or -born -death so have it use the place where the person was born and/or died.
 
 * Cache : [samples/geodat-address-cache.csv](samples/geodat-address-cache.csv)
@@ -170,7 +170,7 @@ python3 ..\gedcom-to-map\gedcom-to-map.py pres2020.ged pres2020-2 -main "@I676@"
 
 ## Trace button
 Load your GED file.  Make sure that you have set an output file (click on the `Output File` label for quick access to the Save As).  Make sure you have selecte HTML mode (not KML).  Double click on a person to trace from that person back.  Then all the traced individuals will light up as green (with the starting person in grey).  Then click on the Trace button.  
-This will product a text file and the name will be shown be show in the Information section of the top left.  (Same directory as the output but with a different name '.trace.txt. instead of .HTML).  If you open this in Excel, you can reformat the last columns and then use that to identify the number of generations. 
+This will produce a text file and the name will be shown be show in the Information section of the top left.  (Same directory as the output but with a different name '.trace.txt. instead of .HTML).  If you open this in Excel, you can reformat the last columns and then use that to identify the number of generations. 
 
 ![img](docs/img/EXCEL_2025-02.png)
 
@@ -184,32 +184,27 @@ This will product a text file and the name will be shown be show in the Informat
 - [See Exploring Family trees](docs/otherlearnings.md)
 
 ## Comparing MyHeritage PedigreeMap Heatmap and GedcomVisual Heatmap
-I noticed that the MyHeritage has added a heatmap a year or so ago and it has a lot of overlap with the GedcomVisual heatmap.
+I noticed that the MyHeritage added a heatmap a year or so ago and it has a lot of overlap with the GedcomVisual heatmap.
 
 ![img](docs/img/MyHeritage-2023-10-09.png) and ![img](docs/img/gedcomVisual-2023-10-09.png)
 
 
 ## TODO
 - Add a treed hierarchy selector to enable people as groups and add expand/collapse to navigation
-- add `search/Find` to people grid
 - more troubleshooting on the address lookup
   - better way to interact and refine the address resolution hints
   - move address hints in a configuration file
 - option to remove 'lines' to not core points (such as RESI or other)
 - Sort the Last Name by the highest number of people first or by distance from star
 - create a marker animation by year (in time steps)
-- better save the state of the options for next use
 - in Person dialog show something for people still alive (vs None or Unknown)
 - remember the starting person next time the same GED is opened
 - add histical timeline and reference events in the area from https://www.vizgr.org/historical-events/ & https://github.com/dh3968mlq/hdtimelines/
 - need to determine how do deal with very large HTML files.  Could use a limit of the number of people included in the selection
-- show only selected people in grid
 
 ## Issues
-- Marriage is not read correctly all the time, does not deal with multiple marriages
-- Sorting does not work after the graph is created (memory corruption?)
-- Sorting the grid does not work properly after loaded a new file (memory corruption?)
-- Sort by year sorts using string instead of number & BC
+- Marriage is not read correctly all the time, limitations with multiple marriages
+- Sort by of GEDCOM ids does not deal with numbers correctly
 
 ### GUI
 - Need to separate the Load and GPS resolve steps (currently loads after 5 minutes of looking up values)
@@ -220,6 +215,10 @@ I noticed that the MyHeritage has added a heatmap a year or so ago and it has a 
 - Person show list of all direct F/M + ancestors + years
 - View only direct ancestors
 - Sort code re-write
+- Better save the state of the options for next use
+- Removed icon at the front of people's name in grid
+- Multiple marriage is better
+- Load tested to 132K GEDCOM records loads in less than 5 minutes, 1600 people loads in 9 seconds.
 ### v0.2.5.2
 - Improved Person info, now should delta between Active and displayed person
 - Finally fixed the Sort issue (mostly).

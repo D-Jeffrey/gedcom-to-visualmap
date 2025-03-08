@@ -28,7 +28,7 @@ import wx.lib.sized_controls as sc
 import wx.lib.mixins.inspection as wit
 import wx.lib.newevent
 import wx.html
-# import wx.grid
+import wx.grid
 
 from const import (GUINAME, GVFONT, KMLMAPSURL, LOG_CONFIG, NAME,
                    VERSION, ABOUTFONT)
@@ -1939,7 +1939,7 @@ class MyWittedApp(wx.App, wit.InspectionMixin):
 
 if __name__ == '__main__':
     # WIT is for debugging only
-    WITMODE = True         # Normal is False
+    WITMODE = False         # Normal is False
     logging.config.dictConfig(LOG_CONFIG)
 
     _log.info("Starting up %s %s", NAME, VERSION)

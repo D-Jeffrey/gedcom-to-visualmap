@@ -130,7 +130,7 @@ class foliumExporter:
     def Done(self):
         if self.saveresult:
             self.fm.save(self.file_name)
-        self.gOptions.stop()
+        # self.gOptions.stop()
         # self.fm = None
 
     def getFeatureGroup(self, thename, depth):
@@ -328,7 +328,7 @@ class foliumExporter:
                 aici = 'child'                                              # Start Point Icon itself
                 bicc = 'gray'                                               # End Point Icon color
                 bici = 'cross'                                              # End Point Icon itself
-                lc = '#' + line.color.to_hexa()                             # Line Color
+                lc = '#' + line.color.to_RGBhex()                           # Line Color
                 da = []
                 ln = line.name                                              # Line Name
                 g = ""
@@ -432,7 +432,7 @@ class foliumExporter:
                 fm_line.append(tuple(diftb))
 
             if (len(fm_line) > 1):                     
-                lcolor = line.color.to_hexa()
+                lcolor = line.color.to_RGBhex()
                 lcolor = lc
                 if line.prof:
                     lwidth = max(int(self.max_line_weight/math.exp(0.5*line.prof)), 2)

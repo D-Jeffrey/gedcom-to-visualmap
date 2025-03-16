@@ -29,7 +29,7 @@ class Creator:
         self.max_missing = max_missing
         self.alltheseids= {}
 
-    def line(self, pos: Pos, current: Human, branch, prof, miss, path="") -> [Line]:
+    def line(self, pos: Pos, current: Human, branch, prof, miss, path="") -> list[Line]:
         if current.xref_id in self.alltheseids:
             _log.error("Looping Problem: {:2} -LOOP STOP - {} {} -Looping= {:20}".format(  prof, self.humans[current.xref_id].name, current.xref_id, path))
             return []
@@ -42,10 +42,10 @@ class Creator:
             )
         color = (branch + DELTA / 2) / (SPACE ** prof)
         _log.info("{:8} {:8} {:2} {:.10f} {} {:20}".format(path, branch, prof, color, self.rainbow.get(color).to_hexa(), current.name))
-        line = Line("{:8} {}".format(path, current.name), pos, current.pos, self.rainbow.get(color), path, branch,prof, human=current)
+        line = Line(f"{path:8}\t{current.name}", pos, current.pos, self.rainbow.get(color), path, branch,prof, human=current)
         return self.link(current.pos, current, branch, prof, 0, path) + [line]
 
-    def link(self, pos: Pos, current: Human, branch=0, prof=0, miss=0, path="") -> [Line]:
+    def link(self, pos: Pos, current: Human, branch=0, prof=0, miss=0, path="") -> list[Line]:
         return (self.line(pos, self.humans[current.father], branch*SPACE, prof+1, miss, f"{path}0") if current.father else []) \
                + (self.line(pos, self.humans[current.mother], branch*SPACE+DELTA, prof+1, miss, path + "1") if current.mother else [])
 
@@ -71,17 +71,17 @@ class CreatorTrace:
         self.max_missing = max_missing
         self.alltheseids= {}
 
-    def line(self, current: Human, branch, prof, path="") -> [Line]:
+    def line(self, current: Human, branch, prof, path="") -> list[Line]:
         if current.xref_id in self.alltheseids:
             _log.error("Looping Trace Problem: {:2} -LOOP STOP - {} {} -Tracing= {:20}".format(  prof, self.humans[current.xref_id].name, current.xref_id, path))
             return []
         self.alltheseids[current.xref_id] = current.xref_id
         
         _log.info("{:8} {:8} {:2} {:20}".format(path, branch, prof, current.name))
-        line = Line("{:8} {}".format(path, current.name), None, None, None, path, branch,prof, human=current)
+        line = Line(f"{path:8}\t{current.name}", None, None, None, path, branch,prof, human=current)
         return self.link(current, branch, prof, path) + [line]
 
-    def link(self, current: Human, branch=0, prof=0,  path="") -> [Line]:
+    def link(self, current: Human, branch=0, prof=0,  path="") -> list[Line]:
         return (self.line(self.humans[current.father],  0, prof+1,  f"{path}0") if current.father else []) \
                + (self.line(self.humans[current.mother], 0, prof+1,  path + "1") if current.mother else [])
 
@@ -108,7 +108,7 @@ class LifetimeCreator:
         self.max_missing = max_missing
         self.alltheseids= {}
 
-    def selfline(self, current: Human, branch, prof, miss, path="") -> [Line]:
+    def selfline(self, current: Human, branch, prof, miss, path="") -> list[Line]:
         # We can not draw a line from Birth to death without both ends  --- or can we???
         self.alltheseids[current.xref_id] = current.xref_id
         color = (branch + DELTA / 2) / (SPACE ** prof)
@@ -126,7 +126,7 @@ class LifetimeCreator:
                     wyear = wyear if wyear else current.home[h].whenyear()
         bp = current.birth.pos if current.birth else None
         bd = current.death.pos if current.death else None
-        line = Line("{:8} {}".format(path, current.name), bp, bd, self.rainbow.get(color), path, branch, prof, 'Life', 
+        line = Line(f"{path:8}\t{current.name}", bp, bd, self.rainbow.get(color), path, branch, prof, 'Life', 
                     None, midpoints, current, wyear)
         if current.birth: 
             line.updateWhen(current.birth.whenyear())
@@ -137,7 +137,7 @@ class LifetimeCreator:
         
     # Draw a line from the parents birth to the child birth location
                             
-    def line(self, pos: Pos, parent: Human, branch, prof, miss, path="", linestyle="", forhuman: Human = None ) -> [Line]:
+    def line(self, pos: Pos, parent: Human, branch, prof, miss, path="", linestyle="", forhuman: Human = None ) -> list[Line]:
         # Check to make sure we are not looping and have been here before
         if parent.xref_id in self.alltheseids:
             _log.error("Looping Problem: {:2} -LOOP STOP- {} {} -Looping= {:20}".format(  prof, parent.name, parent.xref_id, path))
@@ -145,7 +145,7 @@ class LifetimeCreator:
         if hasattr(parent, 'birth') and parent.birth:
             color = (branch + DELTA / 2) / (SPACE ** prof)
             _log.info("{:8} {:8} {:2} {:.10f} {} {:20} from {:20}".format(path, branch, prof, color, self.rainbow.get(color).to_hexa(), parent.name, forhuman.name))
-            line = Line("{:8} {}".format(path, parent.name), pos, parent.birth.pos, self.rainbow.get(color), path, branch, prof, linestyle,  
+            line = Line(f"{path:8}\t{parent.name}", pos, parent.birth.pos, self.rainbow.get(color), path, branch, prof, linestyle,  
                             forhuman,  human=parent, when= (parent.birth.whenyear(), getattrif(parent, 'death','whenyear')))
             return self.link(parent.birth.pos, parent, branch, prof, 0, path) + [line]
         else:

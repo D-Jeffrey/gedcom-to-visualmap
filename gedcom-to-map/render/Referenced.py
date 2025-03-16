@@ -52,5 +52,7 @@ class Referenced:
     
     def __repr__(self):
         return f"Referenced({self.items})"
+    def __len__(self):
+        return len(self.items)
 
 

@@ -85,6 +85,8 @@ class GedcomParser:
     def __init__(self, gOp :gvOptions):
         self.file_path = gOp.GEDCOMinput
         self.gOp = gOp
+        gOp.totalGEDpeople = None
+        gOp.totalGEDfamily = None
         global thisgvOps
         thisgvOps= gOp
         if self.file_path == '':
@@ -200,6 +202,7 @@ class GedcomParser:
     def __create_humans(records0) -> Dict[str, Human]:
         global thisgvOps
         humans = dict()
+        thisgvOps.step("Reading GED", target=(thisgvOps.totalGEDpeople+thisgvOps.totalGEDfamily))
         for record in records0("INDI"):
             if thisgvOps.ShouldStop():
                 break
@@ -210,7 +213,7 @@ class GedcomParser:
                 break
             familyloop += 1
             if familyloop % 15 == 0:
-                thisgvOps.step(info=f"Family loop {familyloop}")  
+                thisgvOps.step(info=f"Family loop {familyloop}", plusStep=15)  
             husband = record.sub_tag("HUSB")
             wife = record.sub_tag("WIFE")
             for marry in record.sub_tags("MARR"):
@@ -239,21 +242,19 @@ class GedcomParser:
                     
                 if wife:
                     humans[chil.xref_id].mother = wife.xref_id
-                    
-
-                    
-            
-            
-
         return humans
 
     def create_humans(self) -> Dict[str, Human]:
+        global thisgvOps
         if self.file_path == '':
             return None
         fpath = Path(self.file_path)
         if not fpath.is_file():
             return None
         with GedcomReader(self.file_path) as parser:
+            thisgvOps.step("Loading GED")
+            thisgvOps.totalGEDpeople = sum(1 for value in parser.xref0.values() if value[1] == 'INDI')
+            thisgvOps.totalGEDfamily = sum(1 for value in parser.xref0.values() if value[1] == 'FAM')
             return self.__create_humans(parser.records0)
         
 

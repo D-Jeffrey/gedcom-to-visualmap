@@ -498,7 +498,7 @@ class GEDComGPSLookup:
         donesome = 0
         nowis =  datetime.now()
         # Update the Grid in 60 seconds if we are still doing this loop
-        startis = nowis.timestamp() + 60
+        startis = nowis.timestamp() + 15
         if hasattr(self, 'addresses') and self.addresses:
             donesome = len(self.addresses)
         self.Geoapp = Nominatim(user_agent=self.geocodeUserAgent)  
@@ -511,6 +511,7 @@ class GEDComGPSLookup:
                 if ho.home:
                     target += len(ho.home)
         self.gOptions.step("Lookup addresses", target=target)
+        gpsstep = 0
         for human in humans:
             if self.gOptions.ShouldStop():
                 self.saveAddressCache()
@@ -538,10 +539,16 @@ class GEDComGPSLookup:
                 self.saveAddressCache()
                 donesome = len(self.addresses)
                 nowis =  datetime.now()
-            if startis > datetime.now().timestamp():
+            if startis < datetime.now().timestamp():
                 BackgroundProcess.updategrid = True
                 BackgroundProcess.updateinfo= f"Updating with {len(humans)} people while resolving some addresses ({len(self.addresses)})" 
-                startis = datetime.now().timestamp() + 300  # update again in 5 minutes
+                startis = datetime.now().timestamp() + 60  # update again in a minutes
+
+            # Hack Step info because when we redraw the grid they overlap
+            if self.gOptions.state == "":
+                self.gOptions.step("Lookup addresses", target=target)
+                self.gOptions.stepCounter(gpsstep)
+            gpsstep += 1
 
         self.updatestats()
         self.gOptions.step("Resolved addresses", target=0)

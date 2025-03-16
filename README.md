@@ -135,8 +135,11 @@ python3 ..\gedcom-to-map\gedcom-to-map.py input.ged output -main "@I0000@" -form
 * HTML Output : [docs/output.html](docs/output.html)
 
 ## KML Example revised
-![img](docs/img/msedge_output.kml.png)
-* KML Output  : [samples/output.kml](samples/output.kml)
+### Google Earth Online
+![img](docs/img/Google_earth_2025-03.png)
+* KML Output  : [samples/input.kml](samples/input.kml) using 'native' only
+### ArcGIS Earth
+![img](docs/img/ArcGISEarth_2025-03-input.jpg)
 
 Go to https://www.google.ca/maps/about/mymaps  
 - Click on `Getting Started`
@@ -210,6 +213,14 @@ I noticed that the MyHeritage added a heatmap a year or so ago and it has a lot 
 - Need to separate the Load and GPS resolve steps (currently loads after 5 minutes of looking up values)
 
 ## Releases
+### v0.2.5.4
+- Busy control is not working
+- Refactored GUI classes into new modules gedcomDialogs
+- minor bugs: Title layout, selected person coloring
+- Fixed grid Sorting... for sure this time
+- Fixed kml plotting errors
+- Fixed colors on kml and  missing alpha
+- Added color to kml markers and provide different born, death and native types
 ### v0.2.5.3
 - Update Colors, and centralize code for color choices
 - Person show list of all direct F/M + ancestors + years

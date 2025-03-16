@@ -66,7 +66,7 @@ class gvOptions:
         self.countertarget = 0
         self.running = False
         self.runningLast = 0
-        self.runingSince = 0
+        self.runningSince = 0
         self.time = time.ctime()
         self.parsed = False
         self.goodmain = False
@@ -85,6 +85,9 @@ class gvOptions:
         self.KMLcmdline = "notepad $n"
         self.BackgroundProcess = None     # Background Thread for processing set later
         self.heritage = None
+        self.UpdateBackgroundEvent = None
+        self.totalGEDpeople = None
+        self.totalGEDfamily = None
 
         # Types 0 - boolean, 1: int, 2: str
         self.html_keys = {'MarksOn':0, 'HeatMap':0, 'BornMark':0, 'DieMark':0, 'MapStyle':1, 'MarkStarOn':0, 'GroupBy':1, 
@@ -216,6 +219,8 @@ class gvOptions:
     
     def setMainHuman(self, mainhuman: Human):
         """ Set the name of the starting person """
+        newMain = (self.mainHuman != mainhuman and mainhuman and self.Name != mainhuman.name) or mainhuman == None
+        
         self.mainHuman = mainhuman 
         if mainhuman:
             self.Name = mainhuman.name
@@ -223,12 +228,12 @@ class gvOptions:
         else:
             self.Name = "<not selected>"
             self.mainHumanPos = None
-         
-        self.selectedpeople = 0
-        self.lastlines = None
-        self.heritage = None
-        self.Referenced = None
-        self.GridView = False
+        if newMain:
+            self.selectedpeople = 0
+            self.lastlines = None
+            self.heritage = None
+            self.Referenced = None
+            self.GridView = False
 
     def setMain(self, Main: str):
         self.Main = Main
@@ -292,7 +297,11 @@ class gvOptions:
             
         return True
     
-    def step(self, state = None, info=None, target=-1, resetCounter=True):
+    def stepCounter(self, newcounter):
+        """ Update the counter used to show progress to the end user """
+        self.counter = newcounter
+
+    def step(self, state = None, info=None, target=-1, resetCounter=True, plusStep=1):
         """ Update the counter used to show progress to the end user """
         """ return true if we should stop stepping """
         if state:
@@ -301,7 +310,7 @@ class gvOptions:
                 self.counter = 0
             self.running = True
         else:
-            self.counter += 1
+            self.counter += plusStep
             self.stepinfo = info
         if target>-1:
             self.countertarget = target

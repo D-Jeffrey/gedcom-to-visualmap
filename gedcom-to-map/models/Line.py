@@ -14,7 +14,7 @@ class Line:
     human - reference to themeselves, 
     """
     def __init__(self, name: str, a: Pos, b: Pos, color: Color, path: str, branch: float, prof: int, style : str = '', parentofhuman : Human = None, 
-                        midpoints:[]=None, human=None, when: int =None, tag:str='', linetype=''):
+                        midpoints:list[LifeEvent]=None, human=None, when: int =None, tag:str='', linetype=''):
         self.name = name
         # TODO we need to use id to avoid problems with duplicate names
         # BUG

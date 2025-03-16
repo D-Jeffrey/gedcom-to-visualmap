@@ -12,6 +12,8 @@ from models.Pos import Pos
 from render.foliumExp import foliumExporter
 from render.KmlExporter import KmlExporter
 from render.Referenced import Referenced
+global BackgroundProcess
+#from const import BackgroundProcess
 
 # Thread for controlling the background processes Created in gedcomVisualGUI.py
 # BackgroundProcess
@@ -31,14 +33,14 @@ def doKML(gOp : gvOptions, humans: list[Human]):
     for h in humans.keys():
         humans[h].map = humans[h].pos
 
-    for p in gOp.PlaceType:
+    for placeType in gOp.PlaceType:
         
-        if (p == 'native'):
+        if (placeType == 'native'):
             for h in humans.keys():
                 humans[h].pos = humans[h].map
             _log.info ("KML native")
             nametag = ''
-        if (p == 'born'):
+        if (placeType == 'born'):
             for h in humans.keys():
                 humans[h].pos = Pos(None,None)
                 if humans[h].birth:
@@ -46,7 +48,7 @@ def doKML(gOp : gvOptions, humans: list[Human]):
                         humans[h].pos = humans[h].birth.pos
             _log.info  ("KML born")
             nametag = ' (b)'
-        if (p == 'death'):
+        if (placeType == 'death'):
             for h in humans.keys():
                 humans[h].pos = Pos(None,None)
                 if humans[h].death:
@@ -69,7 +71,7 @@ def doKML(gOp : gvOptions, humans: list[Human]):
         if (not kmlInstance):
             kmlInstance = KmlExporter(gOp)
 
-        kmlInstance.export(humans[gOp.Main].pos, creator, nametag)
+        kmlInstance.export(humans[gOp.Main].pos, creator, nametag, placeType)
     kmlInstance.Done()
     # TODO restore keys (this is a patch that needs to be changed)
     for h in humans.keys():
@@ -81,7 +83,7 @@ def doKML(gOp : gvOptions, humans: list[Human]):
             # TODO
             cmdline = gOp.KMLcmdline.replace("$n", os.path.join(gOp.resultpath, gOp.Result))
             _log.info(f"KML Running command line : '{cmdline}'") 
-            BackgroundProcess.SayInfoMessage(f"KML output to : {os.path.join(gOp.resultpath, gOp.Result)}") 
+            gOp.BackgroundProcess.SayInfoMessage(f"KML output to : {os.path.join(gOp.resultpath, gOp.Result)}") 
             try:
                 if os.name == 'posix':
                     subprocess.Popen(["/bin/sh" , cmdline])
@@ -133,6 +135,7 @@ def ParseAndGPS(gOp: gvOptions, stage: int = 0 ):
         if gOp.humans:
             del gOp.humans
             gOp.humans = None
+        gOp.UpdateBackgroundEvent.updategrid = True
         humans = GedcomParser(gOp).create_humans()
         gOp.humans = humans
     gOp.parsed = True

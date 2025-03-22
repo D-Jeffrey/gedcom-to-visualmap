@@ -1,4 +1,4 @@
-__all__ = ['AboutDialog', 'ConfigDialog', 'PersonDialog', 'FindDialog', 'BackgroundActions']
+__all__ = ['AboutDialog', 'ConfigDialog', 'PersonDialog', 'FindDialog', 'BackgroundActions', 'formatHumanName']
 
 import _thread
 import logging
@@ -9,7 +9,7 @@ import wx
 import wx.lib.newevent
 import wx.html
 import wx.grid as gridlib
-
+from models.Creator import Human, Pos, LifeEvent
 
 from const import GVFONT, ABOUTFONT, VERSION, GUINAME, ABOUTLINK, NAME
 # from gedcomoptions import gvOptions, AllPlaceType
@@ -87,15 +87,19 @@ For more details and to contribute, visit the <a href="PROJECTLINK">GitHub repos
 #==============================================================
 class ConfigDialog(wx.Frame):
     def __init__(self, parent, title):
-        super(ConfigDialog, self).__init__(parent, title=title, size=(420, 450))
+        super(ConfigDialog, self).__init__(parent, title=title, size=(500, 650))
 
         includeNOTSET = False               # DEFAULT Disabled with False
         self.loggerNames = list(logging.root.manager.loggerDict.keys())
         cfgpanel = wx.Panel(self,style=wx.SIMPLE_BORDER  )
-        TEXTkmlcmdlinelbl = wx.StaticText(cfgpanel, -1,  " KML Command line:   ") 
+        TEXTkmlcmdlinelbl = wx.StaticText(cfgpanel, -1,  " KML Editor Command line:   ") 
         self.TEXTkmlcmdline = wx.TextCtrl(cfgpanel, wx.ID_FILE1, "", size=(250,20))
         if panel.gO.KMLcmdline:
             self.TEXTkmlcmdline.SetValue(panel.gO.KMLcmdline)
+        TEXTcsvcmdlinelbl = wx.StaticText(cfgpanel, -1,  " CSV Table Editor Command line:   ") 
+        self.TEXTcsvcmdline = wx.TextCtrl(cfgpanel, wx.ID_FILE1, "", size=(250,20))
+        if panel.gO.CSVcmdline:
+            self.TEXTcsvcmdline.SetValue(panel.gO.CSVcmdline)            
         GRIDctl = gridlib.Grid(cfgpanel)
         if includeNOTSET:
             gridlen = len(logging.root.manager.loggerDict)
@@ -142,15 +146,22 @@ class ConfigDialog(wx.Frame):
         sizer = wx.BoxSizer(wx.VERTICAL)
         l1 = wx.BoxSizer(wx.HORIZONTAL)
         l1.AddMany([TEXTkmlcmdlinelbl,      (6,20),     self.TEXTkmlcmdline])
+        l2 = wx.BoxSizer(wx.HORIZONTAL)
+        l2.AddMany([TEXTcsvcmdlinelbl,      (6,20),     self.TEXTcsvcmdline])
         sizer.AddSpacer(5)
         sizer.Add(l1)
-        sizer.Add( wx.StaticText(cfgpanel, -1,  "(Use   $n  for the name of the file that was created in the command line)"))   
+        sizer.AddSpacer(10)
+        sizer.Add(l2)
+        sizer.AddSpacer(10)
+        
+        sizer.Add( wx.StaticText(cfgpanel, -1,  "Use   $n  for the name of the file within a command line - such as    notepad $n"))   
+        sizer.Add( wx.StaticText(cfgpanel, -1,  "Use   $n  without any command to open default application for that file type"))   
         sizer.AddSpacer(20)
         sizer.Add(wx.StaticText(cfgpanel, -1,  " Logging Options:"))
-        l2 = wx.BoxSizer(wx.HORIZONTAL)
-        l2.AddMany([(20,20),      GRIDctl,     (20,20)])
+        l3 = wx.BoxSizer(wx.HORIZONTAL)
+        l3.AddMany([(20,20),      GRIDctl,     (20,20)])
         
-        sizer.Add(l2)
+        sizer.Add(l3)
         buttonsizer = wx.BoxSizer(wx.HORIZONTAL)
         buttonsizer.Add(saveBTN, 0, wx.ALIGN_CENTER | wx.ALL, 5)
         buttonsizer.Add(cancelBTN, 0, wx.ALIGN_CENTER | wx.ALL, 5)
@@ -167,6 +178,7 @@ class ConfigDialog(wx.Frame):
             _log = logging.getLogger(loggerName)
             _log.setLevel(getattr(logging, logLevel))
         panel.gO.KMLcmdline = self.TEXTkmlcmdline.GetValue()
+        panel.gO.CSVcmdline = self.TEXTcsvcmdline.GetValue()
         panel.gO.savesettings()
         self.Close()
         self.DestroyLater()
@@ -229,6 +241,18 @@ class FamilyPanel(wx.Panel):
 
 
 
+def formatHumanName(human: Human, longForm=True):
+    if human:
+        if longForm:
+            maiden = f" ({human.maiden})" if human.maiden else ""
+            title = f" - {human.title}" if human.title else ""
+        else:
+            maiden = ""
+            title = ""
+        return f"{human.first} {human.surname}{maiden}{title}" 
+    else:
+        return "<none>"
+
 class PersonDialog(wx.Dialog):
     def __init__(self, parent, human, panel):
         super().__init__(parent, title="Person Details", size=(600, 600))
@@ -246,15 +270,26 @@ class PersonDialog(wx.Dialog):
         sexLabel = wx.StaticText(self, label="Sex: ")
         marriageLabel = wx.StaticText(self, label="Marriages: ")
         homeLabel = wx.StaticText(self, label="Homes: ")
-        
+        # TODO multiple marriages
+        marrying = []
+        if human.marriage:
+            for marry in human.marriage:
+                marrying.append(f"{formatHumanName(humans[marry[0]], False)}{LifeEvent.asEventstr(marry[1])}")
+        marriage = "\n".join(marrying)        
+        # TODO multiple homes
+        homes = []
+        if human.home:
+            for homedesc in human.home:
+                homes.append(f"{LifeEvent.asEventstr(homedesc)}")
+        homelist = "\n".join(homes)
         self.nameTextCtrl = wx.TextCtrl(self, style=wx.TE_READONLY, size=(550,-1))
         self.fatherTextCtrl = wx.TextCtrl(self, style=wx.TE_READONLY)
         self.motherTextCtrl = wx.TextCtrl(self, style=wx.TE_READONLY)
-        self.birthTextCtrl = wx.TextCtrl(self, style=wx.TE_READONLY|wx.TE_MULTILINE)
-        self.deathTextCtrl = wx.TextCtrl(self, style=wx.TE_READONLY|wx.TE_MULTILINE)
+        self.birthTextCtrl = wx.TextCtrl(self, style=wx.TE_READONLY)
+        self.deathTextCtrl = wx.TextCtrl(self, style=wx.TE_READONLY)
         self.sexTextCtrl = wx.TextCtrl(self, style=wx.TE_READONLY)
-        self.marriageTextCtrl = wx.TextCtrl(self, style=wx.TE_READONLY|wx.TE_MULTILINE, size=(-1,sizeAttr(human.marriage)))
-        self.homeTextCtrl = wx.TextCtrl(self, style=wx.TE_READONLY|wx.TE_MULTILINE, size=(-1,sizeAttr(human.home)))
+        self.marriageTextCtrl = wx.TextCtrl(self, style=wx.TE_READONLY|wx.TE_MULTILINE, size=(-1,sizeAttr(marriage)))
+        self.homeTextCtrl = wx.TextCtrl(self, style=wx.TE_READONLY|wx.TE_MULTILINE, size=(-1,sizeAttr(homelist)))
 
         # layout the UI controls using a grid sizer
 
@@ -279,26 +314,19 @@ class PersonDialog(wx.Dialog):
         # self.SetSizer(sizer)
 
         # set the person's data in the UI controls
-        self.nameTextCtrl.SetValue(str(human.first + " " + human.surname))
+        self.nameTextCtrl.SetValue(formatHumanName(human))
 
-        self.fatherTextCtrl.SetValue(f"{humans[human.father].first} {str(humans[human.father].surname)}" if human.father else "<none>")
-        self.motherTextCtrl.SetValue(f"{humans[human.mother].first} {str(humans[human.mother].surname)}" if human.mother else "<none>")
-        self.birthTextCtrl.SetValue(str(human.birth))
-        self.deathTextCtrl.SetValue(str(human.death))
+        if human.father:
+            self.fatherTextCtrl.SetValue(formatHumanName(humans[human.father]))
+        if human.mother:
+            self.motherTextCtrl.SetValue(formatHumanName(humans[human.mother]))
+        self.birthTextCtrl.SetValue(f"{LifeEvent.asEventstr(human.birth)}")
+        self.deathTextCtrl.SetValue(f"{LifeEvent.asEventstr(human.death)}")
         self.sexTextCtrl.SetValue(str(human.sex) if human.sex else "")
-        # TODO multiple marriages
-        marrying = []
-        if human.marriage:
-            for marry in human.marriage:
-                marrying.append(f"{humans[marry[0]].first} {str(humans[marry[0]].surname)} at {marry[1]}")
-        self.marriageTextCtrl.SetValue("\n".join(marrying))
+        self.marriageTextCtrl.SetValue(marriage)
         
-        # TODO multiple homes
-        homes = []
-        if human.home:
-            for homedesc in human.home:
-                homes.append(f"{homedesc}")
-        self.homeTextCtrl.SetValue("\n".join(homes))
+        
+        self.homeTextCtrl.SetValue(homelist)
         if panel.gO.Referenced:
             self.related = None
             relatedLabel = wx.StaticText(self, label="Relative: ")

@@ -201,18 +201,23 @@ I noticed that the MyHeritage added a heatmap a year or so ago and it has a lot 
 - Sort the Last Name by the highest number of people first or by distance from star
 - create a marker animation by year (in time steps)
 - in Person dialog show something for people still alive (vs None or Unknown)
-- remember the starting person next time the same GED is opened
 - add histical timeline and reference events in the area from https://www.vizgr.org/historical-events/ & https://github.com/dh3968mlq/hdtimelines/
 - need to determine how do deal with very large HTML files.  Could use a limit of the number of people included in the selection
+- Improve the KML version of the maps by grouping and improving the track of a person.  Add description bits to people in the KML version
+
 
 ## Issues
 - Marriage is not read correctly all the time, limitations with multiple marriages
-- Sort by of GEDCOM ids does not deal with numbers correctly
+- Linux does not save FileHistory
 
 ### GUI
-- Need to separate the Load and GPS resolve steps (currently loads after 5 minutes of looking up values)
+- Need to separate the Load and GPS resolve steps (currently reloads after 30 seconds of looking up values)
 
 ## Releases
+### v0.2.5.5
+- Improved Person dialog
+- Improved sorting by of GEDCOM ids in the grid
+- Linux compatible fixing/testing (fixed SSL Verifcation errors, Geo Table button, get from github)
 ### v0.2.5.4
 - Busy control is not working
 - Refactored GUI classes into new modules gedcomDialogs

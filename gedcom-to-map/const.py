@@ -1,6 +1,6 @@
 """Constants for gedcom-to-visualmap"""
 
-VERSION = "0.2.5.4"
+VERSION = "0.2.5.5"
 NAME = "gedcom-to-visualmap"
 GEOCODEUSERAGENT = NAME + "/" + VERSION + " GEDCOM-to-map-folium"
 GUINAME = 'GEDCOM Visual Map'

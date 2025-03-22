@@ -273,7 +273,7 @@ class VisualMapFrame(wx.Frame):
 
             # add it to the history
             self.filehistory.AddFileToHistory(path)
-            self.filehistory.Save(panel.config)
+            self.filehistory.Save(panel.fileConfig)
 
         dlg.Destroy()
         wx.Yield()
@@ -566,6 +566,10 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
         
     def GetColumnSorter(self):
         (col, ascending) = self.GetSortState()
+        idsort = False
+        if col == 2:
+            checkid = self.popdata[1][2]
+            idsort = checkid[0:2] == "@I" and checkid[-1] == "@"
         # _log.debug(f"Sorter called col:{col} ascending:{ascending} first time of popdata is {self.popdata[0][0]}")
 
         def cmp_func(item1, item2):
@@ -573,6 +577,9 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
                 year1 = self.popdata[item1][5] 
                 year2 = self.popdata[item2][5] 
                 return (year1 - year2) if ascending else (year2 - year1)
+            elif col == 2 and idsort:
+                data1 = int(self.popdata[item1][col][2:-1])
+                data2 = int(self.popdata[item2][col][2:-1])
             else:
                 data1 = self.popdata[item1][col]
                 data2 = self.popdata[item2][col]
@@ -729,7 +736,7 @@ class VisualMapPanel(wx.Panel):
         
         self.id = {}
         
-        self.config = None
+        self.fileConfig = None
         self.busystate = 0
         self.busycounthack = 0
         self.inTimer = False
@@ -1015,7 +1022,7 @@ class VisualMapPanel(wx.Panel):
         _, filen = os.path.split(self.gO.get('GEDCOMinput'))
         # set the form field
         self.id.TEXTGEDCOMinput.SetValue(filen)
-        self.config.Write("GEDCOMinput", path)
+        self.fileConfig.Write("GEDCOMinput", path)
         #TODO Fix this
         #TODO Fix this
         self.id.TEXTResult.SetValue(self.gO.get('Result'))
@@ -1324,8 +1331,8 @@ class VisualMapPanel(wx.Panel):
 
     def SetupOptions(self):
 
-        if not self.config:
-            self.config = wx.Config("gedcomVisualGUI")
+        if not self.fileConfig:
+            self.fileConfig = wx.Config("gedcomVisualGUI")
         
         if not self.gO:
             self.gO = gvOptions()
@@ -1359,7 +1366,7 @@ class VisualMapPanel(wx.Panel):
         
         self.id.TEXTResult.SetValue(self.gO.get('Result'))
 
-        _, filen = os.path.split(self.gO.get('GEDCOMinput'))
+        _, filen = os.path.split(self.gO.get('GEDCOMinput')) if self.gO.get('GEDCOMinput') else ("", "first.ged")
         self.id.TEXTGEDCOMinput.SetValue(filen)
         self.id.LISTPlaceType.SetCheckedStrings(self.gO.PlaceType)
         self.SetupButtonState()
@@ -1399,15 +1406,37 @@ class VisualMapPanel(wx.Panel):
         
     
     def OpenCSV(self):
+        self.runCMDfile(self.gO.get('CSVcmdline'), self.gO.get('gpsfile'))
 
-        csvfile = self.gO.get('gpsfile')
-        if csvfile and csvfile != '':
-            if sys.platform == 'win32':
-                os.startfile(csvfile)
-            elif sys.platform == 'darwin':
-                subprocess.run(['open', csvfile], check=False)
+    def runCMDfile(self, cmdline, cmdfile, isHTML=False):
+        cmdfile = self.gO.get('gpsfile')
+        cmdline = self.gO.get('CSVcmdline')
+        if cmdfile and cmdfile != '':
+            if cmdline == '$n':
+                if isHTML:
+                    _log.info(f'browserstart {cmdfile}')
+                    webbrowser.open(cmdfile, new = 0, autoraise = True)
+                else:
+                    _log.info(f'startfile {cmdfile}')
+                    os.startfile(cmdfile)
+                
+            elif '$n' in cmdline:
+                cmdline = cmdline.replace('$n','')
+                if ' ' in cmdline:
+                    cmdline = self.gO.get('CSVcmdline').replace('$n', f'{cmdfile}')
+                    _log.info(f'shell run  `{cmdfile}`')
+                    if gOp.cmdline.startswith('http'):
+                        webbrowser.open(cmdline, new = 0, autoraise = True)
+                    else:
+                        subprocess.run(cmdline, shell=True)
+                else:
+                    _log.info(f'process run `{cmdline}` with `{cmdfile}`')
+                    subprocess.run([cmdline, cmdfile], check=False)
+                # TODO need a better command-line management than this
+                # cmdline = f"column -s, -t < {csvfile} | less -#2 -N -S"
+                # subprocess.run(cmdline, shell=True)
             else:
-                _log.error("Error: OpenCSV-Unsupported platform, can not open CSV file")
+                _log.error("Error: runCMDfile-Unsupported platform, can not open cmdline file")
     
     def SaveTrace(self):
         if self.gO.Result and self.gO.Referenced:
@@ -1437,9 +1466,11 @@ class VisualMapPanel(wx.Panel):
 
     def OpenBrowser(self):
         if self.gO.get('ResultHTML'):
-            webbrowser.open(os.path.join(self.gO.resultpath, self.gO.Result), new = 0, autoraise = True)
+            self.runCMDfile(self.gO.get('KMLcmdline'), os.path.join(self.gO.resultpath, self.gO.Result), True)
+            
         else:
-            webbrowser.open(KMLMAPSURL, new = 0, autoraise = True)
+            self.runCMDfile('$n', KMLMAPSURL, True)
+            
     #################################################
     #TODO FIX ME UP            
 
@@ -1506,7 +1537,7 @@ if __name__ == '__main__':
     frm = VisualMapFrame(None, title=GUINAME, size=(1024, 800), style = wx.DEFAULT_FRAME_STYLE)
     panel = VisualMapPanel(frm)
     panel.SetupOptions()
-    frm.filehistory.Load(panel.config)
+    frm.filehistory.Load(panel.fileConfig)
         
     if WITMODE:
         app.ShowInspectionTool()

@@ -49,6 +49,8 @@ class Human:
         self.surname = None             # Last Name
         self.maiden: None
         self.sex: None
+        self.title = None
+
 
     def __str__(self):
         return f"Human(id={self.xref_id}, name={self.name})"
@@ -105,7 +107,15 @@ class LifeEvent:
 
     def __repr__(self):
         return f"[ {self.when} : {self.where} is {self.what}]"
-
+    
+    def asEventstr(self):
+        if self:
+            where = f" at {self.getattr('where')}" if self.where else ""
+            when = f" about {self.getattr('when')}" if self.when else ""
+            return f"{when}{where}"
+        else:
+            return ""
+    
     def whenyear(self, last = False):
         if self.when:
             if (isinstance(self.when, str)):
@@ -143,7 +153,7 @@ class LifeEvent:
         if attr == 'pos':
             return self.pos
         elif attr == 'when':
-            return self.what or ""
+            return self.when.value or ""
         elif attr == 'where':
             return self.where if self.where else ""
         elif attr == 'what':

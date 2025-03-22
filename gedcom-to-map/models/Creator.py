@@ -156,7 +156,7 @@ class LifetimeCreator:
         _log.info("{:8} {:8} {:2} {:.10f} {} Self {:20}".format(" ", " ", " ", 0, "-KICK-", parent.name))
 
         
-    def link(self, pos: Pos, current: Human, branch=0, prof=0, miss=0, path="") -> [Line]:
+    def link(self, pos: Pos, current: Human, branch=0, prof=0, miss=0, path="") -> list[Line]:
         # Maximun recursion depth.  This should never happen
         if prof < 480: 
             return (self.selfline(current, branch*SPACE, prof+1, miss, path)) \

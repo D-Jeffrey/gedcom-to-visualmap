@@ -10,12 +10,15 @@ import os.path
 import re
 import tempfile
 import time
-import urllib.request
+import requests
 import platform
 from datetime import datetime
 
 from const import GV_COUNTRIES_JSON, GV_STATES_JSON, GEOCODEUSERAGENT
 from gedcomoptions import gvOptions
+import certifi
+import ssl
+import geopy.geocoders
 from geopy.geocoders import Nominatim
 from models.Human import Human, LifeEvent
 from models.Pos import Pos
@@ -45,14 +48,16 @@ geoapp = None
 cache_filename = (r"geodat-address-cache.csv", r"geodat-address-cache-1.csv", r"geodat-address-cache-2.csv")
 csvheader = ['name','alt','country','type','class','icon', 'place_id','lat','long', 'boundry', 'size', 'importance', 'used']
 defaultcountry = "CA"
+geoappContext = ssl.create_default_context(cafile=certifi.where())
+geopy.geocoders.options.default_ssl_context = geoappContext
 
 # The cache files should not change, but they might in the future.  There should be an option to clear the cache files.   #TODO
 def readCachedURL(cfile, url):
     nfile = os.path.join(tempfile.gettempdir() , cfile)
     if not os.path.exists(nfile):
         _log.debug("Attempting to request %s as %s", url, nfile)
-        webUrl  = urllib.request.urlopen(url)
-        data = webUrl.read()
+        webUrl  = requests.get(url)
+        data = webUrl.content
         _log.debug("request read, saving to %s", nfile)
         with open(nfile, 'wb') as file:
             file.write(data)

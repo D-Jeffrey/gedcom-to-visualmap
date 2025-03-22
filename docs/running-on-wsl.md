@@ -7,15 +7,20 @@
 ## Linux (WSL - WSL version: 1.1.3.0)
   
 ```
-sudo add-apt-repository ppa:deadsnakes/ppa
+sudo apt update
+sudo apt upgrade
+sudo apt install software-properties-common
+sudo add-apt-repository 'ppa:deadsnakes/ppa'
 sudo apt-get update
-sudo apt install python3.11
-sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 1
-sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.10 2
+sudo apt install python3.10
+sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.10 1
+sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.8 2
 sudo update-alternatives --config python3
 sudo apt install python3-pip
 sudo apt install python3.10-venv
-pip install -U six wheel setuptools
+sudo apt install python3-venv python3-pip python3-wheel
+sudo apt-get install python3.10-dev
+#pip install -U six wheel setuptools
 pip install --upgrade pip
 
 ```
@@ -23,7 +28,12 @@ pip install --upgrade pip
 
 This seems to work best...
 ```
-sudo apt install xubuntu-desktop
+#sudo apt install xubuntu-desktop
+sudo apt install xfce4
+sudo apt-get install libgtk-3-dev
+sudo apt-get install python3-wxgtk4.0 python3-wxgtk-webview4.0 python3-wxgtk-media4.0 
+sudo apt-get install git curl libsdl2-mixer-2.0-0 libsdl2-image-2.0-0 libsdl2-2.0-0
+sudo apt-get reinstall ca-certificates
 ```
 
 Then you can use UXTerm from the Ubuntu menu of your windows Desktop (Slick)
@@ -46,6 +56,7 @@ pip install wheel
 # this attrdict3 is only required for WSL because of issues in the image
 pip install -U attrdict3
 pip install wxPython
+python -m pip install -U -f https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-18.04 wxPython
 pip install git+https://github.com/D-Jeffrey/gedcom-to-visualmap.git
 ```
 
@@ -58,6 +69,8 @@ The egg seems to be generally working (thought I don't have a background underst
 Using the steps of download and unzip release 0.2.1
 ```
 pip install -U attrdict3
+sudo pip3 install -U -f https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-16.04 wxPython
+
 pip install wxPython
 cd gedcom-to-visualmap
 pip install -r requirements.txt
@@ -118,7 +131,7 @@ Windows and Linux (WSL) running on Windows 11 - WSL 1.1.3.0 - Ubuntu
 ![img](img/Windows+wsl.png)
 
 
-# Saved for reference
+# OLD -- OLD -- Saved for reference
 
 I'm not sure if these steps are still required
 

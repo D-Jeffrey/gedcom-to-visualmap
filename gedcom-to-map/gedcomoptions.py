@@ -82,18 +82,33 @@ class gvOptions:
         self.panel = None
         self.selectedpeople = 0
         self.lastlines = None
-        self.KMLcmdline = "notepad $n"
+        
+        os_name = platform.system()
+        if os_name == 'Windows':
+            self.KMLcmdline = "notepad $n"
+            self.CSVcmdline = "$n"
+        elif os_name == 'Darwin':
+            self.KMLcmdline = "Numbers $n"
+            self.CSVcmdline = "libreoffice --calc $n"
+        elif os_name == 'Linux':
+            self.KMLcmdline = "nano $n"
+            self.CSVcmdline = "libreoffice --calc $n"
+        else:
+            self.KMLcmdline = "notepad $n"
+            self.CSVcmdline = "notepad $n"
+
         self.BackgroundProcess = None     # Background Thread for processing set later
         self.heritage = None
         self.UpdateBackgroundEvent = None
         self.totalGEDpeople = None
         self.totalGEDfamily = None
+        self.fileHistory = None
 
         # Types 0 - boolean, 1: int, 2: str
         self.html_keys = {'MarksOn':0, 'HeatMap':0, 'BornMark':0, 'DieMark':0, 'MapStyle':1, 'MarkStarOn':0, 'GroupBy':1, 
                           'UseAntPath':0, 'HeatMapTimeLine':0, 'HeatMapTimeStep':1, 'HomeMarker':0, 'showLayerControl':0, 
                           'mapMini':0}
-        self.core_keys = {'UseGPS':0, 'CacheOnly':0, 'AllEntities':0, 'KMLcmdline':''}
+        self.core_keys = {'UseGPS':0, 'CacheOnly':0, 'AllEntities':0, 'KMLcmdline':'', 'CSVcmdline':''}
         self.logging_keys = ['gedcomvisualgui', 'gedcom.gpslookup', 'ged4py.parser', '__main__', 'gedcomoptions','models.Human','models.Creator','render.foiumExp']
         
         if os.path.exists(self.settingsfile):
@@ -211,6 +226,9 @@ class gvOptions:
         if self.GEDCOMinput and self.Main:
             name = Path(self.GEDCOMinput).stem
             self.gvConfig['Gedcom.Main'][name] = str(self.Main)
+        #for key in range(0, self.panel.fileConfig.filehistory.GetCount()):
+        #    self.gvConfig['Files'][key] = self.panel.fileConfig[key]
+
         for key in self.logging_keys:
             self.gvConfig['Logging'][key] = logging.getLevelName(logging.getLogger(key).getEffectiveLevel())
         with open(self.settingsfile, 'w') as configfile:

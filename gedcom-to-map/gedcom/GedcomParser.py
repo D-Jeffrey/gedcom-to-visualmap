@@ -1,6 +1,7 @@
 __all__ = ['GedcomParser', 'DateFormatter']
 
 import logging
+import re
 from datetime import datetime
 from pathlib import Path
 from typing import Dict
@@ -70,6 +71,14 @@ class GetPosFromTag:
         if subtag:
             self.place = getplace(subtag)
             self.when = subtag.sub_tag("DATE")
+            # Looking for:
+            #   2 PLAC Our Lady of Calvary Cemetery, 134 Forest Street, Yarmouth, Yarmouth County, Nova Scotia, Canada
+            #   3 MAP
+            #   4 LATI 43.831944
+            #   4 LONG -66.102222
+            # --or--
+            #   4 _LATI 43.831944
+            #   4 _LONG -66.102222
             plactag = subtag.sub_tag(placetag)
             if plactag:
                 maploc = plactag.sub_tag("MAP")
@@ -78,6 +87,28 @@ class GetPosFromTag:
                     lon = maploc.sub_tag("LONG")
                     if lat and lon:
                         self.pos = Pos(lat.value,lon.value)
+                    else: 
+                        lat = maploc.sub_tag("_LATI")
+                        lon = maploc.sub_tag("_LONG")
+                        if lat and lon:
+                            self.pos = Pos(lat.value,lon.value)
+                else:
+                    if hasattr(plactag, 'value') : 
+                        # Conderation for : 
+                        # 2 PLAC Our Lady of Calvary Cemetery, 134 Forest Street, Yarmouth, Yarmouth County, Nova Scotia, Canada, , , 43.831944,-66.102222
+
+                        # Regular expression pattern to match GPS coordinates at the end of the string
+                        pattern = r"(.*?)(?:,\s*(-?\d+\.\d+),\s*(-?\d+\.\d+))?$"
+                        match = re.match(pattern, plactag.value)
+
+                        # Match the string using the pattern
+                        if match:
+                            # Extract the main location and optional GPS coordinates
+                            self.place = match.group(1).strip()
+                            lat = match.group(2)
+                            lon = match.group(3)
+                            if lat and lon:
+                                self.pos = Pos(float(lat),float(lon))
             self.event = LifeEvent(self.place, self.when, self.pos, tag)
             
 
@@ -120,8 +151,10 @@ class GedcomParser:
             human.first = "Unknown"
             human.surname = "Unknown"
             human.maiden = "Unknown"
-            8
         
+        title = record.sub_tag("TITL")
+        human.title = title.value if title else ""
+
         # Grab a link to the photo
         obj = record.sub_tag("OBJE")
         human.photo = None
@@ -251,6 +284,10 @@ class GedcomParser:
         fpath = Path(self.file_path)
         if not fpath.is_file():
             return None
+        # TODO Date formating is handled elsewhere so the following in not in effect
+        # format_visitor = DateFormatter()
+
+
         with GedcomReader(self.file_path) as parser:
             thisgvOps.step("Loading GED")
             thisgvOps.totalGEDpeople = sum(1 for value in parser.xref0.values() if value[1] == 'INDI')

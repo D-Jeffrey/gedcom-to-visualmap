@@ -24,8 +24,6 @@ from models.Human import Human, LifeEvent
 from models.Pos import Pos
 
 
-BackgroundProcess = None
-
 
 # TODO This needs to be moved into it's out JSON driven configuration
 fixuplist   = {r'\bof\s': '',

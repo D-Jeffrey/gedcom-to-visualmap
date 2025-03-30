@@ -8,7 +8,7 @@ from models.Line import Line
 from models.Pos import Pos
 from models.Rainbow import Rainbow
 
-_log = logging.getLogger(__name__)
+_log = logging.getLogger(__name__.lower())
 
 
 SPACE = 2.5     # These values drive how colors are selected

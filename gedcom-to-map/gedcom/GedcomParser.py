@@ -13,7 +13,7 @@ from gedcomoptions import gvOptions
 from models.Human import Human, LifeEvent
 from models.Pos import Pos
 
-_log = logging.getLogger(__name__)
+_log = logging.getLogger(__name__.lower())
 
 homelocationtags = ('OCCU', 'CENS', 'EDUC')
 otherlocationtags = ('CHR', 'BAPM', 'BASM', 'BAPL', 'IMMI', 'NATU', 'ORDN','ORDI', 'RETI', 

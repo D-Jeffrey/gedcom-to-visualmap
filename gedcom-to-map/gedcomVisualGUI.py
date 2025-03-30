@@ -1,7 +1,9 @@
+__all__ = ['VisualGedcomIds', 'VisualMapFrame', 'PeopleListCtrl', 'PeopleListCtrlPanel', 'VisualMapPanel']
+
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 #
 #
-#  gedcomVisualGUI.py : GUI Interface main for gedcom-to-map
+#  gedcomVisualGUI.py : GUI Interface  for gedcom-to-map
 #    See https://github.com/D-Jeffrey/gedcom-to-visualmap
 #
 #
@@ -29,17 +31,16 @@ import wx.lib.mixins.inspection as wit
 import wx.lib.newevent
 import wx.html
 import wx.grid
+import xyzservices.providers as xyz 
 
 
-from const import GUINAME, GVFONT, KMLMAPSURL, LOG_CONFIG, NAME, VERSION
+from const import GUINAME, GVFONT, KMLMAPSURL, LOG_CONFIG, NAME, VERSION, BackgroundProcess, panel
 from gedcomoptions import gvOptions, AllPlaceType
 from gedcomvisual import doTrace
 from gedcomDialogs import *
 
 
-_log = logging.getLogger(__name__)
-
-global BackgroundProcess, panel
+_log = logging.getLogger(__name__.lower())
 
 
 InfoBoxLines = 8
@@ -49,7 +50,7 @@ InfoBoxLines = 8
 from wx.lib.embeddedimage import PyEmbeddedImage
 
 
-class Ids():
+class VisualGedcomIds():
     def __init__(self):
         
         self.ids = [
@@ -68,7 +69,7 @@ class Ids():
             self.IDs['ID_CBHeatMap']: ('HeatMap', ''),
             self.IDs['ID_CBBornMark']: ('BornMark', 'Redraw'),
             self.IDs['ID_CBDieMark']: ('DieMark', 'Redraw'),
-            self.IDs['ID_LISTMapStyle']: ('MapStyle', ''),
+            self.IDs['ID_LISTMapStyle']: ('MapStyle', 'Redraw'),
             self.IDs['ID_CBMarkStarOn']: ('MarkStarOn', 'Redraw'),
             self.IDs['ID_RBGroupBy']: ('GroupBy', 'Redraw'),
             self.IDs['ID_CBUseAntPath']: ('UseAntPath', 'Redraw'),
@@ -135,6 +136,21 @@ class Ids():
         )
         
         self.m = {1: ()}
+        # https://xyzservices.readthedocs.io/en/stable/gallery.html
+        self.AllMapTypes = ["CartoDB.Voyager", 
+            "OpenStreetMap.Mapnik", 
+            "OpenStreetMap.HOT", 
+            "Esri.WorldTerrain",
+            "Esri.NatGeoWorldMap",
+            "OpenTopoMap",
+            "Esri.WorldStreetMap",
+            "CartoDB.VoyagerNoLabels",
+            "CartoDB.Positron",
+            "CartoDB.PositronOnlyLabels",
+            "CartoDB.VoyagerOnlyLabels",
+            "CartoDB.DarkMatter"
+            ]
+        
 
     def GetColor(self, colorID):
         if colorID in self.colors:
@@ -145,9 +161,11 @@ class Ids():
 
 #=============================================================
 class VisualMapFrame(wx.Frame):
-    global BackgroundProcess, panel
-
+    
+    
     def __init__(self,  *args, **kw):
+
+
         # ensure the parent's __init__ is called so the wx.frame is created
         #
         super(VisualMapFrame, self).__init__(*args, **kw)
@@ -168,6 +186,7 @@ class VisualMapFrame(wx.Frame):
         wx.Frame.SetFont(self, self.myFont)
         self.inTimer = False
 
+
     def makeMenuBar(self):
         """
         A menu bar is composed of menus, which are composed of menu items.
@@ -180,7 +199,7 @@ class VisualMapFrame(wx.Frame):
         # that the next letter is the "mnemonic" for the menu item. On the
         # platforms that support it those letters are underlined and can be
         # triggered from the keyboard.
-        self.id = Ids()
+        self.id = VisualGedcomIds()
         self.menuBar = menuBar = wx.MenuBar()
         self.fileMenu = fileMenu =  wx.Menu()
         fileMenu.Append(wx.ID_OPEN,    "&Open...\tCtrl-O", "Select a GEDCOM file")
@@ -234,6 +253,7 @@ class VisualMapFrame(wx.Frame):
         # More BIND below in main
 
     def OnExit(self, event):
+        global panel
         panel.myTimer.Stop()
         self.Unbind(wx.EVT_TIMER, self)
         """Close the frame, terminating the application."""
@@ -252,6 +272,7 @@ class VisualMapFrame(wx.Frame):
         panel.OpenBrowser()
 
     def OnFileOpenDialog(self, evt):
+        global panel
 
         dDir = os.getcwd()
         if panel and panel.gO:
@@ -280,6 +301,7 @@ class VisualMapFrame(wx.Frame):
         if Proceed:
             panel.LoadGEDCOM()
     def OnFileResultDialog(self, evt):
+        global panel
 
         dDir = os.getcwd()
         dFile = "visgedcom.html"
@@ -319,6 +341,7 @@ class VisualMapFrame(wx.Frame):
         self.menu.Destroy()
 
     def OnFileHistory(self, evt):
+        global panel
 
         # get the file based on the menu ID
         fileNum = evt.GetId() - wx.ID_FILE1
@@ -337,6 +360,7 @@ class VisualMapFrame(wx.Frame):
         dialog.Destroy()
 
     def OnInfo(self, event):
+        global panel
         """Display an Staticis Info Dialog"""
 
         withoutaddr = 0
@@ -358,9 +382,11 @@ class VisualMapFrame(wx.Frame):
             
         wx.MessageBox (msg, 'Statistics', wx.OK|wx.ICON_INFORMATION)
     def OnFind(self, event):
+        global panel
         panel.peopleList.list.OnFind(event)
 
     def onOptionsReset(self, event):
+        global panel
         panel.gO.defaults()
         panel.SetupOptions()
         wx.MessageBox("Rest options to defaults",
@@ -368,7 +394,7 @@ class VisualMapFrame(wx.Frame):
                       wx.OK|wx.ICON_INFORMATION)
         
     def onOptionsSetup(self, event):
-        dialog = ConfigDialog(None, title='Configuration Options')
+        dialog = ConfigDialog(None, title='Configuration Options', gOptions=panel.gO)
         
 
 
@@ -381,7 +407,7 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
         wx.ListCtrl.__init__(self, parent, ID, pos, size, style)
         listmix.ListCtrlAutoWidthMixin.__init__(self)
 
-        self.id = Ids()
+        self.id = VisualGedcomIds()
         self.active = False
         self.il = wx.ImageList(16, 16)
         self.sm_up = self.il.Add(self.id.SmallUpArrow.GetBitmap())
@@ -434,6 +460,7 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
         self.gO = gOp
 
     def PopulateList(self, humans, mainperson, loading):
+        global panel
         if self.active:
             return
         
@@ -539,8 +566,7 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
             
         self.active = False
 
-
-    
+   
     # Used by the ColumnSorterMixin, see wx/lib/mixins/listctrl.py
     def GetListCtrl(self):
         # print("GetListCtrl {} {}".format(self.GetSortState(), self.itemDataMap[1]))
@@ -655,26 +681,26 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
             _log.debug("column order: %s", self.GetColumnOrder(event.GetColumn()))
 
 
-"""     The following Events types are not needed
+    #  The following Events types are not needed
 
-    def OnItemSelected(self, event):
-        item = event.GetIndex()
-        self.list.SetItemBackgroundColour(item, self.id.GetColor('SELECTED'))  
-        self.list.SetItemTextColour(item, self.id.GetColor('SELECTED_TEXT'))  
-        event.Skip()
+    # def OnItemSelected(self, event):
+    #     item = event.GetIndex()
+    #     self.list.SetItemBackgroundColour(item, self.id.GetColor('SELECTED'))  
+    #     self.list.SetItemTextColour(item, self.id.GetColor('SELECTED_TEXT'))  
+    #     event.Skip()
 
-    def OnItemDeselected(self, event):
-        item = event.GetIndex()
-        self.list.SetItemBackgroundColour(item, wx.NullColour)             # Default background
-        self.list.SetItemTextColour(item, wx.NullColour)                   # Default text color
+    # def OnItemDeselected(self, event):
+    #     item = event.GetIndex()
+    #     self.list.SetItemBackgroundColour(item, wx.NullColour)             # Default background
+    #     self.list.SetItemTextColour(item, wx.NullColour)                   # Default text color
 
-    def OnGetItemsChecked(self, event):
+    # def OnGetItemsChecked(self, event):
 
-        itemcount = self.list.GetItemCount()
-        itemschecked = [i for i in range(itemcount) if self.list.IsItemChecked(item=i)]
-        _log.debug("%s ",  itemschecked)
+    #     itemcount = self.list.GetItemCount()
+    #     itemschecked = [i for i in range(itemcount) if self.list.IsItemChecked(item=i)]
+    #     _log.debug("%s ",  itemschecked)
 
- """
+
 
         
 class PeopleListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
@@ -725,11 +751,12 @@ class VisualMapPanel(wx.Panel):
     """
 
     def __init__(self,  *args, **kw):
+        global panel
         # ensure the parent's __init__ is called so the wx.frame is created
         #
         super(VisualMapPanel, self).__init__(*args, **kw)
 
-
+        panel = self
         self.SetMinSize((800,800))
         self.frame = self.TopLevelParent
         self.gO : gvOptions = None
@@ -741,13 +768,13 @@ class VisualMapPanel(wx.Panel):
         self.busycounthack = 0
         self.inTimer = False
         self.SetAutoLayout(True)
-        self.id = Ids()
+        self.id = VisualGedcomIds()
         
         # create a panel in the frame
         self.panelA = wx.Panel(self, -1, size=(760,420),style=wx.SIMPLE_BORDER  )
-        # https://docs.wxpython.org/wx.ColourDatabase.html#wx-colourdatabase
         self.panelB = wx.Panel(self, -1, size=(300,420),style=wx.SIMPLE_BORDER  )
-        #self.panelA.SetBackgroundColour(wx.TheColourDatabase.FindColour('GOLDENROD'))
+        
+        # https://docs.wxpython.org/wx.ColourDatabase.html#wx-colourdatabase
         self.panelA.SetBackgroundColour(self.id.GetColor('INFO_BOX_BACKGROUND'))
         self.panelB.SetBackgroundColour(wx.WHITE)
 
@@ -776,6 +803,7 @@ class VisualMapPanel(wx.Panel):
         self.LayoutOptions(self.panelB)
 
         self.Layout()
+
 
     def LayoutOptions(self, panel):
         """ Layout the panels in the proper nested manner """
@@ -811,8 +839,8 @@ class VisualMapPanel(wx.Panel):
         self.id.txtoutfile = wx.StaticText(panel, -1, "Output file: ")
         self.id.txtoutfile.SetBackgroundColour(self.id.GetColor('BTN_DIRECTORY'))
         self.id.TEXTResult = wx.TextCtrl(panel, self.id.IDs['ID_TEXTResult'], "", size=(250,20))
-        self.id.txtinfile.Bind(wx.EVT_LEFT_DOWN, frm.OnFileOpenDialog)
-        self.id.txtoutfile.Bind(wx.EVT_LEFT_DOWN, frm.OnFileResultDialog)
+        self.id.txtinfile.Bind(wx.EVT_LEFT_DOWN, self.frame.OnFileOpenDialog)
+        self.id.txtoutfile.Bind(wx.EVT_LEFT_DOWN, self.frame.OnFileResultDialog)
 
         l1 = wx.BoxSizer(wx.HORIZONTAL)
         l1.AddMany([self.id.txtinfile,      (6,20),     self.id.TEXTGEDCOMinput])
@@ -851,11 +879,15 @@ class VisualMapPanel(wx.Panel):
         """
           HTML select controls in a Box
         """
-        hbox = wx.StaticBox( panel, -1, "HTML Options")
+        hbox = wx.StaticBox( panel, -1, "HTML Options", size=(300,-1))
         hTopBorder, hOtherBorder = hbox.GetBordersForSizer()
         hsizer = wx.BoxSizer(wx.VERTICAL)
         hsizer.AddSpacer(hTopBorder)
         hboxIn = wx.BoxSizer(wx.VERTICAL)
+        mapchoices =  sorted(self.id.AllMapTypes)
+        mapboxsizer = wx.BoxSizer(wx.HORIZONTAL)
+        mapStyleLabel = wx.StaticText(hbox, -1, " Map Style")
+        self.id.LISTMapType = wx.Choice(hbox, self.id.IDs['ID_LISTMapStyle'], name="MapStyle", choices=mapchoices)
         self.id.CBMapControl = wx.CheckBox(hbox, self.id.IDs['ID_CBMapControl'], "Open Map Controls",name='MapControl') 
         self.id.CBMapMini = wx.CheckBox(hbox, self.id.IDs['ID_CBMapMini'], "Add Mini Map",name='MapMini') 
         self.id.CBMarksOn = wx.CheckBox(hbox, self.id.IDs['ID_CBMarksOn'], "Markers",name='MarksOn')
@@ -875,8 +907,14 @@ class VisualMapPanel(wx.Panel):
         self.id.LISTHeatMapTimeStep.SetTickFreq(5)
         self.id.RBGroupBy  = wx.RadioBox(hbox, self.id.IDs['ID_RBGroupBy'], "Group by:", 
                                        choices = ['None', 'Last Name', 'Person'], majorDimension= 3)
-        hboxIn.AddMany([ 
+        mapboxsizer.Add(self.id.LISTMapType)
+        mapboxsizer.Add( mapStyleLabel)
+        
+        
+        hboxIn.AddMany([
+        
                         self.id.RBGroupBy, 
+                        mapboxsizer,
                         self.id.CBMapControl,
                         self.id.CBMapMini,
                         self.id.CBMarksOn,
@@ -891,21 +929,21 @@ class VisualMapPanel(wx.Panel):
                         self.id.LISTHeatMapTimeStep,
                         (0,5)
                         ])
-        hsizer.Add( hboxIn, wx.EXPAND|wx.BOTTOM|wx.LEFT|wx.RIGHT, hOtherBorder+10)
+        hsizer.Add( hboxIn, wx.LEFT, hOtherBorder+10)
         
         hbox.SetSizer(hsizer)
         self.hbox = hbox
         #
         # KML select controls in a Box
         #
-        kbox = wx.StaticBox( panel, -1, "KML Options")
+        kbox = wx.StaticBox( panel, -1, "KML Options", size=(300,-1))
         kTopBorder, kOtherBorder = kbox.GetBordersForSizer()
         ksizer = wx.BoxSizer(wx.VERTICAL)
         ksizer.AddSpacer(kTopBorder)
         kboxIn = wx.BoxSizer(wx.VERTICAL)
         self.id.LISTPlaceType = wx.CheckListBox(kbox, self.id.IDs['ID_LISTPlaceType'],  choices=AllPlaceType)
         kboxIn.AddMany( [self.id.LISTPlaceType])
-        ksizer.Add( kboxIn, wx.EXPAND|wx.BOTTOM|wx.LEFT|wx.RIGHT, kOtherBorder+10)
+        ksizer.Add( kboxIn, wx.LEFT, kOtherBorder+10)
         kbox.SetSizer(ksizer)
         self.kbox = kbox
 
@@ -915,21 +953,21 @@ class VisualMapPanel(wx.Panel):
         #
         
         
-        gbox = wx.StaticBox( panel, -1, "Grid View Options")
+        gbox = wx.StaticBox( panel, -1, "Grid View Options",size=(300,-1))
         gTopBorder, gOtherBorder = gbox.GetBordersForSizer()
         gsizer = wx.BoxSizer(wx.VERTICAL)
         gsizer.AddSpacer(gTopBorder)
         gboxIn = wx.BoxSizer(wx.VERTICAL)
         self.id.CBGridView = wx.CheckBox(gbox, self.id.IDs['ID_CBGridView'],  'View Only Direct Ancestors')
         gboxIn.AddMany( [self.id.CBGridView])
-        gsizer.Add( gboxIn, wx.EXPAND|wx.BOTTOM|wx.LEFT|wx.RIGHT, kOtherBorder+10)
+        gsizer.Add( gboxIn, wx.LEFT, kOtherBorder+10)
         
         gbox.SetSizer(gsizer)
         self.gbox = gbox
         
-        box.Add(hbox, 1, wx.EXPAND|wx.ALL, 5)
-        box.Add(kbox, 1, wx.EXPAND|wx.ALL, 5)
-        box.Add(gbox, 1, wx.EXPAND|wx.ALL, 5)
+        box.Add(hbox, 1, wx.LEFT, 15)
+        box.Add(kbox, 1, wx.LEFT, 15)
+        box.Add(gbox, 1, wx.LEFT, 15)
         
         
 
@@ -980,6 +1018,7 @@ class VisualMapPanel(wx.Panel):
         self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.id.IDs['ID_CBAllEntities'])
         self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.id.IDs['ID_CBGridView'])
         self.Bind(wx.EVT_CHECKLISTBOX, self.EvtListBox, id = self.id.IDs['ID_LISTPlaceType'])
+        self.Bind(wx.EVT_CHOICE, self.EvtListBox, id = self.id.IDs['ID_LISTMapStyle'])
         self.Bind(wx.EVT_BUTTON, self.EvtButton, id = self.id.IDs['ID_BTNLoad'])
         self.Bind(wx.EVT_BUTTON, self.EvtButton, id = self.id.IDs['ID_BTNUpdate'])
         self.Bind(wx.EVT_BUTTON, self.EvtButton, id = self.id.IDs['ID_BTNCSV'])
@@ -1141,7 +1180,12 @@ class VisualMapPanel(wx.Panel):
             if places == {}:
                 places = {'native':'native'}
             panel.gO.PlaceType = places
+        elif eventid == self.id.IDs['ID_LISTMapStyle']:
+            
+            panel.gO.MapStyle = sorted(self.id.AllMapTypes)[event.GetSelection()] 
+            self.NeedRedraw()
         else:
+
             _log.error ("Uncontrol LISTbox")
     
 
@@ -1180,7 +1224,7 @@ class VisualMapPanel(wx.Panel):
                 self.id.BTNUpdate.Enable()
                 status = f"{status} - please wait.. Stopping"
 
-            _, filen = os.path.split(panel.gO.get('GEDCOMinput'))
+            _, filen = os.path.split(self.gO.get('GEDCOMinput'))
             if filen == "":
                 self.id.BTNLoad.Disable()
                 self.id.BTNUpdate.Disable()
@@ -1195,7 +1239,7 @@ class VisualMapPanel(wx.Panel):
                 if not self.id.BTNCSV.IsEnabled():
                     self.id.BTNCSV.Enable()
         if not status or status == '':
-            if panel.gO.selectedpeople and self.gO.ResultHTML:
+            if self.gO.selectedpeople and self.gO.ResultHTML:
                 status = f'Ready - {panel.gO.selectedpeople} people selected'
             else:
                 status = 'Ready'
@@ -1281,53 +1325,60 @@ class VisualMapPanel(wx.Panel):
             # self.id.CBAllEntities
             # self.id.CBCacheOnly
             
+        # Define control groups for HTML and KML modes
+        html_controls = [
+            self.id.CBMarksOn,
+            self.id.CBMapControl,
+            self.id.LISTMapType, 
+            self.id.CBMapMini,
+            self.id.CBBornMark,
+            self.id.CBDieMark,
+            self.id.CBHomeMarker,
+            self.id.CBMarkStarOn,
+            self.id.CBHeatMap,
+            self.id.CBUseAntPath,
+            self.id.RBGroupBy
+        ]
+        kml_controls = [
+            self.id.CBBornMark, 
+            self.id.CBDieMark, 
+            self.id.CBHomeMarker
+            ]
+
+        # Enable/disable controls based on result type (HTML vs KML)
         if ResultTypeHTML:
-            # self.panelB.Sizer.Children[1].Window.SetBackgroundColour((0, 230, 230, 255))
-            # self.panelB.Sizer.Children[5].Window.SetBackgroundColour((255, 255, 255, 255)) 
-            for ctrl in list([self.id.CBMarksOn,
-                self.id.CBMapControl,
-                self.id.CBMapMini,
-                self.id.CBBornMark,
-                self.id.CBDieMark,
-                self.id.CBHomeMarker,
-                self.id.CBMarkStarOn,
-                self.id.CBHeatMap,
-                self.id.CBUseAntPath,
-                self.id.RBGroupBy]):
+            # Enable HTML-specific controls
+            for ctrl in html_controls:
                 ctrl.Enable()
+            
+            # Disable KML-specific controls
             self.id.LISTPlaceType.Disable()
+            
+            # Handle heat map related controls
             self.id.CBHeatMapTimeLine.Disable()
             self.id.LISTHeatMapTimeStep.Disable()
+            
             if self.gO.get('HeatMap'):
                 self.id.CBHeatMapTimeLine.Enable()
-                if self.gO.get('HeatMapTimeLine'):    
+                # Only enable time step if timeline is enabled
+                if self.gO.get('HeatMapTimeLine'):
                     self.id.LISTHeatMapTimeStep.Enable()
+                    
+            # Disable marker-dependent controls if markers are off
             if not self.gO.get('MarksOn'):
-                self.id.CBBornMark.Disable()
-                self.id.CBDieMark.Disable()
-                self.id.CBHomeMarker.Disable()
+                for ctrl in kml_controls:
+                    ctrl.Disable()
         else:
-            # self.panelB.Sizer.Children[6].Window.SetBackgroundColour((255, 0, 255, 255)) 
-            # self.panelB.Sizer.Children[7].Window.SetBackgroundColour((230, 230, 230, 255))
-            for ctrl in list([self.id.CBMarksOn, 
-                self.id.CBMapControl,
-                self.id.CBMapMini,
-                self.id.CBBornMark,
-                self.id.CBDieMark,
-                self.id.CBHomeMarker,
-                self.id.CBMarkStarOn,
-                self.id.CBHeatMap,
+            # In KML mode, disable HTML controls and enable KML controls
+            for ctrl in html_controls + [
                 self.id.CBHeatMapTimeLine,
-                self.id.CBUseAntPath,
-                self.id.LISTHeatMapTimeStep,
-                self.id.RBGroupBy]):
+                self.id.LISTHeatMapTimeStep
+            ]:
                 ctrl.Disable()
             self.id.LISTPlaceType.Enable()
-        if self.gO.Referenced and self.gO.Result:
-            self.id.BTNTRACE.Enable() 
-        else:
-            self.id.BTNTRACE.Disable() 
-        self.id.CBGridView.SetValue(self.gO.get('GridView'))
+
+        # Enable/disable trace button based on referenced data availability
+        self.id.BTNTRACE.Enable(bool(self.gO.Referenced and self.gO.Result))
 
     def SetupOptions(self):
 
@@ -1357,6 +1408,7 @@ class VisualMapPanel(wx.Panel):
         self.id.CBAllEntities.SetValue(self.gO.get('AllEntities'))
         self.id.CBCacheOnly.SetValue(self.gO.get('CacheOnly'))
         self.id.LISTHeatMapTimeStep.SetValue(self.gO.get('HeatMapTimeStep'))
+        self.id.LISTMapType.SetSelection(self.id.LISTMapType.FindString(self.gO.get('MapStyle')))
                 
         
         places = self.gO.get('PlaceType')
@@ -1373,6 +1425,10 @@ class VisualMapPanel(wx.Panel):
 
         for t in self.threads:
             t.DefgOps(self.gO)
+
+        # Load file history into the panel's configuration
+        self.frame.filehistory.Load(self.fileConfig)
+
 
     def updateOptions(self):
         pass
@@ -1516,32 +1572,3 @@ class VisualMapPanel(wx.Panel):
 
 
 
-
-class MyWittedApp(wx.App, wit.InspectionMixin):
-        def OnInit(self):
-            self.Init()  # initialize the inspection tool
-            return True
-
-if __name__ == '__main__':
-    # WIT is for debugging only
-    WITMODE = False         # Normal is False
-    logging.config.dictConfig(LOG_CONFIG)
-
-    _log.info("Starting up %s %s", NAME, VERSION)
-    if WITMODE:            # normal is True
-        app = MyWittedApp()
-    else:
-        app = wx.App()
-    
-    BackgroundProcess = None
-    frm = VisualMapFrame(None, title=GUINAME, size=(1024, 800), style = wx.DEFAULT_FRAME_STYLE)
-    panel = VisualMapPanel(frm)
-    panel.SetupOptions()
-    frm.filehistory.Load(panel.fileConfig)
-        
-    if WITMODE:
-        app.ShowInspectionTool()
-    frm.Show()
-    app.MainLoop()
-    _log.info('Finished')
-    exit(0)

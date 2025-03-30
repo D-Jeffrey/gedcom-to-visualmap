@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2">
+    <Document id="1">
+        <Style id="2">
+            <IconStyle id="4">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+                <heading>0</heading>
+                <Icon id="5">
+                    <href>https://maps.google.com/mapfiles/kml/paddle/ylw-circle.png</href>
+                </Icon>
+            </IconStyle>
+            <LabelStyle id="3">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+            </LabelStyle>
+        </Style>
+        <Style id="6">
+            <IconStyle id="8">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+                <heading>0</heading>
+                <Icon id="9">
+                    <href>https://maps.google.com/mapfiles/kml/paddle/ltblu-circle.png</href>
+                </Icon>
+            </IconStyle>
+            <LabelStyle id="7">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+            </LabelStyle>
+        </Style>
+        <Style id="18">
+            <LineStyle id="19">
+                <color>ff00d8ff</color>
+                <colorMode>normal</colorMode>
+                <width>12</width>
+            </LineStyle>
+        </Style>
+        <Style id="26">
+            <LineStyle id="27">
+                <color>ffff7200</color>
+                <colorMode>normal</colorMode>
+                <width>12</width>
+            </LineStyle>
+        </Style>
+        <Placemark id="11">
+            <name>Anne Brontë (b)</name>
+            <Point id="10">
+                <coordinates>-1.8540185,53.7907753,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="13">
+            <name>Patrick Brontë (b)</name>
+            <description>0       </description>
+            <styleUrl>#2</styleUrl>
+            <Point id="12">
+                <coordinates>-1.8542391896417052,53.79073997341946,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="15">
+            <name>Patrick Brontë (b)</name>
+            <description>0       </description>
+            <styleUrl>#6</styleUrl>
+            <Point id="14">
+                <coordinates>-6.295047725167226,53.33954300883106,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="17">
+            <name>Patrick Brontë</name>
+            <description>0       </description>
+            <styleUrl>#18</styleUrl>
+            <LineString id="16">
+                <extrude>1</extrude>
+                <tessellate>1</tessellate>
+                <altitudeMode>clampToGround</altitudeMode>
+                <coordinates>-1.8544456216367533,53.79043463849358,0.0 -6.295477221441999,53.33940650119587,0.0</coordinates>
+            </LineString>
+        </Placemark>
+        <Placemark id="21">
+            <name>Maria Branwell (b)</name>
+            <description>1       </description>
+            <styleUrl>#2</styleUrl>
+            <Point id="20">
+                <coordinates>-1.8539922974006464,53.79127515249903,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="23">
+            <name>Maria Branwell (b)</name>
+            <description>1       </description>
+            <styleUrl>#6</styleUrl>
+            <Point id="22">
+                <coordinates>-5.535498573357091,50.11922415935436,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="25">
+            <name>Maria Branwell</name>
+            <description>1       </description>
+            <styleUrl>#26</styleUrl>
+            <LineString id="24">
+                <extrude>1</extrude>
+                <tessellate>1</tessellate>
+                <altitudeMode>clampToGround</altitudeMode>
+                <coordinates>-1.8541017224019203,53.79114019457889,0.0 -5.535008441864236,50.11971664208801,0.0</coordinates>
+            </LineString>
+        </Placemark>
+        <Placemark id="29">
+            <name>Hugh Brunty (b)</name>
+            <description>00      </description>
+            <styleUrl>#2</styleUrl>
+            <Point id="28">
+                <coordinates>-6.2954758141232485,53.33965903938846,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="31">
+            <name>Eleanor McClory (b)</name>
+            <description>01      </description>
+            <styleUrl>#2</styleUrl>
+            <Point id="30">
+                <coordinates>-6.295039156198166,53.34001404003507,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="33">
+            <name>Thomas Branwell (b)</name>
+            <description>10      </description>
+            <styleUrl>#2</styleUrl>
+            <Point id="32">
+                <coordinates>-5.534920601842174,50.119942310051506,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="35">
+            <name>Anne Carne (b)</name>
+            <description>11      </description>
+            <styleUrl>#2</styleUrl>
+            <Point id="34">
+                <coordinates>-5.534808888308232,50.119532223486644,0.0</coordinates>
+            </Point>
+        </Placemark>
+    </Document>
+</kml>

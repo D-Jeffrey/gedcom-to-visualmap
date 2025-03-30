@@ -5,7 +5,7 @@ import re
 
 from models.Pos import Pos
 
-_log = logging.getLogger(__name__)
+_log = logging.getLogger(__name__.lower())
 
 def DateFromField(field):
     if field:

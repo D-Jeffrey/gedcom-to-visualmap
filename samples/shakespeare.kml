@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2">
+    <Document id="13">
+        <Style id="14">
+            <IconStyle id="16">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+                <heading>0</heading>
+                <Icon id="17">
+                    <href>https://maps.google.com/mapfiles/kml/paddle/ylw-circle.png</href>
+                </Icon>
+            </IconStyle>
+            <LabelStyle id="15">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+            </LabelStyle>
+        </Style>
+        <Style id="18">
+            <IconStyle id="20">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+                <heading>0</heading>
+                <Icon id="21">
+                    <href>https://maps.google.com/mapfiles/kml/paddle/ltblu-circle.png</href>
+                </Icon>
+            </IconStyle>
+            <LabelStyle id="19">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+            </LabelStyle>
+        </Style>
+        <Style id="30">
+            <LineStyle id="31">
+                <color>ff00d8ff</color>
+                <colorMode>normal</colorMode>
+                <width>12</width>
+            </LineStyle>
+        </Style>
+        <Style id="38">
+            <LineStyle id="39">
+                <color>ffff7200</color>
+                <colorMode>normal</colorMode>
+                <width>12</width>
+            </LineStyle>
+        </Style>
+        <Placemark id="23">
+            <name>Hamnet Shakespeare (b)</name>
+            <Point id="22">
+                <coordinates>-1.70634,52.1927803,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="25">
+            <name>William Shakespeare (b)</name>
+            <description>0       </description>
+            <styleUrl>#14</styleUrl>
+            <Point id="24">
+                <coordinates>-1.7064689246366787,52.192911248925874,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="27">
+            <name>William Shakespeare (b)</name>
+            <description>0       </description>
+            <styleUrl>#18</styleUrl>
+            <Point id="26">
+                <coordinates>-1.706222266016169,52.19277390682898,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="29">
+            <name>William Shakespeare</name>
+            <description>0       </description>
+            <styleUrl>#30</styleUrl>
+            <LineString id="28">
+                <extrude>1</extrude>
+                <tessellate>1</tessellate>
+                <altitudeMode>clampToGround</altitudeMode>
+                <coordinates>-1.7066258399283267,52.192371361422936,0.0 -1.7059910252923849,52.19295182562431,0.0</coordinates>
+            </LineString>
+        </Placemark>
+        <Placemark id="33">
+            <name>Anne Hathaway (b)</name>
+            <description>1       </description>
+            <styleUrl>#14</styleUrl>
+            <Point id="32">
+                <coordinates>-1.7061435697044565,52.19271662206243,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="35">
+            <name>Anne Hathaway (b)</name>
+            <description>1       </description>
+            <styleUrl>#18</styleUrl>
+            <Point id="34">
+                <coordinates>-1.7273364440526593,52.19087044785363,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="37">
+            <name>Anne Hathaway</name>
+            <description>1       </description>
+            <styleUrl>#38</styleUrl>
+            <LineString id="36">
+                <extrude>1</extrude>
+                <tessellate>1</tessellate>
+                <altitudeMode>clampToGround</altitudeMode>
+                <coordinates>-1.7063755029055794,52.19246860474055,0.0 -1.72813866944044,52.19097898014693,0.0</coordinates>
+            </LineString>
+        </Placemark>
+        <Placemark id="41">
+            <name>John Shakespeare (b)</name>
+            <description>00      </description>
+            <styleUrl>#14</styleUrl>
+            <Point id="40">
+                <coordinates>-1.7061615910052546,52.19246414175204,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="43">
+            <name>Mary Arden (b)</name>
+            <description>01      </description>
+            <styleUrl>#14</styleUrl>
+            <Point id="42">
+                <coordinates>-1.706715166022854,52.19312861826554,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="45">
+            <name>Richard Hathaway (b)</name>
+            <description>10      </description>
+            <styleUrl>#14</styleUrl>
+            <Point id="44">
+                <coordinates>-1.7276666732840127,52.1913452243794,0.0</coordinates>
+            </Point>
+        </Placemark>
+    </Document>
+</kml>

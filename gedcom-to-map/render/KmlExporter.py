@@ -11,7 +11,7 @@ from models.Line import Line
 from models.Pos import Pos
 from render.Referenced import Referenced
 
-_log = logging.getLogger(__name__)
+_log = logging.getLogger(__name__.lower())
 
 class KmlExporter:
     def __init__(self, gOp: gvOptions):

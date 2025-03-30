@@ -35,7 +35,7 @@ $ pip install -r requirements.txt
 3. Run the GUI interface:
 ```
 cd gedcom-to-map
-python3 gedcomVisualGUI.py 
+python3 gv.py 
 ```
 
 Alternate 3. Start the command line  (Not recommended as there are so many options)
@@ -45,7 +45,7 @@ python3 gedcom-to-map.py /users/darren/documents/myhertitagetree.ged myTree -mai
 ```
 
 ## GUI
-![img](docs/img/python_2025-03.png)
+![img](docs/img/python_2025-03-29.png)
 
 To use the GUI version, `File- > Open` and select your .ged file.
 Set your options in the GUI interface  
@@ -60,6 +60,8 @@ Once you have selected your options,
 - Using the `double-left-click` to select the starting person in (Star)
 - Use the `right-click` on the list of people to bring up some known details and how it 
 was geocoded
+![img](docs/img/python_2025-03.png)
+
 - `Geo Table` open the CSV file for the resolved and cached names.  You can edit the fields and change the `alt` column so substatute in a new name for alternate look up.
 TODO Needs more description.
 - `Trace` Create a list of the individuals from the starting person.  See below
@@ -72,7 +74,82 @@ TODO Needs more description.
   - as a group by the last name 
   - or by their parents
 
-## Output to HTML using folium
+# 
+# Built using
+| Project | Githib Repo | Documentation |
+| --- | --- | --- |
+| wxPython |  https://github.com/wxWidgets/Phoenix  | https://wxpython.org/
+| ged4py | https://github.com/andy-z/ged4py  | https://ged4py.readthedocs.io
+| simplekml | https://github.com/eisoldt/simplekml | https://app.readthedocs.org/projects/simplekml/
+| geopy | https://github.com/geopy/geopy |https://geopy.readthedocs.io/en/latest/#geocoders |
+| folium | https://github.com/python-visualization/folium | https://python-visualization.github.io/folium/latest/|
+| xyzservices | https://github.com/geopandas/xyzservices | https://xyzservices.readthedocs.io/en/stable/index.html |
+
+
+# Results
+## KML Example revised
+### Google Earth Online
+![img](docs/img/Google_earth_2025-03.png)
+* KML Output  : [samples/input.kml](samples/input.kml) using 'native' only
+### ArcGIS Earth
+![img](docs/img/ArcGISEarth_2025-03-input.jpg)
+
+Go to https://www.google.ca/maps/about/mymaps  
+- Click on `Getting Started`
+- Click `Create a New Map`
+- On `Untitled map` click on the `Import` options and open your KML file
+#### Note this does not work in Google Earth as the lines don't appear, not sure about other KML viewers.
+
+The *`geodat-address-cache.csv`* file can be edited to feed back in new Addresses for GeoCoding.  Just edit or clear any column except the *Name* column to have it re-lookup that address.  Especially useful if you want to make a bad or old-style name resolve to a new name/location.
+If you do not have GPS location in your GEDCOM file, then use -born or -born -death so have it use the place where the person was born and/or died.
+
+* Cache : [samples/geodat-address-cache.csv](samples/geodat-address-cache.csv)
+
+
+
+
+![img](docs/img/pres2020.png)
+```
+cd 
+python3 ..\gedcom-to-map\gedcom-to-map.py pres2020.ged pres2020 -main "@I1@" -format HTML -groupby 1 -nomarkstar -antpath
+```
+
+![img](docs/img/pres2020-2.png)
+```
+python3 ..\gedcom-to-map\gedcom-to-map.py pres2020.ged pres2020-2 -main "@I676@" -format HTML -groupby 1 -nomarkstar -antpath
+```
+
+* KML Output  : [samples/pres2020-2.kml](samples/pres2020-2.kml)
+```
+python3 ..\gedcom-to-map\gedcom-to-map.py pres2020.ged pres2020-2 -main "@I676@" -format KML
+```
+
+## Trace button
+Load your GED file.  Make sure that you have set an output file (click on the `Output File` label for quick access to the Save As).  Make sure you have selecte HTML mode (not KML).  Double click on a person to trace from that person back.  Then all the traced individuals will light up as green (with the starting person in grey).  Then click on the Trace button.  
+This will produce a text file and the name will be shown be show in the Information section of the top left.  (Same directory as the output but with a different name '.trace.txt. instead of .HTML).  If you open this in Excel, you can reformat the last columns and then use that to identify the number of generations. 
+
+![img](docs/img/EXCEL_2025-02.png)
+
+## Cluster Markers
+If you turn off the Markers, then it will turn on Clustered markers.  Trying that out and seeing if this become a better way to do markers.  This is W, working towards leverage this feature more consistantly.
+![img](docs/img/markers-2025-03.png)
+
+## Complex Export of MyHeritage - intereactive map
+![img](docs/img/msedge_2022-02-02_22-33-16.gif)
+
+## Running on Linux
+- [See Running on WSL](docs/running-on-wsl.md)
+
+## Other Ideas
+- [See Exploring Family trees](docs/otherlearnings.md)
+
+## Comparing MyHeritage PedigreeMap Heatmap and GedcomVisual Heatmap
+I noticed that the MyHeritage added a heatmap a year or so ago and it has a lot of overlap with the GedcomVisual heatmap.
+
+![img](docs/img/MyHeritage-2023-10-09.png) and ![img](docs/img/gedcomVisual-2023-10-09.png)
+
+
+# Output to HTML using folium
 
  ### Usage
  
@@ -134,64 +211,6 @@ python3 ..\gedcom-to-map\gedcom-to-map.py input.ged output -main "@I0000@" -form
 
 * HTML Output : [docs/output.html](docs/output.html)
 
-## KML Example revised
-### Google Earth Online
-![img](docs/img/Google_earth_2025-03.png)
-* KML Output  : [samples/input.kml](samples/input.kml) using 'native' only
-### ArcGIS Earth
-![img](docs/img/ArcGISEarth_2025-03-input.jpg)
-
-Go to https://www.google.ca/maps/about/mymaps  
-- Click on `Getting Started`
-- Click `Create a New Map`
-- On `Untitled map` click on the `Import` options and open your KML file
-#### Note this does not work in Google Earth as the lines don't appear, not sure about other KML viewers.
-
-The *`geodat-address-cache.csv`* file can be edited to feed back in new Addresses for GeoCoding.  Just edit or clear any column except the *Name* column to have it re-lookup that address.  Especially useful if you want to make a bad or old-style name resolve to a new name/location.
-If you do not have GPS location in your GEDCOM file, then use -born or -born -death so have it use the place where the person was born and/or died.
-
-* Cache : [samples/geodat-address-cache.csv](samples/geodat-address-cache.csv)
-
-
-
-
-![img](docs/img/pres2020.png)
-```
-cd 
-python3 ..\gedcom-to-map\gedcom-to-map.py pres2020.ged pres2020 -main "@I1@" -format HTML -groupby 1 -nomarkstar -antpath
-```
-
-![img](docs/img/pres2020-2.png)
-```
-python3 ..\gedcom-to-map\gedcom-to-map.py pres2020.ged pres2020-2 -main "@I676@" -format HTML -groupby 1 -nomarkstar -antpath
-```
-
-* KML Output  : [samples/pres2020-2.kml](samples/pres2020-2.kml)
-```
-python3 ..\gedcom-to-map\gedcom-to-map.py pres2020.ged pres2020-2 -main "@I676@" -format KML
-```
-
-## Trace button
-Load your GED file.  Make sure that you have set an output file (click on the `Output File` label for quick access to the Save As).  Make sure you have selecte HTML mode (not KML).  Double click on a person to trace from that person back.  Then all the traced individuals will light up as green (with the starting person in grey).  Then click on the Trace button.  
-This will produce a text file and the name will be shown be show in the Information section of the top left.  (Same directory as the output but with a different name '.trace.txt. instead of .HTML).  If you open this in Excel, you can reformat the last columns and then use that to identify the number of generations. 
-
-![img](docs/img/EXCEL_2025-02.png)
-
-## Complex Export of MyHeritage - intereactive map
-![img](docs/img/msedge_2022-02-02_22-33-16.gif)
-
-## Running on Linux
-- [See Running on WSL](docs/running-on-wsl.md)
-
-## Other Ideas
-- [See Exploring Family trees](docs/otherlearnings.md)
-
-## Comparing MyHeritage PedigreeMap Heatmap and GedcomVisual Heatmap
-I noticed that the MyHeritage added a heatmap a year or so ago and it has a lot of overlap with the GedcomVisual heatmap.
-
-![img](docs/img/MyHeritage-2023-10-09.png) and ![img](docs/img/gedcomVisual-2023-10-09.png)
-
-
 ## TODO
 - Add a treed hierarchy selector to enable people as groups and add expand/collapse to navigation
 - more troubleshooting on the address lookup
@@ -214,6 +233,12 @@ I noticed that the MyHeritage added a heatmap a year or so ago and it has a lot 
 - Need to separate the Load and GPS resolve steps (currently reloads after 30 seconds of looking up values)
 
 ## Releases
+### v0.2.6.0
+- New :main program gv.py
+- fixed the logging level settings and reapply of log settings
+- bumped folium version
+- Added a dynamic Legend to replace the static pixely image
+- Large refactored of FoliumExp, including - Tiles selection (move to GUI for selection), Added Cluster Markers, Additional icons for locations types, 
 ### v0.2.5.5
 - Improved Person dialog
 - Improved sorting by of GEDCOM ids in the grid

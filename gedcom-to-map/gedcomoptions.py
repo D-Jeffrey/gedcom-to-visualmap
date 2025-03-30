@@ -12,6 +12,7 @@ from wx import LogGeneric
 from models.Human import Human, Pos
 
 
+
 _log = logging.getLogger(__name__)
 
 def settings_file_pathname(file_name):
@@ -105,11 +106,11 @@ class gvOptions:
         self.fileHistory = None
 
         # Types 0 - boolean, 1: int, 2: str
-        self.html_keys = {'MarksOn':0, 'HeatMap':0, 'BornMark':0, 'DieMark':0, 'MapStyle':1, 'MarkStarOn':0, 'GroupBy':1, 
+        self.html_keys = {'MarksOn':0, 'HeatMap':0, 'BornMark':0, 'DieMark':0,  'MarkStarOn':0, 'GroupBy':1, 
                           'UseAntPath':0, 'HeatMapTimeLine':0, 'HeatMapTimeStep':1, 'HomeMarker':0, 'showLayerControl':0, 
-                          'mapMini':0}
+                          'mapMini':0, 'MapStyle':2}
         self.core_keys = {'UseGPS':0, 'CacheOnly':0, 'AllEntities':0, 'KMLcmdline':'', 'CSVcmdline':''}
-        self.logging_keys = ['gedcomvisualgui', 'gedcom.gpslookup', 'ged4py.parser', '__main__', 'gedcomoptions','models.Human','models.Creator','render.foiumExp']
+        self.logging_keys = ['gedcomvisualgui', 'gedcom.gpslookup', 'ged4py.parser', '__main__', 'gedcomoptions','models.Human','models.Creator']
         
         if os.path.exists(self.settingsfile):
             self.loadsettings()            
@@ -120,13 +121,14 @@ class gvOptions:
         self.HeatMap = False
         self.BornMark = True
         self.DieMark = True
-        self.MapStyle = 3
+        
         self.MarkStarOn = True
         self.GroupBy = 2
         self.UseAntPath = False
         self.HeatMapTimeLine = False
         self.HeatMapTimeStep = 10
         self.HomeMarker = False
+        self.MapStyle = "CartoDB.Voyager"
 
     def setmarkers (self, MarksOn = True, HeatMap = False, MarkStarOn = True, BornMark = True, DieMark = True, MapStyle = 3, GroupBy=2, UseAntPath=False, HeatMapTimeLine=False, HeatMapTimeStep=1, HomeMarker=False):
         
@@ -205,7 +207,7 @@ class gvOptions:
             alogger = logging.getLogger(itm)
             if alogger:
                 alogger.setLevel(lvl)
-               
+
     def savesettings(self):
         if not self.gvConfig:
             self.gvConfig = configparser.ConfigParser()
@@ -228,9 +230,11 @@ class gvOptions:
             self.gvConfig['Gedcom.Main'][name] = str(self.Main)
         #for key in range(0, self.panel.fileConfig.filehistory.GetCount()):
         #    self.gvConfig['Files'][key] = self.panel.fileConfig[key]
-
-        for key in self.logging_keys:
-            self.gvConfig['Logging'][key] = logging.getLevelName(logging.getLogger(key).getEffectiveLevel())
+        
+        loggerNames = list(logging.root.manager.loggerDict.keys())
+        for logName in loggerNames:
+            if logging.getLogger(logName).propagate == False:
+                self.gvConfig['Logging'][logName] = logging.getLevelName(logging.getLogger(logName).getEffectiveLevel())
         with open(self.settingsfile, 'w') as configfile:
             self.gvConfig.write(configfile)
     

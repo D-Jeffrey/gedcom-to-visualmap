@@ -11,16 +11,13 @@ import wx.html
 import wx.grid as gridlib
 from models.Creator import Human, Pos, LifeEvent
 
-from const import GVFONT, ABOUTFONT, VERSION, GUINAME, ABOUTLINK, NAME
+from const import GVFONT, ABOUTFONT, VERSION, GUINAME, ABOUTLINK, NAME, BackgroundProcess, panel
 # from gedcomoptions import gvOptions, AllPlaceType
 from gedcomvisual import ParseAndGPS, doHTML, doKML, doTraceTo
 # import gedcom.gpslookup 
 
-_log = logging.getLogger(__name__)
+_log = logging.getLogger(__name__.lower())
 
-global BackgroundProcess, panel
-BackgroundProcess = None
-panel = None
 UpdateBackgroundEvent = None
 
 class AboutDialog(wx.Dialog):
@@ -86,20 +83,21 @@ For more details and to contribute, visit the <a href="PROJECTLINK">GitHub repos
         self.Destroy()
 #==============================================================
 class ConfigDialog(wx.Frame):
-    def __init__(self, parent, title):
+    def __init__(self, parent, title, gOptions):
         super(ConfigDialog, self).__init__(parent, title=title, size=(500, 650))
 
-        includeNOTSET = False               # DEFAULT Disabled with False
+        includeNOTSET = True
+        self.gOptions = gOptions               # DEFAULT Disabled with False
         self.loggerNames = list(logging.root.manager.loggerDict.keys())
         cfgpanel = wx.Panel(self,style=wx.SIMPLE_BORDER  )
         TEXTkmlcmdlinelbl = wx.StaticText(cfgpanel, -1,  " KML Editor Command line:   ") 
         self.TEXTkmlcmdline = wx.TextCtrl(cfgpanel, wx.ID_FILE1, "", size=(250,20))
-        if panel.gO.KMLcmdline:
-            self.TEXTkmlcmdline.SetValue(panel.gO.KMLcmdline)
+        if gOptions.KMLcmdline:
+            self.TEXTkmlcmdline.SetValue(gOptions.KMLcmdline)
         TEXTcsvcmdlinelbl = wx.StaticText(cfgpanel, -1,  " CSV Table Editor Command line:   ") 
         self.TEXTcsvcmdline = wx.TextCtrl(cfgpanel, wx.ID_FILE1, "", size=(250,20))
-        if panel.gO.CSVcmdline:
-            self.TEXTcsvcmdline.SetValue(panel.gO.CSVcmdline)            
+        if gOptions.CSVcmdline:
+            self.TEXTcsvcmdline.SetValue(gOptions.CSVcmdline)            
         GRIDctl = gridlib.Grid(cfgpanel)
         if includeNOTSET:
             gridlen = len(logging.root.manager.loggerDict)
@@ -110,28 +108,27 @@ class ConfigDialog(wx.Frame):
         GRIDctl.SetColLabelValue(0, "Logger Name")
         GRIDctl.SetColLabelValue(1, "Log Level")
 
-        self.logging_levels = ['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL']
+        self.logging_levels = ['NOTSET', 'DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL']
         row = 0
         for erow, loggerName in enumerate(self.loggerNames):
-            _log = logging.getLogger(loggerName)
-            if logging.getLevelName(_log.level) != "NOTSET":
+            updatelog = logging.getLogger(loggerName)
+            if logging.getLevelName(updatelog.level) != "NOTSET":
                 GRIDctl.SetCellValue(row, 0, loggerName)
                 GRIDctl.SetCellBackgroundColour(row, 0, wx.LIGHT_GREY)
-                GRIDctl.SetCellValue(row, 1, logging.getLevelName(_log.level))
+                GRIDctl.SetCellValue(row, 1, logging.getLevelName(updatelog.level))
                 GRIDctl.SetCellEditor(row, 1, gridlib.GridCellChoiceEditor(self.logging_levels))
                 GRIDctl.SetReadOnly(row, 0)
                 row += 1
         # The following only is relavent for modules that could have `logging`` added to them
         if includeNOTSET:
             for erow, loggerName in enumerate(self.loggerNames):
-                _log = logging.getLogger(loggerName)
-                if logging.getLevelName(_log.level) == "NOTSET":
+                updatelog = logging.getLogger(loggerName)
+                if logging.getLevelName(updatelog.level) == "NOTSET":
                     GRIDctl.SetCellValue(row, 0, loggerName)
-                    GRIDctl.SetCellValue(row, 1, logging.getLevelName(_log.level))
+                    GRIDctl.SetCellValue(row, 1, logging.getLevelName(updatelog.level))
                     GRIDctl.SetCellBackgroundColour(row, 0, wx.LIGHT_GREY)
                     GRIDctl.SetCellBackgroundColour(row, 1, wx.LIGHT_GREY)
-                    GRIDctl.SetReadOnly(row, 0)
-                    GRIDctl.SetReadOnly(row, 1)
+                    GRIDctl.SetCellEditor(row, 1, gridlib.GridCellChoiceEditor(self.logging_levels))
                     row += 1 
             
         GRIDctl.AutoSizeColumn(0,False)
@@ -160,8 +157,8 @@ class ConfigDialog(wx.Frame):
         sizer.Add(wx.StaticText(cfgpanel, -1,  " Logging Options:"))
         l3 = wx.BoxSizer(wx.HORIZONTAL)
         l3.AddMany([(20,20),      GRIDctl,     (20,20)])
-        
-        sizer.Add(l3)
+        # TODO This is wrong but it works for now
+        sizer.Add(l3, 300, 5)
         buttonsizer = wx.BoxSizer(wx.HORIZONTAL)
         buttonsizer.Add(saveBTN, 0, wx.ALIGN_CENTER | wx.ALL, 5)
         buttonsizer.Add(cancelBTN, 0, wx.ALIGN_CENTER | wx.ALL, 5)
@@ -175,11 +172,11 @@ class ConfigDialog(wx.Frame):
         for row in range(self.GRIDctl.GetNumberRows()):
             loggerName = self.GRIDctl.GetCellValue(row, 0)
             logLevel = self.GRIDctl.GetCellValue(row, 1)
-            _log = logging.getLogger(loggerName)
-            _log.setLevel(getattr(logging, logLevel))
-        panel.gO.KMLcmdline = self.TEXTkmlcmdline.GetValue()
-        panel.gO.CSVcmdline = self.TEXTcsvcmdline.GetValue()
-        panel.gO.savesettings()
+            updatelog = logging.getLogger(loggerName)
+            updatelog.setLevel(getattr(logging, logLevel))
+        self.gOptions.KMLcmdline = self.TEXTkmlcmdline.GetValue()
+        self.gOptions.CSVcmdline = self.TEXTcsvcmdline.GetValue()
+        self.gOptions.savesettings()
         self.Close()
         self.DestroyLater()
 
@@ -429,6 +426,7 @@ and generating the output so that the GUI can continue to be responsive
         
 
     def DefgOps(self, gOps):
+        # Pull the global variables into this thread - Critcal to do this
         global panel, BackgroundProcess
         self.gOptions = gOps
         panel = gOps.panel

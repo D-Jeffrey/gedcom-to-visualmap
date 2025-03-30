@@ -4,7 +4,7 @@
 ### WIP, looking for feedback
 
 
-## Linux (WSL - WSL version: 1.1.3.0)
+## Linux (WSL - WSL version: 2.4.12.0)
   
 ```
 sudo apt update
@@ -127,7 +127,7 @@ dj@DESKTOP-R3PSDBU:~/gv/gedcom-to-visualmap-0.2.3.1$ python3 gedcom-to-map/gedco
 ```
 
 ## Side by side
-Windows and Linux (WSL) running on Windows 11 - WSL 1.1.3.0 - Ubuntu 
+Windows and Linux (WSL) running on Windows 11 - WSL version: 2.4.12.0 - Ubuntu 
 ![img](img/Windows+wsl.png)
 
 

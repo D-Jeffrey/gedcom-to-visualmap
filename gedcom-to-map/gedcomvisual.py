@@ -1,3 +1,5 @@
+__all__ = ['gedcom_to_map', 'Geoheatmap', 'doTrace', 'doTraceTo', 'ParseAndGPS', 'doHTML', 'doKML']
+
 import logging
 import os.path
 import os
@@ -12,8 +14,8 @@ from models.Pos import Pos
 from render.foliumExp import foliumExporter
 from render.KmlExporter import KmlExporter
 from render.Referenced import Referenced
-global BackgroundProcess
-#from const import BackgroundProcess
+# global BackgroundProcess
+from const import BackgroundProcess
 
 # Thread for controlling the background processes Created in gedcomVisualGUI.py
 # BackgroundProcess

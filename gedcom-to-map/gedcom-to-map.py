@@ -74,7 +74,7 @@ if __name__ == '__main__':
                                      MapStyle = arg_parse.args.maptiletype, 
                                      MarkStarOn = not arg_parse.args.markstaroff, 
                                      GroupBy = arg_parse.args.groupby,
-                                     AntPath = arg_parse.args.antpath, 
+                                     UseAntPath = arg_parse.args.antpath, 
                                      HeatMapTimeLine = arg_parse.args.heattime,
                                      HeatMapTimeStep = arg_parse.args.heatstep,
                                      HomeMarker = arg_parse.args.markhomes)

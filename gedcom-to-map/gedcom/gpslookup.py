@@ -537,11 +537,12 @@ class GEDComGPSLookup:
             if human_obj.death and human_obj.death.where:
                 human_obj.death.pos = self.lookupaddresses(human_obj.death.where)
                 _log.debug(f"{human_obj.name:30} @ D {human_obj.death.where:60} = {human_obj.death.pos}")
-            if len(self.addresses) - donesome > 512 or datetime.now().timestamp() - nowis.timestamp() > 300:  # Every 5 minutes or 512 addresses save Addresses
-                _log.info(f"************** Saving cache {donesome} {len(self.addresses)}")
-                self.saveAddressCache()
-                donesome = len(self.addresses)
-                nowis =  datetime.now()
+            if self.addresses:
+                if len(self.addresses) - donesome > 512 or datetime.now().timestamp() - nowis.timestamp() > 300:  # Every 5 minutes or 512 addresses save Addresses
+                    _log.info(f"************** Saving cache {donesome} {len(self.addresses)}")
+                    self.saveAddressCache()
+                    donesome = len(self.addresses)
+                    nowis =  datetime.now()
             if startis < datetime.now().timestamp():
                 BackgroundProcess.updategrid = True
                 BackgroundProcess.updateinfo= f"Updating with {len(humans)} people while resolving some addresses ({len(self.addresses)})" 

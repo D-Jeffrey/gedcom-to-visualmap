@@ -6,11 +6,11 @@ import platform
 import time
 
 import configparser
+from const import OFFICECMDLINE
 from pathlib import Path
 from xmlrpc.client import boolean
 from wx import LogGeneric
 from models.Human import Human, Pos
-
 
 
 _log = logging.getLogger(__name__)
@@ -44,7 +44,7 @@ class gvOptions:
         self.defaults()
         self.settingsfile = settings_file_pathname("gedcom-visualmap.ini")
 
-        self.GEDCOMinput = None
+        self.GEDCOMinput = "gedcomfile.ged"
         self.resultpath = None              # directory for .Result
         self.Result = ''                    # output file (could be of resulttype .html or .kml)
         self.ResultType = "html"
@@ -90,10 +90,10 @@ class gvOptions:
             self.CSVcmdline = "$n"
         elif os_name == 'Darwin':
             self.KMLcmdline = "Numbers $n"
-            self.CSVcmdline = "libreoffice --calc $n"
+            self.CSVcmdline = OFFICECMDLINE + " --calc $n"
         elif os_name == 'Linux':
             self.KMLcmdline = "nano $n"
-            self.CSVcmdline = "libreoffice --calc $n"
+            self.CSVcmdline = OFFICECMDLINE + " --calc $n"
         else:
             self.KMLcmdline = "notepad $n"
             self.CSVcmdline = "notepad $n"

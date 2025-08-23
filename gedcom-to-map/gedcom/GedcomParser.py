@@ -19,6 +19,12 @@ homelocationtags = ('OCCU', 'CENS', 'EDUC')
 otherlocationtags = ('CHR', 'BAPM', 'BASM', 'BAPL', 'IMMI', 'NATU', 'ORDN','ORDI', 'RETI', 
                      'EVEN',  'CEME', 'CREM' )
 
+bitstags = {"OCCU" : ("Occupation", True), "RELI" : ("Religion", True), "EDUC" : ("Education", True), 
+            
+            "TITL" : ("Title", True), "BAPM" : ("Baptism", False), "BASM" : ("Baptism", False), "BAPL" : ("Baptism", False),
+            "NATU" : ("Naturalization", ("PLACE", "DATE")),  'BURI' : ('Burial', False), 'CREM' : ('Cremation', False) }
+eventtags = {"EVEN" : "Event"}
+
 addrtags = ('ADR1', 'ADR2', 'ADR3', 'CITY', 'STAE', 'POST', 'CTRY')
 
 thisgvOps = None
@@ -28,7 +34,11 @@ def getgdate (gstr):
     d = m = y = None
     if gstr:
         k = gstr.value.kind.name
-        if (k == 'SIMPLE') or (k == 'ABOUT') or (k == 'FROM'):
+        if (k in ['SIMPLE', 'ABOUT','FROM']):
+            y = gstr.value.date.year
+            m = gstr.value.date.month_num
+            d = gstr.value.date.day
+        elif (k in ['AFTER','BEFORE']):
             y = gstr.value.date.year
             m = gstr.value.date.month_num
             d = gstr.value.date.day
@@ -37,7 +47,7 @@ def getgdate (gstr):
             m = gstr.value.date1.month_num
             d = gstr.value.date1.day
 
-        elif (k == 'PHRASE'):
+        elif k == 'PHRASE':
             #TODO need to fix up
             y = y 
         else:
@@ -159,9 +169,23 @@ class GedcomParser:
         obj = record.sub_tag("OBJE")
         human.photo = None
         if (obj):
-            isjpg = obj.sub_tag("FORM") and obj.sub_tag("FORM").value == 'jpg'
-            if (isjpg):
-                human.photo = obj.sub_tag("FILE").value
+            if obj.sub_tag("FILE"):
+                # Depending on how the GEDCOM was created the FORM maybe at 2 or 3 it may be in a sub tag and it may or may not have the right extension
+                if obj.sub_tag("_PRIM") and obj.sub_tag("_PRIM") == 'N':
+                    # skip non primary photos
+                    pass
+                else:
+                    ext = obj.sub_tag("FILE").value.lower().split('.')[-1]
+                    if ext in ('jpg','bmp','jpeg','png','gif'):
+                        human.photo = obj.sub_tag("FILE").value
+                    else:
+                        form = obj.sub_tag("FORM")
+                        if form and obj.sub_tag("FORM").value.lower() in ('jpg','bmp','jpeg','png','gif'):
+                            human.photo = obj.sub_tag("FILE").value
+                        else:
+                            form = obj.sub_tag("FILE").sub_tag("FORM")
+                            if form and form.value.lower() in ('jpg','bmp','jpeg','png','gif'):
+                                human.photo = obj.sub_tag("FILE").value 
         human.sex = record.sex
         # BIRTH TAG
         birthtag = GetPosFromTag(record, "BIRT")
@@ -173,8 +197,16 @@ class GedcomParser:
         burialtag = GetPosFromTag(record, "BURI")
 
         # DEATH TAG
-        deathtag = GetPosFromTag(record, "DEAT")
-        human.death = deathtag.event 
+        deathtag = record.sub_tag("DEAT")
+        if deathtag:
+            deathtagAge = deathtag.sub_tag_value("AGE")
+            deathtagCause = deathtag.sub_tag_value("CAUS")
+            if deathtagAge:
+                human.age = deathtagAge
+                if deathtagCause: human.age = f"{deathtagAge} of {deathtagCause}"
+        deathtagPos = GetPosFromTag(record, "DEAT")
+        human.death = deathtagPos.event 
+        
         
         # Last Possible is death (or birth)
         if human.death and Pos.hasLocation(human.death.pos):
@@ -228,6 +260,23 @@ class GedcomParser:
                     human.home.append(homes[i])
                 else:
                     human.home = [homes[i]]
+
+        # bits = ""
+        # for tags in (bitstags):
+        #     bitstag=record.sub_tags(tags)
+        #     if bitstag:
+        #         for hom in (allhomes):
+        #             plac = getplace(hom)
+        #             if plac:
+        #                 otherwhat = tags
+        #                 otherstype = hom.sub_tag("TYPE")
+        #                 if otherstype:
+        #                     otherwhat = otherstype.value
+        #                 homedate = getgdate(hom.sub_tag("DATE"))
+        #                 homes[homedate] = LifeEvent(plac, hom.sub_tag("DATE"), what=otherwhat)
+                    
+
+
 
         return human
 
@@ -290,7 +339,16 @@ class GedcomParser:
 
         with GedcomReader(self.file_path) as parser:
             thisgvOps.step("Loading GED")
-            thisgvOps.totalGEDpeople = sum(1 for value in parser.xref0.values() if value[1] == 'INDI')
+            try:
+                thisgvOps.totalGEDpeople = sum(1 for value in parser.xref0.values() if value[1] == 'INDI')
+            except Exception as e:
+                _log.error("Error reading file %s", self.file_path)
+                _log.error("Error %s", e)
+                if self.gOp.BackgroundProcess:
+                    mye = e.args[0].replace("'", "").replace("\"", "").replace("`", "").replace("<", "[").replace(">", "]")
+                    self.gOp.BackgroundProcess.SayErrorMessage(f"Error {mye}", True)
+                return None
+            
             thisgvOps.totalGEDfamily = sum(1 for value in parser.xref0.values() if value[1] == 'FAM')
             return self.__create_humans(parser.records0)
         

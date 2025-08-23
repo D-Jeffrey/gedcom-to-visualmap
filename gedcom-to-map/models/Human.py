@@ -9,17 +9,22 @@ _log = logging.getLogger(__name__.lower())
 
 def DateFromField(field):
     if field:
+        if not isinstance(field, str):
+            field = str(field)
         # BC or B.C
         if field.lower().find("bc") > 0 or field.lower().find("b.c") > 0:
                 return -int(field[:field.lower().find("b")])
         if len(field) > 3 and field[3].isdigit():
-            return int(field[:4])
+            try:
+                return int(field[:4])
+            except:
+                pass
         try:
             return int(field)
         except:
             digits = ''
             for char in field:
-                if char.isdigit():
+                if char.isdigit() or char == '-':
                     digits += char
             return int(digits) if digits else None
     return None
@@ -128,11 +133,16 @@ class LifeEvent:
                         return self.when.value.date2.year_str
                 elif self.when.value.kind.name == "PHRASE":
                     # TODO poor error checking here Assumes a year is in this date
-                    if re.search(r"[0-9]{4}", self.when.value.phrase):
+                    if re.search(r"-?\d{3,4}", self.when.value.phrase):
                         try:
-                            return re.search(r"[0-9]{4}", self.when.value.phrase)[0]
+                            return re.search(r"-?\d{3,4}", self.when.value.phrase)[0]
                         except Exception:
                             return None
+                    # (xxx BC) or xxx B.C.
+                    elif re.search(r"\(?\d{1,4} [Bb]\.?[Cc]\.?\)?", self.when.value.phrase):
+                        matched = re.search(r"\(?(\d{1,4}) [Bb]\.?[Cc]\.?\)?", self.when.value.phrase)
+                        return -int(matched.group(1))
+                        
                     else:
                         if hasattr(self.when.value, 'name') :
                             _log.warning ("'when' year %s as %s", self.when.value.name, self.when.value.phrase)

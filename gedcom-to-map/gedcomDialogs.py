@@ -5,16 +5,21 @@ import logging
 import logging.config
 import time
 
+import requests
+from io import BytesIO
+from pathlib import Path
+import os
 import wx
 import wx.lib.newevent
 import wx.html
 import wx.grid as gridlib
 from models.Creator import Human, Pos, LifeEvent
 
-from const import GVFONT, ABOUTFONT, VERSION, GUINAME, ABOUTLINK, NAME, BackgroundProcess, panel
-# from gedcomoptions import gvOptions, AllPlaceType
+from const import GVFONT, ABOUTFONT, VERSION, GUINAME, ABOUTLINK, NAME, panel
 from gedcomvisual import ParseAndGPS, doHTML, doKML, doTraceTo
-# import gedcom.gpslookup 
+
+maxPhotoWidth = 400  # Maximum width for photos in the PersonDialog
+maxPhotoHeight = 500  # Maximum Height for photos in the PersonDialog
 
 _log = logging.getLogger(__name__.lower())
 
@@ -43,6 +48,7 @@ class AboutDialog(wx.Dialog):
 <h3>Things to know</h3>
 <ul><li><b>Right-click:</b> Right-click on (Activate) a person in the list to view more details.</li>
 <li><b>Double-click</b> Double-click on a person in the list to set them as the main person and find all their associcated parents</li>
+<li><b>click parent</b> Click on a parent in the person dialog to open that parent's details</li>
 <li><b>Trace</b> For the selected person save to a text file all the associcated parents(tab seperated)</li>
 <li><b>Geo Table</b> Edit the file and translates so that next time it does better location lookups by putting replacement values in the 'alt' column or by filling in the 'Country', 
 then blank the lat, long and boundary have it looked up again. Do not convert it to another format and close Excel so the file can be access.</li>
@@ -51,6 +57,7 @@ then blank the lat, long and boundary have it looked up again. Do not convert it
 </ul>                          
 <h3>Additional Information:</h3>
 <ul><li><b>Forked From:</b> Originally forked from <a href="https://github.com/lmallez/gedcom-to-map/">gedcom-to-map.</a></li>
+<ul><li><b>Contributors:</b> Darren Jeffrey (D-Jeffrey), Laurent Mallez (lmallez), Colin Brass (colin0brass)</li>
 <li><b>License:</b> MIT License.</li>
 </ul>
 For more details and to contribute, visit the <a href="PROJECTLINK">GitHub repository.</a></li>
@@ -194,7 +201,7 @@ class FamilyPanel(wx.Panel):
 
         # Create a grid
         self.grid = gridlib.Grid(self)
-        self.grid.CreateGrid(len(self.hertiageData), 6)  # Number of rows based on family data
+        self.grid.CreateGrid(len(self.hertiageData), 8)  # Number of rows based on family data
 
         # Set column labels
         self.grid.SetColLabelValue(0, "Name")
@@ -203,7 +210,10 @@ class FamilyPanel(wx.Panel):
         self.grid.SetColLabelValue(3, "Death Yr")
         self.grid.SetColLabelValue(4, "Age")
         self.grid.SetColLabelValue(5, "Born Address")
-        
+        self.grid.SetColLabelValue(6, "Description")
+        self.grid.SetColLabelValue(7, "ID")
+
+        self.grid.MaxSize = (-1,400)    
         # Populate the grid with family data
         self.populateGrid()
 
@@ -211,32 +221,60 @@ class FamilyPanel(wx.Panel):
         sizer = wx.BoxSizer(wx.VERTICAL)
         sizer.Add(self.grid, 1, wx.EXPAND | wx.ALL, 10)
         self.SetSizer(sizer)
+        
+        
+        
 
     def populateGrid(self):
         """Populate the grid with family data and calculate the age dynamically."""
+        child_born_year = None  # Initialize child_born_year to None for the first iteration
         for row, (parent_id, details) in enumerate(self.hertiageData.items()):
-            name, mother_father, born_year, death_year, born_address, children_born_years = details
-
+            name, mother_father, born_year, death_year, born_address, descrip, id = details
+            
             # Calculate age dynamically based on the oldest child's birth year
-            if children_born_years:
-                age = min(children_born_years) - born_year
+            if child_born_year and born_year:
+                age =   int(child_born_year) - int(born_year)
             else:
-                age = "N/A"  # No children provided
+                age = "?"  # No children provided
 
             # Set cell values
             self.grid.SetCellValue(row, 0, name)  # Name
             self.grid.SetCellValue(row, 1, mother_father)  # Mother/Father
-            self.grid.SetCellValue(row, 2, str(born_year) if born_year else "N/A") # Born Year
-            self.grid.SetCellValue(row, 3, str(death_year) if death_year else "N/A")  # Death Year
+            self.grid.SetCellValue(row, 2, str(born_year) if born_year else "?") # Born Year
+            self.grid.SetCellValue(row, 3, str(death_year) if death_year else "?")  # Death Year
             self.grid.SetCellValue(row, 4, str(age))  # Age
-            self.grid.SetCellValue(row, 5, born_address if born_year else "N/A")  # Born Address
+            self.grid.SetCellValue(row, 5, born_address if born_address else "")  # Born Address
+            self.grid.SetCellValue(row, 6, descrip)  # Description
+            self.grid.SetCellValue(row, 7, id)  # ID
+            if age != "?":
+                if age < 0:
+                    self.grid.SetCellBackgroundColour(row, 4, wx.RED)
+                    self.grid.SetCellTextColour(row, 4, wx.WHITE)
+                elif age > 60 or age < 13:
+                    self.grid.SetCellBackgroundColour(row, 4, wx.YELLOW)
+            child_born_year = born_year     # Use for next loop
+
         self.grid.AutoSizeColumns()
         for row in range(self.grid.GetNumberRows()):
             self.grid.SetCellAlignment(row, 2, wx.ALIGN_RIGHT, wx.ALIGN_CENTER)  # Right-align numbers in the third column
             self.grid.SetCellAlignment(row, 3, wx.ALIGN_RIGHT, wx.ALIGN_CENTER)  # Right-align numbers in the third column
             self.grid.SetCellAlignment(row, 4, wx.ALIGN_RIGHT, wx.ALIGN_CENTER)  # Right-align numbers in the third column
+        self.grid.Bind(wx.grid.EVT_GRID_CELL_LEFT_CLICK, self.OnRowClick)
+        self.grid.Bind(wx.grid.EVT_GRID_LABEL_LEFT_CLICK, self.OnRowClick)
 
-
+    def OnRowClick(self, event: wx.grid.GridEvent):
+        """Handle item activation (double-click) in the grid."""
+        row = event.GetRow()
+        # Get the ID of the selected person
+        person_id = self.grid.GetCellValue(row, 7)
+        # Open the person dialog with the selected person's details
+        person = BackgroundProcess.humans.get(person_id)
+        if person:
+            dialog = PersonDialog(self, person, panel, showrefences=False)
+            dialog.Show(True)
+            dialog.Bind(wx.EVT_CLOSE, lambda evt: dialog.Destroy())
+        else:
+            wx.MessageBox("Person not found.", "Error", wx.OK | wx.ICON_ERROR)
 
 def formatHumanName(human: Human, longForm=True):
     if human:
@@ -251,8 +289,8 @@ def formatHumanName(human: Human, longForm=True):
         return "<none>"
 
 class PersonDialog(wx.Dialog):
-    def __init__(self, parent, human, panel):
-        super().__init__(parent, title="Person Details", size=(600, 600))
+    def __init__(self, parent, human, panel, showrefences=True):
+        super().__init__(parent, title="Person Details", size=(600, 600), style=wx.DEFAULT_DIALOG_STYLE |wx.RESIZE_BORDER)
         
         def sizeAttr(attr,pad=1):
             return (min(len(attr),3)+pad)*(GVFONT[1]+5)  if attr else GVFONT[1]
@@ -260,6 +298,7 @@ class PersonDialog(wx.Dialog):
         humans = BackgroundProcess.humans
         # create the UI controls to display the person's data
         nameLabel = wx.StaticText(self, label="Name: ")
+        titleLabel = wx.StaticText(self, label="Title: ")
         fatherLabel = wx.StaticText(self, label="Father: ")
         motherLabel = wx.StaticText(self, label="Mother: ")
         birthLabel = wx.StaticText(self, label="Birth: ")
@@ -279,7 +318,9 @@ class PersonDialog(wx.Dialog):
             for homedesc in human.home:
                 homes.append(f"{LifeEvent.asEventstr(homedesc)}")
         homelist = "\n".join(homes)
+        photourl = human.photo
         self.nameTextCtrl = wx.TextCtrl(self, style=wx.TE_READONLY, size=(550,-1))
+        self.titleTextCtrl = wx.TextCtrl(self, style=wx.TE_READONLY)
         self.fatherTextCtrl = wx.TextCtrl(self, style=wx.TE_READONLY)
         self.motherTextCtrl = wx.TextCtrl(self, style=wx.TE_READONLY)
         self.birthTextCtrl = wx.TextCtrl(self, style=wx.TE_READONLY)
@@ -289,11 +330,12 @@ class PersonDialog(wx.Dialog):
         self.homeTextCtrl = wx.TextCtrl(self, style=wx.TE_READONLY|wx.TE_MULTILINE, size=(-1,sizeAttr(homelist)))
 
         # layout the UI controls using a grid sizer
-
         sizer = wx.FlexGridSizer(cols=2, hgap=5, vgap=5)
 
         sizer.Add(nameLabel, 0, wx.LEFT|wx.TOP, border=5)
         sizer.Add(self.nameTextCtrl, 0, wx.EXPAND, border=5)
+        sizer.Add(titleLabel, 0, wx.LEFT|wx.TOP, border=5)
+        sizer.Add(self.titleTextCtrl, 0, wx.EXPAND)
         sizer.Add(fatherLabel, 0, wx.LEFT|wx.TOP, border=5)
         sizer.Add(self.fatherTextCtrl, 1, wx.EXPAND)
         sizer.Add(motherLabel, 0, wx.LEFT|wx.TOP, border=5)
@@ -309,40 +351,87 @@ class PersonDialog(wx.Dialog):
         sizer.Add(homeLabel, 0, wx.LEFT|wx.TOP, border=5)
         sizer.Add(self.homeTextCtrl, 1, wx.EXPAND, border=5)
         # self.SetSizer(sizer)
+        
 
         # set the person's data in the UI controls
         self.nameTextCtrl.SetValue(formatHumanName(human))
+
+        # Should be conditional
+        self.titleTextCtrl.SetValue(human.title if human.title else "")
 
         if human.father:
             self.fatherTextCtrl.SetValue(formatHumanName(humans[human.father]))
         if human.mother:
             self.motherTextCtrl.SetValue(formatHumanName(humans[human.mother]))
         self.birthTextCtrl.SetValue(f"{LifeEvent.asEventstr(human.birth)}")
+        if human.death and human.birth and human.death.when and human.birth.when:
+            age = f"(age ~{human.age})" if hasattr( human, "age") else f"(age ~{human.death.whenyearnum() - human.birth.whenyearnum()})" 
+        else:
+            age = ""
         self.deathTextCtrl.SetValue(f"{LifeEvent.asEventstr(human.death)}")
-        self.sexTextCtrl.SetValue(str(human.sex) if human.sex else "")
+        self.sexTextCtrl.SetValue(f"{human.sex if human.sex else ""} {age}")
         self.marriageTextCtrl.SetValue(marriage)
         
         
         self.homeTextCtrl.SetValue(homelist)
-        if panel.gO.Referenced:
+        if len(homes) > 3:
+            sizer.AddGrowableRow(8)
+        if panel.gO.Referenced and showrefences:
             self.related = None
             relatedLabel = wx.StaticText(self, label="Relative: ")
             if panel.gO.Referenced.exists(human.xref_id):
                 hertiageList = doTraceTo(panel.gO, human)
-                personRelated = panel.gO.Referenced.gettag(human.xref_id)
-                if personRelated:
+                if hertiageList:
                     hertiageSet = {}
                     for (hertiageparent, hertiageperson, hyear, hid) in hertiageList:
-                        hertiageSet[hid] = (hertiageperson, hertiageparent, humans[hid].birth.whenyear() if humans[hid].birth else None, humans[hid].death.whenyear() if humans[hid].death else None, humans[hid].birth.getattr('where') if humans[hid].birth else None,[])
+                        descript = f"{humans[hid].title}"
+                        hertiageSet[hid] = (hertiageperson, 
+                                            hertiageparent, 
+                                            humans[hid].birth.whenyear() if humans[hid].birth else None, 
+                                            humans[hid].death.whenyear() if humans[hid].death else None, 
+                                            humans[hid].birth.getattr('where') if humans[hid].birth else None, 
+                                            descript, 
+                                            hid)
                     # Create the panel and pass the data
                     self.related = FamilyPanel(self, hertiageSet)
-
+                
             if not self.related:
                self.related = wx.StaticText(self, label="No References to selected person")
             
             sizer.Add(relatedLabel, 0, wx.LEFT|wx.TOP, border=5)
             sizer.Add(self.related, 1, wx.EXPAND, border=5)
-    
+        image = None
+        image_content = None
+        if photourl:
+            if photourl.find("http")==0:
+                try:
+                    response = requests.get(photourl, timeout=10)
+                    response.raise_for_status()  # Raise an error for bad responses
+                    image_content = BytesIO(response.content)
+                except requests.RequestException as e:
+                    _log.error(f"Error fetching photo from {photourl}:\n      {e}")
+                    image = None
+                    image_content = None
+            else:
+                infile = panel.gO.get('GEDCOMinput')
+                if infile is not None:
+                    dDir =  os.path.dirname(infile)
+                image_content = Path(photourl) if Path(photourl).is_absolute() else os.path.join(dDir, photourl)
+            if image_content:
+                try:
+                    image = wx.Image(image_content, wx.BITMAP_TYPE_ANY)
+                except Exception as e:
+                    _log.error(f"Error reading photo {photourl}:\n      {e}")
+                    image = None
+            if image:
+                if image.GetWidth() > maxPhotoWidth:
+                    image.Rescale(maxPhotoWidth, int(image.GetHeight()*maxPhotoWidth/image.GetWidth()))
+                if image.GetHeight() > maxPhotoHeight:
+                    image.Rescale(int(image.GetWidth()*maxPhotoHeight/image.GetHeight()),maxPhotoHeight)
+                self.photo = wx.StaticBitmap(self, bitmap=wx.Bitmap(image))
+
+                
+        
         sizer.AddSpacer(2)    
         # create the OK button
         ok_btn = wx.Button(self, wx.ID_OK)
@@ -350,7 +439,15 @@ class PersonDialog(wx.Dialog):
         btn_sizer.AddButton(ok_btn)
         btn_sizer.Realize()
         sizer.Add(btn_sizer, 0, wx.RIGHT|wx.BOTTOM, border=10)
-        self.SetSizer(sizer)
+        if image:
+            wrapper = wx.BoxSizer(wx.HORIZONTAL)
+            
+            wrapper.Add(sizer, 0, wx.BOTTOM|wx.EXPAND)
+            wrapper.Add(self.photo, 1, wx.TOP, border=5)
+            
+            self.SetSizer(wrapper)
+        else:
+            self.SetSizer(sizer)
         self.SetBackgroundColour(wx.TheColourDatabase.FindColour('WHITE'))
         self.Fit()
 
@@ -510,7 +607,7 @@ and generating the output so that the GUI can continue to be responsive
                         
                     if self.do & 1 and self.gOptions.Referenced:
                         del self.gOptions.Referenced
-                        self.gOptions.Referenced = None    
+                        self.gOptions.Referenced = None 
                     # self.updategrid = True
                     wx.PostEvent(self.win, UpdateBackgroundEvent(state='busy'))
                     wx.Yield()
@@ -525,7 +622,7 @@ and generating the output so that the GUI can continue to be responsive
                         if self.gOptions.Main:
                             self.SayInfoMessage(f" with '{self.gOptions.Main}' as starting person", False)
                     else:
-                        self.SayErrorMessage("File could not be read as a GEDCOM file", True)
+                        self.SayErrorMessage(f"Error: file could not read as a GEDCOM file", True)
                     
                 if self.do & 2:
                     _log.info("start do 2")

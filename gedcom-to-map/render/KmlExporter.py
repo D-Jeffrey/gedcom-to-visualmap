@@ -103,8 +103,9 @@ class KmlExporter:
             if (line.a.lon and line.a.lat and line.b.lon and line.b.lat):
                 kml_line = kml.newlinestring(name=name, description=linage, coords=[self.driftPos(line.a), self.driftPos(line.b)])
                 kml_line.linestyle.color = line.color.to_hexa()
+                # Protect the exp from overflow for very long linages
                 kml_line.linestyle.width = max(
-                    int(self.max_line_weight/math.exp(0.5*line.prof)),
+                    int(self.max_line_weight/math.exp(0.5*min(line.prof,1000))),
                     1
                 )
                 kml_line.extrude = 1

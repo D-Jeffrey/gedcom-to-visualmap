@@ -28,3 +28,14 @@ If you are using Esri.ArcGISEarth or Google Earth Pro installed on your computer
 ```
 $n
 ```
+
+
+# TODO List
+- Add more details in description of people panel, ~~including age~~
+- for sorting of last name in Folium fold case, remove of punction and think about soundex match option
+- Add mother and father to legend
+- fix missing relationship in people
+- add more detail in the KML version
+- build a life description for using in KML, Popup on Folium and People Panel
+- Need to sort HTML by # of instances of name
+- 

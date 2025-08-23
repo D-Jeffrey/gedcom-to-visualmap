@@ -64,7 +64,8 @@ if __name__ == '__main__':
 
     # Start the application's main event loop
     app.MainLoop()
-
+    if panel:
+        panel.OnCloseWindow()
     # Log the shutdown message
     _log.info('Finished')
 

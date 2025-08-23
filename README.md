@@ -10,7 +10,7 @@ Read a GEDCOM file and translate the locations into GPS addresses.
 The produces different KML map types which should timelines and movements around the earth.
 The produces HTML file which is interactive..
 
-This contains two interfaces: command-line and GUI (only tested on Windows)
+This contains two interfaces: command-line and GUI (only tested on Windows and Windows Sub-system for Linux).  Testing by @colin0brass on Mac
 
 Orginally forked from [https://github.com/lmallez/gedcom-to-map]
 
@@ -37,8 +37,9 @@ $ pip install -r requirements.txt
 cd gedcom-to-map
 python3 gv.py 
 ```
+--or--
 
-Alternate 3. Start the command line  (Not recommended as there are so many options)
+Start the command line  (Not recommended as there are so many options)
 ```
 cd gedcom-to-map
 python3 gedcom-to-map.py /users/darren/documents/myhertitagetree.ged myTree -main "@I500003@" 
@@ -58,14 +59,16 @@ Once you have selected your options,
 - `Open GPS` button will open the CSV file in Excel if you have it... (I'm thinking that does not work on a Mac)  Make sure you close it before running again, or it may not be able to update the CSV file.
 - `Stop` will allow you to abort the Load/ Resolving of addresses without killing the GUI, allowing you to pick different options.
 - Using the `double-left-click` to select the starting person in (Star)
-- Use the `right-click` on the list of people to bring up some known details and how it 
-was geocoded
-![img](docs/img/python_2025-03.png)
 
 - `Geo Table` open the CSV file for the resolved and cached names.  You can edit the fields and change the `alt` column so substatute in a new name for alternate look up.
 TODO Needs more description.
 - `Trace` Create a list of the individuals from the starting person.  See below
 - `Browser` Open the web browser using the last current output html file
+- Use the `right-click` on the list of people to bring up some known **details** and how it 
+was geocoded
+![img](docs/img/python_2025-08.png)
+The Age column can be very useful for testing to see if the parents are of the proper age, showing when thheir age when their child was born.
+![img](docs/img/age_2025-08.png)
 
 - When the people are loaded you can sort by the various columns by clicking on the column.  When the list of people is selected for display it is relative to this starting person, unless you select the `Map all people`
 - You can resize the window (larger or maximized) to see more details about the people.
@@ -130,6 +133,8 @@ This will produce a text file and the name will be shown be show in the Informat
 
 ![img](docs/img/EXCEL_2025-02.png)
 
+## Heatmap Timeline
+![img](docs/img/Heatmap_2025-03.gif)
 ## Cluster Markers
 If you turn off the Markers, then it will turn on Clustered markers.  Trying that out and seeing if this become a better way to do markers.  This is W, working towards leverage this feature more consistantly.
 ![img](docs/img/markers-2025-03.png)
@@ -223,16 +228,27 @@ python3 ..\gedcom-to-map\gedcom-to-map.py input.ged output -main "@I0000@" -form
 - add histical timeline and reference events in the area from https://www.vizgr.org/historical-events/ & https://github.com/dh3968mlq/hdtimelines/
 - need to determine how do deal with very large HTML files.  Could use a limit of the number of people included in the selection
 - Improve the KML version of the maps by grouping and improving the track of a person.  Add description bits to people in the KML version
-
+- Improve marker clusters to have the proper icon
 
 ## Issues
 - Marriage is not read correctly all the time, limitations with multiple marriages
 - Linux does not save FileHistory
+- People dialog displays only one parent after Draw Update
+- list of background maps on Follium is not complete or presented, so currently only shows cartodbvoyager
 
 ### GUI
 - Need to separate the Load and GPS resolve steps (currently reloads after 30 seconds of looking up values)
 
 ## Releases
+
+### v0.2.6.2
+- @colin0brass - Fixes to make it work properly on a Mac as well as a number of other pure programmer errors identified
+- Improve Person Dialog (Displays picture if available)
+### v0.2.6.1
+- Added person attributes age
+- Fixed age calc in Person dialog for parents, scroll grid on parents, click on a parent to bring up there details in a seperate window
+- Improved last Name grouping on Folium maps, added soundex matching option
+- Adjusted for variation in BC or negative dates
 ### v0.2.6.0
 - New :main program gv.py
 - fixed the logging level settings and reapply of log settings

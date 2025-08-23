@@ -1,6 +1,6 @@
 """Constants for gedcom-to-visualmap"""
 
-VERSION = "0.2.6.0"
+VERSION = "0.2.6.2"
 NAME = "gedcom-to-visualmap"
 GEOCODEUSERAGENT = NAME + "/" + VERSION + " GEDCOM-to-map-folium"
 GUINAME = 'GEDCOM Visual Map'
@@ -9,8 +9,8 @@ GV_COUNTRIES_JSON = 'https://raw.githubusercontent.com/nnjeim/world/master/resou
 GV_STATES_JSON = 'https://raw.githubusercontent.com/nnjeim/world/master/resources/json/states.json'
 KMLMAPSURL = "https://www.google.ca/maps/about/mymaps"
 ABOUTLINK = "https://github.com/D-Jeffrey/"
+OFFICECMDLINE = "soffice"               # command to start LibreOffice
 
-BackgroundProcess = None
 panel = None
 
 

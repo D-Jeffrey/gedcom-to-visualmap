@@ -16,6 +16,7 @@ from gedcomoptions import gvOptions
 from models.Line import Line
 from models.Pos import Pos
 from render.Referenced import Referenced
+from render.naming import simplifyLastName, soundex
 from models.Creator import DELTA
 
 
@@ -149,6 +150,7 @@ class foliumExporter:
         self.fm = None
         self.locations = []
         self.popups = []
+        self.soundexLast = gOptions.GroupBy == 2
         
     def _create_marker_options(self, line) -> dict:
         """Generate marker and line options based on line style"""
@@ -229,18 +231,32 @@ class foliumExporter:
     def Done(self):
         """Finalize and save the map."""
         if self.saveresult:
+            self.gOptions.step("Writing Folium HTML")
             self.fm.save(self.file_name)
+            self.gOptions.step("Done")
         # self.gOptions.stop()
         # self.fm = None
-
+    
     def getFeatureGroup(self, thename, depth):
-        """Retrieve or create a feature group."""
-        if not thename in self.fglastname:
-            self.fglastname[thename] = [folium.FeatureGroup(name= thename, show=False), 0, 0]
+        """Retrieve or create a feature group.
+        array of values
+        Index is a simplifyLastName
+            [0] FeatureGroup
+            [1] count of instances
+            [2] depth
+            [3] orginal name
+        """
+        # TODO could offer an option on which name folding to use (Maybe use SoundEx)
+        if self.soundexLast:
+            simpleLastName = soundex(thename)
+        else:
+            simpleLastName = simplifyLastName(thename)
+        if not simpleLastName in self.fglastname:
+            self.fglastname[simpleLastName] = [folium.FeatureGroup(name= thename, show=False), 0, 0, thename]
                              
-        thefg = self.fglastname[thename][0]
-        self.fglastname[thename][1] += 1
-        self.fglastname[thename][2] = depth
+        thefg = self.fglastname[simpleLastName][0]
+        self.fglastname[simpleLastName][1] += 1
+        self.fglastname[simpleLastName][2] = depth
         return thefg
 
     def _process_timeline_data(self, line: Line, mycluster: MyMarkClusters) -> tuple[int, int]:
@@ -422,8 +438,8 @@ class foliumExporter:
             if (not saveresult):
                 return
 
-        SortByLast = (self.gOptions.GroupBy == 1)
-        SortByPerson = (self.gOptions.GroupBy == 2)
+        SortByLast = (self.gOptions.GroupBy == 1 or self.gOptions.GroupBy == 2)
+        SortByPerson = (self.gOptions.GroupBy == 3)
         fm = self.fm
         self.saveresult = saveresult
         
@@ -501,7 +517,7 @@ class foliumExporter:
                 parent_name = line.parentofhuman.name if line.parentofhuman else line.human.name
                 fg = self.getFeatureGroup(parent_name, line.prof)
             if not fg:
-                fg = folium.FeatureGroup(name=group_name, show=False)
+                fg = folium.FeatureGroup(name=group_name, show=True)
                 new_fg = True
 
             # Add start marker
@@ -538,7 +554,8 @@ class foliumExporter:
             # Add polyline
             if len(fm_line) > 1:
                 line_color = marker_options['line_color']
-                line_width = max(int(self.max_line_weight / math.exp(0.5 * line.prof)), 2) if line.prof else 1
+                # Protect the exp from overflow for very long linages
+                line_width = max(int(self.max_line_weight / math.exp(0.5 * min(line.prof,1000))), 2) if line.prof else 1
                 if self.gOptions.UseAntPath:
                     polyline = folium.plugins.AntPath(fm_line, weight=line_width, opacity=.7, tooltip=line.name, popup=popup_content, color=line_color, lineJoin='arcs')
                 else:
@@ -552,7 +569,7 @@ class foliumExporter:
 
         # Add feature groups to map for the sortby options
         for fgn in sorted(self.fglastname.keys(), key=lambda x: self.fglastname[x][2], reverse=False):
-            self.fglastname[fgn][0].layer_name = f"{fgn} : {self.fglastname[fgn][1]}"
+            self.fglastname[fgn][0].layer_name = f"{self.fglastname[fgn][3]} : {self.fglastname[fgn][1]}"
             fm.add_child(self.fglastname[fgn][0])
 
         sc = False if self.gOptions.showLayerControl else True

@@ -34,7 +34,7 @@ import wx.grid
 import xyzservices.providers as xyz 
 
 
-from const import GUINAME, GVFONT, KMLMAPSURL, LOG_CONFIG, NAME, VERSION, BackgroundProcess, panel
+from const import GUINAME, GVFONT, KMLMAPSURL, LOG_CONFIG, NAME, VERSION, panel
 from gedcomoptions import gvOptions, AllPlaceType
 from gedcomvisual import doTrace
 from gedcomDialogs import *
@@ -275,9 +275,10 @@ class VisualMapFrame(wx.Frame):
         global panel
 
         dDir = os.getcwd()
+        filen = "gedcomfile.ged"
         if panel and panel.gO:
             infile = panel.gO.get('GEDCOMinput')
-            if infile != '':
+            if infile is not None:
                 dDir, filen  = os.path.split(infile)
         dlg = wx.FileDialog(self,
                            defaultDir = dDir,
@@ -402,7 +403,7 @@ class VisualMapFrame(wx.Frame):
 #=============================================================
 class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSorterMixin):
     def __init__(self, parent, ID, pos=wx.DefaultPosition,
-                 size=wx.DefaultSize, style=0, *args, **kw):
+                 size=wx.DefaultSize, style=0, name="PeopleList", *args, **kw):
         super(PeopleListCtrl, self).__init__(*args, **kw)
         wx.ListCtrl.__init__(self, parent, ID, pos, size, style)
         listmix.ListCtrlAutoWidthMixin.__init__(self)
@@ -437,8 +438,8 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
         self.itemDataMap = {}
         self.itemIndexMap = []
         self.patterns = [
-            re.compile(r'(\d{1,6}) (B\.?C\.?)'),  # Matches "96 B.C." or "115 BC" or "109 BCE"
-            re.compile(r'(\d{1,4})')              # Matches "1564", "1674", "922"
+            re.compile(r'(\d{1,6}) \(?([Bb\.?[Cc]\.?)'),  # Matches "96 B.C." or "115 BC" or "109 BCE"
+            re.compile(r'(-?\d{1,4})')              # Matches "1564", "1674", "922", "-200"
         ]
 
         parent.Bind(wx.EVT_FIND, self.OnFind, self)
@@ -501,7 +502,7 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
         if self.gO:
             items = self.popdata.items()
             self.gO.selectedpeople = 0
-            self.gO.step("Gridload", resetCounter=False)
+            self.gO.step("Gridload", resetCounter=False, target=len(items))
             self.itemDataMap = {data[0] : data for data in items} 
             index = -1
             for key, data in items:
@@ -542,10 +543,10 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
             self.gO.counter = 0
             self.gO.state = ""
 
-        self.SetColumnWidth(1, wx.LIST_AUTOSIZE_USEHEADER)
-        self.SetColumnWidth(2, wx.LIST_AUTOSIZE_USEHEADER)
-        self.SetColumnWidth(3, wx.LIST_AUTOSIZE_USEHEADER)
-        self.SetColumnWidth(4, wx.LIST_AUTOSIZE_USEHEADER)
+        self.SetColumnWidth(1, 112)
+        self.SetColumnWidth(2, 85)
+        self.SetColumnWidth(3, 220)
+        self.SetColumnWidth(4, 375)
         self.SetColumnWidth(0, wx.LIST_AUTOSIZE_USEHEADER)
         # Sometimes the Name is too long
         if self.GetColumnWidth(0) > 300:
@@ -577,6 +578,8 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
     def ParseDate(self, datestring):
         if datestring == None:
             return 0
+        if not isinstance(datestring, str):
+            datestring = f"{datestring}"
         for pattern in self.patterns:
             match = pattern.search(datestring)
             if match:
@@ -648,8 +651,11 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
             itm = self.GetItemText(self.currentItem, 2)
             if itm in BackgroundProcess.humans:
                 dialog = PersonDialog(None, BackgroundProcess.humans[itm], panel)
-                dialog.ShowModal()
-                dialog.Destroy()
+                dialog.Bind(wx.EVT_CLOSE, lambda evt: dialog.Destroy())
+                dialog.Bind(wx.EVT_BUTTON, lambda evt: dialog.Destroy())
+                dialog.Show(True)
+                
+                #dialog.Destroy()
 
 
     def OnItemActivated(self, event):
@@ -660,11 +666,11 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
             self.gO.setMain(self.GetItemText(self.currentItem, 2))
             if BackgroundProcess.updategridmain:
                 BackgroundProcess.updategridmain = False
-                doTrace(self.gO)
-                self.PopulateList(self.gO.humans, self.gO.get('Main'), False)
-                BackgroundProcess.SayInfoMessage(f"Using '{self.gO.get('Main')}' as starting person with {len(self.gO.Referenced)} direct ancestors", False)
-                BackgroundProcess.updategridmain = True
-                panel.SetupButtonState()
+            doTrace(self.gO)
+            self.PopulateList(self.gO.humans, self.gO.get('Main'), False)
+            BackgroundProcess.SayInfoMessage(f"Using '{self.gO.get('Main')}' as starting person with {len(self.gO.Referenced)} direct ancestors", False)
+            BackgroundProcess.updategridmain = True
+            panel.SetupButtonState()
                 
 
     def OnColClick(self, event):
@@ -720,7 +726,7 @@ class PeopleListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
         None
         """
         super(PeopleListCtrlPanel, self).__init__(*args, **kw)
-        wx.Panel.__init__(self, parent, -1, style=wx.WANTS_CHARS)
+        wx.Panel.__init__(self, parent, -1, style=wx.WANTS_CHARS, name="PeoplePanel")
         # TODO This box defination still have a scroll overlap problem
         sizer = wx.BoxSizer(wx.VERTICAL)
         self.messagelog = "*  Select a file, Load it and Draw Update or change Result Type, Open Geo Table to edit addresses  *"
@@ -880,6 +886,7 @@ class VisualMapPanel(wx.Panel):
           HTML select controls in a Box
         """
         hbox = wx.StaticBox( panel, -1, "HTML Options", size=(300,-1))
+        
         hTopBorder, hOtherBorder = hbox.GetBordersForSizer()
         hsizer = wx.BoxSizer(wx.VERTICAL)
         hsizer.AddSpacer(hTopBorder)
@@ -906,7 +913,7 @@ class VisualMapPanel(wx.Panel):
                 style=wx.SL_HORIZONTAL | wx.SL_AUTOTICKS | wx.SL_LABELS )
         self.id.LISTHeatMapTimeStep.SetTickFreq(5)
         self.id.RBGroupBy  = wx.RadioBox(hbox, self.id.IDs['ID_RBGroupBy'], "Group by:", 
-                                       choices = ['None', 'Last Name', 'Person'], majorDimension= 3)
+                                       choices = ['None', 'Last Name', 'Last Name (Soundex)','Person'], majorDimension= 2)
         mapboxsizer.Add(self.id.LISTMapType)
         mapboxsizer.Add( mapStyleLabel)
         
@@ -937,6 +944,7 @@ class VisualMapPanel(wx.Panel):
         # KML select controls in a Box
         #
         kbox = wx.StaticBox( panel, -1, "KML Options", size=(300,-1))
+        
         kTopBorder, kOtherBorder = kbox.GetBordersForSizer()
         ksizer = wx.BoxSizer(wx.VERTICAL)
         ksizer.AddSpacer(kTopBorder)
@@ -954,6 +962,7 @@ class VisualMapPanel(wx.Panel):
         
         
         gbox = wx.StaticBox( panel, -1, "Grid View Options",size=(300,-1))
+        
         gTopBorder, gOtherBorder = gbox.GetBordersForSizer()
         gsizer = wx.BoxSizer(wx.VERTICAL)
         gsizer.AddSpacer(gTopBorder)
@@ -1224,14 +1233,14 @@ class VisualMapPanel(wx.Panel):
                 self.id.BTNUpdate.Enable()
                 status = f"{status} - please wait.. Stopping"
 
-            _, filen = os.path.split(self.gO.get('GEDCOMinput'))
+            _, filen = os.path.split(self.gO.get('GEDCOMinput') or "")
             if filen == "":
                 self.id.BTNLoad.Disable()
                 self.id.BTNUpdate.Disable()
             else:
                 if not self.id.BTNLoad.IsEnabled():
                     self.id.BTNLoad.Enable()
-                if not self.id.BTNLoad.IsEnabled():
+                if not self.id.BTNUpdate.IsEnabled():
                     self.id.BTNUpdate.Enable()
             if self.gO.get('gpsfile') == '':
                 self.id.BTNCSV.Disable()
@@ -1305,7 +1314,7 @@ class VisualMapPanel(wx.Panel):
             BackgroundProcess.updateinfo = None
         if BackgroundProcess.errorinfo:
             _log.debug("Infobox-Err: %s", BackgroundProcess.errorinfo)
-            einfo = f"<span foreground='red'><b>{BackgroundProcess.errorinfo}</b></span>"
+            einfo = f"{BackgroundProcess.errorinfo}"
             newinfo = newinfo + '\n' + einfo if newinfo else einfo
             BackgroundProcess.errorinfo = None
         if (newinfo):
@@ -1440,6 +1449,8 @@ class VisualMapPanel(wx.Panel):
         else:
             self.OnBusyStart(-1)
             time.sleep(0.1)
+            self.gO.set('GridView', False)
+            self.id.CBGridView.SetValue(False)
         
             cachepath, _ = os.path.split(self.gO.get('GEDCOMinput'))
             if self.gO.get('gpsfile'):
@@ -1449,6 +1460,7 @@ class VisualMapPanel(wx.Panel):
             if self.gO.lookup and cachepath != sourcepath:
                 del self.gO.lookup
                 self.gO.lookup = None
+
             BackgroundProcess.Trigger(1)    
         
     def DrawGEDCOM(self):
@@ -1481,7 +1493,7 @@ class VisualMapPanel(wx.Panel):
                 if ' ' in cmdline:
                     cmdline = self.gO.get('CSVcmdline').replace('$n', f'{cmdfile}')
                     _log.info(f'shell run  `{cmdfile}`')
-                    if gOp.cmdline.startswith('http'):
+                    if cmdline.startswith('http'):
                         webbrowser.open(cmdline, new = 0, autoraise = True)
                     else:
                         subprocess.run(cmdline, shell=True)
@@ -1501,7 +1513,7 @@ class VisualMapPanel(wx.Panel):
                 return 
             tracepath = os.path.splitext(self.gO.Result)[0] + ".trace.txt"
             # indentpath = os.path.splitext(self.gO.Result)[0] + ".indent.txt"
-            trace = open(tracepath , 'w')
+            trace = open(tracepath , 'w', encoding="utf-8")
             # indent = open(indentpath , 'w')
             trace.write("id\tName\tYear\tWhere\tGPS\tPath\n")
             # indent.write("this is an indented file with the number of generations driven by the parents\nid\tName\tYear\tWhere\tGPS\n") 

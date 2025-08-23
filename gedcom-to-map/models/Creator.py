@@ -40,7 +40,7 @@ class Creator:
                 if self.max_missing != 0 and miss >= self.max_missing
                 else self.link(pos, current, branch, prof, miss + 1, path)
             )
-        color = (branch + DELTA / 2) / (SPACE ** prof)
+        color = (branch + DELTA / 2) / (SPACE ** (prof % 256))
         _log.info("{:8} {:8} {:2} {:.10f} {} {:20}".format(path, branch, prof, color, self.rainbow.get(color).to_hexa(), current.name))
         line = Line(f"{path:8}\t{current.name}", pos, current.pos, self.rainbow.get(color), path, branch,prof, human=current)
         return self.link(current.pos, current, branch, prof, 0, path) + [line]
@@ -111,7 +111,7 @@ class LifetimeCreator:
     def selfline(self, current: Human, branch, prof, miss, path="") -> list[Line]:
         # We can not draw a line from Birth to death without both ends  --- or can we???
         self.alltheseids[current.xref_id] = current.xref_id
-        color = (branch + DELTA / 2) / (SPACE ** prof)
+        color = (branch + DELTA / 2) / (SPACE ** (prof % 256))
         if current.birth and current.death:
             if current.birth.pos and current.death.pos:
                 _log.info("{:8} {:8} {:2} {:.10f} {} Self {:20}".format(path, branch, prof, color, self.rainbow.get(color).to_hexa(), current.name))

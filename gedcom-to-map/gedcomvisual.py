@@ -14,8 +14,6 @@ from models.Pos import Pos
 from render.foliumExp import foliumExporter
 from render.KmlExporter import KmlExporter
 from render.Referenced import Referenced
-# global BackgroundProcess
-from const import BackgroundProcess
 
 # Thread for controlling the background processes Created in gedcomVisualGUI.py
 # BackgroundProcess
@@ -137,7 +135,8 @@ def ParseAndGPS(gOp: gvOptions, stage: int = 0 ):
         if gOp.humans:
             del gOp.humans
             gOp.humans = None
-        gOp.UpdateBackgroundEvent.updategrid = True
+        if hasattr(gOp, "UpdateBackgroundEvent") and hasattr(gOp.UpdateBackgroundEvent, "updategrid"):
+            gOp.UpdateBackgroundEvent.updategrid = True
         humans = GedcomParser(gOp).create_humans()
         gOp.humans = humans
     gOp.parsed = True

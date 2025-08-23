@@ -414,12 +414,16 @@ class foliumExporter:
             # if (self.gOptions.MapStyle < 1 or self.gOptions.MapStyle > len(backTypes)):
               #  self.gOptions.MapStyle = 3
 
+            try:
+                tile = xyz.query_name(self.gOptions.MapStyle)
+            except Exception as e:
+                tile = xyz.CartoDB
             if (self.gOptions.humans and self.gOptions.mainHumanPos and self.gOptions.mainHumanPos.isNone()):
-                self.fm = folium.Map(location=[0, 0], zoom_start=4, tiles= xyz.query_name(self.gOptions.MapStyle))
+                self.fm = folium.Map(location=[0, 0], zoom_start=4, tiles= tile)
             else:
                 lat = float(self.gOptions.mainHumanPos.lat)
                 lon = float(self.gOptions.mainHumanPos.lon)
-                self.fm = folium.Map(location=[lat,lon], zoom_start=4, tiles = xyz.query_name(self.gOptions.MapStyle) )
+                self.fm = folium.Map(location=[lat,lon], zoom_start=4, tiles = tile)
             if (self.gOptions.mapMini):
                 folium.plugins.MiniMap(toggle_display=True).add_to(self.fm)
             

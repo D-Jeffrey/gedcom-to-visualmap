@@ -369,7 +369,8 @@ class PersonDialog(wx.Dialog):
         else:
             age = ""
         self.deathTextCtrl.SetValue(f"{LifeEvent.asEventstr(human.death)}")
-        self.sexTextCtrl.SetValue(f"{human.sex if human.sex else ""} {age}")
+        sex = human.sex if human.sex else ""
+        self.sexTextCtrl.SetValue(f"{sex} {age}")
         self.marriageTextCtrl.SetValue(marriage)
         
         

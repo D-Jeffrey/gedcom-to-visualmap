@@ -18,21 +18,35 @@ Orginally forked from [https://github.com/lmallez/gedcom-to-map]
 
 Assuming you have Python installed otherwise... https://github.com/PackeTsar/Install-Python#readme
 
-1. Clone the repository:
+1. Clone the repository: (in powershell or bash)
 ```
-$ git clone https://github.com/D-Jeffrey/gedcom-to-visualmap
+git clone https://github.com/D-Jeffrey/gedcom-to-visualmap
+cd gedcom-to-visualmap
 ```
- - or -
+-- or --
 
 Alternatively download the zip package of the latest [release](https://github.com/D-Jeffrey/gedcom-to-visualmap/releases) and unzip the package into a directory (such as gedcom-to-visualmap)
+2. Create virtual env for Python3 to run this
 
-2. Install dependencies:
+for Windows (powershell)
 ```
-$ cd gedcom-to-visualmap
-$ pip install -r requirements.txt
+python3 -m venv venv
+venv\bin\activate
+```
+-- or --
+for Linux and Mac
+```
+python3 -m venv venv
+source venv/bin/activate
+```
+3. Install dependencies:
+```
+python3 -m venv venv
+source myvenv/bin/activate
+pip install -r requirements.txt
 ```
 
-3. Run the GUI interface:
+4. Run the GUI interface:
 ```
 cd gedcom-to-map
 python3 gv.py 
@@ -76,6 +90,10 @@ The Age column can be very useful for testing to see if the parents are of the p
   - single people, 
   - as a group by the last name 
   - or by their parents
+
+### GUI Issues
+Unix may not like the Font size of 8.  If you get errors, then change the font size in const.py  The interface needs a smaller font or it will throw 
+off all the layout measurements.  (Need to add math to get actual font size)
 
 # 
 # Built using
@@ -241,6 +259,8 @@ python3 ..\gedcom-to-map\gedcom-to-map.py input.ged output -main "@I0000@" -form
 
 ## Releases
 
+### v0.2.6.3
+- Add images for Bronte sample, bug fixes for f{}
 ### v0.2.6.2
 - @colin0brass - Fixes to make it work properly on a Mac as well as a number of other pure programmer errors identified
 - Improve Person Dialog (Displays picture if available)

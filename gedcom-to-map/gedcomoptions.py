@@ -105,13 +105,14 @@ class gvOptions:
         self.totalGEDfamily = None
         self.fileHistory = None
 
-        # Types 0 - boolean, 1: int, 2: str
+        # Types 0 - boolean, 1: int, 2: str, 3 : complex
         self.html_keys = {'MarksOn':0, 'HeatMap':0, 'BornMark':0, 'DieMark':0,  'MarkStarOn':0, 'GroupBy':1, 
                           'UseAntPath':0, 'HeatMapTimeLine':0, 'HeatMapTimeStep':1, 'HomeMarker':0, 'showLayerControl':0, 
                           'mapMini':0, 'MapStyle':2}
-        self.core_keys = {'UseGPS':0, 'CacheOnly':0, 'AllEntities':0, 'KMLcmdline':'', 'CSVcmdline':''}
-        self.logging_keys = ['gedcomvisualgui', 'gedcom.gpslookup', 'ged4py.parser', '__main__', 'gedcomoptions','models.Human','models.Creator']
+        self.core_keys = {'UseGPS':0, 'CacheOnly':0, 'AllEntities':0, 'KMLcmdline':2, 'CSVcmdline':2}
+        self.logging_keys = ['models.human', 'models', 'ged4py.parser', 'ged4py', 'models.creator', 'gedcomoptions', 'gedcom.gedcomparser', 'gedcom', 'gedcom.gpslookup', 'geopy', 'render.kmlexporter', 'render', 'render.foliumexp', 'gedcomvisual', 'gedcomdialogs', 'gedcomvisualgui', '__main__']
         
+        self.kml_keys = {'PlaceType':3, 'MaxLineWeight':1, 'MaxMissing':1}
         if os.path.exists(self.settingsfile):
             self.loadsettings()            
 
@@ -126,7 +127,7 @@ class gvOptions:
         self.GroupBy = 2
         self.UseAntPath = False
         self.HeatMapTimeLine = False
-        self.HeatMapTimeStep = 10
+        self.HeatMapTimeStep = 20
         self.HomeMarker = False
         self.MapStyle = "CartoDB.Voyager"
 
@@ -161,7 +162,18 @@ class gvOptions:
         self.AllEntities = AllEntities             # generte output of everyone in the system
         self.PlaceType = PlaceType                 # Dict add/replace with multiple 'native', 'born' & 'death'
 
-                    
+    def loadsection(self, sectionName, keys=None):
+        for key, typ in keys.items():
+            value = self.gvConfig[sectionName].get(key, None)
+            if value is not None:
+                if typ == 0:  # Boolean
+                    setattr(self, key, value.lower() == 'true')
+                elif typ == 1:  # int
+                    setattr(self, key, int(value))
+                elif typ == 2:  # str
+                    setattr(self, key, value)
+                else:  # complex
+                    setattr(self, key, eval(value))
     def loadsettings(self):
         self.gvConfig = configparser.ConfigParser()
         self.gvConfig.read(self.settingsfile)
@@ -170,37 +182,17 @@ class gvOptions:
         for section in ['Core', 'HTML', 'Logging', 'Gedcom.Main', 'KML']:
             if section not in self.gvConfig.sections():
                 self.gvConfig[section] = {}
-        
         # Load HTML settings
-        for key, typ in self.html_keys.items():
-            value = self.gvConfig['HTML'].get(key, None)
-            if value is not None:
-                if typ == 0:  # Boolean
-                    setattr(self, key, value.lower() == 'true')
-                elif typ == 1:  # int
-                    setattr(self, key, int(value))
-                else:  # str
-                    setattr(self, key, value)
-        
+        self.loadsection('HTML', self.html_keys)
+        # Load KML settings
+        self.loadsection('KML', self.kml_keys)
         # Load Core settings
-        for key, typ in self.core_keys.items():
-            value = self.gvConfig['Core'].get(key, None)
-            if value is not None:
-                if typ == 0:  # Boolean
-                    setattr(self, key, value.lower() == 'true')
-                elif typ == 1:  # int
-                    setattr(self, key, int(value))
-                else:  # str
-                    setattr(self, key, value)
+        self.loadsection('Core', self.core_keys)
         
         self.setInput(self.gvConfig['Core'].get('InputFile', ''), generalRequest=False)
         self.resultpath, self.Result = os.path.split(self.gvConfig['Core'].get('OutputFile', ''))
         self.setResults(self.Result, not ('.kml' in self.Result.lower()))
         self.KMLcmdline = self.gvConfig['Core'].get('KMLcmdline', '')
-        self.PlaceType = []
-        for key in AllPlaceType:
-            if self.gvConfig['KML'][key].lower() == 'true':
-                self.PlaceType.append(key)
 
         # Load logging settings
         for itm, lvl in self.gvConfig.items('Logging'):
@@ -209,6 +201,9 @@ class gvOptions:
                 alogger.setLevel(lvl)
 
     def savesettings(self):
+        # Use this to remove old settings in sections
+        oldsettings = {'native': 'KML', 'born': 'KML', 'death':'KML'}
+        
         if not self.gvConfig:
             self.gvConfig = configparser.ConfigParser()
             for section in ['Core', 'HTML', 'Logging', 'Gedcom.Main', 'KML']:
@@ -219,9 +214,11 @@ class gvOptions:
         for key in self.html_keys:
             self.gvConfig['HTML'][key] =  str(getattr(self, key))
             
-        for key in AllPlaceType:
-            self.gvConfig['KML'][key] =  str(key in self.PlaceType)
-            
+        # for key in AllPlaceType:
+        #   self.gvConfig['KML'][key] =  str(key in self.PlaceType)
+        for key in self.kml_keys:
+            self.gvConfig['KML'][key] =  str(getattr(self, key))
+
         self.gvConfig['Core']['InputFile'] =  self.GEDCOMinput
         self.gvConfig['Core']['OutputFile'] = os.path.join(self.resultpath, self.Result)
         self.gvConfig['Core']['KMLcmdline'] =  self.KMLcmdline
@@ -233,8 +230,14 @@ class gvOptions:
         
         loggerNames = list(logging.root.manager.loggerDict.keys())
         for logName in loggerNames:
-            if logging.getLogger(logName).propagate == False:
-                self.gvConfig['Logging'][logName] = logging.getLevelName(logging.getLogger(logName).getEffectiveLevel())
+            if logName in self.logging_keys:
+                logLevel = logging.getLevelName(logging.getLogger(logName).level)
+                if logLevel == 'NOTSET':
+                    self.gvConfig.remove_option('Logging', logName)
+                else:
+                    self.gvConfig['Logging'][logName] = logging.getLevelName(logging.getLogger(logName).getEffectiveLevel())
+        for key, section  in oldsettings.items():
+            self.gvConfig.remove_option(section, key)
         with open(self.settingsfile, 'w') as configfile:
             self.gvConfig.write(configfile)
     

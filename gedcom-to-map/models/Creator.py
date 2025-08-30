@@ -42,12 +42,13 @@ class Creator:
             )
         color = (branch + DELTA / 2) / (SPACE ** (prof % 256))
         _log.info("{:8} {:8} {:2} {:.10f} {} {:20}".format(path, branch, prof, color, self.rainbow.get(color).to_hexa(), current.name))
-        line = Line(f"{path:8}\t{current.name}", pos, current.pos, self.rainbow.get(color), path, branch,prof, human=current)
+        line = Line(f"{path:8}\t{current.name}", pos, current.pos, self.rainbow.get(color), path, branch,prof, human=current, 
+                    whenFrom=current.birth.whenyear() if hasattr(current, 'birth') and current.birth else None , whenTo=current.death.whenyear() if hasattr(current, 'death') and current.death else None)
         return self.link(current.pos, current, branch, prof, 0, path) + [line]
 
     def link(self, pos: Pos, current: Human, branch=0, prof=0, miss=0, path="") -> list[Line]:
-        return (self.line(pos, self.humans[current.father], branch*SPACE, prof+1, miss, f"{path}0") if current.father else []) \
-               + (self.line(pos, self.humans[current.mother], branch*SPACE+DELTA, prof+1, miss, path + "1") if current.mother else [])
+        return (self.line(pos, self.humans[current.father], branch*SPACE, prof+1, miss, f"{path}F") if current.father else []) \
+               + (self.line(pos, self.humans[current.mother], branch*SPACE+DELTA, prof+1, miss, path + "M") if current.mother else [])
 
     def create(self, main_id: str):
         if main_id not in self.humans.keys():
@@ -78,12 +79,13 @@ class CreatorTrace:
         self.alltheseids[current.xref_id] = current.xref_id
         
         _log.info("{:8} {:8} {:2} {:20}".format(path, branch, prof, current.name))
-        line = Line(f"{path:8}\t{current.name}", None, None, None, path, branch,prof, human=current)
+        line = Line(f"{path:8}\t{current.name}", None, None, None, path, branch,prof, human=current, 
+                    whenFrom=current.birth.whenyear() if hasattr(current, 'birth') and current.birth else None , whenTo=current.death.whenyear() if hasattr(current, 'death') and current.death else None)
         return self.link(current, branch, prof, path) + [line]
 
     def link(self, current: Human, branch=0, prof=0,  path="") -> list[Line]:
-        return (self.line(self.humans[current.father],  0, prof+1,  f"{path}0") if current.father else []) \
-               + (self.line(self.humans[current.mother], 0, prof+1,  path + "1") if current.mother else [])
+        return (self.line(self.humans[current.father],  0, prof+1,  f"{path}F") if current.father else []) \
+               + (self.line(self.humans[current.mother], 0, prof+1,  path + "M") if current.mother else [])
 
     def create(self, main_id: str):
         if main_id not in self.humans.keys():
@@ -127,12 +129,7 @@ class LifetimeCreator:
         bp = current.birth.pos if current.birth else None
         bd = current.death.pos if current.death else None
         line = Line(f"{path:8}\t{current.name}", bp, bd, self.rainbow.get(color), path, branch, prof, 'Life', 
-                    None, midpoints, current, wyear)
-        if current.birth: 
-            line.updateWhen(current.birth.whenyear())
-        line.updateWhen(wyear)
-        if current.death: 
-            line.updateWhen(current.death.whenyear())
+                    None, midpoints, current, whenFrom=current.birth.whenyear() if hasattr(current, 'birth') and current.birth else None , whenTo=current.death.whenyear() if hasattr(current, 'death') and current.death else None)
         return [line]
         
     # Draw a line from the parents birth to the child birth location
@@ -146,7 +143,7 @@ class LifetimeCreator:
             color = (branch + DELTA / 2) / (SPACE ** prof)
             _log.info("{:8} {:8} {:2} {:.10f} {} {:20} from {:20}".format(path, branch, prof, color, self.rainbow.get(color).to_hexa(), parent.name, forhuman.name))
             line = Line(f"{path:8}\t{parent.name}", pos, parent.birth.pos, self.rainbow.get(color), path, branch, prof, linestyle,  
-                            forhuman,  human=parent, when= (parent.birth.whenyear(), getattrif(parent, 'death','whenyear')))
+                            forhuman,  human=parent, whenFrom=parent.birth.whenyear() if hasattr(parent, 'birth') and parent.birth else None , whenTo=parent.death.whenyear() if hasattr(parent, 'death') and parent.death else None)
             return self.link(parent.birth.pos, parent, branch, prof, 0, path) + [line]
         else:
             if self.max_missing != 0 and miss >= self.max_missing:

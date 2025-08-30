@@ -198,10 +198,10 @@ def doTraceTo(gOp : gvOptions, ToID : Human):
         humanTrace = gOp.mainHuman
         if personRelated:    
             for r in personRelated:
-                if r == "0":
+                if r == "F":
                     humanTrace = humans[humanTrace.father]
                     tag = "Father"
-                elif r == "1":
+                elif r == "M":
                     humanTrace = humans[humanTrace.mother]
                     tag = "Mother"
                 else:

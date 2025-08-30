@@ -838,12 +838,12 @@ class VisualMapPanel(wx.Panel):
         box.Add(wx.StaticLine(panel), 0, wx.EXPAND)
             
         
-        self.id.txtinfile = wx.StaticText(panel, -1,  "Input file:   ") 
-        self.id.txtinfile.SetBackgroundColour(self.id.GetColor('BTN_DIRECTORY'))
+        self.id.txtinfile = wx.Button(panel, -1,  "Input file:   ") 
+        # self.id.txtinfile.SetBackgroundColour(self.id.GetColor('BTN_DIRECTORY'))
         self.id.TEXTGEDCOMinput = wx.TextCtrl(panel, self.id.IDs['ID_TEXTGEDCOMinput'], "", size=(250,20))
         self.id.TEXTGEDCOMinput.Enable(False) 
-        self.id.txtoutfile = wx.StaticText(panel, -1, "Output file: ")
-        self.id.txtoutfile.SetBackgroundColour(self.id.GetColor('BTN_DIRECTORY'))
+        self.id.txtoutfile = wx.Button(panel, -1, "Output file: ")
+        # self.id.txtoutfile.SetBackgroundColour(self.id.GetColor('BTN_DIRECTORY'))
         self.id.TEXTResult = wx.TextCtrl(panel, self.id.IDs['ID_TEXTResult'], "", size=(250,20))
         self.id.txtinfile.Bind(wx.EVT_LEFT_DOWN, self.frame.OnFileOpenDialog)
         self.id.txtoutfile.Bind(wx.EVT_LEFT_DOWN, self.frame.OnFileResultDialog)
@@ -1183,11 +1183,18 @@ class VisualMapPanel(wx.Panel):
         _log.debug('%s, %s, %s', event.GetString(), event.IsSelection(), event.GetSelection())                            
         _ = event.GetEventObject()
         if eventid == self.id.IDs['ID_LISTPlaceType']:
+            # Can not use both Native with Born/Death
             places = {}
             for cstr in event.EventObject.CheckedStrings:
                 places[cstr] = cstr
+            if (event.Selection == 0 and not 'native' in places) or event.Selection != 0 and 'native' in places:
+                places = {'born':'born', 'death':'death'}
+            if 'native' in places:
+                places = {'native':'native'}
+                
             if places == {}:
                 places = {'native':'native'}
+            self.id.LISTPlaceType.SetCheckedStrings(places)
             panel.gO.PlaceType = places
         elif eventid == self.id.IDs['ID_LISTMapStyle']:
             

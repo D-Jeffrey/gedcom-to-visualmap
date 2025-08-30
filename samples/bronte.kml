@@ -1,138 +1,195 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2">
-    <Document id="1">
-        <Style id="2">
-            <IconStyle id="4">
-                <colorMode>normal</colorMode>
-                <scale>1</scale>
-                <heading>0</heading>
-                <Icon id="5">
-                    <href>https://maps.google.com/mapfiles/kml/paddle/ylw-circle.png</href>
-                </Icon>
-            </IconStyle>
-            <LabelStyle id="3">
+    <Document id="134">
+        <Style id="148">
+            <LabelStyle id="149">
                 <colorMode>normal</colorMode>
                 <scale>1</scale>
             </LabelStyle>
+            <BalloonStyle>
+                <text><![CDATA[ <br>Lifespan: 1777 to 1861, related as F       </br><br>Father: <a href=#168;ballonFlyto>Hugh Brunty</a></br><br>Mother: <a href=#174;ballonFlyto>Eleanor McClory</a></br> ]]></text>
+                <displayMode>default</displayMode>
+            </BalloonStyle>
         </Style>
-        <Style id="6">
-            <IconStyle id="8">
-                <colorMode>normal</colorMode>
-                <scale>1</scale>
-                <heading>0</heading>
-                <Icon id="9">
-                    <href>https://maps.google.com/mapfiles/kml/paddle/ltblu-circle.png</href>
-                </Icon>
-            </IconStyle>
-            <LabelStyle id="7">
-                <colorMode>normal</colorMode>
-                <scale>1</scale>
-            </LabelStyle>
-        </Style>
-        <Style id="18">
-            <LineStyle id="19">
+        <Style id="153">
+            <LineStyle id="154">
                 <color>ff00d8ff</color>
                 <colorMode>normal</colorMode>
                 <width>12</width>
             </LineStyle>
+            <BalloonStyle>
+                <displayMode>default</displayMode>
+            </BalloonStyle>
         </Style>
-        <Style id="26">
-            <LineStyle id="27">
+        <Style id="159">
+            <LabelStyle id="160">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+            </LabelStyle>
+            <BalloonStyle>
+                <text><![CDATA[ <br>Lifespan: 1783 to 1821, related as M       </br><br>Father: <a href=#179;ballonFlyto>Thomas Branwell</a></br><br>Mother: <a href=#185;ballonFlyto>Anne Carne</a></br> ]]></text>
+                <displayMode>default</displayMode>
+            </BalloonStyle>
+        </Style>
+        <Style id="164">
+            <LineStyle id="165">
                 <color>ffff7200</color>
                 <colorMode>normal</colorMode>
                 <width>12</width>
             </LineStyle>
+            <BalloonStyle>
+                <displayMode>default</displayMode>
+            </BalloonStyle>
         </Style>
-        <Placemark id="11">
+        <Style id="170">
+            <LabelStyle id="171">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+            </LabelStyle>
+            <BalloonStyle>
+                <text><![CDATA[ <br>Lifespan: 1755 to 1808, related as FF      </br> ]]></text>
+                <displayMode>default</displayMode>
+            </BalloonStyle>
+        </Style>
+        <Style id="175">
+            <LabelStyle id="176">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+            </LabelStyle>
+            <BalloonStyle>
+                <text><![CDATA[ <br>Lifespan: ?? to ???, related as FM      </br> ]]></text>
+                <displayMode>default</displayMode>
+            </BalloonStyle>
+        </Style>
+        <Style id="181">
+            <LabelStyle id="182">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+            </LabelStyle>
+            <BalloonStyle>
+                <text><![CDATA[ <br>Lifespan: 1746 to 1808, related as MF      </br> ]]></text>
+                <displayMode>default</displayMode>
+            </BalloonStyle>
+        </Style>
+        <Style id="187">
+            <LabelStyle id="188">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+            </LabelStyle>
+            <BalloonStyle>
+                <text><![CDATA[ <br>Lifespan: 1744 to 1809, related as MM      </br> ]]></text>
+                <displayMode>default</displayMode>
+            </BalloonStyle>
+        </Style>
+        <Style id="190">
+            <BalloonStyle>
+                <displayMode>default</displayMode>
+            </BalloonStyle>
+        </Style>
+        <Style id="196">
+            <BalloonStyle>
+                <displayMode>default</displayMode>
+            </BalloonStyle>
+        </Style>
+        <Placemark id="144">
             <name>Anne Brontë (b)</name>
-            <Point id="10">
+            <styleUrl>#190</styleUrl>
+            <Point id="143">
                 <coordinates>-1.8540185,53.7907753,0.0</coordinates>
             </Point>
         </Placemark>
-        <Placemark id="13">
+        <Placemark id="146">
             <name>Patrick Brontë (b)</name>
-            <description>0       </description>
-            <styleUrl>#2</styleUrl>
-            <Point id="12">
-                <coordinates>-1.8542391896417052,53.79073997341946,0.0</coordinates>
+            <TimeStamp id="147">
+                <when>1777</when>
+            </TimeStamp>
+            <styleUrl>#148</styleUrl>
+            <Point id="145">
+                <coordinates>-1.8540332951489302,53.79073225280648,0.0</coordinates>
             </Point>
         </Placemark>
-        <Placemark id="15">
-            <name>Patrick Brontë (b)</name>
-            <description>0       </description>
-            <styleUrl>#6</styleUrl>
-            <Point id="14">
-                <coordinates>-6.295047725167226,53.33954300883106,0.0</coordinates>
-            </Point>
-        </Placemark>
-        <Placemark id="17">
+        <Placemark id="152">
             <name>Patrick Brontë</name>
-            <description>0       </description>
-            <styleUrl>#18</styleUrl>
-            <LineString id="16">
+            <description><![CDATA[ <br>Lifespan: 1777 to 1861, related as F       </br><br>Father: <a href=#168;ballonFlyto>Hugh Brunty</a></br><br>Mother: <a href=#174;ballonFlyto>Eleanor McClory</a></br> ]]></description>
+            <TimeSpan id="155">
+                <begin>1777</begin>
+                <end>1861</end>
+            </TimeSpan>
+            <styleUrl>#153</styleUrl>
+            <LineString id="151">
                 <extrude>1</extrude>
                 <tessellate>1</tessellate>
                 <altitudeMode>clampToGround</altitudeMode>
-                <coordinates>-1.8544456216367533,53.79043463849358,0.0 -6.295477221441999,53.33940650119587,0.0</coordinates>
+                <coordinates>-1.854271874355924,53.79035270489444,0.0 -6.295045727327681,53.33978244580466,0.0</coordinates>
             </LineString>
         </Placemark>
-        <Placemark id="21">
+        <Placemark id="157">
             <name>Maria Branwell (b)</name>
-            <description>1       </description>
-            <styleUrl>#2</styleUrl>
-            <Point id="20">
-                <coordinates>-1.8539922974006464,53.79127515249903,0.0</coordinates>
+            <TimeStamp id="158">
+                <when>1783</when>
+            </TimeStamp>
+            <styleUrl>#159</styleUrl>
+            <Point id="156">
+                <coordinates>-1.8542551369456213,53.79074134831582,0.0</coordinates>
             </Point>
         </Placemark>
-        <Placemark id="23">
-            <name>Maria Branwell (b)</name>
-            <description>1       </description>
-            <styleUrl>#6</styleUrl>
-            <Point id="22">
-                <coordinates>-5.535498573357091,50.11922415935436,0.0</coordinates>
-            </Point>
-        </Placemark>
-        <Placemark id="25">
+        <Placemark id="163">
             <name>Maria Branwell</name>
-            <description>1       </description>
-            <styleUrl>#26</styleUrl>
-            <LineString id="24">
+            <description><![CDATA[ <br>Lifespan: 1783 to 1821, related as M       </br><br>Father: <a href=#179;ballonFlyto>Thomas Branwell</a></br><br>Mother: <a href=#185;ballonFlyto>Anne Carne</a></br> ]]></description>
+            <TimeSpan id="166">
+                <begin>1783</begin>
+                <end>1821</end>
+            </TimeSpan>
+            <styleUrl>#164</styleUrl>
+            <LineString id="162">
                 <extrude>1</extrude>
                 <tessellate>1</tessellate>
                 <altitudeMode>clampToGround</altitudeMode>
-                <coordinates>-1.8541017224019203,53.79114019457889,0.0 -5.535008441864236,50.11971664208801,0.0</coordinates>
+                <coordinates>-1.8540792297465947,53.79054654561894,0.0 -5.534816920627279,50.119442530579704,0.0</coordinates>
             </LineString>
         </Placemark>
-        <Placemark id="29">
+        <Placemark id="168">
             <name>Hugh Brunty (b)</name>
-            <description>00      </description>
-            <styleUrl>#2</styleUrl>
-            <Point id="28">
-                <coordinates>-6.2954758141232485,53.33965903938846,0.0</coordinates>
+            <TimeStamp id="169">
+                <when>1755</when>
+            </TimeStamp>
+            <styleUrl>#170</styleUrl>
+            <Point id="167">
+                <coordinates>-6.295125989703772,53.339264868192934,0.0</coordinates>
             </Point>
         </Placemark>
-        <Placemark id="31">
+        <Placemark id="174">
             <name>Eleanor McClory (b)</name>
-            <description>01      </description>
-            <styleUrl>#2</styleUrl>
-            <Point id="30">
-                <coordinates>-6.295039156198166,53.34001404003507,0.0</coordinates>
+            <styleUrl>#175</styleUrl>
+            <Point id="173">
+                <coordinates>-6.295192575426363,53.33967344468824,0.0</coordinates>
             </Point>
         </Placemark>
-        <Placemark id="33">
+        <Placemark id="179">
             <name>Thomas Branwell (b)</name>
-            <description>10      </description>
-            <styleUrl>#2</styleUrl>
-            <Point id="32">
-                <coordinates>-5.534920601842174,50.119942310051506,0.0</coordinates>
+            <TimeStamp id="180">
+                <when>1746</when>
+            </TimeStamp>
+            <styleUrl>#181</styleUrl>
+            <Point id="178">
+                <coordinates>-5.53511615149056,50.1192196111354,0.0</coordinates>
             </Point>
         </Placemark>
-        <Placemark id="35">
+        <Placemark id="185">
             <name>Anne Carne (b)</name>
-            <description>11      </description>
-            <styleUrl>#2</styleUrl>
-            <Point id="34">
-                <coordinates>-5.534808888308232,50.119532223486644,0.0</coordinates>
+            <TimeStamp id="186">
+                <when>1744</when>
+            </TimeStamp>
+            <styleUrl>#187</styleUrl>
+            <Point id="184">
+                <coordinates>-5.534817938248901,50.119805359669336,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="195">
+            <name>Anne Brontë (d)</name>
+            <styleUrl>#196</styleUrl>
+            <Point id="194">
+                <coordinates>-0.4011868,54.2820009,0.0</coordinates>
             </Point>
         </Placemark>
     </Document>

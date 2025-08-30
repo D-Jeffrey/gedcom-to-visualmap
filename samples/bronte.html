@@ -26,7 +26,7 @@
             <meta name="viewport" content="width=device-width,
                 initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
             <style>
-                #map_39fee3b632c498392cc20309003ecc9b {
+                #map_b7e31be6d310b1423bcf551ad80f56a0 {
                     position: relative;
                     width: 100.0%;
                     height: 100.0%;
@@ -36,8 +36,6 @@
                 .leaflet-container { font-size: 1rem; }
             </style>
         
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-minimap/3.6.1/Control.MiniMap.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-minimap/3.6.1/Control.MiniMap.css"/>
     <script src="https://cdn.jsdelivr.net/npm/iso8601-js-period@0.2.1/iso8601.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/leaflet-timedimension@1.1.1/dist/leaflet.timedimension.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/pa7_hm.min.js"></script>
@@ -124,21 +122,46 @@
             });
             </script>
                 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.1.0/leaflet.markercluster.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.1.0/MarkerCluster.css"/>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.1.0/MarkerCluster.Default.css"/>
 </head>
 <body>
     
     
-            <div class="folium-map" id="map_39fee3b632c498392cc20309003ecc9b" ></div>
+            <div class="folium-map" id="map_b7e31be6d310b1423bcf551ad80f56a0" ></div>
         
+    
+    <div id="map_legend" class="legend">
+        <h4>Legend</h4>
+        <!-- Dynamic generation of legend items -->
+        <div style="margin: 5px;"><i class="fa fa-baby" style="color: orange;"></i> born</div><div style="margin: 5px;"><i class="fa fa-cross" style="color: gray;"></i> death</div><div style="margin: 5px;"><i class="fa fa-home" style="color: lightred;"></i> home</div><div style="margin: 5px;"><i class="fa fa-ring" style="color: orange;"></i> Marriage</div><div style="margin: 5px;"><i class="fa fa-ship" style="color: darkgreen;"></i> IMMI</div><div style="margin: 5px;"><i class="fa fa-church" style="color: darkgreen;"></i> CHR</div><div style="margin: 5px;"><i class="fa fa-church" style="color: darkgreen;"></i> BAPM</div><div style="margin: 5px;"><i class="fa fa-landmark" style="color: darkgreen;"></i> Deed</div><div style="margin: 5px;"><i class="fa fa-ship" style="color: darkgreen;"></i> Arrival</div><div style="margin: 5px;"><i class="fa fa-shoe-prints" style="color: lightgray;"></i> Other</div>
+    </div>
+    <style>
+        /* Legend styling */
+        .legend {
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(0,0,0,0.5);
+            font-size: 14px;
+            line-height: 1.5;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 1000; /* Ensure legend is above the map */
+        }
+        .legend div {
+            display: flex;
+            align-items: center;
+        }
+        .legend i {
+            margin-right: 5px;
+        }
+    </style>
 </body>
 <script>
     
     
-            var map_39fee3b632c498392cc20309003ecc9b = L.map(
-                "map_39fee3b632c498392cc20309003ecc9b",
+            var map_b7e31be6d310b1423bcf551ad80f56a0 = L.map(
+                "map_b7e31be6d310b1423bcf551ad80f56a0",
                 {
                     center: [53.7907753, -1.8540185],
                     crs: L.CRS.EPSG3857,
@@ -155,7 +178,7 @@
 
         
     
-            var tile_layer_0dd7775226876168cb7e694181ff769e = L.tileLayer(
+            var tile_layer_cd61cb34f99b6217243d4aa695023607 = L.tileLayer(
                 "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
                 {
   "minZoom": 0,
@@ -172,40 +195,17 @@
             );
         
     
-            tile_layer_0dd7775226876168cb7e694181ff769e.addTo(map_39fee3b632c498392cc20309003ecc9b);
-        
-    
-            var tile_layer_1b840a64b602fd644a03365a9ff7d897 = L.tileLayer(
-                "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
-                {"attribution": "\u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors", "detect_retina": false, "max_native_zoom": 19, "max_zoom": 19, "min_zoom": 0, "no_wrap": false, "opacity": 1, "subdomains": "abc", "tms": false}
-            );
-            var mini_map_ea0a57981bee3610d5476b774aa85487 = new L.Control.MiniMap(
-                tile_layer_1b840a64b602fd644a03365a9ff7d897,
-                {
-  "position": "bottomright",
-  "width": 150,
-  "height": 150,
-  "collapsedWidth": 25,
-  "collapsedHeight": 25,
-  "zoomLevelOffset": -5,
-  "centerFixed": false,
-  "zoomAnimation": false,
-  "toggleDisplay": true,
-  "autoToggleDisplay": false,
-  "minimized": false,
-}
-            );
-            map_39fee3b632c498392cc20309003ecc9b.addControl(mini_map_ea0a57981bee3610d5476b774aa85487);
+            tile_layer_cd61cb34f99b6217243d4aa695023607.addTo(map_b7e31be6d310b1423bcf551ad80f56a0);
         
     
 
-            var times = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+            var times = [1, 2, 3, 4, 5, 6];
 
-            map_39fee3b632c498392cc20309003ecc9b.timeDimension = L.timeDimension(
+            map_b7e31be6d310b1423bcf551ad80f56a0.timeDimension = L.timeDimension(
                 {times : times, currentTime: new Date(1)}
             );
 
-            var heat_map_2311255166d0a0ad003e3f6a94aac4ebControl = new L.Control.TimeDimensionCustom([1770, 1780, 1790, 1800, 1810, 1820, 1830, 1840, 1850, 1860], {
+            var heat_map_6dba2884c67a76ceb2681ea119f30c19Control = new L.Control.TimeDimensionCustom([1760, 1780, 1800, 1820, 1840, 1860], {
                 autoPlay: false,
                 backwardButton: true,
                 displayDate: true,
@@ -225,9 +225,9 @@
                 timeSliderDragUpdate: false,
                 timeSteps: 1
                 })
-                .addTo(map_39fee3b632c498392cc20309003ecc9b);
+                .addTo(map_b7e31be6d310b1423bcf551ad80f56a0);
 
-                var heat_map_2311255166d0a0ad003e3f6a94aac4eb = new TDHeatmap([[['53.3395315', '-6.2951498', 0.36363636363636365]], [['53.3395315', '-6.2951498', 0.9090909090909091], ['50.1194794', '-5.5352463', 0.7272727272727273]], [['53.3395315', '-6.2951498', 0.9090909090909091], ['50.1194794', '-5.5352463', 0.9090909090909091]], [['53.3395315', '-6.2951498', 0.9090909090909091], ['50.1194794', '-5.5352463', 0.9090909090909091]], [['53.3395315', '-6.2951498', 0.9090909090909091], ['50.1194794', '-5.5352463', 0.9090909090909091]], [['53.7907753', '-1.8540185', 1.0], ['53.3395315', '-6.2951498', 0.9090909090909091], ['50.1194794', '-5.5352463', 0.09090909090909091]], [['53.7907753', '-1.8540185', 0.9090909090909091], ['53.3395315', '-6.2951498', 0.9090909090909091]], [['53.7907753', '-1.8540185', 0.8181818181818182], ['54.2820009', '-0.4011868', 0.09090909090909091], ['53.3395315', '-6.2951498', 0.9090909090909091]], [['53.3395315', '-6.2951498', 0.9090909090909091]], [['53.3395315', '-6.2951498', 0.09090909090909091]]],
+                var heat_map_6dba2884c67a76ceb2681ea119f30c19 = new TDHeatmap([[['53.3395315', '-6.2951498', 0.19047619047619047]], [['53.3395315', '-6.2951498', 0.9523809523809523], ['50.1194794', '-5.5352463', 0.8571428571428571]], [['53.3395315', '-6.2951498', 0.9523809523809523], ['50.1194794', '-5.5352463', 0.9523809523809523]], [['53.7907753', '-1.8540185', 1.0], ['53.3395315', '-6.2951498', 0.9523809523809523], ['50.1194794', '-5.5352463', 0.047619047619047616]], [['53.7907753', '-1.8540185', 0.42857142857142855], ['54.2820009', '-0.4011868', 0.047619047619047616], ['53.3395315', '-6.2951498', 0.9523809523809523]], [['53.3395315', '-6.2951498', 0.047619047619047616]]],
                 {heatmapOptions: {
                         radius: 15,
                         blur: 0.8,
@@ -242,39 +242,139 @@
 
         
     
-            heat_map_2311255166d0a0ad003e3f6a94aac4eb.addTo(map_39fee3b632c498392cc20309003ecc9b);
+            heat_map_6dba2884c67a76ceb2681ea119f30c19.addTo(map_b7e31be6d310b1423bcf551ad80f56a0);
         
     
-            var feature_group_e0533e203a06bfcf8947d0d53087cd3d = L.featureGroup(
+            var feature_group_a467a715e91d0e2fd03a6a9290d65ce3 = L.featureGroup(
                 {
 }
             );
         
     
-            var poly_line_5dcd7bd0225f74b8d5385c30ba2e011e = L.polyline(
-                [[53.7910073624435, -1.8543107664403384], [54.28156184973219, -0.4008171067631309]],
-                {"bubblingMouseEvents": true, "color": "#ffd800", "dashArray": [], "dashOffset": null, "fill": false, "fillColor": "#ffd800", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "arcs", "noClip": false, "opacity": 1, "smoothFactor": 1.0, "stroke": true, "weight": 12}
-            ).addTo(feature_group_e0533e203a06bfcf8947d0d53087cd3d);
+            var marker_c3d5c5536aa94b6814a03a7d59b8aadc = L.marker(
+                [53.791018250684715, -1.854323856201158],
+                {
+  "opacity": 0.5,
+}
+            ).addTo(feature_group_a467a715e91d0e2fd03a6a9290d65ce3);
         
     
-        var popup_70bd4bbab86e2e069075f89dc0e52285 = L.popup({
+            var icon_e18fc335d52533885477e4dc195890a9 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "orange",
+  "iconColor": "white",
+  "icon": "child",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+  "extraClasses": "fas",
+}
+            );
+        
+    
+        var popup_86a4d32b348fd14e21f52b4b1ab592c6 = L.popup({
   "maxWidth": "100%",
 });
 
         
             
-                var html_f3b9eee6c717b3c74b013d6fb4b1f4ca = $(`<div id="html_f3b9eee6c717b3c74b013d6fb4b1f4ca" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>Life of         	Anne Brontë<br>1820 (Born) 1849 (Died)</div></div>`)[0];
-                popup_70bd4bbab86e2e069075f89dc0e52285.setContent(html_f3b9eee6c717b3c74b013d6fb4b1f4ca);
+                var html_6ec3ee99c75cf174fea34ed0aa1c2801 = $(`<div id="html_6ec3ee99c75cf174fea34ed0aa1c2801" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>Life of         	Anne Brontë<br>1820 (Born) 1849 (Died)</div></div>`)[0];
+                popup_86a4d32b348fd14e21f52b4b1ab592c6.setContent(html_6ec3ee99c75cf174fea34ed0aa1c2801);
             
         
 
-        poly_line_5dcd7bd0225f74b8d5385c30ba2e011e.bindPopup(popup_70bd4bbab86e2e069075f89dc0e52285)
+        marker_c3d5c5536aa94b6814a03a7d59b8aadc.bindPopup(popup_86a4d32b348fd14e21f52b4b1ab592c6)
         ;
 
         
     
     
-            poly_line_5dcd7bd0225f74b8d5385c30ba2e011e.bindTooltip(
+            marker_c3d5c5536aa94b6814a03a7d59b8aadc.bindTooltip(
+                `<div>
+                     Life of         	Anne Brontë
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_c3d5c5536aa94b6814a03a7d59b8aadc.setIcon(icon_e18fc335d52533885477e4dc195890a9);
+            
+    
+            var marker_cabe72d4a8e777e03eee08a54bb7db16 = L.marker(
+                [54.282486285434004, -0.40152156785356624],
+                {
+  "opacity": 0.5,
+}
+            ).addTo(feature_group_a467a715e91d0e2fd03a6a9290d65ce3);
+        
+    
+            var icon_cb7ea47e3850e7312f68a9bc20580335 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "gray",
+  "iconColor": "white",
+  "icon": "cross",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+  "extraClasses": "fas",
+}
+            );
+        
+    
+        var popup_c9bb5f227445b0075bc6df3c5e5f879c = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_c0aeb3f69b761c4d9255d9f4ee47f25b = $(`<div id="html_c0aeb3f69b761c4d9255d9f4ee47f25b" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>Life of         	Anne Brontë<br>1820 (Born) 1849 (Died)</div></div>`)[0];
+                popup_c9bb5f227445b0075bc6df3c5e5f879c.setContent(html_c0aeb3f69b761c4d9255d9f4ee47f25b);
+            
+        
+
+        marker_cabe72d4a8e777e03eee08a54bb7db16.bindPopup(popup_c9bb5f227445b0075bc6df3c5e5f879c)
+        ;
+
+        
+    
+    
+            marker_cabe72d4a8e777e03eee08a54bb7db16.bindTooltip(
+                `<div>
+                     Life of         	Anne Brontë
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_cabe72d4a8e777e03eee08a54bb7db16.setIcon(icon_cb7ea47e3850e7312f68a9bc20580335);
+            
+    
+            var poly_line_5cbbd1f280384e9f70486fe92efbf841 = L.polyline(
+                [[53.791018250684715, -1.854323856201158], [54.282486285434004, -0.40152156785356624]],
+                {"bubblingMouseEvents": true, "color": "#ffd800", "dashArray": [], "dashOffset": null, "fill": false, "fillColor": "#ffd800", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "arcs", "noClip": false, "opacity": 1, "smoothFactor": 1.0, "stroke": true, "weight": 12}
+            ).addTo(feature_group_a467a715e91d0e2fd03a6a9290d65ce3);
+        
+    
+        var popup_11f74426240ffe99e76de3a1f2e93295 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_bf0de49c634c5c9db0ee79b45ec3b051 = $(`<div id="html_bf0de49c634c5c9db0ee79b45ec3b051" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>Life of         	Anne Brontë<br>1820 (Born) 1849 (Died)</div></div>`)[0];
+                popup_11f74426240ffe99e76de3a1f2e93295.setContent(html_bf0de49c634c5c9db0ee79b45ec3b051);
+            
+        
+
+        poly_line_5cbbd1f280384e9f70486fe92efbf841.bindPopup(popup_11f74426240ffe99e76de3a1f2e93295)
+        ;
+
+        
+    
+    
+            poly_line_5cbbd1f280384e9f70486fe92efbf841.bindTooltip(
                 `<div>
                              	Anne Brontë
                  </div>`,
@@ -284,30 +384,230 @@
             );
         
     
-            var poly_line_47153869140e1d25599518ebf32c8d19 = L.polyline(
-                [[53.790903808088956, -1.853534215443398], [53.339206269683395, -6.295614621028343]],
-                {"bubblingMouseEvents": true, "color": "#2b8cbe", "dashArray": [5, 5], "dashOffset": null, "fill": false, "fillColor": "#2b8cbe", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "arcs", "noClip": false, "opacity": 1, "smoothFactor": 1.0, "stroke": true, "weight": 12}
-            ).addTo(feature_group_e0533e203a06bfcf8947d0d53087cd3d);
+            var marker_346b33be2bb7307def07f9c9baf99875 = L.marker(
+                [53.33947453079289, -6.2946885731894255],
+                {
+  "opacity": 0.5,
+}
+            ).addTo(feature_group_a467a715e91d0e2fd03a6a9290d65ce3);
         
     
-        var popup_97b1d393bc0f96b1d2ad6892a34d2fbd = L.popup({
+            var icon_35034d3f936da8d037087ffef42f09f9 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "orange",
+  "iconColor": "white",
+  "icon": "child",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+  "extraClasses": "fas",
+}
+            );
+        
+    
+        var popup_6ed31c682a021903dd1ab1daee0524c8 = L.popup({
   "maxWidth": "100%",
 });
 
         
             
-                var html_5f1543ad15dfd288b72dd3f4f8e91f99 = $(`<div id="html_5f1543ad15dfd288b72dd3f4f8e91f99" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>F       	Patrick Brontë father of Anne Brontë<br>1777 (Born) 1861 (Died)</div></div>`)[0];
-                popup_97b1d393bc0f96b1d2ad6892a34d2fbd.setContent(html_5f1543ad15dfd288b72dd3f4f8e91f99);
+                var html_d53f7ea4475e3bdd056da26b063c79bb = $(`<div id="html_d53f7ea4475e3bdd056da26b063c79bb" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>Life of F       	Patrick Brontë<br>1777 (Born) 1861 (Died)</div></div>`)[0];
+                popup_6ed31c682a021903dd1ab1daee0524c8.setContent(html_d53f7ea4475e3bdd056da26b063c79bb);
             
         
 
-        poly_line_47153869140e1d25599518ebf32c8d19.bindPopup(popup_97b1d393bc0f96b1d2ad6892a34d2fbd)
+        marker_346b33be2bb7307def07f9c9baf99875.bindPopup(popup_6ed31c682a021903dd1ab1daee0524c8)
         ;
 
         
     
     
-            poly_line_47153869140e1d25599518ebf32c8d19.bindTooltip(
+            marker_346b33be2bb7307def07f9c9baf99875.bindTooltip(
+                `<div>
+                     Life of F       	Patrick Brontë
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_346b33be2bb7307def07f9c9baf99875.setIcon(icon_35034d3f936da8d037087ffef42f09f9);
+            
+    
+            var marker_2a594ec9b5b0430a922f865cfc357b4a = L.marker(
+                [53.339820285730234, -6.295307430662995],
+                {
+  "opacity": 0.5,
+}
+            ).addTo(feature_group_a467a715e91d0e2fd03a6a9290d65ce3);
+        
+    
+            var icon_f301fb1aeb417b2b65ab1d3e230c7033 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "green",
+  "iconColor": "white",
+  "icon": "baby-carriage",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+  "extraClasses": "fas",
+}
+            );
+        
+    
+        var popup_16fcfdea2333d0b68e282c7314e5fdc4 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_6e94170780c82877ddc634877e89b494 = $(`<div id="html_6e94170780c82877ddc634877e89b494" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>FF      	Hugh Brunty father of Patrick Brontë<br>1755 (Born) 1808 (Died)</div></div>`)[0];
+                popup_16fcfdea2333d0b68e282c7314e5fdc4.setContent(html_6e94170780c82877ddc634877e89b494);
+            
+        
+
+        marker_2a594ec9b5b0430a922f865cfc357b4a.bindPopup(popup_16fcfdea2333d0b68e282c7314e5fdc4)
+        ;
+
+        
+    
+    
+            marker_2a594ec9b5b0430a922f865cfc357b4a.bindTooltip(
+                `<div>
+                     Life of FF      	Hugh Brunty
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_2a594ec9b5b0430a922f865cfc357b4a.setIcon(icon_f301fb1aeb417b2b65ab1d3e230c7033);
+            
+    
+            var marker_93a61ec9e92a5848443697a134c9de5f = L.marker(
+                [53.79048562388541, -1.8540875599883777],
+                {
+  "opacity": 0.5,
+}
+            ).addTo(feature_group_a467a715e91d0e2fd03a6a9290d65ce3);
+        
+    
+            var icon_fd38fcaec05202bb521d012166e39ab3 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "green",
+  "iconColor": "white",
+  "icon": "baby-carriage",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+  "extraClasses": "fas",
+}
+            );
+        
+    
+        var popup_0a7cc09f066e86ddb34f7678979bda2a = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_c3c815ae3b452ffd989c8c7feea068d6 = $(`<div id="html_c3c815ae3b452ffd989c8c7feea068d6" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>F       	Patrick Brontë father of Anne Brontë<br>1777 (Born) 1861 (Died)</div></div>`)[0];
+                popup_0a7cc09f066e86ddb34f7678979bda2a.setContent(html_c3c815ae3b452ffd989c8c7feea068d6);
+            
+        
+
+        marker_93a61ec9e92a5848443697a134c9de5f.bindPopup(popup_0a7cc09f066e86ddb34f7678979bda2a)
+        ;
+
+        
+    
+    
+            marker_93a61ec9e92a5848443697a134c9de5f.bindTooltip(
+                `<div>
+                     Life of F       	Patrick Brontë
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_93a61ec9e92a5848443697a134c9de5f.setIcon(icon_fd38fcaec05202bb521d012166e39ab3);
+            
+    
+            var marker_08e161b68e289ec907563f466b97ec1f = L.marker(
+                [53.33981604605224, -6.295129797472314],
+                {
+  "opacity": 0.5,
+}
+            ).addTo(feature_group_a467a715e91d0e2fd03a6a9290d65ce3);
+        
+    
+            var icon_2ecc57a19e7b19677164c80de046a806 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "blue",
+  "iconColor": "white",
+  "icon": "male",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+  "extraClasses": "fas",
+}
+            );
+        
+    
+        var popup_06505b5fa428ca8553676d186cafc0c0 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_3cc65390e05ef76f951a8684e81775b8 = $(`<div id="html_3cc65390e05ef76f951a8684e81775b8" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>F       	Patrick Brontë father of Anne Brontë<br>1777 (Born) 1861 (Died)</div></div>`)[0];
+                popup_06505b5fa428ca8553676d186cafc0c0.setContent(html_3cc65390e05ef76f951a8684e81775b8);
+            
+        
+
+        marker_08e161b68e289ec907563f466b97ec1f.bindPopup(popup_06505b5fa428ca8553676d186cafc0c0)
+        ;
+
+        
+    
+    
+            marker_08e161b68e289ec907563f466b97ec1f.bindTooltip(
+                `<div>
+                     Life of F       	Patrick Brontë
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_08e161b68e289ec907563f466b97ec1f.setIcon(icon_2ecc57a19e7b19677164c80de046a806);
+            
+    
+            var poly_line_0e96620baf7420fabd763cf3f214f33d = L.polyline(
+                [[53.79048562388541, -1.8540875599883777], [53.33981604605224, -6.295129797472314]],
+                {"bubblingMouseEvents": true, "color": "#2b8cbe", "dashArray": [5, 5], "dashOffset": null, "fill": false, "fillColor": "#2b8cbe", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "arcs", "noClip": false, "opacity": 1, "smoothFactor": 1.0, "stroke": true, "weight": 12}
+            ).addTo(feature_group_a467a715e91d0e2fd03a6a9290d65ce3);
+        
+    
+        var popup_eee5573ca0c2d4e0d1a1b47a7dc4b170 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_6e775c6b05a68f962208adc7c04ca9cf = $(`<div id="html_6e775c6b05a68f962208adc7c04ca9cf" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>F       	Patrick Brontë father of Anne Brontë<br>1777 (Born) 1861 (Died)</div></div>`)[0];
+                popup_eee5573ca0c2d4e0d1a1b47a7dc4b170.setContent(html_6e775c6b05a68f962208adc7c04ca9cf);
+            
+        
+
+        poly_line_0e96620baf7420fabd763cf3f214f33d.bindPopup(popup_eee5573ca0c2d4e0d1a1b47a7dc4b170)
+        ;
+
+        
+    
+    
+            poly_line_0e96620baf7420fabd763cf3f214f33d.bindTooltip(
                 `<div>
                      F       	Patrick Brontë
                  </div>`,
@@ -317,36 +617,236 @@
             );
         
     
-            var feature_group_03719ba1f450f70fbcf1513d1d5c30c7 = L.featureGroup(
+            var feature_group_0d3109516470f8a16feedb93d235c6ae = L.featureGroup(
                 {
 }
             );
         
     
-            var poly_line_456145ec137e32c6b366f86e879827ad = L.polyline(
-                [[53.79050085021967, -1.853592345008495], [50.119154408894104, -5.535056271445403]],
-                {"bubblingMouseEvents": true, "color": "pink", "dashArray": [5, 5], "dashOffset": null, "fill": false, "fillColor": "pink", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "arcs", "noClip": false, "opacity": 1, "smoothFactor": 1.0, "stroke": true, "weight": 12}
-            ).addTo(feature_group_03719ba1f450f70fbcf1513d1d5c30c7);
+            var marker_958bec593a95ada306caa90060ce1990 = L.marker(
+                [50.11993309989567, -5.535675348946884],
+                {
+  "opacity": 0.5,
+}
+            ).addTo(feature_group_0d3109516470f8a16feedb93d235c6ae);
         
     
-        var popup_ae943b98baf3dd64cddb9f7e95192c52 = L.popup({
+            var icon_427435b65c351e149f48eb2cde509ca0 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "orange",
+  "iconColor": "white",
+  "icon": "child",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+  "extraClasses": "fas",
+}
+            );
+        
+    
+        var popup_19a69547e2d57419ea4933f62097d048 = L.popup({
   "maxWidth": "100%",
 });
 
         
             
-                var html_3adec6a080c2034f008444b846472012 = $(`<div id="html_3adec6a080c2034f008444b846472012" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>M       	Maria Branwell mother of Anne Brontë<br>1783 (Born) 1821 (Died)</div></div>`)[0];
-                popup_ae943b98baf3dd64cddb9f7e95192c52.setContent(html_3adec6a080c2034f008444b846472012);
+                var html_114c22c44ed23c463dfcf72358389ddd = $(`<div id="html_114c22c44ed23c463dfcf72358389ddd" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>Life of M       	Maria Branwell<br>1783 (Born) 1821 (Died)</div></div>`)[0];
+                popup_19a69547e2d57419ea4933f62097d048.setContent(html_114c22c44ed23c463dfcf72358389ddd);
             
         
 
-        poly_line_456145ec137e32c6b366f86e879827ad.bindPopup(popup_ae943b98baf3dd64cddb9f7e95192c52)
+        marker_958bec593a95ada306caa90060ce1990.bindPopup(popup_19a69547e2d57419ea4933f62097d048)
         ;
 
         
     
     
-            poly_line_456145ec137e32c6b366f86e879827ad.bindTooltip(
+            marker_958bec593a95ada306caa90060ce1990.bindTooltip(
+                `<div>
+                     Life of M       	Maria Branwell
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_958bec593a95ada306caa90060ce1990.setIcon(icon_427435b65c351e149f48eb2cde509ca0);
+            
+    
+            var marker_8e3e8d04fbce9499c0d214d1b6db88c5 = L.marker(
+                [50.11916365109678, -5.535122762624064],
+                {
+  "opacity": 0.5,
+}
+            ).addTo(feature_group_0d3109516470f8a16feedb93d235c6ae);
+        
+    
+            var icon_a69249ae0810e08d4b39eaaa47e6fa57 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "green",
+  "iconColor": "white",
+  "icon": "baby-carriage",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+  "extraClasses": "fas",
+}
+            );
+        
+    
+        var popup_c7a97ab7d6ce69f29e78f711ccb60c43 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_76d468234aa2f6953a868d31f25e8e64 = $(`<div id="html_76d468234aa2f6953a868d31f25e8e64" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>MF      	Thomas Branwell father of Maria Branwell<br>1746 (Born) 1808 (Died)</div></div>`)[0];
+                popup_c7a97ab7d6ce69f29e78f711ccb60c43.setContent(html_76d468234aa2f6953a868d31f25e8e64);
+            
+        
+
+        marker_8e3e8d04fbce9499c0d214d1b6db88c5.bindPopup(popup_c7a97ab7d6ce69f29e78f711ccb60c43)
+        ;
+
+        
+    
+    
+            marker_8e3e8d04fbce9499c0d214d1b6db88c5.bindTooltip(
+                `<div>
+                     Life of MF      	Thomas Branwell
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_8e3e8d04fbce9499c0d214d1b6db88c5.setIcon(icon_a69249ae0810e08d4b39eaaa47e6fa57);
+            
+    
+            var marker_606f06e4e157984497e60c15060a1b7b = L.marker(
+                [53.79076919995121, -1.854235601947717],
+                {
+  "opacity": 0.5,
+}
+            ).addTo(feature_group_0d3109516470f8a16feedb93d235c6ae);
+        
+    
+            var icon_9615b3390dfe1b162820c8db81a75b60 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "green",
+  "iconColor": "white",
+  "icon": "baby-carriage",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+  "extraClasses": "fas",
+}
+            );
+        
+    
+        var popup_9da440e83d4d3a5a92ca7a345e4a973c = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_6d9e9cac51012d8535e814cf15f0a9bf = $(`<div id="html_6d9e9cac51012d8535e814cf15f0a9bf" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>M       	Maria Branwell mother of Anne Brontë<br>1783 (Born) 1821 (Died)</div></div>`)[0];
+                popup_9da440e83d4d3a5a92ca7a345e4a973c.setContent(html_6d9e9cac51012d8535e814cf15f0a9bf);
+            
+        
+
+        marker_606f06e4e157984497e60c15060a1b7b.bindPopup(popup_9da440e83d4d3a5a92ca7a345e4a973c)
+        ;
+
+        
+    
+    
+            marker_606f06e4e157984497e60c15060a1b7b.bindTooltip(
+                `<div>
+                     Life of M       	Maria Branwell
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_606f06e4e157984497e60c15060a1b7b.setIcon(icon_9615b3390dfe1b162820c8db81a75b60);
+            
+    
+            var marker_36651e088930ac5a025677b18ed6b530 = L.marker(
+                [50.11944857139314, -5.53546568287765],
+                {
+  "opacity": 0.5,
+}
+            ).addTo(feature_group_0d3109516470f8a16feedb93d235c6ae);
+        
+    
+            var icon_b869a6c924a5d2b0cdaebe17a0e6d708 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "pink",
+  "iconColor": "white",
+  "icon": "female",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+  "extraClasses": "fas",
+}
+            );
+        
+    
+        var popup_3f94eeefa395af67d1058aa33f65e72e = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_fa45caacb0085da7e8f3c4b6992cb908 = $(`<div id="html_fa45caacb0085da7e8f3c4b6992cb908" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>M       	Maria Branwell mother of Anne Brontë<br>1783 (Born) 1821 (Died)</div></div>`)[0];
+                popup_3f94eeefa395af67d1058aa33f65e72e.setContent(html_fa45caacb0085da7e8f3c4b6992cb908);
+            
+        
+
+        marker_36651e088930ac5a025677b18ed6b530.bindPopup(popup_3f94eeefa395af67d1058aa33f65e72e)
+        ;
+
+        
+    
+    
+            marker_36651e088930ac5a025677b18ed6b530.bindTooltip(
+                `<div>
+                     Life of M       	Maria Branwell
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_36651e088930ac5a025677b18ed6b530.setIcon(icon_b869a6c924a5d2b0cdaebe17a0e6d708);
+            
+    
+            var poly_line_1cba6f33189c5d9e638e6a79698d481e = L.polyline(
+                [[53.79076919995121, -1.854235601947717], [50.11944857139314, -5.53546568287765]],
+                {"bubblingMouseEvents": true, "color": "pink", "dashArray": [5, 5], "dashOffset": null, "fill": false, "fillColor": "pink", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "arcs", "noClip": false, "opacity": 1, "smoothFactor": 1.0, "stroke": true, "weight": 12}
+            ).addTo(feature_group_0d3109516470f8a16feedb93d235c6ae);
+        
+    
+        var popup_759834808e3dab1d635a5644f38c1927 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_094f25931beb470eb0b709526979e862 = $(`<div id="html_094f25931beb470eb0b709526979e862" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>M       	Maria Branwell mother of Anne Brontë<br>1783 (Born) 1821 (Died)</div></div>`)[0];
+                popup_759834808e3dab1d635a5644f38c1927.setContent(html_094f25931beb470eb0b709526979e862);
+            
+        
+
+        poly_line_1cba6f33189c5d9e638e6a79698d481e.bindPopup(popup_759834808e3dab1d635a5644f38c1927)
+        ;
+
+        
+    
+    
+            poly_line_1cba6f33189c5d9e638e6a79698d481e.bindTooltip(
                 `<div>
                      M       	Maria Branwell
                  </div>`,
@@ -356,340 +856,101 @@
             );
         
     
-            var feature_group_46fa3f2ee4c88db4d0bf8a76ab32463c = L.featureGroup(
+            var feature_group_5b95e325317061dd2b097d6c780d5010 = L.featureGroup(
                 {
 }
             );
         
     
-            var feature_group_4fab1c64c53f6e41feb55173c425776b = L.featureGroup(
+            var marker_4a855e795866c1d916ab15b056337af0 = L.marker(
+                [50.11898076486651, -5.534793908734453],
+                {
+  "opacity": 0.5,
+}
+            ).addTo(feature_group_5b95e325317061dd2b097d6c780d5010);
+        
+    
+            var icon_58fa864a3551423272eca54860fda7c4 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "green",
+  "iconColor": "white",
+  "icon": "baby-carriage",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+  "extraClasses": "fas",
+}
+            );
+        
+    
+        var popup_9cbfee225ed0d958edc951d1bcf47976 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_ff3728e4c2a8c0799e008e669bfc1dc2 = $(`<div id="html_ff3728e4c2a8c0799e008e669bfc1dc2" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>MM      	Anne Carne mother of Maria Branwell<br>1744 (Born) 1809 (Died)</div></div>`)[0];
+                popup_9cbfee225ed0d958edc951d1bcf47976.setContent(html_ff3728e4c2a8c0799e008e669bfc1dc2);
+            
+        
+
+        marker_4a855e795866c1d916ab15b056337af0.bindPopup(popup_9cbfee225ed0d958edc951d1bcf47976)
+        ;
+
+        
+    
+    
+            marker_4a855e795866c1d916ab15b056337af0.bindTooltip(
+                `<div>
+                     Life of MM      	Anne Carne
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_4a855e795866c1d916ab15b056337af0.setIcon(icon_58fa864a3551423272eca54860fda7c4);
+            
+    
+            var feature_group_1691f751aa3f5c869d2967b836ecaf6f = L.featureGroup(
                 {
 }
             );
         
     
-            var feature_group_1556b787da73c78bf6be66cee7afa7eb = L.featureGroup(
-                {
-}
-            );
-        
-    
-            var marker_cluster_15f426c2d9de9d9ad591576d2977b8ef = L.markerClusterGroup(
-                {
-}
-            );
-            marker_cluster_15f426c2d9de9d9ad591576d2977b8ef.options.iconCreateFunction =
-                function(cluster) {
-    return L.divIcon({
-    html: '<b>' + cluster.getChildCount() + '</b>',
-    className: 'marker-cluster marker-cluster-large',
-    iconSize: new L.Point(20, 20)
-    });
-};
-        
-    
-            var marker_98a96849bb7cc6f04b4cd8b3d81a45c9 = L.marker(
-                [53.7910073624435, -1.8543107664403384],
-                {
-}
-            ).addTo(marker_cluster_15f426c2d9de9d9ad591576d2977b8ef);
-        
-    
-        var popup_88f4dc3566037fa6ba0538c07cba89a8 = L.popup({
-  "maxWidth": "100%",
-});
-
-        
-            
-                var html_86f876a75cf035f322bf9be6368ef05e = $(`<div id="html_86f876a75cf035f322bf9be6368ef05e" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>Life of         	Anne Brontë<br>1820 (Born) 1849 (Died)</div></div>`)[0];
-                popup_88f4dc3566037fa6ba0538c07cba89a8.setContent(html_86f876a75cf035f322bf9be6368ef05e);
-            
-        
-
-        marker_98a96849bb7cc6f04b4cd8b3d81a45c9.bindPopup(popup_88f4dc3566037fa6ba0538c07cba89a8)
-        ;
-
-        
-    
-    
-            var marker_fbe903d3e09100a9d3e780d3e953c997 = L.marker(
-                [54.28156184973219, -0.4008171067631309],
-                {
-}
-            ).addTo(marker_cluster_15f426c2d9de9d9ad591576d2977b8ef);
-        
-    
-        var popup_920fd94cbb2e67777426abbe2eddda60 = L.popup({
-  "maxWidth": "100%",
-});
-
-        
-            
-                var html_aae08454a076afd53db71b05cd2eca77 = $(`<div id="html_aae08454a076afd53db71b05cd2eca77" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>Life of         	Anne Brontë<br>1820 (Born) 1849 (Died)</div></div>`)[0];
-                popup_920fd94cbb2e67777426abbe2eddda60.setContent(html_aae08454a076afd53db71b05cd2eca77);
-            
-        
-
-        marker_fbe903d3e09100a9d3e780d3e953c997.bindPopup(popup_920fd94cbb2e67777426abbe2eddda60)
-        ;
-
-        
-    
-    
-            var marker_b2c3ab99144ea364f2a4f721449fed53 = L.marker(
-                [53.33903764134706, -6.294736509480058],
-                {
-}
-            ).addTo(marker_cluster_15f426c2d9de9d9ad591576d2977b8ef);
-        
-    
-        var popup_ecc77b556562a841de119cdf88c48251 = L.popup({
-  "maxWidth": "100%",
-});
-
-        
-            
-                var html_90686b737e09c813841a0f18da3f434c = $(`<div id="html_90686b737e09c813841a0f18da3f434c" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>Life of F       	Patrick Brontë<br>1777 (Born) 1861 (Died)</div></div>`)[0];
-                popup_ecc77b556562a841de119cdf88c48251.setContent(html_90686b737e09c813841a0f18da3f434c);
-            
-        
-
-        marker_b2c3ab99144ea364f2a4f721449fed53.bindPopup(popup_ecc77b556562a841de119cdf88c48251)
-        ;
-
-        
-    
-    
-            var marker_40405fb4770e85ec4845c38bc35c7c2a = L.marker(
-                [53.33989681793082, -6.295641057482755],
-                {
-}
-            ).addTo(marker_cluster_15f426c2d9de9d9ad591576d2977b8ef);
-        
-    
-        var popup_326bbb603f97e7ef14a4e714c265d309 = L.popup({
-  "maxWidth": "100%",
-});
-
-        
-            
-                var html_6d84c12aaf9c216632804eba57a5f568 = $(`<div id="html_6d84c12aaf9c216632804eba57a5f568" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>FF      	Hugh Brunty father of Patrick Brontë<br>1755 (Born) 1808 (Died)</div></div>`)[0];
-                popup_326bbb603f97e7ef14a4e714c265d309.setContent(html_6d84c12aaf9c216632804eba57a5f568);
-            
-        
-
-        marker_40405fb4770e85ec4845c38bc35c7c2a.bindPopup(popup_326bbb603f97e7ef14a4e714c265d309)
-        ;
-
-        
-    
-    
-            var marker_5c525f7f46ec4879896915baa70a54b7 = L.marker(
-                [53.790903808088956, -1.853534215443398],
-                {
-}
-            ).addTo(marker_cluster_15f426c2d9de9d9ad591576d2977b8ef);
-        
-    
-        var popup_819f6fc8b44e99ee7bbd961ed046e3d3 = L.popup({
-  "maxWidth": "100%",
-});
-
-        
-            
-                var html_efb62c6054be2a1bcabb7662610778f9 = $(`<div id="html_efb62c6054be2a1bcabb7662610778f9" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>F       	Patrick Brontë father of Anne Brontë<br>1777 (Born) 1861 (Died)</div></div>`)[0];
-                popup_819f6fc8b44e99ee7bbd961ed046e3d3.setContent(html_efb62c6054be2a1bcabb7662610778f9);
-            
-        
-
-        marker_5c525f7f46ec4879896915baa70a54b7.bindPopup(popup_819f6fc8b44e99ee7bbd961ed046e3d3)
-        ;
-
-        
-    
-    
-            var marker_f532e4cd642d72d6ef27c126fcfc1878 = L.marker(
-                [53.339206269683395, -6.295614621028343],
-                {
-}
-            ).addTo(marker_cluster_15f426c2d9de9d9ad591576d2977b8ef);
-        
-    
-        var popup_3d8b188dfc5c24edba383dfa724d2f20 = L.popup({
-  "maxWidth": "100%",
-});
-
-        
-            
-                var html_b9974d31ecb498507c20ee9779bfef68 = $(`<div id="html_b9974d31ecb498507c20ee9779bfef68" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>F       	Patrick Brontë father of Anne Brontë<br>1777 (Born) 1861 (Died)</div></div>`)[0];
-                popup_3d8b188dfc5c24edba383dfa724d2f20.setContent(html_b9974d31ecb498507c20ee9779bfef68);
-            
-        
-
-        marker_f532e4cd642d72d6ef27c126fcfc1878.bindPopup(popup_3d8b188dfc5c24edba383dfa724d2f20)
-        ;
-
-        
-    
-    
-            var marker_077d910edbddfc01c18aca1f5352cafb = L.marker(
-                [50.11926904170332, -5.534813783920179],
-                {
-}
-            ).addTo(marker_cluster_15f426c2d9de9d9ad591576d2977b8ef);
-        
-    
-        var popup_adf24c9959aa3ef1e6b4bcbf3c6e29fb = L.popup({
-  "maxWidth": "100%",
-});
-
-        
-            
-                var html_400d9e4b7c5469a0518923e85e4bb26f = $(`<div id="html_400d9e4b7c5469a0518923e85e4bb26f" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>Life of M       	Maria Branwell<br>1783 (Born) 1821 (Died)</div></div>`)[0];
-                popup_adf24c9959aa3ef1e6b4bcbf3c6e29fb.setContent(html_400d9e4b7c5469a0518923e85e4bb26f);
-            
-        
-
-        marker_077d910edbddfc01c18aca1f5352cafb.bindPopup(popup_adf24c9959aa3ef1e6b4bcbf3c6e29fb)
-        ;
-
-        
-    
-    
-            var marker_3c126994b17fc48e985a323ad75b9a30 = L.marker(
-                [50.119124421227255, -5.535038897168995],
-                {
-}
-            ).addTo(marker_cluster_15f426c2d9de9d9ad591576d2977b8ef);
-        
-    
-        var popup_3ce31a4361400c77ffaa42c5323cea8d = L.popup({
-  "maxWidth": "100%",
-});
-
-        
-            
-                var html_c0ed38b6f1fd738dda5837d70f789928 = $(`<div id="html_c0ed38b6f1fd738dda5837d70f789928" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>MF      	Thomas Branwell father of Maria Branwell<br>1746 (Born) 1808 (Died)</div></div>`)[0];
-                popup_3ce31a4361400c77ffaa42c5323cea8d.setContent(html_c0ed38b6f1fd738dda5837d70f789928);
-            
-        
-
-        marker_3c126994b17fc48e985a323ad75b9a30.bindPopup(popup_3ce31a4361400c77ffaa42c5323cea8d)
-        ;
-
-        
-    
-    
-            var marker_c4ca6199b1cc693c156a484618742ee7 = L.marker(
-                [50.119379721359905, -5.5350020142591205],
-                {
-}
-            ).addTo(marker_cluster_15f426c2d9de9d9ad591576d2977b8ef);
-        
-    
-        var popup_503d9c34551e5bc9146098f42b33358e = L.popup({
-  "maxWidth": "100%",
-});
-
-        
-            
-                var html_3db58bc1022da553c7a4cada00c981e7 = $(`<div id="html_3db58bc1022da553c7a4cada00c981e7" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>MM      	Anne Carne mother of Maria Branwell<br>1744 (Born) 1809 (Died)</div></div>`)[0];
-                popup_503d9c34551e5bc9146098f42b33358e.setContent(html_3db58bc1022da553c7a4cada00c981e7);
-            
-        
-
-        marker_c4ca6199b1cc693c156a484618742ee7.bindPopup(popup_503d9c34551e5bc9146098f42b33358e)
-        ;
-
-        
-    
-    
-            var marker_fc101ede4eae4db594d3e0ba216369ba = L.marker(
-                [53.79050085021967, -1.853592345008495],
-                {
-}
-            ).addTo(marker_cluster_15f426c2d9de9d9ad591576d2977b8ef);
-        
-    
-        var popup_036274b87e3ccdb3e8c5906ebb06d3e8 = L.popup({
-  "maxWidth": "100%",
-});
-
-        
-            
-                var html_e69d98b015a0988084fb5257cd47fed2 = $(`<div id="html_e69d98b015a0988084fb5257cd47fed2" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>M       	Maria Branwell mother of Anne Brontë<br>1783 (Born) 1821 (Died)</div></div>`)[0];
-                popup_036274b87e3ccdb3e8c5906ebb06d3e8.setContent(html_e69d98b015a0988084fb5257cd47fed2);
-            
-        
-
-        marker_fc101ede4eae4db594d3e0ba216369ba.bindPopup(popup_036274b87e3ccdb3e8c5906ebb06d3e8)
-        ;
-
-        
-    
-    
-            var marker_a241bde730ee35fcbc8dbbd82f184077 = L.marker(
-                [50.119154408894104, -5.535056271445403],
-                {
-}
-            ).addTo(marker_cluster_15f426c2d9de9d9ad591576d2977b8ef);
-        
-    
-        var popup_4fd1cb91fc129503b9ef433224727ede = L.popup({
-  "maxWidth": "100%",
-});
-
-        
-            
-                var html_68a07a2c4d47b5026bbc69ddbe2e5d1c = $(`<div id="html_68a07a2c4d47b5026bbc69ddbe2e5d1c" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>M       	Maria Branwell mother of Anne Brontë<br>1783 (Born) 1821 (Died)</div></div>`)[0];
-                popup_4fd1cb91fc129503b9ef433224727ede.setContent(html_68a07a2c4d47b5026bbc69ddbe2e5d1c);
-            
-        
-
-        marker_a241bde730ee35fcbc8dbbd82f184077.bindPopup(popup_4fd1cb91fc129503b9ef433224727ede)
-        ;
-
-        
-    
-    
-            marker_cluster_15f426c2d9de9d9ad591576d2977b8ef.addTo(map_39fee3b632c498392cc20309003ecc9b);
-        
-    
-            var layer_control_cc85b0254c56455eb13ccfc8f982f5be_layers = {
+            var layer_control_02f872e96bd80b59bad03e172f1bbd9e_layers = {
                 base_layers : {
-                    "cartodbpositron" : tile_layer_0dd7775226876168cb7e694181ff769e,
+                    "cartodbpositron" : tile_layer_cd61cb34f99b6217243d4aa695023607,
                 },
                 overlays :  {
-                    "Heatmap" : heat_map_2311255166d0a0ad003e3f6a94aac4eb,
-                    "Bront\u00eb : 3" : feature_group_e0533e203a06bfcf8947d0d53087cd3d,
-                    "Branwell : 4" : feature_group_03719ba1f450f70fbcf1513d1d5c30c7,
-                    "Brunty : 2" : feature_group_46fa3f2ee4c88db4d0bf8a76ab32463c,
-                    "Carne : 2" : feature_group_4fab1c64c53f6e41feb55173c425776b,
-                    "McClory : 1" : feature_group_1556b787da73c78bf6be66cee7afa7eb,
-                    "-markers clustered-" : marker_cluster_15f426c2d9de9d9ad591576d2977b8ef,
+                    "Heatmap" : heat_map_6dba2884c67a76ceb2681ea119f30c19,
+                    "Bront\u00eb : 5" : feature_group_a467a715e91d0e2fd03a6a9290d65ce3,
+                    "Branwell : 4" : feature_group_0d3109516470f8a16feedb93d235c6ae,
+                    "Carne : 2" : feature_group_5b95e325317061dd2b097d6c780d5010,
+                    "McClory : 1" : feature_group_1691f751aa3f5c869d2967b836ecaf6f,
                 },
             };
-            let layer_control_cc85b0254c56455eb13ccfc8f982f5be = L.control.layers(
-                layer_control_cc85b0254c56455eb13ccfc8f982f5be_layers.base_layers,
-                layer_control_cc85b0254c56455eb13ccfc8f982f5be_layers.overlays,
+            let layer_control_02f872e96bd80b59bad03e172f1bbd9e = L.control.layers(
+                layer_control_02f872e96bd80b59bad03e172f1bbd9e_layers.base_layers,
+                layer_control_02f872e96bd80b59bad03e172f1bbd9e_layers.overlays,
                 {
   "position": "topleft",
   "collapsed": false,
   "autoZIndex": true,
 }
-            ).addTo(map_39fee3b632c498392cc20309003ecc9b);
+            ).addTo(map_b7e31be6d310b1423bcf551ad80f56a0);
 
         
     
-            var marker_8bc7d1c17d02a1758984eccc88585b29 = L.marker(
-                [53.790702199965274, -1.8535904416896747],
+            var marker_5dcc6d4da4c3c3649a02c35e96a49064 = L.marker(
+                [53.79125268507911, -1.8538200118448764],
                 {
   "opacity": 0.5,
 }
-            ).addTo(map_39fee3b632c498392cc20309003ecc9b);
+            ).addTo(map_b7e31be6d310b1423bcf551ad80f56a0);
         
     
-            var icon_ce9cc0a1583f681490bf9401d3d1efd7 = L.AwesomeMarkers.icon(
+            var icon_9b8855b04ddd64b389d7b32d8f11af9f = L.AwesomeMarkers.icon(
                 {
   "markerColor": "lightred",
   "iconColor": "white",
@@ -704,7 +965,7 @@
             );
         
     
-            marker_8bc7d1c17d02a1758984eccc88585b29.bindTooltip(
+            marker_5dcc6d4da4c3c3649a02c35e96a49064.bindTooltip(
                 `<div>
                      Anne Brontë
                  </div>`,
@@ -714,7 +975,7 @@
             );
         
     
-                marker_8bc7d1c17d02a1758984eccc88585b29.setIcon(icon_ce9cc0a1583f681490bf9401d3d1efd7);
+                marker_5dcc6d4da4c3c3649a02c35e96a49064.setIcon(icon_9b8855b04ddd64b389d7b32d8f11af9f);
             
 </script>
 </html>

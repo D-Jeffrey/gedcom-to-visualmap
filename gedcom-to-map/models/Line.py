@@ -14,7 +14,7 @@ class Line:
     human - reference to themeselves, 
     """
     def __init__(self, name: str, a: Pos, b: Pos, color: Color, path: str, branch: float, prof: int, style : str = '', parentofhuman : Human = None, 
-                        midpoints:list[LifeEvent]=None, human=None, when: int =None, tag:str='', linetype=''):
+                        midpoints:list[LifeEvent]=None, human=None, whenFrom = None, whenTo = None, tag:str='', linetype=''):
         self.name = name
         # TODO we need to use id to avoid problems with duplicate names
         # BUG
@@ -34,10 +34,15 @@ class Line:
 #        if len(when) > 1:
 #            (self.when.a, self.when.b) = (self.valueWhen(when[0]), self.valueWhen(when[1]))
 
-        if when and len(when) > 1:
-            self.when= self.valueWhen(when[0])
-        else:
-            self.when= self.valueWhen(when)
+        if whenFrom: # and len(whenFrom) > 1:
+            #self.whenFrom= self.valueWhen(whenFrom[0])
+        #else:
+            self.whenFrom= self.valueWhen(whenFrom)
+        
+        if whenTo: # and len(whenTo) > 1:
+            #self.whenTo= self.valueWhen(whenTo[0])
+        #else:
+            self.whenTo= self.valueWhen(whenTo)
         self.linetype = linetype
         
 
@@ -49,10 +54,16 @@ class Line:
 
     def updateWhen(self, newwhen):
         newwhen = self.valueWhen(newwhen)
-        if newwhen and not self.when:
-            self.when = newwhen
-        if self.when and newwhen and newwhen < self.when:
-            self.when = newwhen
+        if newwhen and not self.whenFrom:
+            self.whenFrom = newwhen
+        if self.whenFrom and newwhen and newwhen < self.whenFrom:
+            self.whenFrom = newwhen
+    def updateWhenTo(self, newwhen):
+        newwhen = self.valueWhen(newwhen)
+        if newwhen and not self.whenTo:
+            self.whenTo = newwhen
+        if self.whenTo and newwhen and newwhen > self.whenTo:
+            self.whenTo = newwhen
 
     def __getattr__(self, attr):
         if attr == 'parentofhuman' and self.parentofhuman is None:

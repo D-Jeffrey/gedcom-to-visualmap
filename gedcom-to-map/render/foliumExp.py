@@ -472,9 +472,9 @@ class foliumExporter:
         # missing tag a the end on purpose
         fm.default_js.append(['hack.js', 'https://use.fontawesome.com/releases/v6.5.1/js/all.js" data-auto-replace-svg="nest'])
     
-        """ ***************************** """ 
-        """     Line Drawing Section      """ 
-        """ ***************************** """ 
+        # ***************************** 
+        #     Line Drawing Section      
+        # ***************************** 
         
 
 
@@ -610,10 +610,10 @@ class foliumExporter:
 
 
 
-        """ *****************************************************  """ 
-        """    Display people using subgroup control to navigate   """ 
-        """    NOT USED YET                                        """ 
-        """ *****************************************************  """ 
+        """ 
+           Display people using subgroup control to navigate   
+            NOT USED YET                                        
+        """
 
     #def peopleAsTreeNav(people):
     #    peoplegroup = folium.FeatureGroup("Chránené oblasti",control=False)

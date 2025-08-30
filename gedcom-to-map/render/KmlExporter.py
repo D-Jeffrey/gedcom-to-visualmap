@@ -4,6 +4,7 @@ import logging
 import math
 import os.path
 import random
+import re
 
 import simplekml as simplekml
 from gedcomoptions import gvOptions
@@ -13,6 +14,8 @@ from render.Referenced import Referenced
 
 _log = logging.getLogger(__name__.lower())
 
+                
+useballonFlyto = True
 class KmlExporter:
     def __init__(self, gOp: gvOptions):
         self.file_name = os.path.join(gOp.resultpath, gOp.Result)
@@ -33,6 +36,37 @@ class KmlExporter:
         return ((float(l.lon)+(random.random() * 0.001) - 0.0005), float(l.lat)+(random.random() * 0.001) - 0.0005)
         
     def Done(self):
+        self.gOp.step("Finalizing KML")
+        # Fix up the links in the placemark
+        for placemark in self.kml.features:
+            if placemark.description:
+                pattern = r'href=#(.*?);'
+                for match in re.finditer(pattern, placemark.description):
+                    tag = match.group(1)
+                    if self.gOp.Referenced.exists(tag):
+                        replacewith = 1 + int(self.gOp.Referenced.gettag(tag))
+                        original = f"href=#{tag};"
+                        replacement = f"href=#{replacewith};"
+                        placemark.description = placemark.description.replace(original, replacement)
+            if placemark.balloonstyle and placemark.balloonstyle.text:
+                pattern = r'href=#(.*?);'
+                for match in re.finditer(pattern, placemark.balloonstyle.text):
+                    tag = match.group(1)
+                    if self.gOp.Referenced.exists(tag):
+                        replacewith = 1 + int(self.gOp.Referenced.gettag(tag))
+                        original = f"href=#{tag};"
+                        replacement = f"href=#{replacewith};"
+                        placemark.balloonstyle.text = placemark.balloonstyle.text.replace(original, replacement)
+
+            # if placemark.description and placemark.description.find("href=#") >= 0:
+            #     # Loop
+            #     start = placemark.description.find("href=#",end)+6
+            #     end = placemark.description.find(";")
+            #     tag = placemark.description[start:end]
+            #     if self.gOp.Referenced.exists(tag):
+            #         # This is a hack to get to the placemark id
+            #         replacewith = 1 + int(self.gOp.Referenced.gettag(tag) )
+            #         placemark.description = placemark.description.replace(f"href=#{tag};", f"href=#{replacewith};")
         self.gOp.step("Saving KML")
         logging.info("Saved as %s", self.file_name)
         self.kml.save(self.file_name)
@@ -53,15 +87,19 @@ class KmlExporter:
         colorB = "ltblu"
         if self.kml:
             kml = self.kml
+            
             styleA = self.styleA
             styleB = self.styleB     
         else:
             kml = simplekml.Kml()
+            # kml = kmlbase.newdocument(name='Family Tree')
             self.kml = kml
+            
             styleA = simplekml.Style()
             # styleA.labelstyle.color = simplekml.Color.blue  # Make the text blue
             styleA.labelstyle.scale = 1  # Make the text twice as big
-            styleA.iconstyle.icon.href = f'https://maps.google.com/mapfiles/kml/paddle/{colorA}-{marktype}.png'          #   https://kml4earth.appspot.com/icons.html
+            styleA.iconstyle.icon.href = f'https://maps.google.com/mapfiles/kml/paddle/{colorA}-{marktype}.png'
+                      #   https://kml4earth.appspot.com/icons.html
             styleB = simplekml.Style()
             # styleB.labelstyle.color = simplekml.Color.pink  # Make the text pink
             styleB.labelstyle.scale = 1  # Make the text twice as big
@@ -69,48 +107,87 @@ class KmlExporter:
             self.styleA = styleA
             self.styleB = styleB
             
-        if main:
+        if main and main.lon and main.lat:
             kml.newpoint(name=(self.gOp.Name  + ntag),coords=[ (main.lon, main.lat) ])
             self.gOp.totalpeople += 1
         else:
-            _log.error ("No GPS locations to generate a map.")
+            _log.error (f"No GPS locations to generate a map for main for {ntag}.")
 
         
         self.gOp.step("Generating KML")
         sorted_lines = sorted(lines, key=lambda x: x.prof)
         for line in sorted_lines :
             self.gOp.step()
-            names = line.name.split("\t")
-            linage = names[0]
-            name = names[len(names)-1]
-            if (line.a.lon and line.a.lat):
-                pnt = kml.newpoint(name=name + ntag, description=linage, coords=[self.driftPos(line.a)])
-                self.gOp.Referenced.add(line.human.xref_id, 'kml-a')
+            (desend, name) = line.name.split("\t")
+            linage = "<![CDATA[ " 
+            timeA = line.whenFrom if hasattr(line, 'whenFrom') and line.whenFrom else None
+            timeB = line.whenTo if hasattr(line, 'whenTo') and line.whenTo else None
+            linage += "<br>Lifespan: {} to {}, related as {}</br>".format(timeA if timeA else "??", timeB if timeB else "???", desend)
+            if line.human.father:
+                if useballonFlyto:
+                    linage += '<br>Father: <a href=#{};ballonFlyto>{}</a></br>'.format(line.human.father[1:-1],self.gOp.humans[line.human.father].name)    
+                else:
+                    linage += '<br>Father: {}</br>'.format(self.gOp.humans[line.human.father].name)
+            if line.human.mother:
+                if useballonFlyto:
+                    linage += '<br>Mother: <a href=#{};ballonFlyto>{}</a></br>'.format(line.human.mother[1:-1],self.gOp.humans[line.human.mother].name)
+                else:
+                    linage += '<br>Mother: {}</br>'.format(self.gOp.humans[line.human.mother].name)
+            # desend this is the descendant linage 0 for father, 1 for mother
+            linage += " ]]>"
+
+            
+            if line.a.lon and line.a.lat and mark in ['native','born']:
+                pnt = kml.newpoint(name=name + ntag, coords=[self.driftPos(line.a)])
+                    
+                self.gOp.Referenced.add(line.human.xref_id, 'kml-a',tag=pnt.id)
+                self.gOp.Referenced.add(line.human.xref_id[1:-1], tag=pnt.id)
                 self.gOp.totalpeople += 1
-                if line.when: pnt.TimeStamp.when = line.when
-                pnt.style = styleA
+                if hasattr(line, 'whenFrom') and line.whenFrom: pnt.timestamp.when = line.whenFrom
+            
+                pnt.style = simplekml.Style()
+                pnt.style.labelstyle.scale = 1  # Make the text twice as big
+                # pnt.style.iconstyle.icon.href = f'https://maps.google.com/mapfiles/kml/paddle/{colorA}-{marktype}.png'
+
+                pnt.style.balloonstyle = simplekml.BalloonStyle()
+                pnt.style.balloonstyle.text = linage
+
                 
-                # pnt.address = where
-            if (line.b.lon and line.b.lat):
-                pnt = kml.newpoint(name=name + ntag, description=linage, coords=[self.driftPos(line.b)])
+            if line.b.lon and line.b.lat and mark in ['native','death']:
+                pnt = kml.newpoint(name=name + ntag, coords=[self.driftPos(line.b)])
+
                 self.gOp.Referenced.add(line.human.xref_id, 'kml-b')
+                self.gOp.Referenced.add(line.human.xref_id[1:-1], tag=pnt.id)
                 self.gOp.totalpeople += 1
-                if line.when: pnt.TimeStamp.when = line.when
-                pnt.style = styleB
+                if hasattr(line, 'whenTo') and line.whenTo: pnt.timestamp.when = line.whenTo
+                # 
+                pnt.style = simplekml.Style()
+                pnt.style.labelstyle.scale = 1  # Make the text twice as big
+                # pnt.style.iconstyle.icon.href = f'https://maps.google.com/mapfiles/kml/paddle/{colorB}-{marktype}.png'        #   https://kml4earth.appspot.com/icons.html
+
                 
-                # pnt.address = where
+                pnt.style.balloonstyle = simplekml.BalloonStyle()
+                pnt.style.balloonstyle.text = linage 
                 
             if (line.a.lon and line.a.lat and line.b.lon and line.b.lat):
                 kml_line = kml.newlinestring(name=name, description=linage, coords=[self.driftPos(line.a), self.driftPos(line.b)])
                 kml_line.linestyle.color = line.color.to_hexa()
-                # Protect the exp from overflow for very long linages
-                kml_line.linestyle.width = max(
-                    int(self.max_line_weight/math.exp(0.5*min(line.prof,1000))),
-                    1
-                )
-                kml_line.extrude = 1
-                kml_line.tessellate = 1
-                kml_line.altitudemode = simplekml.AltitudeMode.clamptoground 
+                # - exponential decay function for the line width - Protect the exp from overflow for very long linages because the line is in pixels
+                kml_line.linestyle.width = max( int(self.max_line_weight/math.exp(0.5*min(line.prof,100))), .1 )
+                kml_line.extrude = 1                                                # This makes the line drop to the ground
+                kml_line.tessellate = 1                                             # This makes the line follow the terrain
+                kml_line.altitudemode = simplekml.AltitudeMode.relativetoground     # Alternate is clamptoground
+                kml_line.altitude = random.randrange(1,5)                           # This helps to seperate lines in 3d space
+                # Used for timerange spanning/filtering in Google Earth Pro or ArcGIS
+                if timeA and timeB: 
+                    kml_line.timespan.begin = timeA                                 
+                    kml_line.timespan.end = timeB
+                elif timeA:
+                    # If we only know when the birth or death then us a point in time
+                    kml_line.timestamp.when = timeA                       
+                elif timeB:
+                    kml_line.timestamp.when = timeB
+                _log.info    (f"    line    {line.name} ({line.a.lon}, {line.a.lat}) ({line.b.lon}, {line.b.lat})")    
             else:
                 _log.warning (f"skipping {line.name} ({line.a.lon}, {line.a.lat}) ({line.b.lon}, {line.b.lat})")
         self.Done()

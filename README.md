@@ -247,6 +247,8 @@ python3 ..\gedcom-to-map\gedcom-to-map.py input.ged output -main "@I0000@" -form
 - need to determine how do deal with very large HTML files.  Could use a limit of the number of people included in the selection
 - Improve the KML version of the maps by grouping and improving the track of a person.  Add description bits to people in the KML version
 - Improve marker clusters to have the proper icon
+- Move some configuration to YAML to preserve customization over releases
+- Major refactoring to make this *real* Python code
 
 ## Issues
 - Marriage is not read correctly all the time, limitations with multiple marriages
@@ -258,9 +260,13 @@ python3 ..\gedcom-to-map\gedcom-to-map.py input.ged output -main "@I0000@" -form
 - Need to separate the Load and GPS resolve steps (currently reloads after 30 seconds of looking up values)
 
 ## Releases
-
+### v0.2.6.4
+- Fixed Logging Save settings
+- Worked on KML to add FlyTo and improve features and labels
+- working to refactor and enrich the kml results
+- ballonflyto does not work yet
 ### v0.2.6.3
-- Add images for Bronte sample, bug fixes for f{}
+- Add images for Bourbon sample, bug fixes for f{}
 ### v0.2.6.2
 - @colin0brass - Fixes to make it work properly on a Mac as well as a number of other pure programmer errors identified
 - Improve Person Dialog (Displays picture if available)

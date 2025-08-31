@@ -101,15 +101,12 @@ class GEDComGPSLookup:
         self.humans = humans
         self.countrieslist = None
         self.Geoapp = None
-        # Get OS and architecture details
-        os_name = platform.system()
-        os_version = platform.release()
-        arch = platform.machine()
+        
         global BackgroundProcess
         BackgroundProcess = gvO.BackgroundProcess
 
-        # Build the user agent string
-        self.geocodeUserAgent = f"{GEOCODEUSERAGENT} ({os_name} {os_version}; {arch})"
+        # Build the user agent string using OS and architecture details used for making our agent string
+        self.geocodeUserAgent = f"{GEOCODEUSERAGENT} ({platform.system()} {platform.release()}; {platform.machine()})"
         self.stats = ""
         self.used = 0
         self.usedNone = 0

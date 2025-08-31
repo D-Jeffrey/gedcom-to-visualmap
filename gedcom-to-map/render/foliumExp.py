@@ -113,8 +113,8 @@ class MyMarkClusters:
         self.mymap = mymap
         self.step = step
 
-    def mark (self, spot, when=None):
-        if spot and spot.lat and spot.lon:
+    def mark (self, spot : Pos, when=None):
+        if spot and spot.hasLocation():
             cnt = 1
             if (when):
                 # TODO this is a range date hack
@@ -525,14 +525,14 @@ class foliumExporter:
                 new_fg = True
 
             # Add start marker
-            if line.a and line.a.lat and line.a.lon:
+            if line.a and line.a.hasLocation():
                 start_point = [Drift(line.a.lat), Drift(line.a.lon)]
                 self._add_point_marker(fg, start_point, marker_options, 
                                        f"Life of {line.name}".replace("`", "‛").replace("'", "‛"), 
                                        popup_content, marker_options['start_icon'], marker_options['start_color'])
 
             # Add end marker
-            if line.b and line.b.lat and line.b.lon:
+            if line.b and line.b.hasLocation():
                 end_point = [Drift(line.b.lat), Drift(line.b.lon)]
                 self._add_point_marker(fg, end_point, marker_options, 
                                        f"Life of {line.name}".replace("`", "‛").replace("'", "‛"), 
@@ -540,7 +540,7 @@ class foliumExporter:
 
             # Add midpoints
             fm_line = []
-            if line.a and line.a.lat and line.a.lon:
+            if line.a and line.a.hasLocation():
                 fm_line.append(tuple(start_point))
             if line.midpoints:
                 for mids in line.midpoints:
@@ -552,7 +552,7 @@ class foliumExporter:
                         color = MidPointMarker[point_type][1]
                         tooltip = mids.what + ' ' + mids.where if mids.what else '?? ' + mids.where
                         self._add_point_marker(fg, mid_point, marker_options, tooltip, popup_content, marker, color)
-            if line.b and line.b.lat and line.b.lon:
+            if line.b and line.b.hasLocation():
                 fm_line.append(tuple(end_point))
 
             # Add polyline

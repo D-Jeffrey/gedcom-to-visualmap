@@ -15,7 +15,7 @@ from render.Referenced import Referenced
 _log = logging.getLogger(__name__.lower())
 
                 
-useballonFlyto = True
+useballoonFlyto = True
 class KmlExporter:
     def __init__(self, gOp: gvOptions):
         self.file_name = os.path.join(gOp.resultpath, gOp.Result)
@@ -97,13 +97,13 @@ class KmlExporter:
             
             styleA = simplekml.Style()
             # styleA.labelstyle.color = simplekml.Color.blue  # Make the text blue
-            styleA.labelstyle.scale = 1  # Make the text twice as big
+            # styleA.labelstyle.scale = 1  # Make the text twice as big
             styleA.iconstyle.icon.href = f'https://maps.google.com/mapfiles/kml/paddle/{colorA}-{marktype}.png'
                       #   https://kml4earth.appspot.com/icons.html
             styleB = simplekml.Style()
             # styleB.labelstyle.color = simplekml.Color.pink  # Make the text pink
             styleB.labelstyle.scale = 1  # Make the text twice as big
-            styleB.iconstyle.icon.href = f'https://maps.google.com/mapfiles/kml/paddle/{colorB}-{marktype}.png'        #   https://kml4earth.appspot.com/icons.html
+            # styleB.iconstyle.icon.href = f'https://maps.google.com/mapfiles/kml/paddle/{colorB}-{marktype}.png'        #   https://kml4earth.appspot.com/icons.html
             self.styleA = styleA
             self.styleB = styleB
             
@@ -119,42 +119,51 @@ class KmlExporter:
         for line in sorted_lines :
             self.gOp.step()
             (desend, name) = line.name.split("\t")
-            linage = "<![CDATA[ " 
+            linage = ""
             timeA = line.whenFrom if hasattr(line, 'whenFrom') and line.whenFrom else None
             timeB = line.whenTo if hasattr(line, 'whenTo') and line.whenTo else None
-            linage += "<br>Lifespan: {} to {}, related as {}</br>".format(timeA if timeA else "??", timeB if timeB else "???", desend)
+            
             if line.human.father:
-                if useballonFlyto:
-                    linage += '<br>Father: <a href=#{};ballonFlyto>{}</a></br>'.format(line.human.father[1:-1],self.gOp.humans[line.human.father].name)    
+                if useballoonFlyto:
+                    linage += '<br>Father: <a href=#{};balloonFlyto>{}</a></br>'.format(line.human.father[1:-1],self.gOp.humans[line.human.father].name)    
                 else:
                     linage += '<br>Father: {}</br>'.format(self.gOp.humans[line.human.father].name)
             if line.human.mother:
-                if useballonFlyto:
-                    linage += '<br>Mother: <a href=#{};ballonFlyto>{}</a></br>'.format(line.human.mother[1:-1],self.gOp.humans[line.human.mother].name)
+                if useballoonFlyto:
+                    linage += '<br>Mother: <a href=#{};balloonFlyto>{}</a></br>'.format(line.human.mother[1:-1],self.gOp.humans[line.human.mother].name)
                 else:
                     linage += '<br>Mother: {}</br>'.format(self.gOp.humans[line.human.mother].name)
-            # desend this is the descendant linage 0 for father, 1 for mother
-            linage += " ]]>"
+            family = []
+            thisparent = line.human.xref_id
+           
+            for c in self.gOp.humans:
+                if self.gOp.humans[c].father == thisparent or self.gOp.humans[c].mother == thisparent:
+                    family.append(self.gOp.humans[c].name)
+            if family:
+                familyLinage = '<br>Children: {}</br>'.format(", ".join(family))
 
             
-            if line.a.lon and line.a.lat and mark in ['native','born']:
-                pnt = kml.newpoint(name=name + ntag, coords=[self.driftPos(line.a)])
-                    
+
+            
+            if line.a.hasLocation() and mark in ['native','born']:
+                event = "<br>Born: {}</br>".format(timeA if timeA else "Unknown", timeB if timeB else "Unknown")
+                pnt = kml.newpoint(name=name + ntag, coords=[self.driftPos(line.a)], description="<![CDATA[ " + event + linage + " ]]>")
                 self.gOp.Referenced.add(line.human.xref_id, 'kml-a',tag=pnt.id)
                 self.gOp.Referenced.add(line.human.xref_id[1:-1], tag=pnt.id)
                 self.gOp.totalpeople += 1
                 if hasattr(line, 'whenFrom') and line.whenFrom: pnt.timestamp.when = line.whenFrom
             
                 pnt.style = simplekml.Style()
-                pnt.style.labelstyle.scale = 1  # Make the text twice as big
-                # pnt.style.iconstyle.icon.href = f'https://maps.google.com/mapfiles/kml/paddle/{colorA}-{marktype}.png'
+                pnt.style.labelstyle.scale = styleA.labelstyle.scale
+                pnt.style.iconstyle.icon.href = styleA.iconstyle.icon.href
 
-                pnt.style.balloonstyle = simplekml.BalloonStyle()
-                pnt.style.balloonstyle.text = linage
+                # pnt.style.balloonstyle = simplekml.BalloonStyle()
+                # pnt.style.balloonstyle.text = linage
 
                 
-            if line.b.lon and line.b.lat and mark in ['native','death']:
-                pnt = kml.newpoint(name=name + ntag, coords=[self.driftPos(line.b)])
+            if line.b.hasLocation() and mark in ['native','death']:
+                event = "<br>Death: {}</br>".format(timeB if timeB else "Unknown") 
+                pnt = kml.newpoint(name=name + ntag, coords=[self.driftPos(line.b)], description="<![CDATA[ " + event + linage  + familyLinage + " ]]>")
 
                 self.gOp.Referenced.add(line.human.xref_id, 'kml-b')
                 self.gOp.Referenced.add(line.human.xref_id[1:-1], tag=pnt.id)
@@ -162,22 +171,24 @@ class KmlExporter:
                 if hasattr(line, 'whenTo') and line.whenTo: pnt.timestamp.when = line.whenTo
                 # 
                 pnt.style = simplekml.Style()
-                pnt.style.labelstyle.scale = 1  # Make the text twice as big
-                # pnt.style.iconstyle.icon.href = f'https://maps.google.com/mapfiles/kml/paddle/{colorB}-{marktype}.png'        #   https://kml4earth.appspot.com/icons.html
+                pnt.style.labelstyle.scale = styleB.labelstyle.scale
+                pnt.style.iconstyle.icon.href = styleB.iconstyle.icon.href
 
                 
-                pnt.style.balloonstyle = simplekml.BalloonStyle()
-                pnt.style.balloonstyle.text = linage 
+                # pnt.style.balloonstyle = simplekml.BalloonStyle()
+                # pnt.style.balloonstyle.text = linage 
                 
-            if (line.a.lon and line.a.lat and line.b.lon and line.b.lat):
-                kml_line = kml.newlinestring(name=name, description=linage, coords=[self.driftPos(line.a), self.driftPos(line.b)])
+            if line.a.hasLocation() and line.b.hasLocation():
+                # Put the life span description in the line
+                event  = "<br>Lifespan: {} to {}, related as {}</br>".format(timeA if timeA else "Unknown", timeB if timeB else "Unknown", desend) 
+                kml_line = kml.newlinestring(name=name, description="<![CDATA[ " + event + linage + familyLinage + " ]]>", coords=[self.driftPos(line.a), self.driftPos(line.b)])
                 kml_line.linestyle.color = line.color.to_hexa()
                 # - exponential decay function for the line width - Protect the exp from overflow for very long linages because the line is in pixels
                 kml_line.linestyle.width = max( int(self.max_line_weight/math.exp(0.5*min(line.prof,100))), .1 )
                 kml_line.extrude = 1                                                # This makes the line drop to the ground
                 kml_line.tessellate = 1                                             # This makes the line follow the terrain
-                kml_line.altitudemode = simplekml.AltitudeMode.relativetoground     # Alternate is clamptoground
-                kml_line.altitude = random.randrange(1,5)                           # This helps to seperate lines in 3d space
+                kml_line.altitudemode = simplekml.AltitudeMode.clamptoground        # Alternate is relativetoground
+                # kml_line.altitude = random.randrange(1,5)                           # This helps to seperate lines in 3d space
                 # Used for timerange spanning/filtering in Google Earth Pro or ArcGIS
                 if timeA and timeB: 
                     kml_line.timespan.begin = timeA                                 

@@ -260,6 +260,8 @@ python3 ..\gedcom-to-map\gedcom-to-map.py input.ged output -main "@I0000@" -form
 - Need to separate the Load and GPS resolve steps (currently reloads after 30 seconds of looking up values)
 
 ## Releases
+### v0.2.6.4.1
+- Fixed balloonflyto and added children to KML
 ### v0.2.6.4
 - Fixed Logging Save settings
 - Worked on KML to add FlyTo and improve features and labels

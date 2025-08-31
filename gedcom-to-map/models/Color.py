@@ -15,6 +15,8 @@ Args:
         https://developers.google.com/kml/documentation/kmlreference#elements-specific-to-colorstyle
 
 """
+    __slots__ = ('r', 'g', 'b', 'a')
+
     def __init__(self, r=255, g=0, b=0, a=255):
         self.r = r
         self.g = g
@@ -25,5 +27,7 @@ Args:
         return f"{self.a:02x}{self.b:02x}{self.g:02x}{self.r:02x}"
     def to_RGBhex(self) -> str:
         return f"{self.r:02x}{self.g:02x}{self.b:02x}"
-    def __repr__(self):
+    def __repr__(self) -> str:
+        return f"R{self.r:3}G{self.g:3}B{self.b:3}A{self.a:3}"
+    def __str__(self) -> str:
         return f"R{self.r:3}G{self.g:3}B{self.b:3}A{self.a:3}"

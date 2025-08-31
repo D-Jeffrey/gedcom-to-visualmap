@@ -123,11 +123,11 @@ class LifetimeCreator:
         wyear = None
         if current.home:
             for h in (range(0,len(current.home))):
-                if (current.home[h].pos and current.home[h].pos.lat != None):
+                if current.home[h].pos and current.home[h].pos.hasLocation():
                     midpoints.append(LifeEvent(current.home[h].where, current.home[h].whenyear(), current.home[h].pos, current.home[h].what))
                     wyear = wyear if wyear else current.home[h].whenyear()
-        bp = current.birth.pos if current.birth else None
-        bd = current.death.pos if current.death else None
+        bp = current.birth.pos if current.birth and current.birth.pos.hasLocation() else None
+        bd = current.death.pos if current.death and current.death.pos.hasLocation() else None
         line = Line(f"{path:8}\t{current.name}", bp, bd, self.rainbow.get(color), path, branch, prof, 'Life', 
                     None, midpoints, current, whenFrom=current.birth.whenyear() if hasattr(current, 'birth') and current.birth else None , whenTo=current.death.whenyear() if hasattr(current, 'death') and current.death else None)
         return [line]

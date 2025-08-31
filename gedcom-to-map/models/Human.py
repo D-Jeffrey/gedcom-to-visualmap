@@ -37,8 +37,10 @@ class Partner:
         return f"Human(id={self.xref_id}, Pos={self.pos})"
  
 class Human:
+    __slots__ = ['xref_id', 'name', 'father', 'mother', 'pos', 'birth', 'death', 'marriage', 'home', 'map', 'first', 
+                 'surname', 'maiden','sex','title', 'photo', 'children', 'partners']
     def __init__(self, xref_id):
-        self.xref_id = xref_id
+        self.xref_id: str = xref_id
         self.name = None
         self.father : Human = None
         self.mother : Human = None
@@ -57,10 +59,10 @@ class Human:
         self.title = None
 
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"Human(id={self.xref_id}, name={self.name})"
         
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"[ {self.xref_id} : {self.name} - {self.father} & {self.mother} - {self.pos} ]"
 
     # return "year (Born)" or "year (Died)" or "? (Unknown)" along with year as a string or None

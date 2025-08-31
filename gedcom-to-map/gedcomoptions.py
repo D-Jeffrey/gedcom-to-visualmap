@@ -60,6 +60,7 @@ class gvOptions:
         self.AllEntities = False
         self.PlaceType = {'native':'native'}        # Dict add/replace with multiple 'native', 'born' & 'death'
         self.GridView = False
+        self.UseBalloonFlyto = True
 
         self.showLayerControl = True
         self.mapMini = True
@@ -112,7 +113,7 @@ class gvOptions:
         self.core_keys = {'UseGPS':0, 'CacheOnly':0, 'AllEntities':0, 'KMLcmdline':2, 'CSVcmdline':2}
         self.logging_keys = ['models.human', 'models', 'ged4py.parser', 'ged4py', 'models.creator', 'gedcomoptions', 'gedcom.gedcomparser', 'gedcom', 'gedcom.gpslookup', 'geopy', 'render.kmlexporter', 'render', 'render.foliumexp', 'gedcomvisual', 'gedcomdialogs', 'gedcomvisualgui', '__main__']
         
-        self.kml_keys = {'PlaceType':3, 'MaxLineWeight':1, 'MaxMissing':1}
+        self.kml_keys = {'PlaceType':3, 'MaxLineWeight':1, 'MaxMissing':1, 'UseBalloonFlyto':0}
         if os.path.exists(self.settingsfile):
             self.loadsettings()            
 

@@ -56,7 +56,7 @@ def doKML(gOp : gvOptions, humans: list[Human]):
                         humans[h].pos = humans[h].death.pos
             _log.info  ("KML death")
             nametag = ' (d)'
-        
+        # lifeline = LifetimeCreator(humans, gOp.MaxMissing)    
         lifeline = Creator(humans, gOp.MaxMissing) 
         creator = lifeline.create(gOp.Main)
         if gOp.AllEntities:

@@ -15,7 +15,7 @@ from render.Referenced import Referenced
 _log = logging.getLogger(__name__.lower())
 
                 
-useballoonFlyto = True
+
 class KmlExporter:
     def __init__(self, gOp: gvOptions):
         self.file_name = os.path.join(gOp.resultpath, gOp.Result)
@@ -124,30 +124,39 @@ class KmlExporter:
             timeB = line.whenTo if hasattr(line, 'whenTo') and line.whenTo else None
             
             if line.human.father:
-                if useballoonFlyto:
+                if self.gOp.UseBalloonFlyto:
                     linage += '<br>Father: <a href=#{};balloonFlyto>{}</a></br>'.format(line.human.father[1:-1],self.gOp.humans[line.human.father].name)    
                 else:
                     linage += '<br>Father: {}</br>'.format(self.gOp.humans[line.human.father].name)
             if line.human.mother:
-                if useballoonFlyto:
+                if self.gOp.UseBalloonFlyto:
                     linage += '<br>Mother: <a href=#{};balloonFlyto>{}</a></br>'.format(line.human.mother[1:-1],self.gOp.humans[line.human.mother].name)
                 else:
                     linage += '<br>Mother: {}</br>'.format(self.gOp.humans[line.human.mother].name)
             family = []
             thisparent = line.human.xref_id
-           
+
             for c in self.gOp.humans:
                 if self.gOp.humans[c].father == thisparent or self.gOp.humans[c].mother == thisparent:
-                    family.append(self.gOp.humans[c].name)
+                    family.append(c)
             if family:
-                familyLinage = '<br>Children: {}</br>'.format(", ".join(family))
+                if self.gOp.UseBalloonFlyto:
+                    # Format each child as a clickable link
+                    family_links = [
+                        f'<a href=#{child[1:-1]};balloonFlyto>{self.gOp.humans[child].name}</a>'
+                        for child in family
+                    ]
+                    familyLinage = '<br>Children: {}</br>'.format(", ".join(family_links))
+                else:
+                    family_names = [self.gOp.humans[child].name for child in family]
+                    familyLinage = '<br>Children: {}</br>'.format(", ".join(family_names))
 
             
 
             
             if line.a.hasLocation() and mark in ['native','born']:
                 event = "<br>Born: {}</br>".format(timeA if timeA else "Unknown", timeB if timeB else "Unknown")
-                pnt = kml.newpoint(name=name + ntag, coords=[self.driftPos(line.a)], description="<![CDATA[ " + event + linage + " ]]>")
+                pnt = kml.newpoint(name=name + ntag, coords=[self.driftPos(line.a)], description="<![CDATA[ " + event + linage + familyLinage + " ]]>")
                 self.gOp.Referenced.add(line.human.xref_id, 'kml-a',tag=pnt.id)
                 self.gOp.Referenced.add(line.human.xref_id[1:-1], tag=pnt.id)
                 if hasattr(line, 'whenFrom') and line.whenFrom: pnt.timestamp.when = line.whenFrom
@@ -221,4 +230,4 @@ class KmlExporter:
                     else:
                         _log.warning (f"skipping {line.name} ({mid.pos.lon}, {mid.pos.lat})")
         self.Done()
-   
+

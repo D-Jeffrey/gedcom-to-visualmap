@@ -38,7 +38,7 @@ class Partner:
  
 class Human:
     __slots__ = ['xref_id', 'name', 'father', 'mother', 'pos', 'birth', 'death', 'marriage', 'home', 'map', 'first', 
-                 'surname', 'maiden','sex','title', 'photo', 'children', 'partners']
+                 'surname', 'maiden','sex','title', 'photo', 'children', 'partners', 'age']
     def __init__(self, xref_id):
         self.xref_id: str = xref_id
         self.name = None

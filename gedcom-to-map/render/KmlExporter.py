@@ -150,7 +150,6 @@ class KmlExporter:
                 pnt = kml.newpoint(name=name + ntag, coords=[self.driftPos(line.a)], description="<![CDATA[ " + event + linage + " ]]>")
                 self.gOp.Referenced.add(line.human.xref_id, 'kml-a',tag=pnt.id)
                 self.gOp.Referenced.add(line.human.xref_id[1:-1], tag=pnt.id)
-                self.gOp.totalpeople += 1
                 if hasattr(line, 'whenFrom') and line.whenFrom: pnt.timestamp.when = line.whenFrom
             
                 pnt.style = simplekml.Style()
@@ -201,5 +200,25 @@ class KmlExporter:
                 _log.info    (f"    line    {line.name} ({line.a.lon}, {line.a.lat}) ({line.b.lon}, {line.b.lat})")    
             else:
                 _log.warning (f"skipping {line.name} ({line.a.lon}, {line.a.lat}) ({line.b.lon}, {line.b.lat})")
+            self.gOp.totalpeople += 1
+            if line.midpoints:
+                for mid in line.midpoints:
+                    if mid.pos and mid.pos.hasLocation():
+                        whatevent = mid.what if mid.what else "Event"
+                        event = "<br>{}: {}</br>".format(whatevent, mid.when if mid.when else "Unknown") 
+                        pnt = kml.newpoint(name=f"{name} ({whatevent})", coords=[self.driftPos(mid.pos)], description="<![CDATA[ " + event + " ]]>")
+                        pnt.style = simplekml.Style()
+                        pnt.style.labelstyle.scale = 0.7 * styleA.labelstyle.scale
+                        # pnt.style.iconstyle.icon.href = f'https://maps.google.com/mapfiles/kml/paddle/wht-blank.png'
+                        if mid.when and not (isinstance(mid.when, str)):
+                            if hasattr(mid.when.value, 'date'):
+                                pnt.timestamp.when = mid.when.value.date.isoformat()
+                            elif hasattr(mid.when.value, 'date1'):
+                                pnt.timestamp.when = mid.when.value.date1.isoformat()
+                        
+                        
+                        _log.info    (f"    midpt   {line.name} ({mid.pos.lon}, {mid.pos.lat})")    
+                    else:
+                        _log.warning (f"skipping {line.name} ({mid.pos.lon}, {mid.pos.lat})")
         self.Done()
    

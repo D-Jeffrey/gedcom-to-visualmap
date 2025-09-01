@@ -603,20 +603,20 @@ and generating the output so that the GUI can continue to be responsive
                             self.gOptions.humans = None
                             self.humans = None
                     _log.info("ParseAndGPS")
-                    try:
-                        self.humans = ParseAndGPS(self.gOptions, 1)
+                    #try:
+                    self.humans = ParseAndGPS(self.gOptions, 1)
                     
-                    except Exception as e:
-                        # Capture other exceptions
-                        if hasattr(self, 'humans'):
-                            if self.humans:                            
-                                del self.humans
-                                self.humans = None
-                        self.do = 0
-                        _log.warning(str(e))
-                        self.gOptions.stopping = False
-                        self.SayErrorMessage('Failed to Parse', True)
-                        self.SayErrorMessage(str(e), True)
+                    # except Exception as e:
+                    #     # Capture other exceptions
+                    #     if hasattr(self, 'humans'):
+                    #         if self.humans:                            
+                    #             del self.humans
+                    #             self.humans = None
+                    #     self.do = 0
+                    #     _log.warning(str(e))
+                    #     self.gOptions.stopping = False
+                    #     self.SayErrorMessage('Failed to Parse', True)
+                    #     self.SayErrorMessage(str(e), True)
                         
                     if self.do & 1 and self.gOptions.Referenced:
                         del self.gOptions.Referenced

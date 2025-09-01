@@ -75,9 +75,13 @@ if __name__ == '__main__':
                                      MarkStarOn = not arg_parse.args.markstaroff, 
                                      GroupBy = arg_parse.args.groupby,
                                      UseAntPath = arg_parse.args.antpath, 
-                                     HeatMapTimeLine = arg_parse.args.heattime,
+                                     MapTimeLine = arg_parse.args.heattime,
                                      HeatMapTimeStep = arg_parse.args.heatstep,
                                      HomeMarker = arg_parse.args.markhomes)
+    #TODO needs to be fixed
+    
+    _log.fatal(" ERROR Module gedcom-to-map.py needs to be updated to support new code base")
+    
     places = {'native':'native'}
     if arg_parse.args.born or arg_parse.args.death:
         places = {}

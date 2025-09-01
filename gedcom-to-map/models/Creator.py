@@ -14,37 +14,38 @@ _log = logging.getLogger(__name__.lower())
 SPACE = 2.5     # These values drive how colors are selected
 DELTA = 1.5     # These values drive how colors are selected
 
-def getattrif(obj, attname, attvaluename):
+def getattrposif(obj, attname, attvaluename):
     if obj:
         if hasattr(obj, attname):
             a = getattr(obj, attname)
             if hasattr(a, attvaluename):
                 return getattr(a, attvaluename)
-    return None
+    return Pos(None, None)
     
 class Creator:
-    def __init__(self, humans: Dict[str, Human], max_missing=0):
+    def __init__(self, humans: Dict[str, Human], max_missing=0, gpstype="birth"):
         self.humans = humans
         self.rainbow = Rainbow()
         self.max_missing = max_missing
         self.alltheseids= {}
+        self.gpstype = gpstype
 
     def line(self, pos: Pos, current: Human, branch, prof, miss, path="") -> list[Line]:
         if current.xref_id in self.alltheseids:
             _log.error("Looping Problem: {:2} -LOOP STOP - {} {} -Looping= {:20}".format(  prof, self.humans[current.xref_id].name, current.xref_id, path))
             return []
         self.alltheseids[current.xref_id] = current.xref_id
-        if not current.pos:
+        if not getattr(current, self.gpstype):
             return (
                 []
                 if self.max_missing != 0 and miss >= self.max_missing
-                else self.link(pos, current, branch, prof, miss + 1, path)
+                else self.link(getattrposif(current, self.gpstype, 'pos'), current, branch, prof, miss + 1, path)
             )
         color = (branch + DELTA / 2) / (SPACE ** (prof % 256))
         _log.info("{:8} {:8} {:2} {:.10f} {} {:20}".format(path, branch, prof, color, self.rainbow.get(color).to_hexa(), current.name))
-        line = Line(f"{path:8}\t{current.name}", pos, current.pos, self.rainbow.get(color), path, branch,prof, human=current, 
-                    whenFrom=current.birth.whenyear() if hasattr(current, 'birth') and current.birth else None , whenTo=current.death.whenyear() if hasattr(current, 'death') and current.death else None)
-        return self.link(current.pos, current, branch, prof, 0, path) + [line]
+        line = Line(f"{path:8}\t{current.name}", pos, getattrposif(current, self.gpstype, 'pos'), self.rainbow.get(color), path, branch,prof, human=current,
+                    whenFrom=current.birth.whenyear() if hasattr(current, 'birth') and current.birth else None, whenTo=current.death.whenyear() if hasattr(current, 'death') and current.death else None)
+        return self.link(getattrposif(current, self.gpstype, 'pos'), current, branch, prof, 0, path) + [line]
 
     def link(self, pos: Pos, current: Human, branch=0, prof=0, miss=0, path="") -> list[Line]:
         return (self.line(pos, self.humans[current.father], branch*SPACE, prof+1, miss, f"{path}F") if current.father else []) \
@@ -56,14 +57,14 @@ class Creator:
             raise IndexError(f"Missing starting person {main_id}")
 
         current = self.humans[main_id]
-        return self.link(current.pos, current)
+        return self.link(getattrposif(current, self.gpstype, 'pos'), current)
 
     def createothers(self,listof):
         for human in self.humans:
             c = [creates.human.xref_id for creates in listof]
             if human not in c:
                 _log.debug("Others: + %s (%s) (%d)", self.humans[human].name, human, len(listof))
-                listof.extend(self.line(self.humans[human].pos, self.humans[human], len(listof)/10, 5, 0, path=""))
+                listof.extend(self.line(getattrposif(self.humans[human], self.gpstype, 'pos'), self.humans[human], len(listof)/10, 5, 0, path=""))
 
 class CreatorTrace:
     def __init__(self, humans: Dict[str, Human], max_missing=0):

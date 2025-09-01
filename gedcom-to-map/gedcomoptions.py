@@ -35,7 +35,6 @@ def settings_file_pathname(file_name):
     _log.debug (f"Settings file location: {settings_file_path}")
     return settings_file_path
     
-AllPlaceType = ['native','born','death']
 
 class gvOptions:
     def __init__ (self):
@@ -58,7 +57,6 @@ class gvOptions:
         self.UseGPS = True
         self.CacheOnly = False
         self.AllEntities = False
-        self.PlaceType = {'native':'native'}        # Dict add/replace with multiple 'native', 'born' & 'death'
         self.GridView = False
         self.UseBalloonFlyto = True
 
@@ -108,14 +106,18 @@ class gvOptions:
 
         # Types 0 - boolean, 1: int, 2: str, 3 : complex
         self.html_keys = {'MarksOn':0, 'HeatMap':0, 'BornMark':0, 'DieMark':0,  'MarkStarOn':0, 'GroupBy':1, 
-                          'UseAntPath':0, 'HeatMapTimeLine':0, 'HeatMapTimeStep':1, 'HomeMarker':0, 'showLayerControl':0, 
+                          'UseAntPath':0, 'MapTimeLine':0, 'HeatMapTimeStep':1, 'HomeMarker':0, 'showLayerControl':0, 
                           'mapMini':0, 'MapStyle':2}
         self.core_keys = {'UseGPS':0, 'CacheOnly':0, 'AllEntities':0, 'KMLcmdline':2, 'CSVcmdline':2}
         self.logging_keys = ['models.human', 'models', 'ged4py.parser', 'ged4py', 'models.creator', 'gedcomoptions', 'gedcom.gedcomparser', 'gedcom', 'gedcom.gpslookup', 'geopy', 'render.kmlexporter', 'render', 'render.foliumexp', 'gedcomvisual', 'gedcomdialogs', 'gedcomvisualgui', '__main__']
         
-        self.kml_keys = {'PlaceType':3, 'MaxLineWeight':1, 'MaxMissing':1, 'UseBalloonFlyto':0}
+        self.kml_keys = {'MaxLineWeight':1, 'MaxMissing':1, 'UseBalloonFlyto':0}
+        # Old settings that should be removed from the config file
+        self.oldsettings = {'native': 'KML', 'born': 'KML', 'death':'KML', 'PlaceType': 'KML', 'HeatMapTimeLine': 'HTML'}
+
         if os.path.exists(self.settingsfile):
             self.loadsettings()            
+
 
     def defaults(self):
         
@@ -127,12 +129,12 @@ class gvOptions:
         self.MarkStarOn = True
         self.GroupBy = 2
         self.UseAntPath = False
-        self.HeatMapTimeLine = False
+        self.MapTimeLine = False
         self.HeatMapTimeStep = 20
         self.HomeMarker = False
         self.MapStyle = "CartoDB.Voyager"
 
-    def setmarkers (self, MarksOn = True, HeatMap = False, MarkStarOn = True, BornMark = True, DieMark = True, MapStyle = 3, GroupBy=2, UseAntPath=False, HeatMapTimeLine=False, HeatMapTimeStep=1, HomeMarker=False):
+    def setmarkers (self, MarksOn = True, HeatMap = False, MarkStarOn = True, BornMark = True, DieMark = True, MapStyle = 3, GroupBy=2, UseAntPath=False, MapTimeLine=False, HeatMapTimeStep=1, HomeMarker=False):
         
         self.MarksOn = MarksOn
         self.HeatMap = HeatMap
@@ -142,7 +144,7 @@ class gvOptions:
         self.MarkStarOn = MarkStarOn
         self.GroupBy = GroupBy
         self.UseAntPath = UseAntPath
-        self.HeatMapTimeLine = HeatMapTimeLine
+        self.MapTimeLine = MapTimeLine
         self.HeatMapTimeStep = HeatMapTimeStep
         self.HomeMarker = HomeMarker
     
@@ -150,7 +152,7 @@ class gvOptions:
 
 
         
-    def setstatic(self,  GEDCOMinput:2, Result:2, ResultHTML: bool, Main=None, MaxMissing:1 = 0, MaxLineWeight:1 = 20, UseGPS:bool = True, CacheOnly:bool = False,  AllEntities:bool = False, PlaceType = {'native':'native'}):
+    def setstatic(self,  GEDCOMinput:2, Result:2, ResultHTML: bool, Main=None, MaxMissing:1 = 0, MaxLineWeight:1 = 20, UseGPS:bool = True, CacheOnly:bool = False,  AllEntities:bool = False):
         
         self.setInput(GEDCOMinput)
         self.setResults(Result, ResultHTML)
@@ -161,8 +163,7 @@ class gvOptions:
         self.UseGPS = UseGPS
         self.CacheOnly = CacheOnly
         self.AllEntities = AllEntities             # generte output of everyone in the system
-        self.PlaceType = PlaceType                 # Dict add/replace with multiple 'native', 'born' & 'death'
-
+        
     def loadsection(self, sectionName, keys=None):
         for key, typ in keys.items():
             value = self.gvConfig[sectionName].get(key, None)
@@ -203,7 +204,7 @@ class gvOptions:
 
     def savesettings(self):
         # Use this to remove old settings in sections
-        oldsettings = {'native': 'KML', 'born': 'KML', 'death':'KML'}
+
         
         if not self.gvConfig:
             self.gvConfig = configparser.ConfigParser()
@@ -215,8 +216,6 @@ class gvOptions:
         for key in self.html_keys:
             self.gvConfig['HTML'][key] =  str(getattr(self, key))
             
-        # for key in AllPlaceType:
-        #   self.gvConfig['KML'][key] =  str(key in self.PlaceType)
         for key in self.kml_keys:
             self.gvConfig['KML'][key] =  str(getattr(self, key))
 
@@ -237,7 +236,7 @@ class gvOptions:
                     self.gvConfig.remove_option('Logging', logName)
                 else:
                     self.gvConfig['Logging'][logName] = logging.getLevelName(logging.getLogger(logName).getEffectiveLevel())
-        for key, section  in oldsettings.items():
+        for key, section  in self.oldsettings.items():
             self.gvConfig.remove_option(section, key)
         with open(self.settingsfile, 'w') as configfile:
             self.gvConfig.write(configfile)

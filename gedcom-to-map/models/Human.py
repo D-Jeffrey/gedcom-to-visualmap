@@ -37,7 +37,7 @@ class Partner:
         return f"Human(id={self.xref_id}, Pos={self.pos})"
  
 class Human:
-    __slots__ = ['xref_id', 'name', 'father', 'mother', 'pos', 'birth', 'death', 'marriage', 'home', 'map', 'first', 
+    __slots__ = ['xref_id', 'name', 'father', 'mother', 'pos', 'birth', 'death', 'marriage', 'home', 'first', 
                  'surname', 'maiden','sex','title', 'photo', 'children', 'partners', 'age']
     def __init__(self, xref_id):
         self.xref_id: str = xref_id
@@ -51,12 +51,16 @@ class Human:
         self.marriage = None
         # TODO multiple homes
         self.home : LifeEvent = None
-        self.map : Pos = None           # used to save the orginal pos values
+        # self.map : LifeEvent = None           # used to save the orginal pos values (Upgraded)
         self.first = None               # First Name
         self.surname = None             # Last Name
         self.maiden: None
         self.sex: None
         self.title = None
+        self.children : list[str] = []    # xref_id of children NOT YET USED
+        self.partners : list[str] = []    # xref_id of partners NOT YET USED
+        self.age : None
+        self.photo : None         # URL or file path to photo
 
 
     def __str__(self) -> str:
@@ -97,9 +101,9 @@ class Human:
         # TODO Best Location should consider if in KML mode and what is selected  
         # If the location is set in the GED, using MAP attribute then that will be the best
         best = Pos(None, None)
-        if self.map and self.map.hasLocation():
-            best = self.map
-        elif self.birth and self.birth.pos and self.birth.pos.hasLocation():
+#        if self.map and self.map.pos.hasLocation():
+#            best = self.map.pos
+        if self.birth and self.birth.pos and self.birth.pos.hasLocation():
             best = self.birth.pos
         elif self.death and self.death.pos and self.death.pos.hasLocation():
             best = self.death.pos

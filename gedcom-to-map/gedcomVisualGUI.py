@@ -35,7 +35,7 @@ import xyzservices.providers as xyz
 
 
 from const import GUINAME, GVFONT, KMLMAPSURL, LOG_CONFIG, NAME, VERSION, panel
-from gedcomoptions import gvOptions, AllPlaceType
+from gedcomoptions import gvOptions 
 from gedcomvisual import doTrace
 from gedcomDialogs import *
 
@@ -55,10 +55,10 @@ class VisualGedcomIds():
         
         self.ids = [
             'ID_CBMarksOn', 'ID_CBHeatMap', 'ID_CBBornMark', 'ID_CBDieMark', 'ID_LISTMapStyle',
-            'ID_CBMarkStarOn', 'ID_RBGroupBy', 'ID_CBUseAntPath', 'ID_CBHeatMapTimeLine',
+            'ID_CBMarkStarOn', 'ID_RBGroupBy', 'ID_CBUseAntPath', 'ID_CBMapTimeLine',
             'ID_CBHomeMarker', 'ID_LISTHeatMapTimeStep', 'ID_TEXTGEDCOMinput', 'ID_TEXTResult',
             'ID_RBResultHTML', 'ID_TEXTMain', 'ID_TEXTName', 'ID_INTMaxMissing', 'ID_INTMaxLineWeight',
-            'ID_CBUseGPS', 'ID_CBCacheOnly', 'ID_CBAllEntities', 'ID_LISTPlaceType', 'ID_CBMapControl',
+            'ID_CBUseGPS', 'ID_CBCacheOnly', 'ID_CBAllEntities',  'ID_CBMapControl',
             'ID_CBMapMini', 'ID_BTNLoad', 'ID_BTNUpdate', 'ID_BTNCSV', 'ID_BTNTRACE', 'ID_BTNSTOP', 'ID_BTNBROWSER',
             'ID_CBGridView'
         ]
@@ -73,9 +73,9 @@ class VisualGedcomIds():
             self.IDs['ID_CBMarkStarOn']: ('MarkStarOn', 'Redraw'),
             self.IDs['ID_RBGroupBy']: ('GroupBy', 'Redraw'),
             self.IDs['ID_CBUseAntPath']: ('UseAntPath', 'Redraw'),
-            self.IDs['ID_CBHeatMapTimeLine']: ('HeatMapTimeLine', 'Redraw'),
+            self.IDs['ID_CBMapTimeLine']: ('MapTimeLine', 'Redraw'),
             self.IDs['ID_CBHomeMarker']: ('HomeMarker', 'Redraw'),
-            self.IDs['ID_LISTHeatMapTimeStep']: ('HeatMapTimeLine', 'Redraw'),
+            self.IDs['ID_LISTHeatMapTimeStep']: ('MapTimeLine', 'Redraw'),
             self.IDs['ID_TEXTGEDCOMinput']: ('GEDCOMinput', 'Reload'),
             self.IDs['ID_TEXTResult']: ('Result', 'Redraw'),
             self.IDs['ID_RBResultHTML']: ('ResultHTML', 'Redraw'),
@@ -86,7 +86,7 @@ class VisualGedcomIds():
             self.IDs['ID_CBUseGPS']: ('UseGPS', 'Reload'),
             self.IDs['ID_CBCacheOnly']: ('CacheOnly', 'Reload'),
             self.IDs['ID_CBAllEntities']: ('AllEntities', 'Redraw'),
-            self.IDs['ID_LISTPlaceType']: ('PlaceType', 'Redraw'),
+            # self.IDs['ID_LISTPlaceType']: ('PlaceType', 'Redraw'),
             self.IDs['ID_CBMapControl']: ('showLayerControl', 'Redraw'),
             self.IDs['ID_CBMapMini']: ('mapMini', 'Redraw'),
             self.IDs['ID_BTNLoad']: 'Load',
@@ -275,10 +275,9 @@ class VisualMapFrame(wx.Frame):
         global panel
 
         dDir = os.getcwd()
-        filen = "gedcomfile.ged"
         if panel and panel.gO:
             infile = panel.gO.get('GEDCOMinput')
-            if infile is not None:
+            if infile != '':
                 dDir, filen  = os.path.split(infile)
         dlg = wx.FileDialog(self,
                            defaultDir = dDir,
@@ -438,8 +437,8 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
         self.itemDataMap = {}
         self.itemIndexMap = []
         self.patterns = [
-            re.compile(r'(\d{1,6}) \(?([Bb\.?[Cc]\.?)'),  # Matches "96 B.C." or "115 BC" or "109 BCE"
-            re.compile(r'(-?\d{1,4})')              # Matches "1564", "1674", "922", "-200"
+            re.compile(r'(\d{1,6}) (B\.?C\.?)'),  # Matches "96 B.C." or "115 BC" or "109 BCE"
+            re.compile(r'(\d{1,4})')              # Matches "1564", "1674", "922"
         ]
 
         parent.Bind(wx.EVT_FIND, self.OnFind, self)
@@ -578,10 +577,8 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
     def ParseDate(self, datestring):
         if datestring == None:
             return 0
-        if not isinstance(datestring, str):
-            datestring = f"{datestring}"
         for pattern in self.patterns:
-            match = pattern.search(datestring)
+            match = pattern.search(str(datestring))
             if match:
                 if pattern ==self.patterns[0]:
                     # BC year found, convert to negative
@@ -666,11 +663,11 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
             self.gO.setMain(self.GetItemText(self.currentItem, 2))
             if BackgroundProcess.updategridmain:
                 BackgroundProcess.updategridmain = False
-            doTrace(self.gO)
-            self.PopulateList(self.gO.humans, self.gO.get('Main'), False)
-            BackgroundProcess.SayInfoMessage(f"Using '{self.gO.get('Main')}' as starting person with {len(self.gO.Referenced)} direct ancestors", False)
-            BackgroundProcess.updategridmain = True
-            panel.SetupButtonState()
+                doTrace(self.gO)
+                self.PopulateList(self.gO.humans, self.gO.get('Main'), False)
+                BackgroundProcess.SayInfoMessage(f"Using '{self.gO.get('Main')}' as starting person with {len(self.gO.Referenced)} direct ancestors", False)
+                BackgroundProcess.updategridmain = True
+                panel.SetupButtonState()
                 
 
     def OnColClick(self, event):
@@ -838,12 +835,12 @@ class VisualMapPanel(wx.Panel):
         box.Add(wx.StaticLine(panel), 0, wx.EXPAND)
             
         
-        self.id.txtinfile = wx.Button(panel, -1,  "Input file:   ") 
-        # self.id.txtinfile.SetBackgroundColour(self.id.GetColor('BTN_DIRECTORY'))
+        self.id.txtinfile = wx.StaticText(panel, -1,  "Input file:   ") 
+        self.id.txtinfile.SetBackgroundColour(self.id.GetColor('BTN_DIRECTORY'))
         self.id.TEXTGEDCOMinput = wx.TextCtrl(panel, self.id.IDs['ID_TEXTGEDCOMinput'], "", size=(250,20))
         self.id.TEXTGEDCOMinput.Enable(False) 
-        self.id.txtoutfile = wx.Button(panel, -1, "Output file: ")
-        # self.id.txtoutfile.SetBackgroundColour(self.id.GetColor('BTN_DIRECTORY'))
+        self.id.txtoutfile = wx.StaticText(panel, -1, "Output file: ")
+        self.id.txtoutfile.SetBackgroundColour(self.id.GetColor('BTN_DIRECTORY'))
         self.id.TEXTResult = wx.TextCtrl(panel, self.id.IDs['ID_TEXTResult'], "", size=(250,20))
         self.id.txtinfile.Bind(wx.EVT_LEFT_DOWN, self.frame.OnFileOpenDialog)
         self.id.txtoutfile.Bind(wx.EVT_LEFT_DOWN, self.frame.OnFileResultDialog)
@@ -861,32 +858,32 @@ class VisualMapPanel(wx.Panel):
         self.id.CBUseGPS = wx.CheckBox(panel, self.id.IDs['ID_CBUseGPS'], "Use GPS lookup (uncheck if GPS is in file)")#,  wx.NO_BORDER)
         self.id.CBCacheOnly = wx.CheckBox(panel, self.id.IDs['ID_CBCacheOnly'], "Cache Only, do not lookup addresses")#, , wx.NO_BORDER)
         self.id.CBAllEntities = wx.CheckBox(panel, self.id.IDs['ID_CBAllEntities'], "Map all people")#, wx.NO_BORDER)
-        if False:
-            txtMissing = wx.StaticText(panel, -1,  "Max generation missing: ") 
-            self.id.INTMaxMissing = wx.TextCtrl(panel, self.id.IDs['ID_INTMaxMissing'], "", size=(20,20))
-            txtLine = wx.StaticText(panel, -1,  "Line maximum weight: ") 
-            self.id.INTMaxLineWeight = wx.TextCtrl(panel, self.id.IDs['ID_INTMaxLineWeight'], "", size=(20,20))
-            l1 = wx.BoxSizer(wx.HORIZONTAL)
-            l1.AddMany([txtMissing,      (0,20),     self.id.INTMaxMissing])
-            l2 = wx.BoxSizer(wx.HORIZONTAL)
-            l2.AddMany([txtLine,      (0,20),     self.id.INTMaxLineWeight])
-            box.AddMany([l1, (4,4,), l2])
-        # self.id.ID_INTMaxMissing  'MaxMissing'
-        # self.id.ID_INTMaxLineWeight  'MaxLineWeight'
         
         self.id.busyIndicator = wx.ActivityIndicator(panel)
 
         self.id.busyIndicator.SetBackgroundColour(self.id.GetColor('BUSY_BACK'))
-        
+        self.id.CBMarksOn = wx.CheckBox(panel, self.id.IDs['ID_CBMarksOn'], "Markers",name='MarksOn')
+
+        self.id.CBBornMark = wx.CheckBox(panel, self.id.IDs['ID_CBBornMark'], "Marker for when Born")
+        self.id.CBDieMark = wx.CheckBox(panel, self.id.IDs['ID_CBDieMark'], "Marker for when Died")
+        self.id.CBHomeMarker = wx.CheckBox(panel, self.id.IDs['ID_CBHomeMarker'], "Marker point or homes")
+        self.id.CBMarkStarOn = wx.CheckBox(panel, self.id.IDs['ID_CBMarkStarOn'], "Marker starter with Star")
+        self.id.CBMapTimeLine = wx.CheckBox(panel, self.id.IDs['ID_CBMapTimeLine'], "Add Timeline")
+
         box.AddMany([ self.id.RBResultHTML,
                        self.id.CBUseGPS,
                        self.id.CBCacheOnly,
-                       self.id.CBAllEntities])
+                       self.id.CBAllEntities,
+                       self.id.CBMarksOn,
+                       self.id.CBBornMark,
+                       self.id.CBDieMark,
+                       self.id.CBHomeMarker,
+                       self.id.CBMarkStarOn,
+                       self.id.CBMapTimeLine])
         """
           HTML select controls in a Box
         """
         hbox = wx.StaticBox( panel, -1, "HTML Options", size=(300,-1))
-        
         hTopBorder, hOtherBorder = hbox.GetBordersForSizer()
         hsizer = wx.BoxSizer(wx.VERTICAL)
         hsizer.AddSpacer(hTopBorder)
@@ -897,15 +894,11 @@ class VisualMapPanel(wx.Panel):
         self.id.LISTMapType = wx.Choice(hbox, self.id.IDs['ID_LISTMapStyle'], name="MapStyle", choices=mapchoices)
         self.id.CBMapControl = wx.CheckBox(hbox, self.id.IDs['ID_CBMapControl'], "Open Map Controls",name='MapControl') 
         self.id.CBMapMini = wx.CheckBox(hbox, self.id.IDs['ID_CBMapMini'], "Add Mini Map",name='MapMini') 
-        self.id.CBMarksOn = wx.CheckBox(hbox, self.id.IDs['ID_CBMarksOn'], "Markers",name='MarksOn')
         
-        self.id.CBBornMark = wx.CheckBox(hbox, self.id.IDs['ID_CBBornMark'], "Marker for when Born")
-        self.id.CBDieMark = wx.CheckBox(hbox, self.id.IDs['ID_CBDieMark'], "Marker for when Died")
-        self.id.CBHomeMarker = wx.CheckBox(hbox, self.id.IDs['ID_CBHomeMarker'], "Marker point or homes")
-        self.id.CBMarkStarOn = wx.CheckBox(hbox, self.id.IDs['ID_CBMarkStarOn'], "Marker starter with Star")
+        
         
         self.id.CBHeatMap = wx.CheckBox(hbox, self.id.IDs['ID_CBHeatMap'], "Heatmap", style = wx.NO_BORDER)
-        self.id.CBHeatMapTimeLine = wx.CheckBox(hbox, self.id.IDs['ID_CBHeatMapTimeLine'], "Heatmap Timeline Steps")
+        
         self.id.CBUseAntPath = wx.CheckBox(hbox, self.id.IDs['ID_CBUseAntPath'], "Ant paths")
         
         TimeStepVal = 5
@@ -924,14 +917,8 @@ class VisualMapPanel(wx.Panel):
                         mapboxsizer,
                         self.id.CBMapControl,
                         self.id.CBMapMini,
-                        self.id.CBMarksOn,
-                        self.id.CBBornMark,
-                        self.id.CBDieMark,
-                        self.id.CBHomeMarker,
-                        self.id.CBMarkStarOn,
                         self.id.CBUseAntPath,
                         self.id.CBHeatMap,
-                        self.id.CBHeatMapTimeLine, 
                         (0,5),
                         self.id.LISTHeatMapTimeStep,
                         (0,5)
@@ -944,13 +931,24 @@ class VisualMapPanel(wx.Panel):
         # KML select controls in a Box
         #
         kbox = wx.StaticBox( panel, -1, "KML Options", size=(300,-1))
-        
         kTopBorder, kOtherBorder = kbox.GetBordersForSizer()
         ksizer = wx.BoxSizer(wx.VERTICAL)
         ksizer.AddSpacer(kTopBorder)
         kboxIn = wx.BoxSizer(wx.VERTICAL)
-        self.id.LISTPlaceType = wx.CheckListBox(kbox, self.id.IDs['ID_LISTPlaceType'],  choices=AllPlaceType)
-        kboxIn.AddMany( [self.id.LISTPlaceType])
+        if False:
+            txtMissing = wx.StaticText(kboxIn, -1,  "Max generation missing: ") 
+            self.id.INTMaxMissing = wx.TextCtrl(kboxIn, self.id.IDs['ID_INTMaxMissing'], "", size=(20,20))
+            txtLine = wx.StaticText(kboxIn, -1,  "Line maximum weight: ") 
+            self.id.INTMaxLineWeight = wx.TextCtrl(kboxIn, self.id.IDs['ID_INTMaxLineWeight'], "", size=(20,20))
+            l1 = wx.BoxSizer(wx.HORIZONTAL)
+            l1.AddMany([txtMissing,      (0,20),     self.id.INTMaxMissing])
+            l2 = wx.BoxSizer(wx.HORIZONTAL)
+            l2.AddMany([txtLine,      (0,20),     self.id.INTMaxLineWeight])
+            kboxIn.AddMany([l1, (4,4,), l2])
+        # self.id.ID_INTMaxMissing  'MaxMissing'
+        # self.id.ID_INTMaxLineWeight  'MaxLineWeight'
+        
+
         ksizer.Add( kboxIn, wx.LEFT, kOtherBorder+10)
         kbox.SetSizer(ksizer)
         self.kbox = kbox
@@ -962,7 +960,6 @@ class VisualMapPanel(wx.Panel):
         
         
         gbox = wx.StaticBox( panel, -1, "Grid View Options",size=(300,-1))
-        
         gTopBorder, gOtherBorder = gbox.GetBordersForSizer()
         gsizer = wx.BoxSizer(wx.VERTICAL)
         gsizer.AddSpacer(gTopBorder)
@@ -1020,13 +1017,13 @@ class VisualMapPanel(wx.Panel):
         self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.id.IDs['ID_CBHomeMarker'])
         self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.id.IDs['ID_CBMarkStarOn'])
         self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.id.IDs['ID_CBHeatMap'])
-        self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.id.IDs['ID_CBHeatMapTimeLine'])
+        self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.id.IDs['ID_CBMapTimeLine'])
         self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.id.IDs['ID_CBUseAntPath'])
         self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.id.IDs['ID_CBUseGPS'])
         self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.id.IDs['ID_CBCacheOnly'])
         self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.id.IDs['ID_CBAllEntities'])
         self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.id.IDs['ID_CBGridView'])
-        self.Bind(wx.EVT_CHECKLISTBOX, self.EvtListBox, id = self.id.IDs['ID_LISTPlaceType'])
+        # self.Bind(wx.EVT_CHECKLISTBOX, self.EvtListBox, id = self.id.IDs['ID_LISTPlaceType'])
         self.Bind(wx.EVT_CHOICE, self.EvtListBox, id = self.id.IDs['ID_LISTMapStyle'])
         self.Bind(wx.EVT_BUTTON, self.EvtButton, id = self.id.IDs['ID_BTNLoad'])
         self.Bind(wx.EVT_BUTTON, self.EvtButton, id = self.id.IDs['ID_BTNUpdate'])
@@ -1123,7 +1120,7 @@ class VisualMapPanel(wx.Panel):
         _log.debug('set %s to %s (%s)', self.id.IDtoAttr[cbid][0], cb.GetValue(), self.id.IDtoAttr[cbid][1] )
         panel.gO.set( self.id.IDtoAttr[cbid][0], cb.GetValue())
         
-        if cbid == self.id.IDs['ID_CBHeatMap'] or cbid == self.id.IDs['ID_CBHeatMapTimeLine'] or cbid == self.id.IDs['ID_CBMarksOn']:
+        if cbid == self.id.IDs['ID_CBHeatMap'] or cbid == self.id.IDs['ID_CBMapTimeLine'] or cbid == self.id.IDs['ID_CBMarksOn']:
             self.SetupButtonState()
         if ( self.id.IDtoAttr[cbid][1] == 'Redraw'):
             self.NeedRedraw()
@@ -1182,21 +1179,15 @@ class VisualMapPanel(wx.Panel):
         eventid = event.GetId()
         _log.debug('%s, %s, %s', event.GetString(), event.IsSelection(), event.GetSelection())                            
         _ = event.GetEventObject()
-        if eventid == self.id.IDs['ID_LISTPlaceType']:
-            # Can not use both Native with Born/Death
-            places = {}
-            for cstr in event.EventObject.CheckedStrings:
-                places[cstr] = cstr
-            if (event.Selection == 0 and not 'native' in places) or event.Selection != 0 and 'native' in places:
-                places = {'born':'born', 'death':'death'}
-            if 'native' in places:
-                places = {'native':'native'}
-                
-            if places == {}:
-                places = {'native':'native'}
-            self.id.LISTPlaceType.SetCheckedStrings(places)
-            panel.gO.PlaceType = places
-        elif eventid == self.id.IDs['ID_LISTMapStyle']:
+        # if eventid == self.id.IDs['ID_LISTPlaceType']:
+        #     places = {}
+        #     for cstr in event.EventObject.CheckedStrings:
+        #         places[cstr] = cstr
+        #     if places == {}:
+        #         places = {'native':'native'}
+        #     panel.gO.PlaceType = places
+        # el
+        if eventid == self.id.IDs['ID_LISTMapStyle']:
             
             panel.gO.MapStyle = sorted(self.id.AllMapTypes)[event.GetSelection()] 
             self.NeedRedraw()
@@ -1240,14 +1231,14 @@ class VisualMapPanel(wx.Panel):
                 self.id.BTNUpdate.Enable()
                 status = f"{status} - please wait.. Stopping"
 
-            _, filen = os.path.split(self.gO.get('GEDCOMinput') or "")
+            _, filen = os.path.split(self.gO.get('GEDCOMinput'))
             if filen == "":
                 self.id.BTNLoad.Disable()
                 self.id.BTNUpdate.Disable()
             else:
                 if not self.id.BTNLoad.IsEnabled():
                     self.id.BTNLoad.Enable()
-                if not self.id.BTNUpdate.IsEnabled():
+                if not self.id.BTNLoad.IsEnabled():
                     self.id.BTNUpdate.Enable()
             if self.gO.get('gpsfile') == '':
                 self.id.BTNCSV.Disable()
@@ -1321,7 +1312,7 @@ class VisualMapPanel(wx.Panel):
             BackgroundProcess.updateinfo = None
         if BackgroundProcess.errorinfo:
             _log.debug("Infobox-Err: %s", BackgroundProcess.errorinfo)
-            einfo = f"{BackgroundProcess.errorinfo}"
+            einfo = f"<span foreground='red'><b>{BackgroundProcess.errorinfo}</b></span>"
             newinfo = newinfo + '\n' + einfo if newinfo else einfo
             BackgroundProcess.errorinfo = None
         if (newinfo):
@@ -1343,24 +1334,30 @@ class VisualMapPanel(wx.Panel):
             
         # Define control groups for HTML and KML modes
         html_controls = [
-            self.id.CBMarksOn,
-            self.id.CBMapControl,
             self.id.LISTMapType, 
+            self.id.CBMapControl,
             self.id.CBMapMini,
-            self.id.CBBornMark,
-            self.id.CBDieMark,
-            self.id.CBHomeMarker,
-            self.id.CBMarkStarOn,
             self.id.CBHeatMap,
             self.id.CBUseAntPath,
             self.id.RBGroupBy
         ]
-        kml_controls = [
-            self.id.CBBornMark, 
-            self.id.CBDieMark, 
-            self.id.CBHomeMarker
+        marks_controls = [
+            self.id.CBBornMark,
+            self.id.CBDieMark,
+            self.id.CBHomeMarker,
+            self.id.CBMarkStarOn,
             ]
+        kml_controls = [
 
+        ]
+
+        # Enable/Disable marker-dependent controls if markers are off
+        if self.gO.get('MarksOn'):
+            for ctrl in marks_controls:
+                ctrl.Enable()
+        else:
+            for ctrl in marks_controls:
+                ctrl.Disable()
         # Enable/disable controls based on result type (HTML vs KML)
         if ResultTypeHTML:
             # Enable HTML-specific controls
@@ -1368,30 +1365,29 @@ class VisualMapPanel(wx.Panel):
                 ctrl.Enable()
             
             # Disable KML-specific controls
-            self.id.LISTPlaceType.Disable()
+  #          self.id.LISTPlaceType.Disable()
             
             # Handle heat map related controls
-            self.id.CBHeatMapTimeLine.Disable()
+            self.id.CBMapTimeLine.Disable()
             self.id.LISTHeatMapTimeStep.Disable()
             
             if self.gO.get('HeatMap'):
-                self.id.CBHeatMapTimeLine.Enable()
+                self.id.CBMapTimeLine.Enable()
                 # Only enable time step if timeline is enabled
-                if self.gO.get('HeatMapTimeLine'):
+                if self.gO.get('MapTimeLine'):
                     self.id.LISTHeatMapTimeStep.Enable()
                     
-            # Disable marker-dependent controls if markers are off
-            if not self.gO.get('MarksOn'):
-                for ctrl in kml_controls:
-                    ctrl.Disable()
+
         else:
             # In KML mode, disable HTML controls and enable KML controls
-            for ctrl in html_controls + [
-                self.id.CBHeatMapTimeLine,
-                self.id.LISTHeatMapTimeStep
-            ]:
+            for ctrl in html_controls:
                 ctrl.Disable()
-            self.id.LISTPlaceType.Enable()
+            for ctrl in kml_controls:
+                ctrl.Enable()
+            # This timeline just works differently in KML mode vs embedded code for HTML
+            self.id.CBMapTimeLine.Enable()
+
+#            self.id.LISTPlaceType.Enable()
 
         # Enable/disable trace button based on referenced data availability
         self.id.BTNTRACE.Enable(bool(self.gO.Referenced and self.gO.Result))
@@ -1418,7 +1414,7 @@ class VisualMapPanel(wx.Panel):
         self.id.CBHomeMarker.SetValue(self.gO.get('HomeMarker'))
         self.id.CBMarkStarOn.SetValue(self.gO.get('MarkStarOn'))
         self.id.CBHeatMap.SetValue(self.gO.get('HeatMap'))
-        self.id.CBHeatMapTimeLine.SetValue(self.gO.get('HeatMapTimeLine'))
+        self.id.CBMapTimeLine.SetValue(self.gO.get('MapTimeLine'))
         self.id.CBUseAntPath.SetValue(self.gO.get('UseAntPath'))
         self.id.CBUseGPS.SetValue(self.gO.get('UseGPS'))
         self.id.CBAllEntities.SetValue(self.gO.get('AllEntities'))
@@ -1427,8 +1423,8 @@ class VisualMapPanel(wx.Panel):
         self.id.LISTMapType.SetSelection(self.id.LISTMapType.FindString(self.gO.get('MapStyle')))
                 
         
-        places = self.gO.get('PlaceType')
-        self.id.LISTPlaceType.SetCheckedStrings(places)
+#        places = self.gO.get('PlaceType')
+#        self.id.LISTPlaceType.SetCheckedStrings(places)
         self.id.RBGroupBy.SetSelection(self.gO.get('GroupBy'))
         
         
@@ -1436,7 +1432,7 @@ class VisualMapPanel(wx.Panel):
 
         _, filen = os.path.split(self.gO.get('GEDCOMinput')) if self.gO.get('GEDCOMinput') else ("", "first.ged")
         self.id.TEXTGEDCOMinput.SetValue(filen)
-        self.id.LISTPlaceType.SetCheckedStrings(self.gO.PlaceType)
+#        self.id.LISTPlaceType.SetCheckedStrings(self.gO.PlaceType)
         self.SetupButtonState()
 
         for t in self.threads:
@@ -1500,7 +1496,7 @@ class VisualMapPanel(wx.Panel):
                 if ' ' in cmdline:
                     cmdline = self.gO.get('CSVcmdline').replace('$n', f'{cmdfile}')
                     _log.info(f'shell run  `{cmdfile}`')
-                    if cmdline.startswith('http'):
+                    if gOp.cmdline.startswith('http'):
                         webbrowser.open(cmdline, new = 0, autoraise = True)
                     else:
                         subprocess.run(cmdline, shell=True)
@@ -1520,7 +1516,7 @@ class VisualMapPanel(wx.Panel):
                 return 
             tracepath = os.path.splitext(self.gO.Result)[0] + ".trace.txt"
             # indentpath = os.path.splitext(self.gO.Result)[0] + ".indent.txt"
-            trace = open(tracepath , 'w', encoding="utf-8")
+            trace = open(tracepath , 'w')
             # indent = open(indentpath , 'w')
             trace.write("id\tName\tYear\tWhere\tGPS\tPath\n")
             # indent.write("this is an indented file with the number of generations driven by the parents\nid\tName\tYear\tWhere\tGPS\n") 

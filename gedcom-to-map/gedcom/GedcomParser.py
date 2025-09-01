@@ -151,6 +151,7 @@ class GedcomParser:
         human = Human(record.xref_id)
         human.name = ''
         name: NameRec = record.sub_tag("NAME")
+        _log.debug (f"Create Human : {name}")
         if name:
             human.first = record.name.first
             human.surname =record.name.surname
@@ -317,13 +318,17 @@ class GedcomParser:
                     humans[wife.xref_id].name = "Unknown [Mother]"
             
             for chil in record.sub_tags("CHIL"):
-                if chil.xref_id not in humans.keys():
-                    continue
-                if husband:
-                    humans[chil.xref_id].father = husband.xref_id
-                    
-                if wife:
-                    humans[chil.xref_id].mother = wife.xref_id
+                if chil:
+                    if chil.xref_id not in humans.keys():
+                        continue
+                    if husband:
+                        humans[chil.xref_id].father = husband.xref_id
+                        
+                    if wife:
+                        humans[chil.xref_id].mother = wife.xref_id
+                else:
+                    _log.warning("Family has missing INDI record for one of the CHIL: %s",  record.xref_id)
+                
         return humans
 
     def create_humans(self) -> Dict[str, Human]:

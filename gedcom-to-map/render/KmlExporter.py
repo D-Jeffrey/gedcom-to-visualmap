@@ -154,12 +154,13 @@ class KmlExporter:
             
 
             
-            if line.a.hasLocation() and mark in ['native','born']:
+            if line.a.hasLocation() and mark in ['birth']:
                 event = "<br>Born: {}</br>".format(timeA if timeA else "Unknown", timeB if timeB else "Unknown")
                 pnt = kml.newpoint(name=name + ntag, coords=[self.driftPos(line.a)], description="<![CDATA[ " + event + linage + familyLinage + " ]]>")
                 self.gOp.Referenced.add(line.human.xref_id, 'kml-a',tag=pnt.id)
                 self.gOp.Referenced.add(line.human.xref_id[1:-1], tag=pnt.id)
-                if hasattr(line, 'whenFrom') and line.whenFrom: pnt.timestamp.when = line.whenFrom
+                if self.gOp.MapTimeLine and hasattr(line, 'whenFrom') and line.whenFrom: 
+                    pnt.timestamp.when = line.whenFrom
             
                 pnt.style = simplekml.Style()
                 pnt.style.labelstyle.scale = styleA.labelstyle.scale
@@ -169,14 +170,15 @@ class KmlExporter:
                 # pnt.style.balloonstyle.text = linage
 
                 
-            if line.b.hasLocation() and mark in ['native','death']:
+            if line.b.hasLocation() and mark in ['death']:
                 event = "<br>Death: {}</br>".format(timeB if timeB else "Unknown") 
                 pnt = kml.newpoint(name=name + ntag, coords=[self.driftPos(line.b)], description="<![CDATA[ " + event + linage  + familyLinage + " ]]>")
 
                 self.gOp.Referenced.add(line.human.xref_id, 'kml-b')
                 self.gOp.Referenced.add(line.human.xref_id[1:-1], tag=pnt.id)
                 self.gOp.totalpeople += 1
-                if hasattr(line, 'whenTo') and line.whenTo: pnt.timestamp.when = line.whenTo
+                if self.gOp.MapTimeLine and hasattr(line, 'whenTo') and line.whenTo: 
+                    pnt.timestamp.when = line.whenTo
                 # 
                 pnt.style = simplekml.Style()
                 pnt.style.labelstyle.scale = styleB.labelstyle.scale
@@ -198,18 +200,20 @@ class KmlExporter:
                 kml_line.altitudemode = simplekml.AltitudeMode.clamptoground        # Alternate is relativetoground
                 # kml_line.altitude = random.randrange(1,5)                           # This helps to seperate lines in 3d space
                 # Used for timerange spanning/filtering in Google Earth Pro or ArcGIS
-                if timeA and timeB: 
-                    kml_line.timespan.begin = timeA                                 
-                    kml_line.timespan.end = timeB
-                elif timeA:
-                    # If we only know when the birth or death then us a point in time
-                    kml_line.timestamp.when = timeA                       
-                elif timeB:
-                    kml_line.timestamp.when = timeB
+                if self.gOp.MapTimeLine: 
+                    if timeA and timeB: 
+                        kml_line.timespan.begin = timeA                                 
+                        kml_line.timespan.end = timeB
+                    elif timeA:
+                        # If we only know when the birth or death then us a point in time
+                        kml_line.timestamp.when = timeA                       
+                    elif timeB:
+                        kml_line.timestamp.when = timeB
                 _log.info    (f"    line    {line.name} ({line.a.lon}, {line.a.lat}) ({line.b.lon}, {line.b.lat})")    
             else:
                 _log.warning (f"skipping {line.name} ({line.a.lon}, {line.a.lat}) ({line.b.lon}, {line.b.lat})")
             self.gOp.totalpeople += 1
+            # NOT WORKING YET
             if line.midpoints:
                 for mid in line.midpoints:
                     if mid.pos and mid.pos.hasLocation():

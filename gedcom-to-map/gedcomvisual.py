@@ -30,34 +30,24 @@ def doKML(gOp : gvOptions, humans: list[Human]):
         return
     kmlInstance = None
     # Save in case we overwrite
-    for h in humans.keys():
-        humans[h].map = humans[h].pos
+#    for h in humans.keys():
+#        humans[h].map = humans[h].pos
 
-    for placeType in gOp.PlaceType:
-        
-        if (placeType == 'native'):
-            for h in humans.keys():
-                humans[h].pos = humans[h].map
-            _log.info ("KML native")
-            nametag = ''
-        if (placeType == 'born'):
-            for h in humans.keys():
-                humans[h].pos = Pos(None,None)
-                if humans[h].birth:
-                    if humans[h].birth.pos:
-                        humans[h].pos = humans[h].birth.pos
-            _log.info  ("KML born")
-            nametag = ' (b)'
-        if (placeType == 'death'):
-            for h in humans.keys():
-                humans[h].pos = Pos(None,None)
-                if humans[h].death:
-                    if humans[h].death.pos:
-                        humans[h].pos = humans[h].death.pos
-            _log.info  ("KML death")
-            nametag = ' (d)'
+    placeTypes = []
+#    if gOp.MarksOn:
+    if gOp.BornMark:
+        placeTypes.append(['birth', '(b)', 'birth'])
+    if gOp.DieMark:
+        placeTypes.append(['death', '(d)', 'death'])
+#    if gOp.HomeMarker:
+#        placeTypes.append(['home[h]', '(e)', 'event'])
+
+    
+
+    for (key, nametag, placeType) in placeTypes:
+
         # lifeline = LifetimeCreator(humans, gOp.MaxMissing)    
-        lifeline = Creator(humans, gOp.MaxMissing) 
+        lifeline = Creator(humans, gOp.MaxMissing, gpstype=key) 
         creator = lifeline.create(gOp.Main)
         if gOp.AllEntities:
             lifeline.createothers(creator)
@@ -72,32 +62,32 @@ def doKML(gOp : gvOptions, humans: list[Human]):
             kmlInstance = KmlExporter(gOp)
 
         kmlInstance.export(humans[gOp.Main].pos, creator, nametag, placeType)
-    kmlInstance.Done()
-    # TODO restore keys (this is a patch that needs to be changed)
-    for h in humans.keys():
-        humans[h].pos = humans[h].map
-    if gOp.KMLcmdline:
-        if gOp.KMLcmdline.startswith('http'):
-            webbrowser.open(gOp.KMLcmdline, new = 0, autoraise = True)
-        else:
-            # TODO
-            cmdline = gOp.KMLcmdline.replace("$n", os.path.join(gOp.resultpath, gOp.Result))
-            _log.info(f"KML Running command line : '{cmdline}'") 
-            gOp.BackgroundProcess.SayInfoMessage(f"KML output to : {os.path.join(gOp.resultpath, gOp.Result)}") 
-            try:
-                if os.name == 'posix':
-                    subprocess.Popen(["/bin/sh" , cmdline])
-                elif os.name == 'nt':
-                    cmd = os.environ.get("SystemRoot") + "\\system32\\cmd.exe"
-                    subprocess.Popen([cmd, "/c", cmdline])
-                else:
-                    _log.error(f"Unknwon OS to run command-line: '{cmdline}'")
-                    
-            except FileNotFoundError:
-                _log.error(f"command errored: '{cmdline}'") 
-            except Exception as e:
-                _log.error(f"command errored as: {e} : '{cmdline}'") 
-            
+    if kmlInstance:
+        kmlInstance.Done()
+        if gOp.KMLcmdline:
+            if gOp.KMLcmdline.startswith('http'):
+                webbrowser.open(gOp.KMLcmdline, new = 0, autoraise = True)
+            else:
+                # TODO
+                cmdline = gOp.KMLcmdline.replace("$n", os.path.join(gOp.resultpath, gOp.Result))
+                _log.info(f"KML Running command line : '{cmdline}'") 
+                gOp.BackgroundProcess.SayInfoMessage(f"KML output to : {os.path.join(gOp.resultpath, gOp.Result)}") 
+                try:
+                    if os.name == 'posix':
+                        subprocess.Popen(["/bin/sh" , cmdline])
+                    elif os.name == 'nt':
+                        cmd = os.environ.get("SystemRoot") + "\\system32\\cmd.exe"
+                        subprocess.Popen([cmd, "/c", cmdline])
+                    else:
+                        _log.error(f"Unknwon OS to run command-line: '{cmdline}'")
+                        
+                except FileNotFoundError:
+                    _log.error(f"command errored: '{cmdline}'") 
+                except Exception as e:
+                    _log.error(f"command errored as: {e} : '{cmdline}'") 
+    else:
+        _log.error("No KML output created")
+        gOp.BackgroundProcess.SayInfoMessage(f"No KML output created - No data selected to map") 
 
 def Geoheatmap(gOp : gvOptions):
     

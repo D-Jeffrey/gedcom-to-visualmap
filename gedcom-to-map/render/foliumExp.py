@@ -191,14 +191,21 @@ class foliumExporter:
             })
 
         return options
-
+    def _pureName (self, name: str) -> str:
+        """Clean up name for display remove the lineage before the tab if any"""
+        if not name:
+            return ''
+        if '\t' in name:
+            name = name.split('\t')[1]
+        return name
+    
     def _create_popup_content(self, line, birth_info: str = '', death_info: str = '') -> str:
         """Generate popup content for markers"""
         if line.style == 'Life':
-            fancy_name = f"{line.style} of {line.name}"
+            fancy_name = f"{line.style} of {self._pureName(line.name)}"
         else:
             parent_name = line.parentofhuman.name if line.parentofhuman else ''
-            fancy_name = f"{line.name} {line.style} of {parent_name}"
+            fancy_name = f"{self._pureName(line.name)} {line.style} of {parent_name}"
 
         if birth_info or death_info:
             fancy_name = f"{fancy_name}<br>{birth_info} {death_info}"
@@ -462,7 +469,7 @@ class foliumExporter:
         #    HEAT MAP Section            
         # ***************************** 
         
-        if self.gOptions.HeatMapTimeLine:
+        if self.gOptions.MapTimeLine:
             self._create_timeline_heatmap(lines, mycluster, fm)
         else:
             self._create_static_heatmap(lines, mycluster, fm)
@@ -527,14 +534,16 @@ class foliumExporter:
             # Add start marker
             if line.a and line.a.hasLocation():
                 start_point = [Drift(line.a.lat), Drift(line.a.lon)]
-                self._add_point_marker(fg, start_point, marker_options, 
+                if self.gOptions.MarksOn and self.gOptions.BornMark:
+                    self._add_point_marker(fg, start_point, marker_options, 
                                        f"Life of {line.name}".replace("`", "‛").replace("'", "‛"), 
                                        popup_content, marker_options['start_icon'], marker_options['start_color'])
 
             # Add end marker
             if line.b and line.b.hasLocation():
                 end_point = [Drift(line.b.lat), Drift(line.b.lon)]
-                self._add_point_marker(fg, end_point, marker_options, 
+                if self.gOptions.MarksOn and self.gOptions.DieMark:
+                    self._add_point_marker(fg, end_point, marker_options, 
                                        f"Life of {line.name}".replace("`", "‛").replace("'", "‛"), 
                                        popup_content, marker_options['end_icon'], marker_options['end_color'])
 
@@ -546,7 +555,7 @@ class foliumExporter:
                 for mids in line.midpoints:
                     mid_point = [Drift(mids.pos.lat), Drift(mids.pos.lon)]
                     fm_line.append(tuple(mid_point))
-                    if self.gOptions.HomeMarker:
+                    if self.gOptions.HomeMarker and self.gOptions.MarksOn:
                         point_type = mids.what if mids.what in MidPointMarker else "Other"
                         marker = MidPointMarker[point_type][0]
                         color = MidPointMarker[point_type][1]

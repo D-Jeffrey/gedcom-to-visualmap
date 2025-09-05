@@ -1,131 +1,283 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2">
-    <Document id="13">
-        <Style id="14">
-            <IconStyle id="16">
+    <Document id="1">
+        <Style id="11">
+            <IconStyle id="14">
                 <colorMode>normal</colorMode>
                 <scale>1</scale>
                 <heading>0</heading>
-                <Icon id="17">
-                    <href>https://maps.google.com/mapfiles/kml/paddle/ylw-circle.png</href>
+                <Icon id="15">
+                    <href>https://maps.google.com/mapfiles/kml/paddle/ylw-blank.png</href>
                 </Icon>
             </IconStyle>
-            <LabelStyle id="15">
+            <LabelStyle id="13">
                 <colorMode>normal</colorMode>
                 <scale>1</scale>
             </LabelStyle>
+            <BalloonStyle>
+                <displayMode>default</displayMode>
+            </BalloonStyle>
         </Style>
         <Style id="18">
-            <IconStyle id="20">
-                <colorMode>normal</colorMode>
-                <scale>1</scale>
-                <heading>0</heading>
-                <Icon id="21">
-                    <href>https://maps.google.com/mapfiles/kml/paddle/ltblu-circle.png</href>
-                </Icon>
-            </IconStyle>
-            <LabelStyle id="19">
-                <colorMode>normal</colorMode>
-                <scale>1</scale>
-            </LabelStyle>
-        </Style>
-        <Style id="30">
-            <LineStyle id="31">
+            <LineStyle id="19">
                 <color>ff00d8ff</color>
                 <colorMode>normal</colorMode>
                 <width>12</width>
             </LineStyle>
+            <BalloonStyle>
+                <displayMode>default</displayMode>
+            </BalloonStyle>
         </Style>
-        <Style id="38">
-            <LineStyle id="39">
+        <Style id="24">
+            <IconStyle id="26">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+                <heading>0</heading>
+                <Icon id="27">
+                    <href>https://maps.google.com/mapfiles/kml/paddle/ylw-blank.png</href>
+                </Icon>
+            </IconStyle>
+            <LabelStyle id="25">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+            </LabelStyle>
+            <BalloonStyle>
+                <displayMode>default</displayMode>
+            </BalloonStyle>
+        </Style>
+        <Style id="30">
+            <LineStyle id="31">
                 <color>ffff7200</color>
                 <colorMode>normal</colorMode>
                 <width>12</width>
             </LineStyle>
+            <BalloonStyle>
+                <displayMode>default</displayMode>
+            </BalloonStyle>
         </Style>
-        <Placemark id="23">
-            <name>Hamnet Shakespeare (b)</name>
-            <Point id="22">
-                <coordinates>-1.70634,52.1927803,0.0</coordinates>
+        <Style id="36">
+            <IconStyle id="38">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+                <heading>0</heading>
+                <Icon id="39">
+                    <href>https://maps.google.com/mapfiles/kml/paddle/ylw-blank.png</href>
+                </Icon>
+            </IconStyle>
+            <LabelStyle id="37">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+            </LabelStyle>
+            <BalloonStyle>
+                <displayMode>default</displayMode>
+            </BalloonStyle>
+        </Style>
+        <Style id="43">
+            <IconStyle id="45">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+                <heading>0</heading>
+                <Icon id="46">
+                    <href>https://maps.google.com/mapfiles/kml/paddle/ylw-blank.png</href>
+                </Icon>
+            </IconStyle>
+            <LabelStyle id="44">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+            </LabelStyle>
+            <BalloonStyle>
+                <displayMode>default</displayMode>
+            </BalloonStyle>
+        </Style>
+        <Style id="58">
+            <IconStyle id="62">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+                <heading>0</heading>
+                <Icon id="63">
+                    <href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
+                </Icon>
+            </IconStyle>
+            <LabelStyle id="59">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+            </LabelStyle>
+            <BalloonStyle>
+                <displayMode>default</displayMode>
+            </BalloonStyle>
+        </Style>
+        <Style id="66">
+            <LineStyle id="67">
+                <color>ff00d8ff</color>
+                <colorMode>normal</colorMode>
+                <width>12</width>
+            </LineStyle>
+            <BalloonStyle>
+                <displayMode>default</displayMode>
+            </BalloonStyle>
+        </Style>
+        <Style id="72">
+            <IconStyle id="74">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+                <heading>0</heading>
+                <Icon id="75">
+                    <href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
+                </Icon>
+            </IconStyle>
+            <LabelStyle id="73">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+            </LabelStyle>
+            <BalloonStyle>
+                <displayMode>default</displayMode>
+            </BalloonStyle>
+        </Style>
+        <Style id="78">
+            <LineStyle id="79">
+                <color>ffff7200</color>
+                <colorMode>normal</colorMode>
+                <width>12</width>
+            </LineStyle>
+            <BalloonStyle>
+                <displayMode>default</displayMode>
+            </BalloonStyle>
+        </Style>
+        <Document id="2">
+            <Style id="47">
+                <BalloonStyle>
+                    <displayMode>default</displayMode>
+                </BalloonStyle>
+            </Style>
+            <name>About Geomap KML</name>
+            <description>Family tree generated for using shakespeare.ged&lt;br&gt;Judith Shakespeare (@I0007@) as starting person&lt;br&gt;Marker types are Birth Death&lt;br&gt;Timeline enabled. Balloon Flyto enabled.</description>
+            <styleUrl>#47</styleUrl>
+        </Document>
+        <Placemark id="9">
+            <name>William Shakespeare(b)</name>
+            <description><![CDATA[ <br>Born: 1564</br><br>Father: <a href=#34;balloonFlyto>John Shakespeare</a></br><br>Mother: <a href=#41;balloonFlyto>Mary Arden</a></br><br>Children: <a href=#I0005;balloonFlyto>Susanna Shakespeare</a>, <a href=#I0006;balloonFlyto>Hamnet Shakespeare</a>, <a href=#I0007;balloonFlyto>Judith Shakespeare</a></br> ]]></description>
+            <TimeStamp id="10">
+                <when>1564</when>
+            </TimeStamp>
+            <styleUrl>#11</styleUrl>
+            <Point id="8">
+                <coordinates>-1.706503295628342,52.19244765068571,0.0</coordinates>
             </Point>
         </Placemark>
-        <Placemark id="25">
-            <name>William Shakespeare (b)</name>
-            <description>0       </description>
-            <styleUrl>#14</styleUrl>
-            <Point id="24">
-                <coordinates>-1.7064689246366787,52.192911248925874,0.0</coordinates>
-            </Point>
-        </Placemark>
-        <Placemark id="27">
-            <name>William Shakespeare (b)</name>
-            <description>0       </description>
+        <Placemark id="17">
+            <name>William Shakespeare</name>
+            <description><![CDATA[ <br>Lifespan: 1564 to 1616, related as F       </br><br>Father: <a href=#34;balloonFlyto>John Shakespeare</a></br><br>Mother: <a href=#41;balloonFlyto>Mary Arden</a></br><br>Children: <a href=#I0005;balloonFlyto>Susanna Shakespeare</a>, <a href=#I0006;balloonFlyto>Hamnet Shakespeare</a>, <a href=#I0007;balloonFlyto>Judith Shakespeare</a></br> ]]></description>
+            <TimeSpan id="20">
+                <begin>1564</begin>
+                <end>1616</end>
+            </TimeSpan>
             <styleUrl>#18</styleUrl>
-            <Point id="26">
-                <coordinates>-1.706222266016169,52.19277390682898,0.0</coordinates>
+            <LineString id="16">
+                <extrude>1</extrude>
+                <tessellate>1</tessellate>
+                <altitudeMode>clampToGround</altitudeMode>
+                <coordinates>-1.7063082841277286,52.192546835443004,0.0 -1.7060687416579068,52.19243739559366,0.0</coordinates>
+            </LineString>
+        </Placemark>
+        <Placemark id="22">
+            <name>Anne Hathaway(b)</name>
+            <description><![CDATA[ <br>Born: 1556</br><br>Father: <a href=#I0028;balloonFlyto>Richard Hathaway</a></br><br>Children: <a href=#I0005;balloonFlyto>Susanna Shakespeare</a>, <a href=#I0006;balloonFlyto>Hamnet Shakespeare</a>, <a href=#I0007;balloonFlyto>Judith Shakespeare</a></br> ]]></description>
+            <TimeStamp id="23">
+                <when>1556</when>
+            </TimeStamp>
+            <styleUrl>#24</styleUrl>
+            <Point id="21">
+                <coordinates>-1.70600630253809,52.19246840092062,0.0</coordinates>
             </Point>
         </Placemark>
         <Placemark id="29">
-            <name>William Shakespeare</name>
-            <description>0       </description>
+            <name>Anne Hathaway</name>
+            <description><![CDATA[ <br>Lifespan: 1556 to 1623, related as M       </br><br>Father: <a href=#I0028;balloonFlyto>Richard Hathaway</a></br><br>Children: <a href=#I0005;balloonFlyto>Susanna Shakespeare</a>, <a href=#I0006;balloonFlyto>Hamnet Shakespeare</a>, <a href=#I0007;balloonFlyto>Judith Shakespeare</a></br> ]]></description>
+            <TimeSpan id="32">
+                <begin>1556</begin>
+                <end>1623</end>
+            </TimeSpan>
             <styleUrl>#30</styleUrl>
             <LineString id="28">
                 <extrude>1</extrude>
                 <tessellate>1</tessellate>
                 <altitudeMode>clampToGround</altitudeMode>
-                <coordinates>-1.7066258399283267,52.192371361422936,0.0 -1.7059910252923849,52.19295182562431,0.0</coordinates>
+                <coordinates>-1.7058985972523815,52.193170441441126,0.0 -1.7276529778667258,52.190632357372394,0.0</coordinates>
             </LineString>
         </Placemark>
-        <Placemark id="33">
-            <name>Anne Hathaway (b)</name>
-            <description>1       </description>
-            <styleUrl>#14</styleUrl>
-            <Point id="32">
-                <coordinates>-1.7061435697044565,52.19271662206243,0.0</coordinates>
+        <Placemark id="34">
+            <name>John Shakespeare(b)</name>
+            <description><![CDATA[ <br>Born: 1531</br><br>Father: <a href=#I0015;balloonFlyto>Richard Shakespeare</a></br><br>Mother: <a href=#I0031;balloonFlyto>Unknown [Mother]</a></br><br>Children: <a href=#9;balloonFlyto>William Shakespeare</a>, <a href=#I0008;balloonFlyto>Joan Shakespeare</a>, <a href=#I0009;balloonFlyto>Margaret Shakespeare</a>, <a href=#I0010;balloonFlyto>Gilbert Shakespeare</a>, <a href=#I0011;balloonFlyto>Joan Shakespeare</a>, <a href=#I0012;balloonFlyto>Anne Shakespeare</a>, <a href=#I0013;balloonFlyto>Richard Shakespeare</a>, <a href=#I0014;balloonFlyto>Edmund Shakespeare</a></br> ]]></description>
+            <TimeStamp id="35">
+                <when>1531</when>
+            </TimeStamp>
+            <styleUrl>#36</styleUrl>
+            <Point id="33">
+                <coordinates>-1.7066676334443438,52.19255350047537,0.0</coordinates>
             </Point>
         </Placemark>
-        <Placemark id="35">
-            <name>Anne Hathaway (b)</name>
-            <description>1       </description>
-            <styleUrl>#18</styleUrl>
-            <Point id="34">
-                <coordinates>-1.7273364440526593,52.19087044785363,0.0</coordinates>
+        <Placemark id="41">
+            <name>Mary Arden(b)</name>
+            <description><![CDATA[ <br>Born: 1537</br><br>Father: <a href=#I0019;balloonFlyto>Robert Arden</a></br><br>Mother: <a href=#I0018;balloonFlyto>Agnes Webbe</a></br><br>Children: <a href=#9;balloonFlyto>William Shakespeare</a>, <a href=#I0008;balloonFlyto>Joan Shakespeare</a>, <a href=#I0009;balloonFlyto>Margaret Shakespeare</a>, <a href=#I0010;balloonFlyto>Gilbert Shakespeare</a>, <a href=#I0011;balloonFlyto>Joan Shakespeare</a>, <a href=#I0012;balloonFlyto>Anne Shakespeare</a>, <a href=#I0013;balloonFlyto>Richard Shakespeare</a>, <a href=#I0014;balloonFlyto>Edmund Shakespeare</a></br> ]]></description>
+            <TimeStamp id="42">
+                <when>1537</when>
+            </TimeStamp>
+            <styleUrl>#43</styleUrl>
+            <Point id="40">
+                <coordinates>-1.7065801123740345,52.192972843553974,0.0</coordinates>
             </Point>
         </Placemark>
-        <Placemark id="37">
-            <name>Anne Hathaway</name>
-            <description>1       </description>
-            <styleUrl>#38</styleUrl>
-            <LineString id="36">
+        <Placemark id="56">
+            <name>William Shakespeare(d)</name>
+            <description><![CDATA[ <br>Death: 1616</br><br>Father: <a href=#34;balloonFlyto>John Shakespeare</a></br><br>Mother: <a href=#41;balloonFlyto>Mary Arden</a></br><br>Children: <a href=#I0005;balloonFlyto>Susanna Shakespeare</a>, <a href=#I0006;balloonFlyto>Hamnet Shakespeare</a>, <a href=#I0007;balloonFlyto>Judith Shakespeare</a></br> ]]></description>
+            <TimeStamp id="57">
+                <when>1616</when>
+            </TimeStamp>
+            <styleUrl>#58</styleUrl>
+            <Point id="55">
+                <coordinates>-1.706725796008027,52.19239380455248,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="65">
+            <name>William Shakespeare</name>
+            <description><![CDATA[ <br>Lifespan: 1564 to 1616, related as F       </br><br>Father: <a href=#34;balloonFlyto>John Shakespeare</a></br><br>Mother: <a href=#41;balloonFlyto>Mary Arden</a></br><br>Children: <a href=#I0005;balloonFlyto>Susanna Shakespeare</a>, <a href=#I0006;balloonFlyto>Hamnet Shakespeare</a>, <a href=#I0007;balloonFlyto>Judith Shakespeare</a></br> ]]></description>
+            <TimeSpan id="68">
+                <begin>1564</begin>
+                <end>1616</end>
+            </TimeSpan>
+            <styleUrl>#66</styleUrl>
+            <LineString id="64">
                 <extrude>1</extrude>
                 <tessellate>1</tessellate>
                 <altitudeMode>clampToGround</altitudeMode>
-                <coordinates>-1.7063755029055794,52.19246860474055,0.0 -1.72813866944044,52.19097898014693,0.0</coordinates>
+                <coordinates>-1.7066598065222562,52.19313521522165,0.0 -1.7062575605127621,52.19320824233596,0.0</coordinates>
             </LineString>
         </Placemark>
-        <Placemark id="41">
-            <name>John Shakespeare (b)</name>
-            <description>00      </description>
-            <styleUrl>#14</styleUrl>
-            <Point id="40">
-                <coordinates>-1.7061615910052546,52.19246414175204,0.0</coordinates>
+        <Placemark id="70">
+            <name>Anne Hathaway(d)</name>
+            <description><![CDATA[ <br>Death: 1623</br><br>Father: <a href=#I0028;balloonFlyto>Richard Hathaway</a></br><br>Children: <a href=#I0005;balloonFlyto>Susanna Shakespeare</a>, <a href=#I0006;balloonFlyto>Hamnet Shakespeare</a>, <a href=#I0007;balloonFlyto>Judith Shakespeare</a></br> ]]></description>
+            <TimeStamp id="71">
+                <when>1623</when>
+            </TimeStamp>
+            <styleUrl>#72</styleUrl>
+            <Point id="69">
+                <coordinates>-1.7063683513438488,52.19283507052062,0.0</coordinates>
             </Point>
         </Placemark>
-        <Placemark id="43">
-            <name>Mary Arden (b)</name>
-            <description>01      </description>
-            <styleUrl>#14</styleUrl>
-            <Point id="42">
-                <coordinates>-1.706715166022854,52.19312861826554,0.0</coordinates>
-            </Point>
-        </Placemark>
-        <Placemark id="45">
-            <name>Richard Hathaway (b)</name>
-            <description>10      </description>
-            <styleUrl>#14</styleUrl>
-            <Point id="44">
-                <coordinates>-1.7276666732840127,52.1913452243794,0.0</coordinates>
-            </Point>
+        <Placemark id="77">
+            <name>Anne Hathaway</name>
+            <description><![CDATA[ <br>Lifespan: 1556 to 1623, related as M       </br><br>Father: <a href=#I0028;balloonFlyto>Richard Hathaway</a></br><br>Children: <a href=#I0005;balloonFlyto>Susanna Shakespeare</a>, <a href=#I0006;balloonFlyto>Hamnet Shakespeare</a>, <a href=#I0007;balloonFlyto>Judith Shakespeare</a></br> ]]></description>
+            <TimeSpan id="80">
+                <begin>1556</begin>
+                <end>1623</end>
+            </TimeSpan>
+            <styleUrl>#78</styleUrl>
+            <LineString id="76">
+                <extrude>1</extrude>
+                <tessellate>1</tessellate>
+                <altitudeMode>clampToGround</altitudeMode>
+                <coordinates>-1.7058880566792463,52.19291675733937,0.0 -1.7059097697496213,52.19228851441247,0.0</coordinates>
+            </LineString>
         </Placemark>
     </Document>
 </kml>

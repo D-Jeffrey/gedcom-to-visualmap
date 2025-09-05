@@ -105,6 +105,10 @@ class ConfigDialog(wx.Frame):
         self.TEXTcsvcmdline = wx.TextCtrl(cfgpanel, wx.ID_FILE1, "", size=(250,20))
         if gOptions.CSVcmdline:
             self.TEXTcsvcmdline.SetValue(gOptions.CSVcmdline)            
+        TEXTtracecmdlinelbl = wx.StaticText(cfgpanel, -1,  " Trace Table Editor Command line:   ") 
+        self.TEXTtracecmdline = wx.TextCtrl(cfgpanel, wx.ID_FILE1, "", size=(250,20))
+        if gOptions.Tracecmdline:
+            self.TEXTtracecmdline.SetValue(gOptions.Tracecmdline)            
         GRIDctl = gridlib.Grid(cfgpanel)
         if includeNOTSET:
             gridlen = len(logging.root.manager.loggerDict)
@@ -160,14 +164,13 @@ class ConfigDialog(wx.Frame):
 
         sizer = wx.BoxSizer(wx.VERTICAL)
         l1 = wx.BoxSizer(wx.HORIZONTAL)
-        l1.AddMany([TEXTkmlcmdlinelbl,      (6,20),     self.TEXTkmlcmdline])
+        l1.AddMany([TEXTkmlcmdlinelbl,      (3,20),     self.TEXTkmlcmdline])
         l2 = wx.BoxSizer(wx.HORIZONTAL)
-        l2.AddMany([TEXTcsvcmdlinelbl,      (6,20),     self.TEXTcsvcmdline])
-        sizer.AddSpacer(5)
-        sizer.Add(l1)
-        sizer.AddSpacer(10)
-        sizer.Add(l2)
-        sizer.AddSpacer(10)
+        l2.AddMany([TEXTcsvcmdlinelbl,      (3,20),     self.TEXTcsvcmdline])
+        l3 = wx.BoxSizer(wx.HORIZONTAL)
+        l3.AddMany([TEXTtracecmdlinelbl,      (3,20),     self.TEXTtracecmdline])
+        sizer.AddMany([(5,20),  l1, (5,20), l2, (5,20), l3, (10,20)])
+        
         
         sizer.Add( wx.StaticText(cfgpanel, -1,  "Use   $n  for the name of the file within a command line - such as    notepad $n"))   
         sizer.Add( wx.StaticText(cfgpanel, -1,  "Use   $n  without any command to open default application for that file type"))   
@@ -195,6 +198,7 @@ class ConfigDialog(wx.Frame):
             updatelog.setLevel(getattr(logging, logLevel))
         self.gOptions.KMLcmdline = self.TEXTkmlcmdline.GetValue()
         self.gOptions.CSVcmdline = self.TEXTcsvcmdline.GetValue()
+        self.gOptions.Tracecmdline = self.TEXTtracecmdline.GetValue()
         self.gOptions.savesettings()
         self.Close()
         self.DestroyLater()
@@ -633,7 +637,7 @@ and generating the output so that the GUI can continue to be responsive
                         else:
                             self.SayInfoMessage(f"Cancelled loading people")
                         if self.gOptions.Main:
-                            self.SayInfoMessage(f" with '{self.gOptions.Main}' as starting person", False)
+                            self.SayInfoMessage(f" with '{self.gOptions.Main}' as starting person from {Path(self.gOptions.GEDCOMinput).name}", False)
                     else:
                         self.SayErrorMessage(f"Error: file could not read as a GEDCOM file", True)
                     

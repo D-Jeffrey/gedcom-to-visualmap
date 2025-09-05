@@ -26,8 +26,8 @@ from models.Pos import Pos
 
 
 # TODO This needs to be moved into it's out JSON driven configuration
-fixuplist   = {r'\bof\s': '',
-               r'\spart of\s' : ' ', 
+fixuplist   = {r'\spart of\s' : ' ', 
+               r'\bof\s': '',
                r'po box [0-9]+\s' : ' ', 
                r'\([\w\s\.]+\)' : '',
                '(town)' : '', 

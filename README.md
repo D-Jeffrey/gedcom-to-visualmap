@@ -60,11 +60,11 @@ python3 gedcom-to-map.py /users/darren/documents/myhertitagetree.ged myTree -mai
 ```
 
 ## GUI
-![img](docs/img/python_2025-03-29.png)
+![img](docs/img/GUI-python_2025-09-03.png)
 
-To use the GUI version, `File- > Open` and select your .ged file.
+To use the GUI version, click on `Input File` and select your .ged file.
 Set your options in the GUI interface  
-- Type in the Output file name (It saves to the same directory as the Load file).
+- Type in the Output file name (Default is same name, different extension in same directory as the Input file).
 - Result type drives the options mixture
 
 Once you have selected your options, 
@@ -105,14 +105,22 @@ off all the layout measurements.  (Need to add math to get actual font size)
 | geopy | https://github.com/geopy/geopy |https://geopy.readthedocs.io/en/latest/#geocoders |
 | folium | https://github.com/python-visualization/folium | https://python-visualization.github.io/folium/latest/|
 | xyzservices | https://github.com/geopandas/xyzservices | https://xyzservices.readthedocs.io/en/stable/index.html |
+| nnjeim/world | https://github.com/nnjeim/world | https://github.com/nnjeim/world?tab=readme-ov-file#available-actions 
 
 
 # Results
 ## KML Example revised
 ### Google Earth Online
+(Uncheck FlyTo Balloon)
 ![img](docs/img/Google_earth_2025-03.png)
 * KML Output  : [samples/input.kml](samples/input.kml) using 'native' only
+### Google Earth Pro
+(Check FlyTo Balloon)
+![img](docs/img/googleearth_2025-09-01.jpg)
+* KML Output  : [samples/royal92.kml](samples/royal92.kml) all people, birth, death
+
 ### ArcGIS Earth
+(Uncheck FlyTo Balloon)
 ![img](docs/img/ArcGISEarth_2025-03-input.jpg)
 
 Go to https://www.google.ca/maps/about/mymaps  

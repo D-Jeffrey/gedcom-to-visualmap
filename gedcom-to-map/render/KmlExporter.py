@@ -58,15 +58,7 @@ class KmlExporter:
                         replacement = f"href=#{replacewith};"
                         placemark.balloonstyle.text = placemark.balloonstyle.text.replace(original, replacement)
 
-            # if placemark.description and placemark.description.find("href=#") >= 0:
-            #     # Loop
-            #     start = placemark.description.find("href=#",end)+6
-            #     end = placemark.description.find(";")
-            #     tag = placemark.description[start:end]
-            #     if self.gOp.Referenced.exists(tag):
-            #         # This is a hack to get to the placemark id
-            #         replacewith = 1 + int(self.gOp.Referenced.gettag(tag) )
-            #         placemark.description = placemark.description.replace(f"href=#{tag};", f"href=#{replacewith};")
+        
         self.gOp.step("Saving KML")
         logging.info("Saved as %s", self.file_name)
         self.kml.save(self.file_name)
@@ -92,7 +84,22 @@ class KmlExporter:
             styleB = self.styleB     
         else:
             kml = simplekml.Kml()
-            # kml = kmlbase.newdocument(name='Family Tree')
+            inputfile = os.path.basename(self.gOp.GEDCOMinput) if self.gOp.GEDCOMinput else "Unknown"
+            descript = f"Family tree generated for using {inputfile}<br>{self.gOp.Name} ({self.gOp.Main}) as starting person"
+            descript += f"<br>Marker types are {'Birth' if self.gOp.BornMark else ''} {'Death' if self.gOp.DieMark else ''}"
+            kmloptions = []
+            if self.gOp.MapTimeLine:
+                kmloptions.append("Timeline enabled.")
+            if self.gOp.UseBalloonFlyto:
+                kmloptions.append("Balloon Flyto enabled.")
+            if self.gOp.AllEntities:
+                kmloptions.append("All people are included.")
+            if kmloptions:
+                descript += "<br>" + " ".join(kmloptions)
+            
+            
+            kmldoc = kml.newdocument(name='About Geomap KML', description=descript)
+
             self.kml = kml
             
             styleA = simplekml.Style()

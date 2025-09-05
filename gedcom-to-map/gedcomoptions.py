@@ -87,15 +87,21 @@ class gvOptions:
         if os_name == 'Windows':
             self.KMLcmdline = "notepad $n"
             self.CSVcmdline = "$n"
+            self.Tracecmdline = "notepad $n"
+        
         elif os_name == 'Darwin':
             self.KMLcmdline = "Numbers $n"
             self.CSVcmdline = OFFICECMDLINE + " --calc $n"
+            self.Tracecmdline = "Numbers $n"
         elif os_name == 'Linux':
             self.KMLcmdline = "nano $n"
             self.CSVcmdline = OFFICECMDLINE + " --calc $n"
+            self.Tracecmdline = OFFICECMDLINE + " --calc $n"
+
         else:
             self.KMLcmdline = "notepad $n"
             self.CSVcmdline = "notepad $n"
+            self.Tracecmdline = "notepad $n"
 
         self.BackgroundProcess = None     # Background Thread for processing set later
         self.heritage = None
@@ -108,7 +114,7 @@ class gvOptions:
         self.html_keys = {'MarksOn':0, 'HeatMap':0, 'BornMark':0, 'DieMark':0,  'MarkStarOn':0, 'GroupBy':1, 
                           'UseAntPath':0, 'MapTimeLine':0, 'HeatMapTimeStep':1, 'HomeMarker':0, 'showLayerControl':0, 
                           'mapMini':0, 'MapStyle':2}
-        self.core_keys = {'UseGPS':0, 'CacheOnly':0, 'AllEntities':0, 'KMLcmdline':2, 'CSVcmdline':2}
+        self.core_keys = {'UseGPS':0, 'CacheOnly':0, 'AllEntities':0, 'KMLcmdline':2, 'CSVcmdline':2, 'Tracecmdline':2}
         self.logging_keys = ['models.human', 'models', 'ged4py.parser', 'ged4py', 'models.creator', 'gedcomoptions', 'gedcom.gedcomparser', 'gedcom', 'gedcom.gpslookup', 'geopy', 'render.kmlexporter', 'render', 'render.foliumexp', 'gedcomvisual', 'gedcomdialogs', 'gedcomvisualgui', '__main__']
         
         self.kml_keys = {'MaxLineWeight':1, 'MaxMissing':1, 'UseBalloonFlyto':0}

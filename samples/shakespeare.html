@@ -26,7 +26,7 @@
             <meta name="viewport" content="width=device-width,
                 initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
             <style>
-                #map_95df0a052e5b75225a73bc08443dc2c8 {
+                #map_ee183b670381ee642ceb11db4f1169da {
                     position: relative;
                     width: 100.0%;
                     height: 100.0%;
@@ -36,36 +36,133 @@
                 .leaflet-container { font-size: 1rem; }
             </style>
         
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-minimap/3.6.1/Control.MiniMap.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-minimap/3.6.1/Control.MiniMap.css"/>
-    <script src="https://cdn.jsdelivr.net/gh/python-visualization/folium@main/folium/templates/leaflet_heat.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/iso8601-js-period@0.2.1/iso8601.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet-timedimension@1.1.1/dist/leaflet.timedimension.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/pa7_hm.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/pa7_leaflet_hm.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet-timedimension@1.1.1/dist/leaflet.timedimension.control.css"/>
     
-                <style>
-                    #float_image_13c28f5d47d648d7a48a16518d9d6d71 {
-                        position: absolute;
-                        bottom: 2%;
-                        left: 10%;
+            <script>
+                var TDHeatmap = L.TimeDimension.Layer.extend({
+
+            initialize: function(data, options) {
+                var heatmapCfg = {
+                    radius: 15,
+                    blur: 0.8,
+                    maxOpacity: 1.,
+                    scaleRadius: false,
+                    useLocalExtrema: false,
+                    latField: 'lat',
+                    lngField: 'lng',
+                    valueField: 'count',
+                    defaultWeight : 1,
+                };
+                heatmapCfg = $.extend({}, heatmapCfg, options.heatmapOptions || {});
+                var layer = new HeatmapOverlay(heatmapCfg);
+                L.TimeDimension.Layer.prototype.initialize.call(this, layer, options);
+                this._currentLoadedTime = 0;
+                this._currentTimeData = {
+                    data: []
+                    };
+                this.data= data;
+                this.defaultWeight = heatmapCfg.defaultWeight || 1;
+            },
+            onAdd: function(map) {
+                L.TimeDimension.Layer.prototype.onAdd.call(this, map);
+                map.addLayer(this._baseLayer);
+                if (this._timeDimension) {
+                    this._getDataForTime(this._timeDimension.getCurrentTime());
+                }
+            },
+            _onNewTimeLoading: function(ev) {
+                this._getDataForTime(ev.time);
+                return;
+            },
+            isReady: function(time) {
+                return (this._currentLoadedTime == time);
+            },
+            _update: function() {
+                this._baseLayer.setData(this._currentTimeData);
+                return true;
+            },
+            _getDataForTime: function(time) {
+                    delete this._currentTimeData.data;
+                    this._currentTimeData.data = [];
+                    var data = this.data[time-1];
+                    for (var i = 0; i < data.length; i++) {
+                        this._currentTimeData.data.push({
+                                lat: data[i][0],
+                                lng: data[i][1],
+                                count: data[i].length>2 ? data[i][2] : this.defaultWeight
+                            });
                         }
-                </style>
-            
+                    this._currentLoadedTime = time;
+                    if (this._timeDimension && time == this._timeDimension.getCurrentTime() && !this._timeDimension.isLoading()) {
+                        this._update();
+                    }
+                    this.fire('timeload', {
+                        time: time
+                    });
+                }
+        });
+
+        L.Control.TimeDimensionCustom = L.Control.TimeDimension.extend({
+            initialize: function(index, options) {
+                var playerOptions = {
+                    buffer: 1,
+                    minBufferReady: -1
+                    };
+                options.playerOptions = $.extend({}, playerOptions, options.playerOptions || {});
+                L.Control.TimeDimension.prototype.initialize.call(this, options);
+                this.index = index;
+                },
+            _getDisplayDateFormat: function(date){
+                return this.index[date.getTime()-1];
+                }
+            });
+            </script>
+                
+    <script src="https://cdn.jsdelivr.net/npm/leaflet-ant-path@1.1.2/dist/leaflet-ant-path.min.js"></script>
 </head>
 <body>
     
     
-            <div class="folium-map" id="map_95df0a052e5b75225a73bc08443dc2c8" ></div>
+            <div class="folium-map" id="map_ee183b670381ee642ceb11db4f1169da" ></div>
         
     
-            <img id="float_image_13c28f5d47d648d7a48a16518d9d6d71" alt="float_image"
-                 src="file://C:\Users\darre\source\repos\gedcom-to-visualmap\gedcom-to-map\render\foliumExp.py/../legend.png"
-                 style="z-index: 999999">
-            </img>
-            
+    <div id="map_legend" class="legend">
+        <h4>Legend</h4>
+        <!-- Dynamic generation of legend items -->
+        <div style="margin: 5px;"><i class="fa fa-baby" style="color: orange;"></i> born</div><div style="margin: 5px;"><i class="fa fa-cross" style="color: gray;"></i> death</div><div style="margin: 5px;"><i class="fa fa-home" style="color: lightred;"></i> home</div><div style="margin: 5px;"><i class="fa fa-ring" style="color: orange;"></i> Marriage</div><div style="margin: 5px;"><i class="fa fa-ship" style="color: darkgreen;"></i> IMMI</div><div style="margin: 5px;"><i class="fa fa-church" style="color: darkgreen;"></i> CHR</div><div style="margin: 5px;"><i class="fa fa-church" style="color: darkgreen;"></i> BAPM</div><div style="margin: 5px;"><i class="fa fa-landmark" style="color: darkgreen;"></i> Deed</div><div style="margin: 5px;"><i class="fa fa-ship" style="color: darkgreen;"></i> Arrival</div><div style="margin: 5px;"><i class="fa fa-shoe-prints" style="color: lightgray;"></i> Other</div>
+    </div>
+    <style>
+        /* Legend styling */
+        .legend {
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(0,0,0,0.5);
+            font-size: 14px;
+            line-height: 1.5;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 1000; /* Ensure legend is above the map */
+        }
+        .legend div {
+            display: flex;
+            align-items: center;
+        }
+        .legend i {
+            margin-right: 5px;
+        }
+    </style>
 </body>
 <script>
     
     
-            var map_95df0a052e5b75225a73bc08443dc2c8 = L.map(
-                "map_95df0a052e5b75225a73bc08443dc2c8",
+            var map_ee183b670381ee642ceb11db4f1169da = L.map(
+                "map_ee183b670381ee642ceb11db4f1169da",
                 {
                     center: [52.1927803, -1.70634],
                     crs: L.CRS.EPSG3857,
@@ -82,154 +179,14 @@
 
         
     
-            var tile_layer_5b5d5e74cfd3abc464a042e98897f348 = L.tileLayer(
-                "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
-                {
-  "minZoom": 0,
-  "maxZoom": 19,
-  "maxNativeZoom": 19,
-  "noWrap": false,
-  "attribution": "\u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors",
-  "subdomains": "abc",
-  "detectRetina": false,
-  "tms": false,
-  "opacity": 1,
-}
-
-            );
-        
-    
-            tile_layer_5b5d5e74cfd3abc464a042e98897f348.addTo(map_95df0a052e5b75225a73bc08443dc2c8);
-        
-    
-            var tile_layer_897813b16fea2124dcdb661faa30c03e = L.tileLayer(
-                "Stamen Toner",
-                {
-  "minZoom": 0,
-  "maxZoom": 18,
-  "maxNativeZoom": 18,
-  "noWrap": false,
-  "attribution": "\u0026copy; \u003ca href=\"https://openmaptiles.org/\" target=\"_blank\"\u003eOpenMapTiles\u003c/a\u003e",
-  "subdomains": "abc",
-  "detectRetina": false,
-  "tms": false,
-  "opacity": 1,
-}
-
-            );
-        
-    
-            tile_layer_897813b16fea2124dcdb661faa30c03e.addTo(map_95df0a052e5b75225a73bc08443dc2c8);
-        
-    
-            var tile_layer_67d692ae6a2a84c107f3db532f00b237 = L.tileLayer(
-                "https://tiles.stadiamaps.com/tiles/stamen_toner/{z}/{x}/{y}{r}.png",
-                {
-  "minZoom": 0,
-  "maxZoom": 18,
-  "maxNativeZoom": 18,
-  "noWrap": false,
-  "attribution": "\u0026copy; \u003ca href=\"https://www.stadiamaps.com/\" target=\"_blank\"\u003eStadia Maps\u003c/a\u003e \u0026copy; \u003ca href=\"https://www.stamen.com/\" target=\"_blank\"\u003eStamen Design\u003c/a\u003e \u0026copy; \u003ca href=\"https://openmaptiles.org/\" target=\"_blank\"\u003eOpenMapTiles\u003c/a\u003e \u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors",
-  "subdomains": "abc",
-  "detectRetina": false,
-  "tms": false,
-  "opacity": 1,
-}
-
-            );
-        
-    
-            tile_layer_67d692ae6a2a84c107f3db532f00b237.addTo(map_95df0a052e5b75225a73bc08443dc2c8);
-        
-    
-            var tile_layer_1ba51bfdec3b7bd029b3913d9cf674a2 = L.tileLayer(
-                "https://tiles.stadiamaps.com/tiles/stamen_toner_lite/{z}/{x}/{y}{r}.png",
-                {
-  "minZoom": 0,
-  "maxZoom": 18,
-  "maxNativeZoom": 18,
-  "noWrap": false,
-  "attribution": "\u0026copy; \u003ca href=\"https://www.stadiamaps.com/\" target=\"_blank\"\u003eStadia Maps\u003c/a\u003e \u0026copy; \u003ca href=\"https://www.stamen.com/\" target=\"_blank\"\u003eStamen Design\u003c/a\u003e \u0026copy; \u003ca href=\"https://openmaptiles.org/\" target=\"_blank\"\u003eOpenMapTiles\u003c/a\u003e \u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors",
-  "subdomains": "abc",
-  "detectRetina": false,
-  "tms": false,
-  "opacity": 1,
-}
-
-            );
-        
-    
-            tile_layer_1ba51bfdec3b7bd029b3913d9cf674a2.addTo(map_95df0a052e5b75225a73bc08443dc2c8);
-        
-    
-            var tile_layer_865afc2726128b84a35baf1961b644de = L.tileLayer(
-                "https://tiles.stadiamaps.com/tiles/stamen_watercolor/{z}/{x}/{y}.jpg",
-                {
-  "minZoom": 0,
-  "maxZoom": 18,
-  "maxNativeZoom": 18,
-  "noWrap": false,
-  "attribution": "\u0026copy; \u003ca href=\"https://www.stadiamaps.com/\" target=\"_blank\"\u003eStadia Maps\u003c/a\u003e \u0026copy; \u003ca href=\"https://www.stamen.com/\" target=\"_blank\"\u003eStamen Design\u003c/a\u003e \u0026copy; \u003ca href=\"https://openmaptiles.org/\" target=\"_blank\"\u003eOpenMapTiles\u003c/a\u003e \u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors",
-  "subdomains": "abc",
-  "detectRetina": false,
-  "tms": false,
-  "opacity": 1,
-}
-
-            );
-        
-    
-            tile_layer_865afc2726128b84a35baf1961b644de.addTo(map_95df0a052e5b75225a73bc08443dc2c8);
-        
-    
-            var tile_layer_a74b448f65dd0a00fa85006e0ca9f26b = L.tileLayer(
-                "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
-                {
-  "minZoom": 0,
-  "maxZoom": 18,
-  "maxNativeZoom": 18,
-  "noWrap": false,
-  "attribution": "Map data: {attribution.OpenStreetMap}, \u003ca href=\"http://viewfinderpanoramas.org\"\u003eSRTM\u003c/a\u003e | Map style: \u0026copy; \u003ca href=\"https://opentopomap.org\"\u003eOpenTopoMap\u003c/a\u003e (\u003ca href=\"https://creativecommons.org/licenses/by-sa/3.0/\"\u003eCC-BY-SA\u003c/a\u003e)",
-  "subdomains": "abc",
-  "detectRetina": false,
-  "tms": false,
-  "opacity": 1,
-}
-
-            );
-        
-    
-            tile_layer_a74b448f65dd0a00fa85006e0ca9f26b.addTo(map_95df0a052e5b75225a73bc08443dc2c8);
-        
-    
-            var tile_layer_6752f306b2f7cbb1a0c3a7159f581bee = L.tileLayer(
-                "https://server.arcgisonline.com/ArcGIS/rest/services/WorldImagery/MapServer/tile/{z}/{y}/{x}",
-                {
-  "minZoom": 0,
-  "maxZoom": 18,
-  "maxNativeZoom": 18,
-  "noWrap": false,
-  "attribution": "{attribution.Esri} \u0026mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community",
-  "subdomains": "abc",
-  "detectRetina": false,
-  "tms": false,
-  "opacity": 1,
-}
-
-            );
-        
-    
-            tile_layer_6752f306b2f7cbb1a0c3a7159f581bee.addTo(map_95df0a052e5b75225a73bc08443dc2c8);
-        
-    
-            var tile_layer_32dbc57f0ce79831a3f12407828b40bc = L.tileLayer(
-                "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+            var tile_layer_4946f86a6129807c75353af3342f8189 = L.tileLayer(
+                "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
                 {
   "minZoom": 0,
   "maxZoom": 20,
   "maxNativeZoom": 20,
   "noWrap": false,
-  "attribution": "\u0026copy; \u003ca href=\"https://openmaptiles.org/\" target=\"_blank\"\u003eOpenMapTiles\u003c/a\u003e",
+  "attribution": "\u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors \u0026copy; \u003ca href=\"https://carto.com/attributions\"\u003eCARTO\u003c/a\u003e",
   "subdomains": "abcd",
   "detectRetina": false,
   "tms": false,
@@ -239,99 +196,102 @@
             );
         
     
-            tile_layer_32dbc57f0ce79831a3f12407828b40bc.addTo(map_95df0a052e5b75225a73bc08443dc2c8);
+            tile_layer_4946f86a6129807c75353af3342f8189.addTo(map_ee183b670381ee642ceb11db4f1169da);
         
     
-            var tile_layer_d92b191e20a3a16b19af3a7a63bef621 = L.tileLayer(
-                "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
-                {"attribution": "\u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors", "detect_retina": false, "max_native_zoom": 19, "max_zoom": 19, "min_zoom": 0, "no_wrap": false, "opacity": 1, "subdomains": "abc", "tms": false}
+
+            var times = [1, 2, 3, 4, 5, 6, 7];
+
+            map_ee183b670381ee642ceb11db4f1169da.timeDimension = L.timeDimension(
+                {times : times, currentTime: new Date(1)}
             );
-            var mini_map_8a793c62ba9cc521d9171c3eb56fe19e = new L.Control.MiniMap(
-                tile_layer_d92b191e20a3a16b19af3a7a63bef621,
+
+            var heat_map_3a51e9a58edf899dbcce9e99d44f0ebfControl = new L.Control.TimeDimensionCustom([1540, 1560, 1580, 1600, 1620, 1640, 1660], {
+                autoPlay: false,
+                backwardButton: true,
+                displayDate: true,
+                forwardButton: true,
+                limitMinimumRange: 5,
+                limitSliders: true,
+                loopButton: true,
+                maxSpeed: 25,
+                minSpeed: 1,
+                playButton: true,
+                playReverseButton: true,
+                position: "bottomleft",
+                speedSlider: true,
+                speedStep: 1,
+                styleNS: "leaflet-control-timecontrol",
+                timeSlider: true,
+                timeSliderDragUpdate: false,
+                timeSteps: 1
+                })
+                .addTo(map_ee183b670381ee642ceb11db4f1169da);
+
+                var heat_map_3a51e9a58edf899dbcce9e99d44f0ebf = new TDHeatmap([[['52.1909684', '-1.7276632', 0.13513513513513514]], [['52.1927803', '-1.70634', 0.4594594594594595], ['52.1909684', '-1.7276632', 0.5405405405405406]], [['52.1927803', '-1.70634', 0.972972972972973], ['52.1909684', '-1.7276632', 0.5405405405405406]], [['52.1927803', '-1.70634', 1.0], ['52.1909684', '-1.7276632', 0.5405405405405406]], [['52.1927803', '-1.70634', 0.5675675675675675], ['52.1909684', '-1.7276632', 0.08108108108108109]], [['52.1927803', '-1.70634', 0.5405405405405406]], [['52.1927803', '-1.70634', 0.08108108108108109]]],
+                {heatmapOptions: {
+                        radius: 15,
+                        blur: 0.8,
+                        minOpacity: 0,
+                        maxOpacity: 0.9,
+                        scaleRadius: false,
+                        useLocalExtrema: false,
+                        defaultWeight: 1,
+                        gradient: {'0': 'Navy', '0.25': 'Blue', '0.5': 'Green', '0.75': 'Yellow', '1': 'Red'}
+                    }
+                });
+
+        
+    
+            heat_map_3a51e9a58edf899dbcce9e99d44f0ebf.addTo(map_ee183b670381ee642ceb11db4f1169da);
+        
+    
+            var feature_group_dc632935d06cea4e73fbe0b52bbbe47b = L.featureGroup(
                 {
-  "position": "bottomright",
-  "width": 150,
-  "height": 150,
-  "collapsedWidth": 25,
-  "collapsedHeight": 25,
-  "zoomLevelOffset": -5,
-  "centerFixed": false,
-  "zoomAnimation": false,
-  "toggleDisplay": true,
-  "autoToggleDisplay": false,
-  "minimized": false,
 }
             );
-            map_95df0a052e5b75225a73bc08443dc2c8.addControl(mini_map_8a793c62ba9cc521d9171c3eb56fe19e);
         
     
-            var feature_group_9b2da8bd3898f37e7ea1e1b48a3c91f8 = L.featureGroup(
-                {
-}
-            );
-        
-    
-            var heat_map_919520ae3af295ba23f6f9cb72c131d1 = L.heatLayer(
-                [[52.1927803, -1.70634, 12], [52.1909684, -1.7276632, 2]],
-                {
-  "minOpacity": 0.5,
-  "maxZoom": 18,
-  "radius": 25,
-  "blur": 15,
-  "maxOpacity": 0.8,
-}
-            );
-        
-    
-            heat_map_919520ae3af295ba23f6f9cb72c131d1.addTo(feature_group_9b2da8bd3898f37e7ea1e1b48a3c91f8);
-        
-    
-            var feature_group_e9920560e7f2c53392443563bfcb2b22 = L.featureGroup(
-                {
-}
-            );
-        
-    
-            var marker_077f4cdd5c41515f53ac1cb2c612d4f7 = L.marker(
-                [52.19271083332251, -1.706077664239063],
+            var marker_a20057d4a214924cbd162e1a5b58b157 = L.marker(
+                [52.19327846042557, -1.7067730821389526],
                 {
   "opacity": 0.5,
 }
-            ).addTo(feature_group_e9920560e7f2c53392443563bfcb2b22);
+            ).addTo(feature_group_dc632935d06cea4e73fbe0b52bbbe47b);
         
     
-            var icon_0855a7a29e7977327f4aa2edf2dd9838 = L.AwesomeMarkers.icon(
+            var icon_262a0f668fd0b14d1e919ff7fbd6462f = L.AwesomeMarkers.icon(
                 {
   "markerColor": "orange",
   "iconColor": "white",
   "icon": "child",
   "prefix": "fa",
   "extraClasses": "fa-rotate-0",
+  "extraClasses": "fas",
 }
             );
-            marker_077f4cdd5c41515f53ac1cb2c612d4f7.setIcon(icon_0855a7a29e7977327f4aa2edf2dd9838);
         
     
-        var popup_93db4cf8c95b6970492e7d2d0d9a7eca = L.popup({
+        var popup_36e7cb17e8c57deebb158bb1418de9af = L.popup({
   "maxWidth": "100%",
 });
 
         
             
-                var html_bcf85b7ce591bb3862e798245b8ad9b3 = $(`<div id="html_bcf85b7ce591bb3862e798245b8ad9b3" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>Life of          Hamnet Shakespeare<br>1585 (Born) 1596 (Died)</div></div>`)[0];
-                popup_93db4cf8c95b6970492e7d2d0d9a7eca.setContent(html_bcf85b7ce591bb3862e798245b8ad9b3);
+                var html_c14408721a14464b36ecb8e7cac88392 = $(`<div id="html_c14408721a14464b36ecb8e7cac88392" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>Life of Judith Shakespeare<br>1585 (Born) 1662 (Died)</div></div>`)[0];
+                popup_36e7cb17e8c57deebb158bb1418de9af.setContent(html_c14408721a14464b36ecb8e7cac88392);
             
         
 
-        marker_077f4cdd5c41515f53ac1cb2c612d4f7.bindPopup(popup_93db4cf8c95b6970492e7d2d0d9a7eca)
+        marker_a20057d4a214924cbd162e1a5b58b157.bindPopup(popup_36e7cb17e8c57deebb158bb1418de9af)
         ;
 
         
     
     
-            marker_077f4cdd5c41515f53ac1cb2c612d4f7.bindTooltip(
+            marker_a20057d4a214924cbd162e1a5b58b157.bindTooltip(
                 `<div>
-                     Life of          Hamnet Shakespeare
+                     Life of         	Judith Shakespeare
                  </div>`,
                 {
   "sticky": true,
@@ -339,15 +299,18 @@
             );
         
     
-            var marker_9e2c8506c70d65ab132d006659420092 = L.marker(
-                [52.19310650813661, -1.7063868097841501],
+                marker_a20057d4a214924cbd162e1a5b58b157.setIcon(icon_262a0f668fd0b14d1e919ff7fbd6462f);
+            
+    
+            var marker_2f8ce6510d98b8efc3c45a9024286641 = L.marker(
+                [52.19262781751525, -1.7059179638333464],
                 {
   "opacity": 0.5,
 }
-            ).addTo(feature_group_e9920560e7f2c53392443563bfcb2b22);
+            ).addTo(feature_group_dc632935d06cea4e73fbe0b52bbbe47b);
         
     
-            var icon_a7b6ec87019318f57bc1e78f54b515c8 = L.AwesomeMarkers.icon(
+            var icon_35b995a0570cea5e0ac5594e0b222615 = L.AwesomeMarkers.icon(
                 {
   "markerColor": "gray",
   "iconColor": "white",
@@ -357,29 +320,28 @@
   "extraClasses": "fas",
 }
             );
-            marker_9e2c8506c70d65ab132d006659420092.setIcon(icon_a7b6ec87019318f57bc1e78f54b515c8);
         
     
-        var popup_ce494724bdba5f1bfc07f8521548e4eb = L.popup({
+        var popup_e3e667de84dde5fc2aaccbc4f3fd38ac = L.popup({
   "maxWidth": "100%",
 });
 
         
             
-                var html_0aab4ddaaad91ece78a9c49239b05b09 = $(`<div id="html_0aab4ddaaad91ece78a9c49239b05b09" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>Life of          Hamnet Shakespeare<br>1585 (Born) 1596 (Died)</div></div>`)[0];
-                popup_ce494724bdba5f1bfc07f8521548e4eb.setContent(html_0aab4ddaaad91ece78a9c49239b05b09);
+                var html_5dfca3da68e01f2be9b7b1d441abba74 = $(`<div id="html_5dfca3da68e01f2be9b7b1d441abba74" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>Life of Judith Shakespeare<br>1585 (Born) 1662 (Died)</div></div>`)[0];
+                popup_e3e667de84dde5fc2aaccbc4f3fd38ac.setContent(html_5dfca3da68e01f2be9b7b1d441abba74);
             
         
 
-        marker_9e2c8506c70d65ab132d006659420092.bindPopup(popup_ce494724bdba5f1bfc07f8521548e4eb)
+        marker_2f8ce6510d98b8efc3c45a9024286641.bindPopup(popup_e3e667de84dde5fc2aaccbc4f3fd38ac)
         ;
 
         
     
     
-            marker_9e2c8506c70d65ab132d006659420092.bindTooltip(
+            marker_2f8ce6510d98b8efc3c45a9024286641.bindTooltip(
                 `<div>
-                     Life of          Hamnet Shakespeare
+                     Life of         	Judith Shakespeare
                  </div>`,
                 {
   "sticky": true,
@@ -387,79 +349,363 @@
             );
         
     
-            var poly_line_842da1d4493c1cc55b7d4bf299e8bc67 = L.polyline(
-                [[52.19271083332251, -1.706077664239063], [52.192762677425385, -1.706683095601637], [52.19310650813661, -1.7063868097841501]],
-                {"bubblingMouseEvents": true, "color": "gray", "dashArray": [], "dashOffset": null, "fill": false, "fillColor": "gray", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "arcs", "noClip": false, "opacity": 1, "smoothFactor": 1.0, "stroke": true, "weight": 12}
-            ).addTo(feature_group_e9920560e7f2c53392443563bfcb2b22);
-        
-    
-        var popup_23e4ef704d4bc3ac46c7eab987772294 = L.popup({
-  "maxWidth": "100%",
-});
-
-        
+                marker_2f8ce6510d98b8efc3c45a9024286641.setIcon(icon_35b995a0570cea5e0ac5594e0b222615);
             
-                var html_f4c7c980be10f2e9d3efffa2b5965b77 = $(`<div id="html_f4c7c980be10f2e9d3efffa2b5965b77" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>Life of          Hamnet Shakespeare<br>1585 (Born) 1596 (Died)</div></div>`)[0];
-                popup_23e4ef704d4bc3ac46c7eab987772294.setContent(html_f4c7c980be10f2e9d3efffa2b5965b77);
-            
-        
-
-        poly_line_842da1d4493c1cc55b7d4bf299e8bc67.bindPopup(popup_23e4ef704d4bc3ac46c7eab987772294)
-        ;
-
-        
     
-    
-            poly_line_842da1d4493c1cc55b7d4bf299e8bc67.bindTooltip(
-                `<div>
-                              Hamnet Shakespeare
-                 </div>`,
-                {
-  "sticky": true,
-}
-            );
-        
-    
-            var marker_19a592fe6e4555292853f81343fab3bb = L.marker(
-                [52.192667817938855, -1.7067736746593551],
+            var marker_a91218dc17a3d91da890c565e90ddd77 = L.marker(
+                [52.19302138017768, -1.7061592270185002],
                 {
   "opacity": 0.5,
 }
-            ).addTo(feature_group_e9920560e7f2c53392443563bfcb2b22);
+            ).addTo(feature_group_dc632935d06cea4e73fbe0b52bbbe47b);
         
     
-            var icon_c9b0b7c62335289c82fd2d13ac4146d1 = L.AwesomeMarkers.icon(
+            var icon_207f80afa74a5480b921bfee9a1e40cb = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "darkgreen",
+  "iconColor": "white",
+  "icon": "church",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+  "extraClasses": "fas",
+}
+            );
+        
+    
+        var popup_820149091f456a5be96b72cac17ca1ba = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_e50c80bb51fc005adaceabb265c3436c = $(`<div id="html_e50c80bb51fc005adaceabb265c3436c" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>Life of Judith Shakespeare<br>1585 (Born) 1662 (Died)</div></div>`)[0];
+                popup_820149091f456a5be96b72cac17ca1ba.setContent(html_e50c80bb51fc005adaceabb265c3436c);
+            
+        
+
+        marker_a91218dc17a3d91da890c565e90ddd77.bindPopup(popup_820149091f456a5be96b72cac17ca1ba)
+        ;
+
+        
+    
+    
+            marker_a91218dc17a3d91da890c565e90ddd77.bindTooltip(
+                `<div>
+                     CHR Stratford-upon-Avon
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_a91218dc17a3d91da890c565e90ddd77.setIcon(icon_207f80afa74a5480b921bfee9a1e40cb);
+            
+    
+            ant_path_5d7a69bfda290440431e624f5ab23228 = L.polyline.antPath(
+              [[52.19327846042557, -1.7067730821389526], [52.19302138017768, -1.7061592270185002], [52.19262781751525, -1.7059179638333464]],
+              {
+  "stroke": true,
+  "color": "#ffd800",
+  "weight": 12,
+  "opacity": 0.7,
+  "lineCap": "round",
+  "lineJoin": "arcs",
+  "dashArray": [
+10,
+20,
+],
+  "dashOffset": null,
+  "fill": false,
+  "fillColor": "#ffd800",
+  "fillOpacity": 0.2,
+  "fillRule": "evenodd",
+  "bubblingMouseEvents": true,
+  "smoothFactor": 1.0,
+  "noClip": false,
+  "paused": false,
+  "reverse": false,
+  "hardwareAcceleration": false,
+  "delay": 400,
+  "pulseColor": "#FFFFFF",
+}
+        ).addTo(feature_group_dc632935d06cea4e73fbe0b52bbbe47b);
+        
+    
+        var popup_462a628aaa92d892cdb913a20a0c10ab = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_f3e08eee6dc1b688f0c277b4c3141036 = $(`<div id="html_f3e08eee6dc1b688f0c277b4c3141036" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>Life of Judith Shakespeare<br>1585 (Born) 1662 (Died)</div></div>`)[0];
+                popup_462a628aaa92d892cdb913a20a0c10ab.setContent(html_f3e08eee6dc1b688f0c277b4c3141036);
+            
+        
+
+        ant_path_5d7a69bfda290440431e624f5ab23228.bindPopup(popup_462a628aaa92d892cdb913a20a0c10ab)
+        ;
+
+        
+    
+    
+            ant_path_5d7a69bfda290440431e624f5ab23228.bindTooltip(
+                `<div>
+                             	Judith Shakespeare
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_e78fe09f85405c8f114140480c429aad = L.marker(
+                [52.19294757571813, -1.7064509951433293],
+                {
+  "opacity": 0.5,
+}
+            ).addTo(feature_group_dc632935d06cea4e73fbe0b52bbbe47b);
+        
+    
+            var icon_277d799944de92b30aaef200f18f4771 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "orange",
+  "iconColor": "white",
+  "icon": "child",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+  "extraClasses": "fas",
+}
+            );
+        
+    
+        var popup_f467688ac751b38bef82e88c50b83059 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_a5156ebfd286c43e5eb806a522a7d3d6 = $(`<div id="html_a5156ebfd286c43e5eb806a522a7d3d6" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>Life of William Shakespeare<br>1564 (Born) 1616 (Died)</div></div>`)[0];
+                popup_f467688ac751b38bef82e88c50b83059.setContent(html_a5156ebfd286c43e5eb806a522a7d3d6);
+            
+        
+
+        marker_e78fe09f85405c8f114140480c429aad.bindPopup(popup_f467688ac751b38bef82e88c50b83059)
+        ;
+
+        
+    
+    
+            marker_e78fe09f85405c8f114140480c429aad.bindTooltip(
+                `<div>
+                     Life of F       	William Shakespeare
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_e78fe09f85405c8f114140480c429aad.setIcon(icon_277d799944de92b30aaef200f18f4771);
+            
+    
+            var marker_f8a80ea19605ef5965a2160887be0166 = L.marker(
+                [52.19261255104952, -1.7063149173919185],
+                {
+  "opacity": 0.5,
+}
+            ).addTo(feature_group_dc632935d06cea4e73fbe0b52bbbe47b);
+        
+    
+            var icon_3c915489d05570a6789ea1daee0b31a1 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "gray",
+  "iconColor": "white",
+  "icon": "cross",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+  "extraClasses": "fas",
+}
+            );
+        
+    
+        var popup_f4e5d200362f0f5412aa7848be3ff66c = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_87d16254df83afcc8ab28bdb8cc6ddfe = $(`<div id="html_87d16254df83afcc8ab28bdb8cc6ddfe" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>Life of William Shakespeare<br>1564 (Born) 1616 (Died)</div></div>`)[0];
+                popup_f4e5d200362f0f5412aa7848be3ff66c.setContent(html_87d16254df83afcc8ab28bdb8cc6ddfe);
+            
+        
+
+        marker_f8a80ea19605ef5965a2160887be0166.bindPopup(popup_f4e5d200362f0f5412aa7848be3ff66c)
+        ;
+
+        
+    
+    
+            marker_f8a80ea19605ef5965a2160887be0166.bindTooltip(
+                `<div>
+                     Life of F       	William Shakespeare
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_f8a80ea19605ef5965a2160887be0166.setIcon(icon_3c915489d05570a6789ea1daee0b31a1);
+            
+    
+            var marker_6f7cefaaaebc81c70599807a134e80f8 = L.marker(
+                [52.19231120666613, -1.705843912068261],
+                {
+  "opacity": 0.5,
+}
+            ).addTo(feature_group_dc632935d06cea4e73fbe0b52bbbe47b);
+        
+    
+            var icon_599fae4752caf3e0b28ba93a709a3ef3 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "darkgreen",
+  "iconColor": "white",
+  "icon": "church",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+  "extraClasses": "fas",
+}
+            );
+        
+    
+        var popup_519ccc65dc6d032a52bf81b9d20ef481 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_4aa0c8778a2cf9baa7a623a2612c5f83 = $(`<div id="html_4aa0c8778a2cf9baa7a623a2612c5f83" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>Life of William Shakespeare<br>1564 (Born) 1616 (Died)</div></div>`)[0];
+                popup_519ccc65dc6d032a52bf81b9d20ef481.setContent(html_4aa0c8778a2cf9baa7a623a2612c5f83);
+            
+        
+
+        marker_6f7cefaaaebc81c70599807a134e80f8.bindPopup(popup_519ccc65dc6d032a52bf81b9d20ef481)
+        ;
+
+        
+    
+    
+            marker_6f7cefaaaebc81c70599807a134e80f8.bindTooltip(
+                `<div>
+                     CHR Stratford-upon-Avon
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_6f7cefaaaebc81c70599807a134e80f8.setIcon(icon_599fae4752caf3e0b28ba93a709a3ef3);
+            
+    
+            ant_path_75f4709f0d5410624c1f59116b1179c4 = L.polyline.antPath(
+              [[52.19294757571813, -1.7064509951433293], [52.19231120666613, -1.705843912068261], [52.19261255104952, -1.7063149173919185]],
+              {
+  "stroke": true,
+  "color": "#ff0a00",
+  "weight": 7,
+  "opacity": 0.7,
+  "lineCap": "round",
+  "lineJoin": "arcs",
+  "dashArray": [
+10,
+20,
+],
+  "dashOffset": null,
+  "fill": false,
+  "fillColor": "#ff0a00",
+  "fillOpacity": 0.2,
+  "fillRule": "evenodd",
+  "bubblingMouseEvents": true,
+  "smoothFactor": 1.0,
+  "noClip": false,
+  "paused": false,
+  "reverse": false,
+  "hardwareAcceleration": false,
+  "delay": 400,
+  "pulseColor": "#FFFFFF",
+}
+        ).addTo(feature_group_dc632935d06cea4e73fbe0b52bbbe47b);
+        
+    
+        var popup_f7fb0bc7dcc88c98100b52ac3583a843 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_2aa9eb2e5761c490987d0052a3683fbe = $(`<div id="html_2aa9eb2e5761c490987d0052a3683fbe" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>Life of William Shakespeare<br>1564 (Born) 1616 (Died)</div></div>`)[0];
+                popup_f7fb0bc7dcc88c98100b52ac3583a843.setContent(html_2aa9eb2e5761c490987d0052a3683fbe);
+            
+        
+
+        ant_path_75f4709f0d5410624c1f59116b1179c4.bindPopup(popup_f7fb0bc7dcc88c98100b52ac3583a843)
+        ;
+
+        
+    
+    
+            ant_path_75f4709f0d5410624c1f59116b1179c4.bindTooltip(
+                `<div>
+                     F       	William Shakespeare
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_a8ce99e6fe5280cdbb9ac9af4676a006 = L.marker(
+                [52.192367040017274, -1.706099079666958],
+                {
+  "opacity": 0.5,
+}
+            ).addTo(feature_group_dc632935d06cea4e73fbe0b52bbbe47b);
+        
+    
+            var icon_ee50784efd6d0996d61ba2f93d457029 = L.AwesomeMarkers.icon(
                 {
   "markerColor": "green",
   "iconColor": "white",
   "icon": "baby-carriage",
   "prefix": "fa",
   "extraClasses": "fa-rotate-0",
+  "extraClasses": "fas",
 }
             );
-            marker_19a592fe6e4555292853f81343fab3bb.setIcon(icon_c9b0b7c62335289c82fd2d13ac4146d1);
         
     
-        var popup_01b4bd9e2296bc140b9046b0f6107e6c = L.popup({
+        var popup_b687caaed5bb6680d8559c6f575ee72e = L.popup({
   "maxWidth": "100%",
 });
 
         
             
-                var html_e2f93d737bb85c4c832f04cb93cc0f7b = $(`<div id="html_e2f93d737bb85c4c832f04cb93cc0f7b" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>F        William Shakespeare father of Hamnet Shakespeare<br>1564 (Born) 1616 (Died)</div></div>`)[0];
-                popup_01b4bd9e2296bc140b9046b0f6107e6c.setContent(html_e2f93d737bb85c4c832f04cb93cc0f7b);
+                var html_25273ba3b853bdf0888564fc26e6b50b = $(`<div id="html_25273ba3b853bdf0888564fc26e6b50b" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>John Shakespeare father of William Shakespeare<br>1531 (Born) 1601 (Died)</div></div>`)[0];
+                popup_b687caaed5bb6680d8559c6f575ee72e.setContent(html_25273ba3b853bdf0888564fc26e6b50b);
             
         
 
-        marker_19a592fe6e4555292853f81343fab3bb.bindPopup(popup_01b4bd9e2296bc140b9046b0f6107e6c)
+        marker_a8ce99e6fe5280cdbb9ac9af4676a006.bindPopup(popup_b687caaed5bb6680d8559c6f575ee72e)
         ;
 
         
     
     
-            marker_19a592fe6e4555292853f81343fab3bb.bindTooltip(
+            marker_a8ce99e6fe5280cdbb9ac9af4676a006.bindTooltip(
                 `<div>
-                     F        William Shakespeare father of Hamnet Shakespeare
+                     Life of FF      	John Shakespeare
                  </div>`,
                 {
   "sticky": true,
@@ -467,15 +713,68 @@
             );
         
     
-            var marker_ebee6cce244c3d105bec1ee68a462694 = L.marker(
-                [52.1923497670486, -1.7060411595469513],
+                marker_a8ce99e6fe5280cdbb9ac9af4676a006.setIcon(icon_ee50784efd6d0996d61ba2f93d457029);
+            
+    
+            var marker_865d0449c2c4cbddb4d3613ba497ffc9 = L.marker(
+                [52.19278197596687, -1.7064170699653953],
                 {
   "opacity": 0.5,
 }
-            ).addTo(feature_group_e9920560e7f2c53392443563bfcb2b22);
+            ).addTo(feature_group_dc632935d06cea4e73fbe0b52bbbe47b);
         
     
-            var icon_7a82e82760dafda85c5ef79e9e545f63 = L.AwesomeMarkers.icon(
+            var icon_e05b5103894f2525babccfba811aa93e = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "green",
+  "iconColor": "white",
+  "icon": "baby-carriage",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+  "extraClasses": "fas",
+}
+            );
+        
+    
+        var popup_eed6c119538d9cae349b7610a8c80078 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_eb7091ac5d41e207082bd897a6a23a60 = $(`<div id="html_eb7091ac5d41e207082bd897a6a23a60" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>William Shakespeare father of Judith Shakespeare<br>1564 (Born) 1616 (Died)</div></div>`)[0];
+                popup_eed6c119538d9cae349b7610a8c80078.setContent(html_eb7091ac5d41e207082bd897a6a23a60);
+            
+        
+
+        marker_865d0449c2c4cbddb4d3613ba497ffc9.bindPopup(popup_eed6c119538d9cae349b7610a8c80078)
+        ;
+
+        
+    
+    
+            marker_865d0449c2c4cbddb4d3613ba497ffc9.bindTooltip(
+                `<div>
+                     Life of F       	William Shakespeare
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_865d0449c2c4cbddb4d3613ba497ffc9.setIcon(icon_e05b5103894f2525babccfba811aa93e);
+            
+    
+            var marker_a7467aec46549e7ae13b69f490184aaf = L.marker(
+                [52.19268030290286, -1.7059713461123485],
+                {
+  "opacity": 0.5,
+}
+            ).addTo(feature_group_dc632935d06cea4e73fbe0b52bbbe47b);
+        
+    
+            var icon_a2fff99fa66125108fd02bee14cb6b2d = L.AwesomeMarkers.icon(
                 {
   "markerColor": "blue",
   "iconColor": "white",
@@ -485,29 +784,28 @@
   "extraClasses": "fas",
 }
             );
-            marker_ebee6cce244c3d105bec1ee68a462694.setIcon(icon_7a82e82760dafda85c5ef79e9e545f63);
         
     
-        var popup_1172acc93c5ed764f74e3da8d6a6f5e7 = L.popup({
+        var popup_312e564cef737b0bf8c1197fd8fece74 = L.popup({
   "maxWidth": "100%",
 });
 
         
             
-                var html_8bbb510f07a2532616b49fd117fa2a83 = $(`<div id="html_8bbb510f07a2532616b49fd117fa2a83" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>F        William Shakespeare father of Hamnet Shakespeare<br>1564 (Born) 1616 (Died)</div></div>`)[0];
-                popup_1172acc93c5ed764f74e3da8d6a6f5e7.setContent(html_8bbb510f07a2532616b49fd117fa2a83);
+                var html_49362c6422efafa878274c619c138cf4 = $(`<div id="html_49362c6422efafa878274c619c138cf4" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>William Shakespeare father of Judith Shakespeare<br>1564 (Born) 1616 (Died)</div></div>`)[0];
+                popup_312e564cef737b0bf8c1197fd8fece74.setContent(html_49362c6422efafa878274c619c138cf4);
             
         
 
-        marker_ebee6cce244c3d105bec1ee68a462694.bindPopup(popup_1172acc93c5ed764f74e3da8d6a6f5e7)
+        marker_a7467aec46549e7ae13b69f490184aaf.bindPopup(popup_312e564cef737b0bf8c1197fd8fece74)
         ;
 
         
     
     
-            marker_ebee6cce244c3d105bec1ee68a462694.bindTooltip(
+            marker_a7467aec46549e7ae13b69f490184aaf.bindTooltip(
                 `<div>
-                     F        William Shakespeare father of Hamnet Shakespeare
+                     Life of F       	William Shakespeare
                  </div>`,
                 {
   "sticky": true,
@@ -515,32 +813,59 @@
             );
         
     
-            var poly_line_18789c8101d1e989e31c75c348c1f2a3 = L.polyline(
-                [[52.192667817938855, -1.7067736746593551], [52.1923497670486, -1.7060411595469513]],
-                {"bubblingMouseEvents": true, "color": "#2b8cbe", "dashArray": [5, 5], "dashOffset": null, "fill": false, "fillColor": "#2b8cbe", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "arcs", "noClip": false, "opacity": 1, "smoothFactor": 1.0, "stroke": true, "weight": 12}
-            ).addTo(feature_group_e9920560e7f2c53392443563bfcb2b22);
+                marker_a7467aec46549e7ae13b69f490184aaf.setIcon(icon_a2fff99fa66125108fd02bee14cb6b2d);
+            
+    
+            ant_path_ac081e0fddde1f8a4b90cf66694b0dc0 = L.polyline.antPath(
+              [[52.19278197596687, -1.7064170699653953], [52.19268030290286, -1.7059713461123485]],
+              {
+  "stroke": true,
+  "color": "#2b8cbe",
+  "weight": 12,
+  "opacity": 0.7,
+  "lineCap": "round",
+  "lineJoin": "arcs",
+  "dashArray": [
+10,
+20,
+],
+  "dashOffset": null,
+  "fill": false,
+  "fillColor": "#2b8cbe",
+  "fillOpacity": 0.2,
+  "fillRule": "evenodd",
+  "bubblingMouseEvents": true,
+  "smoothFactor": 1.0,
+  "noClip": false,
+  "paused": false,
+  "reverse": false,
+  "hardwareAcceleration": false,
+  "delay": 400,
+  "pulseColor": "#FFFFFF",
+}
+        ).addTo(feature_group_dc632935d06cea4e73fbe0b52bbbe47b);
         
     
-        var popup_ef23ac914d869d4f5434f52c265a17df = L.popup({
+        var popup_9eb3fd9d88ce2f24c425acf3ae175649 = L.popup({
   "maxWidth": "100%",
 });
 
         
             
-                var html_44aa2be49929672b9ed7632c8c92c6f4 = $(`<div id="html_44aa2be49929672b9ed7632c8c92c6f4" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>F        William Shakespeare father of Hamnet Shakespeare<br>1564 (Born) 1616 (Died)</div></div>`)[0];
-                popup_ef23ac914d869d4f5434f52c265a17df.setContent(html_44aa2be49929672b9ed7632c8c92c6f4);
+                var html_e91dacb42cd07169f872bf52402b96bf = $(`<div id="html_e91dacb42cd07169f872bf52402b96bf" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>William Shakespeare father of Judith Shakespeare<br>1564 (Born) 1616 (Died)</div></div>`)[0];
+                popup_9eb3fd9d88ce2f24c425acf3ae175649.setContent(html_e91dacb42cd07169f872bf52402b96bf);
             
         
 
-        poly_line_18789c8101d1e989e31c75c348c1f2a3.bindPopup(popup_ef23ac914d869d4f5434f52c265a17df)
+        ant_path_ac081e0fddde1f8a4b90cf66694b0dc0.bindPopup(popup_9eb3fd9d88ce2f24c425acf3ae175649)
         ;
 
         
     
     
-            poly_line_18789c8101d1e989e31c75c348c1f2a3.bindTooltip(
+            ant_path_ac081e0fddde1f8a4b90cf66694b0dc0.bindTooltip(
                 `<div>
-                     F        William Shakespeare
+                     F       	William Shakespeare
                  </div>`,
                 {
   "sticky": true,
@@ -548,46 +873,209 @@
             );
         
     
-            var marker_20aac4815c8c44cc725fa5d3bac6b307 = L.marker(
-                [52.193048119338364, -1.7062640191919314],
+            var feature_group_4d4463904c23bdd4fed7b766656f2422 = L.featureGroup(
+                {
+}
+            );
+        
+    
+            var marker_87791274accccd6eb508745a683055a0 = L.marker(
+                [52.190690052446826, -1.7278385995457408],
                 {
   "opacity": 0.5,
 }
-            ).addTo(feature_group_e9920560e7f2c53392443563bfcb2b22);
+            ).addTo(feature_group_4d4463904c23bdd4fed7b766656f2422);
         
     
-            var icon_2e2736f0a4e367ded476f5b1622f5e36 = L.AwesomeMarkers.icon(
+            var icon_c4496ba394fe2a0a21553c0516fbb217 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "orange",
+  "iconColor": "white",
+  "icon": "child",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+  "extraClasses": "fas",
+}
+            );
+        
+    
+        var popup_71eb98e7437a0cd89bc4685e6b1dbc74 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_7dc268d1576e81fa264d968ccaff0caa = $(`<div id="html_7dc268d1576e81fa264d968ccaff0caa" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>Life of Anne Hathaway<br>1556 (Born) 1623 (Died)</div></div>`)[0];
+                popup_71eb98e7437a0cd89bc4685e6b1dbc74.setContent(html_7dc268d1576e81fa264d968ccaff0caa);
+            
+        
+
+        marker_87791274accccd6eb508745a683055a0.bindPopup(popup_71eb98e7437a0cd89bc4685e6b1dbc74)
+        ;
+
+        
+    
+    
+            marker_87791274accccd6eb508745a683055a0.bindTooltip(
+                `<div>
+                     Life of M       	Anne Hathaway
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_87791274accccd6eb508745a683055a0.setIcon(icon_c4496ba394fe2a0a21553c0516fbb217);
+            
+    
+            var marker_7c42f6a0c389a5d7784927f3c3cdde2f = L.marker(
+                [52.19268118144441, -1.706535452639291],
+                {
+  "opacity": 0.5,
+}
+            ).addTo(feature_group_4d4463904c23bdd4fed7b766656f2422);
+        
+    
+            var icon_aa6ed42beb1e4cf539c9cc0058d2c9e9 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "gray",
+  "iconColor": "white",
+  "icon": "cross",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+  "extraClasses": "fas",
+}
+            );
+        
+    
+        var popup_01176dbcc625b58a7253155164fda8b8 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_a32f07b01691b0300f8d498f8c5cc674 = $(`<div id="html_a32f07b01691b0300f8d498f8c5cc674" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>Life of Anne Hathaway<br>1556 (Born) 1623 (Died)</div></div>`)[0];
+                popup_01176dbcc625b58a7253155164fda8b8.setContent(html_a32f07b01691b0300f8d498f8c5cc674);
+            
+        
+
+        marker_7c42f6a0c389a5d7784927f3c3cdde2f.bindPopup(popup_01176dbcc625b58a7253155164fda8b8)
+        ;
+
+        
+    
+    
+            marker_7c42f6a0c389a5d7784927f3c3cdde2f.bindTooltip(
+                `<div>
+                     Life of M       	Anne Hathaway
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_7c42f6a0c389a5d7784927f3c3cdde2f.setIcon(icon_aa6ed42beb1e4cf539c9cc0058d2c9e9);
+            
+    
+            ant_path_6cb4992e5ba554cd7e71db235131fa7c = L.polyline.antPath(
+              [[52.190690052446826, -1.7278385995457408], [52.19268118144441, -1.706535452639291]],
+              {
+  "stroke": true,
+  "color": "#00ffbc",
+  "weight": 7,
+  "opacity": 0.7,
+  "lineCap": "round",
+  "lineJoin": "arcs",
+  "dashArray": [
+10,
+20,
+],
+  "dashOffset": null,
+  "fill": false,
+  "fillColor": "#00ffbc",
+  "fillOpacity": 0.2,
+  "fillRule": "evenodd",
+  "bubblingMouseEvents": true,
+  "smoothFactor": 1.0,
+  "noClip": false,
+  "paused": false,
+  "reverse": false,
+  "hardwareAcceleration": false,
+  "delay": 400,
+  "pulseColor": "#FFFFFF",
+}
+        ).addTo(feature_group_4d4463904c23bdd4fed7b766656f2422);
+        
+    
+        var popup_f20c6966f1acf9ee106c97dbbc962029 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_29c1e672ea6043bd39d261346447cde6 = $(`<div id="html_29c1e672ea6043bd39d261346447cde6" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>Life of Anne Hathaway<br>1556 (Born) 1623 (Died)</div></div>`)[0];
+                popup_f20c6966f1acf9ee106c97dbbc962029.setContent(html_29c1e672ea6043bd39d261346447cde6);
+            
+        
+
+        ant_path_6cb4992e5ba554cd7e71db235131fa7c.bindPopup(popup_f20c6966f1acf9ee106c97dbbc962029)
+        ;
+
+        
+    
+    
+            ant_path_6cb4992e5ba554cd7e71db235131fa7c.bindTooltip(
+                `<div>
+                     M       	Anne Hathaway
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_5960250acc51e7a12193757b35e8daf4 = L.marker(
+                [52.19315603938839, -1.7065493698660987],
+                {
+  "opacity": 0.5,
+}
+            ).addTo(feature_group_4d4463904c23bdd4fed7b766656f2422);
+        
+    
+            var icon_748e05ed92c29ace56c702a014fb9f42 = L.AwesomeMarkers.icon(
                 {
   "markerColor": "green",
   "iconColor": "white",
   "icon": "baby-carriage",
   "prefix": "fa",
   "extraClasses": "fa-rotate-0",
+  "extraClasses": "fas",
 }
             );
-            marker_20aac4815c8c44cc725fa5d3bac6b307.setIcon(icon_2e2736f0a4e367ded476f5b1622f5e36);
         
     
-        var popup_16b567874b362bc0143e4da5c7cf4314 = L.popup({
+        var popup_f89aa7b58b05220eeecf77f89bd2a81e = L.popup({
   "maxWidth": "100%",
 });
 
         
             
-                var html_988dfda576d81c4382a70af3ea4f00fd = $(`<div id="html_988dfda576d81c4382a70af3ea4f00fd" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>M        Anne Hathaway mother of Hamnet Shakespeare<br>1556 (Born) 1623 (Died)</div></div>`)[0];
-                popup_16b567874b362bc0143e4da5c7cf4314.setContent(html_988dfda576d81c4382a70af3ea4f00fd);
+                var html_a1a2c43caa730537abcee03fad21edb0 = $(`<div id="html_a1a2c43caa730537abcee03fad21edb0" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>Anne Hathaway mother of Judith Shakespeare<br>1556 (Born) 1623 (Died)</div></div>`)[0];
+                popup_f89aa7b58b05220eeecf77f89bd2a81e.setContent(html_a1a2c43caa730537abcee03fad21edb0);
             
         
 
-        marker_20aac4815c8c44cc725fa5d3bac6b307.bindPopup(popup_16b567874b362bc0143e4da5c7cf4314)
+        marker_5960250acc51e7a12193757b35e8daf4.bindPopup(popup_f89aa7b58b05220eeecf77f89bd2a81e)
         ;
 
         
     
     
-            marker_20aac4815c8c44cc725fa5d3bac6b307.bindTooltip(
+            marker_5960250acc51e7a12193757b35e8daf4.bindTooltip(
                 `<div>
-                     M        Anne Hathaway mother of Hamnet Shakespeare
+                     Life of M       	Anne Hathaway
                  </div>`,
                 {
   "sticky": true,
@@ -595,15 +1083,18 @@
             );
         
     
-            var marker_4affcd5b9545f70d1968baab30e05088 = L.marker(
-                [52.19059394159377, -1.727933756993295],
+                marker_5960250acc51e7a12193757b35e8daf4.setIcon(icon_748e05ed92c29ace56c702a014fb9f42);
+            
+    
+            var marker_f1ed8b45937cdc13356d0f46343b6a40 = L.marker(
+                [52.19087873824529, -1.7272708284714935],
                 {
   "opacity": 0.5,
 }
-            ).addTo(feature_group_e9920560e7f2c53392443563bfcb2b22);
+            ).addTo(feature_group_4d4463904c23bdd4fed7b766656f2422);
         
     
-            var icon_5f673dc990424d4e2269c85cc832f2a0 = L.AwesomeMarkers.icon(
+            var icon_cab36197cdc9353019682e34eafe0ac1 = L.AwesomeMarkers.icon(
                 {
   "markerColor": "pink",
   "iconColor": "white",
@@ -613,29 +1104,28 @@
   "extraClasses": "fas",
 }
             );
-            marker_4affcd5b9545f70d1968baab30e05088.setIcon(icon_5f673dc990424d4e2269c85cc832f2a0);
         
     
-        var popup_b7689c8deeef54efe6ac750b2075b594 = L.popup({
+        var popup_27ddffd7aa02e5478694ae7366181d1d = L.popup({
   "maxWidth": "100%",
 });
 
         
             
-                var html_925fceca62ee904a3a39d83535545b94 = $(`<div id="html_925fceca62ee904a3a39d83535545b94" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>M        Anne Hathaway mother of Hamnet Shakespeare<br>1556 (Born) 1623 (Died)</div></div>`)[0];
-                popup_b7689c8deeef54efe6ac750b2075b594.setContent(html_925fceca62ee904a3a39d83535545b94);
+                var html_2ebeac9f4b86016865fb06d99277b59f = $(`<div id="html_2ebeac9f4b86016865fb06d99277b59f" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>Anne Hathaway mother of Judith Shakespeare<br>1556 (Born) 1623 (Died)</div></div>`)[0];
+                popup_27ddffd7aa02e5478694ae7366181d1d.setContent(html_2ebeac9f4b86016865fb06d99277b59f);
             
         
 
-        marker_4affcd5b9545f70d1968baab30e05088.bindPopup(popup_b7689c8deeef54efe6ac750b2075b594)
+        marker_f1ed8b45937cdc13356d0f46343b6a40.bindPopup(popup_27ddffd7aa02e5478694ae7366181d1d)
         ;
 
         
     
     
-            marker_4affcd5b9545f70d1968baab30e05088.bindTooltip(
+            marker_f1ed8b45937cdc13356d0f46343b6a40.bindTooltip(
                 `<div>
-                     M        Anne Hathaway mother of Hamnet Shakespeare
+                     Life of M       	Anne Hathaway
                  </div>`,
                 {
   "sticky": true,
@@ -643,32 +1133,59 @@
             );
         
     
-            var poly_line_32cc91662774d89b45c7b4f74294427b = L.polyline(
-                [[52.193048119338364, -1.7062640191919314], [52.19059394159377, -1.727933756993295]],
-                {"bubblingMouseEvents": true, "color": "pink", "dashArray": [5, 5], "dashOffset": null, "fill": false, "fillColor": "pink", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "arcs", "noClip": false, "opacity": 1, "smoothFactor": 1.0, "stroke": true, "weight": 12}
-            ).addTo(feature_group_e9920560e7f2c53392443563bfcb2b22);
+                marker_f1ed8b45937cdc13356d0f46343b6a40.setIcon(icon_cab36197cdc9353019682e34eafe0ac1);
+            
+    
+            ant_path_a189d29775b259ad49ce223a52110ebf = L.polyline.antPath(
+              [[52.19315603938839, -1.7065493698660987], [52.19087873824529, -1.7272708284714935]],
+              {
+  "stroke": true,
+  "color": "pink",
+  "weight": 12,
+  "opacity": 0.7,
+  "lineCap": "round",
+  "lineJoin": "arcs",
+  "dashArray": [
+10,
+20,
+],
+  "dashOffset": null,
+  "fill": false,
+  "fillColor": "pink",
+  "fillOpacity": 0.2,
+  "fillRule": "evenodd",
+  "bubblingMouseEvents": true,
+  "smoothFactor": 1.0,
+  "noClip": false,
+  "paused": false,
+  "reverse": false,
+  "hardwareAcceleration": false,
+  "delay": 400,
+  "pulseColor": "#FFFFFF",
+}
+        ).addTo(feature_group_4d4463904c23bdd4fed7b766656f2422);
         
     
-        var popup_457169ce8396f4822b509c46d38c406d = L.popup({
+        var popup_ed0759860ed411485866631daac8dd0c = L.popup({
   "maxWidth": "100%",
 });
 
         
             
-                var html_d313591c48242d5a67c7084e97aa58c6 = $(`<div id="html_d313591c48242d5a67c7084e97aa58c6" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>M        Anne Hathaway mother of Hamnet Shakespeare<br>1556 (Born) 1623 (Died)</div></div>`)[0];
-                popup_457169ce8396f4822b509c46d38c406d.setContent(html_d313591c48242d5a67c7084e97aa58c6);
+                var html_5f179669bf55ad9fa088edd8661e02df = $(`<div id="html_5f179669bf55ad9fa088edd8661e02df" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>Anne Hathaway mother of Judith Shakespeare<br>1556 (Born) 1623 (Died)</div></div>`)[0];
+                popup_ed0759860ed411485866631daac8dd0c.setContent(html_5f179669bf55ad9fa088edd8661e02df);
             
         
 
-        poly_line_32cc91662774d89b45c7b4f74294427b.bindPopup(popup_457169ce8396f4822b509c46d38c406d)
+        ant_path_a189d29775b259ad49ce223a52110ebf.bindPopup(popup_ed0759860ed411485866631daac8dd0c)
         ;
 
         
     
     
-            poly_line_32cc91662774d89b45c7b4f74294427b.bindTooltip(
+            ant_path_a189d29775b259ad49ce223a52110ebf.bindTooltip(
                 `<div>
-                     M        Anne Hathaway
+                     M       	Anne Hathaway
                  </div>`,
                 {
   "sticky": true,
@@ -676,328 +1193,52 @@
             );
         
     
-            var feature_group_beab09e543f09454741927c3353bb7e2 = L.featureGroup(
+            var feature_group_1f91aecd8698e56cc311499d9de9591e = L.featureGroup(
                 {
 }
             );
         
     
-            var marker_5ffc3e13160973053db686007c3ae45d = L.marker(
-                [52.19305377359716, -1.7067358623393285],
+            var marker_858a73c99c33ad7f8f497a8a89ebf036 = L.marker(
+                [52.192783936047725, -1.706047539175476],
                 {
   "opacity": 0.5,
 }
-            ).addTo(feature_group_beab09e543f09454741927c3353bb7e2);
+            ).addTo(feature_group_1f91aecd8698e56cc311499d9de9591e);
         
     
-            var icon_62ce81ab6a4650b0b32cbc2fe0f3fb97 = L.AwesomeMarkers.icon(
-                {
-  "markerColor": "orange",
-  "iconColor": "white",
-  "icon": "child",
-  "prefix": "fa",
-  "extraClasses": "fa-rotate-0",
-}
-            );
-            marker_5ffc3e13160973053db686007c3ae45d.setIcon(icon_62ce81ab6a4650b0b32cbc2fe0f3fb97);
-        
-    
-        var popup_a45e48d32f79cf23215110df10f2d345 = L.popup({
-  "maxWidth": "100%",
-});
-
-        
-            
-                var html_d2fea53d443a2366502715f474b7368b = $(`<div id="html_d2fea53d443a2366502715f474b7368b" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>Life of F        William Shakespeare<br>1564 (Born) 1616 (Died)</div></div>`)[0];
-                popup_a45e48d32f79cf23215110df10f2d345.setContent(html_d2fea53d443a2366502715f474b7368b);
-            
-        
-
-        marker_5ffc3e13160973053db686007c3ae45d.bindPopup(popup_a45e48d32f79cf23215110df10f2d345)
-        ;
-
-        
-    
-    
-            marker_5ffc3e13160973053db686007c3ae45d.bindTooltip(
-                `<div>
-                     Life of F        William Shakespeare
-                 </div>`,
-                {
-  "sticky": true,
-}
-            );
-        
-    
-            var marker_6ab279e9188afa8bee7692213b58ef2e = L.marker(
-                [52.19269516898338, -1.7058445069436572],
-                {
-  "opacity": 0.5,
-}
-            ).addTo(feature_group_beab09e543f09454741927c3353bb7e2);
-        
-    
-            var icon_499b7c4daed9821997bc02ec9421e342 = L.AwesomeMarkers.icon(
-                {
-  "markerColor": "gray",
-  "iconColor": "white",
-  "icon": "cross",
-  "prefix": "fa",
-  "extraClasses": "fa-rotate-0",
-  "extraClasses": "fas",
-}
-            );
-            marker_6ab279e9188afa8bee7692213b58ef2e.setIcon(icon_499b7c4daed9821997bc02ec9421e342);
-        
-    
-        var popup_21dc842ef9ebce9e966aca863aaccbc0 = L.popup({
-  "maxWidth": "100%",
-});
-
-        
-            
-                var html_6c5043a6b2c3090c8038fe79cc17b33b = $(`<div id="html_6c5043a6b2c3090c8038fe79cc17b33b" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>Life of F        William Shakespeare<br>1564 (Born) 1616 (Died)</div></div>`)[0];
-                popup_21dc842ef9ebce9e966aca863aaccbc0.setContent(html_6c5043a6b2c3090c8038fe79cc17b33b);
-            
-        
-
-        marker_6ab279e9188afa8bee7692213b58ef2e.bindPopup(popup_21dc842ef9ebce9e966aca863aaccbc0)
-        ;
-
-        
-    
-    
-            marker_6ab279e9188afa8bee7692213b58ef2e.bindTooltip(
-                `<div>
-                     Life of F        William Shakespeare
-                 </div>`,
-                {
-  "sticky": true,
-}
-            );
-        
-    
-            var poly_line_4cd979bec1c622b8977f0332ec5da439 = L.polyline(
-                [[52.19305377359716, -1.7067358623393285], [52.19286077155786, -1.706194609516508], [52.19269516898338, -1.7058445069436572]],
-                {"bubblingMouseEvents": true, "color": "gray", "dashArray": [], "dashOffset": null, "fill": false, "fillColor": "gray", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "arcs", "noClip": false, "opacity": 1, "smoothFactor": 1.0, "stroke": true, "weight": 7}
-            ).addTo(feature_group_beab09e543f09454741927c3353bb7e2);
-        
-    
-        var popup_3618f780cfcfaabf2a94302fe346e6a9 = L.popup({
-  "maxWidth": "100%",
-});
-
-        
-            
-                var html_9b9919bf2a9026eb08ae37a1f456ec63 = $(`<div id="html_9b9919bf2a9026eb08ae37a1f456ec63" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>Life of F        William Shakespeare<br>1564 (Born) 1616 (Died)</div></div>`)[0];
-                popup_3618f780cfcfaabf2a94302fe346e6a9.setContent(html_9b9919bf2a9026eb08ae37a1f456ec63);
-            
-        
-
-        poly_line_4cd979bec1c622b8977f0332ec5da439.bindPopup(popup_3618f780cfcfaabf2a94302fe346e6a9)
-        ;
-
-        
-    
-    
-            poly_line_4cd979bec1c622b8977f0332ec5da439.bindTooltip(
-                `<div>
-                     F        William Shakespeare
-                 </div>`,
-                {
-  "sticky": true,
-}
-            );
-        
-    
-            var marker_faeb517e50390a49709a06a8b7e15ebb = L.marker(
-                [52.19283166133418, -1.706697791954367],
-                {
-  "opacity": 0.5,
-}
-            ).addTo(feature_group_beab09e543f09454741927c3353bb7e2);
-        
-    
-            var icon_6ad029388706bc2cb1cd449885cf645b = L.AwesomeMarkers.icon(
+            var icon_634df7df98a71992129ca97b76a20095 = L.AwesomeMarkers.icon(
                 {
   "markerColor": "green",
   "iconColor": "white",
   "icon": "baby-carriage",
   "prefix": "fa",
   "extraClasses": "fa-rotate-0",
-}
-            );
-            marker_faeb517e50390a49709a06a8b7e15ebb.setIcon(icon_6ad029388706bc2cb1cd449885cf645b);
-        
-    
-        var popup_9df943ae220f4deac756c9343c78ba72 = L.popup({
-  "maxWidth": "100%",
-});
-
-        
-            
-                var html_c8c671875ccc1d61c3d29d572a73c109 = $(`<div id="html_c8c671875ccc1d61c3d29d572a73c109" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>FF       John Shakespeare father of William Shakespeare<br>1531 (Born) 1601 (Died)</div></div>`)[0];
-                popup_9df943ae220f4deac756c9343c78ba72.setContent(html_c8c671875ccc1d61c3d29d572a73c109);
-            
-        
-
-        marker_faeb517e50390a49709a06a8b7e15ebb.bindPopup(popup_9df943ae220f4deac756c9343c78ba72)
-        ;
-
-        
-    
-    
-            marker_faeb517e50390a49709a06a8b7e15ebb.bindTooltip(
-                `<div>
-                     FF       John Shakespeare father of William Shakespeare
-                 </div>`,
-                {
-  "sticky": true,
-}
-            );
-        
-    
-            var marker_bf0ca039f2a91782cc376ff78bf08e36 = L.marker(
-                [52.192955120389456, -1.7067979375528546],
-                {
-  "opacity": 0.5,
-}
-            ).addTo(feature_group_beab09e543f09454741927c3353bb7e2);
-        
-    
-            var icon_01abbb746eec5a60cba40da82c131d22 = L.AwesomeMarkers.icon(
-                {
-  "markerColor": "green",
-  "iconColor": "white",
-  "icon": "baby-carriage",
-  "prefix": "fa",
-  "extraClasses": "fa-rotate-0",
-}
-            );
-            marker_bf0ca039f2a91782cc376ff78bf08e36.setIcon(icon_01abbb746eec5a60cba40da82c131d22);
-        
-    
-        var popup_b3da6c4df200b7825e81b7ff283662ab = L.popup({
-  "maxWidth": "100%",
-});
-
-        
-            
-                var html_f4ba75755792e1872910142185b8e340 = $(`<div id="html_f4ba75755792e1872910142185b8e340" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>FM       Mary Arden mother of William Shakespeare<br>1537 (Born) 1608 (Died)</div></div>`)[0];
-                popup_b3da6c4df200b7825e81b7ff283662ab.setContent(html_f4ba75755792e1872910142185b8e340);
-            
-        
-
-        marker_bf0ca039f2a91782cc376ff78bf08e36.bindPopup(popup_b3da6c4df200b7825e81b7ff283662ab)
-        ;
-
-        
-    
-    
-            marker_bf0ca039f2a91782cc376ff78bf08e36.bindTooltip(
-                `<div>
-                     FM       Mary Arden mother of William Shakespeare
-                 </div>`,
-                {
-  "sticky": true,
-}
-            );
-        
-    
-            var feature_group_620d88abfd24c06760633d9fc458e2ad = L.featureGroup(
-                {
-}
-            );
-        
-    
-            var marker_720293f8a32fd114bc179125baa8bbd6 = L.marker(
-                [52.19096867385486, -1.7277521445170345],
-                {
-  "opacity": 0.5,
-}
-            ).addTo(feature_group_620d88abfd24c06760633d9fc458e2ad);
-        
-    
-            var icon_e22b85948ddc76a19fd741815b984d64 = L.AwesomeMarkers.icon(
-                {
-  "markerColor": "orange",
-  "iconColor": "white",
-  "icon": "child",
-  "prefix": "fa",
-  "extraClasses": "fa-rotate-0",
-}
-            );
-            marker_720293f8a32fd114bc179125baa8bbd6.setIcon(icon_e22b85948ddc76a19fd741815b984d64);
-        
-    
-        var popup_de6e7854e32ce783d566ccbd5ef42f0c = L.popup({
-  "maxWidth": "100%",
-});
-
-        
-            
-                var html_6a75569635056f4fb2be0ac102f17c65 = $(`<div id="html_6a75569635056f4fb2be0ac102f17c65" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>Life of M        Anne Hathaway<br>1556 (Born) 1623 (Died)</div></div>`)[0];
-                popup_de6e7854e32ce783d566ccbd5ef42f0c.setContent(html_6a75569635056f4fb2be0ac102f17c65);
-            
-        
-
-        marker_720293f8a32fd114bc179125baa8bbd6.bindPopup(popup_de6e7854e32ce783d566ccbd5ef42f0c)
-        ;
-
-        
-    
-    
-            marker_720293f8a32fd114bc179125baa8bbd6.bindTooltip(
-                `<div>
-                     Life of M        Anne Hathaway
-                 </div>`,
-                {
-  "sticky": true,
-}
-            );
-        
-    
-            var marker_a849853c11ee7f2a22d143d34e8470ed = L.marker(
-                [52.1925888009739, -1.7058660275448283],
-                {
-  "opacity": 0.5,
-}
-            ).addTo(feature_group_620d88abfd24c06760633d9fc458e2ad);
-        
-    
-            var icon_3c40a4673961a848c26333ef25e4d874 = L.AwesomeMarkers.icon(
-                {
-  "markerColor": "gray",
-  "iconColor": "white",
-  "icon": "cross",
-  "prefix": "fa",
-  "extraClasses": "fa-rotate-0",
   "extraClasses": "fas",
 }
             );
-            marker_a849853c11ee7f2a22d143d34e8470ed.setIcon(icon_3c40a4673961a848c26333ef25e4d874);
         
     
-        var popup_db1a7f189f7f7aa9239a4c1ff9bb6479 = L.popup({
+        var popup_71a025b78ac5304cfd84dc80b1f90820 = L.popup({
   "maxWidth": "100%",
 });
 
         
             
-                var html_7ba07a3cbb46355a34928f4f0b27290c = $(`<div id="html_7ba07a3cbb46355a34928f4f0b27290c" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>Life of M        Anne Hathaway<br>1556 (Born) 1623 (Died)</div></div>`)[0];
-                popup_db1a7f189f7f7aa9239a4c1ff9bb6479.setContent(html_7ba07a3cbb46355a34928f4f0b27290c);
+                var html_28b2b59f90572ad78569256bf49117de = $(`<div id="html_28b2b59f90572ad78569256bf49117de" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>Mary Arden mother of William Shakespeare<br>1537 (Born) 1608 (Died)</div></div>`)[0];
+                popup_71a025b78ac5304cfd84dc80b1f90820.setContent(html_28b2b59f90572ad78569256bf49117de);
             
         
 
-        marker_a849853c11ee7f2a22d143d34e8470ed.bindPopup(popup_db1a7f189f7f7aa9239a4c1ff9bb6479)
+        marker_858a73c99c33ad7f8f497a8a89ebf036.bindPopup(popup_71a025b78ac5304cfd84dc80b1f90820)
         ;
 
         
     
     
-            marker_a849853c11ee7f2a22d143d34e8470ed.bindTooltip(
+            marker_858a73c99c33ad7f8f497a8a89ebf036.bindTooltip(
                 `<div>
-                     Life of M        Anne Hathaway
+                     Life of FM      	Mary Arden
                  </div>`,
                 {
   "sticky": true,
@@ -1005,78 +1246,55 @@
             );
         
     
-            var poly_line_45a1b6328ad3058e1c4cb24b52791bfa = L.polyline(
-                [[52.19096867385486, -1.7277521445170345], [52.1925888009739, -1.7058660275448283]],
-                {"bubblingMouseEvents": true, "color": "#00ffbc", "dashArray": [], "dashOffset": null, "fill": false, "fillColor": "#00ffbc", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "arcs", "noClip": false, "opacity": 1, "smoothFactor": 1.0, "stroke": true, "weight": 7}
-            ).addTo(feature_group_620d88abfd24c06760633d9fc458e2ad);
-        
-    
-        var popup_68125704d0a9cfd03983c745ea8c607a = L.popup({
-  "maxWidth": "100%",
-});
-
-        
+                marker_858a73c99c33ad7f8f497a8a89ebf036.setIcon(icon_634df7df98a71992129ca97b76a20095);
             
-                var html_2df3c7529b35e54a9168800f16e87c17 = $(`<div id="html_2df3c7529b35e54a9168800f16e87c17" style="width: 100.0%; height: 100.0%;"><div style='min-width: 150px'>Life of M        Anne Hathaway<br>1556 (Born) 1623 (Died)</div></div>`)[0];
-                popup_68125704d0a9cfd03983c745ea8c607a.setContent(html_2df3c7529b35e54a9168800f16e87c17);
-            
-        
-
-        poly_line_45a1b6328ad3058e1c4cb24b52791bfa.bindPopup(popup_68125704d0a9cfd03983c745ea8c607a)
-        ;
-
-        
     
-    
-            poly_line_45a1b6328ad3058e1c4cb24b52791bfa.bindTooltip(
-                `<div>
-                     M        Anne Hathaway
-                 </div>`,
+            var feature_group_0af2a19c5e117c2f044685400d02996f = L.featureGroup(
                 {
-  "sticky": true,
 }
             );
         
     
-            var layer_control_c7fe73495acfd9f4d4fd0908df15c7cc_layers = {
+            var feature_group_76574575b4a820397e248f9078eb525b = L.featureGroup(
+                {
+}
+            );
+        
+    
+            var layer_control_8394d5ab059d6272daa065c7a17cf283_layers = {
                 base_layers : {
-                    "openstreetmap" : tile_layer_5b5d5e74cfd3abc464a042e98897f348,
-                    "Stamen Toner" : tile_layer_897813b16fea2124dcdb661faa30c03e,
-                    "Stadia.StamenTonerLite" : tile_layer_67d692ae6a2a84c107f3db532f00b237,
-                    "Stadia.StamenWatercolor" : tile_layer_1ba51bfdec3b7bd029b3913d9cf674a2,
-                    "OpenTopoMap" : tile_layer_865afc2726128b84a35baf1961b644de,
-                    "ESRI.WorldImagery" : tile_layer_a74b448f65dd0a00fa85006e0ca9f26b,
-                    "CartoBD Voyager" : tile_layer_6752f306b2f7cbb1a0c3a7159f581bee,
-                    "CartoDB Positron" : tile_layer_32dbc57f0ce79831a3f12407828b40bc,
+                    "cartodbvoyager" : tile_layer_4946f86a6129807c75353af3342f8189,
                 },
                 overlays :  {
-                    "\u003cspan style=\"color: black;\"\u003eHeatmap\u003c/span\u003e" : feature_group_9b2da8bd3898f37e7ea1e1b48a3c91f8,
-                    "Hamnet Shakespeare : 9" : feature_group_e9920560e7f2c53392443563bfcb2b22,
-                    "William Shakespeare : 5" : feature_group_beab09e543f09454741927c3353bb7e2,
-                    "Anne Hathaway : 3" : feature_group_620d88abfd24c06760633d9fc458e2ad,
+                    "Heatmap" : heat_map_3a51e9a58edf899dbcce9e99d44f0ebf,
+                    "Shakespeare : 7" : feature_group_dc632935d06cea4e73fbe0b52bbbe47b,
+                    "Hathaway : 3" : feature_group_4d4463904c23bdd4fed7b766656f2422,
+                    "Arden : 3" : feature_group_1f91aecd8698e56cc311499d9de9591e,
+                    "Unknown : 1" : feature_group_0af2a19c5e117c2f044685400d02996f,
+                    "Webbe : 1" : feature_group_76574575b4a820397e248f9078eb525b,
                 },
             };
-            let layer_control_c7fe73495acfd9f4d4fd0908df15c7cc = L.control.layers(
-                layer_control_c7fe73495acfd9f4d4fd0908df15c7cc_layers.base_layers,
-                layer_control_c7fe73495acfd9f4d4fd0908df15c7cc_layers.overlays,
+            let layer_control_8394d5ab059d6272daa065c7a17cf283 = L.control.layers(
+                layer_control_8394d5ab059d6272daa065c7a17cf283_layers.base_layers,
+                layer_control_8394d5ab059d6272daa065c7a17cf283_layers.overlays,
                 {
   "position": "topleft",
   "collapsed": false,
   "autoZIndex": true,
 }
-            ).addTo(map_95df0a052e5b75225a73bc08443dc2c8);
+            ).addTo(map_ee183b670381ee642ceb11db4f1169da);
 
         
     
-            var marker_ba1b7d38257832aafb5eb83a02034020 = L.marker(
-                [52.19321438166132, -1.7063642007909154],
+            var marker_3208767004473735e4f69790c5319029 = L.marker(
+                [52.19234082836661, -1.706559300608371],
                 {
   "opacity": 0.5,
 }
-            ).addTo(map_95df0a052e5b75225a73bc08443dc2c8);
+            ).addTo(map_ee183b670381ee642ceb11db4f1169da);
         
     
-            var icon_d2436d8f074ed818dbfd7c36d7cf4e6e = L.AwesomeMarkers.icon(
+            var icon_2c3eb46b102c70f22cc5089c499de5a0 = L.AwesomeMarkers.icon(
                 {
   "markerColor": "lightred",
   "iconColor": "white",
@@ -1089,17 +1307,19 @@
 ],
 }
             );
-            marker_ba1b7d38257832aafb5eb83a02034020.setIcon(icon_d2436d8f074ed818dbfd7c36d7cf4e6e);
         
     
-            marker_ba1b7d38257832aafb5eb83a02034020.bindTooltip(
+            marker_3208767004473735e4f69790c5319029.bindTooltip(
                 `<div>
-                     Hamnet Shakespeare
+                     Judith Shakespeare
                  </div>`,
                 {
   "sticky": true,
 }
             );
         
+    
+                marker_3208767004473735e4f69790c5319029.setIcon(icon_2c3eb46b102c70f22cc5089c499de5a0);
+            
 </script>
 </html>

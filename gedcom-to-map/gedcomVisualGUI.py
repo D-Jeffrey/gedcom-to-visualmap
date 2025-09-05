@@ -54,7 +54,7 @@ class VisualGedcomIds():
     def __init__(self):
         
         self.ids = [
-            'ID_CBMarksOn', 'ID_CBHeatMap', 'ID_CBBornMark', 'ID_CBDieMark', 'ID_LISTMapStyle',
+            'ID_CBMarksOn', 'ID_CBHeatMap', 'ID_CBFlyTo', 'ID_CBBornMark', 'ID_CBDieMark', 'ID_LISTMapStyle',
             'ID_CBMarkStarOn', 'ID_RBGroupBy', 'ID_CBUseAntPath', 'ID_CBMapTimeLine',
             'ID_CBHomeMarker', 'ID_LISTHeatMapTimeStep', 'ID_TEXTGEDCOMinput', 'ID_TEXTResult',
             'ID_RBResultHTML', 'ID_TEXTMain', 'ID_TEXTName', 'ID_INTMaxMissing', 'ID_INTMaxLineWeight',
@@ -75,6 +75,7 @@ class VisualGedcomIds():
             self.IDs['ID_CBUseAntPath']: ('UseAntPath', 'Redraw'),
             self.IDs['ID_CBMapTimeLine']: ('MapTimeLine', 'Redraw'),
             self.IDs['ID_CBHomeMarker']: ('HomeMarker', 'Redraw'),
+            self.IDs['ID_CBFlyTo']: ('UseBalloonFlyto', 'Redraw'),
             self.IDs['ID_LISTHeatMapTimeStep']: ('MapTimeLine', 'Redraw'),
             self.IDs['ID_TEXTGEDCOMinput']: ('GEDCOMinput', 'Reload'),
             self.IDs['ID_TEXTResult']: ('Result', 'Redraw'),
@@ -86,7 +87,6 @@ class VisualGedcomIds():
             self.IDs['ID_CBUseGPS']: ('UseGPS', 'Reload'),
             self.IDs['ID_CBCacheOnly']: ('CacheOnly', 'Reload'),
             self.IDs['ID_CBAllEntities']: ('AllEntities', 'Redraw'),
-            # self.IDs['ID_LISTPlaceType']: ('PlaceType', 'Redraw'),
             self.IDs['ID_CBMapControl']: ('showLayerControl', 'Redraw'),
             self.IDs['ID_CBMapMini']: ('mapMini', 'Redraw'),
             self.IDs['ID_BTNLoad']: 'Load',
@@ -118,7 +118,7 @@ class VisualGedcomIds():
             self.COLORs['GRID_BACK']: ['WHITE'],            # Alternate DARK SLATE GREY
             self.COLORs['TITLE_TEXT']: ['WHITE'],
             self.COLORs['TITLE_BACK']: ['KHAKI'],
-            self.COLORs['BUSY_BACK']: ['KHAKI']
+            self.COLORs['BUSY_BACK']: ['YELLOW']
 
         }
         for colorToValue in self.colors:
@@ -835,11 +835,11 @@ class VisualMapPanel(wx.Panel):
         box.Add(wx.StaticLine(panel), 0, wx.EXPAND)
             
         
-        self.id.txtinfile = wx.StaticText(panel, -1,  "Input file:   ") 
+        self.id.txtinfile = wx.Button(panel, -1,  "Input file:   ") 
         self.id.txtinfile.SetBackgroundColour(self.id.GetColor('BTN_DIRECTORY'))
         self.id.TEXTGEDCOMinput = wx.TextCtrl(panel, self.id.IDs['ID_TEXTGEDCOMinput'], "", size=(250,20))
         self.id.TEXTGEDCOMinput.Enable(False) 
-        self.id.txtoutfile = wx.StaticText(panel, -1, "Output file: ")
+        self.id.txtoutfile = wx.Button(panel, -1, "Output file: ")
         self.id.txtoutfile.SetBackgroundColour(self.id.GetColor('BTN_DIRECTORY'))
         self.id.TEXTResult = wx.TextCtrl(panel, self.id.IDs['ID_TEXTResult'], "", size=(250,20))
         self.id.txtinfile.Bind(wx.EVT_LEFT_DOWN, self.frame.OnFileOpenDialog)
@@ -938,21 +938,22 @@ class VisualMapPanel(wx.Panel):
         if False:
             txtMissing = wx.StaticText(kboxIn, -1,  "Max generation missing: ") 
             self.id.INTMaxMissing = wx.TextCtrl(kboxIn, self.id.IDs['ID_INTMaxMissing'], "", size=(20,20))
-            txtLine = wx.StaticText(kboxIn, -1,  "Line maximum weight: ") 
-            self.id.INTMaxLineWeight = wx.TextCtrl(kboxIn, self.id.IDs['ID_INTMaxLineWeight'], "", size=(20,20))
             l1 = wx.BoxSizer(wx.HORIZONTAL)
             l1.AddMany([txtMissing,      (0,20),     self.id.INTMaxMissing])
-            l2 = wx.BoxSizer(wx.HORIZONTAL)
-            l2.AddMany([txtLine,      (0,20),     self.id.INTMaxLineWeight])
+            
             kboxIn.AddMany([l1, (4,4,), l2])
         # self.id.ID_INTMaxMissing  'MaxMissing'
-        # self.id.ID_INTMaxLineWeight  'MaxLineWeight'
         
+        kboxs = [wx.BoxSizer(wx.HORIZONTAL), (4,4), wx.BoxSizer(wx.HORIZONTAL)]
+        self.id.CBFlyTo = wx.CheckBox(kbox, self.id.IDs['ID_CBFlyTo'], "FlyTo Balloon", style = wx.NO_BORDER)
+        self.id.ID_INTMaxLineWeight = wx.SpinCtrl(kbox, self.id.IDs['ID_INTMaxLineWeight'], "", min=1, max=100, initial=20)
+        kboxs[0].AddMany([wx.StaticText(kbox, -1, "        "), self.id.CBFlyTo])
+        kboxs[2].AddMany([self.id.ID_INTMaxLineWeight, wx.StaticText(kbox, -1, " Max Line Weight")])
+        kboxIn.AddMany(kboxs)
 
         ksizer.Add( kboxIn, wx.LEFT, kOtherBorder+10)
         kbox.SetSizer(ksizer)
         self.kbox = kbox
-
 
         #
         # Grid View Options
@@ -1017,13 +1018,14 @@ class VisualMapPanel(wx.Panel):
         self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.id.IDs['ID_CBHomeMarker'])
         self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.id.IDs['ID_CBMarkStarOn'])
         self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.id.IDs['ID_CBHeatMap'])
+        self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.id.IDs['ID_CBFlyTo'])
         self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.id.IDs['ID_CBMapTimeLine'])
         self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.id.IDs['ID_CBUseAntPath'])
         self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.id.IDs['ID_CBUseGPS'])
         self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.id.IDs['ID_CBCacheOnly'])
         self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.id.IDs['ID_CBAllEntities'])
         self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.id.IDs['ID_CBGridView'])
-        # self.Bind(wx.EVT_CHECKLISTBOX, self.EvtListBox, id = self.id.IDs['ID_LISTPlaceType'])
+        self.Bind(wx.EVT_SPINCTRL, self.EvtSpinCtrl, id = self.id.IDs['ID_INTMaxLineWeight'])
         self.Bind(wx.EVT_CHOICE, self.EvtListBox, id = self.id.IDs['ID_LISTMapStyle'])
         self.Bind(wx.EVT_BUTTON, self.EvtButton, id = self.id.IDs['ID_BTNLoad'])
         self.Bind(wx.EVT_BUTTON, self.EvtButton, id = self.id.IDs['ID_BTNUpdate'])
@@ -1196,6 +1198,16 @@ class VisualMapPanel(wx.Panel):
             _log.error ("Uncontrol LISTbox")
     
 
+    def EvtSpinCtrl(self, event):
+        eventid = event.GetId()
+        _log.debug('%s, %s, %s', event.GetString(), event.IsSelection(), event.GetSelection())                            
+        _ = event.GetEventObject()
+        if eventid == self.id.IDs['ID_INTMaxLineWeight']:
+            panel.gO.MaxLineWeight = event.GetSelection()
+            self.NeedRedraw()
+        else:
+            _log.error ("Uncontrol SPINbox")
+
     def EvtSlider(self, event):
 
         _log.debug('%s', event.GetSelection())
@@ -1339,7 +1351,8 @@ class VisualMapPanel(wx.Panel):
             self.id.CBMapMini,
             self.id.CBHeatMap,
             self.id.CBUseAntPath,
-            self.id.RBGroupBy
+            self.id.RBGroupBy,
+            self.id.LISTHeatMapTimeStep
         ]
         marks_controls = [
             self.id.CBBornMark,
@@ -1348,7 +1361,9 @@ class VisualMapPanel(wx.Panel):
             self.id.CBMarkStarOn,
             ]
         kml_controls = [
-
+            self.id.CBFlyTo,
+            self.id.ID_INTMaxLineWeight
+                    
         ]
 
         # Enable/Disable marker-dependent controls if markers are off
@@ -1376,7 +1391,8 @@ class VisualMapPanel(wx.Panel):
                 # Only enable time step if timeline is enabled
                 if self.gO.get('MapTimeLine'):
                     self.id.LISTHeatMapTimeStep.Enable()
-                    
+            for ctrl in kml_controls:
+                ctrl.Disable()        
 
         else:
             # In KML mode, disable HTML controls and enable KML controls
@@ -1414,6 +1430,7 @@ class VisualMapPanel(wx.Panel):
         self.id.CBHomeMarker.SetValue(self.gO.get('HomeMarker'))
         self.id.CBMarkStarOn.SetValue(self.gO.get('MarkStarOn'))
         self.id.CBHeatMap.SetValue(self.gO.get('HeatMap'))
+        self.id.CBFlyTo.SetValue(self.gO.get('UseBalloonFlyto'))
         self.id.CBMapTimeLine.SetValue(self.gO.get('MapTimeLine'))
         self.id.CBUseAntPath.SetValue(self.gO.get('UseAntPath'))
         self.id.CBUseGPS.SetValue(self.gO.get('UseGPS'))
@@ -1421,6 +1438,7 @@ class VisualMapPanel(wx.Panel):
         self.id.CBCacheOnly.SetValue(self.gO.get('CacheOnly'))
         self.id.LISTHeatMapTimeStep.SetValue(self.gO.get('HeatMapTimeStep'))
         self.id.LISTMapType.SetSelection(self.id.LISTMapType.FindString(self.gO.get('MapStyle')))
+        self.id.ID_INTMaxLineWeight.SetValue(self.gO.get('MaxLineWeight'))
                 
         
 #        places = self.gO.get('PlaceType')
@@ -1496,7 +1514,7 @@ class VisualMapPanel(wx.Panel):
                 if ' ' in cmdline:
                     cmdline = self.gO.get('CSVcmdline').replace('$n', f'{cmdfile}')
                     _log.info(f'shell run  `{cmdfile}`')
-                    if gOp.cmdline.startswith('http'):
+                    if self.gOp.cmdline.startswith('http'):
                         webbrowser.open(cmdline, new = 0, autoraise = True)
                     else:
                         subprocess.run(cmdline, shell=True)
@@ -1516,7 +1534,12 @@ class VisualMapPanel(wx.Panel):
                 return 
             tracepath = os.path.splitext(self.gO.Result)[0] + ".trace.txt"
             # indentpath = os.path.splitext(self.gO.Result)[0] + ".indent.txt"
-            trace = open(tracepath , 'w')
+            try:
+                trace = open(tracepath , 'w')
+            except Exception as e:
+                logging.error("Error: Could not open trace file %s for writing %s", tracepath, e)
+                BackgroundProcess.SayErrorMessage(f"Error: Could not open trace file {tracepath} for writing {e}")
+                return
             # indent = open(indentpath , 'w')
             trace.write("id\tName\tYear\tWhere\tGPS\tPath\n")
             # indent.write("this is an indented file with the number of generations driven by the parents\nid\tName\tYear\tWhere\tGPS\n") 
@@ -1533,7 +1556,8 @@ class VisualMapPanel(wx.Panel):
             # indent.close()
             _log.info(f"Trace file saved {tracepath}")
             # _log.info(f"Indent file saved {indentpath}")
-            BackgroundProcess.SayInfoMessage(f"Trace file saved: {tracepath}",True)
+            withall = "with all people" if self.gO.get('AllEntities') else ""
+            BackgroundProcess.SayInfoMessage(f"Trace file {withall} saved: {tracepath}",True)
 
     def OpenBrowser(self):
         if self.gO.get('ResultHTML'):

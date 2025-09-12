@@ -22,6 +22,9 @@ import time
 from datetime import datetime
 import webbrowser
 from warnings import catch_warnings
+from models.Human import Human
+from gedcom.GedcomParser import CheckAge 
+from typing import Dict, Union
 
 import wx
 # pylint: disable=no-member
@@ -57,10 +60,10 @@ class VisualGedcomIds():
             'ID_CBMarksOn', 'ID_CBHeatMap', 'ID_CBFlyTo', 'ID_CBBornMark', 'ID_CBDieMark', 'ID_LISTMapStyle',
             'ID_CBMarkStarOn', 'ID_RBGroupBy', 'ID_CBUseAntPath', 'ID_CBMapTimeLine',
             'ID_CBHomeMarker', 'ID_LISTHeatMapTimeStep', 'ID_TEXTGEDCOMinput', 'ID_TEXTResult',
-            'ID_RBResultHTML', 'ID_TEXTMain', 'ID_TEXTName', 'ID_INTMaxMissing', 'ID_INTMaxLineWeight',
+            'ID_RBResultHTML', 'ID_TEXTMain', 'ID_TEXTName', 'ID_RBKMLMode', 'ID_INTMaxMissing', 'ID_INTMaxLineWeight',
             'ID_CBUseGPS', 'ID_CBCacheOnly', 'ID_CBAllEntities',  'ID_CBMapControl',
             'ID_CBMapMini', 'ID_BTNLoad', 'ID_BTNUpdate', 'ID_BTNCSV', 'ID_BTNTRACE', 'ID_BTNSTOP', 'ID_BTNBROWSER',
-            'ID_CBGridView'
+            'ID_CBGridView', 'CBYougeAge'
         ]
         self.IDs = {name: wx.NewIdRef() for name in self.ids}
         # ID = Attribute (in gOptions), Action impact
@@ -82,6 +85,7 @@ class VisualGedcomIds():
             self.IDs['ID_RBResultHTML']: ('ResultHTML', 'Redraw'),
             self.IDs['ID_TEXTMain']: ('Main', 'Reload'),
             self.IDs['ID_TEXTName']: ('Name', ''),
+            self.IDs['ID_RBKMLMode']: ('KMLMode', 'Redraw'),
             self.IDs['ID_INTMaxMissing']: ('MaxMissing', 'Reload'),
             self.IDs['ID_INTMaxLineWeight']: ('MaxLineWeight', 'Reload'),
             self.IDs['ID_CBUseGPS']: ('UseGPS', 'Reload'),
@@ -396,9 +400,6 @@ class VisualMapFrame(wx.Frame):
     def onOptionsSetup(self, event):
         dialog = ConfigDialog(None, title='Configuration Options', gOptions=panel.gO)
         
-
-
-
 #=============================================================
 class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSorterMixin):
     def __init__(self, parent, ID, pos=wx.DefaultPosition,
@@ -536,7 +537,11 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
                             if mainperson == data[2]:
                                 self.SetItemBackgroundColour(index, self.id.GetColor('MAINPERSON'))
                             else:
-                                self.SetItemBackgroundColour(index, self.id.GetColor('ANCESTOR'))
+                                issues = CheckAge(humans, data[2])
+                                if issues:
+                                    self.SetItemBackgroundColour(index, wx.YELLOW)
+                                else:
+                                    self.SetItemBackgroundColour(index, self.id.GetColor('ANCESTOR'))
                         else:
                             self.SetItemBackgroundColour(index, self.id.GetColor('OTHERPERSON'))
             self.gO.counter = 0
@@ -852,8 +857,6 @@ class VisualMapPanel(wx.Panel):
         box.AddMany([l1, (4,4,), l2])
 
         # First select controls
-        self.id.RBResultHTML =  wx.RadioBox(panel, self.id.IDs['ID_RBResultHTML'], "Result Type", 
-                                           choices = ['HTML', 'KML'] , majorDimension= 2)
 
         self.id.CBUseGPS = wx.CheckBox(panel, self.id.IDs['ID_CBUseGPS'], "Use GPS lookup (uncheck if GPS is in file)")#,  wx.NO_BORDER)
         self.id.CBCacheOnly = wx.CheckBox(panel, self.id.IDs['ID_CBCacheOnly'], "Cache Only, do not lookup addresses")#, , wx.NO_BORDER)
@@ -869,9 +872,10 @@ class VisualMapPanel(wx.Panel):
         self.id.CBHomeMarker = wx.CheckBox(panel, self.id.IDs['ID_CBHomeMarker'], "Marker point or homes")
         self.id.CBMarkStarOn = wx.CheckBox(panel, self.id.IDs['ID_CBMarkStarOn'], "Marker starter with Star")
         self.id.CBMapTimeLine = wx.CheckBox(panel, self.id.IDs['ID_CBMapTimeLine'], "Add Timeline")
+        self.id.RBResultHTML =  wx.RadioBox(panel, self.id.IDs['ID_RBResultHTML'], "Result Type", 
+                                           choices = ['HTML', 'KML'] , majorDimension= 2)
 
-        box.AddMany([ self.id.RBResultHTML,
-                       self.id.CBUseGPS,
+        box.AddMany([  self.id.CBUseGPS,
                        self.id.CBCacheOnly,
                        self.id.CBAllEntities,
                        self.id.CBMarksOn,
@@ -879,7 +883,8 @@ class VisualMapPanel(wx.Panel):
                        self.id.CBDieMark,
                        self.id.CBHomeMarker,
                        self.id.CBMarkStarOn,
-                       self.id.CBMapTimeLine])
+                       self.id.CBMapTimeLine,
+                       self.id.RBResultHTML])
         """
           HTML select controls in a Box
         """
@@ -923,7 +928,7 @@ class VisualMapPanel(wx.Panel):
                         self.id.LISTHeatMapTimeStep,
                         (0,5)
                         ])
-        hsizer.Add( hboxIn, wx.LEFT, hOtherBorder+10)
+        hsizer.Add( hboxIn, wx.LEFT, hOtherBorder+5)
         
         hbox.SetSizer(hsizer)
         self.hbox = hbox
@@ -943,15 +948,18 @@ class VisualMapPanel(wx.Panel):
             
             kboxIn.AddMany([l1, (4,4,), l2])
         # self.id.ID_INTMaxMissing  'MaxMissing'
+        self.id.RBKMLMode  = wx.RadioBox(kbox, self.id.IDs['ID_RBKMLMode'], "Organize by:", 
+                                       choices = ['None', 'Folder'], majorDimension= 2)
         
-        kboxs = [wx.BoxSizer(wx.HORIZONTAL), (4,4), wx.BoxSizer(wx.HORIZONTAL)]
+        kboxs = [self.id.RBKMLMode, wx.BoxSizer(wx.HORIZONTAL), (4,4), wx.BoxSizer(wx.HORIZONTAL)]
         self.id.CBFlyTo = wx.CheckBox(kbox, self.id.IDs['ID_CBFlyTo'], "FlyTo Balloon", style = wx.NO_BORDER)
         self.id.ID_INTMaxLineWeight = wx.SpinCtrl(kbox, self.id.IDs['ID_INTMaxLineWeight'], "", min=1, max=100, initial=20)
-        kboxs[0].AddMany([wx.StaticText(kbox, -1, "        "), self.id.CBFlyTo])
-        kboxs[2].AddMany([self.id.ID_INTMaxLineWeight, wx.StaticText(kbox, -1, " Max Line Weight")])
+        
+        kboxs[1].AddMany([wx.StaticText(kbox, -1, "        "), self.id.CBFlyTo])
+        kboxs[3].AddMany([self.id.ID_INTMaxLineWeight, wx.StaticText(kbox, -1, " Max Line Weight")])
         kboxIn.AddMany(kboxs)
 
-        ksizer.Add( kboxIn, wx.LEFT, kOtherBorder+10)
+        ksizer.Add( kboxIn, wx.LEFT, kOtherBorder+5)
         kbox.SetSizer(ksizer)
         self.kbox = kbox
 
@@ -967,15 +975,15 @@ class VisualMapPanel(wx.Panel):
         gboxIn = wx.BoxSizer(wx.VERTICAL)
         self.id.CBGridView = wx.CheckBox(gbox, self.id.IDs['ID_CBGridView'],  'View Only Direct Ancestors')
         gboxIn.AddMany( [self.id.CBGridView])
-        gsizer.Add( gboxIn, wx.LEFT, kOtherBorder+10)
+        gsizer.Add( gboxIn, wx.LEFT, gOtherBorder+5)
         
         gbox.SetSizer(gsizer)
-        self.gbox = gbox
         
         box.Add(hbox, 1, wx.LEFT, 15)
-        box.Add(kbox, 1, wx.LEFT, 15)
         box.Add(gbox, 1, wx.LEFT, 15)
+        box.Add(kbox, 1, wx.LEFT, 15)
         
+        self._needLayoutSet = True
         
 
         l1 = wx.BoxSizer(wx.HORIZONTAL)
@@ -1025,6 +1033,7 @@ class VisualMapPanel(wx.Panel):
         self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.id.IDs['ID_CBCacheOnly'])
         self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.id.IDs['ID_CBAllEntities'])
         self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.id.IDs['ID_CBGridView'])
+        self.Bind(wx.EVT_RADIOBOX, self.EvtRadioBox, id = self.id.IDs['ID_RBKMLMode'])
         self.Bind(wx.EVT_SPINCTRL, self.EvtSpinCtrl, id = self.id.IDs['ID_INTMaxLineWeight'])
         self.Bind(wx.EVT_CHOICE, self.EvtListBox, id = self.id.IDs['ID_LISTMapStyle'])
         self.Bind(wx.EVT_BUTTON, self.EvtButton, id = self.id.IDs['ID_BTNLoad'])
@@ -1098,6 +1107,8 @@ class VisualMapPanel(wx.Panel):
             self.SetupButtonState()
         elif event.GetId() ==  self.id.IDs['ID_RBGroupBy']:
             self.gO.GroupBy = event.GetSelection()
+        elif event.GetId() ==  self.id.IDs['ID_RBKMLMode']:
+            self.gO.KMLsort = event.GetSelection()
         else:
             _log.error('We have a Problem')
         
@@ -1361,6 +1372,7 @@ class VisualMapPanel(wx.Panel):
             self.id.CBMarkStarOn,
             ]
         kml_controls = [
+            self.id.RBKMLMode,
             self.id.CBFlyTo,
             self.id.ID_INTMaxLineWeight
                     
@@ -1379,9 +1391,6 @@ class VisualMapPanel(wx.Panel):
             for ctrl in html_controls:
                 ctrl.Enable()
             
-            # Disable KML-specific controls
-  #          self.id.LISTPlaceType.Disable()
-            
             # Handle heat map related controls
             self.id.CBMapTimeLine.Disable()
             self.id.LISTHeatMapTimeStep.Disable()
@@ -1393,7 +1402,13 @@ class VisualMapPanel(wx.Panel):
                     self.id.LISTHeatMapTimeStep.Enable()
             for ctrl in kml_controls:
                 ctrl.Disable()        
-
+            if self._needLayoutSet:
+                self._needLayoutSet = False
+            else:
+                self.hbox.Show()
+                self.kbox.SetPosition(wx.Point(self.kbox.GetPosition().x, self.hbox.GetPosition().y))
+                self.kbox.Hide()
+            
         else:
             # In KML mode, disable HTML controls and enable KML controls
             for ctrl in html_controls:
@@ -1402,10 +1417,14 @@ class VisualMapPanel(wx.Panel):
                 ctrl.Enable()
             # This timeline just works differently in KML mode vs embedded code for HTML
             self.id.CBMapTimeLine.Enable()
+            if self._needLayoutSet:
+                self._needLayoutSet = False
+            else:
+                self.hbox.Hide()
+                self.kbox.SetPosition(wx.Point(self.kbox.GetPosition().x, self.hbox.GetPosition().y))
+                self.kbox.Show()
 
-#            self.id.LISTPlaceType.Enable()
-
-        # Enable/disable trace button based on referenced data availability
+       # Enable/disable trace button based on referenced data availability
         self.id.BTNTRACE.Enable(bool(self.gO.Referenced and self.gO.Result))
 
     def SetupOptions(self):
@@ -1439,18 +1458,11 @@ class VisualMapPanel(wx.Panel):
         self.id.LISTHeatMapTimeStep.SetValue(self.gO.get('HeatMapTimeStep'))
         self.id.LISTMapType.SetSelection(self.id.LISTMapType.FindString(self.gO.get('MapStyle')))
         self.id.ID_INTMaxLineWeight.SetValue(self.gO.get('MaxLineWeight'))
-                
-        
-#        places = self.gO.get('PlaceType')
-#        self.id.LISTPlaceType.SetCheckedStrings(places)
         self.id.RBGroupBy.SetSelection(self.gO.get('GroupBy'))
-        
-        
         self.id.TEXTResult.SetValue(self.gO.get('Result'))
 
         _, filen = os.path.split(self.gO.get('GEDCOMinput')) if self.gO.get('GEDCOMinput') else ("", "first.ged")
         self.id.TEXTGEDCOMinput.SetValue(filen)
-#        self.id.LISTPlaceType.SetCheckedStrings(self.gO.PlaceType)
         self.SetupButtonState()
 
         for t in self.threads:

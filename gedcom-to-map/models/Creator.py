@@ -57,7 +57,9 @@ class Creator:
             raise IndexError(f"Missing starting person {main_id}")
 
         current = self.humans[main_id]
-        return self.link(getattrposif(current, self.gpstype, 'pos'), current)
+        createpos = getattrposif(current, self.gpstype, 'pos')
+        return self.link(createpos, current) + \
+            self.line(createpos, current, 0, 0, 0, "")
 
     def createothers(self,listof):
         for human in self.humans:

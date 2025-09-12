@@ -60,7 +60,7 @@ python3 gedcom-to-map.py /users/darren/documents/myhertitagetree.ged myTree -mai
 ```
 
 ## GUI
-![img](docs/img/GUI-python_2025-09-03.png)
+![img](docs/img/GUI-python_2025-09.gif)
 
 To use the GUI version, click on `Input File` and select your .ged file.
 Set your options in the GUI interface  
@@ -242,6 +242,9 @@ python3 ..\gedcom-to-map\gedcom-to-map.py input.ged output -main "@I0000@" -form
 
 * HTML Output : [docs/output.html](docs/output.html)
 
+### Other sample GED files:
+- https://github.com/findmypast/gedcom-samples
+
 ## TODO
 - Add a treed hierarchy selector to enable people as groups and add expand/collapse to navigation
 - more troubleshooting on the address lookup
@@ -268,6 +271,17 @@ python3 ..\gedcom-to-map\gedcom-to-map.py input.ged output -main "@I0000@" -form
 - Need to separate the Load and GPS resolve steps (currently reloads after 30 seconds of looking up values)
 
 ## Releases
+### v0.2.6.8
+- Enriched Balloon in KML with proper linked to children and parents
+- Add folders to KML
+- Add children to Person Dialog
+- Add age checking (problems flag in yellow for the lineage people)
+- Dynamic KML/HTML options
+- Refractored long standing inconsistancy related to drawing the first person in KML
+### v0.2.6.7
+- Added FlyTo, Line Weigth & Trace cmdline to configuration
+- Input/Output as Buttons
+- Updates Samples output
 ### v0.2.6.6.x
 - Working on KML functions and reworking GUI.  
 - Fix HTML to use markers properly, optional timeline in KML

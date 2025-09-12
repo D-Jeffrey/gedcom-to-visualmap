@@ -28,6 +28,7 @@ class KmlExporter:
         self.gOp.totalpeople = 0
         self.styleA = None
         self.styleB = None
+        self.styles = []
             
 
     def driftPos(self, l : Pos):
@@ -36,27 +37,29 @@ class KmlExporter:
         return ((float(l.lon)+(random.random() * 0.001) - 0.0005), float(l.lat)+(random.random() * 0.001) - 0.0005)
         
     def Done(self):
+        alist = []
+        glist = []
         self.gOp.step("Finalizing KML")
         # Fix up the links in the placemark
         for placemark in self.kml.features:
-            if placemark.description:
-                pattern = r'href=#(.*?);'
+            if hasattr(placemark, 'description') and placemark.description:
+                pattern = r'href=(#.*?);'
                 for match in re.finditer(pattern, placemark.description):
                     tag = match.group(1)
                     if self.gOp.Referenced.exists(tag):
                         replacewith = 1 + int(self.gOp.Referenced.gettag(tag))
-                        original = f"href=#{tag};"
+                        original = f"href={tag};"
                         replacement = f"href=#{replacewith};"
                         placemark.description = placemark.description.replace(original, replacement)
-            if placemark.balloonstyle and placemark.balloonstyle.text:
-                pattern = r'href=#(.*?);'
-                for match in re.finditer(pattern, placemark.balloonstyle.text):
-                    tag = match.group(1)
-                    if self.gOp.Referenced.exists(tag):
-                        replacewith = 1 + int(self.gOp.Referenced.gettag(tag))
-                        original = f"href=#{tag};"
-                        replacement = f"href=#{replacewith};"
-                        placemark.balloonstyle.text = placemark.balloonstyle.text.replace(original, replacement)
+                        # glist.append(original+"->"+replacement)
+                    else:
+                        # remove the link
+                        replaceit = r'(<a '+ f"href={tag};" + r'[^<]+>)([^>]+)(</a>)'
+                        for ripout in re.findall(replaceit, placemark.description):
+                            if ripout:
+                                # alist.append(ripout[0])
+                                placemark.description = placemark.description.replace(ripout[0]+ripout[1]+ripout[2], ripout[1])
+
 
         
         self.gOp.step("Saving KML")
@@ -65,6 +68,7 @@ class KmlExporter:
         # self.gOp.stop()
         # self.kml = None
     def export(self, main: Pos, lines: list[Line], ntag ="", mark="native"):
+        foldermode = self.gOp.KMLsort == 1
         # marker types are : 
         #           diamond, square, circle, blank, stars
         # colors are : 
@@ -96,11 +100,41 @@ class KmlExporter:
                 kmloptions.append("All people are included.")
             if kmloptions:
                 descript += "<br>" + " ".join(kmloptions)
+    #         myschema = kml.newschema(name='Life')
+    #         myschema.newsimplefield(name='name', type='int', displayname='<![CDATA[Name]]')
+    #         myschema.newsimplefield(name='birth', type='int', displayname='<![CDATA[Birth]]')
+    #         myschema.newsimplefield(name='death', type='int', displayname='<![CDATA[Death]]')
+    #         myschema.newsimplefield(name='birthplace', type='int', displayname='<![CDATA[Born :]]')
+    #         myschema.newsimplefield(name='deathplace', type='int', displayname='<![CDATA[Died :]]')
+    #         myschema.newsimplefield(name='father', type='string', displayname='<![CDATA[Father :]]')
+    #         myschema.newsimplefield(name='mother', type='string', displayname='<![CDATA[Mother :]]')
+    #         myschema.newsimplefield(name='children', type='string', displayname='<![CDATA[Children :]]')
+    #         "string"
+    #         self.styles = simplekml.BalloonStyle()
+    #         self.styles.text = """
+    # <![CDATA[
+    #     <h2> $[Life/name/displayName]$[Life/name] Born</h2>`n<br />
+    #     </br>Born $[Life/birth] - $[Life/death]</br>
+    #     </br>$[Life/birthplace/displayName]$[Life/birthplace]</br>
+    #     <br />
+    #     Parents: 
+    #     <br>$[Life/father/displayName]$[Life/father]</br>
+    #     <br>$[Life/mother/displayName]$[Life/mother]</br>
+    #     <br />
+    #     <br>$[Life/children/displayName]$[Life/children]</br>
+    # ]]>"""
             
             
             kmldoc = kml.newdocument(name='About Geomap KML', description=descript)
 
             self.kml = kml
+            if foldermode:
+                self.folderBirth = kml.newfolder(name="Births")
+                # self.folderMarriage = kml.newfolder(name="Marriages")
+                self.folderDeath = kml.newfolder(name="Deaths")
+                # self.folderParents = kml.newfolder(name="Parents")
+                self.folderLife = kml.newfolder(name="Lifelines")
+                
             
             styleA = simplekml.Style()
             # styleA.labelstyle.color = simplekml.Color.blue  # Make the text blue
@@ -115,10 +149,9 @@ class KmlExporter:
             self.styleB = styleB
             
         if main and main.lon and main.lat:
-            kml.newpoint(name=(self.gOp.Name  + ntag),coords=[ (main.lon, main.lat) ])
-            self.gOp.totalpeople += 1
-        else:
-            _log.error (f"No GPS locations to generate a map for main for {ntag}.")
+            _log.error (f"No GPS locations to generate a map for main person for {ntag}.")
+        if not lines or len(lines)==0:
+            _log.error (f"No GPS locations to generate any person for {ntag}.")
 
         
         self.gOp.step("Generating KML")
@@ -160,12 +193,21 @@ class KmlExporter:
 
             
 
-            
+            if timeA and timeB:
+                event = f"{timeA} - {timeB}"
+            elif timeB:
+                event = f"Death: {timeB}"
+            elif timeA:
+                event = f"Born: {timeA}"
+            else:
+                event = "Unknown dates"
+            event = f"<br>{event}</br>"
+                
             if line.a.hasLocation() and mark in ['birth']:
-                event = "<br>Born: {}</br>".format(timeA if timeA else "Unknown", timeB if timeB else "Unknown")
-                pnt = kml.newpoint(name=name + ntag, coords=[self.driftPos(line.a)], description="<![CDATA[ " + event + linage + familyLinage + " ]]>")
+                connectWhere = self.folderBirth if foldermode else kml
+                pnt = connectWhere.newpoint(name=name + ntag, coords=[self.driftPos(line.a)], description="<![CDATA[ " + event + linage + familyLinage + " ]]>")
                 self.gOp.Referenced.add(line.human.xref_id, 'kml-a',tag=pnt.id)
-                self.gOp.Referenced.add(line.human.xref_id[1:-1], tag=pnt.id)
+                self.gOp.Referenced.add("#"+line.human.xref_id[1:-1], tag=pnt.id)
                 if self.gOp.MapTimeLine and hasattr(line, 'whenFrom') and line.whenFrom: 
                     pnt.timestamp.when = line.whenFrom
             
@@ -178,11 +220,11 @@ class KmlExporter:
 
                 
             if line.b.hasLocation() and mark in ['death']:
-                event = "<br>Death: {}</br>".format(timeB if timeB else "Unknown") 
-                pnt = kml.newpoint(name=name + ntag, coords=[self.driftPos(line.b)], description="<![CDATA[ " + event + linage  + familyLinage + " ]]>")
+                connectWhere = self.folderDeath if foldermode else kml
+                pnt = connectWhere.newpoint(name=name + ntag, coords=[self.driftPos(line.b)], description="<![CDATA[ " + event + linage  + familyLinage + " ]]>")
 
                 self.gOp.Referenced.add(line.human.xref_id, 'kml-b')
-                self.gOp.Referenced.add(line.human.xref_id[1:-1], tag=pnt.id)
+                self.gOp.Referenced.add("#"+line.human.xref_id[1:-1], tag=pnt.id)
                 self.gOp.totalpeople += 1
                 if self.gOp.MapTimeLine and hasattr(line, 'whenTo') and line.whenTo: 
                     pnt.timestamp.when = line.whenTo
@@ -198,7 +240,8 @@ class KmlExporter:
             if line.a.hasLocation() and line.b.hasLocation():
                 # Put the life span description in the line
                 event  = "<br>Lifespan: {} to {}, related as {}</br>".format(timeA if timeA else "Unknown", timeB if timeB else "Unknown", desend) 
-                kml_line = kml.newlinestring(name=name, description="<![CDATA[ " + event + linage + familyLinage + " ]]>", coords=[self.driftPos(line.a), self.driftPos(line.b)])
+                connectWhere = self.folderLife if foldermode else kml
+                kml_line = connectWhere.newlinestring(name=name, description="<![CDATA[ " + event + linage + familyLinage + " ]]>", coords=[self.driftPos(line.a), self.driftPos(line.b)])
                 kml_line.linestyle.color = line.color.to_hexa()
                 # - exponential decay function for the line width - Protect the exp from overflow for very long linages because the line is in pixels
                 kml_line.linestyle.width = max( int(self.max_line_weight/math.exp(0.5*min(line.prof,100))), .1 )
@@ -222,11 +265,12 @@ class KmlExporter:
             self.gOp.totalpeople += 1
             # NOT WORKING YET
             if line.midpoints:
+                connectWhere = self.folderLife if foldermode else kml
                 for mid in line.midpoints:
                     if mid.pos and mid.pos.hasLocation():
                         whatevent = mid.what if mid.what else "Event"
                         event = "<br>{}: {}</br>".format(whatevent, mid.when if mid.when else "Unknown") 
-                        pnt = kml.newpoint(name=f"{name} ({whatevent})", coords=[self.driftPos(mid.pos)], description="<![CDATA[ " + event + " ]]>")
+                        pnt = connectWhere.newpoint(name=f"{name} ({whatevent})", coords=[self.driftPos(mid.pos)], description="<![CDATA[ " + event + " ]]>")
                         pnt.style = simplekml.Style()
                         pnt.style.labelstyle.scale = 0.7 * styleA.labelstyle.scale
                         # pnt.style.iconstyle.icon.href = f'https://maps.google.com/mapfiles/kml/paddle/wht-blank.png'
@@ -240,5 +284,5 @@ class KmlExporter:
                         _log.info    (f"    midpt   {line.name} ({mid.pos.lon}, {mid.pos.lat})")    
                     else:
                         _log.warning (f"skipping {line.name} ({mid.pos.lon}, {mid.pos.lat})")
-        self.Done()
+
 

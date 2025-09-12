@@ -5,6 +5,7 @@ import os
 import platform
 import time
 
+from typing import Union, Dict
 import configparser
 from const import OFFICECMDLINE
 from pathlib import Path
@@ -59,6 +60,8 @@ class gvOptions:
         self.AllEntities = False
         self.GridView = False
         self.UseBalloonFlyto = True
+        self.KMLsort = 1                  # 0 = none, 1 = folder
+        self.badAge = True
 
         self.showLayerControl = True
         self.mapMini = True
@@ -77,7 +80,7 @@ class gvOptions:
         self.totalpeople = None
         self.stepinfo = ''
         self.lastmax = self.counter
-        self.humans = None
+        self.humans: Union[Dict[str, Human], None] = None
         self.Referenced = None
         self.panel = None
         self.selectedpeople = 0
@@ -114,10 +117,10 @@ class gvOptions:
         self.html_keys = {'MarksOn':0, 'HeatMap':0, 'BornMark':0, 'DieMark':0,  'MarkStarOn':0, 'GroupBy':1, 
                           'UseAntPath':0, 'MapTimeLine':0, 'HeatMapTimeStep':1, 'HomeMarker':0, 'showLayerControl':0, 
                           'mapMini':0, 'MapStyle':2}
-        self.core_keys = {'UseGPS':0, 'CacheOnly':0, 'AllEntities':0, 'KMLcmdline':2, 'CSVcmdline':2, 'Tracecmdline':2}
+        self.core_keys = {'UseGPS':0, 'CacheOnly':0, 'AllEntities':0, 'KMLcmdline':2, 'CSVcmdline':2, 'Tracecmdline':2, 'badAge':0}
         self.logging_keys = ['models.human', 'models', 'ged4py.parser', 'ged4py', 'models.creator', 'gedcomoptions', 'gedcom.gedcomparser', 'gedcom', 'gedcom.gpslookup', 'geopy', 'render.kmlexporter', 'render', 'render.foliumexp', 'gedcomvisual', 'gedcomdialogs', 'gedcomvisualgui', '__main__']
         
-        self.kml_keys = {'MaxLineWeight':1, 'MaxMissing':1, 'UseBalloonFlyto':0}
+        self.kml_keys = {'MaxLineWeight':1, 'MaxMissing':1, 'UseBalloonFlyto':0, 'KMLsort':0}
         # Old settings that should be removed from the config file
         self.oldsettings = {'native': 'KML', 'born': 'KML', 'death':'KML', 'PlaceType': 'KML', 'HeatMapTimeLine': 'HTML'}
 

@@ -61,7 +61,8 @@ if __name__ == '__main__':
 
     # Display the main frame
     visualFrame.Show()
-
+    panel.SetupButtonState()
+    
     # Start the application's main event loop
     app.MainLoop()
     if panel:

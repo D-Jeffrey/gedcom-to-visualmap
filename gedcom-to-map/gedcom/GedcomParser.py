@@ -27,6 +27,13 @@ eventtags = {"EVEN" : "Event"}
 
 addrtags = ('ADR1', 'ADR2', 'ADR3', 'CITY', 'STAE', 'POST', 'CTRY')
 
+maxage = 122        # https://en.wikipedia.org/wiki/List_of_the_verified_oldest_people
+maxmotherage = 66   # https://www.oldest.org/people/mothers/
+maxfatherage = 93   # https://www.guinnessworldrecords.com/world-records/oldest-father-
+minmother = 11
+minfather = 12
+
+
 thisgvOps = None
 
 def getgdate (gstr):
@@ -66,6 +73,54 @@ def getplace(gedcomtag : Record, placetag ="PLAC"):
         return myplace.value if myplace else None
 
     return None
+
+def CheckAge(humans: Dict[str, Human], thisXrefID ):
+    ""
+    problems :list[str] = []
+    if humans[thisXrefID]:
+        thishuman = humans[thisXrefID]
+        born = None
+        died = None
+        if thishuman.birth:
+            born = thishuman.birth.whenyearnum()
+        if thishuman.death:
+            died = thishuman.death.whenyearnum()
+        if born and died:
+            if died < born:
+                problems.append("Died before Born")
+            if died - born > maxage:
+                problems.append(f"Too old {died - born} > {maxage}")
+        if thishuman.children:
+            for childId in thishuman.children:
+                if humans[childId]:
+                    child = humans[childId]
+                    if child.birth and child.birth.whenyearnum():
+                        if born:
+                            parentatage = child.birth.whenyearnum() - born
+                            if thishuman.sex == "F":
+                                if parentatage > maxmotherage:
+                                    problems.append(f"Mother too old {parentatage} > {maxmotherage} for {child.name} [{child.xref_id}]")
+                                if parentatage < minmother:
+                                    problems.append(f"Mother too young {parentatage} < {minmother} for {child.name} [{child.xref_id}]")
+                             
+                                if died and died < parentatage:
+                                    problems.append(f"Mother after death for {child.name} [{child.xref_id}]")
+                            elif thishuman.sex == "M":
+                                if parentatage > maxfatherage:
+                                    problems.append(f"Father too old {parentatage} > {maxfatherage} for {child.name} [{child.xref_id}]")
+                                if parentatage < minfather:
+                                    problems.append(f"Father too young {parentatage} < {minfather} for {child.name} [{child.xref_id}]")
+
+                                # Birth after father dies within a year
+                                if died and died+1 < parentatage:    
+                                    problems.append(f"Father after death for {child.name} [{child.xref_id}]")
+                            else:
+                                if parentatage > max(maxfatherage,maxmotherage):
+                                    problems.append(f"Parent too old {parentatage} > {max(maxfatherage,maxmotherage)} for {child.name} [{child.xref_id}]")
+                                if parentatage < min(minmother, minfather):
+                                    problems.append(f"Parent too young {parentatage} < {min(maxfatherage,maxmotherage)} for {child.name} [{child.xref_id}]")
+
+    return problems
 
 class GetPosFromTag: 
     """ build an LifeEvent, but also return the other attributes """
@@ -284,7 +339,7 @@ class GedcomParser:
     @staticmethod
     def __create_humans(records0) -> Dict[str, Human]:
         global thisgvOps
-        humans = dict()
+        humans : Dict[str, Human] = dict()
         thisgvOps.step("Reading GED", target=(thisgvOps.totalGEDpeople+thisgvOps.totalGEDfamily))
         for record in records0("INDI"):
             if thisgvOps.ShouldStop():
@@ -323,9 +378,10 @@ class GedcomParser:
                         continue
                     if husband:
                         humans[chil.xref_id].father = husband.xref_id
-                        
+                        humans[husband.xref_id].children.append(chil.xref_id)
                     if wife:
                         humans[chil.xref_id].mother = wife.xref_id
+                        humans[wife.xref_id].children.append(chil.xref_id)
                 else:
                     _log.warning("Family has missing INDI record for one of the CHIL: %s",  record.xref_id)
                 

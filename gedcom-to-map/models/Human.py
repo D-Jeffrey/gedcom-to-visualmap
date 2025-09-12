@@ -2,6 +2,7 @@ __all__ = ['Human', 'LifeEvent']
 
 import logging
 import re
+from typing import Dict, Union
 
 from models.Pos import Pos
 
@@ -108,7 +109,7 @@ class Human:
         elif self.death and self.death.pos and self.death.pos.hasLocation():
             best = self.death.pos
         return best
-
+    
 class LifeEvent:
     def __init__(self, place :str, atime, position : Pos = None, what = None):  # atime is a Record
         self.where = place
@@ -179,3 +180,4 @@ class LifeEvent:
 
     def __str__(self):
         return f"{self.getattr('where')} : {self.getattr('when')} - {self.getattr('pos')} {self.getattr('what')}"
+

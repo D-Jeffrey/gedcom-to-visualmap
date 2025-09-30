@@ -9,8 +9,8 @@ import webbrowser
 from gedcom.GedcomParser import GedcomParser
 from gedcom.gpslookup import GEDComGPSLookup
 from gedcomoptions import gvOptions
-from models.Creator import Creator, LifetimeCreator, CreatorTrace, Human
-from models.Pos import Pos
+from models.Creator import Creator, LifetimeCreator, CreatorTrace, Person
+from models.LatLon import LatLon
 from render.foliumExp import foliumExporter
 from render.KmlExporter import KmlExporter
 from render.Referenced import Referenced
@@ -22,16 +22,16 @@ _log = logging.getLogger(__name__)
 
 def gedcom_to_map(gOp : gvOptions):
     
-    humans = ParseAndGPS(gOp)
-    doKML(gOp, humans)
+    people = ParseAndGPS(gOp)
+    doKML(gOp, people)
 
-def doKML(gOp : gvOptions, humans: list[Human]):
-    if (not humans):
+def doKML(gOp : gvOptions, people: list[Person]):
+    if (not people):
         return
     kmlInstance = None
     # Save in case we overwrite
-#    for h in humans.keys():
-#        humans[h].map = humans[h].pos
+#    for h in people.keys():
+#        people[h].map = people[h].pos
 
     placeTypes = []
 #    if gOp.MarksOn:
@@ -46,22 +46,22 @@ def doKML(gOp : gvOptions, humans: list[Human]):
 
     for (key, nametag, placeType) in placeTypes:
 
-        # lifeline = LifetimeCreator(humans, gOp.MaxMissing)    
-        lifeline = Creator(humans, gOp.MaxMissing, gpstype=key) 
+        # lifeline = LifetimeCreator(people, gOp.MaxMissing)    
+        lifeline = Creator(people, gOp.MaxMissing, gpstype=key) 
         creator = lifeline.create(gOp.Main)
         if gOp.AllEntities:
             lifeline.createothers(creator)
             _log.info  ("Total of %i people.", len(creator))  
 
-        if gOp.Main not in humans:
+        if gOp.Main not in people:
             _log.error  ("Could not find your starting person: %s", gOp.Main)
             gOp.stopstep('Error could not find first person')
             return
-        gOp.setMainHuman(humans [gOp.Main])
+        gOp.setMainPerson(people [gOp.Main])
         if (not kmlInstance):
             kmlInstance = KmlExporter(gOp)
 
-        kmlInstance.export(humans[gOp.Main].pos, creator, nametag, placeType)
+        kmlInstance.export(people[gOp.Main].pos, creator, nametag, placeType)
     if kmlInstance:
         kmlInstance.Done()
         if gOp.KMLcmdline:
@@ -91,29 +91,29 @@ def doKML(gOp : gvOptions, humans: list[Human]):
 
 def Geoheatmap(gOp : gvOptions):
     
-    humans = ParseAndGPS(gOp)
-    doHTML(gOp, humans, True)
+    people = ParseAndGPS(gOp)
+    doHTML(gOp, people, True)
 
-def doHTML(gOp : gvOptions, humans, fullresult ):
+def doHTML(gOp : gvOptions, people, fullresult ):
     
-    if (not humans):
+    if (not people):
         return
     _log.debug  ("Creating Lifeline (fullresult:%s)", fullresult)
-    lifeline = LifetimeCreator(humans, gOp.MaxMissing)    
-    _log.debug  ("Creating Humans ")
+    lifeline = LifetimeCreator(people, gOp.MaxMissing)    
+    _log.debug  ("Creating People ")
     creator = lifeline.create(gOp.Main)    
-    if gOp.Main not in humans:
+    if gOp.Main not in people:
         _log.error ("Could not find your starting person: %s", gOp.Main)
         gOp.stopstep('Error could not find first person')
         return
-    gOp.setMainHuman(humans[gOp.Main])
+    gOp.setMainPerson(people[gOp.Main])
     if gOp.AllEntities:
         gOp.step('Creating life line for everyone')
         lifeline.createothers(creator)
         _log.info ("Total of %i people & events.", len(creator))   
     gOp.totalpeople = len(creator)
 
-    foliumExporter(gOp).export(humans[gOp.Main], creator, fullresult)
+    foliumExporter(gOp).export(people[gOp.Main], creator, fullresult)
     if (fullresult):
         webbrowser.open(os.path.join(gOp.resultpath, gOp.Result), new = 0, autoraise = True)
         
@@ -122,82 +122,82 @@ def doHTML(gOp : gvOptions, humans, fullresult ):
 def ParseAndGPS(gOp: gvOptions, stage: int = 0 ):
     _log.info ("Starting parsing of GEDCOM : %s (stage: %d)", gOp.GEDCOMinput, stage)
     if (stage == 0 or stage == 1):
-        if gOp.humans:
-            del gOp.humans
-            gOp.humans = None
+        if gOp.people:
+            del gOp.people
+            gOp.people = None
         if hasattr(gOp, "UpdateBackgroundEvent") and hasattr(gOp.UpdateBackgroundEvent, "updategrid"):
             gOp.UpdateBackgroundEvent.updategrid = True
-        humans = GedcomParser(gOp).create_humans()
-        gOp.humans = humans
+        people = GedcomParser(gOp).create_people()
+        gOp.people = people
     gOp.parsed = True
     gOp.goodmain = False
     if (stage == 2):
-        humans = gOp.humans
-    if (humans and gOp.UseGPS and (stage == 0 or stage == 2)):
+        people = gOp.people
+    if (people and gOp.UseGPS and (stage == 0 or stage == 2)):
         _log.info ("Starting Address to GPS resolution")
         # TODO This could cause issues
         # Check for change in the datetime of CSV
         if gOp.lookup:
             lookupresults = gOp.lookup
         else:
-            lookupresults = GEDComGPSLookup(humans, gOp)
+            lookupresults = GEDComGPSLookup(people, gOp)
             _log.info ("Completed Geocode")
             gOp.lookup = lookupresults
-        lookupresults.resolve_addresses(humans)
+        lookupresults.resolve_addresses(people)
         gOp.step('Saving Address Cache')
         lookupresults.saveAddressCache()
         _log.info ("Completed resolves")
     
-    if humans and (not gOp.Main or not gOp.Main in list(humans.keys())):
-            gOp.set('Main', list(humans.keys())[0])
-            _log.info ("Using starting person: %s (%s)", humans[gOp.Main].name, gOp.Main)
+    if people and (not gOp.Main or not gOp.Main in list(people.keys())):
+            gOp.set('Main', list(people.keys())[0])
+            _log.info ("Using starting person: %s (%s)", people[gOp.Main].name, gOp.Main)
     
-    return humans
+    return people
 
 def doTrace(gOp : gvOptions):
     
     gOp.Referenced = Referenced()
     gOp.totalpeople = 0
     
-    if not gOp.humans:
-        _log.error ("Trace:References no humans.")
+    if not gOp.people:
+        _log.error ("Trace:References no people.")
         return
-    humans = gOp.humans
-    if gOp.Main not in humans:
+    people = gOp.people
+    if gOp.Main not in people:
         _log.error  ("Trace:Could not find your starting person: %s", gOp.Main)
         return
     gOp.Referenced.add(gOp.Main)
-    lifeline = CreatorTrace(humans)
-    #for h in humans.keys():
+    lifeline = CreatorTrace(people)
+    #for h in people.keys():
     creator = lifeline.create(gOp.Main)
 
     _log.info  ("Trace:Total of %i people.", len(creator)) 
     if  creator:
         for c in creator:
-            gOp.Referenced.add(c.human.xref_id,tag=c.path)
+            gOp.Referenced.add(c.person.xref_id,tag=c.path)
 
 # Trace from the main person to this ID
-def doTraceTo(gOp : gvOptions, ToID : Human):
+def doTraceTo(gOp : gvOptions, ToID : Person):
     if not gOp.Referenced:
         doTrace(gOp)
-    humans = gOp.humans
+    people = gOp.people
     heritage = []
-    heritage = [("", gOp.mainHuman.name, gOp.mainHuman.refyear()[0], gOp.mainHuman.xref_id)]
+    heritage = [("", gOp.mainPerson.name, gOp.mainPerson.refyear()[0], gOp.mainPerson.xref_id)]
     if gOp.Referenced.exists(ToID.xref_id):
         personRelated = gOp.Referenced.gettag(ToID.xref_id)
-        humanTrace = gOp.mainHuman
+        personTrace = gOp.mainPerson
         if personRelated:    
             for r in personRelated:
                 if r == "F":
-                    humanTrace = humans[humanTrace.father]
+                    personTrace = people[personTrace.father]
                     tag = "Father"
                 elif r == "M":
-                    humanTrace = humans[humanTrace.mother]
+                    personTrace = people[personTrace.mother]
                     tag = "Mother"
                 else:
                     _log.error("doTrace - neither Father or Mother, how did we get here?")
                     tag = "?????"
-                heritage.append((f"[{tag}]",humanTrace.name, humanTrace.refyear()[0], humanTrace.xref_id))
+                heritage.append((f"[{tag}]",personTrace.name, personTrace.refyear()[0], personTrace.xref_id))
     else:
         heritage.append([("NotDirect", ToID.name)])
     gOp.heritage = heritage

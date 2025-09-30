@@ -9,7 +9,7 @@ import re
 import simplekml as simplekml
 from gedcomoptions import gvOptions
 from models.Line import Line
-from models.Pos import Pos
+from models.LatLon import LatLon
 from render.Referenced import Referenced
 
 _log = logging.getLogger(__name__.lower())
@@ -31,7 +31,7 @@ class KmlExporter:
         self.styles = []
             
 
-    def driftPos(self, l : Pos):
+    def driftLatLon(self, l : LatLon):
         if not l or not self.driftOn:
             return l
         return ((float(l.lon)+(random.random() * 0.001) - 0.0005), float(l.lat)+(random.random() * 0.001) - 0.0005)
@@ -67,7 +67,7 @@ class KmlExporter:
         self.kml.save(self.file_name)
         # self.gOp.stop()
         # self.kml = None
-    def export(self, main: Pos, lines: list[Line], ntag ="", mark="native"):
+    def export(self, main: LatLon, lines: list[Line], ntag ="", mark="native"):
         foldermode = self.gOp.KMLsort == 1
         # marker types are : 
         #           diamond, square, circle, blank, stars
@@ -163,32 +163,33 @@ class KmlExporter:
             timeA = line.whenFrom if hasattr(line, 'whenFrom') and line.whenFrom else None
             timeB = line.whenTo if hasattr(line, 'whenTo') and line.whenTo else None
             
-            if line.human.father:
+            if line.person.father:
                 if self.gOp.UseBalloonFlyto:
-                    linage += '<br>Father: <a href=#{};balloonFlyto>{}</a></br>'.format(line.human.father[1:-1],self.gOp.humans[line.human.father].name)    
+                    linage += '<br>Father: <a href=#{};balloonFlyto>{}</a></br>'.format(line.person.father[1:-1],self.gOp.people[line.person.father].name)    
                 else:
-                    linage += '<br>Father: {}</br>'.format(self.gOp.humans[line.human.father].name)
-            if line.human.mother:
+                    linage += '<br>Father: {}</br>'.format(self.gOp.people[line.person.father].name)
+            if line.person.mother:
                 if self.gOp.UseBalloonFlyto:
-                    linage += '<br>Mother: <a href=#{};balloonFlyto>{}</a></br>'.format(line.human.mother[1:-1],self.gOp.humans[line.human.mother].name)
+                    linage += '<br>Mother: <a href=#{};balloonFlyto>{}</a></br>'.format(line.person.mother[1:-1],self.gOp.people[line.person.mother].name)
                 else:
-                    linage += '<br>Mother: {}</br>'.format(self.gOp.humans[line.human.mother].name)
+                    linage += '<br>Mother: {}</br>'.format(self.gOp.people[line.person.mother].name)
             family = []
-            thisparent = line.human.xref_id
+            familyLinage = ""
+            thisparent = line.person.xref_id
 
-            for c in self.gOp.humans:
-                if self.gOp.humans[c].father == thisparent or self.gOp.humans[c].mother == thisparent:
+            for c in self.gOp.people:
+                if self.gOp.people[c].father == thisparent or self.gOp.people[c].mother == thisparent:
                     family.append(c)
             if family:
                 if self.gOp.UseBalloonFlyto:
                     # Format each child as a clickable link
                     family_links = [
-                        f'<a href=#{child[1:-1]};balloonFlyto>{self.gOp.humans[child].name}</a>'
+                        f'<a href=#{child[1:-1]};balloonFlyto>{self.gOp.people[child].name}</a>'
                         for child in family
                     ]
                     familyLinage = '<br>Children: {}</br>'.format(", ".join(family_links))
                 else:
-                    family_names = [self.gOp.humans[child].name for child in family]
+                    family_names = [self.gOp.people[child].name for child in family]
                     familyLinage = '<br>Children: {}</br>'.format(", ".join(family_names))
 
             
@@ -205,9 +206,9 @@ class KmlExporter:
                 
             if line.a.hasLocation() and mark in ['birth']:
                 connectWhere = self.folderBirth if foldermode else kml
-                pnt = connectWhere.newpoint(name=name + ntag, coords=[self.driftPos(line.a)], description="<![CDATA[ " + event + linage + familyLinage + " ]]>")
-                self.gOp.Referenced.add(line.human.xref_id, 'kml-a',tag=pnt.id)
-                self.gOp.Referenced.add("#"+line.human.xref_id[1:-1], tag=pnt.id)
+                pnt = connectWhere.newpoint(name=name + ntag, coords=[self.driftLatLon(line.a)], description="<![CDATA[ " + event + linage + familyLinage + " ]]>")
+                self.gOp.Referenced.add(line.person.xref_id, 'kml-a',tag=pnt.id)
+                self.gOp.Referenced.add("#"+line.person.xref_id[1:-1], tag=pnt.id)
                 if self.gOp.MapTimeLine and hasattr(line, 'whenFrom') and line.whenFrom: 
                     pnt.timestamp.when = line.whenFrom
             
@@ -221,10 +222,10 @@ class KmlExporter:
                 
             if line.b.hasLocation() and mark in ['death']:
                 connectWhere = self.folderDeath if foldermode else kml
-                pnt = connectWhere.newpoint(name=name + ntag, coords=[self.driftPos(line.b)], description="<![CDATA[ " + event + linage  + familyLinage + " ]]>")
+                pnt = connectWhere.newpoint(name=name + ntag, coords=[self.driftLatLon(line.b)], description="<![CDATA[ " + event + linage  + familyLinage + " ]]>")
 
-                self.gOp.Referenced.add(line.human.xref_id, 'kml-b')
-                self.gOp.Referenced.add("#"+line.human.xref_id[1:-1], tag=pnt.id)
+                self.gOp.Referenced.add(line.person.xref_id, 'kml-b')
+                self.gOp.Referenced.add("#"+line.person.xref_id[1:-1], tag=pnt.id)
                 self.gOp.totalpeople += 1
                 if self.gOp.MapTimeLine and hasattr(line, 'whenTo') and line.whenTo: 
                     pnt.timestamp.when = line.whenTo
@@ -241,7 +242,7 @@ class KmlExporter:
                 # Put the life span description in the line
                 event  = "<br>Lifespan: {} to {}, related as {}</br>".format(timeA if timeA else "Unknown", timeB if timeB else "Unknown", desend) 
                 connectWhere = self.folderLife if foldermode else kml
-                kml_line = connectWhere.newlinestring(name=name, description="<![CDATA[ " + event + linage + familyLinage + " ]]>", coords=[self.driftPos(line.a), self.driftPos(line.b)])
+                kml_line = connectWhere.newlinestring(name=name, description="<![CDATA[ " + event + linage + familyLinage + " ]]>", coords=[self.driftLatLon(line.a), self.driftLatLon(line.b)])
                 kml_line.linestyle.color = line.color.to_hexa()
                 # - exponential decay function for the line width - Protect the exp from overflow for very long linages because the line is in pixels
                 kml_line.linestyle.width = max( int(self.max_line_weight/math.exp(0.5*min(line.prof,100))), .1 )
@@ -270,7 +271,7 @@ class KmlExporter:
                     if mid.pos and mid.pos.hasLocation():
                         whatevent = mid.what if mid.what else "Event"
                         event = "<br>{}: {}</br>".format(whatevent, mid.when if mid.when else "Unknown") 
-                        pnt = connectWhere.newpoint(name=f"{name} ({whatevent})", coords=[self.driftPos(mid.pos)], description="<![CDATA[ " + event + " ]]>")
+                        pnt = connectWhere.newpoint(name=f"{name} ({whatevent})", coords=[self.driftLatLon(mid.pos)], description="<![CDATA[ " + event + " ]]>")
                         pnt.style = simplekml.Style()
                         pnt.style.labelstyle.scale = 0.7 * styleA.labelstyle.scale
                         # pnt.style.iconstyle.icon.href = f'https://maps.google.com/mapfiles/kml/paddle/wht-blank.png'

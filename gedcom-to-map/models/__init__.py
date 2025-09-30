@@ -3,22 +3,22 @@ models package initialization.
 
 Contains data structures and utilities for rendering visual maps
 from GEDCOM data, including color schemes, positional logic,
-and human representation.
+and person representation.
 """
 
 from .Color import Color
 from .Creator import Creator
-from .Human import Human
+from .Person import Person
 from .Line import Line
-from .Pos import Pos
+from .LatLon import LatLon
 from .Rainbow import Rainbow
 
 __all__ = [
     "Color",
     "Creator",
-    "Human",
+    "Person",
     "Line",
-    "Pos",
+    "LatLon",
     "Rainbow"
 ]
 

@@ -1,10 +1,10 @@
-__all__ = ['Human', 'LifeEvent']
+__all__ = ['Person', 'LifeEvent']
 
 import logging
 import re
 from typing import Dict, Union
 
-from models.Pos import Pos
+from models.LatLon import LatLon
 
 _log = logging.getLogger(__name__.lower())
 
@@ -33,19 +33,19 @@ def DateFromField(field):
 class Partner:
     def __init__(self, xref_id, pos):
         self.xref_id = xref_id
-        self.pos :Pos = pos
+        self.pos :LatLon = pos
     def __str__(self):
-        return f"Human(id={self.xref_id}, Pos={self.pos})"
+        return f"Person(id={self.xref_id}, LatLon={self.pos})"
  
-class Human:
+class Person:
     __slots__ = ['xref_id', 'name', 'father', 'mother', 'pos', 'birth', 'death', 'marriage', 'home', 'first', 
                  'surname', 'maiden','sex','title', 'photo', 'children', 'partners', 'age']
     def __init__(self, xref_id):
         self.xref_id: str = xref_id
         self.name = None
-        self.father : Human = None
-        self.mother : Human = None
-        self.pos : Pos = None           # save the best postion
+        self.father : Person = None
+        self.mother : Person = None
+        self.pos : LatLon = None           # save the best postion
         self.birth : LifeEvent = None
         self.death : LifeEvent = None
         # TODO need to deal with multiple mariages
@@ -65,7 +65,7 @@ class Human:
 
 
     def __str__(self) -> str:
-        return f"Human(id={self.xref_id}, name={self.name})"
+        return f"Person(id={self.xref_id}, name={self.name})"
         
     def __repr__(self) -> str:
         return f"[ {self.xref_id} : {self.name} - {self.father} & {self.mother} - {self.pos} ]"
@@ -98,10 +98,10 @@ class Human:
             ]
         return best
 
-    def bestPos(self):
+    def bestLatLon(self):
         # TODO Best Location should consider if in KML mode and what is selected  
         # If the location is set in the GED, using MAP attribute then that will be the best
-        best = Pos(None, None)
+        best = LatLon(None, None)
 #        if self.map and self.map.pos.hasLocation():
 #            best = self.map.pos
         if self.birth and self.birth.pos and self.birth.pos.hasLocation():
@@ -111,7 +111,7 @@ class Human:
         return best
     
 class LifeEvent:
-    def __init__(self, place :str, atime, position : Pos = None, what = None):  # atime is a Record
+    def __init__(self, place :str, atime, position : LatLon = None, what = None):  # atime is a Record
         self.where = place
         self.when = atime
         self.pos = position

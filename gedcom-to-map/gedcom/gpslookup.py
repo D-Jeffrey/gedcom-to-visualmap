@@ -7,11 +7,13 @@ import csv
 import hashlib
 import json
 import os.path
+from pathlib import Path
 import re
 import tempfile
 import time
 import requests
 import platform
+from typing import Optional, Tuple, Dict, List
 from datetime import datetime
 
 from const import GV_COUNTRIES_JSON, GV_STATES_JSON, GEOCODEUSERAGENT
@@ -20,8 +22,9 @@ import certifi
 import ssl
 import geopy.geocoders
 from geopy.geocoders import Nominatim
-from models.Human import Human, LifeEvent
-from models.Pos import Pos
+from models.Person import Person, LifeEvent
+from models.LatLon import LatLon
+
 
 
 
@@ -91,14 +94,14 @@ class WordXlator(Xlator):
           r'\b'+r'\b|\b'.join(map(re.escape, self.keys(  )))+r'\b')
     
 class GEDComGPSLookup:
-    def __init__(self, humans,  gvO: gvOptions):
+    def __init__(self, people,  gvO: gvOptions):
 
         self.addresses = None
         self.addresslist = None
         self.usecacheonly = gvO.get('CacheOnly')
         self.gOptions = gvO 
         self.orgMD5 = None
-        self.humans = humans
+        self.people = people
         self.countrieslist = None
         self.Geoapp = None
         
@@ -113,8 +116,8 @@ class GEDComGPSLookup:
         self.totaladdr = 0
       
         # This pulls from the same directory as GEDCOM file
-        if gvO.resultpath:
-            cachefile = os.path.join(gvO.resultpath, cache_filename[0])
+        if self.gOptions.resultpath:
+            cachefile = os.path.join(self.gOptions.resultpath, cache_filename[0])
             self.gOptions.set('gpsfile', cachefile )     
             if os.path.exists(cachefile):
           
@@ -132,7 +135,7 @@ class GEDComGPSLookup:
                         _log.error  ('Error reading GPS cache file %s, line %d: %s', cache_filename[0], readfrom.line_num, e)
              
         if (self.addresslist):
-            gvO.step('Loading Geocode Cache')
+            self.gOptions.step('Loading Geocode Cache')
             self.addresses = dict()
             
             self.addressalt = dict()
@@ -207,8 +210,8 @@ class GEDComGPSLookup:
                     self.used += 1
                     self.totaladdr += self.addresses[xaddr]['used']
                     if (self.addresses[xaddr]['lat'] is None): self.usedNone += 1
-        
-        self.stats = f"Unique addresses: {self.used} with unresolvable: {self.usedNone}"
+        hit = 1-(self.usedNone / self.used) if self.used > 0 else 0
+        self.stats = f"Unique addresses: {self.used} with unresolvable: {self.usedNone}\nAddress hit rate {hit:.1%}\n"
         
 
     def saveAddressCache(self):
@@ -230,59 +233,59 @@ class GEDComGPSLookup:
         if self.addresses:
             resultpath = self.gOptions.resultpath
             self.gOptions.step("Saving GPS Cache", resetCounter=False)
-            n[0] = os.path.join(resultpath,cache_filename[0])                        
-            n[1] = os.path.join(resultpath,cache_filename[1])
-            n[2] = os.path.join(resultpath,cache_filename[2])
-            if (os.path.exists(os.path.join(resultpath,cache_filename[0]))):
-                if (os.path.exists(os.path.join(resultpath,cache_filename[1]))):
-                    if (os.path.exists(os.path.join(resultpath,cache_filename[2]))):
-                        try:
-                            os.remove(n[2])
-                        except:
-                            _log.error("removing %s", n[2])
-                    try:
-                        os.rename(n[1], n[2])
-                    except:
-                        _log.error("renaming %s", n[1])
+            # Rotate cache files for backup
+            cache_files = [os.path.join(resultpath, fname) for fname in cache_filename]
+            # Remove oldest backup if it exists
+            if os.path.exists(cache_files[2]):
                 try:
-                    os.rename(n[0], n[1])
-                except:
-                    _log.error("renaming %s", n[0])
-            self.gOptions.set('gpsfile', n[0])     
-            with open(n[0], "w", newline='', encoding='utf-8') as csvfile:
-                
-                csvwriter = csv.writer(csvfile, dialect='excel' )
-                csvwriter.writerow(csvheader)
-                
-                for xaddr in self.addresses.keys():
-                    # TODO Short term fix
-                    if self.addresses[xaddr]['boundry']:
-                        for i in (range(0,len(self.addresses[xaddr]['boundry']))):
-                            self.addresses[xaddr]['boundry'][i] = float(self.addresses[xaddr]['boundry'][i])
-                    if self.addresses[xaddr]['size'] is None or self.addresses[xaddr]['size'] == '':
-                        boundrybox = self.addresses[xaddr]['boundry']
-                        if boundrybox:
-                            self.addresses[xaddr]['size'] = abs(boundrybox[1]-boundrybox[0]) * abs(boundrybox[3]-boundrybox[2])*1000000
-                        else:
-                            self.addresses[xaddr]['size'] = None
-                    # TODO deal with Unicode names???
+                    os.remove(cache_files[2])
+                except Exception as e:
+                    _log.error(f"Error removing {cache_files[2]}: {e}")
+            # Shift backups
+            for i in [1, 0]:
+                if os.path.exists(cache_files[i]):
+                    try:
+                        os.rename(cache_files[i], cache_files[i+1])
+                    except Exception as e:
+                        _log.error(f"Error renaming {cache_files[i]} to {cache_files[i+1]}: {e}")
+            self.gOptions.set('gpsfile', cache_files[0])
 
-                    r = [self.addresses[xaddr]['name'], 
-                         self.addresses[xaddr]['alt'], 
-                         self.addresses[xaddr]['country'],
-                         self.addresses[xaddr]['type'],
-                         self.addresses[xaddr]['class'],
-                         self.addresses[xaddr]['icon'],
-                         self.addresses[xaddr]['place_id'],
-                         self.addresses[xaddr]['lat'], 
-                         self.addresses[xaddr]['long'],
-                         self.addresses[xaddr]['boundry'],
-                         self.addresses[xaddr]['size'],
-                         self.addresses[xaddr]['importance'],
-                         self.addresses[xaddr]['used']
-                         ]
-                    
-                    csvwriter.writerow(r)
+            # Prepare the cache file path
+            cache_file_path = os.path.join(resultpath, cache_filename[0])
+            with open(cache_file_path, "w", newline='', encoding='utf-8') as csvfile:
+                writer = csv.DictWriter(csvfile, fieldnames=csvheader, dialect='excel')
+                writer.writeheader()
+
+                for addr_key, addr in self.addresses.items():
+                    # Ensure boundary values are floats
+                    if addr['boundry']:
+                        addr['boundry'] = [float(b) for b in addr['boundry']]
+
+                    # Calculate size if missing
+                    if addr['size'] is None or addr['size'] == '':
+                        boundry = addr['boundry']
+                        if boundry and len(boundry) == 4:
+                            addr['size'] = abs(boundry[1] - boundry[0]) * abs(boundry[3] - boundry[2]) * 1_000_000
+                        else:
+                            addr['size'] = None
+
+                    # Prepare row for writing
+                    row = {
+                        'name': addr['name'],
+                        'alt': addr['alt'],
+                        'country': addr['country'],
+                        'type': addr['type'],
+                        'class': addr['class'],
+                        'icon': addr['icon'],
+                        'place_id': addr['place_id'],
+                        'lat': addr['lat'],
+                        'long': addr['long'],
+                        'boundry': addr['boundry'],
+                        'size': addr['size'],
+                        'importance': addr['importance'],
+                        'used': addr['used']
+                    }
+                    writer.writerow(row)
             _log.debug("GPS Cache saved")    
                 
         self.updatestats()
@@ -351,7 +354,7 @@ class GEDComGPSLookup:
         #        _log.debug(" !Large location for: {} ({})".format(self.addresses[name]['name'], self.addresses[name]['size']))
         self.addresses[name]['used'] += 1
         # This large areas maps the trace look wrong, because they are most likely a state or provience.  Flag them to the user.
-        return Pos(self.addresses[name]['lat'], self.addresses[name]['long'])
+        return LatLon(self.addresses[name]['lat'], self.addresses[name]['long'])
     
     def lookupaddresses(self, myaddress, addressdepth=0):
         self.gOptions.step(info=myaddress, resetCounter=False)  
@@ -441,7 +444,7 @@ class GEDComGPSLookup:
             if self.addresses and theaddress.lower() in self.addresses.keys():
                 _log.debug ("#BBefore ??? %s\n\t%s\n\t%s", theaddress.lower() in self.addresses.keys(), self.addresses[addressindex]['name'], self.addresses[addressindex]['alt'])
             if (self.usecacheonly):
-                return (Pos(None,None))
+                return (LatLon(None,None))
             usedGeocode = False
             if (len(theaddress)>0):
                 _log.debug(":Lookup: %s +within+ %s::", theaddress, trycountry)
@@ -491,10 +494,10 @@ class GEDComGPSLookup:
           
             if location:
                 return self.returnandcount(locrec['name'])
-        return Pos(None,None)
+        return LatLon(None,None)
      
    
-    def resolve_addresses(self, humans):
+    def resolve_addresses(self, people):
         donesome = 0
         nowis =  datetime.now()
         # Update the Grid in 60 seconds if we are still doing this loop
@@ -504,36 +507,36 @@ class GEDComGPSLookup:
         self.Geoapp = Nominatim(user_agent=self.geocodeUserAgent)  
         self.gOptions.step("Lookup addresses")
         target = 0
-        for human in humans:
-            ho = humans[human]
+        for person in people:
+            ho = people[person]
             if ho:
                 target += (1 if (ho.birth and ho.birth.where) else 0) + (1 if ho.death and ho.death.where else 0)
                 if ho.home:
                     target += len(ho.home)
         self.gOptions.step("Lookup addresses", target=target)
         gpsstep = 0
-        for human in humans:
+        for person in people:
             if self.gOptions.ShouldStop():
                 self.saveAddressCache()
                 break
 
-            human_obj = humans[human]
+            person_obj = people[person]
         
             # Resolve birth address
-            if human_obj.birth and human_obj.birth.where:
-                human_obj.birth.pos = self.lookupaddresses(human_obj.birth.where)
-                _log.debug(f"{human_obj.name:30} @ B {human_obj.birth.where:60} = {human_obj.birth.pos}")
+            if person_obj.birth and person_obj.birth.where:
+                person_obj.birth.pos = self.lookupaddresses(person_obj.birth.where)
+                _log.debug(f"{person_obj.name:30} @ B {person_obj.birth.where:60} = {person_obj.birth.pos}")
         
             # Resolve home address
-            if human_obj.home:
-                for home in human_obj.home:
+            if person_obj.home:
+                for home in person_obj.home:
                     if home.where:
                         home.pos = self.lookupaddresses(home.where)
         
             # Resolve death address
-            if human_obj.death and human_obj.death.where:
-                human_obj.death.pos = self.lookupaddresses(human_obj.death.where)
-                _log.debug(f"{human_obj.name:30} @ D {human_obj.death.where:60} = {human_obj.death.pos}")
+            if person_obj.death and person_obj.death.where:
+                person_obj.death.pos = self.lookupaddresses(person_obj.death.where)
+                _log.debug(f"{person_obj.name:30} @ D {person_obj.death.where:60} = {person_obj.death.pos}")
             if self.addresses:
                 if len(self.addresses) - donesome > 512 or datetime.now().timestamp() - nowis.timestamp() > 300:  # Every 5 minutes or 512 addresses save Addresses
                     _log.info(f"************** Saving cache {donesome} {len(self.addresses)}")
@@ -542,7 +545,7 @@ class GEDComGPSLookup:
                     nowis =  datetime.now()
             if startis < datetime.now().timestamp():
                 BackgroundProcess.updategrid = True
-                BackgroundProcess.updateinfo= f"Updating with {len(humans)} people while resolving some addresses ({len(self.addresses)})" 
+                BackgroundProcess.updateinfo= f"Updating with {len(people)} people while resolving some addresses ({len(self.addresses)})" 
                 startis = datetime.now().timestamp() + 60  # update again in a minutes
 
             # Hack Step info because when we redraw the grid they overlap

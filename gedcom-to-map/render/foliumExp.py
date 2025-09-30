@@ -14,7 +14,7 @@ from folium.plugins import (AntPath, FloatImage, GroupedLayerControl,
                             HeatMapWithTime, MiniMap, Search, MarkerCluster) 
 from gedcomoptions import gvOptions
 from models.Line import Line
-from models.Pos import Pos
+from models.LatLon import LatLon
 from render.Referenced import Referenced
 from render.naming import simplifyLastName, soundex
 from models.Creator import DELTA
@@ -113,7 +113,7 @@ class MyMarkClusters:
         self.mymap = mymap
         self.step = step
 
-    def mark (self, spot : Pos, when=None):
+    def mark (self, spot : LatLon, when=None):
         if spot and spot.hasLocation():
             cnt = 1
             if (when):
@@ -204,15 +204,15 @@ class foliumExporter:
         if line.style == 'Life':
             fancy_name = f"{line.style} of {self._pureName(line.name)}"
         else:
-            parent_name = line.parentofhuman.name if line.parentofhuman else ''
+            parent_name = line.parentofperson.name if line.parentofperson else ''
             fancy_name = f"{self._pureName(line.name)} {line.style} of {parent_name}"
 
         if birth_info or death_info:
             fancy_name = f"{fancy_name}<br>{birth_info} {death_info}"
 
         popup = f"<div style='min-width: 150px'>{fancy_name}</div>"
-        if line.human.photo:
-            popup += f"<img src='{line.human.photo}' width='150'>"
+        if line.person.photo:
+            popup += f"<img src='{line.person.photo}' width='150'>"
         return popup
 
     def _add_point_marker(self, fg: folium.FeatureGroup, point: list, options: dict, 
@@ -271,13 +271,13 @@ class foliumExporter:
         minyear = maxyear = None
         
         # Add birth location if available
-        if line.human.birth and line.human.birth.pos:
-            mycluster.mark(line.human.birth.pos, line.human.birth.whenyearnum())
-            minyear = line.human.birth.whenyearnum()
+        if line.person.birth and line.person.birth.pos:
+            mycluster.mark(line.person.birth.pos, line.person.birth.whenyearnum())
+            minyear = line.person.birth.whenyearnum()
         
         # Add death year if available
-        if line.human.death and line.human.death.when:
-            maxyear = line.human.death.whenyearnum(True)
+        if line.person.death and line.person.death.when:
+            maxyear = line.person.death.whenyearnum(True)
         else:
             # Process midpoints for min/max year determination
             for mids in line.midpoints:
@@ -295,9 +295,9 @@ class foliumExporter:
         if not (minyear and maxyear):
             return
             
-        activepos = Pos(None, None)
-        if line.human.birth and line.human.birth.pos:
-            activepos = line.human.birth.pos
+        activepos = LatLon(None, None)
+        if line.person.birth and line.person.birth.pos:
+            activepos = line.person.birth.pos
             
         for year in range(minyear, maxyear):
             # Update active position if we have a midpoint for this year
@@ -335,13 +335,13 @@ class foliumExporter:
             if not (hasattr(line, 'style') and line.style == 'Life'):
                 continue
                 
-            self.gOptions.Referenced.add(line.human.xref_id, 'heat')
+            self.gOptions.Referenced.add(line.person.xref_id, 'heat')
             minyear, maxyear = self._process_timeline_data(line, mycluster)
             self._build_yearly_positions(line, minyear, maxyear, mycluster)
             
             # Add death location if available
-            if line.human.death and line.human.death.pos:
-                mycluster.mark(line.human.death.pos, line.human.death.whenyearnum())
+            if line.person.death and line.person.death.pos:
+                mycluster.mark(line.person.death.pos, line.person.death.whenyearnum())
 
         # Extract unique years from markers
         years = sorted(set(
@@ -415,7 +415,7 @@ class foliumExporter:
         fm.add_child(fg)
 
     # In the export method, replace the heatmap section with:
-    def export(self, main: Pos,  lines: list[Line], saveresult = True):
+    def export(self, main: LatLon,  lines: list[Line], saveresult = True):
         
         if not self.fm:
             # if (self.gOptions.MapStyle < 1 or self.gOptions.MapStyle > len(backTypes)):
@@ -425,11 +425,11 @@ class foliumExporter:
                 tile = xyz.query_name(self.gOptions.MapStyle)
             except Exception as e:
                 tile = xyz.CartoDB
-            if (self.gOptions.humans and self.gOptions.mainHumanPos and self.gOptions.mainHumanPos.isNone()):
+            if (self.gOptions.people and self.gOptions.mainPersonLatLon and self.gOptions.mainPersonLatLon.isNone()):
                 self.fm = folium.Map(location=[0, 0], zoom_start=4, tiles= tile)
             else:
-                lat = float(self.gOptions.mainHumanPos.lat)
-                lon = float(self.gOptions.mainHumanPos.lon)
+                lat = float(self.gOptions.mainPersonLatLon.lat)
+                lon = float(self.gOptions.mainPersonLatLon.lon)
                 self.fm = folium.Map(location=[lat,lon], zoom_start=4, tiles = tile)
             if (self.gOptions.mapMini):
                 folium.plugins.MiniMap(toggle_display=True).add_to(self.fm)
@@ -441,11 +441,11 @@ class foliumExporter:
             _log.debug  ("Building Referenced - quick only: %s", not saveresult)
             for line in lines:
                 if (hasattr(line,'style') and line.style == 'Life'):
-                    self.gOptions.Referenced.add(line.human.xref_id, 'quick')
+                    self.gOptions.Referenced.add(line.person.xref_id, 'quick')
             self.gOptions.lastlines = {}
             # make a Dict array of lines 
             for line in lines:
-                self.gOptions.lastlines[line.human.xref_id] = line
+                self.gOptions.lastlines[line.person.xref_id] = line
             if (not saveresult):
                 return
 
@@ -499,7 +499,7 @@ class foliumExporter:
         for line in styled_lines:
             _log.info(f"{line.prof * ((line.branch/DELTA)+1)+ line.prof:8f} {line.path:8} "
                      f"{line.branch:.8f} {line.prof:2} "
-                     f"{line.parentofhuman.name if line.parentofhuman else '':20} from {line.name:20}")
+                     f"{line.parentofperson.name if line.parentofperson else '':20} from {line.name:20}")
 
         for line in styled_lines:
             self.gOptions.step()
@@ -513,8 +513,8 @@ class foliumExporter:
             group_name = lgd_txt.format(txt=label_name, col=marker_options['line_color'])
             
             # Generate popup content
-            birth_info = f"{line.human.birth.whenyear()} (Born)" if line.human.birth and line.human.birth.when else ''
-            death_info = f"{line.human.death.whenyear()} (Died)" if line.human.death and line.human.death.when else ''
+            birth_info = f"{line.person.birth.whenyear()} (Born)" if line.person.birth and line.person.birth.when else ''
+            death_info = f"{line.person.death.whenyear()} (Died)" if line.person.death and line.person.death.when else ''
             popup_content = self._create_popup_content(line, birth_info, death_info)
 
             # Initialize feature group
@@ -523,9 +523,9 @@ class foliumExporter:
 
             # Determine feature group based on sorting options
             if SortByLast:
-                fg = self.getFeatureGroup(line.human.surname, line.prof)
+                fg = self.getFeatureGroup(line.person.surname, line.prof)
             if SortByPerson:
-                parent_name = line.parentofhuman.name if line.parentofhuman else line.human.name
+                parent_name = line.parentofperson.name if line.parentofperson else line.person.name
                 fg = self.getFeatureGroup(parent_name, line.prof)
             if not fg:
                 fg = folium.FeatureGroup(name=group_name, show=True)

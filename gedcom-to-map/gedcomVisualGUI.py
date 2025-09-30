@@ -22,7 +22,7 @@ import time
 from datetime import datetime
 import webbrowser
 from warnings import catch_warnings
-from models.Human import Human
+from models.Person import Person
 from gedcom.GedcomParser import CheckAge 
 from typing import Dict, Union
 
@@ -181,7 +181,7 @@ class VisualMapFrame(wx.Frame):
         self.makeMenuBar()
         # and a status bar
         
-        self.StatusBar.SetFieldsCount(number=2, widths=[-1, 12*GVFONT[1]])
+        self.StatusBar.SetFieldsCount(number=2, widths=[-1, 22*GVFONT[1]])
         self.SetStatusText("Visual Mapping ready",0)
         self.myFont = wx.Font(wx.FontInfo(GVFONT[1]).FaceName(GVFONT[0]))
         # TODO Check for Arial and change it
@@ -369,20 +369,25 @@ class VisualMapFrame(wx.Frame):
 
         withoutaddr = 0
         msg = ""
-        if hasattr(panel.gO, 'humans') and panel.gO.humans:
-            # for xh in panel.gO.humans.keys():
-            #    if (panel.gO.humans[xh].bestlocation() == ''): 
+        if hasattr(panel.gO, 'people') and panel.gO.people:
+            # for xh in panel.gO.people.keys():
+            #    if (panel.gO.people[xh].bestlocation() == ''): 
             #        withoutaddr += 1
-            # msg = f'Total People :\t{len(panel.gO.humans)}\n People without any address {withoutaddr}'
-            msg = f'Total People :{len(panel.gO.humans)}'
+            # msg = f'Total People :\t{len(panel.gO.people)}\n People without any address {withoutaddr}'
+            msg = f'Total People :{len(panel.gO.people)}'
         else:
             msg = "No people loaded yet"
-        msg = msg + '\n'
+        msg += '\n'
         if hasattr(panel.gO, 'lookup') and hasattr(panel.gO.lookup, 'addresses') and panel.gO.lookup.addresses:
-            msg = msg + f'Total cached addresses :{len(panel.gO.lookup.addresses)}\n' +  panel.gO.lookup.stats
+            msg += f'\nTotal cached addresses: {len(panel.gO.lookup.addresses)}\n' +  panel.gO.lookup.stats
+        if panel.gO.timeframe:
+            timeline = "-".join(map(str, panel.gO.timeframe))
+            msg +=  f"\nTimeframe : {timeline}"
+        if panel.gO.selectedpeople > 0:
+            msg += f"\nDirect  people {panel.gO.selectedpeople} in the heritage line"
             
         else:
-            msg = msg + "No address in cache"
+            msg += "\nNo address in cache"
             
         wx.MessageBox (msg, 'Statistics', wx.OK|wx.ICON_INFORMATION)
     def OnFind(self, event):
@@ -460,7 +465,7 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
     def SetGOp(self, gOp):
         self.gO = gOp
 
-    def PopulateList(self, humans, mainperson, loading):
+    def PopulateList(self, people, mainperson, loading):
         global panel
         if self.active:
             return
@@ -486,23 +491,24 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
             # TODO BUG neithe of these clear the sort indicator
             
         selectperson = 0
-        if (not humans):
+        if (not people):
             self.active = False
             return
         
         if (loading):
             index = 0
-            for h in humans:
-                if hasattr(humans[h], 'name'):
-                    d, y = humans[h].refyear()
-                    (location, where) = humans[h].bestlocation()
+            for h in people:
+                if hasattr(people[h], 'name'):
+                    d, y = people[h].refyear()
+                    (location, where) = people[h].bestlocation()
                         
-                    self.popdata[index] = (humans[h].name, d, humans[h].xref_id, location , where, self.ParseDate(y))
+                    self.popdata[index] = (people[h].name, d, people[h].xref_id, location , where, self.ParseDate(y))
                     index += 1
         if self.gO:
             items = self.popdata.items()
             self.gO.selectedpeople = 0
-            self.gO.step("Gridload", resetCounter=False, target=len(items))
+            if not wasrunning:
+                self.gO.step("Gridload", resetCounter=False, target=len(items))
             self.itemDataMap = {data[0] : data for data in items} 
             index = -1
             for key, data in items:
@@ -537,7 +543,7 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
                             if mainperson == data[2]:
                                 self.SetItemBackgroundColour(index, self.id.GetColor('MAINPERSON'))
                             else:
-                                issues = CheckAge(humans, data[2])
+                                issues = CheckAge(people, data[2])
                                 if issues:
                                     self.SetItemBackgroundColour(index, wx.YELLOW)
                                 else:
@@ -556,7 +562,7 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
         if self.GetColumnWidth(0) > 300:
             self.SetColumnWidth(0, 300)
 
-        # NOTE: self.list can be empty (the global value, m, is empty and passed as humans).
+        # NOTE: self.list can be empty (the global value, m, is empty and passed as people).
         if 0 <= selectperson < self.GetItemCount():
             self.SetItemState(selectperson, wx.LIST_STATE_SELECTED, wx.LIST_STATE_SELECTED)
         
@@ -649,10 +655,10 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
                             self.GetItemText(self.currentItem, 1),
                             self.GetItemText(self.currentItem, 2))
         event.Skip()
-        if BackgroundProcess.humans:
+        if BackgroundProcess.people:
             itm = self.GetItemText(self.currentItem, 2)
-            if itm in BackgroundProcess.humans:
-                dialog = PersonDialog(None, BackgroundProcess.humans[itm], panel)
+            if itm in BackgroundProcess.people:
+                dialog = PersonDialog(None, BackgroundProcess.people[itm], panel)
                 dialog.Bind(wx.EVT_CLOSE, lambda evt: dialog.Destroy())
                 dialog.Bind(wx.EVT_BUTTON, lambda evt: dialog.Destroy())
                 dialog.Show(True)
@@ -669,7 +675,7 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
             if BackgroundProcess.updategridmain:
                 BackgroundProcess.updategridmain = False
                 doTrace(self.gO)
-                self.PopulateList(self.gO.humans, self.gO.get('Main'), False)
+                self.PopulateList(self.gO.people, self.gO.get('Main'), False)
                 BackgroundProcess.SayInfoMessage(f"Using '{self.gO.get('Main')}' as starting person with {len(self.gO.Referenced)} direct ancestors", False)
                 BackgroundProcess.updategridmain = True
                 panel.SetupButtonState()
@@ -712,12 +718,12 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
 
         
 class PeopleListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
-    def __init__(self, parent, humans,  *args, **kw):
+    def __init__(self, parent, people,  *args, **kw):
         """    Initializes the PeopleListCtrlPanel.
 
     Args:
         parent: The parent window.
-        humans: The list of humans.
+        people: The list of people.
         *args: Variable length argument list.
         **kw: Arbitrary keyword arguments.
 
@@ -742,7 +748,7 @@ class PeopleListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
                         size=wx.Size(600,600))
         sizer.Add(self.list, -1, wx.EXPAND)
 
-        self.list.PopulateList(humans, None, True)
+        self.list.PopulateList(people, None, True)
 
         self.currentItem = 0
         parent.SetSizer(sizer)
@@ -772,7 +778,7 @@ class VisualMapPanel(wx.Panel):
         self.id = {}
         
         self.fileConfig = None
-        self.busystate = 0
+        self.busystate = False
         self.busycounthack = 0
         self.inTimer = False
         self.SetAutoLayout(True)
@@ -1149,9 +1155,9 @@ class VisualMapPanel(wx.Panel):
             # TODO Fix this up
             if self.gO.get('ResultHTML'):
                 dlg = None
-                if hasattr(BackgroundProcess, 'humans') and BackgroundProcess.humans:
-                    if len(BackgroundProcess.humans) > 200:
-                        dlg = wx.MessageDialog(self, f'Caution, {len(BackgroundProcess.humans)} people in your tree\n it may create very large HTML files and may not open in the browser',
+                if hasattr(BackgroundProcess, 'people') and BackgroundProcess.people:
+                    if len(BackgroundProcess.people) > 200:
+                        dlg = wx.MessageDialog(self, f'Caution, {len(BackgroundProcess.people)} people in your tree\n it may create very large HTML files and may not open in the browser',
                                    'Warning', wx.OK | wx.ICON_WARNING)
                 else:
                     dlg = wx.MessageDialog(self, 'Caution, if you load a GEDCOM with lots of people in your tree\n it may create very large HTML files and may not open in the browser',
@@ -1239,17 +1245,30 @@ class VisualMapPanel(wx.Panel):
             if self.gO.running:
                 self.gO.runningLast = 0
                 status = f"{status} - Processing"
-                runtime = "Running {}".format(time.strftime('%H:%M:%S', time.gmtime(datetime.now().timestamp() - self.gO.runningSince)))
+                runningtime = datetime.now().timestamp() - self.gO.runningSince
+                runtime = f"Running {time.strftime('%H:%M:%S', time.gmtime(runningtime))}"
+                if self.gO.countertarget > 0 and self.gO.counter > 0 and self.gO.counter != self.gO.countertarget:
+                    remaintimeInstant = runningtime * (self.gO.countertarget/ self.gO.counter)- runningtime
+                    # Smoothed runtime average over last 10 seconds
+                    self.gO.runavg.append(remaintimeInstant)
+                    if len(self.gO.runavg) > 10:
+                        self.gO.runavg.pop(0)
+                    remaintime = sum(self.gO.runavg)/len(self.gO.runavg)
+                    remaintime = runningtime * (self.gO.countertarget/ self.gO.counter)- runningtime
+                    runtime = f"{runtime} ({time.strftime('%H:%M:%S', time.gmtime(remaintime))})"
+                    
             else:
                 runtime = "Last {}".format( time.strftime('%H:%M:%S', time.gmtime(self.gO.runningLast)))
+                # Rest the runtime average
+                self.gO.runavg = []
             self.frame.SetStatusText(runtime,1) 
             if self.gO.counter > 0:
                 if self.gO.countertarget > 0:
-                    status = f"{status} : {panel.gO.counter/self.gO.countertarget*100:.0f}% ({panel.gO.counter}/{self.gO.countertarget})  "
+                    status = f"{status} : {self.gO.counter/self.gO.countertarget*100:.0f}% ({self.gO.counter}/{self.gO.countertarget})  "
                 else:
-                    status = f"{status} : {panel.gO.counter}"
-                if panel.gO.stepinfo:
-                    status = f"{status} ({panel.gO.stepinfo})"
+                    status = f"{status} : {self.gO.counter}"
+                if self.gO.stepinfo:
+                    status = f"{status} ({self.gO.stepinfo})"
             if self.gO.ShouldStop():
                 self.id.BTNUpdate.Enable()
                 status = f"{status} - please wait.. Stopping"
@@ -1325,8 +1344,8 @@ class VisualMapPanel(wx.Panel):
             BackgroundProcess.updategrid = False
             saveBusy = self.busystate
             self.OnBusyStart(evt)
-            self.peopleList.list.PopulateList(BackgroundProcess.humans, self.gO.get('Main'), True)
-            if saveBusy:
+            self.peopleList.list.PopulateList(BackgroundProcess.people, self.gO.get('Main'), True)
+            if not saveBusy:
                 self.OnBusyStop(evt)
         newinfo = None
         if BackgroundProcess.updateinfo:
@@ -1555,15 +1574,15 @@ class VisualMapPanel(wx.Panel):
             # indent = open(indentpath , 'w')
             trace.write("id\tName\tYear\tWhere\tGPS\tPath\n")
             # indent.write("this is an indented file with the number of generations driven by the parents\nid\tName\tYear\tWhere\tGPS\n") 
-            humans = BackgroundProcess.humans
+            people = BackgroundProcess.people
             # Create a dictionary from the lines array with xid as the key
-            for h in humans:
-                if self.gO.Referenced.exists(humans[h].xref_id):
-                    refyear, _ = humans[h].refyear()
-                    (location, where) = humans[h].bestlocation()
-                    humanpath = self.gO.lastlines[humans[h].xref_id].path
-                    trace.write(f"{humans[h].xref_id}\t{humans[h].name}\t{refyear}\t{where}\t{location}\t" + "\t".join(humanpath) + "\n") 
-                    # indent.write("\t".join(humanpath) + f",{humans[h].xref_id}\t{humans[h].name}\t{refyear}\t{where}\t{location}\n") 
+            for h in people:
+                if self.gO.Referenced.exists(people[h].xref_id):
+                    refyear, _ = people[h].refyear()
+                    (location, where) = people[h].bestlocation()
+                    personpath = self.gO.lastlines[people[h].xref_id].path
+                    trace.write(f"{people[h].xref_id}\t{people[h].name}\t{refyear}\t{where}\t{location}\t" + "\t".join(personpath) + "\n") 
+                    # indent.write("\t".join(personpath) + f",{people[h].xref_id}\t{people[h].name}\t{refyear}\t{where}\t{location}\n") 
             trace.close()
             # indent.close()
             _log.info(f"Trace file saved {tracepath}")

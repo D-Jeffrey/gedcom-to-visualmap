@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
-# from models.Human import Human, LifeEvent
-# from models.Pos import Pos
+# from models.Person import Person, LifeEvent
+# from models.LatLon import LatLon
 # from models.Line import Line
 from models.Color import Color
 

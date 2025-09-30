@@ -11,8 +11,7 @@ from const import OFFICECMDLINE
 from pathlib import Path
 from xmlrpc.client import boolean
 from wx import LogGeneric
-from models.Human import Human, Pos
-
+from models.Person import Person, LatLon
 
 _log = logging.getLogger(__name__)
 
@@ -50,9 +49,9 @@ class gvOptions:
         self.ResultType = "html"
         self.ResultHTML = True
         self.Main = None                    # xref_id
-        self.mainHuman = None               # point to Human
-        self.Name = None                    # name of human
-        self.mainHumanPos = Pos(None, None)
+        self.mainPerson = None               # point to Person
+        self.Name = None                    # name of person
+        self.mainPersonLatLon = LatLon(None, None)
         self.MaxMissing = 0
         self.MaxLineWeight = 20
         self.UseGPS = True
@@ -80,11 +79,13 @@ class gvOptions:
         self.totalpeople = None
         self.stepinfo = ''
         self.lastmax = self.counter
-        self.humans: Union[Dict[str, Human], None] = None
+        self.people: Union[Dict[str, Person], None] = None
         self.Referenced = None
         self.panel = None
         self.selectedpeople = 0
         self.lastlines = None
+        self.timeframe = [None,None]
+        self.runavg = []
         
         os_name = platform.system()
         if os_name == 'Windows':
@@ -118,7 +119,7 @@ class gvOptions:
                           'UseAntPath':0, 'MapTimeLine':0, 'HeatMapTimeStep':1, 'HomeMarker':0, 'showLayerControl':0, 
                           'mapMini':0, 'MapStyle':2}
         self.core_keys = {'UseGPS':0, 'CacheOnly':0, 'AllEntities':0, 'KMLcmdline':2, 'CSVcmdline':2, 'Tracecmdline':2, 'badAge':0}
-        self.logging_keys = ['models.human', 'models', 'ged4py.parser', 'ged4py', 'models.creator', 'gedcomoptions', 'gedcom.gedcomparser', 'gedcom', 'gedcom.gpslookup', 'geopy', 'render.kmlexporter', 'render', 'render.foliumexp', 'gedcomvisual', 'gedcomdialogs', 'gedcomvisualgui', '__main__']
+        self.logging_keys = ['models.person', 'models', 'ged4py.parser', 'ged4py', 'models.creator', 'gedcomoptions', 'gedcom.gedcomparser', 'gedcom', 'gedcom.gpslookup', 'geopy', 'render.kmlexporter', 'render', 'render.foliumexp', 'gedcomvisual', 'gedcomdialogs', 'gedcomvisualgui', '__main__']
         
         self.kml_keys = {'MaxLineWeight':1, 'MaxMissing':1, 'UseBalloonFlyto':0, 'KMLsort':0}
         # Old settings that should be removed from the config file
@@ -251,17 +252,17 @@ class gvOptions:
             self.gvConfig.write(configfile)
     
     
-    def setMainHuman(self, mainhuman: Human):
+    def setMainPerson(self, mainperson: Person):
         """ Set the name of the starting person """
-        newMain = (self.mainHuman != mainhuman and mainhuman and self.Name != mainhuman.name) or mainhuman == None
+        newMain = (self.mainPerson != mainperson and mainperson and self.Name != mainperson.name) or mainperson == None
         
-        self.mainHuman = mainhuman 
-        if mainhuman:
-            self.Name = mainhuman.name
-            self.mainHumanPos = mainhuman.bestPos()
+        self.mainPerson = mainperson 
+        if mainperson:
+            self.Name = mainperson.name
+            self.mainPersonLatLon = mainperson.bestLatLon()
         else:
             self.Name = "<not selected>"
-            self.mainHumanPos = None
+            self.mainPersonLatLon = None
         if newMain:
             self.selectedpeople = 0
             self.lastlines = None
@@ -271,10 +272,10 @@ class gvOptions:
 
     def setMain(self, Main: str):
         self.Main = Main
-        if self.humans and Main in self.humans:
-            self.setMainHuman(self.humans[Main])
+        if self.people and Main in self.people:
+            self.setMainPerson(self.people[Main])
         else:
-            self.setMainHuman(None)
+            self.setMainPerson(None)
 
     def setResults(self, Result, useHTML):
         """ Set the Output file and type (Only the file name) """

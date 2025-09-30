@@ -1,4 +1,4 @@
-__all__ = ['AboutDialog', 'ConfigDialog', 'PersonDialog', 'FindDialog', 'BackgroundActions', 'formatHumanName']
+__all__ = ['AboutDialog', 'ConfigDialog', 'PersonDialog', 'FindDialog', 'BackgroundActions', 'formatPersonName']
 
 import _thread
 import logging
@@ -13,7 +13,7 @@ import wx
 import wx.lib.newevent
 import wx.html
 import wx.grid as gridlib
-from models.Creator import Human, Pos, LifeEvent
+from models.Creator import Person, LatLon, LifeEvent
 from gedcom.GedcomParser import CheckAge, maxage
 
 from const import GVFONT, ABOUTFONT, VERSION, GUINAME, ABOUTLINK, NAME, panel
@@ -37,7 +37,7 @@ class AboutDialog(wx.Dialog):
         self.html.SetPage("""
         <html><body>
 <h2><a href="PROJECTLINK">VERVER</a></h2>
-<p>The "GEDCOM to Visual Map" project is a powerful tool designed to read <a href="https://en.wikipedia.org/wiki/GEDCOM">GEDCOM files</a> and translate the locations into GPS addresses. It produces different KML map types that show timelines and movements around the earth. The project includes both command-line and GUI interfaces (tested on Windows) to provide flexibility in usage.</p>
+<p>The "GEDCOM to Visual Map" project is a powerful tool designed to read <a href="https://gedcom.io/">GEDCOM files</a> and translate the locations into GPS addresses. It produces different KML map types that show timelines and movements around the earth. The project includes both command-line and GUI interfaces (tested on Windows) to provide flexibility in usage.</p>
 <h3>Key Features:</h3>
 <ul><li><b>Interactive Maps:</b> Generates interactive HTML files that display relationships between children and parents, and where people lived over the years.</li>
 <li><b>Heatmaps:</b> Includes heatmaps to show busier places, with markers overlayed for detailed views.</li>
@@ -58,8 +58,11 @@ then blank the lat, long and boundary have it looked up again. Do not convert it
 </ul>                          
 <h3>Additional Information:</h3>
 <ul><li><b>Forked From:</b> Originally forked from <a href="https://github.com/lmallez/gedcom-to-map/">gedcom-to-map.</a></li>
-<ul><li><b>Contributors:</b> Darren Jeffrey (D-Jeffrey), Laurent Mallez (lmallez), Colin Brass (colin0brass)</li>
-<li><b>License:</b> MIT License.</li>
+<li><b>Contributors:</b> Darren Jeffrey (<a href="https://github.com/D-Jeffrey/">D-Jeffrey</a>), 
+                          Laurent Mallez (<a href="https://github.com/lmallez/">lmallez</a>), 
+                          Colin Brass (<a href="https://github.com/colin0brass/">colin0brass</a>)
+                          </li>
+<li><b>License:</b> <a href="https://github.com/D-Jeffrey/gedcom-to-visualmap/blob/main/LICENSE">MIT License.</a></li>
 </ul>
 For more details and to contribute, visit the <a href="PROJECTLINK">GitHub repository.</a></li>
 <p>
@@ -297,7 +300,7 @@ class FamilyPanel(wx.Panel):
         # Get the ID of the selected person
         person_id = self.grid.GetCellValue(row, 7)
         # Open the person dialog with the selected person's details
-        person = BackgroundProcess.humans.get(person_id)
+        person = BackgroundProcess.people.get(person_id)
         if person:
             dialog = PersonDialog(self, person, panel, showrefences=False)
             dialog.Show(True)
@@ -305,40 +308,40 @@ class FamilyPanel(wx.Panel):
         else:
             wx.MessageBox("Person not found.", "Error", wx.OK | wx.ICON_ERROR)
 
-def formatHumanName(human: Human, longForm=True):
-    if human:
+def formatPersonName(person: Person, longForm=True):
+    if person:
         if longForm:
-            maiden = f" ({human.maiden})" if human.maiden else ""
-            title = f" - {human.title}" if human.title else ""
+            maiden = f" ({person.maiden})" if person.maiden else ""
+            title = f" - {person.title}" if person.title else ""
         else:
             maiden = ""
             title = ""
-        return f"{human.first} {human.surname}{maiden}{title}" 
+        return f"{person.first} {person.surname}{maiden}{title}" 
     else:
         return "<none>"
 
 class PersonDialog(wx.Dialog):
-    def __init__(self, parent, human: Human, panel, showrefences=True):
+    def __init__(self, parent, person: Person, panel, showrefences=True):
         super().__init__(parent, title="Person Details", size=(600, 600), style=wx.DEFAULT_DIALOG_STYLE |wx.RESIZE_BORDER)
         
         def sizeAttr(attr,pad=1):
             return (min(len(attr),3)+pad)*(GVFONT[1]+5)  if attr else GVFONT[1]
         
-        humans = BackgroundProcess.humans
+        people = BackgroundProcess.people
                 
         marrying = []
-        if human.marriage:
-            for marry in human.marriage:
-                marrying.append(f"{formatHumanName(humans[marry[0]], False)}{LifeEvent.asEventstr(marry[1])}")
+        if person.marriage:
+            for marry in person.marriage:
+                marrying.append(f"{formatPersonName(people[marry[0]], False)}{LifeEvent.asEventstr(marry[1])}")
         marriage = "\n".join(marrying)        
 
         homes = []
-        if human.home:
-            for homedesc in human.home:
+        if person.home:
+            for homedesc in person.home:
                 homes.append(f"{LifeEvent.asEventstr(homedesc)}")
         homelist = "\n".join(homes)
-        photourl = human.photo
-        issues = CheckAge(humans, human.xref_id)
+        photourl = person.photo
+        issues = CheckAge(people, person.xref_id)
         self.nameTextCtrl = wx.TextCtrl(self, style=wx.TE_READONLY, size=(550,-1))
         self.titleTextCtrl = wx.TextCtrl(self, style=wx.TE_READONLY)
         self.fatherTextCtrl = wx.TextCtrl(self, style=wx.TE_READONLY)
@@ -379,22 +382,22 @@ class PersonDialog(wx.Dialog):
     
 
         # set the person's data in the UI controls
-        self.nameTextCtrl.SetValue(formatHumanName(human))
+        self.nameTextCtrl.SetValue(formatPersonName(person))
 
         # Should be conditional
-        self.titleTextCtrl.SetValue(human.title if human.title else "")
+        self.titleTextCtrl.SetValue(person.title if person.title else "")
 
-        if human.father:
-            self.fatherTextCtrl.SetValue(formatHumanName(humans[human.father]))
-        if human.mother:
-            self.motherTextCtrl.SetValue(formatHumanName(humans[human.mother]))
-        self.birthTextCtrl.SetValue(f"{LifeEvent.asEventstr(human.birth)}")
-        if human.death and human.birth and human.death.when and human.birth.when:
-            age = f"(age ~{human.age})" if hasattr( human, "age") else f"(age ~{human.death.whenyearnum() - human.birth.whenyearnum()})" 
+        if person.father:
+            self.fatherTextCtrl.SetValue(formatPersonName(people[person.father]))
+        if person.mother:
+            self.motherTextCtrl.SetValue(formatPersonName(people[person.mother]))
+        self.birthTextCtrl.SetValue(f"{LifeEvent.asEventstr(person.birth)}")
+        if person.death and person.birth and person.death.when and person.birth.when:
+            age = f"(age ~{person.age})" if hasattr( person, "age") else f"(age ~{person.death.whenyearnum() - person.birth.whenyearnum()})" 
         else:
             age = ""
-        self.deathTextCtrl.SetValue(f"{LifeEvent.asEventstr(human.death)}")
-        sex = human.sex if human.sex else ""
+        self.deathTextCtrl.SetValue(f"{LifeEvent.asEventstr(person.death)}")
+        sex = person.sex if person.sex else ""
         self.sexTextCtrl.SetValue(f"{sex} {age}")
         self.marriageTextCtrl.SetValue(marriage)
         
@@ -406,17 +409,17 @@ class PersonDialog(wx.Dialog):
             sizer.AddGrowableRow(8)
         if panel.gO.Referenced and showrefences:
             self.related = None
-            if panel.gO.Referenced.exists(human.xref_id):
-                hertiageList = doTraceTo(panel.gO, human)
+            if panel.gO.Referenced.exists(person.xref_id):
+                hertiageList = doTraceTo(panel.gO, person)
                 if hertiageList:
                     hertiageSet = {}
                     for (hertiageparent, hertiageperson, hyear, hid) in hertiageList:
-                        descript = f"{humans[hid].title}"
+                        descript = f"{people[hid].title}"
                         hertiageSet[hid] = (hertiageperson, 
                                             hertiageparent, 
-                                            humans[hid].birth.whenyear() if humans[hid].birth else None, 
-                                            humans[hid].death.whenyear() if humans[hid].death else None, 
-                                            humans[hid].birth.getattr('where') if humans[hid].birth else None, 
+                                            people[hid].birth.whenyear() if people[hid].birth else None, 
+                                            people[hid].death.whenyear() if people[hid].death else None, 
+                                            people[hid].birth.getattr('where') if people[hid].birth else None, 
                                             descript, 
                                             hid)
                     # Create the panel and pass the data
@@ -427,15 +430,15 @@ class PersonDialog(wx.Dialog):
             
             sizer.Add(wx.StaticText(self, label="Lineage: "), 0, wx.LEFT|wx.TOP, border=5)
             sizer.Add(self.related, 1, wx.EXPAND, border=5)
-        if human.children:
+        if person.children:
             childSet = {}
-            for hid in human.children:
-                descript = f"{humans[hid].title}"
-                childSet[hid] = (humans[hid].name, 
+            for hid in person.children:
+                descript = f"{people[hid].title}"
+                childSet[hid] = (people[hid].name, 
                                     "", 
-                                    humans[hid].birth.whenyear() if humans[hid].birth else None, 
-                                    humans[hid].death.whenyear() if humans[hid].death else None, 
-                                    humans[hid].birth.getattr('where') if humans[hid].birth else None, 
+                                    people[hid].birth.whenyear() if people[hid].birth else None, 
+                                    people[hid].death.whenyear() if people[hid].death else None, 
+                                    people[hid].birth.getattr('where') if people[hid].birth else None, 
                                     descript, 
                                     hid)
                 # Create the panel and pass the data
@@ -557,7 +560,7 @@ and generating the output so that the GUI can continue to be responsive
     def __init__(self, win, threadnum):
         self.win = win
         self.gOptions = None
-        self.humans = None
+        self.people = None
         self.threadnum = threadnum
         self.updategrid = False
         self.updategridmain = True
@@ -631,21 +634,21 @@ and generating the output so that the GUI can continue to be responsive
                     wx.PostEvent(self.win, UpdateBackgroundEvent(state='busy'))
                     wx.Yield()
                     _log.info("start ParseAndGPS")
-                    if hasattr(self, 'humans'):
-                        if self.humans:                            
-                            del self.humans
-                            self.gOptions.humans = None
-                            self.humans = None
+                    if hasattr(self, 'people'):
+                        if self.people:                            
+                            del self.people
+                            self.gOptions.people = None
+                            self.people = None
                     _log.info("ParseAndGPS")
                     try:
-                        self.humans = ParseAndGPS(self.gOptions, 1)
+                        self.people = ParseAndGPS(self.gOptions, 1)
                     
                     except Exception as e:
                         # Capture other exceptions
-                        if hasattr(self, 'humans'):
-                            if self.humans:                            
-                                del self.humans
-                                self.humans = None
+                        if hasattr(self, 'people'):
+                            if self.people:                            
+                                del self.people
+                                self.people = None
                         self.do = 0
                         _log.warning(str(e))
                         self.gOptions.stopping = False
@@ -658,12 +661,12 @@ and generating the output so that the GUI can continue to be responsive
                     # self.updategrid = True
                     wx.PostEvent(self.win, UpdateBackgroundEvent(state='busy'))
                     wx.Yield()
-                    if hasattr (self, 'humans') and self.humans:                            
-                        _log.info("human count %d", len(self.humans))
-                        self.humans = ParseAndGPS(self.gOptions, 2)
+                    if hasattr (self, 'people') and self.people:                            
+                        _log.info("person count %d", len(self.people))
+                        self.people = ParseAndGPS(self.gOptions, 2)
                         self.updategrid = True
-                        if self.humans:
-                            self.SayInfoMessage(f"Loaded {len(self.humans)} people")
+                        if self.people:
+                            self.SayInfoMessage(f"Loaded {len(self.people)} people")
                         else:
                             self.SayInfoMessage(f"Cancelled loading people")
                         if self.gOptions.Main:
@@ -678,12 +681,12 @@ and generating the output so that the GUI can continue to be responsive
                         fname = self.gOptions.Result
                         if (self.gOptions.ResultHTML):
                             needAGridUpdate = not self.gOptions.Referenced
-                            doHTML(self.gOptions, self.humans, True)
+                            doHTML(self.gOptions, self.people, True)
                             # We only need to update the Grid if we have not calculated the Referenced before
                             self.updategridmain = needAGridUpdate
                             self.SayInfoMessage(f"HTML generated for {self.gOptions.totalpeople} people ({fname})")
                         else: 
-                            doKML(self.gOptions, self.humans)
+                            doKML(self.gOptions, self.people)
                             self.SayInfoMessage(f"KML file generated for {self.gOptions.totalpeople} people/points ({fname})")
                     else:
                         _log.info("not parsed")

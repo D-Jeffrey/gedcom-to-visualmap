@@ -271,13 +271,18 @@ python3 ..\gedcom-to-map\gedcom-to-map.py input.ged output -main "@I0000@" -form
 - Need to separate the Load and GPS resolve steps (currently reloads after 30 seconds of looking up values)
 
 ## Releases
+### v0.2.6.9
+- improved options stats
+- refactor Pos with LatLon
+- refactor Human into Person and humans into people
+- preparing for replacement modules from @colin0brass
 ### v0.2.6.8
 - Enriched Balloon in KML with proper linked to children and parents
 - Add folders to KML
 - Add children to Person Dialog
 - Add age checking (problems flag in yellow for the lineage people)
 - Dynamic KML/HTML options
-- Refractored long standing inconsistancy related to drawing the first person in KML
+- Refactored long standing inconsistency related to drawing the first person in KML
 ### v0.2.6.7
 - Added FlyTo, Line Weigth & Trace cmdline to configuration
 - Input/Output as Buttons

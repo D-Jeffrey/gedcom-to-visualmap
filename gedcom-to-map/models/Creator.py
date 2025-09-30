@@ -3,9 +3,9 @@ __all__ = ['Creator', 'LifetimeCreator', 'DELTA', 'SPACE']
 import logging
 from typing import Dict
 
-from models.Human import Human, LifeEvent
+from models.Person import Person, LifeEvent
 from models.Line import Line
-from models.Pos import Pos
+from models.LatLon import LatLon
 from models.Rainbow import Rainbow
 
 _log = logging.getLogger(__name__.lower())
@@ -20,19 +20,19 @@ def getattrposif(obj, attname, attvaluename):
             a = getattr(obj, attname)
             if hasattr(a, attvaluename):
                 return getattr(a, attvaluename)
-    return Pos(None, None)
+    return LatLon(None, None)
     
 class Creator:
-    def __init__(self, humans: Dict[str, Human], max_missing=0, gpstype="birth"):
-        self.humans = humans
+    def __init__(self, people: Dict[str, Person], max_missing=0, gpstype="birth"):
+        self.people = people
         self.rainbow = Rainbow()
         self.max_missing = max_missing
         self.alltheseids= {}
         self.gpstype = gpstype
 
-    def line(self, pos: Pos, current: Human, branch, prof, miss, path="") -> list[Line]:
+    def line(self, pos: LatLon, current: Person, branch, prof, miss, path="") -> list[Line]:
         if current.xref_id in self.alltheseids:
-            _log.error("Looping Problem: {:2} -LOOP STOP - {} {} -Looping= {:20}".format(  prof, self.humans[current.xref_id].name, current.xref_id, path))
+            _log.error("Looping Problem: {:2} -LOOP STOP - {} {} -Looping= {:20}".format(  prof, self.people[current.xref_id].name, current.xref_id, path))
             return []
         self.alltheseids[current.xref_id] = current.xref_id
         if not getattr(current, self.gpstype):
@@ -43,77 +43,77 @@ class Creator:
             )
         color = (branch + DELTA / 2) / (SPACE ** (prof % 256))
         _log.info("{:8} {:8} {:2} {:.10f} {} {:20}".format(path, branch, prof, color, self.rainbow.get(color).to_hexa(), current.name))
-        line = Line(f"{path:8}\t{current.name}", pos, getattrposif(current, self.gpstype, 'pos'), self.rainbow.get(color), path, branch,prof, human=current,
+        line = Line(f"{path:8}\t{current.name}", pos, getattrposif(current, self.gpstype, 'pos'), self.rainbow.get(color), path, branch,prof, person=current,
                     whenFrom=current.birth.whenyear() if hasattr(current, 'birth') and current.birth else None, whenTo=current.death.whenyear() if hasattr(current, 'death') and current.death else None)
         return self.link(getattrposif(current, self.gpstype, 'pos'), current, branch, prof, 0, path) + [line]
 
-    def link(self, pos: Pos, current: Human, branch=0, prof=0, miss=0, path="") -> list[Line]:
-        return (self.line(pos, self.humans[current.father], branch*SPACE, prof+1, miss, f"{path}F") if current.father else []) \
-               + (self.line(pos, self.humans[current.mother], branch*SPACE+DELTA, prof+1, miss, path + "M") if current.mother else [])
+    def link(self, pos: LatLon, current: Person, branch=0, prof=0, miss=0, path="") -> list[Line]:
+        return (self.line(pos, self.people[current.father], branch*SPACE, prof+1, miss, f"{path}F") if current.father else []) \
+               + (self.line(pos, self.people[current.mother], branch*SPACE+DELTA, prof+1, miss, path + "M") if current.mother else [])
 
     def create(self, main_id: str):
-        if main_id not in self.humans.keys():
+        if main_id not in self.people.keys():
             _log.error("Could not find your starting person: %s", main_id)
             raise IndexError(f"Missing starting person {main_id}")
 
-        current = self.humans[main_id]
+        current = self.people[main_id]
         createpos = getattrposif(current, self.gpstype, 'pos')
         return self.link(createpos, current) + \
             self.line(createpos, current, 0, 0, 0, "")
 
     def createothers(self,listof):
-        for human in self.humans:
-            c = [creates.human.xref_id for creates in listof]
-            if human not in c:
-                _log.debug("Others: + %s (%s) (%d)", self.humans[human].name, human, len(listof))
-                listof.extend(self.line(getattrposif(self.humans[human], self.gpstype, 'pos'), self.humans[human], len(listof)/10, 5, 0, path=""))
+        for person in self.people:
+            c = [creates.person.xref_id for creates in listof]
+            if person not in c:
+                _log.debug("Others: + %s (%s) (%d)", self.people[person].name, person, len(listof))
+                listof.extend(self.line(getattrposif(self.people[person], self.gpstype, 'pos'), self.people[person], len(listof)/10, 5, 0, path=""))
 
 class CreatorTrace:
-    def __init__(self, humans: Dict[str, Human], max_missing=0):
-        self.humans = humans
+    def __init__(self, people: Dict[str, Person], max_missing=0):
+        self.people = people
         self.rainbow = Rainbow()
         self.max_missing = max_missing
         self.alltheseids= {}
 
-    def line(self, current: Human, branch, prof, path="") -> list[Line]:
+    def line(self, current: Person, branch, prof, path="") -> list[Line]:
         if current.xref_id in self.alltheseids:
-            _log.error("Looping Trace Problem: {:2} -LOOP STOP - {} {} -Tracing= {:20}".format(  prof, self.humans[current.xref_id].name, current.xref_id, path))
+            _log.error("Looping Trace Problem: {:2} -LOOP STOP - {} {} -Tracing= {:20}".format(  prof, self.people[current.xref_id].name, current.xref_id, path))
             return []
         self.alltheseids[current.xref_id] = current.xref_id
         
         _log.info("{:8} {:8} {:2} {:20}".format(path, branch, prof, current.name))
-        line = Line(f"{path:8}\t{current.name}", None, None, None, path, branch,prof, human=current, 
+        line = Line(f"{path:8}\t{current.name}", None, None, None, path, branch,prof, person=current, 
                     whenFrom=current.birth.whenyear() if hasattr(current, 'birth') and current.birth else None , whenTo=current.death.whenyear() if hasattr(current, 'death') and current.death else None)
         return self.link(current, branch, prof, path) + [line]
 
-    def link(self, current: Human, branch=0, prof=0,  path="") -> list[Line]:
-        return (self.line(self.humans[current.father],  0, prof+1,  f"{path}F") if current.father else []) \
-               + (self.line(self.humans[current.mother], 0, prof+1,  path + "M") if current.mother else [])
+    def link(self, current: Person, branch=0, prof=0,  path="") -> list[Line]:
+        return (self.line(self.people[current.father],  0, prof+1,  f"{path}F") if current.father else []) \
+               + (self.line(self.people[current.mother], 0, prof+1,  path + "M") if current.mother else [])
 
     def create(self, main_id: str):
-        if main_id not in self.humans.keys():
+        if main_id not in self.people.keys():
             _log.error("Could not find your starting person: %s", main_id)
             raise IndexError(f"Missing starting person {main_id}")
 
-        current = self.humans[main_id]
+        current = self.people[main_id]
         return self.link(current)
     
     def createothers(self,listof):
-        for human in self.humans:
-            c = [creates.human.xref_id for creates in listof]
-            if human not in c:
-                _log.debug("Others: + %s (%s) (%d)", self.humans[human].name, human, len(listof))
-                listof.extend(self.line(self.humans[human], len(listof)/10, 5, path=""))
+        for person in self.people:
+            c = [creates.person.xref_id for creates in listof]
+            if person not in c:
+                _log.debug("Others: + %s (%s) (%d)", self.people[person].name, person, len(listof))
+                listof.extend(self.line(self.people[person], len(listof)/10, 5, path=""))
 
 
 class LifetimeCreator:
-    def __init__(self, humans: Dict[str, Human], max_missing=0):
-        self.humans = humans
+    def __init__(self, people: Dict[str, Person], max_missing=0):
+        self.people = people
         self.rainbow = Rainbow()
         self.max_missing = max_missing
         self.alltheseids= {}
 
-    def selfline(self, current: Human, branch, prof, miss, path="") -> list[Line]:
+    def selfline(self, current: Person, branch, prof, miss, path="") -> list[Line]:
         # We can not draw a line from Birth to death without both ends  --- or can we???
         self.alltheseids[current.xref_id] = current.xref_id
         color = (branch + DELTA / 2) / (SPACE ** (prof % 256))
@@ -137,16 +137,16 @@ class LifetimeCreator:
         
     # Draw a line from the parents birth to the child birth location
                             
-    def line(self, pos: Pos, parent: Human, branch, prof, miss, path="", linestyle="", forhuman: Human = None ) -> list[Line]:
+    def line(self, pos: LatLon, parent: Person, branch, prof, miss, path="", linestyle="", forperson: Person = None ) -> list[Line]:
         # Check to make sure we are not looping and have been here before
         if parent.xref_id in self.alltheseids:
             _log.error("Looping Problem: {:2} -LOOP STOP- {} {} -Looping= {:20}".format(  prof, parent.name, parent.xref_id, path))
             return []
         if hasattr(parent, 'birth') and parent.birth:
             color = (branch + DELTA / 2) / (SPACE ** prof)
-            _log.info("{:8} {:8} {:2} {:.10f} {} {:20} from {:20}".format(path, branch, prof, color, self.rainbow.get(color).to_hexa(), parent.name, forhuman.name))
+            _log.info("{:8} {:8} {:2} {:.10f} {} {:20} from {:20}".format(path, branch, prof, color, self.rainbow.get(color).to_hexa(), parent.name, forperson.name))
             line = Line(f"{path:8}\t{parent.name}", pos, parent.birth.pos, self.rainbow.get(color), path, branch, prof, linestyle,  
-                            forhuman,  human=parent, whenFrom=parent.birth.whenyear() if hasattr(parent, 'birth') and parent.birth else None , whenTo=parent.death.whenyear() if hasattr(parent, 'death') and parent.death else None)
+                            forperson,  person=parent, whenFrom=parent.birth.whenyear() if hasattr(parent, 'birth') and parent.birth else None , whenTo=parent.death.whenyear() if hasattr(parent, 'death') and parent.death else None)
             return self.link(parent.birth.pos, parent, branch, prof, 0, path) + [line]
         else:
             if self.max_missing != 0 and miss >= self.max_missing:
@@ -156,28 +156,28 @@ class LifetimeCreator:
         _log.info("{:8} {:8} {:2} {:.10f} {} Self {:20}".format(" ", " ", " ", 0, "-KICK-", parent.name))
 
         
-    def link(self, pos: Pos, current: Human, branch=0, prof=0, miss=0, path="") -> list[Line]:
+    def link(self, pos: LatLon, current: Person, branch=0, prof=0, miss=0, path="") -> list[Line]:
         # Maximun recursion depth.  This should never happen
         if prof < 480: 
             return (self.selfline(current, branch*SPACE, prof+1, miss, path)) \
-               + (self.line(pos, self.humans[current.father], branch*SPACE, prof+1, miss, path + "F",'father', current) if current.father else []) \
-               + (self.line(pos, self.humans[current.mother], branch*SPACE+DELTA, prof+1, miss, path + "M", 'mother', current) if current.mother else [])
+               + (self.line(pos, self.people[current.father], branch*SPACE, prof+1, miss, path + "F",'father', current) if current.father else []) \
+               + (self.line(pos, self.people[current.mother], branch*SPACE+DELTA, prof+1, miss, path + "M", 'mother', current) if current.mother else [])
         else:
             _log.warning("{:8} {:8} {:2} {} {} {:20}".format(" ", " ", prof, " ", "-TOO DEEP-", current.name))
             return (self.selfline(current, branch*SPACE, prof+1, miss, path)) + [] + []
 
     def create(self, main_id: str):
-        if main_id not in self.humans.keys():
+        if main_id not in self.people.keys():
             _log.error ("Could not find your starting person: %s", main_id)
             raise IndexError(f"Missing starting person {main_id}")
-        current = self.humans[main_id]
+        current = self.people[main_id]
 
-        return self.link(current.birth.pos if hasattr(current, 'birth') and current.birth != None else Pos(None, None), current) 
+        return self.link(current.birth.pos if hasattr(current, 'birth') and current.birth != None else LatLon(None, None), current) 
     
     def createothers(self,listof):
-        for human in self.humans:
-            c = [creates.human.xref_id for creates in listof]
-            if human not in c:
-                _log.debug ("Others: + %s(%s) (%d)", self.humans[human].name, human, len(listof))
-                listof.extend(self.selfline(self.humans[human], len(listof)/10, len(listof)/10, 5, path=""))
+        for person in self.people:
+            c = [creates.person.xref_id for creates in listof]
+            if person not in c:
+                _log.debug ("Others: + %s(%s) (%d)", self.people[person].name, person, len(listof))
+                listof.extend(self.selfline(self.people[person], len(listof)/10, len(listof)/10, 5, path=""))
                

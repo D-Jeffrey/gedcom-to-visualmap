@@ -10,14 +10,14 @@ from ged4py import GedcomReader
 from ged4py.date import DateValueVisitor
 from ged4py.model import NameRec, Record
 from gedcomoptions import gvOptions
-from models.Human import Human, LifeEvent
-from models.Pos import Pos
+from models.Person import Person, LifeEvent
+from models.LatLon import LatLon
 
 _log = logging.getLogger(__name__.lower())
 
 homelocationtags = ('OCCU', 'CENS', 'EDUC')
 otherlocationtags = ('CHR', 'BAPM', 'BASM', 'BAPL', 'IMMI', 'NATU', 'ORDN','ORDI', 'RETI', 
-                     'EVEN',  'CEME', 'CREM' )
+                     'EVEN',  'CEME', 'CREM', 'FACT' )
 
 bitstags = {"OCCU" : ("Occupation", True), "RELI" : ("Religion", True), "EDUC" : ("Education", True), 
             
@@ -74,30 +74,30 @@ def getplace(gedcomtag : Record, placetag ="PLAC"):
 
     return None
 
-def CheckAge(humans: Dict[str, Human], thisXrefID ):
+def CheckAge(people: Dict[str, Person], thisXrefID ):
     ""
     problems :list[str] = []
-    if humans[thisXrefID]:
-        thishuman = humans[thisXrefID]
+    if people[thisXrefID]:
+        thisperson = people[thisXrefID]
         born = None
         died = None
-        if thishuman.birth:
-            born = thishuman.birth.whenyearnum()
-        if thishuman.death:
-            died = thishuman.death.whenyearnum()
+        if thisperson.birth:
+            born = thisperson.birth.whenyearnum()
+        if thisperson.death:
+            died = thisperson.death.whenyearnum()
         if born and died:
             if died < born:
                 problems.append("Died before Born")
             if died - born > maxage:
                 problems.append(f"Too old {died - born} > {maxage}")
-        if thishuman.children:
-            for childId in thishuman.children:
-                if humans[childId]:
-                    child = humans[childId]
+        if thisperson.children:
+            for childId in thisperson.children:
+                if people[childId]:
+                    child = people[childId]
                     if child.birth and child.birth.whenyearnum():
                         if born:
                             parentatage = child.birth.whenyearnum() - born
-                            if thishuman.sex == "F":
+                            if thisperson.sex == "F":
                                 if parentatage > maxmotherage:
                                     problems.append(f"Mother too old {parentatage} > {maxmotherage} for {child.name} [{child.xref_id}]")
                                 if parentatage < minmother:
@@ -105,7 +105,7 @@ def CheckAge(humans: Dict[str, Human], thisXrefID ):
                              
                                 if died and died < parentatage:
                                     problems.append(f"Mother after death for {child.name} [{child.xref_id}]")
-                            elif thishuman.sex == "M":
+                            elif thisperson.sex == "M":
                                 if parentatage > maxfatherage:
                                     problems.append(f"Father too old {parentatage} > {maxfatherage} for {child.name} [{child.xref_id}]")
                                 if parentatage < minfather:
@@ -127,7 +127,7 @@ class GetPosFromTag:
     def __init__(self, gedcomtag : Record, tag : str, placetag ="PLAC"):
         self.when = None
         self.place = None
-        self.pos = Pos(None, None)
+        self.pos = LatLon(None, None)
         self.event = None
         if tag:
             subtag = gedcomtag.sub_tag(tag)
@@ -151,12 +151,12 @@ class GetPosFromTag:
                     lat = maploc.sub_tag("LATI")
                     lon = maploc.sub_tag("LONG")
                     if lat and lon:
-                        self.pos = Pos(lat.value,lon.value)
+                        self.pos = LatLon(lat.value,lon.value)
                     else: 
                         lat = maploc.sub_tag("_LATI")
                         lon = maploc.sub_tag("_LONG")
                         if lat and lon:
-                            self.pos = Pos(lat.value,lon.value)
+                            self.pos = LatLon(lat.value,lon.value)
                 else:
                     if hasattr(plactag, 'value') : 
                         # Conderation for : 
@@ -173,7 +173,7 @@ class GetPosFromTag:
                             lat = match.group(2)
                             lon = match.group(3)
                             if lat and lon:
-                                self.pos = Pos(float(lat),float(lon))
+                                self.pos = LatLon(float(lat),float(lon))
             self.event = LifeEvent(self.place, self.when, self.pos, tag)
             
 
@@ -183,6 +183,7 @@ class GedcomParser:
         self.gOp = gOp
         gOp.totalGEDpeople = None
         gOp.totalGEDfamily = None
+        gOp.timeframe = [None,None]
         global thisgvOps
         thisgvOps= gOp
         if self.file_path == '':
@@ -200,30 +201,30 @@ class GedcomParser:
 
 
     @staticmethod
-    def __create_human(record: Record) -> Human:
+    def __create_person(record: Record) -> Person:
         global thisgvOps
         thisgvOps.step()
-        human = Human(record.xref_id)
-        human.name = ''
+        person = Person(record.xref_id)
+        person.name = ''
         name: NameRec = record.sub_tag("NAME")
-        _log.debug (f"Create Human : {name}")
+        _log.debug (f"Create Person : {name}")
         if name:
-            human.first = record.name.first
-            human.surname =record.name.surname
-            human.maiden = record.name.maiden
-            human.name = "{}".format(record.name.format())
-            # human.name = "{} {}".format(name.value[0], name.value[1])
-        if human.name == '':
-            human.first = "Unknown"
-            human.surname = "Unknown"
-            human.maiden = "Unknown"
+            person.first = record.name.first
+            person.surname =record.name.surname
+            person.maiden = record.name.maiden
+            person.name = "{}".format(record.name.format())
+            # person.name = "{} {}".format(name.value[0], name.value[1])
+        if person.name == '':
+            person.first = "Unknown"
+            person.surname = "Unknown"
+            person.maiden = "Unknown"
         
         title = record.sub_tag("TITL")
-        human.title = title.value if title else ""
+        person.title = title.value if title else ""
 
         # Grab a link to the photo
         obj = record.sub_tag("OBJE")
-        human.photo = None
+        person.photo = None
         if (obj):
             if obj.sub_tag("FILE"):
                 # Depending on how the GEDCOM was created the FORM maybe at 2 or 3 it may be in a sub tag and it may or may not have the right extension
@@ -233,20 +234,26 @@ class GedcomParser:
                 else:
                     ext = obj.sub_tag("FILE").value.lower().split('.')[-1]
                     if ext in ('jpg','bmp','jpeg','png','gif'):
-                        human.photo = obj.sub_tag("FILE").value
+                        person.photo = obj.sub_tag("FILE").value
                     else:
                         form = obj.sub_tag("FORM")
                         if form and obj.sub_tag("FORM").value.lower() in ('jpg','bmp','jpeg','png','gif'):
-                            human.photo = obj.sub_tag("FILE").value
+                            person.photo = obj.sub_tag("FILE").value
                         else:
                             form = obj.sub_tag("FILE").sub_tag("FORM")
                             if form and form.value.lower() in ('jpg','bmp','jpeg','png','gif'):
-                                human.photo = obj.sub_tag("FILE").value 
-        human.sex = record.sex
+                                person.photo = obj.sub_tag("FILE").value 
+        person.sex = record.sex
         # BIRTH TAG
         birthtag = GetPosFromTag(record, "BIRT")
-        human.birth = birthtag.event
-        human.pos = birthtag.pos
+        person.birth = birthtag.event
+        # Build a time range 
+        if thisgvOps.timeframe[0]:
+            if person.birth and person.birth.whenyearnum() and person.birth.whenyearnum() < thisgvOps.timeframe[0]:
+                thisgvOps.timeframe[0] = person.birth.whenyearnum()
+        else:
+            thisgvOps.timeframe[0] = person.birth.whenyearnum()
+        person.pos = birthtag.pos
         
         # Use the Burial Tag as a backup for the Death attributes
         # TODO need to code this as backup
@@ -258,15 +265,20 @@ class GedcomParser:
             deathtagAge = deathtag.sub_tag_value("AGE")
             deathtagCause = deathtag.sub_tag_value("CAUS")
             if deathtagAge:
-                human.age = deathtagAge
-                if deathtagCause: human.age = f"{deathtagAge} of {deathtagCause}"
+                person.age = deathtagAge
+                if deathtagCause: person.age = f"{deathtagAge} of {deathtagCause}"
         deathtagPos = GetPosFromTag(record, "DEAT")
-        human.death = deathtagPos.event 
+        person.death = deathtagPos.event 
+        if thisgvOps.timeframe[1]:
+            if person.death and person.death.whenyearnum() and person.death.whenyearnum() > thisgvOps.timeframe[0]:
+                thisgvOps.timeframe[1] = person.death.whenyearnum()
+        else:
+            thisgvOps.timeframe[1] = person.death.whenyearnum()
         
         
         # Last Possible is death (or birth)
-        if human.death and Pos.hasLocation(human.death.pos):
-            human.pos = human.death.pos
+        if person.death and LatLon.hasLocation(person.death.pos):
+            person.pos = person.death.pos
         
         homes = {}
         allhomes=record.sub_tags("RESI")
@@ -283,7 +295,7 @@ class GedcomParser:
                     if alladdr != '':
                         homedate = getgdate(hom.sub_tag("DATE"))
                         if homedate in homes:
-                            _log.debug ("**Double RESI location for : %s on %s @ %s", human.name, homedate , alladdr)
+                            _log.debug ("**Double RESI location for : %s on %s @ %s", person.name, homedate , alladdr)
                         homes[homedate] = LifeEvent(alladdr, hom.sub_tag("DATE"))
         for tags in (homelocationtags):
             allhomes=record.sub_tags(tags)
@@ -312,10 +324,10 @@ class GedcomParser:
         # Sort them by year          
         if (homes):
             for i in sorted (homes.keys()) :
-                if human.home:
-                    human.home.append(homes[i])
+                if person.home:
+                    person.home.append(homes[i])
                 else:
-                    human.home = [homes[i]]
+                    person.home = [homes[i]]
 
         # bits = ""
         # for tags in (bitstags):
@@ -334,17 +346,17 @@ class GedcomParser:
 
 
 
-        return human
+        return person
 
     @staticmethod
-    def __create_humans(records0) -> Dict[str, Human]:
+    def __create_people(records0) -> Dict[str, Person]:
         global thisgvOps
-        humans : Dict[str, Human] = dict()
+        people : Dict[str, Person] = dict()
         thisgvOps.step("Reading GED", target=(thisgvOps.totalGEDpeople+thisgvOps.totalGEDfamily))
         for record in records0("INDI"):
             if thisgvOps.ShouldStop():
                 break
-            humans[record.xref_id] = GedcomParser.__create_human(record)
+            people[record.xref_id] = GedcomParser.__create_person(record)
         familyloop = 0
         for record in records0("FAM"):
             if thisgvOps.ShouldStop():
@@ -357,37 +369,37 @@ class GedcomParser:
             for marry in record.sub_tags("MARR"):
                 marryevent = GetPosFromTag(marry, None).event
                 if husband and wife:
-                    if humans[husband.xref_id].marriage:
-                        humans[husband.xref_id].marriage.append((wife.xref_id, marryevent))
+                    if people[husband.xref_id].marriage:
+                        people[husband.xref_id].marriage.append((wife.xref_id, marryevent))
                     else:
-                        humans[husband.xref_id].marriage = [(wife.xref_id, marryevent)]
-                    if humans[wife.xref_id].marriage :
-                        humans[wife.xref_id].marriage.append((husband.xref_id, marryevent))
+                        people[husband.xref_id].marriage = [(wife.xref_id, marryevent)]
+                    if people[wife.xref_id].marriage :
+                        people[wife.xref_id].marriage.append((husband.xref_id, marryevent))
                     else:
-                        humans[wife.xref_id].marriage = [(husband.xref_id, marryevent)]
+                        people[wife.xref_id].marriage = [(husband.xref_id, marryevent)]
             if husband:
-                if humans[husband.xref_id].name == "Unknown":
-                    humans[husband.xref_id].name = "Unknown [Father]"
+                if people[husband.xref_id].name == "Unknown":
+                    people[husband.xref_id].name = "Unknown [Father]"
             if wife:
-                if humans[wife.xref_id].name == "Unknown":
-                    humans[wife.xref_id].name = "Unknown [Mother]"
+                if people[wife.xref_id].name == "Unknown":
+                    people[wife.xref_id].name = "Unknown [Mother]"
             
             for chil in record.sub_tags("CHIL"):
                 if chil:
-                    if chil.xref_id not in humans.keys():
+                    if chil.xref_id not in people.keys():
                         continue
                     if husband:
-                        humans[chil.xref_id].father = husband.xref_id
-                        humans[husband.xref_id].children.append(chil.xref_id)
+                        people[chil.xref_id].father = husband.xref_id
+                        people[husband.xref_id].children.append(chil.xref_id)
                     if wife:
-                        humans[chil.xref_id].mother = wife.xref_id
-                        humans[wife.xref_id].children.append(chil.xref_id)
+                        people[chil.xref_id].mother = wife.xref_id
+                        people[wife.xref_id].children.append(chil.xref_id)
                 else:
                     _log.warning("Family has missing INDI record for one of the CHIL: %s",  record.xref_id)
                 
-        return humans
+        return people
 
-    def create_humans(self) -> Dict[str, Human]:
+    def create_people(self) -> Dict[str, Person]:
         global thisgvOps
         if self.file_path == '':
             return None
@@ -411,7 +423,7 @@ class GedcomParser:
                 return None
             
             thisgvOps.totalGEDfamily = sum(1 for value in parser.xref0.values() if value[1] == 'FAM')
-            return self.__create_humans(parser.records0)
+            return self.__create_people(parser.records0)
         
 
 

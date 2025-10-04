@@ -172,7 +172,7 @@ class VisualMapFrame(wx.Frame):
 
         # ensure the parent's __init__ is called so the wx.frame is created
         #
-        super(VisualMapFrame, self).__init__(*args, **kw)
+        super().__init__(*args, **kw)
 
         self.SetMinSize((800,800))
         self.StatusBar = self.CreateStatusBar()
@@ -228,6 +228,7 @@ class VisualMapFrame(wx.Frame):
 
         # Now a help menu for the about item
         helpMenu = wx.Menu()
+        helpMenu.Append(wx.ID_HELP, "Help")
         helpMenu.Append(wx.ID_ABOUT, "About")
 
         menuBar.Append(self.fileMenu, "&File")
@@ -248,6 +249,7 @@ class VisualMapFrame(wx.Frame):
         self.Bind(wx.EVT_CLOSE, self.OnExit)
         self.Bind(wx.EVT_MENU, self.OnInfo, id=wx.ID_INFO)
         self.Bind(wx.EVT_MENU, self.OnAbout, id=wx.ID_ABOUT)
+        self.Bind(wx.EVT_MENU, self.OnAbout, id=wx.ID_HELP)
         self.Bind(wx.EVT_MENU_RANGE, self.OnFileHistory, id=wx.ID_FILE1, id2=wx.ID_FILE9)
         self.Bind(wx.EVT_MENU, self.onOptionsReset, id=wx.ID_REVERT)
         self.Bind(wx.EVT_MENU, self.OnFind, id=wx.ID_FIND)
@@ -359,7 +361,10 @@ class VisualMapFrame(wx.Frame):
         panel.LoadGEDCOM()
 
     def OnAbout(self, event):
-        dialog = AboutDialog(None, title=f"About {GUINAME} {VERSION}")
+        if event.GetId() == wx.ID_ABOUT:
+            dialog = AboutDialog(None, title=f"About {GUINAME} {VERSION}")
+        else:
+            dialog = HelpDialog(None, title=f"Help for {GUINAME} {VERSION}")    
         dialog.ShowModal()
         dialog.Destroy()
 
@@ -374,20 +379,20 @@ class VisualMapFrame(wx.Frame):
             #    if (panel.gO.people[xh].bestlocation() == ''): 
             #        withoutaddr += 1
             # msg = f'Total People :\t{len(panel.gO.people)}\n People without any address {withoutaddr}'
-            msg = f'Total People :{len(panel.gO.people)}'
-        else:
-            msg = "No people loaded yet"
-        msg += '\n'
-        if hasattr(panel.gO, 'lookup') and hasattr(panel.gO.lookup, 'addresses') and panel.gO.lookup.addresses:
-            msg += f'\nTotal cached addresses: {len(panel.gO.lookup.addresses)}\n' +  panel.gO.lookup.stats
-        if panel.gO.timeframe:
-            timeline = "-".join(map(str, panel.gO.timeframe))
-            msg +=  f"\nTimeframe : {timeline}"
-        if panel.gO.selectedpeople > 0:
-            msg += f"\nDirect  people {panel.gO.selectedpeople} in the heritage line"
+            msg = f'Total People :{len(panel.gO.people)}\n'
+            if panel.gO.timeframe:
+                timeline = "-".join(map(str, panel.gO.timeframe))
+                msg +=  f"\nTimeframe : {timeline}\n"
+            if panel.gO.selectedpeople > 0:
+                msg += f"\nDirect  people {panel.gO.selectedpeople} in the heritage line\n"
+                
+            else:
+                msg += "\nSelect main person for heritage line\n"
             
         else:
-            msg += "\nNo address in cache"
+            msg = "No people loaded yet\n"
+        if hasattr(panel.gO, 'lookup') and hasattr(panel.gO.lookup, 'addresses') and panel.gO.lookup.addresses:
+            msg += f'\nTotal cached addresses: {len(panel.gO.lookup.addresses)}\n' +  panel.gO.lookup.stats
             
         wx.MessageBox (msg, 'Statistics', wx.OK|wx.ICON_INFORMATION)
     def OnFind(self, event):
@@ -409,7 +414,7 @@ class VisualMapFrame(wx.Frame):
 class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSorterMixin):
     def __init__(self, parent, ID, pos=wx.DefaultPosition,
                  size=wx.DefaultSize, style=0, name="PeopleList", *args, **kw):
-        super(PeopleListCtrl, self).__init__(*args, **kw)
+        super().__init__(*args, **kw)
         wx.ListCtrl.__init__(self, parent, ID, pos, size, style)
         listmix.ListCtrlAutoWidthMixin.__init__(self)
 
@@ -733,7 +738,7 @@ class PeopleListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
     Raises:
         None
         """
-        super(PeopleListCtrlPanel, self).__init__(*args, **kw)
+        super().__init__(*args, **kw)
         wx.Panel.__init__(self, parent, -1, style=wx.WANTS_CHARS, name="PeoplePanel")
         # TODO This box defination still have a scroll overlap problem
         sizer = wx.BoxSizer(wx.VERTICAL)
@@ -768,7 +773,7 @@ class VisualMapPanel(wx.Panel):
         global panel
         # ensure the parent's __init__ is called so the wx.frame is created
         #
-        super(VisualMapPanel, self).__init__(*args, **kw)
+        super().__init__(*args, **kw)
 
         panel = self
         self.SetMinSize((800,800))

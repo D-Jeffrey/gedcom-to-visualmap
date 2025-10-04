@@ -268,10 +268,10 @@ class KmlExporter:
             if line.midpoints:
                 connectWhere = self.folderLife if foldermode else kml
                 for mid in line.midpoints:
-                    if mid.pos and mid.pos.hasLocation():
+                    if mid.latlon and mid.latlon.hasLocation():
                         whatevent = mid.what if mid.what else "Event"
                         event = "<br>{}: {}</br>".format(whatevent, mid.when if mid.when else "Unknown") 
-                        pnt = connectWhere.newpoint(name=f"{name} ({whatevent})", coords=[self.driftLatLon(mid.pos)], description="<![CDATA[ " + event + " ]]>")
+                        pnt = connectWhere.newpoint(name=f"{name} ({whatevent})", coords=[self.driftLatLon(mid.latlon)], description="<![CDATA[ " + event + " ]]>")
                         pnt.style = simplekml.Style()
                         pnt.style.labelstyle.scale = 0.7 * styleA.labelstyle.scale
                         # pnt.style.iconstyle.icon.href = f'https://maps.google.com/mapfiles/kml/paddle/wht-blank.png'
@@ -282,8 +282,8 @@ class KmlExporter:
                                 pnt.timestamp.when = mid.when.value.date1.isoformat()
                         
                         
-                        _log.info    (f"    midpt   {line.name} ({mid.pos.lon}, {mid.pos.lat})")    
+                        _log.info    (f"    midpt   {line.name} ({mid.latlon.lon}, {mid.latlon.lat})")    
                     else:
-                        _log.warning (f"skipping {line.name} ({mid.pos.lon}, {mid.pos.lat})")
+                        _log.warning (f"skipping {line.name} ({mid.latlon.lon}, {mid.latlon.lat})")
 
 

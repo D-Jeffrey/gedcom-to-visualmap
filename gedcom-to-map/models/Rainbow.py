@@ -58,5 +58,5 @@ class Rainbow:
             v = 0.9999
         len_steps = len(self.steps ) - 1
         step = int(v * len_steps)
-        pos = v % (1 / len_steps) * len_steps
-        return self.merge_color(self.steps[step], self.steps[step + 1], pos)
+        latlon = v % (1 / len_steps) * len_steps
+        return self.merge_color(self.steps[step], self.steps[step + 1], latlon)

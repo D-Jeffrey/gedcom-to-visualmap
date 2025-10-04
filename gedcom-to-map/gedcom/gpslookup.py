@@ -524,19 +524,19 @@ class GEDComGPSLookup:
         
             # Resolve birth address
             if person_obj.birth and person_obj.birth.where:
-                person_obj.birth.pos = self.lookupaddresses(person_obj.birth.where)
-                _log.debug(f"{person_obj.name:30} @ B {person_obj.birth.where:60} = {person_obj.birth.pos}")
+                person_obj.birth.latlon = self.lookupaddresses(person_obj.birth.where)
+                _log.debug(f"{person_obj.name:30} @ B {person_obj.birth.where:60} = {person_obj.birth.latlon}")
         
             # Resolve home address
             if person_obj.home:
                 for home in person_obj.home:
                     if home.where:
-                        home.pos = self.lookupaddresses(home.where)
+                        home.latlon = self.lookupaddresses(home.where)
         
             # Resolve death address
             if person_obj.death and person_obj.death.where:
-                person_obj.death.pos = self.lookupaddresses(person_obj.death.where)
-                _log.debug(f"{person_obj.name:30} @ D {person_obj.death.where:60} = {person_obj.death.pos}")
+                person_obj.death.latlon = self.lookupaddresses(person_obj.death.where)
+                _log.debug(f"{person_obj.name:30} @ D {person_obj.death.where:60} = {person_obj.death.latlon}")
             if self.addresses:
                 if len(self.addresses) - donesome > 512 or datetime.now().timestamp() - nowis.timestamp() > 300:  # Every 5 minutes or 512 addresses save Addresses
                     _log.info(f"************** Saving cache {donesome} {len(self.addresses)}")

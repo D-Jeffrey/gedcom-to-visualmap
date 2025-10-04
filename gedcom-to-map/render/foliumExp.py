@@ -271,8 +271,8 @@ class foliumExporter:
         minyear = maxyear = None
         
         # Add birth location if available
-        if line.person.birth and line.person.birth.pos:
-            mycluster.mark(line.person.birth.pos, line.person.birth.whenyearnum())
+        if line.person.birth and line.person.birth.latlon:
+            mycluster.mark(line.person.birth.latlon, line.person.birth.whenyearnum())
             minyear = line.person.birth.whenyearnum()
         
         # Add death year if available
@@ -296,14 +296,14 @@ class foliumExporter:
             return
             
         activepos = LatLon(None, None)
-        if line.person.birth and line.person.birth.pos:
-            activepos = line.person.birth.pos
+        if line.person.birth and line.person.birth.latlon:
+            activepos = line.person.birth.latlon
             
         for year in range(minyear, maxyear):
             # Update active position if we have a midpoint for this year
             for mids in line.midpoints:
                 if mids.whenyearnum() == year:
-                    activepos = mids.pos
+                    activepos = mids.latlon
             if activepos and activepos.lat and activepos.lon:
                 mycluster.mark(activepos, year)
 
@@ -340,8 +340,8 @@ class foliumExporter:
             self._build_yearly_positions(line, minyear, maxyear, mycluster)
             
             # Add death location if available
-            if line.person.death and line.person.death.pos:
-                mycluster.mark(line.person.death.pos, line.person.death.whenyearnum())
+            if line.person.death and line.person.death.latlon:
+                mycluster.mark(line.person.death.latlon, line.person.death.whenyearnum())
 
         # Extract unique years from markers
         years = sorted(set(
@@ -392,7 +392,7 @@ class foliumExporter:
             mycluster.mark(line.b)
             if line.midpoints:
                 for mids in line.midpoints:
-                    mycluster.mark(mids.pos, None)
+                    mycluster.mark(mids.latlon, None)
 
         # Create feature group and heat data
         fg = folium.FeatureGroup(
@@ -553,7 +553,7 @@ class foliumExporter:
                 fm_line.append(tuple(start_point))
             if line.midpoints:
                 for mids in line.midpoints:
-                    mid_point = [Drift(mids.pos.lat), Drift(mids.pos.lon)]
+                    mid_point = [Drift(mids.latlon.lat), Drift(mids.latlon.lon)]
                     fm_line.append(tuple(mid_point))
                     if self.gOptions.HomeMarker and self.gOptions.MarksOn:
                         point_type = mids.what if mids.what in MidPointMarker else "Other"
@@ -601,9 +601,9 @@ class foliumExporter:
             marker_cluster.add_to(fm)
         folium.map.LayerControl('topleft', collapsed=sc).add_to(fm)
 
-        if main and main.birth and main.birth.pos and main.birth.pos.lat:
+        if main and main.birth and main.birth.latlon and main.birth.latlon.lat:
             if self.gOptions.MarkStarOn:
-                folium.Marker([Drift(main.birth.pos.lat), Drift(main.birth.pos.lon)], tooltip=main.name, opacity=0.5, icon=folium.Icon(color='lightred', icon='star', prefix='fa', iconSize=['50%', '50%'])).add_to(fm)
+                folium.Marker([Drift(main.birth.latlon.lat), Drift(main.birth.latlon.lon)], tooltip=main.name, opacity=0.5, icon=folium.Icon(color='lightred', icon='star', prefix='fa', iconSize=['50%', '50%'])).add_to(fm)
         else:
             _log.warning("No GPS locations to generate a Star on the map.")
 

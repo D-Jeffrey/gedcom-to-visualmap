@@ -2,7 +2,7 @@ __all__ = ['Person', 'LifeEvent']
 
 import logging
 import re
-from typing import Dict, Union
+from typing import Dict, Union, Optional, List
 
 from models.LatLon import LatLon
 
@@ -31,44 +31,51 @@ def DateFromField(field):
     return None
 
 class Partner:
-    def __init__(self, xref_id, pos):
+    def __init__(self, xref_id, latlon : LatLon = None):
         self.xref_id = xref_id
-        self.pos :LatLon = pos
+        self.latlon :LatLon = latlon
     def __str__(self):
-        return f"Person(id={self.xref_id}, LatLon={self.pos})"
+        return f"Person(id={self.xref_id}, LatLon={self.latlon})"
+    def __repr__(self) -> str:
+        return f'[ {self.parent.xref_id} : {self.parent.name} -> {self.xref_id} {self.mother} - {self.lat_lon} ]'
  
 class Person:
-    __slots__ = ['xref_id', 'name', 'father', 'mother', 'pos', 'birth', 'death', 'marriage', 'home', 'first', 
+    __slots__ = ['xref_id', 'name', 'father', 'mother', 'latlon', 'birth', 'death', 'marriage', 'home', 'first', 
                  'surname', 'maiden','sex','title', 'photo', 'children', 'partners', 'age']
-    def __init__(self, xref_id):
-        self.xref_id: str = xref_id
-        self.name = None
+    def __init__(self, xref_id : str):
+        """
+        Initialize a Person.
+
+        Args:
+            xref_id (str): GEDCOM cross-reference ID.
+        """
+        self.xref_id = xref_id
+        self.name : Optional[str] = None
         self.father : Person = None
         self.mother : Person = None
-        self.pos : LatLon = None           # save the best postion
+        self.latlon : LatLon = None           # save the best postion
         self.birth : LifeEvent = None
         self.death : LifeEvent = None
         # TODO need to deal with multiple mariages
-        self.marriage = None
+        self.marriage : List[LifeEvent] = []
         # TODO multiple homes
-        self.home : LifeEvent = None
-        # self.map : LifeEvent = None           # used to save the orginal pos values (Upgraded)
-        self.first = None               # First Name
-        self.surname = None             # Last Name
-        self.maiden: None
-        self.sex: None
-        self.title = None
+        self.home : List[LifeEvent] = []
+        self.first : Optional[str] = None               # First Name
+        self.surname : Optional[str] = None             # Last Name
+        self.maiden : Optional[str] = None
+        self.sex : Optional[str] = None
+        self.title : Optional[str] = None
         self.children : list[str] = []    # xref_id of children NOT YET USED
         self.partners : list[str] = []    # xref_id of partners NOT YET USED
-        self.age : None
-        self.photo : None         # URL or file path to photo
+        self.age = None           # This can be age number or a including the cause of death
+        self.photo = None         # URL or file path to photo
 
 
     def __str__(self) -> str:
         return f"Person(id={self.xref_id}, name={self.name})"
         
     def __repr__(self) -> str:
-        return f"[ {self.xref_id} : {self.name} - {self.father} & {self.mother} - {self.pos} ]"
+        return f"[ {self.xref_id} : {self.name} - {self.father} & {self.mother} - {self.latlon} ]"
 
     # return "year (Born)" or "year (Died)" or "? (Unknown)" along with year as a string or None
     # Example "2010 (Born)", "2010" or "1150 (Died)", "1150" or "? (Unknown)"
@@ -86,14 +93,14 @@ class Person:
     def bestlocation(self):
         # TODO Best Location should consider if in KML mode and what is selected
         best = ["Unknown", ""]
-        if self.birth and self.birth.pos:
+        if self.birth and self.birth.latlon:
             best = [
-                str(self.birth.pos),
+                str(self.birth.latlon),
                 f"{self.birth.where} (Born)" if self.birth.where else "",
             ]
-        elif self.death and self.death.pos:
+        elif self.death and self.death.latlon:
             best = [
-                str(self.death.pos),
+                str(self.death.latlon),
                 f"{self.death.where} (Died)" if self.death.where else "",
             ]
         return best
@@ -102,22 +109,22 @@ class Person:
         # TODO Best Location should consider if in KML mode and what is selected  
         # If the location is set in the GED, using MAP attribute then that will be the best
         best = LatLon(None, None)
-#        if self.map and self.map.pos.hasLocation():
-#            best = self.map.pos
-        if self.birth and self.birth.pos and self.birth.pos.hasLocation():
-            best = self.birth.pos
-        elif self.death and self.death.pos and self.death.pos.hasLocation():
-            best = self.death.pos
+#        if self.map and self.map.latlon.hasLocation():
+#            best = self.map.latlon
+        if self.birth and self.birth.latlon and self.birth.latlon.hasLocation():
+            best = self.birth.latlon
+        elif self.death and self.death.latlon and self.death.latlon.hasLocation():
+            best = self.death.latlon
         return best
     
 class LifeEvent:
     def __init__(self, place :str, atime, position : LatLon = None, what = None):  # atime is a Record
-        self.where = place
+        self.where: Optional[str] = place
         self.when = atime
-        self.pos = position
-        self.what = what
+        self.latlon : Optional[LatLon] = position
+        self.what: Optional[str] = what
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"[ {self.when} : {self.where} is {self.what}]"
     
     def asEventstr(self):
@@ -128,7 +135,7 @@ class LifeEvent:
         else:
             return ""
     
-    def whenyear(self, last = False):
+    def whenyear(self, last = False) -> Optional[str]:
         if self.when:
             if (isinstance(self.when, str)):
                 return (self.when)
@@ -167,8 +174,8 @@ class LifeEvent:
         return DateFromField(self.whenyear(last))
 
     def getattr(self, attr):
-        if attr == 'pos':
-            return self.pos
+        if attr == 'latlon':
+            return self.latlon
         elif attr == 'when':
             return self.when.value or ""
         elif attr == 'where':
@@ -178,6 +185,6 @@ class LifeEvent:
         _log.warning("Life Event attr: %s' object has no attribute '%s'", type(self).__name__, attr)    
         return None
 
-    def __str__(self):
-        return f"{self.getattr('where')} : {self.getattr('when')} - {self.getattr('pos')} {self.getattr('what')}"
+    def __str__(self) -> str:
+        return f"{self.getattr('where')} : {self.getattr('when')} - {self.getattr('latlon')} {self.getattr('what')}"
 

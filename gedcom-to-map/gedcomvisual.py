@@ -29,9 +29,6 @@ def doKML(gOp : gvOptions, people: list[Person]):
     if (not people):
         return
     kmlInstance = None
-    # Save in case we overwrite
-#    for h in people.keys():
-#        people[h].map = people[h].pos
 
     placeTypes = []
 #    if gOp.MarksOn:
@@ -61,7 +58,7 @@ def doKML(gOp : gvOptions, people: list[Person]):
         if (not kmlInstance):
             kmlInstance = KmlExporter(gOp)
 
-        kmlInstance.export(people[gOp.Main].pos, creator, nametag, placeType)
+        kmlInstance.export(people[gOp.Main].latlon, creator, nametag, placeType)
     if kmlInstance:
         kmlInstance.Done()
         if gOp.KMLcmdline:

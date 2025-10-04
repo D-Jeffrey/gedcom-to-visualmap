@@ -127,7 +127,7 @@ class GetPosFromTag:
     def __init__(self, gedcomtag : Record, tag : str, placetag ="PLAC"):
         self.when = None
         self.place = None
-        self.pos = LatLon(None, None)
+        self.latlon = LatLon(None, None)
         self.event = None
         if tag:
             subtag = gedcomtag.sub_tag(tag)
@@ -151,12 +151,12 @@ class GetPosFromTag:
                     lat = maploc.sub_tag("LATI")
                     lon = maploc.sub_tag("LONG")
                     if lat and lon:
-                        self.pos = LatLon(lat.value,lon.value)
+                        self.latlon = LatLon(lat.value,lon.value)
                     else: 
                         lat = maploc.sub_tag("_LATI")
                         lon = maploc.sub_tag("_LONG")
                         if lat and lon:
-                            self.pos = LatLon(lat.value,lon.value)
+                            self.latlon = LatLon(lat.value,lon.value)
                 else:
                     if hasattr(plactag, 'value') : 
                         # Conderation for : 
@@ -173,8 +173,8 @@ class GetPosFromTag:
                             lat = match.group(2)
                             lon = match.group(3)
                             if lat and lon:
-                                self.pos = LatLon(float(lat),float(lon))
-            self.event = LifeEvent(self.place, self.when, self.pos, tag)
+                                self.latlon = LatLon(float(lat),float(lon))
+            self.event = LifeEvent(self.place, self.when, self.latlon, tag)
             
 
 class GedcomParser:
@@ -213,7 +213,6 @@ class GedcomParser:
             person.surname =record.name.surname
             person.maiden = record.name.maiden
             person.name = "{}".format(record.name.format())
-            # person.name = "{} {}".format(name.value[0], name.value[1])
         if person.name == '':
             person.first = "Unknown"
             person.surname = "Unknown"
@@ -253,7 +252,7 @@ class GedcomParser:
                 thisgvOps.timeframe[0] = person.birth.whenyearnum()
         else:
             thisgvOps.timeframe[0] = person.birth.whenyearnum()
-        person.pos = birthtag.pos
+        person.latlon = birthtag.latlon
         
         # Use the Burial Tag as a backup for the Death attributes
         # TODO need to code this as backup
@@ -277,8 +276,8 @@ class GedcomParser:
         
         
         # Last Possible is death (or birth)
-        if person.death and LatLon.hasLocation(person.death.pos):
-            person.pos = person.death.pos
+        if person.death and LatLon.hasLocation(person.death.latlon):
+            person.latlon = person.death.latlon
         
         homes = {}
         allhomes=record.sub_tags("RESI")

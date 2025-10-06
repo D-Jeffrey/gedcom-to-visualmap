@@ -61,27 +61,12 @@ def doKML(gOp : gvOptions, people: list[Person]):
         kmlInstance.export(people[gOp.Main].latlon, creator, nametag, placeType)
     if kmlInstance:
         kmlInstance.Done()
+        cmdfile = os.path.join(gOp.resultpath, gOp.Result)
+        gOp.BackgroundProcess.SayInfoMessage(f"KML output to : {cmdfile}") 
         if gOp.KMLcmdline:
-            if gOp.KMLcmdline.startswith('http'):
-                webbrowser.open(gOp.KMLcmdline, new = 0, autoraise = True)
-            else:
-                # TODO
-                cmdline = gOp.KMLcmdline.replace("$n", os.path.join(gOp.resultpath, gOp.Result))
-                _log.info(f"KML Running command line : '{cmdline}'") 
-                gOp.BackgroundProcess.SayInfoMessage(f"KML output to : {os.path.join(gOp.resultpath, gOp.Result)}") 
-                try:
-                    if os.name == 'posix':
-                        subprocess.Popen(["/bin/sh" , cmdline])
-                    elif os.name == 'nt':
-                        cmd = os.environ.get("SystemRoot") + "\\system32\\cmd.exe"
-                        subprocess.Popen([cmd, "/c", cmdline])
-                    else:
-                        _log.error(f"Unknwon OS to run command-line: '{cmdline}'")
-                        
-                except FileNotFoundError:
-                    _log.error(f"command errored: '{cmdline}'") 
-                except Exception as e:
-                    _log.error(f"command errored as: {e} : '{cmdline}'") 
+            gOp.panel.runCMDfile(gOp.KMLcmdline, cmdfile)
+        else:
+            _log.error("Use Options -> Options Setup to define a command line to run")
     else:
         _log.error("No KML output created")
         gOp.BackgroundProcess.SayInfoMessage(f"No KML output created - No data selected to map") 

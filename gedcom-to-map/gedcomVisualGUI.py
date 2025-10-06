@@ -1449,7 +1449,7 @@ class VisualMapPanel(wx.Panel):
                 self.kbox.Show()
 
        # Enable/disable trace button based on referenced data availability
-        self.id.BTNTRACE.Enable(bool(self.gO.Referenced and self.gO.Result))
+        self.id.BTNTRACE.Enable(bool(self.gO.Referenced and self.gO.Result and ResultTypeHTML))
 
     def SetupOptions(self):
 
@@ -1534,8 +1534,6 @@ class VisualMapPanel(wx.Panel):
         self.runCMDfile(self.gO.get('CSVcmdline'), self.gO.get('gpsfile'))
 
     def runCMDfile(self, cmdline, cmdfile, isHTML=False):
-        cmdfile = self.gO.get('gpsfile')
-        cmdline = self.gO.get('CSVcmdline')
         if cmdfile and cmdfile != '':
             if cmdline == '$n':
                 if isHTML:
@@ -1550,10 +1548,10 @@ class VisualMapPanel(wx.Panel):
                 if ' ' in cmdline:
                     cmdline = self.gO.get('CSVcmdline').replace('$n', f'{cmdfile}')
                     _log.info(f'shell run  `{cmdfile}`')
-                    if self.gOp.cmdline.startswith('http'):
+                    if cmdline.startswith('http'):
                         webbrowser.open(cmdline, new = 0, autoraise = True)
                     else:
-                        subprocess.run(cmdline, shell=True)
+                        subprocess.Popen([cmdline], shell=True)
                 else:
                     _log.info(f'process run `{cmdline}` with `{cmdfile}`')
                     subprocess.run([cmdline, cmdfile], check=False)
@@ -1566,7 +1564,7 @@ class VisualMapPanel(wx.Panel):
     def SaveTrace(self):
         if self.gO.Result and self.gO.Referenced:
             if not self.gO.lastlines:
-                logging.error("No lastline values in SaveTrace (do draw first)")
+                logging.error("No lastline values in SaveTrace (do draw first using HTML Mode for this to work)")
                 return 
             tracepath = os.path.splitext(self.gO.Result)[0] + ".trace.txt"
             # indentpath = os.path.splitext(self.gO.Result)[0] + ".indent.txt"
@@ -1594,6 +1592,8 @@ class VisualMapPanel(wx.Panel):
             # _log.info(f"Indent file saved {indentpath}")
             withall = "with all people" if self.gO.get('AllEntities') else ""
             BackgroundProcess.SayInfoMessage(f"Trace file {withall} saved: {tracepath}",True)
+            self.runCMDfile(self.gO.get('Tracecmdline'), tracepath)
+
 
     def OpenBrowser(self):
         if self.gO.get('ResultHTML'):

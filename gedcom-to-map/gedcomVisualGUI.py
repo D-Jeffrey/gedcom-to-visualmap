@@ -41,6 +41,7 @@ from const import GUINAME, GVFONT, KMLMAPSURL, LOG_CONFIG, NAME, VERSION, panel
 from gedcomoptions import gvOptions 
 from gedcomvisual import doTrace
 from gedcomDialogs import *
+from style.stylemanager import FontManager
 
 
 _log = logging.getLogger(__name__.lower())
@@ -181,7 +182,7 @@ class VisualMapFrame(wx.Frame):
         self.makeMenuBar()
         # and a status bar
         
-        self.StatusBar.SetFieldsCount(number=2, widths=[-1, 22*GVFONT[1]])
+        self.StatusBar.SetFieldsCount(number=2, widths=[-1, 28*GVFONT[1]])
         self.SetStatusText("Visual Mapping ready",0)
         self.myFont = wx.Font(wx.FontInfo(GVFONT[1]).FaceName(GVFONT[0]))
         # TODO Check for Arial and change it
@@ -189,6 +190,8 @@ class VisualMapFrame(wx.Frame):
             self.myFont = wx.Font(wx.FontInfo(10).FaceName('Verdana'))
         wx.Frame.SetFont(self, self.myFont)
         self.inTimer = False
+        
+
 
 
     def makeMenuBar(self):
@@ -257,6 +260,54 @@ class VisualMapFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.OnOpenCSV, id = self.id.IDs['ID_BTNCSV'])
         self.Bind(wx.EVT_MENU, self.OnOpenBrowser, id = self.id.IDs['ID_BTNBROWSER'])
         # More BIND below in main
+    
+        FontManager.load()
+        # existing Option items...
+        # Add Set Font submenu
+        set_font_menu = wx.Menu()
+        for fname in FontManager.PREDEFINED_FONTS:
+            item = wx.MenuItem(set_font_menu, wx.ID_ANY, fname, kind=wx.ITEM_RADIO)
+            set_font_menu.Append(item)
+            # pre-check current selection
+            current_face = FontManager._current.get("face") if FontManager._current else None
+            if current_face == fname:
+                item.Check(True)
+
+        # optional: add font size submenu or a Font Size dialog entry
+        set_font_sub = wx.MenuItem(optionsMenu, wx.ID_ANY, "Set Font")
+        optionsMenu.AppendSubMenu(set_font_menu, "Set Font")
+        # bind events
+        for mi in set_font_menu.GetMenuItems():
+            self.Bind(wx.EVT_MENU, self.on_font_menu_item, mi)
+
+        # self.Bind(wx.EVT_MENU, self.on_set_font, id=set_font_menu.GetMenuItems()[0].GetId())  # placeholder
+
+        # better: bind each menu item individually
+        for mi in set_font_menu.GetMenuItems():
+            self.Bind(wx.EVT_MENU, self.on_font_menu_item, mi)
+
+        #   event handler
+    def on_font_menu_item(self, event):
+        mi = self.GetMenuBar().FindItemById(event.GetId())
+        if mi is None:
+            return
+        face = mi.GetItemLabelText()
+        success = FontManager.set_font(face)
+        if success:
+            # optionally reset font size or prompt user for size
+            FontManager.apply_to_all_controls(self)
+            # Apply to the people grid specifically
+            if self.panel.peopleList:
+                try:
+                    FontManager.apply_to(self.panel.peopleList)
+                except Exception:
+                    pass
+            # Also apply to top-level frame to propagate to other controls
+            FontManager.apply_to_all_controls(self)
+            # refresh/redraw
+            self.Layout()
+            self.Refresh()
+
 
     def OnExit(self, event):
         global panel

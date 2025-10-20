@@ -6,6 +6,7 @@ import platform
 import time
 
 from typing import Union, Dict
+from enum import Enum
 import configparser
 from const import OFFICECMDLINE
 from pathlib import Path
@@ -35,6 +36,22 @@ def settings_file_pathname(file_name):
     _log.debug (f"Settings file location: {settings_file_path}")
     return settings_file_path
     
+class ResultsType(Enum):
+    HTML = "HTML"
+    KML = "KML"
+    KML2 = "KML2"
+    SUM = "SUM"
+
+def ResultsTypeEnforce(value):
+    if isinstance(value, ResultsType):
+        return value
+    elif isinstance(value, str):
+        try:
+            return ResultsType[value.upper()]
+        except KeyError:
+            raise ValueError(f"Invalid ResultsType string: {value}")
+    else:
+        raise TypeError(f"Cannot convert {type(value)} to ResultsType")
 
 class gvOptions:
     def __init__ (self):
@@ -46,12 +63,11 @@ class gvOptions:
         self.GEDCOMinput = "gedcomfile.ged"
         self.resultpath = None              # directory for .Result
         self.Result = ''                    # output file (could be of resulttype .html or .kml)
-        self.ResultType = "html"
-        self.ResultHTML = True
+        self.ResultType : ResultsType = ResultsType.HTML
         self.Main = None                    # xref_id
         self.mainPerson = None               # point to Person
         self.Name = None                    # name of person
-        self.mainPersonLatLon = LatLon(None, None)
+        self.mainPersonLatLon : LatLon = LatLon(None, None)
         self.MaxMissing = 0
         self.MaxLineWeight = 20
         self.UseGPS = True
@@ -71,7 +87,7 @@ class gvOptions:
         self.runningSince = 0
         self.time = time.ctime()
         self.parsed = False
-        self.goodmain = False
+        self.newload = False
         self.state = ''
         self.gpsfile = None
         self.stopping = False
@@ -86,6 +102,11 @@ class gvOptions:
         self.lastlines = None
         self.timeframe = [None,None]
         self.runavg = []
+
+        self.skip_file_geocache = False
+        self.skip_file_alt_places = False
+        self.defaultCountry = "England"
+        self.include_canonical = True
         
         os_name = platform.system()
         if os_name == 'Windows':
@@ -118,8 +139,10 @@ class gvOptions:
         self.html_keys = {'MarksOn':0, 'HeatMap':0, 'BornMark':0, 'DieMark':0,  'MarkStarOn':0, 'GroupBy':1, 
                           'UseAntPath':0, 'MapTimeLine':0, 'HeatMapTimeStep':1, 'HomeMarker':0, 'showLayerControl':0, 
                           'mapMini':0, 'MapStyle':2}
-        self.core_keys = {'UseGPS':0, 'CacheOnly':0, 'AllEntities':0, 'KMLcmdline':2, 'CSVcmdline':2, 'Tracecmdline':2, 'badAge':0}
-        self.logging_keys = ['models.person', 'models', 'ged4py.parser', 'ged4py', 'models.creator', 'gedcomoptions', 'gedcom.gedcomparser', 'gedcom', 'gedcom.gpslookup', 'geopy', 'render.kmlexporter', 'render', 'render.foliumexp', 'gedcomvisual', 'gedcomdialogs', 'gedcomvisualgui', '__main__']
+        self.core_keys = {'UseGPS':0, 'CacheOnly':0, 'AllEntities':0, 'ResultType':3, 'KMLcmdline':2, 'CSVcmdline':2, 'Tracecmdline':2, 'badAge':0}
+        self.logging_keys = ['models.person', 'models', 'ged4py.parser', 'ged4py', 'models.creator', 'models.location', 'gedcomoptions', 'gedcom.gedcomparser', 
+                             'gedcom', 'gedcom.gedcom', 'gedcom.geocode','gedcom.geocache','gedcom.addressbook',
+                             'geopy', 'render.kmlexporter', 'render', 'render.foliumexp', 'gedcomvisual', 'gedcomdialogs', 'gedcomvisualgui', '__main__']
         
         self.kml_keys = {'MaxLineWeight':1, 'MaxMissing':1, 'UseBalloonFlyto':0, 'KMLsort':0}
         # Old settings that should be removed from the config file
@@ -162,10 +185,10 @@ class gvOptions:
 
 
         
-    def setstatic(self,  GEDCOMinput:2, Result:2, ResultHTML: bool, Main=None, MaxMissing:1 = 0, MaxLineWeight:1 = 20, UseGPS:bool = True, CacheOnly:bool = False,  AllEntities:bool = False):
+    def setstatic(self,  GEDCOMinput:2, Result:2, ResultType: ResultsType, Main=None, MaxMissing:1 = 0, MaxLineWeight:1 = 20, UseGPS:bool = True, CacheOnly:bool = False,  AllEntities:bool = False):
         
         self.setInput(GEDCOMinput)
-        self.setResults(Result, ResultHTML)
+        self.setResults(Result, ResultType)
         self.Main = Main
         self.Name = None
         self.MaxMissing = MaxMissing
@@ -203,7 +226,7 @@ class gvOptions:
         
         self.setInput(self.gvConfig['Core'].get('InputFile', ''), generalRequest=False)
         self.resultpath, self.Result = os.path.split(self.gvConfig['Core'].get('OutputFile', ''))
-        self.setResults(self.Result, not ('.kml' in self.Result.lower()))
+        self.setResults(self.Result, self.ResultType)
         self.KMLcmdline = self.gvConfig['Core'].get('KMLcmdline', '')
 
         # Load logging settings
@@ -277,16 +300,22 @@ class gvOptions:
         else:
             self.setMainPerson(None)
 
-    def setResults(self, Result, useHTML):
+    def setResults(self, Result, OutputType: ResultsType):
         """ Set the Output file and type (Only the file name) """
-        self.ResultHTML = useHTML
-        if (useHTML):
-            self.ResultType = "html"
-        else:
-            self.ResultType = "kml"
-        self.Result, extension = os.path.splitext(Result)                   # output file (could be of resulttype .html or .kml)
+        self.ResultType = ResultsTypeEnforce(OutputType)
+        extension = "txt"
+        if OutputType is ResultsType.HTML:
+            extension = "html"
+        elif OutputType is ResultsType.KML:
+            extension = "kml"
+        elif OutputType is ResultsType.KML2:
+            extension = "kml"
+        elif OutputType is ResultsType.SUM:
+            extension = "txt"
+        
+        self.Result, e = os.path.splitext(Result)                   # output file (could be of resulttype .html or .kml)
         if self.Result != "":
-            self.Result = self.Result + "." + self.ResultType
+            self.Result = self.Result + "." + extension
         # TODO Update Visual value
 
     def setInput(self, theInput, generalRequest=True):
@@ -313,7 +342,7 @@ class gvOptions:
             if org != self.GEDCOMinput:
                 self.resultpath = os.path.dirname(self.GEDCOMinput)
                 # Force the output to match the name and location of the input
-                self.setResults(filen, self.ResultHTML)
+                self.setResults(filen, self.ResultType)
         else:
             self.resultpath = None
         if org != self.GEDCOMinput:
@@ -365,11 +394,11 @@ class gvOptions:
         self.stopping = False
 
     def get (self, attribute):
-        """ check an gOptions attribute """
+        """ check an gOp attribute """
         return getattr(self,attribute)
 
     def set(self, attribute, value):
-        """ set an gOptions attribute """
+        """ set an gOp attribute """
         if not hasattr(self, attribute):
             _log.error(f'attempting to set an attribute : {attribute} which does not exist')
             raise ValueError(f'attempting to set an attribute : {attribute} which does not exist')

@@ -270,16 +270,16 @@ class KmlExporter:
                 for mid in line.midpoints:
                     if mid.latlon and mid.latlon.hasLocation():
                         whatevent = mid.what if mid.what else "Event"
-                        event = "<br>{}: {}</br>".format(whatevent, mid.when if mid.when else "Unknown") 
+                        event = "<br>{}: {}</br>".format(whatevent, mid.date if mid.date else "Unknown") 
                         pnt = connectWhere.newpoint(name=f"{name} ({whatevent})", coords=[self.driftLatLon(mid.latlon)], description="<![CDATA[ " + event + " ]]>")
                         pnt.style = simplekml.Style()
                         pnt.style.labelstyle.scale = 0.7 * styleA.labelstyle.scale
                         # pnt.style.iconstyle.icon.href = f'https://maps.google.com/mapfiles/kml/paddle/wht-blank.png'
-                        if mid.when and not (isinstance(mid.when, str)):
-                            if hasattr(mid.when.value, 'date'):
-                                pnt.timestamp.when = mid.when.value.date.isoformat()
-                            elif hasattr(mid.when.value, 'date1'):
-                                pnt.timestamp.when = mid.when.value.date1.isoformat()
+                        if mid.when and not (isinstance(mid.date, str)):
+                            if hasattr(mid.date.value, 'date'):
+                                pnt.timestamp.when = mid.date.value.date.isoformat()
+                            elif hasattr(mid.date.value, 'date1'):
+                                pnt.timestamp.when = mid.date.value.date1.isoformat()
                         
                         
                         _log.info    (f"    midpt   {line.name} ({mid.latlon.lon}, {mid.latlon.lat})")    

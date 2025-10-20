@@ -11,7 +11,7 @@ import logging
 import logging.config
 
 from const import LOG_CONFIG, NAME, VERSION
-from gedcomoptions import gvOptions
+from gedcomoptions import gvOptions, ResultsType
 from gedcomvisual import Geoheatmap, gedcom_to_map
 
 _log = logging.getLogger(__name__)
@@ -89,13 +89,16 @@ if __name__ == '__main__':
             places['born'] = 'born'
         if arg_parse.args.death:
             places['death'] = 'death'
-       
+    if arg_parse.args.format =='HTML':
+        forformtm = ResultsType.HTML
+    else:
+        formt = ResultsType.KML2
     myGeoOptions.setstatic( arg_parse.args.input_file, arg_parse.args.output_file,
-            arg_parse.args.format =='HTML', arg_parse.args.main, 
+            formt, arg_parse.args.main, 
             arg_parse.args.max_missing, arg_parse.args.max_line_weight, 
             arg_parse.args.usegps, arg_parse.args.cacheonly,  arg_parse.args.everyone) 
 
-    if (myGeoOptions.ResultHTML):
+    if (myGeoOptions.ResultType):
         Geoheatmap(myGeoOptions)
     elif arg_parse.args.format =='KML': 
         gedcom_to_map(myGeoOptions)

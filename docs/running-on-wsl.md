@@ -1,9 +1,56 @@
-
 # Running gedcomVisualGUI on Linux (WSL)
 
-### WIP, looking for feedback
+## CoPilot Guided instuctions for WSL Ubuntu 24.04
+
+![img](img/windows+wsl-2025-10.png)
+1. Install GTK+ 3 Development Packages
+Most modern wxPython builds rely on GTK+ 3. You can install the necessary development files with:
+```
+sudo apt update
+sudo apt install libgtk-3-dev pkg-config
+```
+
+2. Verify pkg-config and .pc Files
+Ensure pkg-config can locate the GTK+ .pc files:
+```
+pkg-config --modversion gtk+-3.0
+```
+
+If this returns a version number, you're good. **If not, check:**
+```
+ls /usr/lib/x86_64-linux-gnu/pkgconfig/gtk+-*.pc
+```
 
 
+If the .pc file exists but **isn’t found**, add its path to PKG_CONFIG_PATH:
+```
+export PKG_CONFIG_PATH=/usr/lib/x86_64-linux-gnu/pkgconfig:$PKG_CONFIG_PATH
+```
+
+You can add that line to your ~/.bashrc or ~/.zshrc to persist it.
+3. Check LD_LIBRARY_PATH
+Ensure GTK+ libraries are discoverable:
+```
+export LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH
+```
+
+Again, add this to your shell config file if needed.
+4. Install Other Dependencies
+wxPython may also need these:
+```
+sudo apt install libgl1-mesa-dev libglu1-mesa-dev libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev
+```
+
+5. Try installing via pip (if prebuilt wheels are available, building the wheel for wxpython can take a very long time):
+```
+pip install wxPython
+```
+
+
+---
+---
+
+# OLD do not use
 ## Linux (WSL - WSL version: 2.4.12.0)
   
 ```
@@ -26,7 +73,7 @@ pip install --upgrade pip
 ```
 
 
-This seems to work best...
+This seems to work best... (but is not a good idea if you are using 24.4, as it breaks the default python3.12)
 ```
 #sudo apt install xubuntu-desktop
 sudo apt install xfce4
@@ -64,67 +111,6 @@ I have not figured out how to use `venv` properly yet, so this a work in progres
 
 The egg seems to be generally working (thought I don't have a background understanding of eggs).  It appears eggs are obsolute.
 
-
-##Running on Linux (WSL)
-Using the steps of download and unzip release 0.2.1
-```
-pip install -U attrdict3
-sudo pip3 install -U -f https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-16.04 wxPython
-
-pip install wxPython
-cd gedcom-to-visualmap
-pip install -r requirements.txt
-python3 gedcomVisualGUI.py 
-```
-
-![img](img/WSL-2023-04-01-bash.png)
-
-![img](img/WSL-2023-03-31.png)
-
-
-Trying an alternate approach of:
-
-```
-sudo apt install xubuntu-desktop
-
-```
-
-Output from a download and run
-```
-dj@DESKTOP-R3PSDBU:~/gv$ tar -xf  ../Downloads/gedcom-to-visualmap-0.2.3.1.tar.gz 
-dj@DESKTOP-R3PSDBU:~/gv$ ls
-gedcom-to-visualmap-0.2.3.1
-dj@DESKTOP-R3PSDBU:~/gv$ cd gedcom-to-visualmap-0.2.3.1/
-dj@DESKTOP-R3PSDBU:~/gv/gedcom-to-visualmap-0.2.3.1$ ls
-LICENSE    docs           gedcom-to-map.pyproj  img               samples
-README.md  gedcom-to-map  gedcom-to-map.sln     requirements.txt  setup.py
-dj@DESKTOP-R3PSDBU:~/gv/gedcom-to-visualmap-0.2.3.1$ pip install -r requirements.txt 
-Requirement already satisfied: ged4py>=0.4.4 in /home/dj/.local/lib/python3.8/site-packages (from -r requirements.txt (line 1)) (0.4.4)
-Requirement already satisfied: simplekml>=1.3.6 in /home/dj/.local/lib/python3.8/site-packages (from -r requirements.txt (line 2)) (1.3.6)
-Requirement already satisfied: geopy>=2.3.0 in /home/dj/.local/lib/python3.8/site-packages (from -r requirements.txt (line 3)) (2.3.0)
-Requirement already satisfied: folium>=0.14.0 in /home/dj/.local/lib/python3.8/site-packages (from -r requirements.txt (line 4)) (0.14.0)
-Requirement already satisfied: wxPython>=4.1.0 in /home/dj/.local/lib/python3.8/site-packages (from -r requirements.txt (line 5)) (4.2.0)
-Requirement already satisfied: convertdate in /home/dj/.local/lib/python3.8/site-packages (from ged4py>=0.4.4->-r requirements.txt (line 1)) (2.4.0)
-Requirement already satisfied: ansel in /home/dj/.local/lib/python3.8/site-packages (from ged4py>=0.4.4->-r requirements.txt (line 1)) (1.0.0)
-Requirement already satisfied: geographiclib<3,>=1.52 in /home/dj/.local/lib/python3.8/site-packages (from geopy>=2.3.0->-r requirements.txt (line 3)) (2.0)
-Requirement already satisfied: requests in /usr/lib/python3/dist-packages (from folium>=0.14.0->-r requirements.txt (line 4)) (2.22.0)
-Requirement already satisfied: numpy in /home/dj/.local/lib/python3.8/site-packages (from folium>=0.14.0->-r requirements.txt (line 4)) (1.24.2)
-Requirement already satisfied: jinja2>=2.9 in /usr/lib/python3/dist-packages (from folium>=0.14.0->-r requirements.txt (line 4)) (2.10.1)
-Requirement already satisfied: branca>=0.6.0 in /home/dj/.local/lib/python3.8/site-packages (from folium>=0.14.0->-r requirements.txt (line 4)) (0.6.0)
-Requirement already satisfied: six in /usr/lib/python3/dist-packages (from wxPython>=4.1.0->-r requirements.txt (line 5)) (1.14.0)
-Requirement already satisfied: pillow in /home/dj/.local/lib/python3.8/site-packages (from wxPython>=4.1.0->-r requirements.txt (line 5)) (9.4.0)
-Requirement already satisfied: pymeeus<=1,>=0.3.13 in /home/dj/.local/lib/python3.8/site-packages (from convertdate->ged4py>=0.4.4->-r requirements.txt (line 1)) (0.5.12)
-dj@DESKTOP-R3PSDBU:~/gv/gedcom-to-visualmap-0.2.3.1$ pwd
-/home/dj/gv/gedcom-to-visualmap-0.2.3.1
-dj@DESKTOP-R3PSDBU:~/gv/gedcom-to-visualmap-0.2.3.1$ ls
-LICENSE    docs           gedcom-to-map.pyproj  img               samples
-README.md  gedcom-to-map  gedcom-to-map.sln     requirements.txt  setup.py
-dj@DESKTOP-R3PSDBU:~/gv/gedcom-to-visualmap-0.2.3.1$ python3 gedcom-to-map/gedcomVisualGUI.py 
-01-04-2023 06:29:51 : INFO : gedcomVisualGUI : <module> : 1315 : Starting up gedcom-to-visualmap 0.2.3
-01-04-2023 06:29:51 : INFO : gedcomVisualGUI : <module> : 1315 : Starting up gedcom-to-visualmap 0.2.3
-
-
-```
 
 ## Side by side
 Windows and Linux (WSL) running on Windows 11 - WSL version: 2.4.12.0 - Ubuntu 

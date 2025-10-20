@@ -1,8 +1,8 @@
 # Constants for gedcom-to-visualmap
 
-VERSION = "0.2.6.9.2"
+VERSION = "0.2.7.0.0"
 NAME = "gedcom-to-visualmap"
-GEOCODEUSERAGENT = NAME + "/" + VERSION + " GEDCOM-to-map-folium"
+GEOCODEUSERAGENT = NAME + "/" + VERSION + " GEDCOM-to-visualmap"
 GUINAME = 'GEDCOM Visual Map'
 
 GV_COUNTRIES_JSON = 'https://raw.githubusercontent.com/nnjeim/world/master/resources/json/countries.json'

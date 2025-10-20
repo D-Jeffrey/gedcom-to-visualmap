@@ -15,6 +15,7 @@ import logging
 import logging.config
 import os
 import os.path
+from pathlib import Path
 import re
 import subprocess
 import sys
@@ -38,7 +39,7 @@ import xyzservices.providers as xyz
 
 
 from const import GUINAME, GVFONT, KMLMAPSURL, LOG_CONFIG, NAME, VERSION, panel
-from gedcomoptions import gvOptions 
+from gedcomoptions import gvOptions, ResultsType 
 from gedcomvisual import doTrace
 from gedcomDialogs import *
 from style.stylemanager import FontManager
@@ -61,13 +62,13 @@ class VisualGedcomIds():
             'ID_CBMarksOn', 'ID_CBHeatMap', 'ID_CBFlyTo', 'ID_CBBornMark', 'ID_CBDieMark', 'ID_LISTMapStyle',
             'ID_CBMarkStarOn', 'ID_RBGroupBy', 'ID_CBUseAntPath', 'ID_CBMapTimeLine',
             'ID_CBHomeMarker', 'ID_LISTHeatMapTimeStep', 'ID_TEXTGEDCOMinput', 'ID_TEXTResult',
-            'ID_RBResultHTML', 'ID_TEXTMain', 'ID_TEXTName', 'ID_RBKMLMode', 'ID_INTMaxMissing', 'ID_INTMaxLineWeight',
+            'ID_RBResultsType', 'ID_TEXTMain', 'ID_TEXTName', 'ID_RBKMLMode', 'ID_INTMaxMissing', 'ID_INTMaxLineWeight',
             'ID_CBUseGPS', 'ID_CBCacheOnly', 'ID_CBAllEntities',  'ID_CBMapControl',
             'ID_CBMapMini', 'ID_BTNLoad', 'ID_BTNUpdate', 'ID_BTNCSV', 'ID_BTNTRACE', 'ID_BTNSTOP', 'ID_BTNBROWSER',
             'ID_CBGridView', 'CBYougeAge'
         ]
         self.IDs = {name: wx.NewIdRef() for name in self.ids}
-        # ID = Attribute (in gOptions), Action impact
+        # ID = Attribute (in gOp), Action impact
         self.IDtoAttr = {
             self.IDs['ID_CBMarksOn']: ('MarksOn', 'Redraw'),
             self.IDs['ID_CBHeatMap']: ('HeatMap', ''),
@@ -83,7 +84,7 @@ class VisualGedcomIds():
             self.IDs['ID_LISTHeatMapTimeStep']: ('MapTimeLine', 'Redraw'),
             self.IDs['ID_TEXTGEDCOMinput']: ('GEDCOMinput', 'Reload'),
             self.IDs['ID_TEXTResult']: ('Result', 'Redraw'),
-            self.IDs['ID_RBResultHTML']: ('ResultHTML', 'Redraw'),
+            self.IDs['ID_RBResultsType']: ('ResultType', 'Redraw'),
             self.IDs['ID_TEXTMain']: ('Main', 'Reload'),
             self.IDs['ID_TEXTName']: ('Name', ''),
             self.IDs['ID_RBKMLMode']: ('KMLMode', 'Redraw'),
@@ -314,7 +315,7 @@ class VisualMapFrame(wx.Frame):
         panel.myTimer.Stop()
         self.Unbind(wx.EVT_TIMER, self)
         """Close the frame, terminating the application."""
-        panel.gO.savesettings()
+        panel.gOp.savesettings()
         if event.GetEventType() == wx.EVT_CLOSE.typeId:
             self.Destroy()
         else:
@@ -332,8 +333,8 @@ class VisualMapFrame(wx.Frame):
         global panel
 
         dDir = os.getcwd()
-        if panel and panel.gO:
-            infile = panel.gO.get('GEDCOMinput')
+        if panel and panel.gOp:
+            infile = panel.gOp.get('GEDCOMinput')
             if infile != '':
                 dDir, filen  = os.path.split(infile)
         dlg = wx.FileDialog(self,
@@ -362,12 +363,12 @@ class VisualMapFrame(wx.Frame):
 
         dDir = os.getcwd()
         dFile = "visgedcom.html"
-        if panel and panel.gO:
-            resultfile = panel.gO.get('Result')
+        if panel and panel.gOp:
+            resultfile = panel.gOp.get('Result')
             if resultfile != '':
                 dDir, dFile= os.path.split(resultfile)
             else:
-                resultfile = panel.gO.get('GEDCOMinput')
+                resultfile = panel.gOp.get('GEDCOMinput')
                 dDir, dFile  = os.path.split(resultfile)
         dFile = os.path.splitext(dFile)[0]
 
@@ -384,7 +385,7 @@ class VisualMapFrame(wx.Frame):
             _log.debug("Output selected %s", path)
             filetype = os.path.splitext(path)[1]
             isHTML = not (filetype.lower() in ['.kml'])
-            panel.gO.setResults(path, isHTML)
+            panel.gOp.setResults(path, isHTML)
             panel.id.TEXTResult.SetValue(path)
             panel.id.RBResultHTML.SetSelection(0 if isHTML else 1)
             panel.SetupButtonState()
@@ -425,25 +426,25 @@ class VisualMapFrame(wx.Frame):
 
         withoutaddr = 0
         msg = ""
-        if hasattr(panel.gO, 'people') and panel.gO.people:
-            # for xh in panel.gO.people.keys():
-            #    if (panel.gO.people[xh].bestlocation() == ''): 
+        if hasattr(panel.gOp, 'people') and panel.gOp.people:
+            # for xh in panel.gOp.people.keys():
+            #    if (panel.gOp.people[xh].bestlocation() == ''): 
             #        withoutaddr += 1
-            # msg = f'Total People :\t{len(panel.gO.people)}\n People without any address {withoutaddr}'
-            msg = f'Total People :{len(panel.gO.people)}\n'
-            if panel.gO.timeframe:
-                timeline = "-".join(map(str, panel.gO.timeframe))
+            # msg = f'Total People :\t{len(panel.gOp.people)}\n People without any address {withoutaddr}'
+            msg = f'Total People :{len(panel.gOp.people)}\n'
+            if panel.gOp.timeframe:
+                timeline = "-".join(map(str, panel.gOp.timeframe))
                 msg +=  f"\nTimeframe : {timeline}\n"
-            if panel.gO.selectedpeople > 0:
-                msg += f"\nDirect  people {panel.gO.selectedpeople} in the heritage line\n"
+            if panel.gOp.selectedpeople > 0:
+                msg += f"\nDirect  people {panel.gOp.selectedpeople} in the heritage line\n"
                 
             else:
                 msg += "\nSelect main person for heritage line\n"
             
         else:
             msg = "No people loaded yet\n"
-        if hasattr(panel.gO, 'lookup') and hasattr(panel.gO.lookup, 'addresses') and panel.gO.lookup.addresses:
-            msg += f'\nTotal cached addresses: {len(panel.gO.lookup.addresses)}\n' +  panel.gO.lookup.stats
+        if hasattr(panel.gOp, 'lookup') and hasattr(panel.gOp.lookup, 'addresses') and panel.gOp.lookup.addresses:
+            msg += f'\nTotal cached addresses: {len(panel.gOp.lookup.addresses)}\n' +  panel.gOp.lookup.stats
             
         wx.MessageBox (msg, 'Statistics', wx.OK|wx.ICON_INFORMATION)
     def OnFind(self, event):
@@ -452,14 +453,14 @@ class VisualMapFrame(wx.Frame):
 
     def onOptionsReset(self, event):
         global panel
-        panel.gO.defaults()
+        panel.gOp.defaults()
         panel.SetupOptions()
         wx.MessageBox("Rest options to defaults",
                       "Reset Options",
                       wx.OK|wx.ICON_INFORMATION)
         
     def onOptionsSetup(self, event):
-        dialog = ConfigDialog(None, title='Configuration Options', gOptions=panel.gO)
+        dialog = ConfigDialog(None, title='Configuration Options', gOp=panel.gOp)
         
 #=============================================================
 class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSorterMixin):
@@ -477,7 +478,7 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
         self.GridOnlyFamily = False
         self._LastGridOnlyFamily = self.GridOnlyFamily
         self.LastSearch = ""
-        self.gO = None
+        self.gOp = None
         self.parent = parent
 
         self.SetImageList(self.il, wx.IMAGE_LIST_SMALL)
@@ -519,7 +520,7 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
         
 
     def SetGOp(self, gOp):
-        self.gO = gOp
+        self.gOp = gOp
 
     def PopulateList(self, people, mainperson, loading):
         global panel
@@ -528,10 +529,10 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
         
         self.active = True
 
-        if self.gO:
-            wasrunning = self.gO.running
-            self.gO.running = True
-            self.GridOnlyFamily = self.gO.get('GridView')
+        if self.gOp:
+            wasrunning = self.gOp.running
+            self.gOp.running = True
+            self.GridOnlyFamily = self.gOp.get('GridView')
         
         if (loading):
             # BUG this does not work
@@ -560,20 +561,20 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
                         
                     self.popdata[index] = (people[h].name, d, people[h].xref_id, location , where, self.ParseDate(y))
                     index += 1
-        if self.gO:
+        if self.gOp:
             items = self.popdata.items()
-            self.gO.selectedpeople = 0
+            self.gOp.selectedpeople = 0
             if not wasrunning:
-                self.gO.step("Gridload", resetCounter=False, target=len(items))
+                self.gOp.step("Gridload", resetCounter=False, target=len(items))
             self.itemDataMap = {data[0] : data for data in items} 
             index = -1
             for key, data in items:
-                self.gO.counter = key
+                self.gOp.counter = key
                 if key % 2048 == 0:
                     wx.Yield()
                 
-                if self.GridOnlyFamily and self.gO.Referenced:
-                    DisplayItem = self.gO.Referenced.exists(data[2])
+                if self.GridOnlyFamily and self.gOp.Referenced:
+                    DisplayItem = self.gOp.Referenced.exists(data[2])
                 else:
                     DisplayItem = True
                 if DisplayItem:
@@ -593,9 +594,9 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
                         if mainperson == self.GetItem(index,2):
                             selectperson = index
                     
-                    if self.gO.Referenced:
-                        if self.gO.Referenced.exists(data[2]):
-                            self.gO.selectedpeople = self.gO.selectedpeople + 1
+                    if self.gOp.Referenced:
+                        if self.gOp.Referenced.exists(data[2]):
+                            self.gOp.selectedpeople = self.gOp.selectedpeople + 1
                             if mainperson == data[2]:
                                 self.SetItemBackgroundColour(index, self.id.GetColor('MAINPERSON'))
                             else:
@@ -606,8 +607,8 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
                                     self.SetItemBackgroundColour(index, self.id.GetColor('ANCESTOR'))
                         else:
                             self.SetItemBackgroundColour(index, self.id.GetColor('OTHERPERSON'))
-            self.gO.counter = 0
-            self.gO.state = ""
+            self.gOp.counter = 0
+            self.gOp.state = ""
 
         self.SetColumnWidth(1, 112)
         self.SetColumnWidth(2, 85)
@@ -625,11 +626,11 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
         if mainperson and selectperson > 0 and loading:
             self.EnsureVisible(selectperson)
         wx.Yield()
-        if self.gO and self.gO.running:
+        if self.gOp and self.gOp.running:
             # Hack race condition
             if not wasrunning:
                 panel.StopTimer()
-            self.gO.running = wasrunning
+            self.gOp.running = wasrunning
             
         self.active = False
 
@@ -726,16 +727,21 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
         global BackgroundProcess, panel
         self.currentItem = event.Index
         _log.debug("%s TopItem: %s", self.GetItemText(self.currentItem), self.GetTopItem())
-        if self.gO:
-            self.gO.setMain(self.GetItemText(self.currentItem, 2))
+        self.ShowSelectedLinage(self.GetItemText(self.currentItem, 2))
+                
+    def ShowSelectedLinage(self, personid: str):
+        if self.gOp:
+            self.gOp.setMain(personid)
             if BackgroundProcess.updategridmain:
+                _log.debug("Linage for: %s", personid)
                 BackgroundProcess.updategridmain = False
-                doTrace(self.gO)
-                self.PopulateList(self.gO.people, self.gO.get('Main'), False)
-                BackgroundProcess.SayInfoMessage(f"Using '{self.gO.get('Main')}' as starting person with {len(self.gO.Referenced)} direct ancestors", False)
+                doTrace(self.gOp)
+                self.gOp.newload = False
+                self.PopulateList(self.gOp.people, self.gOp.get('Main'), False)
+                BackgroundProcess.SayInfoMessage(f"Using '{personid}' as starting person with {len(self.gOp.Referenced)} direct ancestors", False)
                 BackgroundProcess.updategridmain = True
                 panel.SetupButtonState()
-                
+
 
     def OnColClick(self, event):
         item = self.GetColumn(event.GetColumn())
@@ -810,7 +816,7 @@ class PeopleListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
         parent.SetSizer(sizer)
         
     def setGOp(self, gOp):
-        self.gO = gOp
+        self.gOp = gOp
         if self.list:
             self.list.SetGOp(gOp)
 
@@ -829,7 +835,7 @@ class VisualMapPanel(wx.Panel):
         panel = self
         self.SetMinSize((800,800))
         self.frame = self.TopLevelParent
-        self.gO : gvOptions = None
+        self.gOp : gvOptions = None
         
         self.id = {}
         
@@ -934,8 +940,8 @@ class VisualMapPanel(wx.Panel):
         self.id.CBHomeMarker = wx.CheckBox(panel, self.id.IDs['ID_CBHomeMarker'], "Marker point or homes")
         self.id.CBMarkStarOn = wx.CheckBox(panel, self.id.IDs['ID_CBMarkStarOn'], "Marker starter with Star")
         self.id.CBMapTimeLine = wx.CheckBox(panel, self.id.IDs['ID_CBMapTimeLine'], "Add Timeline")
-        self.id.RBResultHTML =  wx.RadioBox(panel, self.id.IDs['ID_RBResultHTML'], "Result Type", 
-                                           choices = ['HTML', 'KML'] , majorDimension= 2)
+        self.id.RBResultHTML =  wx.RadioBox(panel, self.id.IDs['ID_RBResultsType'], "Result Type", 
+                                           choices = ['HTML', 'KML', 'KML2', 'SUM'] , majorDimension= 5)
 
         box.AddMany([  self.id.CBUseGPS,
                        self.id.CBCacheOnly,
@@ -1079,7 +1085,7 @@ class VisualMapPanel(wx.Panel):
         # panel.SetSizeHints(box)
         panel.SetSizer(box)
         
-        self.Bind(wx.EVT_RADIOBOX, self.EvtRadioBox, id = self.id.IDs['ID_RBResultHTML'])
+        self.Bind(wx.EVT_RADIOBOX, self.EvtRadioBox, id = self.id.IDs['ID_RBResultsType'])
         self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.id.IDs['ID_CBMapControl'])
         self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.id.IDs['ID_CBMapMini'])
         self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.id.IDs['ID_CBMarksOn'])
@@ -1126,8 +1132,8 @@ class VisualMapPanel(wx.Panel):
 
 
     def NeedReload(self):
-        if self.gO:
-            self.gO.parsed= False
+        if self.gOp:
+            self.gOp.parsed= False
         self.id.BTNLoad.SetBackgroundColour(self.id.GetColor('BTN_PRESS'))
         self.NeedRedraw()
 
@@ -1136,51 +1142,51 @@ class VisualMapPanel(wx.Panel):
 
     def setInputFile(self, path):
         # set the state variables
-        self.gO.setInput(path)
-        _, filen = os.path.split(self.gO.get('GEDCOMinput'))
+        self.gOp.setInput(path)
+        _, filen = os.path.split(self.gOp.get('GEDCOMinput'))
         # set the form field
         self.id.TEXTGEDCOMinput.SetValue(filen)
         self.fileConfig.Write("GEDCOMinput", path)
         #TODO Fix this
         #TODO Fix this
-        self.id.TEXTResult.SetValue(self.gO.get('Result'))
+        self.id.TEXTResult.SetValue(self.gOp.get('Result'))
         self.NeedReload()
         self.SetupButtonState()
 
     def EvtRadioBox(self, event):
 
         _log.debug('%d is %d',  event.GetId(), event.GetInt())
-        if event.GetId() == self.id.IDs['ID_RBResultHTML']:
-            self.gO.set('ResultHTML', event.GetInt() == 0)
-            filename = self.gO.get('Result')
-            newname = filename
-            if self.gO.get('ResultHTML'):
-                BackgroundProcess.updategridmain = True
-                if '.kml' in filename.lower():
-                    newname = self.gO.get('Result').replace('.kml', '.html', -1)
-            else:
-                if '.html' in filename.lower():
-                    newname = self.gO.get('Result').replace('.html', '.kml', -1)
-            if filename != newname:      
-                self.gO.set('Result', newname)
-                self.id.TEXTResult.SetValue(self.gO.get('Result'))
+        if event.GetId() == self.id.IDs['ID_RBResultsType']:
+            if event.GetInt() == 0:
+                outType = ResultsType.HTML
+            elif event.GetInt() == 1:
+                outType = ResultsType.KML
+            elif event.GetInt() == 2:
+                outType = ResultsType.KML2
+            elif event.GetInt() == 3:
+                outType = ResultsType.SUM
+            self.gOp.setResults(self.gOp.get('Result'), outType)
 
-           
+#            BackgroundProcess.updategridmain = True
+
+            self.id.TEXTResult.SetValue(self.gOp.get('Result'))
             self.SetupButtonState()
+
         elif event.GetId() ==  self.id.IDs['ID_RBGroupBy']:
-            self.gO.GroupBy = event.GetSelection()
+            self.gOp.GroupBy = event.GetSelection()
+
         elif event.GetId() ==  self.id.IDs['ID_RBKMLMode']:
-            self.gO.KMLsort = event.GetSelection()
+            self.gOp.KMLsort = event.GetSelection()
         else:
-            _log.error('We have a Problem')
+            _log.error('We have a Problem 81')
         
 
     def EvtText(self, event):
 
         if event.GetId() == self.id.IDs['ID_TEXTResult']:
             event.GetString()
-            self.gO.set('Result', event.GetString())
-            _log.debug("Result %s", self.gO.get('Result') )
+            self.gOp.set('Result', event.GetString())
+            _log.debug("Result %s", self.gOp.get('Result') )
         else:
             _log.error("uncontrolled TEXT")
             self.SetupButtonState()
@@ -1193,7 +1199,7 @@ class VisualMapPanel(wx.Panel):
             _log.debug("3StateValue: %s", cb.Get3StateValue())
         cbid = event.GetId()
         _log.debug('set %s to %s (%s)', self.id.IDtoAttr[cbid][0], cb.GetValue(), self.id.IDtoAttr[cbid][1] )
-        panel.gO.set( self.id.IDtoAttr[cbid][0], cb.GetValue())
+        panel.gOp.set( self.id.IDtoAttr[cbid][0], cb.GetValue())
         
         if cbid == self.id.IDs['ID_CBHeatMap'] or cbid == self.id.IDs['ID_CBMapTimeLine'] or cbid == self.id.IDs['ID_CBMarksOn']:
             self.SetupButtonState()
@@ -1209,7 +1215,7 @@ class VisualMapPanel(wx.Panel):
             _log.error("uncontrolled CB %d with '%s'", cbid,   self.id.IDtoAttr[cbid][1])
         if cbid == self.id.IDs['ID_CBAllEntities'] and cb.GetValue():
             # TODO Fix this up
-            if self.gO.get('ResultHTML'):
+            if self.gOp.get('ResultType'):
                 dlg = None
                 if hasattr(BackgroundProcess, 'people') and BackgroundProcess.people:
                     if len(BackgroundProcess.people) > 200:
@@ -1240,8 +1246,8 @@ class VisualMapPanel(wx.Panel):
         elif myid == self.id.IDs['ID_BTNTRACE']:
             self.SaveTrace()
         elif myid == self.id.IDs['ID_BTNSTOP']:
-            self.gO.set('stopping', True)
-            self.gO.set('parsed', False)
+            self.gOp.set('stopping', True)
+            self.gOp.set('parsed', False)
             self.NeedRedraw()
             self.NeedReload()
         elif myid == self.id.IDs['ID_BTNBROWSER']:
@@ -1260,11 +1266,11 @@ class VisualMapPanel(wx.Panel):
         #         places[cstr] = cstr
         #     if places == {}:
         #         places = {'native':'native'}
-        #     panel.gO.PlaceType = places
+        #     panel.gOp.PlaceType = places
         # el
         if eventid == self.id.IDs['ID_LISTMapStyle']:
             
-            panel.gO.MapStyle = sorted(self.id.AllMapTypes)[event.GetSelection()] 
+            panel.gOp.MapStyle = sorted(self.id.AllMapTypes)[event.GetSelection()] 
             self.NeedRedraw()
         else:
 
@@ -1276,7 +1282,7 @@ class VisualMapPanel(wx.Panel):
         _log.debug('%s, %s, %s', event.GetString(), event.IsSelection(), event.GetSelection())                            
         _ = event.GetEventObject()
         if eventid == self.id.IDs['ID_INTMaxLineWeight']:
-            panel.gO.MaxLineWeight = event.GetSelection()
+            panel.gOp.MaxLineWeight = event.GetSelection()
             self.NeedRedraw()
         else:
             _log.error ("Uncontrol SPINbox")
@@ -1284,52 +1290,52 @@ class VisualMapPanel(wx.Panel):
     def EvtSlider(self, event):
 
         _log.debug('%s', event.GetSelection())
-        panel.gO.HeatMapTimeStep = event.GetSelection()
+        panel.gOp.HeatMapTimeStep = event.GetSelection()
 
     def OnMyTimer(self, evt):
         if self.inTimer:
             return
         self.inTimer = True
         status = ''
-        if self.gO:
-            if self.gO.ShouldStop() or not self.gO.running:
+        if self.gOp:
+            if self.gOp.ShouldStop() or not self.gOp.running:
                 if self.id.BTNSTOP.IsEnabled():
                     self.id.BTNSTOP.Disable()
             else:
                 self.id.BTNSTOP.Enable()
-            status = self.gO.state
-            if self.gO.running:
-                self.gO.runningLast = 0
+            status = self.gOp.state
+            if self.gOp.running:
+                self.gOp.runningLast = 0
                 status = f"{status} - Processing"
-                runningtime = datetime.now().timestamp() - self.gO.runningSince
+                runningtime = datetime.now().timestamp() - self.gOp.runningSince
                 runtime = f"Running {time.strftime('%H:%M:%S', time.gmtime(runningtime))}"
-                if self.gO.countertarget > 0 and self.gO.counter > 0 and self.gO.counter != self.gO.countertarget:
-                    remaintimeInstant = runningtime * (self.gO.countertarget/ self.gO.counter)- runningtime
+                if self.gOp.countertarget > 0 and self.gOp.counter > 0 and self.gOp.counter != self.gOp.countertarget:
+                    remaintimeInstant = runningtime * (self.gOp.countertarget/ self.gOp.counter)- runningtime
                     # Smoothed runtime average over last 10 seconds
-                    self.gO.runavg.append(remaintimeInstant)
-                    if len(self.gO.runavg) > 10:
-                        self.gO.runavg.pop(0)
-                    remaintime = sum(self.gO.runavg)/len(self.gO.runavg)
-                    remaintime = runningtime * (self.gO.countertarget/ self.gO.counter)- runningtime
+                    self.gOp.runavg.append(remaintimeInstant)
+                    if len(self.gOp.runavg) > 20:
+                        self.gOp.runavg.pop(0)
+                    remaintime = sum(self.gOp.runavg)/len(self.gOp.runavg)
+                    remaintime = runningtime * (self.gOp.countertarget/ self.gOp.counter)- runningtime
                     runtime = f"{runtime} ({time.strftime('%H:%M:%S', time.gmtime(remaintime))})"
                     
             else:
-                runtime = "Last {}".format( time.strftime('%H:%M:%S', time.gmtime(self.gO.runningLast)))
+                runtime = "Last {}".format( time.strftime('%H:%M:%S', time.gmtime(self.gOp.runningLast)))
                 # Rest the runtime average
-                self.gO.runavg = []
+                self.gOp.runavg = []
             self.frame.SetStatusText(runtime,1) 
-            if self.gO.counter > 0:
-                if self.gO.countertarget > 0:
-                    status = f"{status} : {self.gO.counter/self.gO.countertarget*100:.0f}% ({self.gO.counter}/{self.gO.countertarget})  "
+            if self.gOp.counter > 0:
+                if self.gOp.countertarget > 0:
+                    status = f"{status} : {self.gOp.counter/self.gOp.countertarget*100:.0f}% ({self.gOp.counter}/{self.gOp.countertarget})  "
                 else:
-                    status = f"{status} : {self.gO.counter}"
-                if self.gO.stepinfo:
-                    status = f"{status} ({self.gO.stepinfo})"
-            if self.gO.ShouldStop():
+                    status = f"{status} : {self.gOp.counter}"
+                if self.gOp.stepinfo:
+                    status = f"{status} ({self.gOp.stepinfo})"
+            if self.gOp.ShouldStop():
                 self.id.BTNUpdate.Enable()
                 status = f"{status} - please wait.. Stopping"
 
-            _, filen = os.path.split(self.gO.get('GEDCOMinput'))
+            _, filen = os.path.split(self.gOp.get('GEDCOMinput'))
             if filen == "":
                 self.id.BTNLoad.Disable()
                 self.id.BTNUpdate.Disable()
@@ -1338,14 +1344,14 @@ class VisualMapPanel(wx.Panel):
                     self.id.BTNLoad.Enable()
                 if not self.id.BTNLoad.IsEnabled():
                     self.id.BTNUpdate.Enable()
-            if self.gO.get('gpsfile') == '':
+            if self.gOp.get('gpsfile') == '':
                 self.id.BTNCSV.Disable()
             else:
                 if not self.id.BTNCSV.IsEnabled():
                     self.id.BTNCSV.Enable()
         if not status or status == '':
-            if self.gO.selectedpeople and self.gO.ResultHTML:
-                status = f'Ready - {panel.gO.selectedpeople} people selected'
+            if self.gOp.selectedpeople and self.gOp.ResultType:
+                status = f'Ready - {panel.gOp.selectedpeople} people selected'
             else:
                 status = 'Ready'
             self.OnBusyStop(-1)
@@ -1353,18 +1359,18 @@ class VisualMapPanel(wx.Panel):
             self.frame.SetStatusText(status)
         if BackgroundProcess.updateinfo or BackgroundProcess.errorinfo or BackgroundProcess.updategrid:
             self.OnUpdate(evt)
-        if self.busystate != self.gO.running:
-            logging.info("Busy %d not Running %d", self.busystate, self.gO.running)
-            if self.gO.running:
-                self.gO.runningSince = datetime.now().timestamp()
+        if self.busystate != self.gOp.running:
+            logging.info("Busy %d not Running %d", self.busystate, self.gOp.running)
+            if self.gOp.running:
+                self.gOp.runningSince = datetime.now().timestamp()
                 self.OnBusyStart(-1)
             else:
                 self.OnBusyStop(-1)
                 self.StopTimer()
-        if not self.gO.running:
-           self.gO.countertarget = 0
-           self.gO.stepinfo = ""
-           self.gO.runningSince = datetime.now().timestamp()
+        if not self.gOp.running:
+           self.gOp.countertarget = 0
+           self.gOp.stepinfo = ""
+           self.gOp.runningSince = datetime.now().timestamp()
            self.busycounthack += 1
            if self.busycounthack > 40:
                 self.OnBusyStop(-1)
@@ -1372,7 +1378,7 @@ class VisualMapPanel(wx.Panel):
         wx.Yield()
         self.inTimer = False
     def StopTimer(self):
-        self.gO.runningLast = datetime.now().timestamp() - self.gO.runningSince
+        self.gOp.runningLast = datetime.now().timestamp() - self.gOp.runningSince
     def OnBusyStart(self, evt):
         """ show the spinning Busy graphic """
         self.busystate = True
@@ -1400,7 +1406,9 @@ class VisualMapPanel(wx.Panel):
             BackgroundProcess.updategrid = False
             saveBusy = self.busystate
             self.OnBusyStart(evt)
-            self.peopleList.list.PopulateList(BackgroundProcess.people, self.gO.get('Main'), True)
+            self.peopleList.list.PopulateList(BackgroundProcess.people, self.gOp.get('Main'), True)
+            if self.gOp.newload:
+                self.peopleList.list.ShowSelectedLinage(self.gOp.get('Main'))
             if not saveBusy:
                 self.OnBusyStop(evt)
         newinfo = None
@@ -1424,7 +1432,7 @@ class VisualMapPanel(wx.Panel):
 
     def SetupButtonState(self):
         """ based on the type of file output, enable/disable the interface """
-        ResultTypeHTML = self.gO.get('ResultHTML')
+        ResultTypeHTML = self.gOp.get('ResultType')
         # Always enabled
             # self.id.CBUseGPS
             # self.id.CBAllEntities
@@ -1454,7 +1462,7 @@ class VisualMapPanel(wx.Panel):
         ]
 
         # Enable/Disable marker-dependent controls if markers are off
-        if self.gO.get('MarksOn'):
+        if self.gOp.get('MarksOn'):
             for ctrl in marks_controls:
                 ctrl.Enable()
         else:
@@ -1470,10 +1478,10 @@ class VisualMapPanel(wx.Panel):
             self.id.CBMapTimeLine.Disable()
             self.id.LISTHeatMapTimeStep.Disable()
             
-            if self.gO.get('HeatMap'):
+            if self.gOp.get('HeatMap'):
                 self.id.CBMapTimeLine.Enable()
                 # Only enable time step if timeline is enabled
-                if self.gO.get('MapTimeLine'):
+                if self.gOp.get('MapTimeLine'):
                     self.id.LISTHeatMapTimeStep.Enable()
             for ctrl in kml_controls:
                 ctrl.Disable()        
@@ -1500,48 +1508,52 @@ class VisualMapPanel(wx.Panel):
                 self.kbox.Show()
 
        # Enable/disable trace button based on referenced data availability
-        self.id.BTNTRACE.Enable(bool(self.gO.Referenced and self.gO.Result and ResultTypeHTML))
+        self.id.BTNTRACE.Enable(bool(self.gOp.Referenced and self.gOp.Result and ResultTypeHTML))
 
     def SetupOptions(self):
 
         if not self.fileConfig:
             self.fileConfig = wx.Config("gedcomVisualGUI")
         
-        if not self.gO:
-            self.gO = gvOptions()
-            self.gO.panel = self
-            self.gO.BackgroundProcess = BackgroundProcess
-            self.gO.UpdateBackgroundEvent = UpdateBackgroundEvent
-            self.peopleList.setGOp(self.gO)
+        if not self.gOp:
+            self.gOp = gvOptions()
+            self.gOp.panel = self
+            self.gOp.BackgroundProcess = BackgroundProcess
+            self.gOp.UpdateBackgroundEvent = UpdateBackgroundEvent
+            self.peopleList.setGOp(self.gOp)
 
-        self.id.RBResultHTML.SetSelection(0 if self.gO.get('ResultHTML') else 1)
+        if self.gOp.get('ResultType'):
+            self.id.RBResultHTML.SetSelection(0)
+        else:
+            if self.id.RBResultHTML.GetSelection() not in [1,2]:
+                self.id.RBResultHTML.SetSelection(1)
         
-        self.id.CBMapControl.SetValue(self.gO.get('showLayerControl'))
-        self.id.CBMapMini.SetValue(self.gO.get('mapMini'))
-        self.id.CBMarksOn.SetValue(self.gO.get('MarksOn'))
-        self.id.CBBornMark.SetValue(self.gO.get('BornMark'))
-        self.id.CBDieMark.SetValue(self.gO.get('DieMark'))
-        self.id.CBHomeMarker.SetValue(self.gO.get('HomeMarker'))
-        self.id.CBMarkStarOn.SetValue(self.gO.get('MarkStarOn'))
-        self.id.CBHeatMap.SetValue(self.gO.get('HeatMap'))
-        self.id.CBFlyTo.SetValue(self.gO.get('UseBalloonFlyto'))
-        self.id.CBMapTimeLine.SetValue(self.gO.get('MapTimeLine'))
-        self.id.CBUseAntPath.SetValue(self.gO.get('UseAntPath'))
-        self.id.CBUseGPS.SetValue(self.gO.get('UseGPS'))
-        self.id.CBAllEntities.SetValue(self.gO.get('AllEntities'))
-        self.id.CBCacheOnly.SetValue(self.gO.get('CacheOnly'))
-        self.id.LISTHeatMapTimeStep.SetValue(self.gO.get('HeatMapTimeStep'))
-        self.id.LISTMapType.SetSelection(self.id.LISTMapType.FindString(self.gO.get('MapStyle')))
-        self.id.ID_INTMaxLineWeight.SetValue(self.gO.get('MaxLineWeight'))
-        self.id.RBGroupBy.SetSelection(self.gO.get('GroupBy'))
-        self.id.TEXTResult.SetValue(self.gO.get('Result'))
+        self.id.CBMapControl.SetValue(self.gOp.get('showLayerControl'))
+        self.id.CBMapMini.SetValue(self.gOp.get('mapMini'))
+        self.id.CBMarksOn.SetValue(self.gOp.get('MarksOn'))
+        self.id.CBBornMark.SetValue(self.gOp.get('BornMark'))
+        self.id.CBDieMark.SetValue(self.gOp.get('DieMark'))
+        self.id.CBHomeMarker.SetValue(self.gOp.get('HomeMarker'))
+        self.id.CBMarkStarOn.SetValue(self.gOp.get('MarkStarOn'))
+        self.id.CBHeatMap.SetValue(self.gOp.get('HeatMap'))
+        self.id.CBFlyTo.SetValue(self.gOp.get('UseBalloonFlyto'))
+        self.id.CBMapTimeLine.SetValue(self.gOp.get('MapTimeLine'))
+        self.id.CBUseAntPath.SetValue(self.gOp.get('UseAntPath'))
+        self.id.CBUseGPS.SetValue(self.gOp.get('UseGPS'))
+        self.id.CBAllEntities.SetValue(self.gOp.get('AllEntities'))
+        self.id.CBCacheOnly.SetValue(self.gOp.get('CacheOnly'))
+        self.id.LISTHeatMapTimeStep.SetValue(self.gOp.get('HeatMapTimeStep'))
+        self.id.LISTMapType.SetSelection(self.id.LISTMapType.FindString(self.gOp.get('MapStyle')))
+        self.id.ID_INTMaxLineWeight.SetValue(self.gOp.get('MaxLineWeight'))
+        self.id.RBGroupBy.SetSelection(self.gOp.get('GroupBy'))
+        self.id.TEXTResult.SetValue(self.gOp.get('Result'))
 
-        _, filen = os.path.split(self.gO.get('GEDCOMinput')) if self.gO.get('GEDCOMinput') else ("", "first.ged")
+        _, filen = os.path.split(self.gOp.get('GEDCOMinput')) if self.gOp.get('GEDCOMinput') else ("", "first.ged")
         self.id.TEXTGEDCOMinput.SetValue(filen)
         self.SetupButtonState()
 
         for t in self.threads:
-            t.DefgOps(self.gO)
+            t.DefgOps(self.gOp)
 
         # Load file history into the panel's configuration
         self.frame.filehistory.Load(self.fileConfig)
@@ -1553,27 +1565,27 @@ class VisualMapPanel(wx.Panel):
     def LoadGEDCOM(self):
         #TODO stop the previous actions and then do the load... need to be improved
         if BackgroundProcess.IsTriggered(): 
-            self.gO.stopping = True
+            self.gOp.stopping = True
         else:
             self.OnBusyStart(-1)
             time.sleep(0.1)
-            self.gO.set('GridView', False)
+            self.gOp.set('GridView', False)
             self.id.CBGridView.SetValue(False)
         
-            cachepath, _ = os.path.split(self.gO.get('GEDCOMinput'))
-            if self.gO.get('gpsfile'):
-                sourcepath, _ = os.path.split(self.gO.get('gpsfile'))
+            cachepath, _ = os.path.split(self.gOp.get('GEDCOMinput'))
+            if self.gOp.get('gpsfile'):
+                sourcepath, _ = os.path.split(self.gOp.get('gpsfile'))
             else:
                 sourcepath = None
-            if self.gO.lookup and cachepath != sourcepath:
-                del self.gO.lookup
-                self.gO.lookup = None
+            if self.gOp.lookup and cachepath != sourcepath:
+                del self.gOp.lookup
+                self.gOp.lookup = None
 
-            BackgroundProcess.Trigger(1)    
+            BackgroundProcess.Trigger(1)
         
     def DrawGEDCOM(self):
 
-        if not self.gO.get('Result') or self.gO.get('Result') == '':
+        if not self.gOp.get('Result') or self.gOp.get('Result') == '':
             _log.error("Error: Not output file name set")
             BackgroundProcess.SayErrorMessage("Error: Please set the Output file name")
         else:
@@ -1582,7 +1594,7 @@ class VisualMapPanel(wx.Panel):
         
     
     def OpenCSV(self):
-        self.runCMDfile(self.gO.get('CSVcmdline'), self.gO.get('gpsfile'))
+        self.runCMDfile(self.gOp.get('CSVcmdline'), self.gOp.get('gpsfile'))
 
     def runCMDfile(self, cmdline, cmdfile, isHTML=False):
         if cmdfile and cmdfile != '':
@@ -1597,7 +1609,7 @@ class VisualMapPanel(wx.Panel):
             elif '$n' in cmdline:
                 cmdline = cmdline.replace('$n','')
                 if ' ' in cmdline:
-                    cmdline = self.gO.get('CSVcmdline').replace('$n', f'{cmdfile}')
+                    cmdline = self.gOp.get('CSVcmdline').replace('$n', f'{cmdfile}')
                     _log.info(f'shell run  `{cmdfile}`')
                     if cmdline.startswith('http'):
                         webbrowser.open(cmdline, new = 0, autoraise = True)
@@ -1613,12 +1625,12 @@ class VisualMapPanel(wx.Panel):
                 _log.error("Error: runCMDfile-Unsupported platform, can not open cmdline file")
     
     def SaveTrace(self):
-        if self.gO.Result and self.gO.Referenced:
-            if not self.gO.lastlines:
+        if self.gOp.Result and self.gOp.Referenced:
+            if not self.gOp.lastlines:
                 logging.error("No lastline values in SaveTrace (do draw first using HTML Mode for this to work)")
                 return 
-            tracepath = os.path.splitext(self.gO.Result)[0] + ".trace.txt"
-            # indentpath = os.path.splitext(self.gO.Result)[0] + ".indent.txt"
+            tracepath = os.path.splitext(self.gOp.Result)[0] + ".trace.txt"
+            # indentpath = os.path.splitext(self.gOp.Result)[0] + ".indent.txt"
             try:
                 trace = open(tracepath , 'w')
             except Exception as e:
@@ -1631,24 +1643,24 @@ class VisualMapPanel(wx.Panel):
             people = BackgroundProcess.people
             # Create a dictionary from the lines array with xid as the key
             for h in people:
-                if self.gO.Referenced.exists(people[h].xref_id):
+                if self.gOp.Referenced.exists(people[h].xref_id):
                     refyear, _ = people[h].refyear()
                     (location, where) = people[h].bestlocation()
-                    personpath = self.gO.lastlines[people[h].xref_id].path
+                    personpath = self.gOp.lastlines[people[h].xref_id].path
                     trace.write(f"{people[h].xref_id}\t{people[h].name}\t{refyear}\t{where}\t{location}\t" + "\t".join(personpath) + "\n") 
                     # indent.write("\t".join(personpath) + f",{people[h].xref_id}\t{people[h].name}\t{refyear}\t{where}\t{location}\n") 
             trace.close()
             # indent.close()
             _log.info(f"Trace file saved {tracepath}")
             # _log.info(f"Indent file saved {indentpath}")
-            withall = "with all people" if self.gO.get('AllEntities') else ""
+            withall = "with all people" if self.gOp.get('AllEntities') else ""
             BackgroundProcess.SayInfoMessage(f"Trace file {withall} saved: {tracepath}",True)
-            self.runCMDfile(self.gO.get('Tracecmdline'), tracepath)
+            self.runCMDfile(self.gOp.get('Tracecmdline'), tracepath)
 
 
     def OpenBrowser(self):
-        if self.gO.get('ResultHTML'):
-            self.runCMDfile(self.gO.get('KMLcmdline'), os.path.join(self.gO.resultpath, self.gO.Result), True)
+        if self.gOp.get('ResultType'):
+            self.runCMDfile(self.gOp.get('KMLcmdline'), os.path.join(self.gOp.resultpath, self.gOp.Result), True)
             
         else:
             self.runCMDfile('$n', KMLMAPSURL, True)

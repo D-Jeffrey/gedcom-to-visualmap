@@ -17,7 +17,7 @@ from models.Line import Line
 from models.LatLon import LatLon
 from render.Referenced import Referenced
 from render.naming import simplifyLastName, soundex
-from models.Creator import DELTA
+from models.Creator import DELTA, getAttrLatLonif
 
 
 _log = logging.getLogger(__name__.lower())
@@ -141,16 +141,16 @@ class MyMarkClusters:
                 return self.markercluster[markname]
 
 class foliumExporter:
-    def __init__(self, gOptions : gvOptions):
-        self.file_name = os.path.join(gOptions.resultpath, gOptions.Result)
-        self.max_line_weight = gOptions.MaxLineWeight
-        self.gOptions = gOptions
+    def __init__(self, gOp : gvOptions):
+        self.file_name = os.path.join(gOp.resultpath, gOp.Result)
+        self.max_line_weight = gOp.MaxLineWeight
+        self.gOp = gOp
         self.fglastname = dict()
         self.saveresult = False
         self.fm = None
         self.locations = []
         self.popups = []
-        self.soundexLast = gOptions.GroupBy == 2
+        self.soundexLast = gOp.GroupBy == 2
         
     def _create_marker_options(self, line) -> dict:
         """Generate marker and line options based on line style"""
@@ -218,7 +218,7 @@ class foliumExporter:
     def _add_point_marker(self, fg: folium.FeatureGroup, point: list, options: dict, 
                         tooltip: str, popup: str, icon_name: str, color: str) -> None:
         """Add a marker to the feature group"""
-        if self.gOptions.MarksOn:
+        if self.gOp.MarksOn:
             marker = folium.features.Marker(
                 point,
                 tooltip=tooltip,
@@ -238,10 +238,10 @@ class foliumExporter:
     def Done(self):
         """Finalize and save the map."""
         if self.saveresult:
-            self.gOptions.step("Writing Folium HTML")
+            self.gOp.step("Writing Folium HTML")
             self.fm.save(self.file_name)
-            self.gOptions.step("Done")
-        # self.gOptions.stop()
+            self.gOp.step("Done")
+        # self.gOp.stop()
         # self.fm = None
     
     def getFeatureGroup(self, thename, depth):
@@ -271,12 +271,12 @@ class foliumExporter:
         minyear = maxyear = None
         
         # Add birth location if available
-        if line.person.birth and line.person.birth.latlon:
-            mycluster.mark(line.person.birth.latlon, line.person.birth.whenyearnum())
+        if line.person.birth and getAttrLatLonif(line.person, 'birth') and line.person.birth.date:
+            mycluster.mark(getAttrLatLonif(line.person, 'birth'), line.person.birth.whenyearnum())
             minyear = line.person.birth.whenyearnum()
         
         # Add death year if available
-        if line.person.death and line.person.death.when:
+        if line.person.death and line.person.death.date:
             maxyear = line.person.death.whenyearnum(True)
         else:
             # Process midpoints for min/max year determination
@@ -295,9 +295,7 @@ class foliumExporter:
         if not (minyear and maxyear):
             return
             
-        activepos = LatLon(None, None)
-        if line.person.birth and line.person.birth.latlon:
-            activepos = line.person.birth.latlon
+        activepos = getAttrLatLonif(line.person, 'birth')
             
         for year in range(minyear, maxyear):
             # Update active position if we have a midpoint for this year
@@ -329,19 +327,19 @@ class foliumExporter:
         
         # Process life events for each line
         for line in lines:
-            if self.gOptions.step():
+            if self.gOp.step():
                 break
                 
             if not (hasattr(line, 'style') and line.style == 'Life'):
                 continue
                 
-            self.gOptions.Referenced.add(line.person.xref_id, 'heat')
+            self.gOp.Referenced.add(line.person.xref_id, 'heat')
             minyear, maxyear = self._process_timeline_data(line, mycluster)
             self._build_yearly_positions(line, minyear, maxyear, mycluster)
             
             # Add death location if available
-            if line.person.death and line.person.death.latlon:
-                mycluster.mark(line.person.death.latlon, line.person.death.whenyearnum())
+            if line.person.death and getAttrLatLonif(line.person, 'death'):
+                mycluster.mark(getAttrLatLonif(line.person, 'death'), line.person.death.whenyearnum())
 
         # Extract unique years from markers
         years = sorted(set(
@@ -387,7 +385,7 @@ class foliumExporter:
         """Create a static heatmap visualization"""
         # Mark all locations
         for line in lines:
-            self.gOptions.step()
+            self.gOp.step()
             mycluster.mark(line.a)
             mycluster.mark(line.b)
             if line.midpoints:
@@ -397,7 +395,7 @@ class foliumExporter:
         # Create feature group and heat data
         fg = folium.FeatureGroup(
             name=lgd_txt.format(txt='Heatmap', col='black'),
-            show=self.gOptions.HeatMap
+            show=self.gOp.HeatMap
         )
         
         heat_data = [
@@ -418,49 +416,49 @@ class foliumExporter:
     def export(self, main: LatLon,  lines: list[Line], saveresult = True):
         
         if not self.fm:
-            # if (self.gOptions.MapStyle < 1 or self.gOptions.MapStyle > len(backTypes)):
-              #  self.gOptions.MapStyle = 3
+            # if (self.gOp.MapStyle < 1 or self.gOp.MapStyle > len(backTypes)):
+              #  self.gOp.MapStyle = 3
 
             try:
-                tile = xyz.query_name(self.gOptions.MapStyle)
+                tile = xyz.query_name(self.gOp.MapStyle)
             except Exception as e:
                 tile = xyz.CartoDB
-            if (self.gOptions.people and self.gOptions.mainPersonLatLon and self.gOptions.mainPersonLatLon.isNone()):
+            if self.gOp.people and (getAttrLatLonif(self.gOp.mainPerson, 'death') or getAttrLatLonif(self.gOp.mainPerson, 'birth')):
                 self.fm = folium.Map(location=[0, 0], zoom_start=4, tiles= tile)
             else:
-                lat = float(self.gOptions.mainPersonLatLon.lat)
-                lon = float(self.gOptions.mainPersonLatLon.lon)
+                lat = float(self.gOp.mainPerson.latlon.lat)
+                lon = float(self.gOp.mainPerson.latlon.lon)
                 self.fm = folium.Map(location=[lat,lon], zoom_start=4, tiles = tile)
-            if (self.gOptions.mapMini):
+            if (self.gOp.mapMini):
                 folium.plugins.MiniMap(toggle_display=True).add_to(self.fm)
             
 
             random.seed()
 
-            self.gOptions.Referenced = Referenced()
+            self.gOp.Referenced = Referenced()
             _log.debug  ("Building Referenced - quick only: %s", not saveresult)
             for line in lines:
                 if (hasattr(line,'style') and line.style == 'Life'):
-                    self.gOptions.Referenced.add(line.person.xref_id, 'quick')
-            self.gOptions.lastlines = {}
+                    self.gOp.Referenced.add(line.person.xref_id, 'quick')
+            self.gOp.lastlines = {}
             # make a Dict array of lines 
             for line in lines:
-                self.gOptions.lastlines[line.person.xref_id] = line
+                self.gOp.lastlines[line.person.xref_id] = line
             if (not saveresult):
                 return
 
-        SortByLast = (self.gOptions.GroupBy == 1 or self.gOptions.GroupBy == 2)
-        SortByPerson = (self.gOptions.GroupBy == 3)
+        SortByLast = (self.gOp.GroupBy == 1 or self.gOp.GroupBy == 2)
+        SortByPerson = (self.gOp.GroupBy == 3)
         fm = self.fm
         self.saveresult = saveresult
         
-        self.gOptions.step("Preparing")
+        self.gOp.step("Preparing")
         self.fglastname = dict()
         
 
         flr = folium.FeatureGroup(name= lgd_txt.format(txt= 'Relations', col='green'), show=False  )
         flp = folium.FeatureGroup(name= lgd_txt.format(txt= 'People', col='Black'), show=False  )
-        mycluster = MyMarkClusters(fm, self.gOptions.HeatMapTimeStep)
+        mycluster = MyMarkClusters(fm, self.gOp.HeatMapTimeStep)
 
 
         
@@ -469,7 +467,7 @@ class foliumExporter:
         #    HEAT MAP Section            
         # ***************************** 
         
-        if self.gOptions.MapTimeLine:
+        if self.gOp.MapTimeLine:
             self._create_timeline_heatmap(lines, mycluster, fm)
         else:
             self._create_static_heatmap(lines, mycluster, fm)
@@ -486,7 +484,7 @@ class foliumExporter:
 
 
         i = 0
-        self.gOptions.step("Building lines")
+        self.gOp.step("Building lines")
         lines_sorted = lines if SortByLast else sorted(
             lines, 
             key=lambda x: x.prof * ((x.branch/DELTA)+1) + x.prof
@@ -502,7 +500,7 @@ class foliumExporter:
                      f"{line.parentofperson.name if line.parentofperson else '':20} from {line.name:20}")
 
         for line in styled_lines:
-            self.gOptions.step()
+            self.gOp.step()
             i += 1
             
             # Get styling options based on line type
@@ -513,8 +511,8 @@ class foliumExporter:
             group_name = lgd_txt.format(txt=label_name, col=marker_options['line_color'])
             
             # Generate popup content
-            birth_info = f"{line.person.birth.whenyear()} (Born)" if line.person.birth and line.person.birth.when else ''
-            death_info = f"{line.person.death.whenyear()} (Died)" if line.person.death and line.person.death.when else ''
+            birth_info = f"{line.person.birth.whenyear()} (Born)" if line.person.birth and line.person.birth.date else ''
+            death_info = f"{line.person.death.whenyear()} (Died)" if line.person.death and line.person.death.date else ''
             popup_content = self._create_popup_content(line, birth_info, death_info)
 
             # Initialize feature group
@@ -534,7 +532,7 @@ class foliumExporter:
             # Add start marker
             if line.a and line.a.hasLocation():
                 start_point = [Drift(line.a.lat), Drift(line.a.lon)]
-                if self.gOptions.MarksOn and self.gOptions.BornMark:
+                if self.gOp.MarksOn and self.gOp.BornMark:
                     self._add_point_marker(fg, start_point, marker_options, 
                                        f"Life of {line.name}".replace("`", "‛").replace("'", "‛"), 
                                        popup_content, marker_options['start_icon'], marker_options['start_color'])
@@ -542,7 +540,7 @@ class foliumExporter:
             # Add end marker
             if line.b and line.b.hasLocation():
                 end_point = [Drift(line.b.lat), Drift(line.b.lon)]
-                if self.gOptions.MarksOn and self.gOptions.DieMark:
+                if self.gOp.MarksOn and self.gOp.DieMark:
                     self._add_point_marker(fg, end_point, marker_options, 
                                        f"Life of {line.name}".replace("`", "‛").replace("'", "‛"), 
                                        popup_content, marker_options['end_icon'], marker_options['end_color'])
@@ -555,11 +553,11 @@ class foliumExporter:
                 for mids in line.midpoints:
                     mid_point = [Drift(mids.latlon.lat), Drift(mids.latlon.lon)]
                     fm_line.append(tuple(mid_point))
-                    if self.gOptions.HomeMarker and self.gOptions.MarksOn:
+                    if self.gOp.HomeMarker and self.gOp.MarksOn:
                         point_type = mids.what if mids.what in MidPointMarker else "Other"
                         marker = MidPointMarker[point_type][0]
                         color = MidPointMarker[point_type][1]
-                        tooltip = mids.what + ' ' + mids.where if mids.what else '?? ' + mids.where
+                        tooltip = mids.what + ' ' + mids.place if mids.what else '?? ' + mids.place
                         self._add_point_marker(fg, mid_point, marker_options, tooltip, popup_content, marker, color)
             if line.b and line.b.hasLocation():
                 fm_line.append(tuple(end_point))
@@ -569,7 +567,7 @@ class foliumExporter:
                 line_color = marker_options['line_color']
                 # Protect the exp from overflow for very long linages
                 line_width = max(int(self.max_line_weight / math.exp(0.5 * min(line.prof,1000))), 2) if line.prof else 1
-                if self.gOptions.UseAntPath:
+                if self.gOp.UseAntPath:
                     polyline = folium.plugins.AntPath(fm_line, weight=line_width, opacity=.7, tooltip=line.name, popup=popup_content, color=line_color, lineJoin='arcs')
                 else:
                     polyline = folium.features.PolyLine(fm_line, color=line_color, weight=line_width, opacity=1, tooltip=line.name, popup=popup_content, dash_array=marker_options['dash_array'], lineJoin='arcs')
@@ -585,7 +583,7 @@ class foliumExporter:
             self.fglastname[fgn][0].layer_name = f"{self.fglastname[fgn][3]} : {self.fglastname[fgn][1]}"
             fm.add_child(self.fglastname[fgn][0])
 
-        sc = False if self.gOptions.showLayerControl else True
+        sc = False if self.gOp.showLayerControl else True
         
         if self.locations:
             # popups = ["lon:{}<br>lat:{}".format(lon, lat) for (lat, lon) in self.locations]
@@ -601,14 +599,15 @@ class foliumExporter:
             marker_cluster.add_to(fm)
         folium.map.LayerControl('topleft', collapsed=sc).add_to(fm)
 
-        if main and main.birth and main.birth.latlon and main.birth.latlon.lat:
-            if self.gOptions.MarkStarOn:
-                folium.Marker([Drift(main.birth.latlon.lat), Drift(main.birth.latlon.lon)], tooltip=main.name, opacity=0.5, icon=folium.Icon(color='lightred', icon='star', prefix='fa', iconSize=['50%', '50%'])).add_to(fm)
+        if main and getAttrLatLonif(main, 'birth'):
+            if self.gOp.MarkStarOn:
+                loc = getAttrLatLonif(main, 'birth')
+                folium.Marker([Drift(loc.lat), Drift(loc.lon)], tooltip=main.name, opacity=0.5, icon=folium.Icon(color='lightred', icon='star', prefix='fa', iconSize=['50%', '50%'])).add_to(fm)
         else:
             _log.warning("No GPS locations to generate a Star on the map.")
 
         #------------LEGEND if there are Markers --------------------
-        if self.gOptions.MarksOn:
+        if self.gOp.MarksOn:
             fm.add_child(Legend())
         
         if SortByLast:

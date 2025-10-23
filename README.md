@@ -271,6 +271,12 @@ python3 ..\gedcom-to-map\gedcom-to-map.py input.ged output -main "@I0000@" -form
 - Need to separate the Load and GPS resolve steps (currently reloads after 30 seconds of looking up values)
 
 ## Releases
+### v0.2.7.0
+- MAJOR UPGRADE/REFACTOR
+- This is a major rework of many components to merge in new address lookup and gedcom reading approch from @colin0brass
+- New KML (2) a new approach to rendering the KML output using @colin0brass approach
+- Added in data summaries by @colin0brass
+- There continue to be a lot of bugs after the retrofit.  It will have bugs, wait for next release
 ### v0.2.6.9
 - improved options stats
 - refactor Pos with LatLon

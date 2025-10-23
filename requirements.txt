@@ -5,3 +5,10 @@ folium>=0.16.0
 wxPython>=4.1.0
 selenium>=4.0.0
 xyzservices>=2025.1.0
+pyyaml
+rapidfuzz
+pycountry
+pycountry-convert
+pandas
+seaborn
+matplotlib

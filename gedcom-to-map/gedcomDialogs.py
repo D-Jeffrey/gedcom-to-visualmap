@@ -13,11 +13,13 @@ import wx
 import wx.lib.newevent
 import wx.html
 import wx.grid as gridlib
-from models.Creator import Person, LatLon, LifeEvent
+from models.LatLon import LatLon
+from models.Person import Person, LifeEvent
 from gedcom.GedcomParser import CheckAge, maxage
+from gedcomoptions import gvOptions, ResultsType
 
 from const import GVFONT, ABOUTFONT, VERSION, GUINAME, ABOUTLINK, NAME, panel
-from gedcomvisual import ParseAndGPS, doHTML, doKML, doTraceTo
+from gedcomvisual import ParseAndGPS, doHTML, doKML, doKML2, doSUM, doTraceTo
 
 maxPhotoWidth = 400  # Maximum width for photos in the PersonDialog
 maxPhotoHeight = 500  # Maximum Height for photos in the PersonDialog
@@ -96,7 +98,7 @@ class HelpDialog(HTMLDialog):
 <ul><li><b>Interactive Maps:</b> Generates interactive HTML files that display relationships between children and parents, and where people lived over the years.</li>
 <li><b>Heatmaps:</b> Includes heatmaps to show busier places, with markers overlayed for detailed views.</li>
 <li><b>Geocoding:</b> Converts place names into GPS coordinates, allowing for accurate mapping.</li>
-<li><b>Multiple Output Formats:</b> Supports both <a href="https://python-visualization.github.io/folium/latest/">HTML</a> and <a href="https://support.google.com/earth/answer/7365595">KML</a> output formats for versatile map visualization.</li>
+<li><b>Multiple Output Formats:</b> Supports both <a href="https://python-visualization.github.io/folium/latest/">HTML</a> and <a href="https://support.google.com/earth/answer/7365595">KML</a> output formats for versatile map visualization.  KML2 is an alternate and improved version of the orginal way of generating the relationship(Not all Options work with this mode yet)</li>
 <li><b>User-Friendly GUI:</b> The GUI version allows users to easily load GEDCOM files, set options, and generate maps with a few clicks.</li>
 <li><b>Customizable Options:</b> Offers various options to customize the map, such as grouping by family name, turning on/off markers, and adjusting heatmap settings.</li>
 </ul>
@@ -123,27 +125,27 @@ For more details and to contribute, visit the <a href="PROJECTLINK">GitHub repos
 
 #==============================================================
 class ConfigDialog(wx.Frame):
-    def __init__(self, parent, title, gOptions):
+    def __init__(self, parent, title, gOp):
         super().__init__(parent, title=title, size=(500, 650))
 
         includeNOTSET = True
-        self.gOptions = gOptions               # DEFAULT Disabled with False
+        self.gOp = gOp               # DEFAULT Disabled with False
         self.loggerNames = list(logging.root.manager.loggerDict.keys())
         cfgpanel = wx.Panel(self,style=wx.SIMPLE_BORDER  )
         TEXTkmlcmdlinelbl = wx.StaticText(cfgpanel, -1,  " KML Editor Command line:   ") 
         self.TEXTkmlcmdline = wx.TextCtrl(cfgpanel, wx.ID_FILE1, "", size=(250,20))
-        if gOptions.KMLcmdline:
-            self.TEXTkmlcmdline.SetValue(gOptions.KMLcmdline)
+        if gOp.KMLcmdline:
+            self.TEXTkmlcmdline.SetValue(gOp.KMLcmdline)
         TEXTcsvcmdlinelbl = wx.StaticText(cfgpanel, -1,  " CSV Table Editor Command line:   ") 
         self.TEXTcsvcmdline = wx.TextCtrl(cfgpanel, wx.ID_FILE1, "", size=(250,20))
-        if gOptions.CSVcmdline:
-            self.TEXTcsvcmdline.SetValue(gOptions.CSVcmdline)            
+        if gOp.CSVcmdline:
+            self.TEXTcsvcmdline.SetValue(gOp.CSVcmdline)            
         TEXTtracecmdlinelbl = wx.StaticText(cfgpanel, -1,  " Trace Table Editor Command line:   ") 
         self.TEXTtracecmdline = wx.TextCtrl(cfgpanel, wx.ID_FILE1, "", size=(250,20))
-        if gOptions.Tracecmdline:
-            self.TEXTtracecmdline.SetValue(gOptions.Tracecmdline)
+        if gOp.Tracecmdline:
+            self.TEXTtracecmdline.SetValue(gOp.Tracecmdline)
         self.CBBadAge = wx.CheckBox(cfgpanel, -1,  'Flag if age is off')
-        self.CBBadAge.SetValue(gOptions.badAge)
+        self.CBBadAge.SetValue(gOp.badAge)
         self.badAge = True            
         GRIDctl = gridlib.Grid(cfgpanel)
         if includeNOTSET:
@@ -172,19 +174,19 @@ class ConfigDialog(wx.Frame):
         self.row = 0
         for erow, loggerName in enumerate(self.loggerNames):
             updatelog = logging.getLogger(loggerName)
-            if logging.getLevelName(updatelog.level) != "NOTSET" and loggerName in self.gOptions.logging_keys:
+            if logging.getLevelName(updatelog.level) != "NOTSET" and loggerName in self.gOp.logging_keys:
                 makeCells()
                 
         # The following only is relavent for modules that could have `logging`` added to them
         if includeNOTSET:
             for erow, loggerName in enumerate(self.loggerNames):
                 updatelog = logging.getLogger(loggerName)
-                if logging.getLevelName(updatelog.level) == "NOTSET" and loggerName in self.gOptions.logging_keys:
+                if logging.getLevelName(updatelog.level) == "NOTSET" and loggerName in self.gOp.logging_keys:
                     makeCells()
                     
             for erow, loggerName in enumerate(self.loggerNames):
                 updatelog = logging.getLogger(loggerName)
-                if loggerName not in self.gOptions.logging_keys:
+                if loggerName not in self.gOp.logging_keys:
                     makeCells()
                     
             
@@ -230,11 +232,11 @@ class ConfigDialog(wx.Frame):
             logLevel = self.GRIDctl.GetCellValue(row, 1)
             updatelog = logging.getLogger(loggerName)
             updatelog.setLevel(getattr(logging, logLevel))
-        self.gOptions.KMLcmdline = self.TEXTkmlcmdline.GetValue()
-        self.gOptions.CSVcmdline = self.TEXTcsvcmdline.GetValue()
-        self.gOptions.Tracecmdline = self.TEXTtracecmdline.GetValue()
-        self.gOptions.badAge = self.CBBadAge.GetValue()
-        self.gOptions.savesettings()
+        self.gOp.KMLcmdline = self.TEXTkmlcmdline.GetValue()
+        self.gOp.CSVcmdline = self.TEXTcsvcmdline.GetValue()
+        self.gOp.Tracecmdline = self.TEXTtracecmdline.GetValue()
+        self.gOp.badAge = self.CBBadAge.GetValue()
+        self.gOp.savesettings()
         self.Close()
         self.DestroyLater()
 
@@ -340,12 +342,12 @@ class FamilyPanel(wx.Panel):
 def formatPersonName(person: Person, longForm=True):
     if person:
         if longForm:
-            maiden = f" ({person.maiden})" if person.maiden else ""
+            maidenname = f" ({person.maidenname})" if person.maidenname else ""
             title = f" - {person.title}" if person.title else ""
         else:
-            maiden = ""
+            maidenname = ""
             title = ""
-        return f"{person.first} {person.surname}{maiden}{title}" 
+        return f"{person.firstname} {person.surname}{maidenname}{title}" 
     else:
         return "<none>"
 
@@ -357,12 +359,12 @@ class PersonDialog(wx.Dialog):
             return (min(len(attr),3)+pad)*(GVFONT[1]+5)  if attr else GVFONT[1]
         
         people = BackgroundProcess.people
-                
+        # Display the marriage information including the marriage location and date                
         marrying = []
-        if person.marriage:
-            for marry in person.marriage:
-                marrying.append(f"{formatPersonName(people[marry[0]], False)}{LifeEvent.asEventstr(marry[1])}")
-        marriage = "\n".join(marrying)        
+        if person.marriages:
+            for marry in person.marriages:
+                marrying.append(f"{formatPersonName(people[marry.record.xref_id], False)}{marry.asEventstr()}")
+        marriages = "\n".join(marrying)        
 
         homes = []
         if person.home:
@@ -378,7 +380,7 @@ class PersonDialog(wx.Dialog):
         self.birthTextCtrl = wx.TextCtrl(self, style=wx.TE_READONLY)
         self.deathTextCtrl = wx.TextCtrl(self, style=wx.TE_READONLY)
         self.sexTextCtrl = wx.TextCtrl(self, style=wx.TE_READONLY)
-        self.marriageTextCtrl = wx.TextCtrl(self, style=wx.TE_READONLY|wx.TE_MULTILINE, size=(-1,sizeAttr(marriage)))
+        self.marriageTextCtrl = wx.TextCtrl(self, style=wx.TE_READONLY|wx.TE_MULTILINE, size=(-1,sizeAttr(marriages)))
         self.homeTextCtrl = wx.TextCtrl(self, style=wx.TE_READONLY|wx.TE_MULTILINE, size=(-1,sizeAttr(homelist)))
         if issues:
             self.issuesTextCtrl = wx.TextCtrl(self, style=wx.TE_READONLY|wx.TE_MULTILINE, size=(-1,sizeAttr(issues)))
@@ -420,15 +422,15 @@ class PersonDialog(wx.Dialog):
             self.fatherTextCtrl.SetValue(formatPersonName(people[person.father]))
         if person.mother:
             self.motherTextCtrl.SetValue(formatPersonName(people[person.mother]))
-        self.birthTextCtrl.SetValue(f"{LifeEvent.asEventstr(person.birth)}")
+        self.birthTextCtrl.SetValue(f"{person.birth.asEventstr()}" if person.birth else "")  
         if person.death and person.birth and person.death.when and person.birth.when:
             age = f"(age ~{person.age})" if hasattr( person, "age") else f"(age ~{person.death.whenyearnum() - person.birth.whenyearnum()})" 
         else:
             age = ""
-        self.deathTextCtrl.SetValue(f"{LifeEvent.asEventstr(person.death)}")
+        self.deathTextCtrl.SetValue(f"{LifeEvent.asEventstr(person.death)}" if person.death else "")
         sex = person.sex if person.sex else ""
         self.sexTextCtrl.SetValue(f"{sex} {age}")
-        self.marriageTextCtrl.SetValue(marriage)
+        self.marriageTextCtrl.SetValue(marriages)
         
         if issues:
             self.issuesTextCtrl.SetValue("\n".join(issues))
@@ -436,10 +438,10 @@ class PersonDialog(wx.Dialog):
         self.homeTextCtrl.SetValue(homelist)
         if len(homes) > 3:
             sizer.AddGrowableRow(8)
-        if panel.gO.Referenced and showrefences:
+        if panel.gOp.Referenced and showrefences:
             self.related = None
-            if panel.gO.Referenced.exists(person.xref_id):
-                hertiageList = doTraceTo(panel.gO, person)
+            if panel.gOp.Referenced.exists(person.xref_id):
+                hertiageList = doTraceTo(panel.gOp, person)
                 if hertiageList:
                     hertiageSet = {}
                     for (hertiageparent, hertiageperson, hyear, hid) in hertiageList:
@@ -448,7 +450,7 @@ class PersonDialog(wx.Dialog):
                                             hertiageparent, 
                                             people[hid].birth.whenyear() if people[hid].birth else None, 
                                             people[hid].death.whenyear() if people[hid].death else None, 
-                                            people[hid].birth.getattr('where') if people[hid].birth else None, 
+                                            people[hid].birth.getattr('place') if people[hid].birth else None, 
                                             descript, 
                                             hid)
                     # Create the panel and pass the data
@@ -467,7 +469,7 @@ class PersonDialog(wx.Dialog):
                                     "", 
                                     people[hid].birth.whenyear() if people[hid].birth else None, 
                                     people[hid].death.whenyear() if people[hid].death else None, 
-                                    people[hid].birth.getattr('where') if people[hid].birth else None, 
+                                    people[hid].birth.getattr('place') if people[hid].birth else None, 
                                     descript, 
                                     hid)
                 # Create the panel and pass the data
@@ -488,7 +490,7 @@ class PersonDialog(wx.Dialog):
                     image = None
                     image_content = None
             else:
-                infile = panel.gO.get('GEDCOMinput')
+                infile = panel.gOp.get('GEDCOMinput')
                 if infile is not None:
                     dDir =  os.path.dirname(infile)
                 image_content = Path(photourl) if Path(photourl).is_absolute() else os.path.join(dDir, photourl)
@@ -588,7 +590,7 @@ and generating the output so that the GUI can continue to be responsive
 """
     def __init__(self, win, threadnum):
         self.win = win
-        self.gOptions = None
+        self.gOp = None
         self.people = None
         self.threadnum = threadnum
         self.updategrid = False
@@ -601,12 +603,12 @@ and generating the output so that the GUI can continue to be responsive
         self.readyToDo = True
         
 
-    def DefgOps(self, gOps):
+    def DefgOps(self, gOp):
         # Pull the global variables into this thread - Critcal to do this
         global panel, BackgroundProcess
-        self.gOptions = gOps
-        panel = gOps.panel
-        BackgroundProcess = gOps.BackgroundProcess
+        self.gOp = gOp
+        panel = gOp.panel
+        BackgroundProcess = gOp.BackgroundProcess
         
 
     def Start(self):
@@ -656,21 +658,21 @@ and generating the output so that the GUI can continue to be responsive
                 self.readyToDo = False          # Avoid a Race
                 _log.info("triggered thread %d (Thread# %d / %d)", self.do, self.threadnum, _thread.get_ident())
                 if not UpdateBackgroundEvent:
-                    UpdateBackgroundEvent = self.gOptions.UpdateBackgroundEvent
-                self.gOptions.stopping = False
+                    UpdateBackgroundEvent = self.gOp.UpdateBackgroundEvent
+                self.gOp.stopping = False
                 wx.Yield()
-                if self.do & 1 or (self.do & 4 and not self.gOptions.parsed):
+                if self.do & 1 or (self.do & 4 and not self.gOp.parsed):
                     wx.PostEvent(self.win, UpdateBackgroundEvent(state='busy'))
                     wx.Yield()
                     _log.info("start ParseAndGPS")
                     if hasattr(self, 'people'):
                         if self.people:                            
                             del self.people
-                            self.gOptions.people = None
+                            self.gOp.people = None
                             self.people = None
                     _log.info("ParseAndGPS")
                     try:
-                        self.people = ParseAndGPS(self.gOptions, 1)
+                        self.people = ParseAndGPS(self.gOp, 1)
                     
                     except Exception as e:
                         # Capture other exceptions
@@ -680,43 +682,49 @@ and generating the output so that the GUI can continue to be responsive
                                 self.people = None
                         self.do = 0
                         _log.warning(str(e))
-                        self.gOptions.stopping = False
+                        self.gOp.stopping = False
                         self.SayErrorMessage('Failed to Parse', True)
                         self.SayErrorMessage(str(e), True)
                         
-                    if self.do & 1 and self.gOptions.Referenced:
-                        del self.gOptions.Referenced
-                        self.gOptions.Referenced = None 
+                    if self.do & 1 and self.gOp.Referenced:
+                        del self.gOp.Referenced
+                        self.gOp.Referenced = None 
                     # self.updategrid = True
                     wx.PostEvent(self.win, UpdateBackgroundEvent(state='busy'))
                     wx.Yield()
                     if hasattr (self, 'people') and self.people:                            
                         _log.info("person count %d", len(self.people))
-                        self.people = ParseAndGPS(self.gOptions, 2)
+                        # self.people = ParseAndGPS(self.gOp, 2)
                         self.updategrid = True
                         if self.people:
                             self.SayInfoMessage(f"Loaded {len(self.people)} people")
                         else:
                             self.SayInfoMessage(f"Cancelled loading people")
-                        if self.gOptions.Main:
-                            self.SayInfoMessage(f" with '{self.gOptions.Main}' as starting person from {Path(self.gOptions.GEDCOMinput).name}", False)
+                        if self.gOp.Main:
+                            self.SayInfoMessage(f" with '{self.gOp.Main}' as starting person from {Path(self.gOp.GEDCOMinput).name}", False)
                     else:
                         self.SayErrorMessage(f"Error: file could not read as a GEDCOM file", True)
                     
                 if self.do & 2:
                     _log.info("start do 2")
-                    if (self.gOptions.parsed):
+                    if (self.gOp.parsed):
                         _log.info("doHTML or doKML")
-                        fname = self.gOptions.Result
-                        if (self.gOptions.ResultHTML):
-                            needAGridUpdate = not self.gOptions.Referenced
-                            doHTML(self.gOptions, self.people, True)
+                        fname = self.gOp.Result
+                        if (self.gOp.ResultType is ResultsType.HTML):
+                            ### needAGridUpdate = not self.gOp.Referenced
+                            doHTML(self.gOp, self.people, True)
                             # We only need to update the Grid if we have not calculated the Referenced before
-                            self.updategridmain = needAGridUpdate
-                            self.SayInfoMessage(f"HTML generated for {self.gOptions.totalpeople} people ({fname})")
-                        else: 
-                            doKML(self.gOptions, self.people)
-                            self.SayInfoMessage(f"KML file generated for {self.gOptions.totalpeople} people/points ({fname})")
+                            ### self.updategridmain = needAGridUpdate
+                            self.SayInfoMessage(f"HTML generated for {self.gOp.totalpeople} people ({fname})")
+                        elif (self.gOp.ResultType is ResultsType.KML):  
+                            doKML(self.gOp, self.people)
+                            self.SayInfoMessage(f"KML file generated for {self.gOp.totalpeople} people/points ({fname})")
+                        elif (self.gOp.ResultType is ResultsType.KML2):  
+                            doKML2(self.gOp, self.people)
+                            self.SayInfoMessage(f"KML2 file generated for {self.gOp.totalpeople} people/points ({fname})")
+                        elif (self.gOp.ResultType is ResultsType.SUM):  
+                            doSUM(self.gOp)
+                            self.SayInfoMessage(f"KML2 file generated for {self.gOp.totalpeople} people/points ({fname})")
                     else:
                         _log.info("not parsed")
                     _log.info("done draw")
@@ -725,11 +733,11 @@ and generating the output so that the GUI can continue to be responsive
                 _log.debug("=======================GOING TO IDLE %d", self.threadnum)
                 self.do = 0
                 self.readyToDo = True
-                self.gOptions.stop()
+                self.gOp.stop()
                 wx.PostEvent(self.win, UpdateBackgroundEvent(state='done'))
             else:
                 time.sleep(0.3)
-                # _log.info("background Do:%d  &  Running:%d  %d", self.do , self.gOptions.running, self.gOptions.counter)
+                # _log.info("background Do:%d  &  Running:%d  %d", self.do , self.gOp.running, self.gOp.counter)
 
         self.threadrunning = False
 

@@ -209,14 +209,14 @@ class GedcomParser:
         name: NameRec = record.sub_tag("NAME")
         _log.debug (f"Create Person : {name}")
         if name:
-            person.first = record.name.first
+            person.firstname = record.name.first
             person.surname =record.name.surname
-            person.maiden = record.name.maiden
+            person.maidenname = record.name.maiden
             person.name = "{}".format(record.name.format())
         if person.name == '':
-            person.first = "Unknown"
+            person.firstname = "Unknown"
             person.surname = "Unknown"
-            person.maiden = "Unknown"
+            person.maidenname = "Unknown"
         
         title = record.sub_tag("TITL")
         person.title = title.value if title else ""
@@ -368,14 +368,14 @@ class GedcomParser:
             for marry in record.sub_tags("MARR"):
                 marryevent = GetPosFromTag(marry, None).event
                 if husband and wife:
-                    if people[husband.xref_id].marriage:
-                        people[husband.xref_id].marriage.append((wife.xref_id, marryevent))
+                    if people[husband.xref_id].marriages:
+                        people[husband.xref_id].marriages.append((wife.xref_id, marryevent))
                     else:
-                        people[husband.xref_id].marriage = [(wife.xref_id, marryevent)]
-                    if people[wife.xref_id].marriage :
-                        people[wife.xref_id].marriage.append((husband.xref_id, marryevent))
+                        people[husband.xref_id].marriages = [(wife.xref_id, marryevent)]
+                    if people[wife.xref_id].marriages :
+                        people[wife.xref_id].marriages.append((husband.xref_id, marryevent))
                     else:
-                        people[wife.xref_id].marriage = [(husband.xref_id, marryevent)]
+                        people[wife.xref_id].marriages = [(husband.xref_id, marryevent)]
             if husband:
                 if people[husband.xref_id].name == "Unknown":
                     people[husband.xref_id].name = "Unknown [Father]"

@@ -18,6 +18,7 @@ import os.path
 from pathlib import Path
 import re
 import subprocess
+import shutil
 import sys
 import time
 from datetime import datetime
@@ -39,7 +40,7 @@ import xyzservices.providers as xyz
 
 
 from const import GUINAME, GVFONT, KMLMAPSURL, LOG_CONFIG, NAME, VERSION, panel
-from gedcomoptions import gvOptions, ResultsType 
+from gedcomoptions import gvOptions, ResultsTypes 
 from gedcomvisual import doTrace
 from gedcomDialogs import *
 from style.stylemanager import FontManager
@@ -64,8 +65,8 @@ class VisualGedcomIds():
             'ID_CBHomeMarker', 'ID_LISTHeatMapTimeStep', 'ID_TEXTGEDCOMinput', 'ID_TEXTResult',
             'ID_RBResultsType', 'ID_TEXTMain', 'ID_TEXTName', 'ID_RBKMLMode', 'ID_INTMaxMissing', 'ID_INTMaxLineWeight',
             'ID_CBUseGPS', 'ID_CBCacheOnly', 'ID_CBAllEntities',  'ID_CBMapControl',
-            'ID_CBMapMini', 'ID_BTNLoad', 'ID_BTNUpdate', 'ID_BTNCSV', 'ID_BTNTRACE', 'ID_BTNSTOP', 'ID_BTNBROWSER',
-            'ID_CBGridView', 'CBYougeAge'
+            'ID_CBMapMini', 'ID_BTNLoad', 'ID_BTNCreateFiles', 'ID_BTNCSV', 'ID_BTNTRACE', 'ID_BTNSTOP', 'ID_BTNBROWSER',
+            'ID_CBGridView', 'CBYougeAge', 'ID_CBSummary'
         ]
         self.IDs = {name: wx.NewIdRef() for name in self.ids}
         # ID = Attribute (in gOp), Action impact
@@ -96,12 +97,13 @@ class VisualGedcomIds():
             self.IDs['ID_CBMapControl']: ('showLayerControl', 'Redraw'),
             self.IDs['ID_CBMapMini']: ('mapMini', 'Redraw'),
             self.IDs['ID_BTNLoad']: 'Load',
-            self.IDs['ID_BTNUpdate']: 'Update',
+            self.IDs['ID_BTNCreateFiles']: 'CreateFiles',
             self.IDs['ID_BTNCSV']: 'OpenCSV',
             self.IDs['ID_BTNTRACE']: 'Trace',
             self.IDs['ID_BTNSTOP']: 'Stop',
             self.IDs['ID_BTNBROWSER']: 'OpenBrowser',
-            self.IDs['ID_CBGridView']: ('GridView', 'Render')
+            self.IDs['ID_CBGridView']: ('GridView', 'Render'),
+            self.IDs['ID_CBSummary']: ('Summary','Redraw')
         }
 
         self.colors = [
@@ -387,7 +389,7 @@ class VisualMapFrame(wx.Frame):
             isHTML = not (filetype.lower() in ['.kml'])
             panel.gOp.setResults(path, isHTML)
             panel.id.TEXTResult.SetValue(path)
-            panel.id.RBResultHTML.SetSelection(0 if isHTML else 1)
+            panel.id.RBResultOutType.SetSelection(0 if isHTML else 1)
             panel.SetupButtonState()
         dlg.Destroy()
         wx.Yield()
@@ -426,7 +428,7 @@ class VisualMapFrame(wx.Frame):
 
         withoutaddr = 0
         msg = ""
-        if hasattr(panel.gOp, 'people') and panel.gOp.people:
+        if getattr(panel.gOp, 'people', None):
             # for xh in panel.gOp.people.keys():
             #    if (panel.gOp.people[xh].bestlocation() == ''): 
             #        withoutaddr += 1
@@ -443,8 +445,9 @@ class VisualMapFrame(wx.Frame):
             
         else:
             msg = "No people loaded yet\n"
-        if hasattr(panel.gOp, 'lookup') and hasattr(panel.gOp.lookup, 'addresses') and panel.gOp.lookup.addresses:
-            msg += f'\nTotal cached addresses: {len(panel.gOp.lookup.addresses)}\n' +  panel.gOp.lookup.stats
+        if hasattr(panel.gOp, 'lookup') and getattr(panel.gOp.lookup, 'address_book', None):
+            stats = panel.gOp.lookup.address_book.updatestats()
+            msg += f'\nTotal cached addresses: {panel.gOp.lookup.address_book.len()}\n{stats}' 
             
         wx.MessageBox (msg, 'Statistics', wx.OK|wx.ICON_INFORMATION)
     def OnFind(self, event):
@@ -799,7 +802,7 @@ class PeopleListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
         wx.Panel.__init__(self, parent, -1, style=wx.WANTS_CHARS, name="PeoplePanel")
         # TODO This box defination still have a scroll overlap problem
         sizer = wx.BoxSizer(wx.VERTICAL)
-        self.messagelog = "*  Select a file, Load it and Draw Update or change Result Type, Open Geo Table to edit addresses  *"
+        self.messagelog = "*  Select a file, Load it and Create Files or change Result Type, Open Geo Table to edit addresses  *"
         self.InfoBox = []
         for i in range(InfoBoxLines):
             self.InfoBox.append(wx.StaticText(parent, -1, ' '))
@@ -879,6 +882,8 @@ class VisualMapPanel(wx.Panel):
         self.LayoutOptions(self.panelB)
 
         self.Layout()
+        self.lastruninstance = 0.0
+        self.remaintime = 0
 
 
     def LayoutOptions(self, panel):
@@ -940,7 +945,7 @@ class VisualMapPanel(wx.Panel):
         self.id.CBHomeMarker = wx.CheckBox(panel, self.id.IDs['ID_CBHomeMarker'], "Marker point or homes")
         self.id.CBMarkStarOn = wx.CheckBox(panel, self.id.IDs['ID_CBMarkStarOn'], "Marker starter with Star")
         self.id.CBMapTimeLine = wx.CheckBox(panel, self.id.IDs['ID_CBMapTimeLine'], "Add Timeline")
-        self.id.RBResultHTML =  wx.RadioBox(panel, self.id.IDs['ID_RBResultsType'], "Result Type", 
+        self.id.RBResultOutType =  wx.RadioBox(panel, self.id.IDs['ID_RBResultsType'], "Result Type", 
                                            choices = ['HTML', 'KML', 'KML2', 'SUM'] , majorDimension= 5)
 
         box.AddMany([  self.id.CBUseGPS,
@@ -951,8 +956,7 @@ class VisualMapPanel(wx.Panel):
                        self.id.CBDieMark,
                        self.id.CBHomeMarker,
                        self.id.CBMarkStarOn,
-                       self.id.CBMapTimeLine,
-                       self.id.RBResultHTML])
+                       self.id.CBMapTimeLine])
         """
           HTML select controls in a Box
         """
@@ -999,7 +1003,7 @@ class VisualMapPanel(wx.Panel):
         hsizer.Add( hboxIn, wx.LEFT, hOtherBorder+5)
         
         hbox.SetSizer(hsizer)
-        self.hbox = hbox
+        self.optionHbox = hbox
         #
         # KML select controls in a Box
         #
@@ -1029,14 +1033,48 @@ class VisualMapPanel(wx.Panel):
 
         ksizer.Add( kboxIn, wx.LEFT, kOtherBorder+5)
         kbox.SetSizer(ksizer)
-        self.kbox = kbox
+        self.optionKbox = kbox
+            #
+        # KML select controls in a Box
+        #
+        k2box = wx.StaticBox( panel, -1, "KML2 Options", size=(300,-1))
+        k2TopBorder, k2OtherBorder = k2box.GetBordersForSizer()
+        k2sizer = wx.BoxSizer(wx.VERTICAL)
+        k2sizer.AddSpacer(k2TopBorder)
+        k2boxIn = wx.BoxSizer(wx.VERTICAL)
+        
+        k2sizer.Add( k2boxIn, wx.LEFT, k2OtherBorder+5)
+        k2box.SetSizer(k2sizer)
+        self.optionK2box = k2box
+        #
+        # Summary select controls in a Box
+        #
+        sbox = wx.StaticBox( panel, -1, "Summary Options", size=(300,-1))
+        sTopBorder, sOtherBorder = sbox.GetBordersForSizer()
+        ssizer = wx.BoxSizer(wx.VERTICAL)
+        ssizer.AddSpacer(sTopBorder)
+        sboxIn = wx.BoxSizer(wx.VERTICAL)
+        
+        self.id.CBSummary = [wx.CheckBox(sbox, self.id.IDs['ID_CBSummary'], label="Open files after created", name="Open"),
+                             wx.CheckBox(sbox, self.id.IDs['ID_CBSummary'], label="Places", name="Places"),
+                             wx.CheckBox(sbox, self.id.IDs['ID_CBSummary'], label="People", name="People"),
+                             wx.CheckBox(sbox, self.id.IDs['ID_CBSummary'], label="Countries", name="Countries"),
+                             wx.CheckBox(sbox, self.id.IDs['ID_CBSummary'], label="Countries Grid", name="CountriesGrid"),
+                             wx.CheckBox(sbox, self.id.IDs['ID_CBSummary'], label="Geocode", name="Geocode"),
+                             wx.CheckBox(sbox, self.id.IDs['ID_CBSummary'], label="Alternate Places", name="AltPlaces")]
+        
+        sboxIn.AddMany(self.id.CBSummary)
+        ssizer.Add( sboxIn, wx.LEFT, sOtherBorder+5)
+        sbox.SetSizer(ssizer)
+        self.optionSbox = sbox
+
 
         #
         # Grid View Options
         #
         
         
-        gbox = wx.StaticBox( panel, -1, "Grid View Options",size=(300,-1))
+        gbox = wx.StaticBox( panel, -1, "Grid View Options",size=(300,40))
         gTopBorder, gOtherBorder = gbox.GetBordersForSizer()
         gsizer = wx.BoxSizer(wx.VERTICAL)
         gsizer.AddSpacer(gTopBorder)
@@ -1047,22 +1085,25 @@ class VisualMapPanel(wx.Panel):
         
         gbox.SetSizer(gsizer)
         
-        box.Add(hbox, 1, wx.LEFT, 15)
-        box.Add(gbox, 1, wx.LEFT, 15)
-        box.Add(kbox, 1, wx.LEFT, 15)
-        
+        box.Add(gbox, 1, wx.LEFT, 5)
+        box.AddMany([self.id.RBResultOutType])
+        box.Add(hbox, 1, wx.LEFT, 5)
+        box.Add(kbox, 1, wx.LEFT, 5)
+        box.Add(sbox, 1, wx.LEFT, 5)
+        box.Add(k2box, 1, wx.LEFT, 5)
+
         self._needLayoutSet = True
         
 
         l1 = wx.BoxSizer(wx.HORIZONTAL)
         self.id.BTNLoad = wx.Button(panel, self.id.IDs['ID_BTNLoad'], "Load")
-        self.id.BTNUpdate = wx.Button(panel, self.id.IDs['ID_BTNUpdate'], "Draw & Update")
+        self.id.BTNCreateFiles = wx.Button(panel, self.id.IDs['ID_BTNCreateFiles'], "Create Files")
         self.id.BTNCSV = wx.Button(panel, self.id.IDs['ID_BTNCSV'], "Geo Table")
         self.id.BTNTRACE = wx.Button(panel, self.id.IDs['ID_BTNTRACE'], "Trace")
         self.id.BTNSTOP = wx.Button(panel, self.id.IDs['ID_BTNSTOP'], "Stop")
         self.id.BTNBROWSER = wx.Button(panel, self.id.IDs['ID_BTNBROWSER'], "Browser")
         l1.Add (self.id.BTNLoad, 0, wx.EXPAND | wx.ALL, 5)
-        l1.Add (self.id.BTNUpdate, 0, wx.EXPAND | wx.ALL, 5)
+        l1.Add (self.id.BTNCreateFiles, 0, wx.EXPAND | wx.ALL, 5)
         l1.Add (self.id.BTNCSV, 0, wx.EXPAND | wx.ALL, 5)
         l1.Add (self.id.BTNTRACE, 0, wx.EXPAND | wx.ALL, 5)
         box.Add(l1, 0, wx.EXPAND | wx.ALL,0)
@@ -1084,7 +1125,6 @@ class VisualMapPanel(wx.Panel):
         
         # panel.SetSizeHints(box)
         panel.SetSizer(box)
-        
         self.Bind(wx.EVT_RADIOBOX, self.EvtRadioBox, id = self.id.IDs['ID_RBResultsType'])
         self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.id.IDs['ID_CBMapControl'])
         self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.id.IDs['ID_CBMapMini'])
@@ -1101,11 +1141,12 @@ class VisualMapPanel(wx.Panel):
         self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.id.IDs['ID_CBCacheOnly'])
         self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.id.IDs['ID_CBAllEntities'])
         self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.id.IDs['ID_CBGridView'])
+        self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.id.IDs['ID_CBSummary'])
         self.Bind(wx.EVT_RADIOBOX, self.EvtRadioBox, id = self.id.IDs['ID_RBKMLMode'])
         self.Bind(wx.EVT_SPINCTRL, self.EvtSpinCtrl, id = self.id.IDs['ID_INTMaxLineWeight'])
         self.Bind(wx.EVT_CHOICE, self.EvtListBox, id = self.id.IDs['ID_LISTMapStyle'])
         self.Bind(wx.EVT_BUTTON, self.EvtButton, id = self.id.IDs['ID_BTNLoad'])
-        self.Bind(wx.EVT_BUTTON, self.EvtButton, id = self.id.IDs['ID_BTNUpdate'])
+        self.Bind(wx.EVT_BUTTON, self.EvtButton, id = self.id.IDs['ID_BTNCreateFiles'])
         self.Bind(wx.EVT_BUTTON, self.EvtButton, id = self.id.IDs['ID_BTNCSV'])
         self.Bind(wx.EVT_BUTTON, self.EvtButton, id = self.id.IDs['ID_BTNTRACE'])
         self.Bind(wx.EVT_BUTTON, self.EvtButton, id = self.id.IDs['ID_BTNSTOP'])
@@ -1117,7 +1158,7 @@ class VisualMapPanel(wx.Panel):
         self.NeedReload()
         self.NeedRedraw()
         self.Bind(wx.EVT_CLOSE, self.OnCloseWindow)
-        self.Bind(EVT_UPDATE_STATE, self.OnUpdate)
+        self.Bind(EVT_UPDATE_STATE, self.OnCreateFiles)
         self.threads = []
         BackgroundProcess = BackgroundActions(self, 0)
         self.threads.append(BackgroundProcess)
@@ -1138,7 +1179,7 @@ class VisualMapPanel(wx.Panel):
         self.NeedRedraw()
 
     def NeedRedraw(self):
-        self.id.BTNUpdate.SetBackgroundColour(self.id.GetColor('BTN_PRESS'))
+        self.id.BTNCreateFiles.SetBackgroundColour(self.id.GetColor('BTN_PRESS'))
 
     def setInputFile(self, path):
         # set the state variables
@@ -1158,13 +1199,13 @@ class VisualMapPanel(wx.Panel):
         _log.debug('%d is %d',  event.GetId(), event.GetInt())
         if event.GetId() == self.id.IDs['ID_RBResultsType']:
             if event.GetInt() == 0:
-                outType = ResultsType.HTML
+                outType = ResultsTypes.HTML
             elif event.GetInt() == 1:
-                outType = ResultsType.KML
+                outType = ResultsTypes.KML
             elif event.GetInt() == 2:
-                outType = ResultsType.KML2
+                outType = ResultsTypes.KML2
             elif event.GetInt() == 3:
-                outType = ResultsType.SUM
+                outType = ResultsTypes.SUM
             self.gOp.setResults(self.gOp.get('Result'), outType)
 
 #            BackgroundProcess.updategridmain = True
@@ -1179,7 +1220,21 @@ class VisualMapPanel(wx.Panel):
             self.gOp.KMLsort = event.GetSelection()
         else:
             _log.error('We have a Problem 81')
+    def SetRestulTypeRadioBox(self):
+        rType = self.gOp.get('ResultType')
         
+        if rType is ResultsTypes.HTML:
+            outType = 0
+        elif rType is ResultsTypes.KML:
+            outType = 1
+        elif rType is ResultsTypes.KML2:
+            outType = 2
+        elif rType is ResultsTypes.SUM:
+            outType = 3
+        else:
+            outType = 0
+        self.id.RBResultOutType.SetSelection(outType)
+    
 
     def EvtText(self, event):
 
@@ -1199,7 +1254,11 @@ class VisualMapPanel(wx.Panel):
             _log.debug("3StateValue: %s", cb.Get3StateValue())
         cbid = event.GetId()
         _log.debug('set %s to %s (%s)', self.id.IDtoAttr[cbid][0], cb.GetValue(), self.id.IDtoAttr[cbid][1] )
-        panel.gOp.set( self.id.IDtoAttr[cbid][0], cb.GetValue())
+        if cbid == self.id.IDs['ID_CBSummary']:
+            extra = cb.Name
+        else:
+            extra = ''
+        panel.gOp.set( self.id.IDtoAttr[cbid][0]+extra, cb.GetValue())
         
         if cbid == self.id.IDs['ID_CBHeatMap'] or cbid == self.id.IDs['ID_CBMapTimeLine'] or cbid == self.id.IDs['ID_CBMarksOn']:
             self.SetupButtonState()
@@ -1217,7 +1276,7 @@ class VisualMapPanel(wx.Panel):
             # TODO Fix this up
             if self.gOp.get('ResultType'):
                 dlg = None
-                if hasattr(BackgroundProcess, 'people') and BackgroundProcess.people:
+                if getattr(BackgroundProcess, 'people', None):
                     if len(BackgroundProcess.people) > 200:
                         dlg = wx.MessageDialog(self, f'Caution, {len(BackgroundProcess.people)} people in your tree\n it may create very large HTML files and may not open in the browser',
                                    'Warning', wx.OK | wx.ICON_WARNING)
@@ -1234,11 +1293,11 @@ class VisualMapPanel(wx.Panel):
         myid = event.GetId() 
         _log.debug("Click! (%d)", myid)
         # TODO HACK
-        self.SetupOptions()
+    #    self.SetupOptions()
         if myid == self.id.IDs['ID_BTNLoad']:
             self.LoadGEDCOM()
                 
-        elif myid == self.id.IDs['ID_BTNUpdate']:
+        elif myid == self.id.IDs['ID_BTNCreateFiles']:
             self.DrawGEDCOM()
                                 
         elif myid == self.id.IDs['ID_BTNCSV']:
@@ -1310,15 +1369,16 @@ class VisualMapPanel(wx.Panel):
                 runningtime = datetime.now().timestamp() - self.gOp.runningSince
                 runtime = f"Running {time.strftime('%H:%M:%S', time.gmtime(runningtime))}"
                 if self.gOp.countertarget > 0 and self.gOp.counter > 0 and self.gOp.counter != self.gOp.countertarget:
-                    remaintimeInstant = runningtime * (self.gOp.countertarget/ self.gOp.counter)- runningtime
-                    # Smoothed runtime average over last 10 seconds
-                    self.gOp.runavg.append(remaintimeInstant)
-                    if len(self.gOp.runavg) > 20:
-                        self.gOp.runavg.pop(0)
-                    remaintime = sum(self.gOp.runavg)/len(self.gOp.runavg)
-                    remaintime = runningtime * (self.gOp.countertarget/ self.gOp.counter)- runningtime
-                    runtime = f"{runtime} ({time.strftime('%H:%M:%S', time.gmtime(remaintime))})"
-                    
+                    if runningtime-1.5 > self.lastruninstance: 
+                        remaintimeInstant = runningtime * (self.gOp.countertarget/ self.gOp.counter)- runningtime
+                        # Smoothed runtime average over last 10 seconds
+                        self.gOp.runavg.append(remaintimeInstant)
+                        if len(self.gOp.runavg) > 20:
+                            self.gOp.runavg.pop(0)
+                        remaintime = sum(self.gOp.runavg)/len(self.gOp.runavg)
+                        self.remaintime = runningtime * (self.gOp.countertarget/ self.gOp.counter)- runningtime
+                        self.lastruninstance = runningtime
+                    runtime = f"{runtime} ({time.strftime('%H:%M:%S', time.gmtime(self.remaintime))})"
             else:
                 runtime = "Last {}".format( time.strftime('%H:%M:%S', time.gmtime(self.gOp.runningLast)))
                 # Rest the runtime average
@@ -1332,18 +1392,18 @@ class VisualMapPanel(wx.Panel):
                 if self.gOp.stepinfo:
                     status = f"{status} ({self.gOp.stepinfo})"
             if self.gOp.ShouldStop():
-                self.id.BTNUpdate.Enable()
+                self.id.BTNCreateFiles.Enable()
                 status = f"{status} - please wait.. Stopping"
 
             _, filen = os.path.split(self.gOp.get('GEDCOMinput'))
             if filen == "":
                 self.id.BTNLoad.Disable()
-                self.id.BTNUpdate.Disable()
+                self.id.BTNCreateFiles.Disable()
             else:
                 if not self.id.BTNLoad.IsEnabled():
                     self.id.BTNLoad.Enable()
                 if not self.id.BTNLoad.IsEnabled():
-                    self.id.BTNUpdate.Enable()
+                    self.id.BTNCreateFiles.Enable()
             if self.gOp.get('gpsfile') == '':
                 self.id.BTNCSV.Disable()
             else:
@@ -1358,7 +1418,7 @@ class VisualMapPanel(wx.Panel):
         if self.frame:
             self.frame.SetStatusText(status)
         if BackgroundProcess.updateinfo or BackgroundProcess.errorinfo or BackgroundProcess.updategrid:
-            self.OnUpdate(evt)
+            self.OnCreateFiles(evt)
         if self.busystate != self.gOp.running:
             logging.info("Busy %d not Running %d", self.busystate, self.gOp.running)
             if self.gOp.running:
@@ -1394,7 +1454,7 @@ class VisualMapPanel(wx.Panel):
         self.busycounthack = 0
         wx.Yield()
 
-    def OnUpdate(self, evt):
+    def OnCreateFiles(self, evt):
         # proces evt state hand off
         if hasattr(evt, 'state'):
             if evt.state == 'busy': 
@@ -1432,7 +1492,8 @@ class VisualMapPanel(wx.Panel):
 
     def SetupButtonState(self):
         """ based on the type of file output, enable/disable the interface """
-        ResultTypeHTML = self.gOp.get('ResultType')
+        ResultTypeSelect = self.gOp.get('ResultType')
+        self.SetRestulTypeRadioBox()
         # Always enabled
             # self.id.CBUseGPS
             # self.id.CBAllEntities
@@ -1468,8 +1529,29 @@ class VisualMapPanel(wx.Panel):
         else:
             for ctrl in marks_controls:
                 ctrl.Disable()
-        # Enable/disable controls based on result type (HTML vs KML)
-        if ResultTypeHTML:
+        # layout the Summary box, and KML box in the same space as the HTML box (toggle them off and on to dsisplay)
+        # also forward the boxes to be there maximinum size, they may ahve been made small when setup and rendering
+        
+        self.optionKbox.SetPosition(wx.Point(self.optionKbox.GetPosition().x, self.optionHbox.GetPosition().y))
+        if self.optionKbox.GetSize() != self.optionKbox.GetBestSize():
+            self.optionKbox.SetSize(self.optionKbox.GetBestSize())
+        self.optionK2box.SetPosition(wx.Point(self.optionK2box.GetPosition().x, self.optionHbox.GetPosition().y))
+        if self.optionK2box.GetSize() != self.optionK2box.GetBestSize():
+            self.optionK2box.SetSize(self.optionK2box.GetBestSize())
+        self.optionSbox.SetPosition(wx.Point(self.optionSbox.GetPosition().x, self.optionHbox.GetPosition().y))
+        if self.optionSbox.GetSize() != self.optionSbox.GetBestSize():
+            self.optionSbox.SetSize(self.optionSbox.GetBestSize())
+        self.optionHbox.SetPosition(wx.Point(self.optionKbox.GetPosition().x, self.optionHbox.GetPosition().y))
+        if self.optionHbox.GetSize() != self.optionHbox.GetBestSize():
+            self.optionHbox.SetSize(self.optionHbox.GetBestSize())
+        # Enable/disable controls based on result type (HTML vs KML vs Summary Mode )
+        if not self._needLayoutSet:
+            self.optionHbox.Hide()
+            self.optionSbox.Hide()
+            self.optionKbox.Hide()
+            self.optionK2box.Hide()
+
+        if ResultTypeSelect is ResultsTypes.HTML:
             # Enable HTML-specific controls
             for ctrl in html_controls:
                 ctrl.Enable()
@@ -1488,11 +1570,15 @@ class VisualMapPanel(wx.Panel):
             if self._needLayoutSet:
                 self._needLayoutSet = False
             else:
-                self.hbox.Show()
-                self.kbox.SetPosition(wx.Point(self.kbox.GetPosition().x, self.hbox.GetPosition().y))
-                self.kbox.Hide()
+                self.optionHbox.Show()
             
-        else:
+        elif ResultTypeSelect is ResultsTypes.SUM:
+            if self._needLayoutSet:
+                self._needLayoutSet = False
+            else:
+                self.optionSbox.Show()
+
+        elif ResultTypeSelect is ResultsTypes.KML:
             # In KML mode, disable HTML controls and enable KML controls
             for ctrl in html_controls:
                 ctrl.Disable()
@@ -1503,12 +1589,16 @@ class VisualMapPanel(wx.Panel):
             if self._needLayoutSet:
                 self._needLayoutSet = False
             else:
-                self.hbox.Hide()
-                self.kbox.SetPosition(wx.Point(self.kbox.GetPosition().x, self.hbox.GetPosition().y))
-                self.kbox.Show()
+                self.optionKbox.Show()
+        elif ResultTypeSelect is ResultsTypes.KML2:
+            if self._needLayoutSet:
+                self._needLayoutSet = False
+            else:
+                self.optionK2box.Show()
+
 
        # Enable/disable trace button based on referenced data availability
-        self.id.BTNTRACE.Enable(bool(self.gOp.Referenced and self.gOp.Result and ResultTypeHTML))
+        self.id.BTNTRACE.Enable(bool(self.gOp.Referenced and self.gOp.Result and ResultTypeSelect))
 
     def SetupOptions(self):
 
@@ -1523,10 +1613,10 @@ class VisualMapPanel(wx.Panel):
             self.peopleList.setGOp(self.gOp)
 
         if self.gOp.get('ResultType'):
-            self.id.RBResultHTML.SetSelection(0)
+            self.id.RBResultOutType.SetSelection(0)
         else:
-            if self.id.RBResultHTML.GetSelection() not in [1,2]:
-                self.id.RBResultHTML.SetSelection(1)
+            if self.id.RBResultOutType.GetSelection() not in [1,2]:
+                self.id.RBResultOutType.SetSelection(1)
         
         self.id.CBMapControl.SetValue(self.gOp.get('showLayerControl'))
         self.id.CBMapMini.SetValue(self.gOp.get('mapMini'))
@@ -1550,6 +1640,14 @@ class VisualMapPanel(wx.Panel):
 
         _, filen = os.path.split(self.gOp.get('GEDCOMinput')) if self.gOp.get('GEDCOMinput') else ("", "first.ged")
         self.id.TEXTGEDCOMinput.SetValue(filen)
+        self.id.CBSummary[0].SetValue(self.gOp.get('SummaryOpen'))
+        self.id.CBSummary[1].SetValue(self.gOp.get('SummaryPlaces'))
+        self.id.CBSummary[2].SetValue(self.gOp.get('SummaryPeople'))
+        self.id.CBSummary[3].SetValue(self.gOp.get('SummaryCountries'))
+        self.id.CBSummary[4].SetValue(self.gOp.get('SummaryCountriesGrid'))
+        self.id.CBSummary[5].SetValue(self.gOp.get('SummaryGeocode'))
+        self.id.CBSummary[6].SetValue(self.gOp.get('SummaryAltPlaces'))
+
         self.SetupButtonState()
 
         for t in self.threads:
@@ -1596,33 +1694,47 @@ class VisualMapPanel(wx.Panel):
     def OpenCSV(self):
         self.runCMDfile(self.gOp.get('CSVcmdline'), self.gOp.get('gpsfile'))
 
-    def runCMDfile(self, cmdline, cmdfile, isHTML=False):
-        if cmdfile and cmdfile != '':
-            if cmdline == '$n':
-                if isHTML:
-                    _log.info(f'browserstart {cmdfile}')
-                    webbrowser.open(cmdfile, new = 0, autoraise = True)
+    def runCMDfile(self, cmdline, datafile, isHTML=False):
+        orgcmdline = cmdline
+        if datafile and datafile != '' and datafile != None:
+            cmdline = cmdline.replace('$n', f'{datafile}')
+            try:
+                if isHTML:          # Force it to run in a browsers
+                    _log.info(f'browserstart {cmdline}')
+                    webbrowser.open(datafile, new = 0, autoraise = True)
+                elif orgcmdline == '$n':
+                    if sys.platform == "win32":
+                        _log.info(f'startfile {datafile}')
+                        os.startfile(datafile)          # Native Windows method
+                    elif sys.platform == "darwin":
+                        opener = "open" 
+                    else:
+                        opener ="xdg-open"
+                        if not shutil.which(opener):
+                            raise EnvironmentError(f"{opener} not found. Install it or use a different method.")
+                        _log.info(f'subprocess.Popen {datafile}')
+                        subprocess.Popen([opener, datafile])
                 else:
-                    _log.info(f'startfile {cmdfile}')
-                    os.startfile(cmdfile)
-                
-            elif '$n' in cmdline:
-                cmdline = cmdline.replace('$n','')
-                if ' ' in cmdline:
-                    cmdline = self.gOp.get('CSVcmdline').replace('$n', f'{cmdfile}')
-                    _log.info(f'shell run  `{cmdfile}`')
+                    # it is suggesting a web URL
                     if cmdline.startswith('http'):
+                        _log.info(f'webbrowswer run  `{cmdline}`')
                         webbrowser.open(cmdline, new = 0, autoraise = True)
                     else:
-                        subprocess.Popen([cmdline], shell=True)
-                else:
-                    _log.info(f'process run `{cmdline}` with `{cmdfile}`')
-                    subprocess.run([cmdline, cmdfile], check=False)
-                # TODO need a better command-line management than this
-                # cmdline = f"column -s, -t < {csvfile} | less -#2 -N -S"
-                # subprocess.run(cmdline, shell=True)
-            else:
-                _log.error("Error: runCMDfile-Unsupported platform, can not open cmdline file")
+                        # does the command line contain the $n placeholder
+                        if '$n' in orgcmdline:
+                            _log.info(f'subprocess.Popen file {cmdline}')
+                            subprocess.Popen(cmdline, shell=True)
+                        else:
+                            _log.info(f'subprocess.Popen line {cmdline};{datafile}')
+                            subprocess.Popen([cmdline, datafile], shell=True)
+
+                        # TODO need a better command-line management than this
+                        # cmdline = f"column -s, -t < {csvfile} | less -#2 -N -S"
+            except Exception as e:
+                _log.error(f"Failed to open file: {e}")
+
+        else:
+            _log.error(f"Error: runCMDfile-unknwon cmdline {datafile}")
     
     def SaveTrace(self):
         if self.gOp.Result and self.gOp.Referenced:

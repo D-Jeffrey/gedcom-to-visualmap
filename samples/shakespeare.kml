@@ -1,283 +1,397 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2">
     <Document id="1">
-        <Style id="11">
-            <IconStyle id="14">
-                <colorMode>normal</colorMode>
-                <scale>1</scale>
-                <heading>0</heading>
-                <Icon id="15">
-                    <href>https://maps.google.com/mapfiles/kml/paddle/ylw-blank.png</href>
-                </Icon>
-            </IconStyle>
-            <LabelStyle id="13">
-                <colorMode>normal</colorMode>
-                <scale>1</scale>
-            </LabelStyle>
-            <BalloonStyle>
-                <displayMode>default</displayMode>
-            </BalloonStyle>
-        </Style>
-        <Style id="18">
-            <LineStyle id="19">
-                <color>ff00d8ff</color>
-                <colorMode>normal</colorMode>
-                <width>12</width>
-            </LineStyle>
-            <BalloonStyle>
-                <displayMode>default</displayMode>
-            </BalloonStyle>
-        </Style>
-        <Style id="24">
-            <IconStyle id="26">
-                <colorMode>normal</colorMode>
-                <scale>1</scale>
-                <heading>0</heading>
-                <Icon id="27">
-                    <href>https://maps.google.com/mapfiles/kml/paddle/ylw-blank.png</href>
-                </Icon>
-            </IconStyle>
-            <LabelStyle id="25">
-                <colorMode>normal</colorMode>
-                <scale>1</scale>
-            </LabelStyle>
-            <BalloonStyle>
-                <displayMode>default</displayMode>
-            </BalloonStyle>
-        </Style>
-        <Style id="30">
-            <LineStyle id="31">
-                <color>ffff7200</color>
-                <colorMode>normal</colorMode>
-                <width>12</width>
-            </LineStyle>
-            <BalloonStyle>
-                <displayMode>default</displayMode>
-            </BalloonStyle>
-        </Style>
-        <Style id="36">
-            <IconStyle id="38">
-                <colorMode>normal</colorMode>
-                <scale>1</scale>
-                <heading>0</heading>
-                <Icon id="39">
-                    <href>https://maps.google.com/mapfiles/kml/paddle/ylw-blank.png</href>
-                </Icon>
-            </IconStyle>
-            <LabelStyle id="37">
-                <colorMode>normal</colorMode>
-                <scale>1</scale>
-            </LabelStyle>
-            <BalloonStyle>
-                <displayMode>default</displayMode>
-            </BalloonStyle>
-        </Style>
-        <Style id="43">
-            <IconStyle id="45">
-                <colorMode>normal</colorMode>
-                <scale>1</scale>
-                <heading>0</heading>
-                <Icon id="46">
-                    <href>https://maps.google.com/mapfiles/kml/paddle/ylw-blank.png</href>
-                </Icon>
-            </IconStyle>
-            <LabelStyle id="44">
-                <colorMode>normal</colorMode>
-                <scale>1</scale>
-            </LabelStyle>
-            <BalloonStyle>
-                <displayMode>default</displayMode>
-            </BalloonStyle>
-        </Style>
-        <Style id="58">
-            <IconStyle id="62">
-                <colorMode>normal</colorMode>
-                <scale>1</scale>
-                <heading>0</heading>
-                <Icon id="63">
-                    <href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
-                </Icon>
-            </IconStyle>
-            <LabelStyle id="59">
-                <colorMode>normal</colorMode>
-                <scale>1</scale>
-            </LabelStyle>
-            <BalloonStyle>
-                <displayMode>default</displayMode>
-            </BalloonStyle>
-        </Style>
-        <Style id="66">
-            <LineStyle id="67">
-                <color>ff00d8ff</color>
-                <colorMode>normal</colorMode>
-                <width>12</width>
-            </LineStyle>
-            <BalloonStyle>
-                <displayMode>default</displayMode>
-            </BalloonStyle>
-        </Style>
-        <Style id="72">
-            <IconStyle id="74">
-                <colorMode>normal</colorMode>
-                <scale>1</scale>
-                <heading>0</heading>
-                <Icon id="75">
-                    <href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
-                </Icon>
-            </IconStyle>
-            <LabelStyle id="73">
-                <colorMode>normal</colorMode>
-                <scale>1</scale>
-            </LabelStyle>
-            <BalloonStyle>
-                <displayMode>default</displayMode>
-            </BalloonStyle>
-        </Style>
-        <Style id="78">
-            <LineStyle id="79">
-                <color>ffff7200</color>
-                <colorMode>normal</colorMode>
-                <width>12</width>
-            </LineStyle>
-            <BalloonStyle>
-                <displayMode>default</displayMode>
-            </BalloonStyle>
-        </Style>
-        <Document id="2">
-            <Style id="47">
-                <BalloonStyle>
-                    <displayMode>default</displayMode>
-                </BalloonStyle>
+        <Folder id="5">
+            <Style id="2">
+                <IconStyle id="3">
+                    <colorMode>normal</colorMode>
+                    <scale>1</scale>
+                    <heading>0</heading>
+                    <Icon id="4">
+                        <href>http://maps.google.com/mapfiles/kml/paddle/pink-blank.png</href>
+                    </Icon>
+                </IconStyle>
             </Style>
-            <name>About Geomap KML</name>
-            <description>Family tree generated for using shakespeare.ged&lt;br&gt;Judith Shakespeare (@I0007@) as starting person&lt;br&gt;Marker types are Birth Death&lt;br&gt;Timeline enabled. Balloon Flyto enabled.</description>
-            <styleUrl>#47</styleUrl>
-        </Document>
-        <Placemark id="9">
-            <name>William Shakespeare(b)</name>
-            <description><![CDATA[ <br>Born: 1564</br><br>Father: <a href=#34;balloonFlyto>John Shakespeare</a></br><br>Mother: <a href=#41;balloonFlyto>Mary Arden</a></br><br>Children: <a href=#I0005;balloonFlyto>Susanna Shakespeare</a>, <a href=#I0006;balloonFlyto>Hamnet Shakespeare</a>, <a href=#I0007;balloonFlyto>Judith Shakespeare</a></br> ]]></description>
-            <TimeStamp id="10">
-                <when>1564</when>
-            </TimeStamp>
-            <styleUrl>#11</styleUrl>
-            <Point id="8">
-                <coordinates>-1.706503295628342,52.19244765068571,0.0</coordinates>
-            </Point>
-        </Placemark>
-        <Placemark id="17">
-            <name>William Shakespeare</name>
-            <description><![CDATA[ <br>Lifespan: 1564 to 1616, related as F       </br><br>Father: <a href=#34;balloonFlyto>John Shakespeare</a></br><br>Mother: <a href=#41;balloonFlyto>Mary Arden</a></br><br>Children: <a href=#I0005;balloonFlyto>Susanna Shakespeare</a>, <a href=#I0006;balloonFlyto>Hamnet Shakespeare</a>, <a href=#I0007;balloonFlyto>Judith Shakespeare</a></br> ]]></description>
-            <TimeSpan id="20">
-                <begin>1564</begin>
-                <end>1616</end>
-            </TimeSpan>
-            <styleUrl>#18</styleUrl>
-            <LineString id="16">
-                <extrude>1</extrude>
-                <tessellate>1</tessellate>
-                <altitudeMode>clampToGround</altitudeMode>
-                <coordinates>-1.7063082841277286,52.192546835443004,0.0 -1.7060687416579068,52.19243739559366,0.0</coordinates>
-            </LineString>
-        </Placemark>
-        <Placemark id="22">
-            <name>Anne Hathaway(b)</name>
-            <description><![CDATA[ <br>Born: 1556</br><br>Father: <a href=#I0028;balloonFlyto>Richard Hathaway</a></br><br>Children: <a href=#I0005;balloonFlyto>Susanna Shakespeare</a>, <a href=#I0006;balloonFlyto>Hamnet Shakespeare</a>, <a href=#I0007;balloonFlyto>Judith Shakespeare</a></br> ]]></description>
-            <TimeStamp id="23">
-                <when>1556</when>
-            </TimeStamp>
-            <styleUrl>#24</styleUrl>
-            <Point id="21">
-                <coordinates>-1.70600630253809,52.19246840092062,0.0</coordinates>
-            </Point>
-        </Placemark>
-        <Placemark id="29">
-            <name>Anne Hathaway</name>
-            <description><![CDATA[ <br>Lifespan: 1556 to 1623, related as M       </br><br>Father: <a href=#I0028;balloonFlyto>Richard Hathaway</a></br><br>Children: <a href=#I0005;balloonFlyto>Susanna Shakespeare</a>, <a href=#I0006;balloonFlyto>Hamnet Shakespeare</a>, <a href=#I0007;balloonFlyto>Judith Shakespeare</a></br> ]]></description>
-            <TimeSpan id="32">
-                <begin>1556</begin>
-                <end>1623</end>
-            </TimeSpan>
-            <styleUrl>#30</styleUrl>
-            <LineString id="28">
-                <extrude>1</extrude>
-                <tessellate>1</tessellate>
-                <altitudeMode>clampToGround</altitudeMode>
-                <coordinates>-1.7058985972523815,52.193170441441126,0.0 -1.7276529778667258,52.190632357372394,0.0</coordinates>
-            </LineString>
-        </Placemark>
-        <Placemark id="34">
-            <name>John Shakespeare(b)</name>
-            <description><![CDATA[ <br>Born: 1531</br><br>Father: <a href=#I0015;balloonFlyto>Richard Shakespeare</a></br><br>Mother: <a href=#I0031;balloonFlyto>Unknown [Mother]</a></br><br>Children: <a href=#9;balloonFlyto>William Shakespeare</a>, <a href=#I0008;balloonFlyto>Joan Shakespeare</a>, <a href=#I0009;balloonFlyto>Margaret Shakespeare</a>, <a href=#I0010;balloonFlyto>Gilbert Shakespeare</a>, <a href=#I0011;balloonFlyto>Joan Shakespeare</a>, <a href=#I0012;balloonFlyto>Anne Shakespeare</a>, <a href=#I0013;balloonFlyto>Richard Shakespeare</a>, <a href=#I0014;balloonFlyto>Edmund Shakespeare</a></br> ]]></description>
-            <TimeStamp id="35">
-                <when>1531</when>
-            </TimeStamp>
-            <styleUrl>#36</styleUrl>
-            <Point id="33">
-                <coordinates>-1.7066676334443438,52.19255350047537,0.0</coordinates>
-            </Point>
-        </Placemark>
-        <Placemark id="41">
-            <name>Mary Arden(b)</name>
-            <description><![CDATA[ <br>Born: 1537</br><br>Father: <a href=#I0019;balloonFlyto>Robert Arden</a></br><br>Mother: <a href=#I0018;balloonFlyto>Agnes Webbe</a></br><br>Children: <a href=#9;balloonFlyto>William Shakespeare</a>, <a href=#I0008;balloonFlyto>Joan Shakespeare</a>, <a href=#I0009;balloonFlyto>Margaret Shakespeare</a>, <a href=#I0010;balloonFlyto>Gilbert Shakespeare</a>, <a href=#I0011;balloonFlyto>Joan Shakespeare</a>, <a href=#I0012;balloonFlyto>Anne Shakespeare</a>, <a href=#I0013;balloonFlyto>Richard Shakespeare</a>, <a href=#I0014;balloonFlyto>Edmund Shakespeare</a></br> ]]></description>
-            <TimeStamp id="42">
-                <when>1537</when>
-            </TimeStamp>
-            <styleUrl>#43</styleUrl>
-            <Point id="40">
-                <coordinates>-1.7065801123740345,52.192972843553974,0.0</coordinates>
-            </Point>
-        </Placemark>
-        <Placemark id="56">
-            <name>William Shakespeare(d)</name>
-            <description><![CDATA[ <br>Death: 1616</br><br>Father: <a href=#34;balloonFlyto>John Shakespeare</a></br><br>Mother: <a href=#41;balloonFlyto>Mary Arden</a></br><br>Children: <a href=#I0005;balloonFlyto>Susanna Shakespeare</a>, <a href=#I0006;balloonFlyto>Hamnet Shakespeare</a>, <a href=#I0007;balloonFlyto>Judith Shakespeare</a></br> ]]></description>
-            <TimeStamp id="57">
-                <when>1616</when>
-            </TimeStamp>
-            <styleUrl>#58</styleUrl>
-            <Point id="55">
-                <coordinates>-1.706725796008027,52.19239380455248,0.0</coordinates>
-            </Point>
-        </Placemark>
-        <Placemark id="65">
-            <name>William Shakespeare</name>
-            <description><![CDATA[ <br>Lifespan: 1564 to 1616, related as F       </br><br>Father: <a href=#34;balloonFlyto>John Shakespeare</a></br><br>Mother: <a href=#41;balloonFlyto>Mary Arden</a></br><br>Children: <a href=#I0005;balloonFlyto>Susanna Shakespeare</a>, <a href=#I0006;balloonFlyto>Hamnet Shakespeare</a>, <a href=#I0007;balloonFlyto>Judith Shakespeare</a></br> ]]></description>
-            <TimeSpan id="68">
-                <begin>1564</begin>
-                <end>1616</end>
-            </TimeSpan>
-            <styleUrl>#66</styleUrl>
-            <LineString id="64">
-                <extrude>1</extrude>
-                <tessellate>1</tessellate>
-                <altitudeMode>clampToGround</altitudeMode>
-                <coordinates>-1.7066598065222562,52.19313521522165,0.0 -1.7062575605127621,52.19320824233596,0.0</coordinates>
-            </LineString>
-        </Placemark>
-        <Placemark id="70">
-            <name>Anne Hathaway(d)</name>
-            <description><![CDATA[ <br>Death: 1623</br><br>Father: <a href=#I0028;balloonFlyto>Richard Hathaway</a></br><br>Children: <a href=#I0005;balloonFlyto>Susanna Shakespeare</a>, <a href=#I0006;balloonFlyto>Hamnet Shakespeare</a>, <a href=#I0007;balloonFlyto>Judith Shakespeare</a></br> ]]></description>
-            <TimeStamp id="71">
-                <when>1623</when>
-            </TimeStamp>
-            <styleUrl>#72</styleUrl>
-            <Point id="69">
-                <coordinates>-1.7063683513438488,52.19283507052062,0.0</coordinates>
-            </Point>
-        </Placemark>
-        <Placemark id="77">
-            <name>Anne Hathaway</name>
-            <description><![CDATA[ <br>Lifespan: 1556 to 1623, related as M       </br><br>Father: <a href=#I0028;balloonFlyto>Richard Hathaway</a></br><br>Children: <a href=#I0005;balloonFlyto>Susanna Shakespeare</a>, <a href=#I0006;balloonFlyto>Hamnet Shakespeare</a>, <a href=#I0007;balloonFlyto>Judith Shakespeare</a></br> ]]></description>
-            <TimeSpan id="80">
-                <begin>1556</begin>
-                <end>1623</end>
-            </TimeSpan>
-            <styleUrl>#78</styleUrl>
-            <LineString id="76">
-                <extrude>1</extrude>
-                <tessellate>1</tessellate>
-                <altitudeMode>clampToGround</altitudeMode>
-                <coordinates>-1.7058880566792463,52.19291675733937,0.0 -1.7059097697496213,52.19228851441247,0.0</coordinates>
-            </LineString>
-        </Placemark>
+            <name>Birth</name>
+            <Placemark id="16">
+                <name>William Shakespeare</name>
+                <description>Birth 1564&lt;br&gt;Stratford-upon-Avon&lt;br&gt;Children: &lt;a href=#34;balloonFlyto&gt;Susanna Shakespeare&lt;/a&gt; &lt;a href=#40;balloonFlyto&gt;Hamnet Shakespeare&lt;/a&gt; &lt;a href=#49;balloonFlyto&gt;Judith Shakespeare&lt;/a&gt; </description>
+                <TimeStamp id="17">
+                    <when>1564</when>
+                </TimeStamp>
+                <styleUrl>#2</styleUrl>
+                <Point id="15">
+                    <coordinates>-1.70634,52.1927803,0.0</coordinates>
+                </Point>
+            </Placemark>
+            <Placemark id="22">
+                <name>Anne Hathaway</name>
+                <description>Birth 1556&lt;br&gt;Shottery, Warwickshire&lt;br&gt;Children: &lt;a href=#34;balloonFlyto&gt;Susanna Shakespeare&lt;/a&gt; &lt;a href=#40;balloonFlyto&gt;Hamnet Shakespeare&lt;/a&gt; &lt;a href=#49;balloonFlyto&gt;Judith Shakespeare&lt;/a&gt; </description>
+                <TimeStamp id="23">
+                    <when>1556</when>
+                </TimeStamp>
+                <styleUrl>#2</styleUrl>
+                <Point id="21">
+                    <coordinates>-1.7276632,52.1909684,0.0</coordinates>
+                </Point>
+            </Placemark>
+            <Placemark id="28">
+                <name>Susanna Shakespeare</name>
+                <description>Birth 1583&lt;br&gt;Stratford-upon-Avon&lt;br&gt;Father: &lt;a href=#19;balloonFlyto&gt;William Shakespeare&lt;/a&gt;&lt;br&gt;Mother: &lt;a href=#25;balloonFlyto&gt;Anne Hathaway&lt;/a&gt;&lt;br&gt;Children: Elizabeth Shakespeare </description>
+                <TimeStamp id="29">
+                    <when>1583</when>
+                </TimeStamp>
+                <styleUrl>#2</styleUrl>
+                <Point id="27">
+                    <coordinates>-1.70634,52.1927803,0.0</coordinates>
+                </Point>
+            </Placemark>
+            <Placemark id="37">
+                <name>Hamnet Shakespeare</name>
+                <description>Birth 1585&lt;br&gt;Stratford-upon-Avon&lt;br&gt;Father: &lt;a href=#19;balloonFlyto&gt;William Shakespeare&lt;/a&gt;&lt;br&gt;Mother: &lt;a href=#25;balloonFlyto&gt;Anne Hathaway&lt;/a&gt;&lt;br&gt;</description>
+                <TimeStamp id="38">
+                    <when>1585</when>
+                </TimeStamp>
+                <styleUrl>#2</styleUrl>
+                <Point id="36">
+                    <coordinates>-1.70634,52.1927803,0.0</coordinates>
+                </Point>
+            </Placemark>
+            <Placemark id="43">
+                <name>Judith Shakespeare</name>
+                <description>Birth 1585&lt;br&gt;Stratford-upon-Avon&lt;br&gt;Father: &lt;a href=#19;balloonFlyto&gt;William Shakespeare&lt;/a&gt;&lt;br&gt;Mother: &lt;a href=#25;balloonFlyto&gt;Anne Hathaway&lt;/a&gt;&lt;br&gt;Children: Shakespeare Quiney Richard Quiney Thomas Quiney </description>
+                <TimeStamp id="44">
+                    <when>1585</when>
+                </TimeStamp>
+                <styleUrl>#2</styleUrl>
+                <Point id="42">
+                    <coordinates>-1.70634,52.1927803,0.0</coordinates>
+                </Point>
+            </Placemark>
+        </Folder>
+        <Folder id="9">
+            <Style id="6">
+                <IconStyle id="7">
+                    <colorMode>normal</colorMode>
+                    <scale>1</scale>
+                    <heading>0</heading>
+                    <Icon id="8">
+                        <href>http://maps.google.com/mapfiles/kml/paddle/grn-blank.png</href>
+                    </Icon>
+                </IconStyle>
+            </Style>
+            <name>Marriage</name>
+            <Placemark id="31">
+                <name>Susanna Shakespeare</name>
+                <description>Marriage 1607&lt;br&gt;Stratford-upon-Avon&lt;br&gt;Father: &lt;a href=#19;balloonFlyto&gt;William Shakespeare&lt;/a&gt;&lt;br&gt;Mother: &lt;a href=#25;balloonFlyto&gt;Anne Hathaway&lt;/a&gt;&lt;br&gt;Children: Elizabeth Shakespeare </description>
+                <TimeStamp id="32">
+                    <when>1607</when>
+                </TimeStamp>
+                <styleUrl>#6</styleUrl>
+                <Point id="30">
+                    <coordinates>-1.70634,52.1927803,0.0</coordinates>
+                </Point>
+            </Placemark>
+            <Placemark id="46">
+                <name>Judith Shakespeare</name>
+                <description>Marriage 1616&lt;br&gt;Stratford-upon-Avon&lt;br&gt;Father: &lt;a href=#19;balloonFlyto&gt;William Shakespeare&lt;/a&gt;&lt;br&gt;Mother: &lt;a href=#25;balloonFlyto&gt;Anne Hathaway&lt;/a&gt;&lt;br&gt;Children: Shakespeare Quiney Richard Quiney Thomas Quiney </description>
+                <TimeStamp id="47">
+                    <when>1616</when>
+                </TimeStamp>
+                <styleUrl>#6</styleUrl>
+                <Point id="45">
+                    <coordinates>-1.70634,52.1927803,0.0</coordinates>
+                </Point>
+            </Placemark>
+            <Placemark id="52">
+                <name>John Hall</name>
+                <description>Marriage 1607&lt;br&gt;Stratford-upon-Avon&lt;br&gt;</description>
+                <TimeStamp id="53">
+                    <when>1607</when>
+                </TimeStamp>
+                <styleUrl>#6</styleUrl>
+                <Point id="51">
+                    <coordinates>-1.70634,52.1927803,0.0</coordinates>
+                </Point>
+            </Placemark>
+            <Placemark id="55">
+                <name>Thomas Quiney</name>
+                <description>Marriage 1616&lt;br&gt;Stratford-upon-Avon&lt;br&gt;</description>
+                <TimeStamp id="56">
+                    <when>1616</when>
+                </TimeStamp>
+                <styleUrl>#6</styleUrl>
+                <Point id="54">
+                    <coordinates>-1.70634,52.1927803,0.0</coordinates>
+                </Point>
+            </Placemark>
+            <Placemark id="58">
+                <name>Thomas Quiney</name>
+                <description>Marriage None&lt;br&gt;Unmarried&lt;br&gt;</description>
+                <styleUrl>#6</styleUrl>
+                <Point id="57">
+                    <coordinates>-1.2649062,52.5310214,0.0</coordinates>
+                </Point>
+            </Placemark>
+            <Placemark id="60">
+                <name>Margaret Wheeler</name>
+                <description>Marriage None&lt;br&gt;Unmarried&lt;br&gt;</description>
+                <styleUrl>#6</styleUrl>
+                <Point id="59">
+                    <coordinates>-1.2649062,52.5310214,0.0</coordinates>
+                </Point>
+            </Placemark>
+        </Folder>
+        <Folder id="13">
+            <Style id="10">
+                <IconStyle id="11">
+                    <colorMode>normal</colorMode>
+                    <scale>1</scale>
+                    <heading>0</heading>
+                    <Icon id="12">
+                        <href>http://maps.google.com/mapfiles/kml/paddle/wht-blank.png</href>
+                    </Icon>
+                </IconStyle>
+            </Style>
+            <name>Death</name>
+            <Placemark id="19">
+                <name>William Shakespeare</name>
+                <description>Death 1616&lt;br&gt;Stratford-upon-Avon&lt;br&gt;Children: &lt;a href=#34;balloonFlyto&gt;Susanna Shakespeare&lt;/a&gt; &lt;a href=#40;balloonFlyto&gt;Hamnet Shakespeare&lt;/a&gt; &lt;a href=#49;balloonFlyto&gt;Judith Shakespeare&lt;/a&gt; </description>
+                <TimeStamp id="20">
+                    <when>1616</when>
+                </TimeStamp>
+                <styleUrl>#10</styleUrl>
+                <Point id="18">
+                    <coordinates>-1.70634,52.1927803,0.0</coordinates>
+                </Point>
+            </Placemark>
+            <Placemark id="25">
+                <name>Anne Hathaway</name>
+                <description>Death 1623&lt;br&gt;Stratford-upon-Avon&lt;br&gt;Children: &lt;a href=#34;balloonFlyto&gt;Susanna Shakespeare&lt;/a&gt; &lt;a href=#40;balloonFlyto&gt;Hamnet Shakespeare&lt;/a&gt; &lt;a href=#49;balloonFlyto&gt;Judith Shakespeare&lt;/a&gt; </description>
+                <TimeStamp id="26">
+                    <when>1623</when>
+                </TimeStamp>
+                <styleUrl>#10</styleUrl>
+                <Point id="24">
+                    <coordinates>-1.70634,52.1927803,0.0</coordinates>
+                </Point>
+            </Placemark>
+            <Placemark id="34">
+                <name>Susanna Shakespeare</name>
+                <description>Death 1649&lt;br&gt;Stratford-upon-Avon&lt;br&gt;Father: &lt;a href=#19;balloonFlyto&gt;William Shakespeare&lt;/a&gt;&lt;br&gt;Mother: &lt;a href=#25;balloonFlyto&gt;Anne Hathaway&lt;/a&gt;&lt;br&gt;Children: Elizabeth Shakespeare </description>
+                <TimeStamp id="35">
+                    <when>1649</when>
+                </TimeStamp>
+                <styleUrl>#10</styleUrl>
+                <Point id="33">
+                    <coordinates>-1.70634,52.1927803,0.0</coordinates>
+                </Point>
+            </Placemark>
+            <Placemark id="40">
+                <name>Hamnet Shakespeare</name>
+                <description>Death 1596&lt;br&gt;Stratford-upon-Avon&lt;br&gt;Father: &lt;a href=#19;balloonFlyto&gt;William Shakespeare&lt;/a&gt;&lt;br&gt;Mother: &lt;a href=#25;balloonFlyto&gt;Anne Hathaway&lt;/a&gt;&lt;br&gt;</description>
+                <TimeStamp id="41">
+                    <when>1596</when>
+                </TimeStamp>
+                <styleUrl>#10</styleUrl>
+                <Point id="39">
+                    <coordinates>-1.70634,52.1927803,0.0</coordinates>
+                </Point>
+            </Placemark>
+            <Placemark id="49">
+                <name>Judith Shakespeare</name>
+                <description>Death 1662&lt;br&gt;Stratford-upon-Avon&lt;br&gt;Father: &lt;a href=#19;balloonFlyto&gt;William Shakespeare&lt;/a&gt;&lt;br&gt;Mother: &lt;a href=#25;balloonFlyto&gt;Anne Hathaway&lt;/a&gt;&lt;br&gt;Children: Shakespeare Quiney Richard Quiney Thomas Quiney </description>
+                <TimeStamp id="50">
+                    <when>1662</when>
+                </TimeStamp>
+                <styleUrl>#10</styleUrl>
+                <Point id="48">
+                    <coordinates>-1.70634,52.1927803,0.0</coordinates>
+                </Point>
+            </Placemark>
+            <Placemark id="62">
+                <name>Margaret Wheeler</name>
+                <description>Death None&lt;br&gt;Died in childbirth&lt;br&gt;</description>
+                <styleUrl>#10</styleUrl>
+                <Point id="61">
+                    <coordinates>-1.2649062,52.5310214,0.0</coordinates>
+                </Point>
+            </Placemark>
+            <Placemark id="64">
+                <name>Not named Quiney</name>
+                <description>Death None&lt;br&gt;Died in childbirth&lt;br&gt;</description>
+                <styleUrl>#10</styleUrl>
+                <Point id="63">
+                    <coordinates>-1.2649062,52.5310214,0.0</coordinates>
+                </Point>
+            </Placemark>
+        </Folder>
+        <Folder id="14">
+            <Style id="68">
+                <LineStyle id="69">
+                    <color>ffff0000</color>
+                    <colorMode>normal</colorMode>
+                    <width>2</width>
+                </LineStyle>
+            </Style>
+            <Style id="73">
+                <LineStyle id="74">
+                    <color>ff0000ff</color>
+                    <colorMode>normal</colorMode>
+                    <width>2</width>
+                </LineStyle>
+            </Style>
+            <Style id="78">
+                <LineStyle id="79">
+                    <color>ffff0000</color>
+                    <colorMode>normal</colorMode>
+                    <width>2</width>
+                </LineStyle>
+            </Style>
+            <Style id="83">
+                <LineStyle id="84">
+                    <color>ff0000ff</color>
+                    <colorMode>normal</colorMode>
+                    <width>2</width>
+                </LineStyle>
+            </Style>
+            <Style id="88">
+                <LineStyle id="89">
+                    <color>ffff0000</color>
+                    <colorMode>normal</colorMode>
+                    <width>2</width>
+                </LineStyle>
+            </Style>
+            <Style id="93">
+                <LineStyle id="94">
+                    <color>ff0000ff</color>
+                    <colorMode>normal</colorMode>
+                    <width>2</width>
+                </LineStyle>
+            </Style>
+            <Style id="98">
+                <LineStyle id="99">
+                    <color>ffff0000</color>
+                    <colorMode>normal</colorMode>
+                    <width>2</width>
+                </LineStyle>
+            </Style>
+            <Style id="103">
+                <LineStyle id="104">
+                    <color>ff0000ff</color>
+                    <colorMode>normal</colorMode>
+                    <width>2</width>
+                </LineStyle>
+            </Style>
+            <name>Parents</name>
+            <Placemark id="66">
+                <name>Father: William Shakespeare</name>
+                <TimeSpan id="67">
+                    <begin>1583</begin>
+                    <end>1564</end>
+                </TimeSpan>
+                <styleUrl>#68</styleUrl>
+                <LineString id="65">
+                    <extrude>1</extrude>
+                    <tessellate>1</tessellate>
+                    <altitudeMode>clampToGround</altitudeMode>
+                    <coordinates>-1.70634,52.1927803,0.0 -1.70634,52.1927803,0.0</coordinates>
+                </LineString>
+            </Placemark>
+            <Placemark id="71">
+                <name>Mother: Anne Hathaway</name>
+                <TimeSpan id="72">
+                    <begin>1583</begin>
+                    <end>1556</end>
+                </TimeSpan>
+                <styleUrl>#73</styleUrl>
+                <LineString id="70">
+                    <extrude>1</extrude>
+                    <tessellate>1</tessellate>
+                    <altitudeMode>clampToGround</altitudeMode>
+                    <coordinates>-1.70634,52.1927803,0.0 -1.7276632,52.1909684,0.0</coordinates>
+                </LineString>
+            </Placemark>
+            <Placemark id="76">
+                <name>Father: William Shakespeare</name>
+                <TimeSpan id="77">
+                    <begin>1585</begin>
+                    <end>1564</end>
+                </TimeSpan>
+                <styleUrl>#78</styleUrl>
+                <LineString id="75">
+                    <extrude>1</extrude>
+                    <tessellate>1</tessellate>
+                    <altitudeMode>clampToGround</altitudeMode>
+                    <coordinates>-1.70634,52.1927803,0.0 -1.70634,52.1927803,0.0</coordinates>
+                </LineString>
+            </Placemark>
+            <Placemark id="81">
+                <name>Mother: Anne Hathaway</name>
+                <TimeSpan id="82">
+                    <begin>1585</begin>
+                    <end>1556</end>
+                </TimeSpan>
+                <styleUrl>#83</styleUrl>
+                <LineString id="80">
+                    <extrude>1</extrude>
+                    <tessellate>1</tessellate>
+                    <altitudeMode>clampToGround</altitudeMode>
+                    <coordinates>-1.70634,52.1927803,0.0 -1.7276632,52.1909684,0.0</coordinates>
+                </LineString>
+            </Placemark>
+            <Placemark id="86">
+                <name>Father: William Shakespeare</name>
+                <TimeSpan id="87">
+                    <begin>1585</begin>
+                    <end>1564</end>
+                </TimeSpan>
+                <styleUrl>#88</styleUrl>
+                <LineString id="85">
+                    <extrude>1</extrude>
+                    <tessellate>1</tessellate>
+                    <altitudeMode>clampToGround</altitudeMode>
+                    <coordinates>-1.70634,52.1927803,0.0 -1.70634,52.1927803,0.0</coordinates>
+                </LineString>
+            </Placemark>
+            <Placemark id="91">
+                <name>Mother: Anne Hathaway</name>
+                <TimeSpan id="92">
+                    <begin>1585</begin>
+                    <end>1556</end>
+                </TimeSpan>
+                <styleUrl>#93</styleUrl>
+                <LineString id="90">
+                    <extrude>1</extrude>
+                    <tessellate>1</tessellate>
+                    <altitudeMode>clampToGround</altitudeMode>
+                    <coordinates>-1.70634,52.1927803,0.0 -1.7276632,52.1909684,0.0</coordinates>
+                </LineString>
+            </Placemark>
+            <Placemark id="96">
+                <name>Father: Thomas Quiney</name>
+                <TimeSpan id="97">
+                    <end>1589</end>
+                </TimeSpan>
+                <styleUrl>#98</styleUrl>
+                <LineString id="95">
+                    <extrude>1</extrude>
+                    <tessellate>1</tessellate>
+                    <altitudeMode>clampToGround</altitudeMode>
+                    <coordinates>-1.2649062,52.5310214,0.0 -1.70634,52.1927803,0.0</coordinates>
+                </LineString>
+            </Placemark>
+            <Placemark id="101">
+                <name>Mother: Margaret Wheeler</name>
+                <TimeSpan id="102"/>
+                <styleUrl>#103</styleUrl>
+                <LineString id="100">
+                    <extrude>1</extrude>
+                    <tessellate>1</tessellate>
+                    <altitudeMode>clampToGround</altitudeMode>
+                    <coordinates>-1.2649062,52.5310214,0.0 -1.2649062,52.5310214,0.0</coordinates>
+                </LineString>
+            </Placemark>
+        </Folder>
     </Document>
 </kml>

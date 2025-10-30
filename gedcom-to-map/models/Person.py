@@ -58,7 +58,7 @@ class Person:
         father (Optional[str]): Father's xref ID.
         mother (Optional[str]): Mother's xref ID.
         children (List[str]): List of children xref IDs.
-        lat_lon (Optional[LatLon]): Latitude/longitude.
+        latlon (Optional[LatLon]): Latitude/longitude.
         birth (Optional[LifeEvent]): Birth event.
         death (Optional[LifeEvent]): Death event.
         marriages (List[LifeEvent]): Marriage events.
@@ -169,7 +169,7 @@ class LifeEvent:
         what: The type of event (e.g., 'BIRT', 'DEAT').
         record (Record): The GEDCOM record associated with the event.
         location (Location): Geocoded location object.
-        lat_lon (LatLon): Latitude/longitude of the event, if available.
+        latlon (LatLon): Latitude/longitude of the event, if available.
     """
     __slots__ = [
         'place',

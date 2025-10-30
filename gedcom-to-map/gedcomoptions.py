@@ -36,22 +36,22 @@ def settings_file_pathname(file_name):
     _log.debug (f"Settings file location: {settings_file_path}")
     return settings_file_path
     
-class ResultsType(Enum):
+class ResultsTypes(Enum):
     HTML = "HTML"
     KML = "KML"
     KML2 = "KML2"
     SUM = "SUM"
 
-def ResultsTypeEnforce(value):
-    if isinstance(value, ResultsType):
-        return value
-    elif isinstance(value, str):
-        try:
-            return ResultsType[value.upper()]
-        except KeyError:
-            raise ValueError(f"Invalid ResultsType string: {value}")
-    else:
-        raise TypeError(f"Cannot convert {type(value)} to ResultsType")
+    def ResultsTypesEnforce(value):
+        if isinstance(value, ResultsTypes):
+            return value
+        elif isinstance(value, str):
+            try:
+                return ResultsTypes[value.upper()]
+            except KeyError:
+                raise ValueError(f"Invalid ResultsTypes string: {value}")
+        else:
+            raise TypeError(f"Cannot convert {type(value)} to ResultsTypes")
 
 class gvOptions:
     def __init__ (self):
@@ -63,7 +63,7 @@ class gvOptions:
         self.GEDCOMinput = "gedcomfile.ged"
         self.resultpath = None              # directory for .Result
         self.Result = ''                    # output file (could be of resulttype .html or .kml)
-        self.ResultType : ResultsType = ResultsType.HTML
+        self.ResultType : ResultsTypes = ResultsTypes.HTML
         self.Main = None                    # xref_id
         self.mainPerson = None               # point to Person
         self.Name = None                    # name of person
@@ -102,6 +102,15 @@ class gvOptions:
         self.lastlines = None
         self.timeframe = [None,None]
         self.runavg = []
+        self.SummaryOpen = True
+        self.SummaryPlaces = True
+        self.SummaryPeople = True
+        self.SummaryCountries = False
+        self.SummaryCountriesGrid = True
+        self.SummaryCountries = False
+        self.SummaryGeocode = True
+        self.SummaryAltPlaces = False
+        
 
         self.skip_file_geocache = False
         self.skip_file_alt_places = False
@@ -139,7 +148,9 @@ class gvOptions:
         self.html_keys = {'MarksOn':0, 'HeatMap':0, 'BornMark':0, 'DieMark':0,  'MarkStarOn':0, 'GroupBy':1, 
                           'UseAntPath':0, 'MapTimeLine':0, 'HeatMapTimeStep':1, 'HomeMarker':0, 'showLayerControl':0, 
                           'mapMini':0, 'MapStyle':2}
-        self.core_keys = {'UseGPS':0, 'CacheOnly':0, 'AllEntities':0, 'ResultType':3, 'KMLcmdline':2, 'CSVcmdline':2, 'Tracecmdline':2, 'badAge':0}
+        self.core_keys = {'UseGPS':0, 'CacheOnly':0, 'AllEntities':0, 'ResultType':3, 'KMLcmdline':2, 'CSVcmdline':2, 'Tracecmdline':2, 'badAge':0,
+                        'SummaryPlaces':0, 'SummaryPeople':0, 'SummaryCountries':0, 'SummaryCountriesGrid':0, 
+                        'SummaryCountries':0, 'SummaryGeocode':0, 'SummaryAltPlaces':0, 'SummaryOpen':0}
         self.logging_keys = ['models.person', 'models', 'ged4py.parser', 'ged4py', 'models.creator', 'models.location', 'gedcomoptions', 'gedcom.gedcomparser', 
                              'gedcom', 'gedcom.gedcom', 'gedcom.geocode','gedcom.geocache','gedcom.addressbook',
                              'geopy', 'render.kmlexporter', 'render', 'render.foliumexp', 'gedcomvisual', 'gedcomdialogs', 'gedcomvisualgui', '__main__']
@@ -185,7 +196,7 @@ class gvOptions:
 
 
         
-    def setstatic(self,  GEDCOMinput:2, Result:2, ResultType: ResultsType, Main=None, MaxMissing:1 = 0, MaxLineWeight:1 = 20, UseGPS:bool = True, CacheOnly:bool = False,  AllEntities:bool = False):
+    def setstatic(self,  GEDCOMinput:2, Result:2, ResultType: ResultsTypes, Main=None, MaxMissing:1 = 0, MaxLineWeight:1 = 20, UseGPS:bool = True, CacheOnly:bool = False,  AllEntities:bool = False):
         
         self.setInput(GEDCOMinput)
         self.setResults(Result, ResultType)
@@ -300,17 +311,17 @@ class gvOptions:
         else:
             self.setMainPerson(None)
 
-    def setResults(self, Result, OutputType: ResultsType):
+    def setResults(self, Result, OutputType: ResultsTypes):
         """ Set the Output file and type (Only the file name) """
-        self.ResultType = ResultsTypeEnforce(OutputType)
+        self.ResultType = ResultsTypes.ResultsTypesEnforce(OutputType)
         extension = "txt"
-        if OutputType is ResultsType.HTML:
+        if OutputType is ResultsTypes.HTML:
             extension = "html"
-        elif OutputType is ResultsType.KML:
+        elif OutputType is ResultsTypes.KML:
             extension = "kml"
-        elif OutputType is ResultsType.KML2:
+        elif OutputType is ResultsTypes.KML2:
             extension = "kml"
-        elif OutputType is ResultsType.SUM:
+        elif OutputType is ResultsTypes.SUM:
             extension = "txt"
         
         self.Result, e = os.path.splitext(Result)                   # output file (could be of resulttype .html or .kml)

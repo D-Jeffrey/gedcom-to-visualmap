@@ -18,7 +18,8 @@ class Line:
         self.name = name
         # TODO we need to use id to avoid problems with duplicate names
         # BUG
-        
+        self.whenFrom = None 
+        self.whenTo = None
         self.a = a
         self.b = b
         self.color = color

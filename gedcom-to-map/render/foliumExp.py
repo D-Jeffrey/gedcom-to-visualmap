@@ -330,7 +330,7 @@ class foliumExporter:
             if self.gOp.step():
                 break
                 
-            if not (hasattr(line, 'style') and line.style == 'Life'):
+            if not (getattr(line, 'style', None) == 'Life'):
                 continue
                 
             self.gOp.Referenced.add(line.person.xref_id, 'heat')
@@ -438,7 +438,7 @@ class foliumExporter:
             self.gOp.Referenced = Referenced()
             _log.debug  ("Building Referenced - quick only: %s", not saveresult)
             for line in lines:
-                if (hasattr(line,'style') and line.style == 'Life'):
+                if (getattr(line,'style', None) == 'Life'):
                     self.gOp.Referenced.add(line.person.xref_id, 'quick')
             self.gOp.lastlines = {}
             # make a Dict array of lines 

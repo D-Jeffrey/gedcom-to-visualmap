@@ -87,6 +87,7 @@ class Geocode:
             alt_place_file_path (Optional[Path]): Alternative place names file path.
         """
         self.always_geocode = always_geocode
+        logger.debug(f"Geocode always_geocode={self.always_geocode}")
         self.location_cache_file = cache_file
         
         geo_yaml_path = Path(__file__).parent / "geo_config.yaml"
@@ -249,7 +250,6 @@ class Geocode:
             if len(parts) > 1:
                 less_precise_address = ','.join(parts[1:]).strip()
                 location = self.geocode_place(less_precise_address, country_code, country_name, address_depth + 1)
-        BackgroundProcess.gOp.step(info=f"Looked up : {place}") if BackgroundProcess.gOp else None
         return location
 
     def separate_cached_locations(self, address_book: FuzzyAddressBook) -> Tuple[FuzzyAddressBook, FuzzyAddressBook]:
@@ -314,7 +314,7 @@ class Geocode:
                     logger.info(f"Country not found in cache for {use_place_name}, using default country: {self.default_country}")
 
         if not found_in_cache:
-
+            # BackgroundProcess.gOp.step(info=f"Looked up : {place}") if BackgroundProcess.gOp else None
             location = self.geocode_place(place_with_country, country_code, country_name, found_country, address_depth=0)
             if location is not None:
                 location.address = place

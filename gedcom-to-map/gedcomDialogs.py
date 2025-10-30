@@ -16,7 +16,7 @@ import wx.grid as gridlib
 from models.LatLon import LatLon
 from models.Person import Person, LifeEvent
 from gedcom.GedcomParser import CheckAge, maxage
-from gedcomoptions import gvOptions, ResultsType
+from gedcomoptions import gvOptions, ResultsTypes
 
 from const import GVFONT, ABOUTFONT, VERSION, GUINAME, ABOUTLINK, NAME, panel
 from gedcomvisual import ParseAndGPS, doHTML, doKML, doKML2, doSUM, doTraceTo
@@ -132,6 +132,7 @@ class ConfigDialog(wx.Frame):
         self.gOp = gOp               # DEFAULT Disabled with False
         self.loggerNames = list(logging.root.manager.loggerDict.keys())
         cfgpanel = wx.Panel(self,style=wx.SIMPLE_BORDER  )
+        
         TEXTkmlcmdlinelbl = wx.StaticText(cfgpanel, -1,  " KML Editor Command line:   ") 
         self.TEXTkmlcmdline = wx.TextCtrl(cfgpanel, wx.ID_FILE1, "", size=(250,20))
         if gOp.KMLcmdline:
@@ -206,7 +207,7 @@ class ConfigDialog(wx.Frame):
         sizer = wx.BoxSizer(wx.VERTICAL)
         sizer.AddMany(parts)
         
-        
+
         sizer.AddMany([ 
             wx.StaticText(cfgpanel, -1,  "Use   $n  for the name of the file within a command line - such as    notepad $n"),    
             wx.StaticText(cfgpanel, -1,  "Use   $n  without any command to open default application for that file type") ])  
@@ -635,7 +636,7 @@ and generating the output so that the GUI can continue to be responsive
         if dolevel & 1 or dolevel & 4:
             panel.id.BTNLoad.SetBackgroundColour(panel.id.GetColor('BTN_DONE'))
         if dolevel & 2:
-            panel.id.BTNUpdate.SetBackgroundColour(panel.id.GetColor('BTN_DONE'))
+            panel.id.BTNCreateFiles.SetBackgroundColour(panel.id.GetColor('BTN_DONE'))
         self.do = dolevel
         
     def SayInfoMessage(self, line, newline= True):
@@ -710,21 +711,21 @@ and generating the output so that the GUI can continue to be responsive
                     if (self.gOp.parsed):
                         _log.info("doHTML or doKML")
                         fname = self.gOp.Result
-                        if (self.gOp.ResultType is ResultsType.HTML):
+                        if (self.gOp.ResultType is ResultsTypes.HTML):
                             ### needAGridUpdate = not self.gOp.Referenced
                             doHTML(self.gOp, self.people, True)
                             # We only need to update the Grid if we have not calculated the Referenced before
                             ### self.updategridmain = needAGridUpdate
                             self.SayInfoMessage(f"HTML generated for {self.gOp.totalpeople} people ({fname})")
-                        elif (self.gOp.ResultType is ResultsType.KML):  
+                        elif (self.gOp.ResultType is ResultsTypes.KML):  
                             doKML(self.gOp, self.people)
                             self.SayInfoMessage(f"KML file generated for {self.gOp.totalpeople} people/points ({fname})")
-                        elif (self.gOp.ResultType is ResultsType.KML2):  
+                        elif (self.gOp.ResultType is ResultsTypes.KML2):  
                             doKML2(self.gOp, self.people)
                             self.SayInfoMessage(f"KML2 file generated for {self.gOp.totalpeople} people/points ({fname})")
-                        elif (self.gOp.ResultType is ResultsType.SUM):  
+                        elif (self.gOp.ResultType is ResultsTypes.SUM):  
                             doSUM(self.gOp)
-                            self.SayInfoMessage(f"KML2 file generated for {self.gOp.totalpeople} people/points ({fname})")
+                            self.SayInfoMessage(f"Summary files generated ({fname})")
                     else:
                         _log.info("not parsed")
                     _log.info("done draw")

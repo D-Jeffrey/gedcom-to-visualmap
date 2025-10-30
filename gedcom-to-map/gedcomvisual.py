@@ -20,11 +20,7 @@ from render.kml import KML_Life_Lines
 from render.summary import write_places_summary, write_people_summary, write_birth_death_countries_summary, write_geocache_summary, write_alt_places_summary
 from gedcom.gedcom import GeolocatedGedcom
 
-# Constants
-GLOBAL_GEO_CACHE_FILENAME = 'geo_cache.csv'
-FILE_ALT_PLACE_FILENAME_SUFFIX = '_alt.csv'
-FILE_GEOCACHE_FILENAME_SUFFIX = '_cache.csv'
-GEO_CONFIG_FILENAME = 'geo_config.yaml'
+from const import GLOBAL_GEO_CACHE_FILENAME, FILE_ALT_PLACE_FILENAME_SUFFIX, FILE_GEOCACHE_FILENAME_SUFFIX, GEO_CONFIG_FILENAME
 
 # Thread for controlling the background processes Created in gedcomVisualGUI.py
 # BackgroundProcess
@@ -86,14 +82,14 @@ def doKML2(gOp : gvOptions, people: list[Person]):
     if (not gOp.lookup):
         _log.error("doKML2: GeolocatedGedcom is not processed")
         return
-    cmdfile = os.path.join(gOp.resultpath, gOp.Result)
+    resultFile = os.path.join(gOp.resultpath, gOp.Result)
 
-    kml_life_lines = KML_Life_Lines(gedcom=gOp.lookup, kml_file=str(cmdfile),
+    kml_life_lines = KML_Life_Lines(gedcom=gOp.lookup, kml_file=str(resultFile),
                                         connect_parents=True, save=True)
-    if kml_life_lines and kml_life_lines.kml:
-        gOp.BackgroundProcess.SayInfoMessage(f"KML(2) output to : {cmdfile}") 
+    if kml_life_lines:
+        gOp.BackgroundProcess.SayInfoMessage(f"KML(2) output to : {resultFile}") 
         if gOp.KMLcmdline:
-            gOp.panel.runCMDfile(gOp.KMLcmdline, cmdfile)
+            gOp.panel.runCMDfile(gOp.KMLcmdline, resultFile)
         else:
             _log.error("Use Options -> Options Setup to define a command line to run")
     else:
@@ -102,49 +98,63 @@ def doKML2(gOp : gvOptions, people: list[Person]):
 
 def doSUM(gOp : gvOptions):
 # HACK this in
-    args = argparse.Namespace()
+    args = None
 
     base_file_name = Path(gOp.GEDCOMinput).stem
-    output_folder = Path(gOp.resultpath).parent
+    output_folder = Path(gOp.resultpath)
     my_gedcom = gOp.lookup
-    if True or args.write_places_summary or args.write_all:
+    if gOp.SummaryPlaces:
         places_summary_file = output_folder / f"{base_file_name}_places.csv"
         places_summary_file = places_summary_file.resolve()
         _log.info(f"Writing places summary to {places_summary_file}")
-        write_places_summary(args, my_gedcom.address_book, str(places_summary_file))
-        gOp.BackgroundProcess.SayInfoMessage(f"Places Summary: {places_summary_file}") 
-        gOp.panel.runCMDfile("", str(places_summary_file))
-    if True or args.write_people_summary or args.write_all:
+        write_places_summary(my_gedcom.address_book, str(places_summary_file))
+        if places_summary_file.exists():
+            gOp.BackgroundProcess.SayInfoMessage(f"Places Summary: {places_summary_file}") 
+            if gOp.SummaryOpen:
+                gOp.panel.runCMDfile("$n", str(places_summary_file))
+    if gOp.SummaryPeople:
         people_summary_file = output_folder / f"{base_file_name}_people.csv"
         people_summary_file = people_summary_file.resolve()
         _log.info(f"Writing people summary to {people_summary_file}")
-        write_people_summary(args, my_gedcom.people, str(people_summary_file))
-        gOp.BackgroundProcess.SayInfoMessage(f"Places Summary: {places_summary_file}") 
-        gOp.panel.runCMDfile("", str(places_summary_file))
+        write_people_summary(my_gedcom.people, str(people_summary_file))
+        if people_summary_file.exists():
+            gOp.BackgroundProcess.SayInfoMessage(f"Places Summary: {people_summary_file}") 
+            if gOp.SummaryOpen:
+                gOp.panel.runCMDfile("$n", str(people_summary_file))
 
-    if True or args.write_countries_summary or args.write_all:
+    if gOp.SummaryCountries or gOp.SummaryCountriesGrid:
         countries_summary_file = output_folder / f"{base_file_name}_countries.csv"
         countries_summary_file = countries_summary_file.resolve()
         _log.info(f"Writing countries summary to {countries_summary_file}")
-        write_birth_death_countries_summary(args, my_gedcom.people, str(countries_summary_file), base_file_name)
-        gOp.BackgroundProcess.SayInfoMessage(f"Countries summary: {countries_summary_file}") 
-        gOp.panel.runCMDfile("", str(countries_summary_file))
+        img_file = write_birth_death_countries_summary(my_gedcom.people, str(countries_summary_file), base_file_name)
+        if gOp.SummaryCountries and countries_summary_file.exists():
+            gOp.BackgroundProcess.SayInfoMessage(f"Countries summary: {countries_summary_file}") 
+            if gOp.SummaryOpen:
+                gOp.panel.runCMDfile("$n", str(countries_summary_file))
+        if gOp.SummaryCountriesGrid and img_file:
+            gOp.BackgroundProcess.SayInfoMessage(f"Countries summary Graph: {img_file}") 
+            if gOp.SummaryOpen:
+                gOp.panel.runCMDfile("$n", str(img_file))
 
-    if True or args.write_geocache_per_input_file or args.write_all:
+    if gOp.SummaryGeocode:
         per_file_cache = output_folder / f"{base_file_name}{FILE_GEOCACHE_FILENAME_SUFFIX}"
         per_file_cache = per_file_cache.resolve()
         _log.info(f"Writing geo cache to {per_file_cache}")
         write_geocache_summary(my_gedcom.address_book, str(per_file_cache))
-        gOp.BackgroundProcess.SayInfoMessage(f"geo cache: {per_file_cache}") 
-        gOp.panel.runCMDfile("", str(per_file_cache))
+        if per_file_cache.exists():
+            gOp.BackgroundProcess.SayInfoMessage(f"geo cache: {per_file_cache}") 
+            if gOp.SummaryOpen:
+                gOp.panel.runCMDfile("$n", str(per_file_cache))
 
-    if True or not args.skip_file_alt_places and (args.write_alt_place_summary or args.write_all):
+    if gOp.SummaryAltPlaces:
         alt_places_summary_file = output_folder / f"{base_file_name}_alt_places.csv"
         alt_places_summary_file = alt_places_summary_file.resolve()
         _log.info(f"Writing alternative places summary to {alt_places_summary_file}")
-        write_alt_places_summary(args, my_gedcom.address_book, str(alt_places_summary_file))
-        gOp.BackgroundProcess.SayInfoMessage(f"Alternative places summary: {alt_places_summary_file}") 
-        gOp.panel.runCMDfile("", str(alt_places_summary_file))
+        write_alt_places_summary(my_gedcom.address_book, str(alt_places_summary_file))
+        if alt_places_summary_file.exists():
+            gOp.BackgroundProcess.SayInfoMessage(f"Alternative places summary: {alt_places_summary_file}") 
+            if gOp.SummaryOpen:
+                gOp.panel.runCMDfile("$n", str(alt_places_summary_file))
 
 
 def Geoheatmap(gOp : gvOptions):
@@ -218,9 +228,9 @@ def ParseAndGPS(gOp: gvOptions, stage: int = 0 ):
             if not input_path.is_absolute():
                 input_path = (Path.cwd() / input_path).resolve()
             base_file_name = input_path.stem
-            cache_filename = (r"geodat-address-cache.csv", r"geodat-address-cache-1.csv", r"geodat-address-cache-2.csv")
             
-            cachefile = input_path.parent / cache_filename[0]
+            cachefile = input_path.parent / GLOBAL_GEO_CACHE_FILENAME
+            gOp.gpsfile = cachefile
             alt_place_file_path = input_path.parent / f"{base_file_name}{FILE_ALT_PLACE_FILENAME_SUFFIX}"
             file_geo_cache_path = input_path.parent / f"{base_file_name}{FILE_GEOCACHE_FILENAME_SUFFIX}"
             geo_config_path = Path(__file__).parent.resolve() / GEO_CONFIG_FILENAME

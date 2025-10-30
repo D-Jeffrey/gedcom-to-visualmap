@@ -72,8 +72,6 @@ class Location:
         self.size = size
         self.importance = importance
 
-        # self.name = name        # This should not be used this is triggered by a slot bug but not sure what is the cause
-
     @classmethod
     def from_dict(cls, d: dict) -> "Location":
         """
@@ -85,6 +83,7 @@ class Location:
         Returns:
             Location: Location instance.
         """
+        # Track unknown attributes
         unknown = []
         obj = cls()
         for key, value in d.items():
@@ -97,6 +96,7 @@ class Location:
             elif key.lower() == 'alt_place':
                 setattr(obj, 'alt_addr', value)
             else:
+                # make it ignore extra columns in the CSV file
                 if key in obj.__slots__:
                     setattr(obj, key, value)
                 else:

@@ -468,9 +468,10 @@ class GeolocatedGedcom(Gedcom):
         )
         # self.address_book: FuzzyAddressBook = FuzzyAddressBook()
         self.geocoder.setupBackgroundProcess(background)
-        BackgroundProcess.gOp.step("Reading GED", target=(BackgroundProcess.gOp.totalGEDpeople+BackgroundProcess.gOp.totalGEDfamily))
+        BackgroundProcess.gOp.step("Reading GED")
         self._geolocate_all()
         self._parse_people()
+        
 
     def save_location_cache(self) -> None:
         """
@@ -506,6 +507,7 @@ class GeolocatedGedcom(Gedcom):
             self.address_book.fuzzy_add_address(place, location)
             if idx % self.geolocate_all_logger_interval == 0 or idx == num_non_cached_places:
                 logger.info(f"Geolocated {idx} of {num_non_cached_places} non-cached places...")
+            BackgroundProcess.gOp.step(info=f"Geolocated {idx} of {num_non_cached_places}")
         logger.info(f"Geolocation of all {self.address_book.len()} places completed.")
 
     def _parse_people(self) -> None:
@@ -513,6 +515,10 @@ class GeolocatedGedcom(Gedcom):
         Parse and geolocate all people in the GEDCOM file.
         """
         super()._parse_people()
+        # People loaded
+        BackgroundProcess.gOp.totalGEDpeople = len(self.people)
+        BackgroundProcess.gOp.totalGEDfamily = len([p for p in self.people.values() if p.father or p.mother])
+        BackgroundProcess.gOp.step("Locating People", target=(BackgroundProcess.gOp.totalGEDpeople))
         self._geolocate_people()
 
     def _geolocate_people(self) -> None:
@@ -539,6 +545,7 @@ class GeolocatedGedcom(Gedcom):
                 if not found_location and event.location and event.location.latlon and event.location.latlon.is_valid():
                     person.latlon = event.location.latlon
                     found_location = True
+            BackgroundProcess.gOp.step(info =f"Reviewing {getattr(person, 'name', '-Unknwon-')}") 
 
     def _geolocate_event(self, event: LifeEvent) -> LifeEvent:
         """

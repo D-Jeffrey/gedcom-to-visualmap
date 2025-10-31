@@ -183,7 +183,7 @@ def doHTML(gOp : gvOptions, people, fullresult ):
 
     foliumExporter(gOp).export(people[gOp.Main], creator, fullresult)
     if (fullresult):
-        webbrowser.open(os.path.join(gOp.resultpath, gOp.Result), new = 0, autoraise = True)
+        webbrowser.open(Path(gOp.resultpath, gOp.Result).resolve().as_uri(), new=0, autoraise=True)
         
     
 

@@ -17,7 +17,7 @@ import wx.grid as gridlib
 from models.LatLon import LatLon
 from models.Person import Person, LifeEvent
 from gedcom.GedcomParser import CheckAge, maxage
-from gedcomoptions import gvOptions, ResultsTypes
+from gedcomoptions import gvOptions, ResultsType
 
 from const import GVFONT, ABOUTFONT, VERSION, GUINAME, ABOUTLINK, NAME, panel
 from gedcomvisual import ParseAndGPS, doHTML, doKML, doKML2, doSUM, doTraceTo
@@ -718,19 +718,19 @@ and generating the output so that the GUI can continue to be responsive
                     if (self.gOp.parsed):
                         _log.info("doHTML or doKML")
                         fname = self.gOp.Result
-                        if (self.gOp.ResultType is ResultsTypes.HTML):
+                        if (self.gOp.ResultType is ResultsType.HTML):
                             ### needAGridUpdate = not self.gOp.Referenced
                             doHTML(self.gOp, self.people, True)
                             # We only need to update the Grid if we have not calculated the Referenced before
                             ### self.updategridmain = needAGridUpdate
                             self.SayInfoMessage(f"HTML generated for {self.gOp.totalpeople} people ({fname})")
-                        elif (self.gOp.ResultType is ResultsTypes.KML):  
+                        elif (self.gOp.ResultType is ResultsType.KML):  
                             doKML(self.gOp, self.people)
                             self.SayInfoMessage(f"KML file generated for {self.gOp.totalpeople} people/points ({fname})")
-                        elif (self.gOp.ResultType is ResultsTypes.KML2):  
+                        elif (self.gOp.ResultType is ResultsType.KML2):  
                             doKML2(self.gOp, self.people)
                             self.SayInfoMessage(f"KML2 file generated for {self.gOp.totalpeople} people/points ({fname})")
-                        elif (self.gOp.ResultType is ResultsTypes.SUM):  
+                        elif (self.gOp.ResultType is ResultsType.SUM):  
                             doSUM(self.gOp)
                             self.SayInfoMessage(f"Summary files generated ({fname})")
                     else:

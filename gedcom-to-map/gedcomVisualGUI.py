@@ -41,7 +41,7 @@ import xyzservices.providers as xyz
 
 
 from const import GUINAME, GVFONT, KMLMAPSURL, LOG_CONFIG, NAME, VERSION, panel
-from gedcomoptions import gvOptions, ResultsTypes 
+from gedcomoptions import gvOptions, ResultsType 
 from gedcomvisual import doTrace
 from gedcomDialogs import *
 from style.stylemanager import FontManager, ApproxTextWidth
@@ -1211,13 +1211,13 @@ class VisualMapPanel(wx.Panel):
         _log.debug('%d is %d',  event.GetId(), event.GetInt())
         if event.GetId() == self.id.IDs['ID_RBResultsType']:
             if event.GetInt() == 0:
-                outType = ResultsTypes.HTML
+                outType = ResultsType.HTML
             elif event.GetInt() == 1:
-                outType = ResultsTypes.KML
+                outType = ResultsType.KML
             elif event.GetInt() == 2:
-                outType = ResultsTypes.KML2
+                outType = ResultsType.KML2
             elif event.GetInt() == 3:
-                outType = ResultsTypes.SUM
+                outType = ResultsType.SUM
             self.gOp.setResults(self.gOp.get('Result'), outType)
 
 #            BackgroundProcess.updategridmain = True
@@ -1235,13 +1235,13 @@ class VisualMapPanel(wx.Panel):
     def SetRestulTypeRadioBox(self):
         rType = self.gOp.get('ResultType')
         
-        if rType is ResultsTypes.HTML:
+        if rType is ResultsType.HTML:
             outType = 0
-        elif rType is ResultsTypes.KML:
+        elif rType is ResultsType.KML:
             outType = 1
-        elif rType is ResultsTypes.KML2:
+        elif rType is ResultsType.KML2:
             outType = 2
-        elif rType is ResultsTypes.SUM:
+        elif rType is ResultsType.SUM:
             outType = 3
         else:
             outType = 0
@@ -1563,7 +1563,7 @@ class VisualMapPanel(wx.Panel):
             self.optionK2box.Hide()
         # self.optionGbox.SetSize(self.optionGbox.GetBestSize())
 
-        if ResultTypeSelect is ResultsTypes.HTML:
+        if ResultTypeSelect is ResultsType.HTML:
             # Enable HTML-specific controls
             for ctrl in html_controls:
                 ctrl.Enable()
@@ -1584,13 +1584,13 @@ class VisualMapPanel(wx.Panel):
             else:
                 self.optionHbox.Show()
             
-        elif ResultTypeSelect is ResultsTypes.SUM:
+        elif ResultTypeSelect is ResultsType.SUM:
             if self._needLayoutSet:
                 self._needLayoutSet = False
             else:
                 self.optionSbox.Show()
 
-        elif ResultTypeSelect is ResultsTypes.KML:
+        elif ResultTypeSelect is ResultsType.KML:
             # In KML mode, disable HTML controls and enable KML controls
             for ctrl in html_controls:
                 ctrl.Disable()
@@ -1602,7 +1602,7 @@ class VisualMapPanel(wx.Panel):
                 self._needLayoutSet = False
             else:
                 self.optionKbox.Show()
-        elif ResultTypeSelect is ResultsTypes.KML2:
+        elif ResultTypeSelect is ResultsType.KML2:
             if self._needLayoutSet:
                 self._needLayoutSet = False
             else:

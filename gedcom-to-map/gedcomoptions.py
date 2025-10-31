@@ -36,22 +36,22 @@ def settings_file_pathname(file_name):
     _log.debug (f"Settings file location: {settings_file_path}")
     return settings_file_path
     
-class ResultsTypes(Enum):
+class ResultsType(Enum):
     HTML = "HTML"
     KML = "KML"
     KML2 = "KML2"
     SUM = "SUM"
 
-    def ResultsTypesEnforce(value):
-        if isinstance(value, ResultsTypes):
+    def ResultsTypeEnforce(value):
+        if isinstance(value, ResultsType):
             return value
         elif isinstance(value, str):
             try:
-                return ResultsTypes[value.upper()]
+                return ResultsType[value.upper()]
             except KeyError:
-                raise ValueError(f"Invalid ResultsTypes string: {value}")
+                raise ValueError(f"Invalid ResultsType string: {value}")
         else:
-            raise TypeError(f"Cannot convert {type(value)} to ResultsTypes")
+            raise TypeError(f"Cannot convert {type(value)} to ResultsType")
 
 class gvOptions:
     def __init__ (self):
@@ -63,7 +63,7 @@ class gvOptions:
         self.GEDCOMinput = "gedcomfile.ged"
         self.resultpath = None              # directory for .Result
         self.Result = ''                    # output file (could be of resulttype .html or .kml)
-        self.ResultType : ResultsTypes = ResultsTypes.HTML
+        self.ResultType : ResultsType = ResultsType.HTML
         self.Main = None                    # xref_id
         self.mainPerson = None               # point to Person
         self.Name = None                    # name of person
@@ -216,7 +216,7 @@ class gvOptions:
                 self.timeframe['to'] = theyear
 
         
-    def setstatic(self,  GEDCOMinput:2, Result:2, ResultType: ResultsTypes, Main=None, MaxMissing:1 = 0, MaxLineWeight:1 = 20, UseGPS:bool = True, CacheOnly:bool = False,  AllEntities:bool = False):
+    def setstatic(self,  GEDCOMinput:2, Result:2, ResultType: ResultsType, Main=None, MaxMissing:1 = 0, MaxLineWeight:1 = 20, UseGPS:bool = True, CacheOnly:bool = False,  AllEntities:bool = False):
         
         self.setInput(GEDCOMinput)
         self.setResults(Result, ResultType)
@@ -331,17 +331,17 @@ class gvOptions:
         else:
             self.setMainPerson(None)
 
-    def setResults(self, Result, OutputType: ResultsTypes):
+    def setResults(self, Result, OutputType: ResultsType):
         """ Set the Output file and type (Only the file name) """
-        self.ResultType = ResultsTypes.ResultsTypesEnforce(OutputType)
+        self.ResultType = ResultsType.ResultsTypeEnforce(OutputType)
         extension = "txt"
-        if OutputType is ResultsTypes.HTML:
+        if OutputType is ResultsType.HTML:
             extension = "html"
-        elif OutputType is ResultsTypes.KML:
+        elif OutputType is ResultsType.KML:
             extension = "kml"
-        elif OutputType is ResultsTypes.KML2:
+        elif OutputType is ResultsType.KML2:
             extension = "kml"
-        elif OutputType is ResultsTypes.SUM:
+        elif OutputType is ResultsType.SUM:
             extension = "txt"
         
         self.Result, e = os.path.splitext(Result)                   # output file (could be of resulttype .html or .kml)

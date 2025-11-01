@@ -1718,7 +1718,9 @@ class VisualMapPanel(wx.Panel):
                         _log.info(f'startfile {datafile}')
                         os.startfile(datafile)          # Native Windows method
                     elif sys.platform == "darwin":
-                        opener = "open" 
+                        opener = "open"
+                        _log.info(f'subprocess.Popen {datafile}')
+                        subprocess.Popen([opener, datafile])
                     else:
                         opener ="xdg-open"
                         if not shutil.which(opener):

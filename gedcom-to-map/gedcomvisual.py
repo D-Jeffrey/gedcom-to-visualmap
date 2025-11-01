@@ -63,17 +63,20 @@ def doKML(gOp : gvOptions, people: list[Person]):
             kmlInstance = KmlExporter(gOp)
 
         kmlInstance.export(people[gOp.Main].latlon, creator, nametag, placeType)
+    bg = getattr(gOp, "BackgroundProcess", None)
     if kmlInstance:
         kmlInstance.Done()
         cmdfile = os.path.join(gOp.resultpath, gOp.Result)
-        gOp.BackgroundProcess.SayInfoMessage(f"KML output to : {cmdfile}") 
+        if bg:
+            bg.SayInfoMessage(f"KML output to : {cmdfile}")
         if gOp.KMLcmdline:
             gOp.panel.runCMDfile(gOp.KMLcmdline, cmdfile)
         else:
             _log.error("Use Options -> Options Setup to define a command line to run")
     else:
         _log.error("No KML output created")
-        gOp.BackgroundProcess.SayInfoMessage(f"No KML output created - No data selected to map") 
+        if bg:
+            bg.SayInfoMessage(f"No KML output created - No data selected to map")
 
 def doKML2(gOp : gvOptions, people: list[Person]):
     if (not gOp.lookup):
@@ -83,15 +86,18 @@ def doKML2(gOp : gvOptions, people: list[Person]):
 
     kml_life_lines = KML_Life_Lines(gedcom=gOp.lookup, kml_file=str(resultFile),
                                         connect_parents=True, save=True)
+    bg = getattr(gOp, "BackgroundProcess", None)
     if kml_life_lines:
-        gOp.BackgroundProcess.SayInfoMessage(f"KML(2) output to : {resultFile}") 
+        if bg:
+            bg.SayInfoMessage(f"KML(2) output to : {resultFile}")
         if gOp.KMLcmdline:
             gOp.panel.runCMDfile(gOp.KMLcmdline, resultFile)
         else:
             _log.error("Use Options -> Options Setup to define a command line to run")
     else:
         _log.error("No KML output created")
-        gOp.BackgroundProcess.SayInfoMessage(f"No KML(2) output created") 
+        if bg:
+            bg.SayInfoMessage(f"No KML output created - No data selected to map")
 
 def doSUM(gOp : gvOptions):
 # HACK this in
@@ -100,13 +106,15 @@ def doSUM(gOp : gvOptions):
     base_file_name = Path(gOp.GEDCOMinput).stem
     output_folder = Path(gOp.resultpath)
     my_gedcom = gOp.lookup
+    bg = getattr(gOp, "BackgroundProcess", None)
     if gOp.SummaryPlaces:
         places_summary_file = output_folder / f"{base_file_name}_places.csv"
         places_summary_file = places_summary_file.resolve()
         _log.info(f"Writing places summary to {places_summary_file}")
         write_places_summary(my_gedcom.address_book, str(places_summary_file))
         if places_summary_file.exists():
-            gOp.BackgroundProcess.SayInfoMessage(f"Places Summary: {places_summary_file}") 
+            if bg:
+                bg.SayInfoMessage(f"Places Summary: {places_summary_file}")
             if gOp.SummaryOpen:
                 gOp.panel.runCMDfile("$n", str(places_summary_file))
     if gOp.SummaryPeople:
@@ -115,7 +123,8 @@ def doSUM(gOp : gvOptions):
         _log.info(f"Writing people summary to {people_summary_file}")
         write_people_summary(my_gedcom.people, str(people_summary_file))
         if people_summary_file.exists():
-            gOp.BackgroundProcess.SayInfoMessage(f"Places Summary: {people_summary_file}") 
+            if bg:
+                bg.SayInfoMessage(f"People Summary: {people_summary_file}")
             if gOp.SummaryOpen:
                 gOp.panel.runCMDfile("$n", str(people_summary_file))
 
@@ -125,11 +134,13 @@ def doSUM(gOp : gvOptions):
         _log.info(f"Writing countries summary to {countries_summary_file}")
         img_file = write_birth_death_countries_summary(my_gedcom.people, str(countries_summary_file), base_file_name)
         if gOp.SummaryCountries and countries_summary_file.exists():
-            gOp.BackgroundProcess.SayInfoMessage(f"Countries summary: {countries_summary_file}") 
+            if bg:
+                bg.SayInfoMessage(f"Countries summary: {countries_summary_file}")
             if gOp.SummaryOpen:
                 gOp.panel.runCMDfile("$n", str(countries_summary_file))
         if gOp.SummaryCountriesGrid and img_file:
-            gOp.BackgroundProcess.SayInfoMessage(f"Countries summary Graph: {img_file}") 
+            if bg:
+                bg.SayInfoMessage(f"Countries summary Graph: {img_file}")
             if gOp.SummaryOpen:
                 gOp.panel.runCMDfile("$n", str(img_file))
 
@@ -139,7 +150,8 @@ def doSUM(gOp : gvOptions):
         _log.info(f"Writing geo cache to {per_file_cache}")
         write_geocache_summary(my_gedcom.address_book, str(per_file_cache))
         if per_file_cache.exists():
-            gOp.BackgroundProcess.SayInfoMessage(f"geo cache: {per_file_cache}") 
+            if bg:
+                bg.SayInfoMessage(f"geo cache: {per_file_cache}")
             if gOp.SummaryOpen:
                 gOp.panel.runCMDfile("$n", str(per_file_cache))
 
@@ -149,7 +161,8 @@ def doSUM(gOp : gvOptions):
         _log.info(f"Writing alternative places summary to {alt_places_summary_file}")
         write_alt_places_summary(my_gedcom.address_book, str(alt_places_summary_file))
         if alt_places_summary_file.exists():
-            gOp.BackgroundProcess.SayInfoMessage(f"Alternative places summary: {alt_places_summary_file}") 
+            if bg:
+                bg.SayInfoMessage(f"Alternative places summary: {alt_places_summary_file}")
             if gOp.SummaryOpen:
                 gOp.panel.runCMDfile("$n", str(alt_places_summary_file))
 

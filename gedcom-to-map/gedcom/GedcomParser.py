@@ -416,9 +416,10 @@ class GedcomParser:
             except Exception as e:
                 _log.error("Error reading file %s", self.file_path)
                 _log.error("Error %s", e)
-                if self.gOp.BackgroundProcess:
+                bg = getattr(self.gOp, "BackgroundProcess", None)
+                if bg:
                     mye = e.args[0].replace("'", "").replace("\"", "").replace("`", "").replace("<", "[").replace(">", "]")
-                    self.gOp.BackgroundProcess.SayErrorMessage(f"Error {mye}", True)
+                    bg.SayErrorMessage(f"Error {mye}", True)
                 return None
             
             thisgvOps.totalGEDfamily = sum(1 for value in parser.xref0.values() if value[1] == 'FAM')

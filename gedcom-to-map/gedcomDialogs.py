@@ -337,7 +337,13 @@ class FamilyPanel(wx.Panel):
         # Get the ID of the selected person
         person_id = self.grid.GetCellValue(row, 7)
         # Open the person dialog with the selected person's details
-        person = self.gOp.BackgroundProcess.people.get(person_id)
+        # bg = getattr(self.gOp, "BackgroundProcess", None)
+        # people = getattr(bg, "people", {}) if bg else {}
+        # self.visual_map_panel set in __init__; use its gOp for background process
+        vm = getattr(getattr(self, "visual_map_panel", None), "gOp", None)
+        bg = getattr(vm, "BackgroundProcess", None) if vm else None
+        people = getattr(bg, "people", {}) if bg else {}
+        person = people.get(person_id)
         if person:
             dialog = PersonDialog(self, person, self.visual_map_panel, showrefences=False)
             dialog.Show(True)
@@ -368,7 +374,9 @@ class PersonDialog(wx.Dialog):
         def sizeAttr(attr,pad=1):
             return (min(len(attr),3)+pad)*(self.font_size+5)  if attr else self.font_size
 
-        people = self.gOp.BackgroundProcess.people
+        # Use the panel's gOp (panel passed in) — self.gOp is not set here
+        bg = getattr(getattr(panel, "gOp", None), "BackgroundProcess", None)
+        people = getattr(bg, "people", {}) if bg else {}
         # Display the marriage information including the marriage location and date                
         marrying = []
         if person.marriages:

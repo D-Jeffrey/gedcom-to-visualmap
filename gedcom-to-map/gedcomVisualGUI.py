@@ -746,8 +746,10 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
                         self.SetItemState(checknames, wx.LIST_STATE_SELECTED, wx.LIST_STATE_SELECTED)
                         self.EnsureVisible(checknames)
                         return
-            self.gOp.BackgroundProcess.SayInfoMessage(f"* Could not find '{self.LastSearch}' in the names", False)
-  
+            bg = getattr(self.gOp, "BackgroundProcess", None)
+            if bg:
+                bg.SayInfoMessage(f"* Could not find '{self.LastSearch}' in the names", False)
+
     def OnItemRightClick(self, event):
         self.currentItem = event.Index
         _log.debug("%s, %s, %s, %s", 
@@ -756,10 +758,12 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
                             self.GetItemText(self.currentItem, 1),
                             self.GetItemText(self.currentItem, 2))
         event.Skip()
-        if self.gOp.BackgroundProcess.people:
+        bg = getattr(gOp, "BackgroundProcess", None)
+        people = getattr(bg, "people", {}) if bg else {}
+        if bg and people:
             itm = self.GetItemText(self.currentItem, 2)
-            if itm in self.gOp.BackgroundProcess.people:
-                dialog = PersonDialog(None, self.gOp.BackgroundProcess.people[itm], self.visual_map_panel)
+            if itm in people:
+                dialog = PersonDialog(None, people[itm], self.visual_map_panel)
                 dialog.Bind(wx.EVT_CLOSE, lambda evt: dialog.Destroy())
                 dialog.Bind(wx.EVT_BUTTON, lambda evt: dialog.Destroy())
                 dialog.Show(True)
@@ -775,14 +779,15 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
     def ShowSelectedLinage(self, personid: str):
         if self.gOp:
             self.gOp.setMain(personid)
-            if self.gOp.BackgroundProcess.updategridmain:
+            bg = getattr(self.gOp, "BackgroundProcess", None)
+            if bg and getattr(bg, "updategridmain", True):
                 _log.debug("Linage for: %s", personid)
-                self.gOp.BackgroundProcess.updategridmain = False
+                bg.updategridmain = False
                 doTrace(self.gOp)
                 self.gOp.newload = False
                 self.PopulateList(self.gOp.people, self.gOp.get('Main'), False)
-                self.gOp.BackgroundProcess.SayInfoMessage(f"Using '{personid}' as starting person with {len(self.gOp.Referenced)} direct ancestors", False)
-                self.gOp.BackgroundProcess.updategridmain = True
+                bg.SayInfoMessage(f"Using '{personid}' as starting person with {len(self.gOp.Referenced)} direct ancestors", False)
+                bg.updategridmain = True
                 self.visual_map_panel.SetupButtonState()
 
 

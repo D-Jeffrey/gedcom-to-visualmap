@@ -600,8 +600,8 @@ class foliumExporter:
         folium.map.LayerControl('topleft', collapsed=sc).add_to(fm)
 
         if main and getAttrLatLonif(main, 'birth'):
-            if self.gOp.MarkStarOn:
-                loc = getAttrLatLonif(main, 'birth')
+            loc = getAttrLatLonif(main, 'birth')
+            if loc:
                 folium.Marker([Drift(loc.lat), Drift(loc.lon)], tooltip=main.name, opacity=0.5, icon=folium.Icon(color='lightred', icon='star', prefix='fa', iconSize=['50%', '50%'])).add_to(fm)
         else:
             _log.warning("No GPS locations to generate a Star on the map.")

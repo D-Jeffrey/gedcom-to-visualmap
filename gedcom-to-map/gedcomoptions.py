@@ -137,7 +137,6 @@ class gvOptions:
             self.CSVcmdline = "notepad $n"
             self.Tracecmdline = "notepad $n"
 
-        self.BackgroundProcess = None     # Background Thread for processing set later
         self.heritage = None
         self.UpdateBackgroundEvent = None
         self.totalGEDpeople = None

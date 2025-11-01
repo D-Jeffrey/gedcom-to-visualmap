@@ -4,9 +4,24 @@ import json
 import os
 
 
+def ApproxTextWidth(numChars, sizePt=9, dpi=96.0, isMono=False, emRatio=None, marginPx=2):
+    """
+    Return approximate pixel width for numChars of text.
+    - sizePt: font size in points
+    - dpi: display DPI (use 96 for standard)
+    - isMono: True for monospace fonts
+    - emRatio: override default per-character em ratio (None uses defaults)
+    - marginPx: small safety margin in pixels
+    """
+    if emRatio is None:
+        emRatio = 1.0 if isMono else 0.55
+    pxPerEm = sizePt * (dpi / 72.0)
+    return int(round(numChars * pxPerEm * emRatio)) + marginPx
+
+
 class FontManager:
     PREDEFINED_FONTS = [
-        "Arial", "Calibri", "Consolas", "Courier New", "Georgia",
+        "Arial", "Calibri", "Corbel", "Consolas", "Courier New", "DejaVu Sans", "Georgia",  "Noto Sans", 
         "Segoe UI", "Tahoma", "Times New Roman", "Trebuchet MS", "Verdana"
     ]
 
@@ -94,7 +109,7 @@ class FontManager:
             return
 
         # Generic wx.Window and controls: propagate to children
-        if isinstance(widget, wx.Window):
+        if isinstance(widget, wx.Window) or isinstance(widget, wx.Panel) or isinstance(widget, wx.Control):
             widget.SetFont(font)
             for child in widget.GetChildren():
                 # avoid changing complex custom controls that manage fonts internally if needed
@@ -102,6 +117,9 @@ class FontManager:
                     child.SetFont(font)
                 except Exception:
                     pass
+            print(f"Widget {type(widget)}")
+        else:
+            print(f"widget {type(widget)}")
 
     @classmethod
     def apply_to_all_controls(cls, top_window):

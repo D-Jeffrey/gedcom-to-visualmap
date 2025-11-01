@@ -10,7 +10,7 @@ Read a GEDCOM file and translate the locations into GPS addresses.
 The produces different KML map types which should timelines and movements around the earth.
 The produces HTML file which is interactive..
 
-This contains two interfaces: command-line and GUI (only tested on Windows and Windows Sub-system for Linux).  Testing by @colin0brass on Mac
+This contains two interfaces: command-line and GUI (GUI is tested on Windows and Windows Sub-system for Linux, testing by @colin0brass on Mac)
 
 Orginally forked from [https://github.com/lmallez/gedcom-to-map]
 
@@ -60,7 +60,7 @@ python3 gedcom-to-map.py /users/darren/documents/myhertitagetree.ged myTree -mai
 ```
 
 ## GUI
-![img](docs/img/GUI-python_2025-10.png)
+![img](docs/img/GUI-python_2025-11.gif)
 
 To use the GUI version, click on `Input File` and select your .ged file.
 Set your options in the GUI interface  
@@ -259,7 +259,7 @@ python3 ..\gedcom-to-map\gedcom-to-map.py input.ged output -main "@I0000@" -form
 | pycountry | https://github.com/pycountry/pycountry
 | pycountry-convert | https://github.com/jefftune/pycountry-convert | | pycountry-convert is a Python module for TUNE Multiverse Libraries.
 | pandas | https://github.com/pandas-dev/pandas | | A Powerful Python Data Analysis Toolkit
-| seaborn | https://github.com/mwaskom/seaborn | https://seaborn.pydata.org/ | Seaborn is a Python visualization library based on matplotlib. It provides a high-level interface for drawing attractive statistical graphics.
+| seaborn | https://github.com/mwaskom/seaborn | https://seaborn.pydata.org/ | Seaborn is a Python visualization library based on matplotlib. 
 | matplotlib | https://github.com/matplotlib/matplotlib | https://matplotlib.org/ |Matplotlib is a comprehensive library for creating static, animated, and interactive visualizations in Python.
 
 ### Other sample GED files:
@@ -267,9 +267,6 @@ python3 ..\gedcom-to-map\gedcom-to-map.py input.ged output -main "@I0000@" -form
 
 ## TODO
 - Add a tree hierarchy selector to enable people as groups and add expand/collapse to navigation
-- more troubleshooting on the address lookup
-  - better way to interact and refine the address resolution hints
-  - move address hints in a configuration file
 - option to remove 'lines' to not core points (such as RESI or other)
 - Sort the Last Name by the highest number of people first or by distance from star
 - create a marker animation by year (in time steps)
@@ -282,7 +279,6 @@ python3 ..\gedcom-to-map\gedcom-to-map.py input.ged output -main "@I0000@" -form
 - Major refactoring to make this *real* Python code
 
 ## Issues
-- Marriage is not read correctly all the time, limitations with multiple marriages
 - Linux does not save FileHistory
 - People dialog displays only one parent after Draw Update
 - list of background maps on Follium is not complete or presented, so currently only shows cartodbvoyager
@@ -291,6 +287,12 @@ python3 ..\gedcom-to-map\gedcom-to-map.py input.ged output -main "@I0000@" -form
 - Need to separate the Load and GPS resolve steps (currently reloads after 30 seconds of looking up values)
 
 ## Releases
+### v0.2.7.0.2
+- more bug fixes
+- Regrouping of options based on Output type
+- Default country text input
+- Update and stop working
+- Different font config for defferent platforms
 ### v0.2.7.0.1
 - Bug fixes for the quick related of 0.2.7.  Lots of fixes with the assistance of @colin0brass
 ### v0.2.7.0

@@ -9,6 +9,7 @@ import requests
 from io import BytesIO
 from pathlib import Path
 import os
+import platform
 import wx
 import wx.lib.newevent
 import wx.html
@@ -30,12 +31,15 @@ UpdateBackgroundEvent = None
 
 class HTMLDialog(wx.Dialog):
     def __init__(self, parent, title, icontype, htmlbody, width=55):
-        super().__init__(parent, title=title, size=(ABOUTFONT[1]*width, ABOUTFONT[1]*45))
+        super().__init__(parent, title=title, size=(ABOUTFONT[platform.system()]['sizePt']*width, ABOUTFONT[platform.system()]['sizePt']*45))
 
         self.icon = wx.ArtProvider.GetBitmap(icontype, wx.ART_OTHER, (32, 32))
         self.icon_ctrl = wx.StaticBitmap(self, bitmap=self.icon)
         self.html = wx.html.HtmlWindow(self)
-        self.html.SetFonts(ABOUTFONT[0], ABOUTFONT[0], [ABOUTFONT[1]] * 7)  # Set font-family to Garamond and font-size to 6 points
+        self.html.SetFonts(ABOUTFONT[platform.system()]['family'], 
+                ABOUTFONT[platform.system()]['family'], 
+                [ABOUTFONT[platform.system()]['sizePt']]*7)  # Set font-family to Garamond and font-size to 6 points
+        
         self.html.SetPage(f"<html><body>{htmlbody}</body></html>".replace('VERVER', f"{GUINAME} {VERSION}").replace('PROJECTLINK', f"{ABOUTLINK}{NAME}"))
 
         self.okButton = wx.Button(self, wx.ID_OK, "OK")
@@ -357,7 +361,7 @@ class PersonDialog(wx.Dialog):
         super().__init__(parent, title="Person Details", size=(600, 600), style=wx.DEFAULT_DIALOG_STYLE |wx.RESIZE_BORDER)
         
         def sizeAttr(attr,pad=1):
-            return (min(len(attr),3)+pad)*(GVFONT[1]+5)  if attr else GVFONT[1]
+            return (min(len(attr),3)+pad)*(GVFONT[platform.system()]['sizePt']+5)  if attr else GVFONT[platform.system()]['sizePt']
         
         people = BackgroundProcess.people
         # Display the marriage information including the marriage location and date                
@@ -704,7 +708,10 @@ and generating the output so that the GUI can continue to be responsive
                         if self.gOp.Main:
                             self.SayInfoMessage(f" with '{self.gOp.Main}' as starting person from {Path(self.gOp.GEDCOMinput).name}", False)
                     else:
-                        self.SayErrorMessage(f"Error: file could not read as a GEDCOM file", True)
+                        if self.gOp.stopping:
+                            self.SayErrorMessage(f"Error: Aborted loading GEDCOM file", True)
+                        else:
+                            self.SayErrorMessage(f"Error: file could not read as a GEDCOM file", True)
                     
                 if self.do & 2:
                     _log.info("start do 2")

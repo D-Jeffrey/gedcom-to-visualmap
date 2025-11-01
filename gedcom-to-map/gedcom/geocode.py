@@ -314,7 +314,6 @@ class Geocode:
                     logger.info(f"Country not found in cache for {use_place_name}, using default country: {self.default_country}")
 
         if not found_in_cache:
-            # BackgroundProcess.gOp.step(info=f"Looked up : {place}") if BackgroundProcess.gOp else None
             location = self.geocode_place(place_with_country, country_code, country_name, found_country, address_depth=0)
             if location is not None:
                 location.address = place

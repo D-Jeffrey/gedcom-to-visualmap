@@ -12,11 +12,15 @@ from typing import Dict, Any
 import os
 import pandas as pd
 import seaborn as sns
+import matplotlib
 import matplotlib.pyplot as plt
 
 from gedcom.addressbook import FuzzyAddressBook
 
 logger = logging.getLogger(__name__)
+# Avoid using any interactive backends
+matplotlib.use("Agg")
+
 
 def write_places_summary(address_book: FuzzyAddressBook, output_file: str) -> None:
     """

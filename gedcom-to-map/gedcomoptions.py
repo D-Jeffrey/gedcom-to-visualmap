@@ -12,7 +12,7 @@ from const import OFFICECMDLINE
 from pathlib import Path
 from xmlrpc.client import boolean
 from wx import LogGeneric
-from models.Person import Person, LatLon
+from models.Person import Person, LatLon, LifeEvent
 
 _log = logging.getLogger(__name__)
 
@@ -100,7 +100,7 @@ class gvOptions:
         self.panel = None
         self.selectedpeople = 0
         self.lastlines = None
-        self.timeframe = [None,None]
+        self.timeframe = {'from': None, 'to': None}
         self.runavg = []
         self.SummaryOpen = True
         self.SummaryPlaces = True
@@ -114,7 +114,7 @@ class gvOptions:
 
         self.skip_file_geocache = False
         self.skip_file_alt_places = False
-        self.defaultCountry = "England"
+        self.defaultCountry = None
         self.include_canonical = True
         
         os_name = platform.system()
@@ -150,7 +150,8 @@ class gvOptions:
                           'mapMini':0, 'MapStyle':2}
         self.core_keys = {'UseGPS':0, 'CacheOnly':0, 'AllEntities':0, 'ResultType':3, 'KMLcmdline':2, 'CSVcmdline':2, 'Tracecmdline':2, 'badAge':0,
                         'SummaryPlaces':0, 'SummaryPeople':0, 'SummaryCountries':0, 'SummaryCountriesGrid':0, 
-                        'SummaryCountries':0, 'SummaryGeocode':0, 'SummaryAltPlaces':0, 'SummaryOpen':0}
+                        'SummaryCountries':0, 'SummaryGeocode':0, 'SummaryAltPlaces':0, 'SummaryOpen':0, 
+                        'defaultCountry':2}
         self.logging_keys = ['models.person', 'models', 'ged4py.parser', 'ged4py', 'models.creator', 'models.location', 'gedcomoptions', 'gedcom.gedcomparser', 
                              'gedcom', 'gedcom.gedcom', 'gedcom.geocode','gedcom.geocache','gedcom.addressbook',
                              'geopy', 'render.kmlexporter', 'render', 'render.foliumexp', 'gedcomvisual', 'gedcomdialogs', 'gedcomvisualgui', '__main__']
@@ -193,7 +194,26 @@ class gvOptions:
         self.HomeMarker = HomeMarker
     
 
-
+    def addtimereference(self, timeRefrence: LifeEvent):
+        """ 
+        Update the over all timeframe with person event details
+        timeRefrence: LifeEvent
+        """
+        if not timeRefrence:
+            return
+        theyear = timeRefrence.whenyearnum()
+        if theyear is None:
+            return
+        if self.timeframe['from'] is None:
+            self.timeframe['from'] = theyear
+        else:
+            if theyear < self.timeframe['from']:
+                self.timeframe['from'] = theyear
+        if self.timeframe['to'] is None:
+            self.timeframe['to'] = theyear
+        else:
+            if theyear > self.timeframe['to']:
+                self.timeframe['to'] = theyear
 
         
     def setstatic(self,  GEDCOMinput:2, Result:2, ResultType: ResultsTypes, Main=None, MaxMissing:1 = 0, MaxLineWeight:1 = 20, UseGPS:bool = True, CacheOnly:bool = False,  AllEntities:bool = False):
@@ -404,9 +424,13 @@ class gvOptions:
         self.running = False        # Race conditions
         self.stopping = False
 
-    def get (self, attribute):
+    def get (self, attribute, default=None, ifNone=None):
         """ check an gOp attribute """
-        return getattr(self,attribute)
+        if ifNone is not None:
+            val = getattr(self,attribute, default)
+            if val == None:
+                return ifNone
+        return getattr(self,attribute, default)
 
     def set(self, attribute, value):
         """ set an gOp attribute """

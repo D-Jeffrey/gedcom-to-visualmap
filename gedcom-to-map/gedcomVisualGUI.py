@@ -15,6 +15,7 @@ import logging
 import logging.config
 import os
 import os.path
+import platform
 from pathlib import Path
 import re
 import subprocess
@@ -43,7 +44,7 @@ from const import GUINAME, GVFONT, KMLMAPSURL, LOG_CONFIG, NAME, VERSION, panel
 from gedcomoptions import gvOptions, ResultsTypes 
 from gedcomvisual import doTrace
 from gedcomDialogs import *
-from style.stylemanager import FontManager
+from style.stylemanager import FontManager, ApproxTextWidth
 
 
 _log = logging.getLogger(__name__.lower())
@@ -66,7 +67,7 @@ class VisualGedcomIds():
             'ID_RBResultsType', 'ID_TEXTMain', 'ID_TEXTName', 'ID_RBKMLMode', 'ID_INTMaxMissing', 'ID_INTMaxLineWeight',
             'ID_CBUseGPS', 'ID_CBCacheOnly', 'ID_CBAllEntities',  'ID_CBMapControl',
             'ID_CBMapMini', 'ID_BTNLoad', 'ID_BTNCreateFiles', 'ID_BTNCSV', 'ID_BTNTRACE', 'ID_BTNSTOP', 'ID_BTNBROWSER',
-            'ID_CBGridView', 'CBYougeAge', 'ID_CBSummary'
+            'ID_CBGridView', 'CBYougeAge', 'ID_CBSummary', 'ID_TEXTDefaultCountry'
         ]
         self.IDs = {name: wx.NewIdRef() for name in self.ids}
         # ID = Attribute (in gOp), Action impact
@@ -84,7 +85,7 @@ class VisualGedcomIds():
             self.IDs['ID_CBFlyTo']: ('UseBalloonFlyto', 'Redraw'),
             self.IDs['ID_LISTHeatMapTimeStep']: ('MapTimeLine', 'Redraw'),
             self.IDs['ID_TEXTGEDCOMinput']: ('GEDCOMinput', 'Reload'),
-            self.IDs['ID_TEXTResult']: ('Result', 'Redraw'),
+            self.IDs['ID_TEXTResult']: ('Result', 'Redraw', 'Result'),
             self.IDs['ID_RBResultsType']: ('ResultType', 'Redraw'),
             self.IDs['ID_TEXTMain']: ('Main', 'Reload'),
             self.IDs['ID_TEXTName']: ('Name', ''),
@@ -103,6 +104,7 @@ class VisualGedcomIds():
             self.IDs['ID_BTNSTOP']: 'Stop',
             self.IDs['ID_BTNBROWSER']: 'OpenBrowser',
             self.IDs['ID_CBGridView']: ('GridView', 'Render'),
+            self.IDs['ID_TEXTDefaultCountry']: ('defaultCountry', 'Reload', 'defaultCountry'),
             self.IDs['ID_CBSummary']: ('Summary','Redraw')
         }
 
@@ -185,11 +187,14 @@ class VisualMapFrame(wx.Frame):
         self.makeMenuBar()
         # and a status bar
         
-        self.StatusBar.SetFieldsCount(number=2, widths=[-1, 28*GVFONT[1]])
+        #TODO get proper font size 
+        widthMax = ApproxTextWidth(30, GVFONT[platform.system()]['sizePt'])
+        self.StatusBar.SetFieldsCount(number=2, widths=[-1, widthMax])
         self.SetStatusText("Visual Mapping ready",0)
-        self.myFont = wx.Font(wx.FontInfo(GVFONT[1]).FaceName(GVFONT[0]))
+        self.myFont = wx.Font(wx.FontInfo(GVFONT[platform.system()]['sizePt']).FaceName(GVFONT[platform.system()]['family']))
         # TODO Check for Arial and change it
         if not self.myFont:
+            _log.warning("Could not set font to %s, using default", GVFONT[platform.system()]['family'])
             self.myFont = wx.Font(wx.FontInfo(10).FaceName('Verdana'))
         wx.Frame.SetFont(self, self.myFont)
         self.inTimer = False
@@ -278,7 +283,7 @@ class VisualMapFrame(wx.Frame):
 
         # optional: add font size submenu or a Font Size dialog entry
         set_font_sub = wx.MenuItem(optionsMenu, wx.ID_ANY, "Set Font")
-        optionsMenu.AppendSubMenu(set_font_menu, "Set Font")
+        optionsMenu.AppendSubMenu(set_font_menu, "Set People Grid Font")
         # bind events
         for mi in set_font_menu.GetMenuItems():
             self.Bind(wx.EVT_MENU, self.on_font_menu_item, mi)
@@ -298,15 +303,15 @@ class VisualMapFrame(wx.Frame):
         success = FontManager.set_font(face)
         if success:
             # optionally reset font size or prompt user for size
-            FontManager.apply_to_all_controls(self)
             # Apply to the people grid specifically
-            if self.panel.peopleList:
+            if self.panel.peopleList.list:
                 try:
-                    FontManager.apply_to(self.panel.peopleList)
+                    FontManager.apply_to(self.panel.peopleList.list)
                 except Exception:
                     pass
             # Also apply to top-level frame to propagate to other controls
-            FontManager.apply_to_all_controls(self)
+            # FontManager.apply_to_all_controls(self)
+            
             # refresh/redraw
             self.Layout()
             self.Refresh()
@@ -434,9 +439,8 @@ class VisualMapFrame(wx.Frame):
             #        withoutaddr += 1
             # msg = f'Total People :\t{len(panel.gOp.people)}\n People without any address {withoutaddr}'
             msg = f'Total People :{len(panel.gOp.people)}\n'
-            if panel.gOp.timeframe:
-                timeline = "-".join(map(str, panel.gOp.timeframe))
-                msg +=  f"\nTimeframe : {timeline}\n"
+            if panel.gOp.timeframe['from'] is not None:
+                msg +=  f"\nTimeframe : {panel.gOp.timeframe['from']}-{panel.gOp.timeframe['to']}\n"
             if panel.gOp.selectedpeople > 0:
                 msg += f"\nDirect  people {panel.gOp.selectedpeople} in the heritage line\n"
                 
@@ -891,9 +895,10 @@ class VisualMapPanel(wx.Panel):
         # Top of the Panel
         global BackgroundProcess
         box = wx.BoxSizer(wx.VERTICAL)
-        titleFont = wx.Font(wx.FontInfo(GVFONT[2]).FaceName(GVFONT[0]).Bold())
+        titleFont = wx.Font(wx.FontInfo(GVFONT[platform.system()]['sizeTitle']).FaceName(GVFONT[platform.system()]['family']).Bold())
         # TODO Check for Arial and change it
         if not titleFont:
+            _log.warning("Could not load font %s, using Verdana", GVFONT[platform.system()]['family'])
             titleFont  = wx.Font(wx.FontInfo(16).FaceName('Verdana').Bold())
         fh = titleFont.GetPixelSize()[1]
         titleArea = wx.Panel(panel, size=(-1, fh + 10))
@@ -933,30 +938,22 @@ class VisualMapPanel(wx.Panel):
 
         self.id.CBUseGPS = wx.CheckBox(panel, self.id.IDs['ID_CBUseGPS'], "Use GPS lookup (uncheck if GPS is in file)")#,  wx.NO_BORDER)
         self.id.CBCacheOnly = wx.CheckBox(panel, self.id.IDs['ID_CBCacheOnly'], "Cache Only, do not lookup addresses")#, , wx.NO_BORDER)
+        self.id.labelDefCountry = wx.StaticText(panel, -1,  "Default Country:   ") 
+        self.id.TEXTDefaultCountry = wx.TextCtrl(panel, self.id.IDs['ID_TEXTDefaultCountry'], "", size=(250,20))
+        defCounttryBox = wx.BoxSizer(wx.HORIZONTAL)
+        defCounttryBox.AddMany([self.id.labelDefCountry,      (6,20),     self.id.TEXTDefaultCountry])
         self.id.CBAllEntities = wx.CheckBox(panel, self.id.IDs['ID_CBAllEntities'], "Map all people")#, wx.NO_BORDER)
         
         self.id.busyIndicator = wx.ActivityIndicator(panel)
 
         self.id.busyIndicator.SetBackgroundColour(self.id.GetColor('BUSY_BACK'))
-        self.id.CBMarksOn = wx.CheckBox(panel, self.id.IDs['ID_CBMarksOn'], "Markers",name='MarksOn')
-
-        self.id.CBBornMark = wx.CheckBox(panel, self.id.IDs['ID_CBBornMark'], "Marker for when Born")
-        self.id.CBDieMark = wx.CheckBox(panel, self.id.IDs['ID_CBDieMark'], "Marker for when Died")
-        self.id.CBHomeMarker = wx.CheckBox(panel, self.id.IDs['ID_CBHomeMarker'], "Marker point or homes")
-        self.id.CBMarkStarOn = wx.CheckBox(panel, self.id.IDs['ID_CBMarkStarOn'], "Marker starter with Star")
-        self.id.CBMapTimeLine = wx.CheckBox(panel, self.id.IDs['ID_CBMapTimeLine'], "Add Timeline")
         self.id.RBResultOutType =  wx.RadioBox(panel, self.id.IDs['ID_RBResultsType'], "Result Type", 
                                            choices = ['HTML', 'KML', 'KML2', 'SUM'] , majorDimension= 5)
 
         box.AddMany([  self.id.CBUseGPS,
                        self.id.CBCacheOnly,
-                       self.id.CBAllEntities,
-                       self.id.CBMarksOn,
-                       self.id.CBBornMark,
-                       self.id.CBDieMark,
-                       self.id.CBHomeMarker,
-                       self.id.CBMarkStarOn,
-                       self.id.CBMapTimeLine])
+                       defCounttryBox,
+                       self.id.CBAllEntities])
         """
           HTML select controls in a Box
         """
@@ -968,6 +965,14 @@ class VisualMapPanel(wx.Panel):
         mapchoices =  sorted(self.id.AllMapTypes)
         mapboxsizer = wx.BoxSizer(wx.HORIZONTAL)
         mapStyleLabel = wx.StaticText(hbox, -1, " Map Style")
+        self.id.CBMarksOn = wx.CheckBox(hbox, self.id.IDs['ID_CBMarksOn'], "Markers",name='MarksOn')
+
+        self.id.CBBornMark = wx.CheckBox(hbox, self.id.IDs['ID_CBBornMark'], "Marker for when Born")
+        self.id.CBDieMark = wx.CheckBox(hbox, self.id.IDs['ID_CBDieMark'], "Marker for when Died")
+        self.id.CBHomeMarker = wx.CheckBox(hbox, self.id.IDs['ID_CBHomeMarker'], "Marker point or homes")
+        self.id.CBMarkStarOn = wx.CheckBox(hbox, self.id.IDs['ID_CBMarkStarOn'], "Marker starter with Star")
+        self.id.CBMapTimeLine = wx.CheckBox(hbox, self.id.IDs['ID_CBMapTimeLine'], "Add Timeline")
+
         self.id.LISTMapType = wx.Choice(hbox, self.id.IDs['ID_LISTMapStyle'], name="MapStyle", choices=mapchoices)
         self.id.CBMapControl = wx.CheckBox(hbox, self.id.IDs['ID_CBMapControl'], "Open Map Controls",name='MapControl') 
         self.id.CBMapMini = wx.CheckBox(hbox, self.id.IDs['ID_CBMapMini'], "Add Mini Map",name='MapMini') 
@@ -989,17 +994,22 @@ class VisualMapPanel(wx.Panel):
         
         
         hboxIn.AddMany([
-        
-                        self.id.RBGroupBy, 
-                        mapboxsizer,
-                        self.id.CBMapControl,
-                        self.id.CBMapMini,
-                        self.id.CBUseAntPath,
-                        self.id.CBHeatMap,
-                        (0,5),
-                        self.id.LISTHeatMapTimeStep,
-                        (0,5)
-                        ])
+            self.id.CBMarksOn,
+            self.id.CBBornMark,
+            self.id.CBDieMark,
+            self.id.CBHomeMarker,
+            self.id.CBMarkStarOn,
+            self.id.CBMapTimeLine,        
+            self.id.RBGroupBy, 
+            mapboxsizer,
+            self.id.CBMapControl,
+            self.id.CBMapMini,
+            self.id.CBUseAntPath,
+            self.id.CBHeatMap,
+            (0,5),
+            self.id.LISTHeatMapTimeStep,
+            (0,5)
+            ])
         hsizer.Add( hboxIn, wx.LEFT, hOtherBorder+5)
         
         hbox.SetSizer(hsizer)
@@ -1084,6 +1094,7 @@ class VisualMapPanel(wx.Panel):
         gsizer.Add( gboxIn, wx.LEFT, gOtherBorder+5)
         
         gbox.SetSizer(gsizer)
+        self.optionGbox = gbox
         
         box.Add(gbox, 1, wx.LEFT, 5)
         box.AddMany([self.id.RBResultOutType])
@@ -1152,6 +1163,7 @@ class VisualMapPanel(wx.Panel):
         self.Bind(wx.EVT_BUTTON, self.EvtButton, id = self.id.IDs['ID_BTNSTOP'])
         self.Bind(wx.EVT_BUTTON, self.EvtButton, id = self.id.IDs['ID_BTNBROWSER'])
         self.Bind(wx.EVT_TEXT, self.EvtText, id = self.id.IDs['ID_TEXTResult'])
+        self.Bind(wx.EVT_TEXT, self.EvtText, id = self.id.IDs['ID_TEXTDefaultCountry'])
         self.OnBusyStop(-1)
         self.Bind(wx.EVT_RADIOBOX, self.EvtRadioBox, id = self.id.IDs['ID_RBGroupBy'])
         self.Bind(wx.EVT_SLIDER, self.EvtSlider, id = self.id.IDs['ID_LISTHeatMapTimeStep'])
@@ -1237,11 +1249,10 @@ class VisualMapPanel(wx.Panel):
     
 
     def EvtText(self, event):
-
-        if event.GetId() == self.id.IDs['ID_TEXTResult']:
-            event.GetString()
-            self.gOp.set('Result', event.GetString())
-            _log.debug("Result %s", self.gOp.get('Result') )
+        cbid = event.GetId()
+        if event.GetId() == self.id.IDs['ID_TEXTResult'] or event.GetId() == self.id.IDs['ID_TEXTDefaultCountry']:
+            self.gOp.set(self.id.IDtoAttr[cbid][2], event.GetString())
+            _log.debug("TXT %s set value %s", self.id.IDtoAttr[cbid][0], self.id.IDtoAttr[cbid][2])
         else:
             _log.error("uncontrolled TEXT")
             self.SetupButtonState()
@@ -1550,6 +1561,7 @@ class VisualMapPanel(wx.Panel):
             self.optionSbox.Hide()
             self.optionKbox.Hide()
             self.optionK2box.Hide()
+        # self.optionGbox.SetSize(self.optionGbox.GetBestSize())
 
         if ResultTypeSelect is ResultsTypes.HTML:
             # Enable HTML-specific controls
@@ -1596,7 +1608,6 @@ class VisualMapPanel(wx.Panel):
             else:
                 self.optionK2box.Show()
 
-
        # Enable/disable trace button based on referenced data availability
         self.id.BTNTRACE.Enable(bool(self.gOp.Referenced and self.gOp.Result and ResultTypeSelect))
 
@@ -1638,7 +1649,7 @@ class VisualMapPanel(wx.Panel):
         self.id.RBGroupBy.SetSelection(self.gOp.get('GroupBy'))
         self.id.TEXTResult.SetValue(self.gOp.get('Result'))
 
-        _, filen = os.path.split(self.gOp.get('GEDCOMinput')) if self.gOp.get('GEDCOMinput') else ("", "first.ged")
+        _, filen = os.path.split(self.gOp.get('GEDCOMinput', ifNone='first.ged')) 
         self.id.TEXTGEDCOMinput.SetValue(filen)
         self.id.CBSummary[0].SetValue(self.gOp.get('SummaryOpen'))
         self.id.CBSummary[1].SetValue(self.gOp.get('SummaryPlaces'))
@@ -1647,7 +1658,7 @@ class VisualMapPanel(wx.Panel):
         self.id.CBSummary[4].SetValue(self.gOp.get('SummaryCountriesGrid'))
         self.id.CBSummary[5].SetValue(self.gOp.get('SummaryGeocode'))
         self.id.CBSummary[6].SetValue(self.gOp.get('SummaryAltPlaces'))
-
+        self.id.TEXTDefaultCountry.SetValue(self.gOp.get('defaultCountry', ifNone=""))
         self.SetupButtonState()
 
         for t in self.threads:

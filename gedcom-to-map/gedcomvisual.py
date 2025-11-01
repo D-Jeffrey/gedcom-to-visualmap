@@ -216,7 +216,7 @@ def ParseAndGPS(gOp: gvOptions, stage: int = 0 ):
     #    people = gOp.people
     #if (people and gOp.UseGPS and (stage == 0 or stage == 2)):
     if (stage == 1):
-            gOp.parsed = True
+            
             _log.info ("Starting Address to GPS resolution")
         # TODO This could cause issues
         # Check for change in the datetime of CSV
@@ -234,10 +234,12 @@ def ParseAndGPS(gOp: gvOptions, stage: int = 0 ):
             alt_place_file_path = input_path.parent / f"{base_file_name}{FILE_ALT_PLACE_FILENAME_SUFFIX}"
             file_geo_cache_path = input_path.parent / f"{base_file_name}{FILE_GEOCACHE_FILENAME_SUFFIX}"
             geo_config_path = Path(__file__).parent.resolve() / GEO_CONFIG_FILENAME
+            defaultCountry = gOp.get('defaultCountry')
+            if defaultCountry == "": defaultCountry = None
             gOp.lookup = GeolocatedGedcom(
                 gedcom_file=input_path.resolve(), 
                 location_cache_file=cachefile,
-                default_country=gOp.defaultCountry,      #TODO make this an option
+                default_country=defaultCountry,
                 always_geocode=not gOp.CacheOnly,
                 use_alt_places = not gOp.skip_file_alt_places,
                 alt_place_file_path=alt_place_file_path if not gOp.skip_file_alt_places else None,

@@ -1,6 +1,10 @@
+import sys
+import platform
+import wx
+
 # Constants for gedcom-to-visualmap
 
-VERSION = "0.2.7.0.1"
+VERSION = "0.2.7.0.2"
 NAME = "gedcom-to-visualmap"
 GEOCODEUSERAGENT = NAME + "/" + VERSION + " GEDCOM-to-visualmap"
 GUINAME = 'GEDCOM Visual Map'
@@ -19,8 +23,39 @@ OFFICECMDLINE = "soffice"               # command to start LibreOffice
 panel = None
 
 
-GVFONT = ('Verdana', 8, 11)             # General Font family and size (suggested range 8 to 11) and Title 'Visual Mapping Options' size
-ABOUTFONT = ('Garamond', 13)            # About Font family and size (suggested range 8 to 14)
+# Default GVFONT dict (family left as None until wx is available)
+GVFONT = {
+    "Windows": {
+        "family": "Tahoma",         #  alternates "Segoe UI", "Calibri", "Corbel", "Tahoma", "Arial"
+        "sizePt": 10,
+        "sizeTitle": 16
+    },
+    "Darwin": {
+        "family": "San Francisco",  # alternates "Helvetica Neue", "Helvetica", "Arial"
+        "sizePt": 9,
+        "sizeTitle": 12
+    },
+    "Linux": { 
+        "family": "DejaVu Sans",    # alternates "Noto Sans", "Liberation Sans", "Arial"
+        "sizePt": 9,
+        "sizeTitle": 12
+    }  
+}
+
+ABOUTFONT = {            # About Font family and size (suggested range 8 to 14)
+    "Windows": {
+        "family": "Garamond",
+        "sizePt": 13
+    },
+    "Darwin": {
+        "family": "Garamond",
+        "sizePt": 13
+    },
+    "Linux": { 
+        "family": "Garamond",
+        "sizePt": 13
+    }  
+}
 
 LOG_CONFIG = {
     'version': 1,

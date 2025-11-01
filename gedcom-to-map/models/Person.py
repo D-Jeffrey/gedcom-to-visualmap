@@ -249,7 +249,7 @@ class LifeEvent:
         if attr == 'latlon':
             return self.latlon
         elif attr == 'when' or attr == 'date':
-            return self.date.value or ""
+            return getattr(self.date, 'value', "")
         elif attr == 'where' or attr == 'place':
             return self.place if self.place else ""
         elif attr == 'what':

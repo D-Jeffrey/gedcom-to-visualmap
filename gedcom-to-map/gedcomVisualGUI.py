@@ -334,7 +334,10 @@ class VisualMapFrame(wx.Frame):
 
         FontManager.apply_font_recursive(self)
         # this does not yet work for setting the font in the message area top left
-        FontManager.apply_font_recursive(self.visual_map_panel.peopleList)
+        # FontManager.apply_font_recursive(self.visual_map_panel.peopleList)
+        FontManager.apply_font_recursive(self.visual_map_panel)
+        self.visual_map_panel.Layout()
+        self.visual_map_panel.Refresh()
 
         # refresh/redraw
         self.Layout()

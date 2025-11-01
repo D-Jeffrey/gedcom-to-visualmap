@@ -6,7 +6,7 @@ import os
 import subprocess
 import webbrowser
 from pathlib import Path
-import argparse     # HACK
+import sys
 
 from gedcom.GedcomParser import GedcomParser
 # from gedcom.gpslookup import GEDComGPSLookup
@@ -180,7 +180,21 @@ def doHTML(gOp : gvOptions, people, fullresult ):
 
     foliumExporter(gOp).export(people[gOp.Main], creator, fullresult)
     if (fullresult):
-        webbrowser.open(Path(gOp.resultpath, gOp.Result).resolve().as_uri(), new=0, autoraise=True)
+        result_path = Path(gOp.resultpath) / gOp.Result
+        result_path = result_path.resolve()
+        if result_path.exists():
+            url = result_path.as_uri()
+            opened = webbrowser.open(url, new=0, autoraise=True)
+            if not opened:
+                # platform fallbacks
+                if sys.platform == "darwin":
+                    subprocess.run(["open", str(result_path)])
+                elif os.name == "posix":
+                    subprocess.run(["xdg-open", str(result_path)])
+                elif os.name == "nt":
+                    os.startfile(str(result_path))
+        else:
+            _log.error("Result file not found: %s", result_path)
         
     
 
@@ -306,4 +320,4 @@ def doTraceTo(gOp : gvOptions, ToID : Person):
         heritage.append([("NotDirect", ToID.name)])
     gOp.heritage = heritage
     return heritage
-    
+

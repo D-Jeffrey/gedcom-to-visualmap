@@ -22,9 +22,6 @@ from gedcom.gedcom import GeolocatedGedcom
 
 from const import GLOBAL_GEO_CACHE_FILENAME, FILE_ALT_PLACE_FILENAME_SUFFIX, FILE_GEOCACHE_FILENAME_SUFFIX, GEO_CONFIG_FILENAME
 
-# Thread for controlling the background processes Created in gedcomVisualGUI.py
-# BackgroundProcess
-
 _log = logging.getLogger(__name__)
 
 def gedcom_to_map(gOp : gvOptions):
@@ -196,9 +193,6 @@ def ParseAndGPS(gOp: gvOptions, stage: int = 0 ):
         - Optionally use alternative place/address files.
         - Save updated cache.
     """
-    global BackgroundProcess
-    # Link and establish the BackgroundProcess connection to the other thread
-    BackgroundProcess = gOp.BackgroundProcess
     people = None
     _log.info ("Starting parsing of GEDCOM : %s (stage: %d)", gOp.GEDCOMinput, stage)
     if (stage == 0 or stage == 1):

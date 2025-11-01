@@ -64,7 +64,8 @@ class Geocode:
         'always_geocode', 'location_cache_file', 'additional_countries_codes_dict_to_add',
         'additional_countries_to_add', 'country_substitutions', 'default_country', 'geo_cache',
         'geolocator', 'countrynames', 'countrynames_lower', 'country_name_to_code_dict',
-        'country_code_to_name_dict', 'country_code_to_continent_dict', 'fallback_continent_map'
+        'country_code_to_name_dict', 'country_code_to_continent_dict', 'fallback_continent_map',
+        'background_process'
     ]
     geocode_sleep_interval = 1  # Delay due to Nominatim request limit
 
@@ -113,6 +114,8 @@ class Geocode:
         self.country_code_to_name_dict = {v.upper(): k for k, v in self.country_name_to_code_dict.items()}
         self.country_code_to_continent_dict = {code: self.country_code_to_continent(code) for code in self.country_code_to_name_dict.keys()}
 
+        self.background_process = None
+
     def setupBackgroundProcess(self, background: gvOptions) -> None:
         """
         Setup BackgroundProcess for progress updates.
@@ -120,10 +123,9 @@ class Geocode:
         Args:
             background (gvOptions): Background process options.
         """
-        global BackgroundProcess
-        BackgroundProcess = background
-        BackgroundProcess.gOp.totalGEDpeople = 0
-        BackgroundProcess.gOp.totalGEDfamily = 0 
+        self.background_process = background
+        self.background_process.gOp.totalGEDpeople = 0
+        self.background_process.gOp.totalGEDfamily = 0
 
 
     def save_geo_cache(self) -> None:

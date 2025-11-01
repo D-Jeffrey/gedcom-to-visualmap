@@ -20,9 +20,6 @@ FILE_GEOCACHE_FILENAME_SUFFIX = '_cache.csv'
 GEO_CONFIG_FILENAME = 'geo_config.yaml'
 OFFICECMDLINE = "soffice"               # command to start LibreOffice
 
-panel = None
-
-
 # Default GVFONT dict (family left as None until wx is available)
 GVFONT = {
     "Windows": {

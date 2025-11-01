@@ -19,7 +19,7 @@ from models.Person import Person, LifeEvent
 from gedcom.GedcomParser import CheckAge, maxage
 from gedcomoptions import gvOptions, ResultsType
 
-from const import GVFONT, ABOUTFONT, VERSION, GUINAME, ABOUTLINK, NAME, panel
+from const import GVFONT, ABOUTFONT, VERSION, GUINAME, ABOUTLINK, NAME
 from gedcomvisual import ParseAndGPS, doHTML, doKML, doKML2, doSUM, doTraceTo
 
 maxPhotoWidth = 400  # Maximum width for photos in the PersonDialog
@@ -284,7 +284,7 @@ class FamilyPanel(wx.Panel):
         sizer.Add(self.grid, 1, wx.EXPAND | wx.ALL, 10)
         self.SetSizer(sizer)
         
-        
+        self.visual_map_panel = self.GetParent().GetParent()
         
 
     def populateGrid(self, isChildren=False):
@@ -336,9 +336,9 @@ class FamilyPanel(wx.Panel):
         # Get the ID of the selected person
         person_id = self.grid.GetCellValue(row, 7)
         # Open the person dialog with the selected person's details
-        person = BackgroundProcess.people.get(person_id)
+        person = self.gOp.BackgroundProcess.people.get(person_id)
         if person:
-            dialog = PersonDialog(self, person, panel, showrefences=False)
+            dialog = PersonDialog(self, person, self.visual_map_panel, showrefences=False)
             dialog.Show(True)
             dialog.Bind(wx.EVT_CLOSE, lambda evt: dialog.Destroy())
         else:
@@ -363,7 +363,7 @@ class PersonDialog(wx.Dialog):
         def sizeAttr(attr,pad=1):
             return (min(len(attr),3)+pad)*(GVFONT[platform.system()]['sizePt']+5)  if attr else GVFONT[platform.system()]['sizePt']
         
-        people = BackgroundProcess.people
+        people = self.gOp.BackgroundProcess.people
         # Display the marriage information including the marriage location and date                
         marrying = []
         if person.marriages:
@@ -609,11 +609,8 @@ and generating the output so that the GUI can continue to be responsive
         
 
     def DefgOps(self, gOp):
-        # Pull the global variables into this thread - Critcal to do this
-        global panel, BackgroundProcess
+        # Pull the global variables into this thread - Critical to do this
         self.gOp = gOp
-        panel = gOp.panel
-        BackgroundProcess = gOp.BackgroundProcess
         
 
     def Start(self):
@@ -635,12 +632,10 @@ and generating the output so that the GUI can continue to be responsive
         return self.do != 0
 
     def Trigger(self, dolevel):
-        global panel
-
         if dolevel & 1 or dolevel & 4:
-            panel.id.BTNLoad.SetBackgroundColour(panel.id.GetColor('BTN_DONE'))
+            self.gOp.panel.id.BTNLoad.SetBackgroundColour(self.gOp.panel.id.GetColor('BTN_DONE'))
         if dolevel & 2:
-            panel.id.BTNCreateFiles.SetBackgroundColour(panel.id.GetColor('BTN_DONE'))
+            self.gOp.panel.id.BTNCreateFiles.SetBackgroundColour(self.gOp.panel.id.GetColor('BTN_DONE'))
         self.do = dolevel
         
     def SayInfoMessage(self, line, newline= True):

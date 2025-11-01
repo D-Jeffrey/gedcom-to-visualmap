@@ -61,10 +61,37 @@ LOG_CONFIG = {
     'version': 1,
     'disable_existing_loggers': False,
 
+    "formatters": {
+        "standard": {"format": "%(asctime)s %(name)s %(levelname)s: %(message)s"},
+    },
+
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'level': 'ERROR',
+            'formatter': 'standard',
+            'stream': 'ext://sys.stdout',
+        },
+        'file': {
+            'class': 'logging.FileHandler',
+            'level': 'DEBUG',
+            'formatter': 'standard',
+            'filename': f'{NAME}.log',
+            'mode': 'w',
+            'encoding': 'utf-8',
+        },
+    },
+
+    'root': {
+        'handlers': ['file', 'console'],
+        'level': 'DEBUG',
+    },
+
     # NOTE the following values are supperceded by the values in "AppData\..\Local\gedcomvisual\gedcom-visualmap.ini"
     # Clear those values if you want to set loggers values here
     'loggers': {
         'gedcomvisual': {
+            'handlers': ['file', 'console'],
             'level': 'DEBUG' # Works
         },
     }

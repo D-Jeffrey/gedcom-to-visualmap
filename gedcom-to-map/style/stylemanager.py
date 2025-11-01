@@ -31,6 +31,8 @@ class FontManager:
         "style": "normal"   # placeholder for future bold/italic
     }
 
+    PREDEFINED_FONT_SIZES = [8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24]
+
     _current = None
 
     @classmethod
@@ -85,6 +87,14 @@ class FontManager:
             cls._current["size"] = int(size)
         cls.save()
         return True
+    
+    @classmethod
+    def set_font_size(cls, size):
+        if cls._current is None:
+            cls.load()
+        cls._current["size"] = int(size)
+        cls.save()
+        return True
 
     @classmethod
     def apply_to(cls, widget):
@@ -108,6 +118,7 @@ class FontManager:
             widget.ForceRefresh()
             return
 
+        wx.Frame.SetFont(widget, font)
         # Generic wx.Window and controls: propagate to children
         if isinstance(widget, wx.Window) or isinstance(widget, wx.Panel) or isinstance(widget, wx.Control):
             widget.SetFont(font)
@@ -127,3 +138,18 @@ class FontManager:
         # Walk children to try to apply where needed
         for c in top_window.GetChildren():
             cls.apply_to(c)
+
+    @classmethod
+    def apply_font_recursive(cls,win: wx.Window):
+        font = cls.get_font()
+        # ensure a wx.Font instance
+        if not isinstance(font, wx.Font):
+            font = wx.SystemSettings.GetFont(wx.SYS_DEFAULT_GUI_FONT)
+
+        try:
+            win.SetFont(font)
+        except Exception:
+            # some native controls may raise; ignore and continue
+            pass
+        for child in win.GetChildren():
+            cls.apply_font_recursive(child)

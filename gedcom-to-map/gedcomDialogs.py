@@ -18,6 +18,7 @@ from models.LatLon import LatLon
 from models.Person import Person, LifeEvent
 from gedcom.GedcomParser import CheckAge, maxage
 from gedcomoptions import gvOptions, ResultsType
+from style.stylemanager import FontManager
 
 from const import GVFONT, ABOUTFONT, VERSION, GUINAME, ABOUTLINK, NAME
 from gedcomvisual import ParseAndGPS, doHTML, doKML, doKML2, doSUM, doTraceTo
@@ -360,9 +361,13 @@ class PersonDialog(wx.Dialog):
     def __init__(self, parent, person: Person, panel, showrefences=True):
         super().__init__(parent, title="Person Details", size=(600, 600), style=wx.DEFAULT_DIALOG_STYLE |wx.RESIZE_BORDER)
         
+        FontManager.load()
+        self.font = FontManager._current if FontManager._current else GVFONT
+        self.font_size = self.font.get("size", GVFONT[1])
+
         def sizeAttr(attr,pad=1):
-            return (min(len(attr),3)+pad)*(GVFONT[platform.system()]['sizePt']+5)  if attr else GVFONT[platform.system()]['sizePt']
-        
+            return (min(len(attr),3)+pad)*(self.font_size+5)  if attr else self.font_size
+
         people = self.gOp.BackgroundProcess.people
         # Display the marriage information including the marriage location and date                
         marrying = []

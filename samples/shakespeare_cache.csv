@@ -1,5 +1,5 @@
 address,alt_addr,used,type,class_,icon,latitude,longitude,found_country,country_code,country_name
-Stratford-upon-Avon,,18,,,,52.1927803,-1.70634,False,NONE,
-"Shottery, Warwickshire",,1,,,,52.1909684,-1.7276632,False,NONE,
+Stratford-upon-Avon,,18,,,,52.1927803,-1.70634,True,NONE,
+"Shottery, Warwickshire",,1,,,,52.1909684,-1.7276632,True,NONE,
 Died in childbirth,,2,,,,,,False,,
-Unmarried,,1,,,,-33.4596678,149.5481193,False,NONE,
+Unmarried,,1,,,,-33.4596678,149.5481193,True,NONE,

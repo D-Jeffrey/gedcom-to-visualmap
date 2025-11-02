@@ -120,7 +120,7 @@ Go to https://www.google.ca/maps/about/mymaps
 The *`geo_cache.csv`* file can be edited to feed back in new Addresses for GeoCoding.  Just edit or clear any column except the *Name* column to have it re-lookup that address.  Especially useful if you want to make a bad or old-style name resolve to a new name/location.
 If you do not have GPS location in your GEDCOM file, then use -born or -born -death so have it use the place where the person was born and/or died.
 
-* Cache : [samples/geo_cache](samples/geo_cache)
+* Cache : [samples/geo_cache](samples/geo_cache.csv)
 
 
 
@@ -240,8 +240,6 @@ python3 ..\gedcom-to-map\gedcom-to-map.py input.ged output -main "@I0000@" -form
 
 ```
 
-* HTML Output : [docs/output.html](docs/output.html)
-
 
 # 
 # Built using
@@ -287,12 +285,12 @@ python3 ..\gedcom-to-map\gedcom-to-map.py input.ged output -main "@I0000@" -form
 - Need to separate the Load and GPS resolve steps (currently reloads after 30 seconds of looking up values)
 
 ## Releases
-### v0.2.7.0.2
+### v0.2.7.0.3
 - more bug fixes
 - Regrouping of options based on Output type
 - Default country text input
-- Update and stop working
-- Different font config for defferent platforms
+- Update and stop buttons fixed
+- Different font config for defferent platforms, adjustable from the menu
 ### v0.2.7.0.1
 - Bug fixes for the quick related of 0.2.7.  Lots of fixes with the assistance of @colin0brass
 ### v0.2.7.0

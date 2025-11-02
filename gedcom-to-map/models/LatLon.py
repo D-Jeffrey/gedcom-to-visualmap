@@ -99,7 +99,7 @@ class LatLon:
     
     def hasLocation(self):
         """ Does this Position have a actual value """
-        return bool(hasattr(self, "lat") and self.lat != None and self.lon != None)
+        return bool(getattr(self, "lat", None) and getattr(self, "lon", None))
         
     def is_valid(self) -> bool:
         """

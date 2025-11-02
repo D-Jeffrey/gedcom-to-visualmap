@@ -42,7 +42,7 @@ class KmlExporter:
         self.gOp.step("Finalizing KML")
         # Fix up the links in the placemark
         for placemark in self.kml.features:
-            if hasattr(placemark, 'description') and placemark.description:
+            if getattr(placemark, 'description', None) :
                 pattern = r'href=(#.*?);'
                 for match in re.finditer(pattern, placemark.description):
                     tag = match.group(1)
@@ -160,9 +160,8 @@ class KmlExporter:
             self.gOp.step()
             (desend, name) = line.name.split("\t")
             linage = ""
-            timeA = line.whenFrom if hasattr(line, 'whenFrom') and line.whenFrom else None
-            timeB = line.whenTo if hasattr(line, 'whenTo') and line.whenTo else None
-            
+            timeA = getattr(line, 'whenFrom', None)
+            timeB = getattr(line, 'whenTo', None)            
             if line.person.father:
                 if self.gOp.UseBalloonFlyto:
                     linage += '<br>Father: <a href=#{};balloonFlyto>{}</a></br>'.format(line.person.father[1:-1],self.gOp.people[line.person.father].name)    
@@ -209,7 +208,7 @@ class KmlExporter:
                 pnt = connectWhere.newpoint(name=name + ntag, coords=[self.driftLatLon(line.a)], description="<![CDATA[ " + event + linage + familyLinage + " ]]>")
                 self.gOp.Referenced.add(line.person.xref_id, 'kml-a',tag=pnt.id)
                 self.gOp.Referenced.add("#"+line.person.xref_id[1:-1], tag=pnt.id)
-                if self.gOp.MapTimeLine and hasattr(line, 'whenFrom') and line.whenFrom: 
+                if self.gOp.MapTimeLine and getattr(line, 'whenFrom', None) and line.whenFrom: 
                     pnt.timestamp.when = line.whenFrom
             
                 pnt.style = simplekml.Style()
@@ -227,7 +226,7 @@ class KmlExporter:
                 self.gOp.Referenced.add(line.person.xref_id, 'kml-b')
                 self.gOp.Referenced.add("#"+line.person.xref_id[1:-1], tag=pnt.id)
                 self.gOp.totalpeople += 1
-                if self.gOp.MapTimeLine and hasattr(line, 'whenTo') and line.whenTo: 
+                if self.gOp.MapTimeLine and getattr(line, 'whenTo', None) and line.whenTo: 
                     pnt.timestamp.when = line.whenTo
                 # 
                 pnt.style = simplekml.Style()

@@ -16,8 +16,8 @@ import wx.lib.mixins.inspection as wit
 # pylint: disable=no-member
 
 # Import constants and GUI components
-from const import GUINAME, LOG_CONFIG, NAME, VERSION, panel
-from gedcomVisualGUI import VisualMapFrame, VisualMapPanel
+from const import GUINAME, LOG_CONFIG, NAME, VERSION
+from gedcomVisualGUI import VisualMapFrame
 
 # Initialize logger for the application
 _log = logging.getLogger(__name__)
@@ -46,28 +46,21 @@ if __name__ == '__main__':
     else:  # Normal mode
         app = wx.App()
 
-    # Create the main application frame
+    # Create the main application frame and panel
     visualFrame = VisualMapFrame(None, title=GUINAME, size=(1024, 800), style=wx.DEFAULT_FRAME_STYLE)
-
-    # Create and set up the main panel within the frame
-    panel = VisualMapPanel(visualFrame)
-    visualFrame.panel = panel
-    panel.SetupOptions()  # Configure panel options
-    
     
     # Show the inspection tool if WITMODE is enabled
     if WITMODE:
         app.ShowInspectionTool()
 
     # Display the main frame
-    visualFrame.Show()
-    panel.SetupButtonState()
+    visualFrame.start()
     
     # Start the application's main event loop
     app.MainLoop()
-    if panel:
-        panel.OnCloseWindow()
-    # Log the shutdown message
+
+    # Clean up and stop the application
+    visualFrame.stop()
     _log.info('Finished')
 
     # Exit the program

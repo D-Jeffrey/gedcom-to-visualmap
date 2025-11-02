@@ -64,7 +64,8 @@ class Geocode:
         'always_geocode', 'location_cache_file', 'additional_countries_codes_dict_to_add',
         'additional_countries_to_add', 'country_substitutions', 'default_country', 'geo_cache',
         'geolocator', 'countrynames', 'countrynames_lower', 'country_name_to_code_dict',
-        'country_code_to_name_dict', 'country_code_to_continent_dict', 'fallback_continent_map'
+        'country_code_to_name_dict', 'country_code_to_continent_dict', 'fallback_continent_map',
+        'gOp'
     ]
     geocode_sleep_interval = 1  # Delay due to Nominatim request limit
 
@@ -73,7 +74,8 @@ class Geocode:
         cache_file: str,
         default_country: Optional[str] = None,
         always_geocode: bool = False,
-        alt_place_file_path: Optional[Path] = None
+        alt_place_file_path: Optional[Path] = None,
+        gOp: Optional[gvOptions] = None
     ):
         """
         Initialize the Geocode object, loading country info and cache.
@@ -87,6 +89,7 @@ class Geocode:
             alt_place_file_path (Optional[Path]): Alternative place names file path.
         """
         self.always_geocode = always_geocode
+        logger.debug(f"Geocode always_geocode={self.always_geocode}")
         self.location_cache_file = cache_file
         
         geo_yaml_path = Path(__file__).parent / "geo_config.yaml"
@@ -112,18 +115,7 @@ class Geocode:
         self.country_code_to_name_dict = {v.upper(): k for k, v in self.country_name_to_code_dict.items()}
         self.country_code_to_continent_dict = {code: self.country_code_to_continent(code) for code in self.country_code_to_name_dict.keys()}
 
-    def setupBackgroundProcess(self, background: gvOptions) -> None:
-        """
-        Setup BackgroundProcess for progress updates.
-
-        Args:
-            background (gvOptions): Background process options.
-        """
-        global BackgroundProcess
-        BackgroundProcess = background
-        BackgroundProcess.gOp.totalGEDpeople = 0
-        BackgroundProcess.gOp.totalGEDfamily = 0 
-
+        self.gOp = gOp
 
     def save_geo_cache(self) -> None:
         """
@@ -249,7 +241,6 @@ class Geocode:
             if len(parts) > 1:
                 less_precise_address = ','.join(parts[1:]).strip()
                 location = self.geocode_place(less_precise_address, country_code, country_name, address_depth + 1)
-        BackgroundProcess.gOp.step(info=f"Looked up : {place}") if BackgroundProcess.gOp else None
         return location
 
     def separate_cached_locations(self, address_book: FuzzyAddressBook) -> Tuple[FuzzyAddressBook, FuzzyAddressBook]:
@@ -314,7 +305,6 @@ class Geocode:
                     logger.info(f"Country not found in cache for {use_place_name}, using default country: {self.default_country}")
 
         if not found_in_cache:
-
             location = self.geocode_place(place_with_country, country_code, country_name, found_country, address_depth=0)
             if location is not None:
                 location.address = place

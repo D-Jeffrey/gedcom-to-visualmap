@@ -58,7 +58,7 @@ class Person:
         father (Optional[str]): Father's xref ID.
         mother (Optional[str]): Mother's xref ID.
         children (List[str]): List of children xref IDs.
-        lat_lon (Optional[LatLon]): Latitude/longitude.
+        latlon (Optional[LatLon]): Latitude/longitude.
         birth (Optional[LifeEvent]): Birth event.
         death (Optional[LifeEvent]): Death event.
         marriages (List[LifeEvent]): Marriage events.
@@ -169,7 +169,7 @@ class LifeEvent:
         what: The type of event (e.g., 'BIRT', 'DEAT').
         record (Record): The GEDCOM record associated with the event.
         location (Location): Geocoded location object.
-        lat_lon (LatLon): Latitude/longitude of the event, if available.
+        latlon (LatLon): Latitude/longitude of the event, if available.
     """
     __slots__ = [
         'place',
@@ -209,7 +209,7 @@ class LifeEvent:
     
     def whenyear(self, last = False) -> Optional[str]:
         if self.date:
-            if (isinstance(self.date, str)):
+            if isinstance(self.date, str):
                 return (self.date)
             else:
                 if self.date.value.kind.name == "RANGE" or self.date.value.kind.name == "PERIOD":
@@ -218,23 +218,11 @@ class LifeEvent:
                     else:
                         return self.date.value.date2.year_str
                 elif self.date.value.kind.name == "PHRASE":
-                    # TODO poor error checking here Assumes a year is in this date
-                    if re.search(r"-?\d{3,4}", self.date.value.phrase):
-                        try:
-                            return re.search(r"-?\d{3,4}", self.date.value.phrase)[0]
-                        except Exception:
-                            return None
-                    # (xxx BC) or xxx B.C.
-                    elif re.search(r"\(?\d{1,4} [Bb]\.?[Cc]\.?\)?", self.date.value.phrase):
-                        matched = re.search(r"\(?(\d{1,4}) [Bb]\.?[Cc]\.?\)?", self.date.value.phrase)
-                        return -int(matched.group(1))
-                        
-                    else:
-                        if hasattr(self.date.value, 'name') :
-                            _log.warning ("'when' year %s as %s", self.date.value.name, self.date.value.phrase)
-                        else:
-                            _log.warning ("unknown 'when' name %s ", self.date.value)
-                        return None
+                    # use match.group(0) to extract the year safely
+                    m = re.search(r"-?\d{3,4}", self.date.value.phrase)
+                    if m:
+                        return m.group(0)
+                    return None
                 else:
                     return self.date.value.date.year_str
         return None
@@ -249,7 +237,7 @@ class LifeEvent:
         if attr == 'latlon':
             return self.latlon
         elif attr == 'when' or attr == 'date':
-            return self.date.value or ""
+            return getattr(self.date, 'value', "")
         elif attr == 'where' or attr == 'place':
             return self.place if self.place else ""
         elif attr == 'what':
@@ -280,11 +268,16 @@ class LifeEvent:
                     else:
                         return self.date.value.date2.year_str
                 elif kind and kind.name == 'PHRASE':
-                    try:
-                        return re.search(r'[0-9]{4}', self.date.value.phrase)[0]
-                    except Exception:
-                        _log.warning(f'LifeEvent: date_year: unable to parse date phrase: {self.date.value.phrase}')
+                    # Safely extract a 3- or 4-digit year (allow optional leading minus)
+                    phrase = getattr(getattr(self.date, 'value', None), 'phrase', None)
+                    if not phrase:
+                        _log.warning('LifeEvent: date_year: no phrase available on date.value')
                         return None
+                    m = re.search(r'-?\d{3,4}', phrase)
+                    if m:
+                        return m.group(0)
+                    _log.warning('LifeEvent: date_year: unable to parse date phrase: %s', phrase)
+                    return None
                 else:
                     return getattr(self.date.value.date, 'year_str', None)
         return None

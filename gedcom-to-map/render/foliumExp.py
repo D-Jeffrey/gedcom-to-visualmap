@@ -330,7 +330,7 @@ class foliumExporter:
             if self.gOp.step():
                 break
                 
-            if not (hasattr(line, 'style') and line.style == 'Life'):
+            if not (getattr(line, 'style', None) == 'Life'):
                 continue
                 
             self.gOp.Referenced.add(line.person.xref_id, 'heat')
@@ -438,7 +438,7 @@ class foliumExporter:
             self.gOp.Referenced = Referenced()
             _log.debug  ("Building Referenced - quick only: %s", not saveresult)
             for line in lines:
-                if (hasattr(line,'style') and line.style == 'Life'):
+                if (getattr(line,'style', None) == 'Life'):
                     self.gOp.Referenced.add(line.person.xref_id, 'quick')
             self.gOp.lastlines = {}
             # make a Dict array of lines 
@@ -600,8 +600,8 @@ class foliumExporter:
         folium.map.LayerControl('topleft', collapsed=sc).add_to(fm)
 
         if main and getAttrLatLonif(main, 'birth'):
-            if self.gOp.MarkStarOn:
-                loc = getAttrLatLonif(main, 'birth')
+            loc = getAttrLatLonif(main, 'birth')
+            if loc:
                 folium.Marker([Drift(loc.lat), Drift(loc.lon)], tooltip=main.name, opacity=0.5, icon=folium.Icon(color='lightred', icon='star', prefix='fa', iconSize=['50%', '50%'])).add_to(fm)
         else:
             _log.warning("No GPS locations to generate a Star on the map.")

@@ -9,17 +9,21 @@ Author: @colin0brass
 import csv
 import logging
 from typing import Dict, Any
-from argparse import Namespace
 import os
 import pandas as pd
 import seaborn as sns
+import matplotlib
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 from gedcom.addressbook import FuzzyAddressBook
 
 logger = logging.getLogger(__name__)
+# Avoid using any interactive backends
+matplotlib.use("Agg")
 
-def write_places_summary(args: Namespace, address_book: FuzzyAddressBook, output_file: str) -> None:
+
+def write_places_summary(address_book: FuzzyAddressBook, output_file: str) -> None:
     """
     Write a summary of all geolocated places to a CSV file.
 
@@ -41,8 +45,8 @@ def write_places_summary(args: Namespace, address_book: FuzzyAddressBook, output
             csv_writer.writerow(csv_header)
             for place, location in address_book.addresses().items():
                 # location = data.get('location', None)
-                latitude = getattr(location.lat_lon, 'lat', '') if location and getattr(location, 'lat_lon', None) else ''
-                longitude = getattr(location.lat_lon, 'lon', '') if location and getattr(location, 'lat_lon', None) else ''
+                latitude = getattr(location.latlon, 'lat', '') if location and getattr(location, 'latlon', None) else ''
+                longitude = getattr(location.latlon, 'lon', '') if location and getattr(location, 'latlon', None) else ''
                 found_country = getattr(location, 'found_country', '') if location else ''
                 country_name = getattr(location, 'country_name', '') if location else ''
                 continent = getattr(location, 'continent', '') if location else ''
@@ -54,7 +58,7 @@ def write_places_summary(args: Namespace, address_book: FuzzyAddressBook, output
     except IOError as e:
         logger.error(f"Failed to write places summary to {output_file}: {e}")
 
-def write_people_summary(args: Namespace, people: Dict[str, Any], output_file: str) -> None:
+def write_people_summary(people: Dict[str, Any], output_file: str) -> None:
     """
     Write a summary of all people to a CSV file.
 
@@ -331,7 +335,7 @@ def save_birth_death_heatmap_matrix(birth_death_countries_summary: Dict[Any, Any
     plt.savefig(output_image_file)
     plt.close()
 
-def write_birth_death_countries_summary(args: Namespace, people: Dict[str, Any], output_file: str, gedcom_file_name: str) -> None:
+def write_birth_death_countries_summary( people: Dict[str, Any], output_file: str, gedcom_file_name: str) -> None:
     """
     Write a summary of birth and death countries to a CSV file.
 
@@ -375,6 +379,7 @@ def write_birth_death_countries_summary(args: Namespace, people: Dict[str, Any],
     output_image_file = os.path.splitext(output_file)[0] + "_heatmap.png"
     save_birth_death_heatmap_matrix(birth_death_countries_summary, output_image_file, gedcom_file_name)
     logger.info(f"Saved heatmap matrix image to {output_image_file}")
+    return output_image_file
 
 def write_geocache_summary(address_book: FuzzyAddressBook, output_file: str) -> None:
     """
@@ -402,7 +407,7 @@ def write_geocache_summary(address_book: FuzzyAddressBook, output_file: str) -> 
     except IOError as e:
         logger.error(f"Failed to write places summary to {output_file}: {e}")
 
-def write_alt_places_summary(args: Namespace, address_book: FuzzyAddressBook, output_file: str) -> None:
+def write_alt_places_summary(address_book: FuzzyAddressBook, output_file: str) -> None:
     """
     Write a summary of all alternative place names to a CSV file.
 

@@ -46,7 +46,7 @@ class Creator:
         color = (branch + DELTA / 2) / (SPACE ** (prof % 256))
         _log.info("{:8} {:8} {:2} {:.10f} {} {:20}".format(path, branch, prof, color, self.rainbow.get(color).to_hexa(), current.name))
         line = Line(f"{path:8}\t{current.name}", latlon, getAttrLatLonif(current, self.gpstype), self.rainbow.get(color), path, branch,prof, person=current,
-                    whenFrom=current.birth.whenyear() if hasattr(current, 'birth') and current.birth else None, whenTo=current.death.whenyear() if hasattr(current, 'death') and current.death else None)
+                    whenFrom=current.birth.whenyear() if getattr(current, 'birth',None) else None, whenTo=current.death.whenyear() if getattr(current, 'death', None) else None )
         return self.link(getAttrLatLonif(current, self.gpstype), current, branch, prof, 0, path) + [line]
 
     def link(self, latlon: LatLon, current: Person, branch=0, prof=0, miss=0, path="") -> list[Line]:
@@ -85,7 +85,7 @@ class CreatorTrace:
         
         _log.info("{:8} {:8} {:2} {:20}".format(path, branch, prof, current.name))
         line = Line(f"{path:8}\t{current.name}", None, None, None, path, branch,prof, person=current, 
-                    whenFrom=current.birth.whenyear() if hasattr(current, 'birth') and current.birth else None , whenTo=current.death.whenyear() if hasattr(current, 'death') and current.death else None)
+                    whenFrom=current.birth.whenyear() if getattr(current, 'birth', None) else None , whenTo=current.death.whenyear() if getattr(current, 'death', None)  else None)
         return self.link(current, branch, prof, path) + [line]
 
     def link(self, current: Person, branch=0, prof=0,  path="") -> list[Line]:
@@ -134,7 +134,7 @@ class LifetimeCreator:
         bp = getAttrLatLonif(current, 'birth')
         bd = getAttrLatLonif(current, 'death')
         line = Line(f"{path:8}\t{current.name}", bp, bd, self.rainbow.get(color), path, branch, prof, 'Life', 
-                    None, midpoints, current, whenFrom=current.birth.whenyear() if hasattr(current, 'birth') and current.birth else None , whenTo=current.death.whenyear() if hasattr(current, 'death') and current.death else None)
+                    None, midpoints, current, whenFrom=current.birth.whenyear() if getattr(current, 'birth', None)  else None , whenTo=current.death.whenyear() if getattr(current, 'death', None) else None)
         return [line]
         
     # Draw a line from the parents birth to the child birth location
@@ -144,11 +144,11 @@ class LifetimeCreator:
         if parent.xref_id in self.alltheseids:
             _log.error("Looping Problem: {:2} -LOOP STOP- {} {} -Looping= {:20}".format(  prof, parent.name, parent.xref_id, path))
             return []
-        if hasattr(parent, 'birth') and parent.birth:
+        if getattr(parent, 'birth', None):
             color = (branch + DELTA / 2) / (SPACE ** prof)
             _log.info("{:8} {:8} {:2} {:.10f} {} {:20} from {:20}".format(path, branch, prof, color, self.rainbow.get(color).to_hexa(), parent.name, forperson.name))
             line = Line(f"{path:8}\t{parent.name}", latlon, getAttrLatLonif(parent, 'birth'), self.rainbow.get(color), path, branch, prof, linestyle,  
-                            forperson,  person=parent, whenFrom=parent.birth.whenyear() if hasattr(parent, 'birth') and parent.birth else None , whenTo=parent.death.whenyear() if hasattr(parent, 'death') and parent.death else None)
+                            forperson,  person=parent, whenFrom=parent.birth.whenyear() if getattr(parent, 'birth', None) else None , whenTo=parent.death.whenyear() if getattr(parent, 'death', None) else None)
             return self.link(parent.birth.latlon, parent, branch, prof, 0, path) + [line]
         else:
             if self.max_missing != 0 and miss >= self.max_missing:

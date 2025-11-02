@@ -82,14 +82,14 @@ class KmlExporterRefined:
             logger.info(f'Saving KML file: {self.kml_file}')
             self.kml.save(self.kml_file)
 
-    def add_point(self, marker_type: str, name: str, lat_lon: LatLon, timestamp: str, description: str) -> Tuple[Optional[str], Optional[str]]:
+    def add_point(self, marker_type: str, name: str, latlon: LatLon, timestamp: str, description: str) -> Tuple[Optional[str], Optional[str]]:
         """
         Add a placemark point to the KML for a given event.
 
         Args:
             marker_type (str): Type of marker ('Birth', 'Marriage', 'Death').
             name (str): Name for the placemark.
-            lat_lon (LatLon): Latitude/longitude.
+            latlon (LatLon): Latitude/longitude.
             timestamp (str): Timestamp string.
             description (str): Description for the placemark.
 
@@ -98,10 +98,10 @@ class KmlExporterRefined:
         """
         placemark_id = None
         point_id = None
-        if lat_lon and lat_lon.is_valid():
+        if latlon and latlon.is_valid():
             pnt = self.kml_folders[marker_type].newpoint(
                 name=name,
-                coords=[(lat_lon.lon, lat_lon.lat)],
+                coords=[(latlon.lon, latlon.lat)],
                 description=description
             )
             if timestamp:
@@ -146,12 +146,12 @@ class KmlExporterRefined:
             return kml_line.id
         return None
     
-    def lookat(self, lat_lon: LatLon, begin_year: int, end_year: int, altitude=0, range=1000, heading=0, tilt=0) -> None:
+    def lookat(self, latlon: LatLon, begin_year: int, end_year: int, altitude=0, range=1000, heading=0, tilt=0) -> None:
         """
         Set the initial camera view in Google Earth to a given LatLon.
 
         Args:
-            lat_lon (LatLon): Location to look at.
+            latlon (LatLon): Location to look at.
             begin_year (int): Start year.
             end_year (int): End year.
             altitude (int): Altitude.
@@ -159,9 +159,9 @@ class KmlExporterRefined:
             heading (int): Heading.
             tilt (int): Tilt.
         """
-        if lat_lon and lat_lon.is_valid():
+        if latlon and latlon.is_valid():
             lookat = simplekml.LookAt(
-                latitude=lat_lon.lat, longitude=lat_lon.lon,
+                latitude=latlon.lat, longitude=latlon.lon,
                 altitude=altitude, range=range,
                 heading=heading, tilt=tilt
             )
@@ -215,10 +215,10 @@ class KML_Life_Lines_Creator:
             event_type (str): Type of event.
         """
         location = getattr(event, 'location', None)
-        lat_lon = getattr(location, 'lat_lon', None)
-        if event and lat_lon and lat_lon.is_valid():
+        latlon = getattr(location, 'latlon', None)
+        if event and latlon and latlon.is_valid():
             description =  f'{event_type} {event.date_year()}<br>{event.place}<br>'
-            placemark_id, point_id = self.kml_instance.add_point(event_type, current.name, lat_lon, event.date_year(), description)
+            placemark_id, point_id = self.kml_instance.add_point(event_type, current.name, latlon, event.date_year(), description)
             self.kml_point_to_person_lookup[point_id] = current.xref_id
             self.kml_person_to_point_lookup[current.xref_id] = point_id
             self.kml_person_to_placemark_lookup[current.xref_id] = placemark_id
@@ -230,12 +230,12 @@ class KML_Life_Lines_Creator:
         Args:
             current (Person): The person.
         """
-        if current.birth and getattr(current.birth, 'location', None) and getattr(current.birth.location, 'lat_lon', None) and current.birth.location.lat_lon.is_valid():
+        if current.birth and getattr(current.birth, 'location', None) and getattr(current.birth.location, 'latlon', None) and current.birth.location.latlon.is_valid():
             self._add_point(current, current.birth, "Birth")
         for marriage_event in getattr(current, 'marriages', []):
-            if marriage_event and getattr(marriage_event, 'location', None) and getattr(marriage_event.location, 'lat_lon', None) and marriage_event.location.lat_lon.is_valid():
+            if marriage_event and getattr(marriage_event, 'location', None) and getattr(marriage_event.location, 'latlon', None) and marriage_event.location.latlon.is_valid():
                 self._add_point(current, marriage_event, "Marriage")
-        if getattr(current, 'death', None) and getattr(current.death, 'location', None) and getattr(current.death.location, 'lat_lon', None) and current.death.location.lat_lon.is_valid():
+        if getattr(current, 'death', None) and getattr(current.death, 'location', None) and getattr(current.death.location, 'latlon', None) and current.death.location.latlon.is_valid():
             self._add_point(current, current.death, "Death")
 
     def update_person_description(self, point: simplekml.featgeom.Point, current: Person) -> None:
@@ -247,7 +247,7 @@ class KML_Life_Lines_Creator:
             current (Person): The person.
         """
         description = point.description
-        if current.birth and getattr(current.birth, 'location', None) and getattr(current.birth.location, 'lat_lon', None) and current.birth.location.lat_lon.is_valid():
+        if current.birth and getattr(current.birth, 'location', None) and getattr(current.birth.location, 'latlon', None) and current.birth.location.latlon.is_valid():
             if current.father and (current.father in self.kml_person_to_point_lookup):
                 father_id = self.kml_person_to_placemark_lookup.get(current.father)
                 if father_id and current.father in self.gedcom.people:
@@ -290,23 +290,23 @@ class KML_Life_Lines_Creator:
         line_type = 'Parents'
         for person_id, person in self.gedcom.people.items():
             logger.info(f'person: {person}')
-            if person.lat_lon and person.lat_lon.is_valid():
+            if person.latlon and person.latlon.is_valid():
                 begin_date = person.birth.date_year() if person.birth and person.birth.date else None
 
                 if person.father:
                     father = self.gedcom.people[person.father]
                     line_name = f'Father: {father.name}'
-                    if father.lat_lon and father.lat_lon.is_valid():
+                    if father.latlon and father.latlon.is_valid():
                         end_date = father.birth.date_year() if father.birth and father.birth.date else None
-                        self.kml_instance.draw_line(line_type, line_name, person.lat_lon, father.lat_lon,
+                        self.kml_instance.draw_line(line_type, line_name, person.latlon, father.latlon,
                                                     begin_date, end_date, simplekml.Color.blue)
 
                 if person.mother:
                     mother = self.gedcom.people[person.mother]
                     line_name = f'Mother: {mother.name}'
-                    if mother.lat_lon and mother.lat_lon.is_valid():
+                    if mother.latlon and mother.latlon.is_valid():
                         end_date = mother.birth.date_year() if mother.birth and mother.birth.date else None
-                        self.kml_instance.draw_line(line_type, line_name, person.lat_lon, mother.lat_lon,
+                        self.kml_instance.draw_line(line_type, line_name, person.latlon, mother.latlon,
                                                     begin_date, end_date, simplekml.Color.red)
 
     def lookat_person(self, person_id: str) -> None:
@@ -317,10 +317,10 @@ class KML_Life_Lines_Creator:
             person_id (str): Person's xref ID.
         """
         person = self.gedcom.people.get(person_id)
-        if person and person.lat_lon and person.lat_lon.is_valid():
+        if person and person.latlon and person.latlon.is_valid():
             begin_year = person.birth.date_year() if person.birth and person.birth.date else None
             end_year = person.death.date_year() if person.death and person.death.date else None
-            self.kml_instance.lookat(lat_lon=person.lat_lon, begin_year=begin_year, end_year=end_year)
+            self.kml_instance.lookat(latlon=person.latlon, begin_year=begin_year, end_year=end_year)
 
     def save_kml(self) -> None:
         """

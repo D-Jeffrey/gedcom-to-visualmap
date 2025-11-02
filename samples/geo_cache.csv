@@ -1,0 +1,4 @@
+continent,address,used,longitude,latitude,found_country,country_code,country_name,alt_addr
+,Stratford-upon-Avon,0,-1.70634,52.1927803,True,NONE,,
+,"Shottery, Warwickshire",0,-1.7276632,52.1909684,True,NONE,,
+,Unmarried,0,149.5481193,-33.4596678,True,NONE,,

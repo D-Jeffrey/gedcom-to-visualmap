@@ -12,7 +12,7 @@ from const import OFFICECMDLINE
 from pathlib import Path
 from xmlrpc.client import boolean
 from wx import LogGeneric
-from models.Person import Person, LatLon
+from models.Person import Person, LatLon, LifeEvent
 
 _log = logging.getLogger(__name__)
 
@@ -42,16 +42,16 @@ class ResultsType(Enum):
     KML2 = "KML2"
     SUM = "SUM"
 
-def ResultsTypeEnforce(value):
-    if isinstance(value, ResultsType):
-        return value
-    elif isinstance(value, str):
-        try:
-            return ResultsType[value.upper()]
-        except KeyError:
-            raise ValueError(f"Invalid ResultsType string: {value}")
-    else:
-        raise TypeError(f"Cannot convert {type(value)} to ResultsType")
+    def ResultsTypeEnforce(value):
+        if isinstance(value, ResultsType):
+            return value
+        elif isinstance(value, str):
+            try:
+                return ResultsType[value.upper()]
+            except KeyError:
+                raise ValueError(f"Invalid ResultsType string: {value}")
+        else:
+            raise TypeError(f"Cannot convert {type(value)} to ResultsType")
 
 class gvOptions:
     def __init__ (self):
@@ -100,12 +100,21 @@ class gvOptions:
         self.panel = None
         self.selectedpeople = 0
         self.lastlines = None
-        self.timeframe = [None,None]
+        self.timeframe = {'from': None, 'to': None}
         self.runavg = []
+        self.SummaryOpen = True
+        self.SummaryPlaces = True
+        self.SummaryPeople = True
+        self.SummaryCountries = False
+        self.SummaryCountriesGrid = True
+        self.SummaryCountries = False
+        self.SummaryGeocode = True
+        self.SummaryAltPlaces = False
+        
 
         self.skip_file_geocache = False
         self.skip_file_alt_places = False
-        self.defaultCountry = "England"
+        self.defaultCountry = None
         self.include_canonical = True
         
         os_name = platform.system()
@@ -128,7 +137,6 @@ class gvOptions:
             self.CSVcmdline = "notepad $n"
             self.Tracecmdline = "notepad $n"
 
-        self.BackgroundProcess = None     # Background Thread for processing set later
         self.heritage = None
         self.UpdateBackgroundEvent = None
         self.totalGEDpeople = None
@@ -139,7 +147,10 @@ class gvOptions:
         self.html_keys = {'MarksOn':0, 'HeatMap':0, 'BornMark':0, 'DieMark':0,  'MarkStarOn':0, 'GroupBy':1, 
                           'UseAntPath':0, 'MapTimeLine':0, 'HeatMapTimeStep':1, 'HomeMarker':0, 'showLayerControl':0, 
                           'mapMini':0, 'MapStyle':2}
-        self.core_keys = {'UseGPS':0, 'CacheOnly':0, 'AllEntities':0, 'ResultType':3, 'KMLcmdline':2, 'CSVcmdline':2, 'Tracecmdline':2, 'badAge':0}
+        self.core_keys = {'UseGPS':0, 'CacheOnly':0, 'AllEntities':0, 'ResultType':3, 'KMLcmdline':2, 'CSVcmdline':2, 'Tracecmdline':2, 'badAge':0,
+                        'SummaryPlaces':0, 'SummaryPeople':0, 'SummaryCountries':0, 'SummaryCountriesGrid':0, 
+                        'SummaryCountries':0, 'SummaryGeocode':0, 'SummaryAltPlaces':0, 'SummaryOpen':0, 
+                        'defaultCountry':2}
         self.logging_keys = ['models.person', 'models', 'ged4py.parser', 'ged4py', 'models.creator', 'models.location', 'gedcomoptions', 'gedcom.gedcomparser', 
                              'gedcom', 'gedcom.gedcom', 'gedcom.geocode','gedcom.geocache','gedcom.addressbook',
                              'geopy', 'render.kmlexporter', 'render', 'render.foliumexp', 'gedcomvisual', 'gedcomdialogs', 'gedcomvisualgui', '__main__']
@@ -182,7 +193,26 @@ class gvOptions:
         self.HomeMarker = HomeMarker
     
 
-
+    def addtimereference(self, timeRefrence: LifeEvent):
+        """ 
+        Update the over all timeframe with person event details
+        timeRefrence: LifeEvent
+        """
+        if not timeRefrence:
+            return
+        theyear = timeRefrence.whenyearnum()
+        if theyear is None:
+            return
+        if self.timeframe['from'] is None:
+            self.timeframe['from'] = theyear
+        else:
+            if theyear < self.timeframe['from']:
+                self.timeframe['from'] = theyear
+        if self.timeframe['to'] is None:
+            self.timeframe['to'] = theyear
+        else:
+            if theyear > self.timeframe['to']:
+                self.timeframe['to'] = theyear
 
         
     def setstatic(self,  GEDCOMinput:2, Result:2, ResultType: ResultsType, Main=None, MaxMissing:1 = 0, MaxLineWeight:1 = 20, UseGPS:bool = True, CacheOnly:bool = False,  AllEntities:bool = False):
@@ -201,14 +231,18 @@ class gvOptions:
         for key, typ in keys.items():
             value = self.gvConfig[sectionName].get(key, None)
             if value is not None:
-                if typ == 0:  # Boolean
-                    setattr(self, key, value.lower() == 'true')
-                elif typ == 1:  # int
-                    setattr(self, key, int(value))
-                elif typ == 2:  # str
-                    setattr(self, key, value)
-                else:  # complex
-                    setattr(self, key, eval(value))
+                # Trap for manual editing of the configuration file
+                try:
+                    if typ == 0:  # Boolean
+                        setattr(self, key, value.lower() == 'true')
+                    elif typ == 1:  # int
+                        setattr(self, key, int(value))
+                    elif typ == 2:  # str
+                        setattr(self, key, value)
+                    else:  # complex
+                        setattr(self, key, eval(value))
+                except Exception as e:
+                    _log.error(f"Error loading setting '{key}' type {typ} in section {sectionName}: {e}")
     def loadsettings(self):
         self.gvConfig = configparser.ConfigParser()
         self.gvConfig.read(self.settingsfile)
@@ -302,7 +336,7 @@ class gvOptions:
 
     def setResults(self, Result, OutputType: ResultsType):
         """ Set the Output file and type (Only the file name) """
-        self.ResultType = ResultsTypeEnforce(OutputType)
+        self.ResultType = ResultsType.ResultsTypeEnforce(OutputType)
         extension = "txt"
         if OutputType is ResultsType.HTML:
             extension = "html"
@@ -393,9 +427,13 @@ class gvOptions:
         self.running = False        # Race conditions
         self.stopping = False
 
-    def get (self, attribute):
+    def get (self, attribute, default=None, ifNone=None):
         """ check an gOp attribute """
-        return getattr(self,attribute)
+        if ifNone is not None:
+            val = getattr(self,attribute, default)
+            if val == None:
+                return ifNone
+        return getattr(self,attribute, default)
 
     def set(self, attribute, value):
         """ set an gOp attribute """

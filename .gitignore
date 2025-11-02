@@ -1,12 +1,17 @@
 # My stuff
 geodat-address-cache*.csv
-myTree.html
-myTree.kml
 .vs/
 other/
 geodat-address-cache-1.csv
 geodat-address-cache-2.csv
 *.user
+/samples/sample-bourbon
+/samples/sample-kennedy
+/samples/shakespeare.html
+*.pyperf
+/Scripts
+/Jupyter/*
+
 
 
 # Byte-compiled / optimized / DLL files
@@ -37,6 +42,7 @@ share/python-wheels/
 .installed.cfg
 *.egg
 MANIFEST
+share/*
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -120,6 +126,9 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+env11/
+env8/
+env1/
 
 # Spyder project settings
 .spyderproject
@@ -138,14 +147,3 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
-/gedcom-to-map/webdrive.py
-/samples/sample-bourbon
-/samples/sample-kennedy
-/samples/shakespeare.html
-/Tree.html
-/Tree.kml
-*.pyperf
-/env11
-/env8
-/env1
-/Scripts

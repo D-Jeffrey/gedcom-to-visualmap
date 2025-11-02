@@ -9,6 +9,7 @@ import requests
 from io import BytesIO
 from pathlib import Path
 import os
+import platform
 import wx
 import wx.lib.newevent
 import wx.html
@@ -17,8 +18,9 @@ from models.LatLon import LatLon
 from models.Person import Person, LifeEvent
 from gedcom.GedcomParser import CheckAge, maxage
 from gedcomoptions import gvOptions, ResultsType
+from style.stylemanager import FontManager
 
-from const import GVFONT, ABOUTFONT, VERSION, GUINAME, ABOUTLINK, NAME, panel
+from const import GVFONT, ABOUTFONT, VERSION, GUINAME, ABOUTLINK, NAME
 from gedcomvisual import ParseAndGPS, doHTML, doKML, doKML2, doSUM, doTraceTo
 
 maxPhotoWidth = 400  # Maximum width for photos in the PersonDialog
@@ -30,12 +32,15 @@ UpdateBackgroundEvent = None
 
 class HTMLDialog(wx.Dialog):
     def __init__(self, parent, title, icontype, htmlbody, width=55):
-        super().__init__(parent, title=title, size=(ABOUTFONT[1]*width, ABOUTFONT[1]*45))
+        super().__init__(parent, title=title, size=(ABOUTFONT[platform.system()]['sizePt']*width, ABOUTFONT[platform.system()]['sizePt']*45))
 
         self.icon = wx.ArtProvider.GetBitmap(icontype, wx.ART_OTHER, (32, 32))
         self.icon_ctrl = wx.StaticBitmap(self, bitmap=self.icon)
         self.html = wx.html.HtmlWindow(self)
-        self.html.SetFonts(ABOUTFONT[0], ABOUTFONT[0], [ABOUTFONT[1]] * 7)  # Set font-family to Garamond and font-size to 6 points
+        self.html.SetFonts(ABOUTFONT[platform.system()]['family'], 
+                ABOUTFONT[platform.system()]['family'], 
+                [ABOUTFONT[platform.system()]['sizePt']]*7)  # Set font-family to Garamond and font-size to 6 points
+        
         self.html.SetPage(f"<html><body>{htmlbody}</body></html>".replace('VERVER', f"{GUINAME} {VERSION}").replace('PROJECTLINK', f"{ABOUTLINK}{NAME}"))
 
         self.okButton = wx.Button(self, wx.ID_OK, "OK")
@@ -132,6 +137,7 @@ class ConfigDialog(wx.Frame):
         self.gOp = gOp               # DEFAULT Disabled with False
         self.loggerNames = list(logging.root.manager.loggerDict.keys())
         cfgpanel = wx.Panel(self,style=wx.SIMPLE_BORDER  )
+        
         TEXTkmlcmdlinelbl = wx.StaticText(cfgpanel, -1,  " KML Editor Command line:   ") 
         self.TEXTkmlcmdline = wx.TextCtrl(cfgpanel, wx.ID_FILE1, "", size=(250,20))
         if gOp.KMLcmdline:
@@ -206,7 +212,7 @@ class ConfigDialog(wx.Frame):
         sizer = wx.BoxSizer(wx.VERTICAL)
         sizer.AddMany(parts)
         
-        
+
         sizer.AddMany([ 
             wx.StaticText(cfgpanel, -1,  "Use   $n  for the name of the file within a command line - such as    notepad $n"),    
             wx.StaticText(cfgpanel, -1,  "Use   $n  without any command to open default application for that file type") ])  
@@ -279,7 +285,7 @@ class FamilyPanel(wx.Panel):
         sizer.Add(self.grid, 1, wx.EXPAND | wx.ALL, 10)
         self.SetSizer(sizer)
         
-        
+        self.visual_map_panel = self.GetParent().GetParent()
         
 
     def populateGrid(self, isChildren=False):
@@ -331,9 +337,9 @@ class FamilyPanel(wx.Panel):
         # Get the ID of the selected person
         person_id = self.grid.GetCellValue(row, 7)
         # Open the person dialog with the selected person's details
-        person = BackgroundProcess.people.get(person_id)
+        person = self.gOp.BackgroundProcess.people.get(person_id)
         if person:
-            dialog = PersonDialog(self, person, panel, showrefences=False)
+            dialog = PersonDialog(self, person, self.visual_map_panel, showrefences=False)
             dialog.Show(True)
             dialog.Bind(wx.EVT_CLOSE, lambda evt: dialog.Destroy())
         else:
@@ -355,10 +361,14 @@ class PersonDialog(wx.Dialog):
     def __init__(self, parent, person: Person, panel, showrefences=True):
         super().__init__(parent, title="Person Details", size=(600, 600), style=wx.DEFAULT_DIALOG_STYLE |wx.RESIZE_BORDER)
         
+        FontManager.load()
+        self.font = FontManager._current if FontManager._current else GVFONT
+        self.font_size = self.font.get("size", GVFONT[platform.system()]['sizePt'])
+
         def sizeAttr(attr,pad=1):
-            return (min(len(attr),3)+pad)*(GVFONT[1]+5)  if attr else GVFONT[1]
+            return (min(len(attr),3)+pad)*(GVFONT[platform.system()]['sizePt']+5)  if attr else GVFONT[platform.system()]['sizePt']
         
-        people = BackgroundProcess.people
+        people = panel.gOp.BackgroundProcess.people
         # Display the marriage information including the marriage location and date                
         marrying = []
         if person.marriages:
@@ -604,11 +614,8 @@ and generating the output so that the GUI can continue to be responsive
         
 
     def DefgOps(self, gOp):
-        # Pull the global variables into this thread - Critcal to do this
-        global panel, BackgroundProcess
+        # Pull the global variables into this thread - Critical to do this
         self.gOp = gOp
-        panel = gOp.panel
-        BackgroundProcess = gOp.BackgroundProcess
         
 
     def Start(self):
@@ -630,12 +637,10 @@ and generating the output so that the GUI can continue to be responsive
         return self.do != 0
 
     def Trigger(self, dolevel):
-        global panel
-
         if dolevel & 1 or dolevel & 4:
-            panel.id.BTNLoad.SetBackgroundColour(panel.id.GetColor('BTN_DONE'))
+            self.gOp.panel.id.BTNLoad.SetBackgroundColour(self.gOp.panel.id.GetColor('BTN_DONE'))
         if dolevel & 2:
-            panel.id.BTNUpdate.SetBackgroundColour(panel.id.GetColor('BTN_DONE'))
+            self.gOp.panel.id.BTNCreateFiles.SetBackgroundColour(self.gOp.panel.id.GetColor('BTN_DONE'))
         self.do = dolevel
         
     def SayInfoMessage(self, line, newline= True):
@@ -703,7 +708,10 @@ and generating the output so that the GUI can continue to be responsive
                         if self.gOp.Main:
                             self.SayInfoMessage(f" with '{self.gOp.Main}' as starting person from {Path(self.gOp.GEDCOMinput).name}", False)
                     else:
-                        self.SayErrorMessage(f"Error: file could not read as a GEDCOM file", True)
+                        if self.gOp.stopping:
+                            self.SayErrorMessage(f"Error: Aborted loading GEDCOM file", True)
+                        else:
+                            self.SayErrorMessage(f"Error: file could not read as a GEDCOM file", True)
                     
                 if self.do & 2:
                     _log.info("start do 2")
@@ -724,7 +732,7 @@ and generating the output so that the GUI can continue to be responsive
                             self.SayInfoMessage(f"KML2 file generated for {self.gOp.totalpeople} people/points ({fname})")
                         elif (self.gOp.ResultType is ResultsType.SUM):  
                             doSUM(self.gOp)
-                            self.SayInfoMessage(f"KML2 file generated for {self.gOp.totalpeople} people/points ({fname})")
+                            self.SayInfoMessage(f"Summary files generated ({fname})")
                     else:
                         _log.info("not parsed")
                     _log.info("done draw")

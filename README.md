@@ -10,7 +10,7 @@ Read a GEDCOM file and translate the locations into GPS addresses.
 The produces different KML map types which should timelines and movements around the earth.
 The produces HTML file which is interactive..
 
-This contains two interfaces: command-line and GUI (only tested on Windows and Windows Sub-system for Linux).  Testing by @colin0brass on Mac
+This contains two interfaces: command-line and GUI (GUI is tested on Windows and Windows Sub-system for Linux, testing by @colin0brass on Mac)
 
 Orginally forked from [https://github.com/lmallez/gedcom-to-map]
 
@@ -60,7 +60,7 @@ python3 gedcom-to-map.py /users/darren/documents/myhertitagetree.ged myTree -mai
 ```
 
 ## GUI
-![img](docs/img/GUI-python_2025-09.gif)
+![img](docs/img/GUI-python_2025-11.gif)
 
 To use the GUI version, click on `Input File` and select your .ged file.
 Set your options in the GUI interface  
@@ -95,18 +95,6 @@ The Age column can be very useful for testing to see if the parents are of the p
 Unix may not like the Font size of 8.  If you get errors, then change the font size in const.py  The interface needs a smaller font or it will throw 
 off all the layout measurements.  (Need to add math to get actual font size)
 
-# 
-# Built using
-| Project | Githib Repo | Documentation |
-| --- | --- | --- |
-| wxPython |  https://github.com/wxWidgets/Phoenix  | https://wxpython.org/
-| ged4py | https://github.com/andy-z/ged4py  | https://ged4py.readthedocs.io
-| simplekml | https://github.com/eisoldt/simplekml | https://app.readthedocs.org/projects/simplekml/
-| geopy | https://github.com/geopy/geopy |https://geopy.readthedocs.io/en/latest/#geocoders |
-| folium | https://github.com/python-visualization/folium | https://python-visualization.github.io/folium/latest/|
-| xyzservices | https://github.com/geopandas/xyzservices | https://xyzservices.readthedocs.io/en/stable/index.html |
-| nnjeim/world | https://github.com/nnjeim/world | https://github.com/nnjeim/world?tab=readme-ov-file#available-actions 
-
 
 # Results
 ## KML Example revised
@@ -129,10 +117,10 @@ Go to https://www.google.ca/maps/about/mymaps
 - On `Untitled map` click on the `Import` options and open your KML file
 #### Note this does not work in Google Earth as the lines don't appear, not sure about other KML viewers.
 
-The *`geodat-address-cache.csv`* file can be edited to feed back in new Addresses for GeoCoding.  Just edit or clear any column except the *Name* column to have it re-lookup that address.  Especially useful if you want to make a bad or old-style name resolve to a new name/location.
+The *`geo_cache.csv`* file can be edited to feed back in new Addresses for GeoCoding.  Just edit or clear any column except the *Name* column to have it re-lookup that address.  Especially useful if you want to make a bad or old-style name resolve to a new name/location.
 If you do not have GPS location in your GEDCOM file, then use -born or -born -death so have it use the place where the person was born and/or died.
 
-* Cache : [samples/geodat-address-cache.csv](samples/geodat-address-cache.csv)
+* Cache : [samples/geo_cache](samples/geo_cache.csv)
 
 
 
@@ -164,6 +152,18 @@ This will produce a text file and the name will be shown be show in the Informat
 ## Cluster Markers
 If you turn off the Markers, then it will turn on Clustered markers.  Trying that out and seeing if this become a better way to do markers.  This is W, working towards leverage this feature more consistantly.
 ![img](docs/img/markers-2025-03.png)
+
+## Options Values
+KML Editor:     
+  googleearth.exe $n
+  "C:\Program Files\ArcGIS\Earth\ArcGISEarth.exe" "$n"
+
+KML2 is an improved version of KML
+
+## Summary
+SUM is a summary CSV files and plot of birth vs death related to continent and country
+
+![img](samples/shakespeare_countries_heatmap.png)
 
 ## Complex Export of MyHeritage - intereactive map
 ![img](docs/img/msedge_2022-02-02_22-33-16.gif)
@@ -240,16 +240,31 @@ python3 ..\gedcom-to-map\gedcom-to-map.py input.ged output -main "@I0000@" -form
 
 ```
 
-* HTML Output : [docs/output.html](docs/output.html)
+
+# 
+# Built using
+| Project | Githib Repo | Documentation | Purpose
+| --- | --- | --- | --- | 
+| wxPython |  https://github.com/wxWidgets/Phoenix  | https://wxpython.org/ | Toolkit and provides access to the user interface
+| ged4py | https://github.com/andy-z/ged4py  | https://simplekml.readthedocs.io/en/latest/ | Implementation of the GEDCOM parser in Python
+| simplekml | https://github.com/eisoldt/simplekml | https://app.readthedocs.org/projects/simplekml/ | created to generate kml (or kmz)
+| geopy | https://github.com/geopy/geopy |https://geopy.readthedocs.io/en/latest/#geocoders |
+| folium | https://github.com/python-visualization/folium | https://python-visualization.github.io/folium/latest/|
+| xyzservices | https://github.com/geopandas/xyzservices | https://xyzservices.readthedocs.io/en/stable/index.html |
+| nnjeim/world | https://github.com/nnjeim/world | https://github.com/nnjeim/world?tab=readme-ov-file#available-actions 
+| pyyaml | https://github.com/yaml/pyyaml | | A full-featured YAML processing framework for Python
+| rapidfuzz | https://github.com/rapidfuzz/RapidFuzz | | Rapid fuzzy string matching in Python and C++ using the Levenshtein Distance
+| pycountry | https://github.com/pycountry/pycountry
+| pycountry-convert | https://github.com/jefftune/pycountry-convert | | pycountry-convert is a Python module for TUNE Multiverse Libraries.
+| pandas | https://github.com/pandas-dev/pandas | | A Powerful Python Data Analysis Toolkit
+| seaborn | https://github.com/mwaskom/seaborn | https://seaborn.pydata.org/ | Seaborn is a Python visualization library based on matplotlib. 
+| matplotlib | https://github.com/matplotlib/matplotlib | https://matplotlib.org/ |Matplotlib is a comprehensive library for creating static, animated, and interactive visualizations in Python.
 
 ### Other sample GED files:
 - https://github.com/findmypast/gedcom-samples
 
 ## TODO
-- Add a treed hierarchy selector to enable people as groups and add expand/collapse to navigation
-- more troubleshooting on the address lookup
-  - better way to interact and refine the address resolution hints
-  - move address hints in a configuration file
+- Add a tree hierarchy selector to enable people as groups and add expand/collapse to navigation
 - option to remove 'lines' to not core points (such as RESI or other)
 - Sort the Last Name by the highest number of people first or by distance from star
 - create a marker animation by year (in time steps)
@@ -262,7 +277,6 @@ python3 ..\gedcom-to-map\gedcom-to-map.py input.ged output -main "@I0000@" -form
 - Major refactoring to make this *real* Python code
 
 ## Issues
-- Marriage is not read correctly all the time, limitations with multiple marriages
 - Linux does not save FileHistory
 - People dialog displays only one parent after Draw Update
 - list of background maps on Follium is not complete or presented, so currently only shows cartodbvoyager
@@ -271,6 +285,14 @@ python3 ..\gedcom-to-map\gedcom-to-map.py input.ged output -main "@I0000@" -form
 - Need to separate the Load and GPS resolve steps (currently reloads after 30 seconds of looking up values)
 
 ## Releases
+### v0.2.7.0.3
+- more bug fixes
+- Regrouping of options based on Output type
+- Default country text input
+- Update and stop buttons fixed
+- Different font config for defferent platforms, adjustable from the menu
+### v0.2.7.0.1
+- Bug fixes for the quick related of 0.2.7.  Lots of fixes with the assistance of @colin0brass
 ### v0.2.7.0
 - MAJOR UPGRADE/REFACTOR
 - This is a major rework of many components to merge in new address lookup and gedcom reading approch from @colin0brass

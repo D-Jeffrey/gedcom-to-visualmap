@@ -4,9 +4,24 @@ import json
 import os
 
 
+def ApproxTextWidth(numChars, sizePt=9, dpi=96.0, isMono=False, emRatio=None, marginPx=2):
+    """
+    Return approximate pixel width for numChars of text.
+    - sizePt: font size in points
+    - dpi: display DPI (use 96 for standard)
+    - isMono: True for monospace fonts
+    - emRatio: override default per-character em ratio (None uses defaults)
+    - marginPx: small safety margin in pixels
+    """
+    if emRatio is None:
+        emRatio = 1.0 if isMono else 0.55
+    pxPerEm = sizePt * (dpi / 72.0)
+    return int(round(numChars * pxPerEm * emRatio)) + marginPx
+
+
 class FontManager:
     PREDEFINED_FONTS = [
-        "Arial", "Calibri", "Consolas", "Courier New", "Georgia",
+        "Arial", "Calibri", "Corbel", "Consolas", "Courier New", "DejaVu Sans", "Georgia",  "Noto Sans", 
         "Segoe UI", "Tahoma", "Times New Roman", "Trebuchet MS", "Verdana"
     ]
 
@@ -16,7 +31,13 @@ class FontManager:
         "style": "normal"   # placeholder for future bold/italic
     }
 
+    PREDEFINED_FONT_SIZES = [8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24]
+
     _current = None
+
+    def __init__(self):
+        if self._current is None:
+            self.load()
 
     @classmethod
     def load(cls):
@@ -70,42 +91,33 @@ class FontManager:
             cls._current["size"] = int(size)
         cls.save()
         return True
+    
+    @classmethod
+    def set_font_size(cls, size):
+        if cls._current is None:
+            cls.load()
+        cls._current["size"] = int(size)
+        cls.save()
+        return True
 
     @classmethod
-    def apply_to(cls, widget):
-        """
-        Apply the current font to a widget and its children where appropriate.
-        For wx.Grid we set the default cell font and refresh.
-        """
-        font = cls.get_font()
-        # If it's a wx.Grid, use its specific API
+    def set_font_size(cls, size):
+        if cls._current is None:
+            cls.load()
+        cls._current["size"] = int(size)
+        cls.save()
+        return True
+
+    @classmethod
+    def apply_font_recursive(self, win: wx.Window, font: wx.Font):
+        """Set font on window and all children; ignore failures on native widgets."""
         try:
-            import wx.grid as gridlib
+            win.SetFont(font)
         except Exception:
-            gridlib = None
-
-        # Apply to known grid types
-        if gridlib and isinstance(widget, gridlib.Grid):
-            # set label and cell fonts
-            widget.SetDefaultCellFont(font)
-            widget.SetLabelFont(font)
-            widget.SetDefaultCellTextColour(widget.GetDefaultCellTextColour())
-            widget.ForceRefresh()
-            return
-
-        # Generic wx.Window and controls: propagate to children
-        if isinstance(widget, wx.Window):
-            widget.SetFont(font)
-            for child in widget.GetChildren():
-                # avoid changing complex custom controls that manage fonts internally if needed
-                try:
-                    child.SetFont(font)
-                except Exception:
-                    pass
-
-    @classmethod
-    def apply_to_all_controls(cls, top_window):
-        cls.apply_to(top_window)
-        # Walk children to try to apply where needed
-        for c in top_window.GetChildren():
-            cls.apply_to(c)
+            pass
+        # recurse to children (some objects may not implement GetChildren)
+        for child in getattr(win, "GetChildren", lambda: [])():
+            try:
+                self.apply_font_recursive(child, font)
+            except Exception:
+                pass

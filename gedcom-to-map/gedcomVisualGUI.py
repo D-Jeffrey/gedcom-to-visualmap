@@ -188,7 +188,7 @@ class VisualMapFrame(wx.Frame):
         # and a status bar
         
         #TODO get proper font size 
-        widthMax = ApproxTextWidth(30, GVFONT[platform.system()]['sizePt'])
+        widthMax = ApproxTextWidth(35, GVFONT[platform.system()]['sizePt'])
         self.StatusBar.SetFieldsCount(number=2, widths=[-1, widthMax])
         self.SetStatusText("Visual Mapping ready",0)
         self.myFont = wx.Font(wx.FontInfo(GVFONT[platform.system()]['sizePt']).FaceName(GVFONT[platform.system()]['family']))

@@ -590,7 +590,10 @@ class GeolocatedGedcom(Gedcom):
                 if place_tag.value:
                     location = self.geocoder.lookup_location(place_tag.value)
                     event.location = location
-                    logger.debug(f"Place found {location.address} for event in record {record}")
+                    if location:
+                        logger.debug(f"Place found {location.address} for event in record {record}")
+                    else:
+                        logger.info(f"No location found for place '{place_tag.value}' in record {record}")
                 if map_tag:
                     lat = map_tag.sub_tag('LATI')
                     lon = map_tag.sub_tag('LONG')

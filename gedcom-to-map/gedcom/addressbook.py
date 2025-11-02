@@ -218,7 +218,7 @@ class FuzzyAddressBook:
                 if (getattr(location, 'used',0) > 0): 
                     self.used += 1
                     self.totaladdr += getattr(location, 'used',0)
-                    if location.latlon.isNone(): 
+                    if (location and location.latlon is None or location.latlon.isNone()) or location is None : 
                         self.usedNone += 1
         hit = 1-(self.usedNone / self.used) if self.used > 0 else 0
         self.stats = f"Unique addresses: {self.used} with unresolvable: {self.usedNone}\nAddress hit rate {hit:.1%}\n or is it correct???" 

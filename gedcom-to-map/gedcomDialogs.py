@@ -257,6 +257,7 @@ class FamilyPanel(wx.Panel):
         # Data structure: Family data with parent-child relationships
         # Example: {"parent_id": ("Name", "Mother/Father", BornYear, DeathYear, BornAddress, [children_born_years])}
         self.hertiageData = hertiageData
+        self.gOp = parent.gOp
 
         # Create a grid
         self.grid = gridlib.Grid(self)
@@ -339,7 +340,7 @@ class FamilyPanel(wx.Panel):
         # Open the person dialog with the selected person's details
         person = self.gOp.BackgroundProcess.people.get(person_id)
         if person:
-            dialog = PersonDialog(self, person, self.visual_map_panel, showrefences=False)
+            dialog = PersonDialog(self, person, self.visual_map_panel, showrefences=False, gOp =self.gOp)
             dialog.Show(True)
             dialog.Bind(wx.EVT_CLOSE, lambda evt: dialog.Destroy())
         else:
@@ -358,9 +359,10 @@ def formatPersonName(person: Person, longForm=True):
         return "<none>"
 
 class PersonDialog(wx.Dialog):
-    def __init__(self, parent, person: Person, panel, showrefences=True):
+    def __init__(self, parent, person: Person, panel, showrefences=True, gOp: gvOptions = None):
         super().__init__(parent, title="Person Details", size=(600, 600), style=wx.DEFAULT_DIALOG_STYLE |wx.RESIZE_BORDER)
         
+        self.gOp = gOp
         FontManager.load()
         self.font = FontManager._current if FontManager._current else GVFONT
         self.font_size = self.font.get("size", GVFONT[platform.system()]['sizePt'])
@@ -368,7 +370,7 @@ class PersonDialog(wx.Dialog):
         def sizeAttr(attr,pad=1):
             return (min(len(attr),3)+pad)*(GVFONT[platform.system()]['sizePt']+5)  if attr else GVFONT[platform.system()]['sizePt']
         
-        people = panel.gOp.BackgroundProcess.people
+        people = self.gOp.BackgroundProcess.people
         # Display the marriage information including the marriage location and date                
         marrying = []
         if person.marriages:
@@ -448,7 +450,7 @@ class PersonDialog(wx.Dialog):
         self.homeTextCtrl.SetValue(homelist)
         if len(homes) > 3:
             sizer.AddGrowableRow(8)
-        if panel.gOp.Referenced and showrefences:
+        if self.gOp.Referenced and showrefences:
             self.related = None
             if panel.gOp.Referenced.exists(person.xref_id):
                 hertiageList = doTraceTo(panel.gOp, person)

@@ -753,7 +753,7 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
         if self.gOp.BackgroundProcess.people:
             itm = self.GetItemText(self.currentItem, 2)
             if itm in self.gOp.BackgroundProcess.people:
-                dialog = PersonDialog(None, self.gOp.BackgroundProcess.people[itm], self.visual_map_panel)
+                dialog = PersonDialog(None, self.gOp.BackgroundProcess.people[itm], self.visual_map_panel, gOp =self.gOp)
                 dialog.Bind(wx.EVT_CLOSE, lambda evt: dialog.Destroy())
                 dialog.Bind(wx.EVT_BUTTON, lambda evt: dialog.Destroy())
                 dialog.Show(True)

@@ -65,7 +65,7 @@ class Geocode:
         'additional_countries_to_add', 'country_substitutions', 'default_country', 'geo_cache',
         'geolocator', 'countrynames', 'countrynames_lower', 'country_name_to_code_dict',
         'country_code_to_name_dict', 'country_code_to_continent_dict', 'fallback_continent_map',
-        'background_process'
+        'gOp'
     ]
     geocode_sleep_interval = 1  # Delay due to Nominatim request limit
 
@@ -74,7 +74,8 @@ class Geocode:
         cache_file: str,
         default_country: Optional[str] = None,
         always_geocode: bool = False,
-        alt_place_file_path: Optional[Path] = None
+        alt_place_file_path: Optional[Path] = None,
+        gOp: Optional[gvOptions] = None
     ):
         """
         Initialize the Geocode object, loading country info and cache.
@@ -114,19 +115,7 @@ class Geocode:
         self.country_code_to_name_dict = {v.upper(): k for k, v in self.country_name_to_code_dict.items()}
         self.country_code_to_continent_dict = {code: self.country_code_to_continent(code) for code in self.country_code_to_name_dict.keys()}
 
-        self.background_process = None
-
-    def setupBackgroundProcess(self, background: gvOptions) -> None:
-        """
-        Setup BackgroundProcess for progress updates.
-
-        Args:
-            background (gvOptions): Background process options.
-        """
-        self.background_process = background
-        self.background_process.gOp.totalGEDpeople = 0
-        self.background_process.gOp.totalGEDfamily = 0
-
+        self.gOp = gOp
 
     def save_geo_cache(self) -> None:
         """

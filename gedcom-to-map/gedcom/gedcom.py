@@ -71,14 +71,15 @@ class GedcomParser:
         gedcom_file (Optional[str]): Path to GEDCOM file.
     """
     __slots__ = [
-        'gedcom_file'
+        'gedcom_file',
+        'gOp'
     ]
 
     LINE_RE = re.compile(
         r'^(\d+)\s+(?:@[^@]+@\s+)?([A-Z0-9_]+)(.*)$'
     )  # allow optional @xref@ before the tag
 
-    def __init__(self, gedcom_file: Path = None):
+    def __init__(self, gedcom_file: Path = None, gOp: Optional[gvOptions] = None):
         """
         Initialize GedcomParser.
 
@@ -86,6 +87,7 @@ class GedcomParser:
             gedcom_file (Path): Path to GEDCOM file.
         """
         self.gedcom_file = self.check_fix_gedcom(gedcom_file)
+        self.gOp = gOp
 
     def close(self):
         """Placeholder for compatibility."""
@@ -223,8 +225,10 @@ class GedcomParser:
                             if form and form.value.lower() in ('jpg','bmp','jpeg','png','gif'):
                                 person.photo = obj.sub_tag("FILE").value 
         # update timeframe ranges
-        BackgroundProcess.gOp.addtimereference(person.birth)
-        BackgroundProcess.gOp.addtimereference(person.death)
+        bg = self.gOp.BackgroundProcess if self.gOp else None
+        if bg:
+            bg.addtimereference(person.birth)
+            bg.addtimereference(person.death)
         homes = {}
         allhomes=record.sub_tags("RESI")
         if allhomes:
@@ -242,7 +246,8 @@ class GedcomParser:
                         if homedate in homes:
                             logger.debug ("**Double RESI location for : %s on %s @ %s", person.name, homedate , alladdr)
                         homes[homedate] = LifeEvent(alladdr, hom.sub_tag("DATE"), what='home')
-                        BackgroundProcess.gOp.addtimereference(homes[homedate])
+                        if bg:
+                            bg.addtimereference(homes[homedate])
         for tags in (homelocationtags):
             allhomes=record.sub_tags(tags)
             if allhomes:
@@ -252,7 +257,8 @@ class GedcomParser:
                     if plac: 
                         homedate = getgdate(hom.sub_tag("DATE"))
                         homes[homedate] = LifeEvent(plac, hom.sub_tag("DATE"), what='home')
-                        BackgroundProcess.gOp.addtimereference(homes[homedate])
+                        if bg:
+                            bg.addtimereference(homes[homedate])
         for tag in (otherlocationtags):
             allhomes=record.sub_tags(tag)
             if allhomes:
@@ -266,7 +272,8 @@ class GedcomParser:
                             otherwhat = otherstype.value
                         homedate = getgdate(hom.sub_tag("DATE"))
                         homes[homedate] = LifeEvent(plac, hom.sub_tag("DATE"), what=otherwhat)
-                        BackgroundProcess.gOp.addtimereference(homes[homedate])
+                        if bg:
+                            bg.addtimereference(homes[homedate])
                     
                     
         # Sort them by year          
@@ -391,8 +398,9 @@ class Gedcom:
         'gedcom_parser',
         'people',
         'address_book',
+        'gOp'
     ]
-    def __init__(self, gedcom_file: Path):
+    def __init__(self, gedcom_file: Path, gOp: Optional[gvOptions] = None):
         """
         Initialize Gedcom.
 
@@ -400,10 +408,12 @@ class Gedcom:
             gedcom_file (Path): Path to GEDCOM file.
         """
         self.gedcom_parser = GedcomParser(
-            gedcom_file=gedcom_file
+            gedcom_file=gedcom_file,
+            gOp=gOp
         )
         self.people: Dict[str, Person] = {}
         self.address_book: FuzzyAddressBook = FuzzyAddressBook()
+        self.gOp = gOp
 
     def close(self):
         """Close the GEDCOM parser."""
@@ -441,7 +451,7 @@ class GeolocatedGedcom(Gedcom):
         'geocoder',
         'address_book',
         'alt_place_file_path',
-        'background_process'
+        'gOp'
     ]
     geolocate_all_logger_interval = 20
     
@@ -453,7 +463,7 @@ class GeolocatedGedcom(Gedcom):
             always_geocode: Optional[bool] = False,
             use_alt_places: Optional[bool] = False,
             alt_place_file_path: Optional[Path] = None,
-            background: Optional[gvOptions] = None
+            gOp: Optional[gvOptions] = None
     ):
         """
         Initialize GeolocatedGedcom.
@@ -470,19 +480,24 @@ class GeolocatedGedcom(Gedcom):
             cache_file=location_cache_file,
             default_country=default_country,
             always_geocode=always_geocode,
-            alt_place_file_path=alt_place_file_path if use_alt_places else None
+            alt_place_file_path=alt_place_file_path if use_alt_places else None,
+            gOp=gOp
         )
-        self.background_process = background
+        self.gOp = gOp
+        if self.gOp:
+            self.gOp.totalGEDpeople = 0
+            self.gOp.totalGEDfamily = 0
         # self.address_book: FuzzyAddressBook = FuzzyAddressBook()
-        self.geocoder.setupBackgroundProcess(background)
-        self.background_process.gOp.step("Reading GED")
+        bg = self.gOp.BackgroundProcess if self.gOp else None
+        if bg:
+            self.gOp.step("Reading GED")
         self._geolocate_all()
-        if BackgroundProcess.gOp.ShouldStop():
+        if self.gOp.ShouldStop():
             return
         self._parse_people()
-        if BackgroundProcess.gOp.ShouldStop():
+        if self.gOp.ShouldStop():
             return
-        BackgroundProcess.gOp.parsed = True
+        self.gOp.parsed = True
 
 
         
@@ -497,22 +512,22 @@ class GeolocatedGedcom(Gedcom):
         """
         Geolocate all places in the GEDCOM file.
         """
-        self.background_process.gOp.step("Loading Addressbook") if self.background_process.gOp else None
+        self.gOp.step("Loading Addressbook")
         self.address_book = self.gedcom_parser.get_full_address_book()
-        self.background_process.gOp.step("Loading Cacehd") if self.background_process.gOp else None
+        self.gOp.step("Loading Cached")
         cached_places, non_cached_places = self.geocoder.separate_cached_locations(self.address_book)
         logger.info(f"Found {cached_places.len()} cached places, {non_cached_places.len()} non-cached places.")
-        self.background_process.gOp.step(f"Found {cached_places.len()}") if self.background_process.gOp else None
+        self.gOp.step(f"Found {cached_places.len()}")
         logger.info(f"Geolocating {cached_places.len()} cached places...")
         for place, data in cached_places.addresses().items():
             use_place = data.alt_addr if data.alt_addr else place
             location = self.geocoder.lookup_location(use_place)
             self.address_book.fuzzy_add_address(place, location)
-            if BackgroundProcess.gOp.ShouldStop():
+            if self.gOp.ShouldStop():
                 return
 
         num_non_cached_places = non_cached_places.len()
-        self.background_process.gOp.step(f"Geolocating non-cached places...", target=num_non_cached_places) if self.background_process.gOp else None
+        self.gOp.step(f"Geolocating non-cached places...", target=num_non_cached_places) if self.gOp else None
         logger.info(f"Geolocating {num_non_cached_places} non-cached places...")
         
         for place in non_cached_places.addresses().keys():
@@ -523,7 +538,7 @@ class GeolocatedGedcom(Gedcom):
             self.address_book.fuzzy_add_address(place, location)
             if idx % self.geolocate_all_logger_interval == 0 or idx == num_non_cached_places:
                 logger.info(f"Geolocated {idx} of {num_non_cached_places} non-cached places...")
-            self.background_process.gOp.step(info=f"Geolocated {idx} of {num_non_cached_places}")
+            self.gOp.step(info=f"Geolocated {idx} of {num_non_cached_places}")
         logger.info(f"Geolocation of all {self.address_book.len()} places completed.")
 
     def _parse_people(self) -> None:
@@ -532,9 +547,9 @@ class GeolocatedGedcom(Gedcom):
         """
         super()._parse_people()
         # People loaded
-        self.background_process.gOp.totalGEDpeople = len(self.people)
-        self.background_process.gOp.totalGEDfamily = len([p for p in self.people.values() if p.father or p.mother])
-        self.background_process.gOp.step("Locating People", target=(self.background_process.gOp.totalGEDpeople))
+        self.gOp.totalGEDpeople = len(self.people)
+        self.gOp.totalGEDfamily = len([p for p in self.people.values() if p.father or p.mother])
+        self.gOp.step("Locating People", target=(self.gOp.totalGEDpeople))
         self._geolocate_people()
 
     def _geolocate_people(self) -> None:
@@ -561,7 +576,7 @@ class GeolocatedGedcom(Gedcom):
                 if not found_location and event.location and event.location.latlon and event.location.latlon.is_valid():
                     person.latlon = event.location.latlon
                     found_location = True
-            self.background_process.gOp.step(info =f"Reviewing {getattr(person, 'name', '-Unknwon-')}")
+            self.gOp.step(info =f"Reviewing {getattr(person, 'name', '-Unknwon-')}")
 
     def _geolocate_event(self, event: LifeEvent) -> LifeEvent:
         """
@@ -582,10 +597,7 @@ class GeolocatedGedcom(Gedcom):
                 if place_tag.value:
                     location = self.geocoder.lookup_location(place_tag.value)
                     event.location = location
-                    if location:
-                        logger.debug(f"Place found {location.address} for event in record {record}")
-                    else:
-                        logger.info(f"No location found for place '{place_tag.value}' in record {record}")
+                    logger.debug(f"Place found {location.address if location else '-unknown-'} for event in record {record}")
                 if map_tag:
                     lat = map_tag.sub_tag('LATI')
                     lon = map_tag.sub_tag('LONG')

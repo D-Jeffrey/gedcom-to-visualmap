@@ -130,7 +130,7 @@
                 <description>Marriage None&lt;br&gt;Unmarried&lt;br&gt;</description>
                 <styleUrl>#6</styleUrl>
                 <Point id="57">
-                    <coordinates>-1.2649062,52.5310214,0.0</coordinates>
+                    <coordinates>149.5481193,-33.4596678,0.0</coordinates>
                 </Point>
             </Placemark>
             <Placemark id="60">
@@ -138,7 +138,7 @@
                 <description>Marriage None&lt;br&gt;Unmarried&lt;br&gt;</description>
                 <styleUrl>#6</styleUrl>
                 <Point id="59">
-                    <coordinates>-1.2649062,52.5310214,0.0</coordinates>
+                    <coordinates>149.5481193,-33.4596678,0.0</coordinates>
                 </Point>
             </Placemark>
         </Folder>
@@ -209,187 +209,133 @@
                     <coordinates>-1.70634,52.1927803,0.0</coordinates>
                 </Point>
             </Placemark>
-            <Placemark id="62">
-                <name>Margaret Wheeler</name>
-                <description>Death None&lt;br&gt;Died in childbirth&lt;br&gt;</description>
-                <styleUrl>#10</styleUrl>
-                <Point id="61">
-                    <coordinates>-1.2649062,52.5310214,0.0</coordinates>
-                </Point>
-            </Placemark>
-            <Placemark id="64">
-                <name>Not named Quiney</name>
-                <description>Death None&lt;br&gt;Died in childbirth&lt;br&gt;</description>
-                <styleUrl>#10</styleUrl>
-                <Point id="63">
-                    <coordinates>-1.2649062,52.5310214,0.0</coordinates>
-                </Point>
-            </Placemark>
         </Folder>
         <Folder id="14">
-            <Style id="68">
-                <LineStyle id="69">
+            <Style id="64">
+                <LineStyle id="65">
                     <color>ffff0000</color>
                     <colorMode>normal</colorMode>
                     <width>2</width>
                 </LineStyle>
             </Style>
-            <Style id="73">
-                <LineStyle id="74">
+            <Style id="69">
+                <LineStyle id="70">
                     <color>ff0000ff</color>
                     <colorMode>normal</colorMode>
                     <width>2</width>
                 </LineStyle>
             </Style>
-            <Style id="78">
-                <LineStyle id="79">
+            <Style id="74">
+                <LineStyle id="75">
                     <color>ffff0000</color>
                     <colorMode>normal</colorMode>
                     <width>2</width>
                 </LineStyle>
             </Style>
-            <Style id="83">
-                <LineStyle id="84">
+            <Style id="79">
+                <LineStyle id="80">
                     <color>ff0000ff</color>
                     <colorMode>normal</colorMode>
                     <width>2</width>
                 </LineStyle>
             </Style>
-            <Style id="88">
-                <LineStyle id="89">
+            <Style id="84">
+                <LineStyle id="85">
                     <color>ffff0000</color>
                     <colorMode>normal</colorMode>
                     <width>2</width>
                 </LineStyle>
             </Style>
-            <Style id="93">
-                <LineStyle id="94">
-                    <color>ff0000ff</color>
-                    <colorMode>normal</colorMode>
-                    <width>2</width>
-                </LineStyle>
-            </Style>
-            <Style id="98">
-                <LineStyle id="99">
-                    <color>ffff0000</color>
-                    <colorMode>normal</colorMode>
-                    <width>2</width>
-                </LineStyle>
-            </Style>
-            <Style id="103">
-                <LineStyle id="104">
+            <Style id="89">
+                <LineStyle id="90">
                     <color>ff0000ff</color>
                     <colorMode>normal</colorMode>
                     <width>2</width>
                 </LineStyle>
             </Style>
             <name>Parents</name>
-            <Placemark id="66">
+            <Placemark id="62">
                 <name>Father: William Shakespeare</name>
-                <TimeSpan id="67">
+                <TimeSpan id="63">
                     <begin>1583</begin>
                     <end>1564</end>
                 </TimeSpan>
-                <styleUrl>#68</styleUrl>
-                <LineString id="65">
+                <styleUrl>#64</styleUrl>
+                <LineString id="61">
                     <extrude>1</extrude>
                     <tessellate>1</tessellate>
                     <altitudeMode>clampToGround</altitudeMode>
                     <coordinates>-1.70634,52.1927803,0.0 -1.70634,52.1927803,0.0</coordinates>
                 </LineString>
             </Placemark>
-            <Placemark id="71">
+            <Placemark id="67">
                 <name>Mother: Anne Hathaway</name>
-                <TimeSpan id="72">
+                <TimeSpan id="68">
                     <begin>1583</begin>
                     <end>1556</end>
                 </TimeSpan>
-                <styleUrl>#73</styleUrl>
-                <LineString id="70">
+                <styleUrl>#69</styleUrl>
+                <LineString id="66">
                     <extrude>1</extrude>
                     <tessellate>1</tessellate>
                     <altitudeMode>clampToGround</altitudeMode>
                     <coordinates>-1.70634,52.1927803,0.0 -1.7276632,52.1909684,0.0</coordinates>
                 </LineString>
             </Placemark>
-            <Placemark id="76">
+            <Placemark id="72">
                 <name>Father: William Shakespeare</name>
-                <TimeSpan id="77">
+                <TimeSpan id="73">
                     <begin>1585</begin>
                     <end>1564</end>
                 </TimeSpan>
-                <styleUrl>#78</styleUrl>
-                <LineString id="75">
+                <styleUrl>#74</styleUrl>
+                <LineString id="71">
                     <extrude>1</extrude>
                     <tessellate>1</tessellate>
                     <altitudeMode>clampToGround</altitudeMode>
                     <coordinates>-1.70634,52.1927803,0.0 -1.70634,52.1927803,0.0</coordinates>
                 </LineString>
             </Placemark>
-            <Placemark id="81">
+            <Placemark id="77">
                 <name>Mother: Anne Hathaway</name>
-                <TimeSpan id="82">
+                <TimeSpan id="78">
                     <begin>1585</begin>
                     <end>1556</end>
                 </TimeSpan>
-                <styleUrl>#83</styleUrl>
-                <LineString id="80">
+                <styleUrl>#79</styleUrl>
+                <LineString id="76">
                     <extrude>1</extrude>
                     <tessellate>1</tessellate>
                     <altitudeMode>clampToGround</altitudeMode>
                     <coordinates>-1.70634,52.1927803,0.0 -1.7276632,52.1909684,0.0</coordinates>
                 </LineString>
             </Placemark>
-            <Placemark id="86">
+            <Placemark id="82">
                 <name>Father: William Shakespeare</name>
-                <TimeSpan id="87">
+                <TimeSpan id="83">
                     <begin>1585</begin>
                     <end>1564</end>
                 </TimeSpan>
-                <styleUrl>#88</styleUrl>
-                <LineString id="85">
+                <styleUrl>#84</styleUrl>
+                <LineString id="81">
                     <extrude>1</extrude>
                     <tessellate>1</tessellate>
                     <altitudeMode>clampToGround</altitudeMode>
                     <coordinates>-1.70634,52.1927803,0.0 -1.70634,52.1927803,0.0</coordinates>
                 </LineString>
             </Placemark>
-            <Placemark id="91">
+            <Placemark id="87">
                 <name>Mother: Anne Hathaway</name>
-                <TimeSpan id="92">
+                <TimeSpan id="88">
                     <begin>1585</begin>
                     <end>1556</end>
                 </TimeSpan>
-                <styleUrl>#93</styleUrl>
-                <LineString id="90">
+                <styleUrl>#89</styleUrl>
+                <LineString id="86">
                     <extrude>1</extrude>
                     <tessellate>1</tessellate>
                     <altitudeMode>clampToGround</altitudeMode>
                     <coordinates>-1.70634,52.1927803,0.0 -1.7276632,52.1909684,0.0</coordinates>
-                </LineString>
-            </Placemark>
-            <Placemark id="96">
-                <name>Father: Thomas Quiney</name>
-                <TimeSpan id="97">
-                    <end>1589</end>
-                </TimeSpan>
-                <styleUrl>#98</styleUrl>
-                <LineString id="95">
-                    <extrude>1</extrude>
-                    <tessellate>1</tessellate>
-                    <altitudeMode>clampToGround</altitudeMode>
-                    <coordinates>-1.2649062,52.5310214,0.0 -1.70634,52.1927803,0.0</coordinates>
-                </LineString>
-            </Placemark>
-            <Placemark id="101">
-                <name>Mother: Margaret Wheeler</name>
-                <TimeSpan id="102"/>
-                <styleUrl>#103</styleUrl>
-                <LineString id="100">
-                    <extrude>1</extrude>
-                    <tessellate>1</tessellate>
-                    <altitudeMode>clampToGround</altitudeMode>
-                    <coordinates>-1.2649062,52.5310214,0.0 -1.2649062,52.5310214,0.0</coordinates>
                 </LineString>
             </Placemark>
         </Folder>

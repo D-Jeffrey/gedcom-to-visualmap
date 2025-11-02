@@ -180,9 +180,10 @@ class VisualMapFrame(wx.Frame):
         #
         super().__init__(*args, **kw)
 
-        FontManager.load()
-        font = FontManager._current if FontManager._current else GVFONT
-        font_size = font.get("size", GVFONT[1])
+        self.font_manager = FontManager()
+        font = self.font_manager._current if self.font_manager._current else GVFONT[platform.system()]
+        self.font_name = font.get("face", GVFONT[platform.system()]['family'])
+        self.font_size = font.get("size", GVFONT[platform.system()]['sizePt'])
 
         self.SetMinSize((800,800))
         self.StatusBar = self.CreateStatusBar()
@@ -191,12 +192,13 @@ class VisualMapFrame(wx.Frame):
         self.makeMenuBar()
         # and a status bar
         
-        self.StatusBar.SetFieldsCount(number=2, widths=[-1, 28*font_size])
+        self.StatusBar.SetFieldsCount(number=2, widths=[-1, 28*self.font_size])
+        widthMax = ApproxTextWidth(30, self.font_size)
+        self.StatusBar.SetFieldsCount(number=2, widths=[-1, widthMax])
         self.SetStatusText("Visual Mapping ready",0)
-        self.myFont = wx.Font(wx.FontInfo(font_size).FaceName(font.get("face", GVFONT[0])))
-        # TODO Check for Arial and change it
+        self.myFont = wx.Font(wx.FontInfo(self.font_size).FaceName(self.font_name))
         if not self.myFont:
-            _log.warning("Could not set font to %s, using default", GVFONT[platform.system()]['family'])
+            _log.warning("Could not set font to %s, using default", self.font_name)
             self.myFont = wx.Font(wx.FontInfo(10).FaceName('Verdana'))
         wx.Frame.SetFont(self, self.myFont)
         self.inTimer = False
@@ -280,34 +282,32 @@ class VisualMapFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.OnOpenBrowser, id = self.id.IDs['ID_BTNBROWSER'])
         # More BIND below in main
     
-        FontManager.load()
         # existing Option items...
         # Add Set Font submenu
         set_font_menu = wx.Menu()
-        for fname in FontManager.PREDEFINED_FONTS:
+        for fname in self.font_manager.PREDEFINED_FONTS:
             item = wx.MenuItem(set_font_menu, wx.ID_ANY, fname, kind=wx.ITEM_RADIO)
             set_font_menu.Append(item)
             # pre-check current selection
-            current_face = FontManager._current.get("face") if FontManager._current else None
+            current_face = self.font_manager._current.get("face") if self.font_manager._current else None
             if current_face == fname:
                 item.Check(True)
 
         # optional: add font size submenu or a Font Size dialog entry
         set_font_sub = wx.MenuItem(optionsMenu, wx.ID_ANY, "Set Font")
-        optionsMenu.AppendSubMenu(set_font_menu, "Set People Grid Font")
+        # optionsMenu.AppendSubMenu(set_font_menu, "Set People Grid Font")
+        optionsMenu.AppendSubMenu(set_font_menu, "Set Font")
         # bind events
         for mi in set_font_menu.GetMenuItems():
             self.Bind(wx.EVT_MENU, self.on_font_menu_item, mi)
 
-        # self.Bind(wx.EVT_MENU, self.on_set_font, id=set_font_menu.GetMenuItems()[0].GetId())  # placeholder
-
         # Add Set Font Size submenu
         set_font_size_menu = wx.Menu()
-        for fsize in FontManager.PREDEFINED_FONT_SIZES:
+        for fsize in self.font_manager.PREDEFINED_FONT_SIZES:
             item = wx.MenuItem(set_font_size_menu, wx.ID_ANY, str(fsize), kind=wx.ITEM_RADIO)
             set_font_size_menu.Append(item)
             # pre-check current selection
-            current_size = FontManager._current.get("size") if FontManager._current else None
+            current_size = self.font_manager._current.get("size") if self.font_manager._current else None
             if current_size == fsize:
                 item.Check(True)
 
@@ -317,42 +317,32 @@ class VisualMapFrame(wx.Frame):
         for mi in set_font_size_menu.GetMenuItems():
             self.Bind(wx.EVT_MENU, self.on_font_size_menu_item, mi)
 
-    def __set_font__(self, font):
-        wx.Frame.SetFont(self, font)
-        self.myFont = font
+    def set_font(self, font_name, font_size):
+        success = self.font_manager.set_font(font_name, font_size)
+        if not success:
+            _log.error(f"Failed to set font to {font_name}")
+        else:
+            self.font_name = font_name
+            self.font_size = font_size
+            self.myFont = wx.Font(wx.FontInfo(font_size).FaceName(font_name))
+            # Apply to VisualMapFrame
+            self.font_manager.apply_font_recursive(self, self.myFont)
+            # Apply to sub-panel: VisualMapPanel
+            self.visual_map_panel.set_font(font_name, font_size)
 
-        # # Apply to the people grid specifically
-        # FontManager.apply_to_all_controls(self.visual_map_panel)
-        # if self.visual_map_panel.peopleList:
-        #     try:
-        #         FontManager.apply_to(self.visual_map_panel.peopleList)
-        #     except Exception:
-        #         pass
-
-        # # Also apply to top-level frame to propagate to other controls
-        # FontManager.apply_to_all_controls(self)
-
-        FontManager.apply_font_recursive(self)
-        # this does not yet work for setting the font in the message area top left
-        # FontManager.apply_font_recursive(self.visual_map_panel.peopleList)
-        FontManager.apply_font_recursive(self.visual_map_panel)
-        self.visual_map_panel.Layout()
-        self.visual_map_panel.Refresh()
-
-        # refresh/redraw
         self.Layout()
         self.Refresh()
 
-        #   event handler
+    #  event handler
     def on_font_menu_item(self, event):
         mi = self.GetMenuBar().FindItemById(event.GetId())
         if mi is None:
             return
         face = mi.GetItemLabelText()
-        success = FontManager.set_font(face)
+        success = self.font_manager.set_font(face)
         if success:
-            new_font = FontManager.get_font()
-            self.__set_font__(new_font)
+            self.font_name = face
+            self.set_font(self.font_name, self.font_size)
 
     def on_font_size_menu_item(self, event):
         mi = self.GetMenuBar().FindItemById(event.GetId())
@@ -364,10 +354,10 @@ class VisualMapFrame(wx.Frame):
         except ValueError:
             _log.error(f"Invalid font size selected: '{size_str}'")
             return
-        success = FontManager.set_font_size(size)
+        success = self.font_manager.set_font_size(size)
         if success:
-            new_font = FontManager.get_font()
-            self.__set_font__(new_font)
+            self.font_size = size
+            self.set_font(self.font_name, self.font_size)
 
     def OnExit(self, event):
         self.visual_map_panel.myTimer.Stop()
@@ -511,6 +501,7 @@ class VisualMapFrame(wx.Frame):
         
     def onOptionsSetup(self, event):
         dialog = ConfigDialog(None, title='Configuration Options', gOp=self.visual_map_panel.gOp)
+        self.config_dialog = dialog
         
 #=============================================================
 class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSorterMixin):
@@ -749,10 +740,8 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
                         self.SetItemState(checknames, wx.LIST_STATE_SELECTED, wx.LIST_STATE_SELECTED)
                         self.EnsureVisible(checknames)
                         return
-            bg = getattr(self.gOp, "BackgroundProcess", None)
-            if bg:
-                bg.SayInfoMessage(f"* Could not find '{self.LastSearch}' in the names", False)
-
+            self.gOp.BackgroundProcess.SayInfoMessage(f"* Could not find '{self.LastSearch}' in the names", False)
+  
     def OnItemRightClick(self, event):
         self.currentItem = event.Index
         _log.debug("%s, %s, %s, %s", 
@@ -761,12 +750,10 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
                             self.GetItemText(self.currentItem, 1),
                             self.GetItemText(self.currentItem, 2))
         event.Skip()
-        bg = getattr(gOp, "BackgroundProcess", None)
-        people = getattr(bg, "people", {}) if bg else {}
-        if bg and people:
+        if self.gOp.BackgroundProcess.people:
             itm = self.GetItemText(self.currentItem, 2)
-            if itm in people:
-                dialog = PersonDialog(None, people[itm], self.visual_map_panel)
+            if itm in self.gOp.BackgroundProcess.people:
+                dialog = PersonDialog(None, self.gOp.BackgroundProcess.people[itm], self.visual_map_panel)
                 dialog.Bind(wx.EVT_CLOSE, lambda evt: dialog.Destroy())
                 dialog.Bind(wx.EVT_BUTTON, lambda evt: dialog.Destroy())
                 dialog.Show(True)
@@ -782,15 +769,14 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
     def ShowSelectedLinage(self, personid: str):
         if self.gOp:
             self.gOp.setMain(personid)
-            bg = getattr(self.gOp, "BackgroundProcess", None)
-            if bg and getattr(bg, "updategridmain", True):
+            if self.gOp.BackgroundProcess.updategridmain:
                 _log.debug("Linage for: %s", personid)
-                bg.updategridmain = False
+                self.gOp.BackgroundProcess.updategridmain = False
                 doTrace(self.gOp)
                 self.gOp.newload = False
                 self.PopulateList(self.gOp.people, self.gOp.get('Main'), False)
-                bg.SayInfoMessage(f"Using '{personid}' as starting person with {len(self.gOp.Referenced)} direct ancestors", False)
-                bg.updategridmain = True
+                self.gOp.BackgroundProcess.SayInfoMessage(f"Using '{personid}' as starting person with {len(self.gOp.Referenced)} direct ancestors", False)
+                self.gOp.BackgroundProcess.updategridmain = True
                 self.visual_map_panel.SetupButtonState()
 
 
@@ -878,19 +864,20 @@ class VisualMapPanel(wx.Panel):
     A Frame that says Visual Setup
     """
 
-    def __init__(self,  *args, **kw):
+    def __init__(self, *args, **kw):
         # ensure the parent's __init__ is called so the wx.frame is created
         #
         super().__init__(*args, **kw)
 
-        FontManager.load()
-        self.font = FontManager._current if FontManager._current else GVFONT
-        self.font_size = self.font.get("size", GVFONT[1])
+        self.font_manager = FontManager()
+        font = self.font_manager._current if self.font_manager._current else GVFONT[platform.system()]
+        self.font_name = font.get("face", GVFONT[platform.system()]['family'])
+        self.font_size = font.get("size", GVFONT[platform.system()]['sizePt'])
+        self.myFont = wx.Font(wx.FontInfo(self.font_size).FaceName(self.font_name))
 
         self.SetMinSize((800,800))
         self.frame = self.TopLevelParent
         self.gOp : gvOptions = None
-        self.background_process = None
 
         self.id = {}
         
@@ -937,16 +924,25 @@ class VisualMapPanel(wx.Panel):
         self.lastruninstance = 0.0
         self.remaintime = 0
 
+    def set_font(self, font_name, font_size):
+        self.font_name = font_name
+        self.font_size = font_size
+        self.myFont = wx.Font(wx.FontInfo(self.font_size).FaceName(self.font_name))
+
+        self.font_manager.apply_font_recursive(self, self.myFont)
+
+        self.Layout()
+        self.Refresh()
 
     def LayoutOptions(self, panel):
         """ Layout the panels in the proper nested manner """
         # Top of the Panel
         box = wx.BoxSizer(wx.VERTICAL)
-        titleFont = wx.Font(wx.FontInfo(self.font_size).FaceName(GVFONT[0]).Bold())
+        titleFont = wx.Font(wx.FontInfo(self.font_size).FaceName(self.font_name).Bold())
         # TODO Check for Arial and change it
         if not titleFont:
-            _log.warning("Could not load font %s, using Verdana", GVFONT[platform.system()]['family'])
-            titleFont  = wx.Font(wx.FontInfo(16).FaceName('Verdana').Bold())
+            _log.warning("Could not load font %s, using ", self.font_name)
+            titleFont  = wx.Font(wx.FontInfo(GVFONT[platform.system()]['sizePt']).FaceName(GVFONT[platform.system()]['family']).Bold())
         fh = titleFont.GetPixelSize()[1]
         titleArea = wx.Panel(panel, size=(-1, fh + 10))
         titleArea.SetBackgroundColour(self.id.GetColor('TITLE_BACK')) 
@@ -1316,7 +1312,7 @@ class VisualMapPanel(wx.Panel):
             extra = cb.Name
         else:
             extra = ''
-        self.visual_map_panel.gOp.set( self.id.IDtoAttr[cbid][0]+extra, cb.GetValue())
+        self.gOp.set( self.id.IDtoAttr[cbid][0]+extra, cb.GetValue())
         
         if cbid == self.id.IDs['ID_CBHeatMap'] or cbid == self.id.IDs['ID_CBMapTimeLine'] or cbid == self.id.IDs['ID_CBMarksOn']:
             self.SetupButtonState()
@@ -1387,7 +1383,7 @@ class VisualMapPanel(wx.Panel):
         # el
         if eventid == self.id.IDs['ID_LISTMapStyle']:
             
-            self.visual_map_panel.gOp.MapStyle = sorted(self.id.AllMapTypes)[event.GetSelection()] 
+            self.gOp.MapStyle = sorted(self.id.AllMapTypes)[event.GetSelection()] 
             self.NeedRedraw()
         else:
 
@@ -1399,7 +1395,7 @@ class VisualMapPanel(wx.Panel):
         _log.debug('%s, %s, %s', event.GetString(), event.IsSelection(), event.GetSelection())                            
         _ = event.GetEventObject()
         if eventid == self.id.IDs['ID_INTMaxLineWeight']:
-            self.visual_map_panel.gOp.MaxLineWeight = event.GetSelection()
+            self.gOp.MaxLineWeight = event.GetSelection()
             self.NeedRedraw()
         else:
             _log.error ("Uncontrol SPINbox")
@@ -1407,7 +1403,7 @@ class VisualMapPanel(wx.Panel):
     def EvtSlider(self, event):
 
         _log.debug('%s', event.GetSelection())
-        self.visual_map_panel.gOp.HeatMapTimeStep = event.GetSelection()
+        self.gOp.HeatMapTimeStep = event.GetSelection()
 
     def OnMyTimer(self, evt):
         if self.inTimer:

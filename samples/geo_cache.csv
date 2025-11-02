@@ -1,5 +1,4 @@
-latitude,country_code,longitude,used,alt_addr,country_name,continent,found_country,address
-52.1927803,GB,-1.70634,0,,England,Europe,True,Stratford-upon-Avon
-52.1909684,GB,-1.7276632,0,,England,Europe,True,"Shottery, Warwickshire"
-52.5310214,GB,-1.2649062,0,,England,Europe,True,Died in childbirth
-52.5310214,GB,-1.2649062,0,,England,Europe,True,Unmarried
+address,country_code,latitude,country_name,continent,used,alt_addr,found_country,longitude
+Stratford-upon-Avon,NONE,52.1927803,,,1,,True,-1.70634
+"Shottery, Warwickshire",NONE,52.1909684,,,1,,True,-1.7276632
+Unmarried,NONE,-33.4596678,,,1,,True,149.5481193

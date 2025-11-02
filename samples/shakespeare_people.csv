@@ -1,11 +1,11 @@
 ID,Name,birth_place,birth_alt_addr,birth_date,birth_country,birth_continent,death_place,death_alt_addr,death_date,death_country,death_continent
-@I0001@,William Shakespeare,Stratford-upon-Avon,,1564,England,Europe,Stratford-upon-Avon,,1616,England,Europe
+@I0001@,William Shakespeare,Stratford-upon-Avon,,1564,,Unknown,Stratford-upon-Avon,,1616,,Unknown
 @I0002@,Mary Arden,,,1537,,,,,1608,,
 @I0003@,John Shakespeare,,,1531,,,,,1601,,
-@I0004@,Anne Hathaway,"Shottery, Warwickshire",,1556,England,Europe,Stratford-upon-Avon,,1623,England,Europe
-@I0005@,Susanna Shakespeare,Stratford-upon-Avon,,1583,England,Europe,Stratford-upon-Avon,,1649,England,Europe
-@I0006@,Hamnet Shakespeare,Stratford-upon-Avon,,1585,England,Europe,Stratford-upon-Avon,,1596,England,Europe
-@I0007@,Judith Shakespeare,Stratford-upon-Avon,,1585,England,Europe,Stratford-upon-Avon,,1662,England,Europe
+@I0004@,Anne Hathaway,"Shottery, Warwickshire",,1556,,Unknown,Stratford-upon-Avon,,1623,,Unknown
+@I0005@,Susanna Shakespeare,Stratford-upon-Avon,,1583,,Unknown,Stratford-upon-Avon,,1649,,Unknown
+@I0006@,Hamnet Shakespeare,Stratford-upon-Avon,,1585,,Unknown,Stratford-upon-Avon,,1596,,Unknown
+@I0007@,Judith Shakespeare,Stratford-upon-Avon,,1585,,Unknown,Stratford-upon-Avon,,1662,,Unknown
 @I0008@,Joan Shakespeare,,,1558,,,,,1558,,
 @I0009@,Margaret Shakespeare,,,1562,,,,,1563,,
 @I0010@,Gilbert Shakespeare,,,1566,,,,,1612,,
@@ -27,6 +27,6 @@ ID,Name,birth_place,birth_alt_addr,birth_date,birth_country,birth_continent,deat
 @I0026@,Richard Quiney,,,1618,,,,,1639,,
 @I0027@,Thomas Quiney,,,1620,,,,,1639,,
 @I0028@,Richard Hathaway,,,,,,,,1581,,
-@I0029@,Margaret Wheeler,,,,,,Died in childbirth,,,England,Europe
-@I0030@,Not named Quiney,,,,,,Died in childbirth,,,England,Europe
+@I0029@,Margaret Wheeler,,,,,,Died in childbirth,,,,
+@I0030@,Not named Quiney,,,,,,Died in childbirth,,,,
 @I0031@,Unknown,,,,,,,,,,

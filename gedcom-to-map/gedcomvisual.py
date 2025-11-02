@@ -8,7 +8,7 @@ import webbrowser
 from pathlib import Path
 import sys
 
-from gedcom.GedcomParser import GedcomParser
+# from gedcom.GedcomParser import GedcomParser
 # from gedcom.gpslookup import GEDComGPSLookup
 from gedcomoptions import gvOptions
 from models.Creator import Creator, LifetimeCreator, CreatorTrace, Person
@@ -267,7 +267,7 @@ def ParseAndGPS(gOp: gvOptions, stage: int = 0 ):
 #                geo_config_path=geo_config_path if geo_config_path.exists() else None,
 #                file_geo_cache_path=file_geo_cache_path if not gOp.skip_file_geocache else None,
 #                include_canonical= gOp.include_canonical,         # TODO make this an option
-                background=gOp.BackgroundProcess
+                gOp=gOp
             )
             _log.info ("Completed Geocode")
 #            gOp.lookup = lookupresults

@@ -35,6 +35,10 @@ class FontManager:
 
     _current = None
 
+    def __init__(self):
+        if self._current is None:
+            self.load()
+
     @classmethod
     def load(cls):
         sp = wx.StandardPaths.Get()
@@ -97,59 +101,23 @@ class FontManager:
         return True
 
     @classmethod
-    def apply_to(cls, widget):
-        """
-        Apply the current font to a widget and its children where appropriate.
-        For wx.Grid we set the default cell font and refresh.
-        """
-        font = cls.get_font()
-        # If it's a wx.Grid, use its specific API
-        try:
-            import wx.grid as gridlib
-        except Exception:
-            gridlib = None
-
-        # Apply to known grid types
-        if gridlib and isinstance(widget, gridlib.Grid):
-            # set label and cell fonts
-            widget.SetDefaultCellFont(font)
-            widget.SetLabelFont(font)
-            widget.SetDefaultCellTextColour(widget.GetDefaultCellTextColour())
-            widget.ForceRefresh()
-            return
-
-        wx.Frame.SetFont(widget, font)
-        # Generic wx.Window and controls: propagate to children
-        if isinstance(widget, wx.Window) or isinstance(widget, wx.Panel) or isinstance(widget, wx.Control):
-            widget.SetFont(font)
-            for child in widget.GetChildren():
-                # avoid changing complex custom controls that manage fonts internally if needed
-                try:
-                    child.SetFont(font)
-                except Exception:
-                    pass
-            print(f"Widget {type(widget)}")
-        else:
-            print(f"widget {type(widget)}")
+    def set_font_size(cls, size):
+        if cls._current is None:
+            cls.load()
+        cls._current["size"] = int(size)
+        cls.save()
+        return True
 
     @classmethod
-    def apply_to_all_controls(cls, top_window):
-        cls.apply_to(top_window)
-        # Walk children to try to apply where needed
-        for c in top_window.GetChildren():
-            cls.apply_to(c)
-
-    @classmethod
-    def apply_font_recursive(cls,win: wx.Window):
-        font = cls.get_font()
-        # ensure a wx.Font instance
-        if not isinstance(font, wx.Font):
-            font = wx.SystemSettings.GetFont(wx.SYS_DEFAULT_GUI_FONT)
-
+    def apply_font_recursive(self, win: wx.Window, font: wx.Font):
+        """Set font on window and all children; ignore failures on native widgets."""
         try:
             win.SetFont(font)
         except Exception:
-            # some native controls may raise; ignore and continue
             pass
-        for child in win.GetChildren():
-            cls.apply_font_recursive(child)
+        # recurse to children (some objects may not implement GetChildren)
+        for child in getattr(win, "GetChildren", lambda: [])():
+            try:
+                self.apply_font_recursive(child, font)
+            except Exception:
+                pass

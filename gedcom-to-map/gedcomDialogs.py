@@ -363,12 +363,12 @@ class PersonDialog(wx.Dialog):
         
         FontManager.load()
         self.font = FontManager._current if FontManager._current else GVFONT
-        self.font_size = self.font.get("size", GVFONT[1])
+        self.font_size = self.font.get("size", GVFONT[platform.system()]['sizePt'])
 
         def sizeAttr(attr,pad=1):
             return (min(len(attr),3)+pad)*(GVFONT[platform.system()]['sizePt']+5)  if attr else GVFONT[platform.system()]['sizePt']
         
-        people = self.gOp.BackgroundProcess.people
+        people = panel.gOp.BackgroundProcess.people
         # Display the marriage information including the marriage location and date                
         marrying = []
         if person.marriages:

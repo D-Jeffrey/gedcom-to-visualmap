@@ -242,7 +242,7 @@ class gvOptions:
                     else:  # complex
                         setattr(self, key, eval(value))
                 except Exception as e:
-                    _log.error(f"Error loading setting {key} type {typ} in section {sectionName}: {e}")
+                    _log.error(f"Error loading setting '{key}' type {typ} in section {sectionName}: {e}")
     def loadsettings(self):
         self.gvConfig = configparser.ConfigParser()
         self.gvConfig.read(self.settingsfile)

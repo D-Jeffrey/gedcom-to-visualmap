@@ -231,14 +231,18 @@ class gvOptions:
         for key, typ in keys.items():
             value = self.gvConfig[sectionName].get(key, None)
             if value is not None:
-                if typ == 0:  # Boolean
-                    setattr(self, key, value.lower() == 'true')
-                elif typ == 1:  # int
-                    setattr(self, key, int(value))
-                elif typ == 2:  # str
-                    setattr(self, key, value)
-                else:  # complex
-                    setattr(self, key, eval(value))
+                # Trap for manual editing of the configuration file
+                try:
+                    if typ == 0:  # Boolean
+                        setattr(self, key, value.lower() == 'true')
+                    elif typ == 1:  # int
+                        setattr(self, key, int(value))
+                    elif typ == 2:  # str
+                        setattr(self, key, value)
+                    else:  # complex
+                        setattr(self, key, eval(value))
+                except Exception as e:
+                    _log.error(f"Error loading setting {key} type {typ} in section {sectionName}: {e}")
     def loadsettings(self):
         self.gvConfig = configparser.ConfigParser()
         self.gvConfig.read(self.settingsfile)

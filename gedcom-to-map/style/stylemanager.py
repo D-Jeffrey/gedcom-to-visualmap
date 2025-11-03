@@ -2,22 +2,8 @@
 import wx
 import json
 import os
-
-
-def ApproxTextWidth(numChars, sizePt=9, dpi=96.0, isMono=False, emRatio=None, marginPx=2):
-    """
-    Return approximate pixel width for numChars of text.
-    - sizePt: font size in points
-    - dpi: display DPI (use 96 for standard)
-    - isMono: True for monospace fonts
-    - emRatio: override default per-character em ratio (None uses defaults)
-    - marginPx: small safety margin in pixels
-    """
-    if emRatio is None:
-        emRatio = 1.0 if isMono else 0.55
-    pxPerEm = sizePt * (dpi / 72.0)
-    return int(round(numChars * pxPerEm * emRatio)) + marginPx
-
+import logging
+_log = logging.getLogger(__name__)
 
 class FontManager:
     PREDEFINED_FONTS = [
@@ -66,20 +52,36 @@ class FontManager:
 
         try:
             cfg = dict(cls._current or cls.DEFAULT)
+            os.makedirs(os.path.dirname(_CONFIG_FILENAME), exist_ok=True)
             with open(_CONFIG_FILENAME, "w", encoding="utf-8") as f:
                 json.dump(cfg, f)
-        except Exception:
-            pass
+        except Exception as e:
+            _log.exception("Failed to save visualmap style: %s", e)
 
     @classmethod
-    def get_font(cls):
+    def get_font_name_size(cls):
         if cls._current is None:
             cls.load()
         face = cls._current.get("face", cls.DEFAULT["face"])
         size = cls._current.get("size", cls.DEFAULT["size"])
+        try:
+            f = wx.Font(int(size), wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, face)
+            if getattr(f, "IsOk", lambda: True)():
+                return face, int(size)
+        except Exception as e:
+            _log.debug("Font validation failed for %s@%s: %s", face, size, e)
+        return cls.DEFAULT["face"], cls.DEFAULT["size"]
+    
+    @classmethod
+    def get_font(cls):
+        face, size = cls.get_font_name_size()
         # wx.Font expects integer point sizes on Windows; cast safely
-        return wx.Font(int(size), wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, face)
-
+        try:
+            return wx.Font(int(size), wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, face)
+        except Exception as e:
+            _log.warning("Failed to construct font %s@%s, falling back to system font: %s", face, size, e)
+            return wx.SystemSettings.GetFont(wx.SYS_DEFAULT_GUI_FONT)
+    
     @classmethod
     def set_font(cls, face, size=None):
         if cls._current is None:
@@ -101,23 +103,35 @@ class FontManager:
         return True
 
     @classmethod
-    def set_font_size(cls, size):
-        if cls._current is None:
-            cls.load()
-        cls._current["size"] = int(size)
-        cls.save()
-        return True
-
-    @classmethod
-    def apply_font_recursive(self, win: wx.Window, font: wx.Font):
+    def apply_current_font_recursive(cls, win: wx.Window):
         """Set font on window and all children; ignore failures on native widgets."""
-        try:
-            win.SetFont(font)
-        except Exception:
-            pass
-        # recurse to children (some objects may not implement GetChildren)
-        for child in getattr(win, "GetChildren", lambda: [])():
+        font = cls.get_font()
+        def _apply(w):
             try:
-                self.apply_font_recursive(child, font)
+                w.SetFont(font)
             except Exception:
                 pass
+            for child in getattr(w, "GetChildren", lambda: [])():
+                _apply(child)
+        _apply(win)
+
+    @classmethod
+    def approx_text_width(cls, numChars, sizePt=9, dpi=96.0, isMono=False, emRatio=None, marginPx=2):
+        """
+        Return approximate pixel width for numChars of text.
+        - sizePt: font size in points
+        - dpi: display DPI (use 96 for standard)
+        - isMono: True for monospace fonts
+        - emRatio: override default per-character em ratio (None uses defaults)
+        - marginPx: small safety margin in pixels
+        """
+        if emRatio is None:
+            emRatio = 1.0 if isMono else 0.55
+        pxPerEm = sizePt * (dpi / 72.0)
+        return int(round(numChars * pxPerEm * emRatio)) + marginPx
+
+    @classmethod
+    def get_text_width(cls, num_chars):
+        face, size = cls.get_font_name_size()
+        isMono = face in ["Consolas", "Courier New", "DejaVu Sans Mono"]
+        return cls.approx_text_width(num_chars, sizePt=size, isMono=isMono)

@@ -40,11 +40,11 @@ import wx.grid
 import xyzservices.providers as xyz 
 
 
-from const import GUINAME, GVFONT, KMLMAPSURL, LOG_CONFIG, NAME, VERSION
+from const import GUINAME, KMLMAPSURL, LOG_CONFIG, NAME, VERSION
 from gedcomoptions import gvOptions, ResultsType 
 from gedcomvisual import doTrace
 from gedcomDialogs import *
-from style.stylemanager import FontManager, ApproxTextWidth
+from style.stylemanager import FontManager
 
 
 _log = logging.getLogger(__name__.lower())
@@ -181,9 +181,9 @@ class VisualMapFrame(wx.Frame):
         super().__init__(*args, **kw)
 
         self.font_manager = FontManager()
-        font = self.font_manager._current if self.font_manager._current else GVFONT[platform.system()]
-        self.font_name = font.get("face", GVFONT[platform.system()]['family'])
-        self.font_size = font.get("size", GVFONT[platform.system()]['sizePt'])
+        self.font_name, self.font_size = self.font_manager.get_font_name_size()
+
+        self.set_current_font()
 
         self.SetMinSize((800,800))
         self.StatusBar = self.CreateStatusBar()
@@ -193,19 +193,18 @@ class VisualMapFrame(wx.Frame):
         # and a status bar
         
         self.StatusBar.SetFieldsCount(number=2, widths=[-1, 28*self.font_size])
-        widthMax = ApproxTextWidth(30, self.font_size)
+        widthMax = self.font_manager.get_text_width(30)
         self.StatusBar.SetFieldsCount(number=2, widths=[-1, widthMax])
         self.SetStatusText("Visual Mapping ready",0)
-        self.myFont = wx.Font(wx.FontInfo(self.font_size).FaceName(self.font_name))
-        if not self.myFont:
-            _log.warning("Could not set font to %s, using default", self.font_name)
-            self.myFont = wx.Font(wx.FontInfo(10).FaceName('Verdana'))
-        wx.Frame.SetFont(self, self.myFont)
         self.inTimer = False
         
         # Create and set up the main panel within the frame
-        self.visual_map_panel = VisualMapPanel(self)
+        self.visual_map_panel = VisualMapPanel(self, self.font_manager)  # pass the frame's FontManager into the panel
         self.visual_map_panel.SetupOptions() # Configure panel options
+
+    def set_current_font(self):
+        self.font = self.font_manager.get_font()
+        wx.Frame.SetFont(self, self.font)
 
     def start(self):
         self.visual_map_panel.SetupButtonState()
@@ -317,18 +316,11 @@ class VisualMapFrame(wx.Frame):
         for mi in set_font_size_menu.GetMenuItems():
             self.Bind(wx.EVT_MENU, self.on_font_size_menu_item, mi)
 
-    def set_font(self, font_name, font_size):
-        success = self.font_manager.set_font(font_name, font_size)
-        if not success:
-            _log.error(f"Failed to set font to {font_name}")
-        else:
-            self.font_name = font_name
-            self.font_size = font_size
-            self.myFont = wx.Font(wx.FontInfo(font_size).FaceName(font_name))
-            # Apply to VisualMapFrame
-            self.font_manager.apply_font_recursive(self, self.myFont)
-            # Apply to sub-panel: VisualMapPanel
-            self.visual_map_panel.set_font(font_name, font_size)
+    def set_gui_font(self, font_name, font_size):
+        # Apply to VisualMapFrame
+        self.font_manager.apply_current_font_recursive(self)
+        # Apply to sub-panel: VisualMapPanel
+        self.visual_map_panel.set_current_font()
 
         self.Layout()
         self.Refresh()
@@ -342,7 +334,7 @@ class VisualMapFrame(wx.Frame):
         success = self.font_manager.set_font(face)
         if success:
             self.font_name = face
-            self.set_font(self.font_name, self.font_size)
+            self.set_gui_font(self.font_name, self.font_size)
 
     def on_font_size_menu_item(self, event):
         mi = self.GetMenuBar().FindItemById(event.GetId())
@@ -357,7 +349,7 @@ class VisualMapFrame(wx.Frame):
         success = self.font_manager.set_font_size(size)
         if success:
             self.font_size = size
-            self.set_font(self.font_name, self.font_size)
+            self.set_gui_font(self.font_name, self.font_size)
 
     def OnExit(self, event):
         self.visual_map_panel.myTimer.Stop()
@@ -506,10 +498,13 @@ class VisualMapFrame(wx.Frame):
 #=============================================================
 class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSorterMixin):
     def __init__(self, parent, ID, pos=wx.DefaultPosition,
-                 size=wx.DefaultSize, style=0, name="PeopleList", *args, **kw):
+                 size=wx.DefaultSize, style=0, name="PeopleList",
+                 font_manager=None, *args, **kw):
         super().__init__(*args, **kw)
         wx.ListCtrl.__init__(self, parent, ID, pos, size, style)
         listmix.ListCtrlAutoWidthMixin.__init__(self)
+
+        self.font_manager = font_manager
 
         self.id = VisualGedcomIds()
         self.active = False
@@ -753,7 +748,7 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
         if self.gOp.BackgroundProcess.people:
             itm = self.GetItemText(self.currentItem, 2)
             if itm in self.gOp.BackgroundProcess.people:
-                dialog = PersonDialog(None, self.gOp.BackgroundProcess.people[itm], self.visual_map_panel, gOp =self.gOp)
+                dialog = PersonDialog(None, self.gOp.BackgroundProcess.people[itm], self.visual_map_panel, gOp =self.gOp, font_manager=self.font_manager, title=f"Person: {self.GetItemText(self.currentItem)}")
                 dialog.Bind(wx.EVT_CLOSE, lambda evt: dialog.Destroy())
                 dialog.Bind(wx.EVT_BUTTON, lambda evt: dialog.Destroy())
                 dialog.Show(True)
@@ -815,9 +810,9 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
 
 
 
-        
+
 class PeopleListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
-    def __init__(self, parent, people,  *args, **kw):
+    def __init__(self, parent, people, font_manager, *args, **kw):
         """    Initializes the PeopleListCtrlPanel.
 
     Args:
@@ -845,7 +840,8 @@ class PeopleListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
         self.visual_map_panel = self.GetParent()
         self.list = PeopleListCtrl(parent, tID,
                         style=wx.LC_REPORT | wx.BORDER_SUNKEN | wx.LC_SINGLE_SEL,
-                        size=wx.Size(600,600))
+                        size=wx.Size(600,600),
+                        font_manager=font_manager)
         sizer.Add(self.list, -1, wx.EXPAND)
 
         self.list.PopulateList(people, None, True)
@@ -864,16 +860,12 @@ class VisualMapPanel(wx.Panel):
     A Frame that says Visual Setup
     """
 
-    def __init__(self, *args, **kw):
-        # ensure the parent's __init__ is called so the wx.frame is created
-        #
-        super().__init__(*args, **kw)
+    def __init__(self, parent, font_manager, *args, **kw):
+        # parent must be the wx parent for this panel; call panel initializer with it
+        super().__init__(parent, *args, **kw)
 
-        self.font_manager = FontManager()
-        font = self.font_manager._current if self.font_manager._current else GVFONT[platform.system()]
-        self.font_name = font.get("face", GVFONT[platform.system()]['family'])
-        self.font_size = font.get("size", GVFONT[platform.system()]['sizePt'])
-        self.myFont = wx.Font(wx.FontInfo(self.font_size).FaceName(self.font_name))
+        self.font_manager = font_manager
+        self.font_name, self.font_size = self.font_manager.get_font_name_size()
 
         self.SetMinSize((800,800))
         self.frame = self.TopLevelParent
@@ -915,7 +907,7 @@ class VisualMapPanel(wx.Panel):
         
 
         # Add Data Grid on Left panel
-        self.peopleList = PeopleListCtrlPanel(self.panelA, self.id.m)
+        self.peopleList = PeopleListCtrlPanel(self.panelA, self.id.m, font_manager=self.font_manager)
         
         # Add all the labels, button and radiobox to Right Panel
         self.LayoutOptions(self.panelB)
@@ -924,12 +916,8 @@ class VisualMapPanel(wx.Panel):
         self.lastruninstance = 0.0
         self.remaintime = 0
 
-    def set_font(self, font_name, font_size):
-        self.font_name = font_name
-        self.font_size = font_size
-        self.myFont = wx.Font(wx.FontInfo(self.font_size).FaceName(self.font_name))
-
-        self.font_manager.apply_font_recursive(self, self.myFont)
+    def set_current_font(self):
+        self.font_manager.apply_current_font_recursive(self)
 
         self.Layout()
         self.Refresh()
@@ -939,10 +927,6 @@ class VisualMapPanel(wx.Panel):
         # Top of the Panel
         box = wx.BoxSizer(wx.VERTICAL)
         titleFont = wx.Font(wx.FontInfo(self.font_size).FaceName(self.font_name).Bold())
-        # TODO Check for Arial and change it
-        if not titleFont:
-            _log.warning("Could not load font %s, using ", self.font_name)
-            titleFont  = wx.Font(wx.FontInfo(GVFONT[platform.system()]['sizePt']).FaceName(GVFONT[platform.system()]['family']).Bold())
         fh = titleFont.GetPixelSize()[1]
         titleArea = wx.Panel(panel, size=(-1, fh + 10))
         titleArea.SetBackgroundColour(self.id.GetColor('TITLE_BACK')) 

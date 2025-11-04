@@ -380,7 +380,7 @@ class VisualMapFrame(wx.Frame):
 
     def OnOpenCSV(self, event):
         self.visual_map_panel.OpenCSV()
-        
+
     def OnOpenBrowser(self, event):
         self.visual_map_panel.OpenBrowser()
 
@@ -934,6 +934,7 @@ class VisualMapPanel(wx.Panel):
 
     def set_current_font(self):
         self.font_manager.apply_current_font_recursive(self)
+        self.font_manager.apply_current_font_recursive(self.peopleList) 
 
         self.Layout()
         self.Refresh()

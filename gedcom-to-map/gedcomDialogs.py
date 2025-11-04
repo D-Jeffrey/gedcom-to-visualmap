@@ -82,7 +82,7 @@ class AboutDialog(HTMLDialog):
 <b>Orginal project:</b> Originally forked from <a href="https://github.com/lmallez/gedcom-to-map/">gedcom-to-map.</a><p />
 <h2>Contributors:</h2> 
 <ul><li><b>Darren Jeffrey</b> (<a href="https://github.com/D-Jeffrey/">D-Jeffrey</a>)</li>
-<li><b>Colin Brass</b> (<a href="https://github.com/colin0brass/">colin0brass</a>)</li>
+<li><b>Colin Osborne</b> (<a href="https://github.com/colin0brass/">colin0brass</a>)</li>
 <li><b>Laurent Mallez</b> (<a href="https://github.com/lmallez/">lmallez</a>)</li>
 </ul>
 <h3>Major Packages:</h3>

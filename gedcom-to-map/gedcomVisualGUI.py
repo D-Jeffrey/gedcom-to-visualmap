@@ -322,6 +322,20 @@ class VisualMapFrame(wx.Frame):
         # Apply to sub-panel: VisualMapPanel
         self.visual_map_panel.set_current_font()
 
+        font = wx.Font(pointSize=font_size, family=wx.FONTFAMILY_DEFAULT,
+                       style=wx.FONTSTYLE_NORMAL, weight=wx.FONTWEIGHT_NORMAL,
+                       faceName=font_name)
+        frame = self
+        frame.SetFont(font)
+        try:
+            frame.GetMenuBar().SetFont(font)
+        except Exception:
+            pass
+        try:
+            frame.GetStatusBar().SetFont(font)
+        except Exception:
+            pass
+
         self.Layout()
         self.Refresh()
 
@@ -366,6 +380,7 @@ class VisualMapFrame(wx.Frame):
 
     def OnOpenCSV(self, event):
         self.visual_map_panel.OpenCSV()
+        
     def OnOpenBrowser(self, event):
         self.visual_map_panel.OpenBrowser()
 
@@ -396,6 +411,7 @@ class VisualMapFrame(wx.Frame):
         wx.Yield()
         if Proceed:
             self.visual_map_panel.LoadGEDCOM()
+
     def OnFileResultDialog(self, evt):
         dDir = os.getcwd()
         dFile = "visgedcom.html"

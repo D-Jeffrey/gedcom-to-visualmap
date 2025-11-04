@@ -345,7 +345,7 @@ class FamilyPanel(wx.Panel):
         if person:
             # pass the shared FontManager from the VisualMapPanel into the dialog
             fm = getattr(self.visual_map_panel, "font_manager", None)
-            dialog = PersonDialog(self, person, self.visual_map_panel, showrefences=False, gOp=self.gOp, font_manager=fm)
+            dialog = PersonDialog(self, person, self.visual_map_panel, font_manager=fm, gOp=self.gOp, showrefences=False)
             dialog.Show(True)
             dialog.Bind(wx.EVT_CLOSE, lambda evt: dialog.Destroy())
         else:
@@ -364,7 +364,7 @@ def formatPersonName(person: Person, longForm=True):
         return "<none>"
 
 class PersonDialog(wx.Dialog):
-    def __init__(self, parent, person: Person, panel, showrefences=True, gOp: gvOptions = None, font_manager: FontManager = None):
+    def __init__(self, parent, person: Person, panel, font_manager: FontManager, gOp: gvOptions, showrefences=True):
         """
         NOTE: font_manager is required by callers; pass the FontManager instance used by the UI.
         Keep signature backwards-compatible in source order but require font_manager parameter.

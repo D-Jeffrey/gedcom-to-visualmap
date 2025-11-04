@@ -252,7 +252,7 @@ class VisualMapFrame(wx.Frame):
         # Now a help menu for the about item
         helpMenu = wx.Menu()
         helpMenu.Append(wx.ID_HELP, "Help")
-        helpMenu.Append(wx.ID_ABOUT, "About")
+        helpMenu.Append(wx.ID_ABOUT, "About") # On Mac this will appear in the application menu
 
         menuBar.Append(self.fileMenu, "&File")
         menuBar.Append(ActionMenu, "&Actions")

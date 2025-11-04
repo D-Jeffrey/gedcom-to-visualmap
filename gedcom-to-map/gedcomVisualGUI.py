@@ -448,9 +448,9 @@ class VisualMapFrame(wx.Frame):
 
     def OnAbout(self, event):
         if event.GetId() == wx.ID_ABOUT:
-            dialog = AboutDialog(None, title=f"About {GUINAME} {VERSION}")
+            dialog = AboutDialog(self, title=f"About {GUINAME} {VERSION}", font_manager=self.font_manager)
         else:
-            dialog = HelpDialog(None, title=f"Help for {GUINAME} {VERSION}")    
+            dialog = HelpDialog(self, title=f"Help for {GUINAME} {VERSION}", font_manager=self.font_manager)
         dialog.ShowModal()
         dialog.Destroy()
 
@@ -725,7 +725,7 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
         return self
 
     def OnFind(self, event):
-        find_dialog = FindDialog(None, "Find", LastSearch=self.LastSearch)
+        find_dialog = FindDialog(self.visual_map_panel, "Find", LastSearch=self.LastSearch)
         if find_dialog.ShowModal() == wx.ID_OK:
             self.LastSearch = find_dialog.GetSearchString()
             if self.GetItemCount() > 1:
@@ -748,7 +748,7 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
         if self.gOp.BackgroundProcess.people:
             itm = self.GetItemText(self.currentItem, 2)
             if itm in self.gOp.BackgroundProcess.people:
-                dialog = PersonDialog(None, self.gOp.BackgroundProcess.people[itm], self.visual_map_panel, font_manager=self.font_manager, gOp =self.gOp)
+                dialog = PersonDialog(self.visual_map_panel, self.gOp.BackgroundProcess.people[itm], self.visual_map_panel, font_manager=self.font_manager, gOp=self.gOp)
                 dialog.Bind(wx.EVT_CLOSE, lambda evt: dialog.Destroy())
                 dialog.Bind(wx.EVT_BUTTON, lambda evt: dialog.Destroy())
                 dialog.Show(True)

@@ -44,7 +44,8 @@ class HTMLDialog(wx.Dialog):
         self.html.SetPage(f"<html><body>{htmlbody}</body></html>".replace('VERVER', f"{GUINAME} {VERSION}").replace('PROJECTLINK', f"{ABOUTLINK}{NAME}"))
 
         self.okButton = wx.Button(self, wx.ID_OK, "OK")
-        self.okButton.Bind(wx.EVT_BUTTON, self.on_ok)
+        # ensure OK ends the modal loop cleanly
+        self.okButton.Bind(wx.EVT_BUTTON, lambda evt: self.EndModal(wx.ID_OK))
 
         sizer = wx.BoxSizer(wx.VERTICAL)
         icon_sizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -66,7 +67,12 @@ class HTMLDialog(wx.Dialog):
         wx.LaunchDefaultBrowser(event.GetLinkInfo().GetHref())
 
     def on_ok(self, event):
-        self.Destroy()
+        # Defensive: end modal loop; caller will Destroy() after ShowModal returns
+        try:
+            self.EndModal(wx.ID_OK)
+        except Exception:
+            # fallback: ensure dialog is closed
+            self.Destroy()
 
 class AboutDialog(HTMLDialog):
     def __init__(self, parent, title, font_manager: FontManager):
@@ -128,8 +134,8 @@ For more details and to contribute, visit the <a href="PROJECTLINK">GitHub repos
 
 </p>
 """
-        super().__init__(parent, title=title, icontype=wx.ART_QUESTION, htmlbody=helppage, width=70, font_manager=font_manager)
 
+        super().__init__(parent, title=title, icontype=wx.ART_INFORMATION, htmlbody=helppage, width=55, font_manager=font_manager)
 
 #==============================================================
 class ConfigDialog(wx.Frame):
@@ -543,6 +549,8 @@ class PersonDialog(wx.Dialog):
         # create the OK button
         ok_btn = wx.Button(self, wx.ID_OK)
         btn_sizer = wx.StdDialogButtonSizer()
+        # ensure OK ends the modal dialog reliably
+        ok_btn.Bind(wx.EVT_BUTTON, lambda evt: self.EndModal(wx.ID_OK))
         btn_sizer.AddButton(ok_btn)
         btn_sizer.Realize()
         mainSizer.Add(btn_sizer, 0, wx.ALIGN_LEFT|wx.ALL, border=10)

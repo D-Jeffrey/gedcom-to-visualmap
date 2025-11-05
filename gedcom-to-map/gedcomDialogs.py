@@ -20,7 +20,7 @@ from gedcom.GedcomParser import CheckAge, maxage
 from gedcomoptions import gvOptions, ResultsType
 from style.stylemanager import FontManager
 
-from const import GVFONT, ABOUTFONT, VERSION, GUINAME, ABOUTLINK, NAME
+from const import VERSION, GUINAME, ABOUTLINK, NAME
 from gedcomvisual import ParseAndGPS, doHTML, doKML, doKML2, doSUM, doTraceTo
 
 maxPhotoWidth = 400  # Maximum width for photos in the PersonDialog
@@ -31,20 +31,21 @@ _log = logging.getLogger(__name__.lower())
 UpdateBackgroundEvent = None
 
 class HTMLDialog(wx.Dialog):
-    def __init__(self, parent, title, icontype, htmlbody, width=55):
-        super().__init__(parent, title=title, size=(ABOUTFONT[platform.system()]['sizePt']*width, ABOUTFONT[platform.system()]['sizePt']*45))
+    def __init__(self, parent, title, icontype, htmlbody, width: int, font_manager: FontManager):
+        # font_manager is required; caller must pass a valid FontManager instance
+        self.font_manager = font_manager
+        self.font_name, self.font_size = self.font_manager.get_font_name_size()
+        super().__init__(parent, title=title, size=(self.font_size * width, self.font_size * 45))
 
         self.icon = wx.ArtProvider.GetBitmap(icontype, wx.ART_OTHER, (32, 32))
         self.icon_ctrl = wx.StaticBitmap(self, bitmap=self.icon)
         self.html = wx.html.HtmlWindow(self)
-        self.html.SetFonts(ABOUTFONT[platform.system()]['family'], 
-                ABOUTFONT[platform.system()]['family'], 
-                [ABOUTFONT[platform.system()]['sizePt']]*7)  # Set font-family to Garamond and font-size to 6 points
-        
+        self.set_current_font()
         self.html.SetPage(f"<html><body>{htmlbody}</body></html>".replace('VERVER', f"{GUINAME} {VERSION}").replace('PROJECTLINK', f"{ABOUTLINK}{NAME}"))
 
         self.okButton = wx.Button(self, wx.ID_OK, "OK")
-        self.okButton.Bind(wx.EVT_BUTTON, self.on_ok)
+        # ensure OK ends the modal loop cleanly
+        self.okButton.Bind(wx.EVT_BUTTON, lambda evt: self.EndModal(wx.ID_OK))
 
         sizer = wx.BoxSizer(wx.VERTICAL)
         icon_sizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -59,21 +60,29 @@ class HTMLDialog(wx.Dialog):
 
         self.Bind(wx.html.EVT_HTML_LINK_CLICKED, self.on_link_clicked, self.html)
 
+    def set_current_font(self):
+        self.html.SetFonts(self.font_name, self.font_name, [self.font_size]*7)
+
     def on_link_clicked(self, event):
         wx.LaunchDefaultBrowser(event.GetLinkInfo().GetHref())
 
     def on_ok(self, event):
-        self.Destroy()
+        # Defensive: end modal loop; caller will Destroy() after ShowModal returns
+        try:
+            self.EndModal(wx.ID_OK)
+        except Exception:
+            # fallback: ensure dialog is closed
+            self.Destroy()
 
 class AboutDialog(HTMLDialog):
-    def __init__(self, parent, title):
+    def __init__(self, parent, title, font_manager: FontManager):
 
         abouttype = """
 <h1><a href="PROJECTLINK">VERVER</a></h1>
 <b>Orginal project:</b> Originally forked from <a href="https://github.com/lmallez/gedcom-to-map/">gedcom-to-map.</a><p />
 <h2>Contributors:</h2> 
 <ul><li><b>Darren Jeffrey</b> (<a href="https://github.com/D-Jeffrey/">D-Jeffrey</a>)</li>
-<li><b>Colin Brass</b> (<a href="https://github.com/colin0brass/">colin0brass</a>)</li>
+<li><b>Colin Osborne</b> (<a href="https://github.com/colin0brass/">colin0brass</a>)</li>
 <li><b>Laurent Mallez</b> (<a href="https://github.com/lmallez/">lmallez</a>)</li>
 </ul>
 <h3>Major Packages:</h3>
@@ -91,10 +100,10 @@ class AboutDialog(HTMLDialog):
 For more details and to contribute, visit the <a href="PROJECTLINK">GitHub repository.</a></li>
 """
 
-        super().__init__(parent, title=title, icontype=wx.ART_INFORMATION, htmlbody=abouttype)
+        super().__init__(parent, title=title, icontype=wx.ART_INFORMATION, htmlbody=abouttype, width=55, font_manager=font_manager)
 
 class HelpDialog(HTMLDialog):
-    def __init__(self, parent, title):
+    def __init__(self, parent, title, font_manager: FontManager):
 
         helppage = """
 <h2><a href="PROJECTLINK">VERVER</a></h2>
@@ -125,8 +134,8 @@ For more details and to contribute, visit the <a href="PROJECTLINK">GitHub repos
 
 </p>
 """
-        super().__init__(parent, title=title, icontype=wx.ART_QUESTION, htmlbody=helppage, width=70)
 
+        super().__init__(parent, title=title, icontype=wx.ART_INFORMATION, htmlbody=helppage, width=55, font_manager=font_manager)
 
 #==============================================================
 class ConfigDialog(wx.Frame):
@@ -340,7 +349,9 @@ class FamilyPanel(wx.Panel):
         # Open the person dialog with the selected person's details
         person = self.gOp.BackgroundProcess.people.get(person_id)
         if person:
-            dialog = PersonDialog(self, person, self.visual_map_panel, showrefences=False, gOp =self.gOp)
+            # pass the shared FontManager from the VisualMapPanel into the dialog
+            fm = getattr(self.visual_map_panel, "font_manager", None)
+            dialog = PersonDialog(self, person, self.visual_map_panel, font_manager=fm, gOp=self.gOp, showrefences=False)
             dialog.Show(True)
             dialog.Bind(wx.EVT_CLOSE, lambda evt: dialog.Destroy())
         else:
@@ -359,16 +370,21 @@ def formatPersonName(person: Person, longForm=True):
         return "<none>"
 
 class PersonDialog(wx.Dialog):
-    def __init__(self, parent, person: Person, panel, showrefences=True, gOp: gvOptions = None):
-        super().__init__(parent, title="Person Details", size=(600, 600), style=wx.DEFAULT_DIALOG_STYLE |wx.RESIZE_BORDER)
+    def __init__(self, parent, person: Person, panel, font_manager: FontManager, gOp: gvOptions, showrefences=True):
+        """
+        NOTE: font_manager is required by callers; pass the FontManager instance used by the UI.
+        Keep signature backwards-compatible in source order but require font_manager parameter.
+        """
+        if font_manager is None:
+            raise ValueError("font_manager is required for PersonDialog")
+        super().__init__(parent, title="Person Details", size=(600, 600), style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER)
         
         self.gOp = gOp
-        FontManager.load()
-        self.font = FontManager._current if FontManager._current else GVFONT
-        self.font_size = self.font.get("size", GVFONT[platform.system()]['sizePt'])
+        self.font_manager = font_manager
+        self.font_name, self.font_size = self.font_manager.get_font_name_size()
 
         def sizeAttr(attr,pad=1):
-            return (min(len(attr),3)+pad)*(GVFONT[platform.system()]['sizePt']+5)  if attr else GVFONT[platform.system()]['sizePt']
+            return (min(len(attr),3)+pad)*(self.font_size+5)  if attr else self.font_size
         
         people = self.gOp.BackgroundProcess.people
         # Display the marriage information including the marriage location and date                
@@ -533,6 +549,8 @@ class PersonDialog(wx.Dialog):
         # create the OK button
         ok_btn = wx.Button(self, wx.ID_OK)
         btn_sizer = wx.StdDialogButtonSizer()
+        # ensure OK ends the modal dialog reliably
+        ok_btn.Bind(wx.EVT_BUTTON, lambda evt: self.EndModal(wx.ID_OK))
         btn_sizer.AddButton(ok_btn)
         btn_sizer.Realize()
         mainSizer.Add(btn_sizer, 0, wx.ALIGN_LEFT|wx.ALL, border=10)

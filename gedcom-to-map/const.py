@@ -20,40 +20,6 @@ FILE_GEOCACHE_FILENAME_SUFFIX = '_cache.csv'
 GEO_CONFIG_FILENAME = 'geo_config.yaml'
 OFFICECMDLINE = "soffice"               # command to start LibreOffice
 
-# Default GVFONT dict (family left as None until wx is available)
-GVFONT = {
-    "Windows": {
-        "family": "Tahoma",         #  alternates "Segoe UI", "Calibri", "Corbel", "Tahoma", "Arial"
-        "sizePt": 10,
-        "sizeTitle": 16
-    },
-    "Darwin": {
-        "family": "San Francisco",  # alternates "Helvetica Neue", "Helvetica", "Arial"
-        "sizePt": 9,
-        "sizeTitle": 12
-    },
-    "Linux": { 
-        "family": "DejaVu Sans",    # alternates "Noto Sans", "Liberation Sans", "Arial"
-        "sizePt": 9,
-        "sizeTitle": 12
-    }  
-}
-
-ABOUTFONT = {            # About Font family and size (suggested range 8 to 14)
-    "Windows": {
-        "family": "Garamond",
-        "sizePt": 13
-    },
-    "Darwin": {
-        "family": "Garamond",
-        "sizePt": 13
-    },
-    "Linux": { 
-        "family": "Garamond",
-        "sizePt": 13
-    }  
-}
-
 LOG_CONFIG = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -94,5 +60,3 @@ LOG_CONFIG = {
     }
 
 }
-
-

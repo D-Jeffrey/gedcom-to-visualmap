@@ -894,6 +894,7 @@ class VisualMapPanel(wx.Panel):
         self.busystate = False
         self.busycounthack = 0
         self.inTimer = False
+        self.timeformat = '%H hr %M'
         self.SetAutoLayout(True)
         self.id = VisualGedcomIds()
         
@@ -1434,19 +1435,21 @@ class VisualMapPanel(wx.Panel):
             if self.gOp.running:
                 self.gOp.runningLast = 0
                 status = f"{status} - Processing"
-                runningtime = datetime.now().timestamp() - self.gOp.runningSince
+                nowtime = datetime.now().timestamp()
+                runningtime = nowtime - self.gOp.runningSince
                 runtime = f"Running {time.strftime('%H:%M:%S', time.gmtime(runningtime))}"
                 if self.gOp.countertarget > 0 and self.gOp.counter > 0 and self.gOp.counter != self.gOp.countertarget:
-                    if runningtime-1.5 > self.lastruninstance: 
+                    if nowtime-1.0 > self.lastruninstance: 
                         self.timeformat = '%H:%M:%S'
-                        remaintimeInstant = runningtime * (self.gOp.countertarget/ self.gOp.counter)- runningtime
+                        remaintimeInstant = (nowtime - self.gOp.runningSinceStep) * (self.gOp.countertarget/ self.gOp.counter)-runningtime
+                        remaintimeInstant = remaintimeInstant if remaintimeInstant > 0 else 0.0
                         # Smoothed runtime average over last 10 seconds
                         self.gOp.runavg.append(remaintimeInstant)
-                        if len(self.gOp.runavg) > 20:
+                        if len(self.gOp.runavg) > 5:
                             self.gOp.runavg.pop(0)
                         remaintime = sum(self.gOp.runavg)/len(self.gOp.runavg)
-                        self.remaintime = runningtime * (self.gOp.countertarget/ self.gOp.counter)- runningtime
-                        self.lastruninstance = runningtime
+                        self.remaintime = remaintime
+                        self.lastruninstance = nowtime
                         if self.remaintime> 3600:
                             self.timeformat = '%H hr %M'
                             if self.remaintime > 3600*24:
@@ -1802,6 +1805,7 @@ class VisualMapPanel(wx.Panel):
                         # TODO need a better command-line management than this
                         # cmdline = f"column -s, -t < {csvfile} | less -#2 -N -S"
             except Exception as e:
+                _log.exception("Issues in runCMDfile")
                 _log.error(f"Failed to open file: {e}")
 
         else:

@@ -4,6 +4,7 @@ import logging
 import os
 import platform
 import time
+from datetime import datetime
 
 from typing import Union, Dict
 from enum import Enum
@@ -85,6 +86,7 @@ class gvOptions:
         self.running = False
         self.runningLast = 0
         self.runningSince = 0
+        self.runningSinceStep = 0
         self.time = time.ctime()
         self.parsed = False
         self.newload = False
@@ -408,11 +410,13 @@ class gvOptions:
             self.state = state
             if resetCounter:
                 self.counter = 0
+                self.runningSinceStep = datetime.now().timestamp()
             self.running = True
         else:
             self.counter += plusStep
             self.stepinfo = info
         if target>-1:
+            self.runningSinceStep = datetime.now().timestamp()
             self.countertarget = target
             # logging.debug(">>>>>> stepped %d", self.counter)
         return self.ShouldStop()

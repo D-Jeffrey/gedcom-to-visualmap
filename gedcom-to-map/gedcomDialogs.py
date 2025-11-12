@@ -704,6 +704,7 @@ and generating the output so that the GUI can continue to be responsive
                         self.people = ParseAndGPS(self.gOp, 1)
                     
                     except Exception as e:
+                        _log.exception("Issues in ParseAndGPS")
                         # Capture other exceptions
                         if hasattr(self, 'people'):
                             if self.people:                            

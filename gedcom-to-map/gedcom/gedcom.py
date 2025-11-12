@@ -357,6 +357,7 @@ class GedcomParser:
                 people = self.__create_people(records)
                 people = self.__add_marriages(people, records)
         except Exception as e:
+            logger.exception("Issues in parse_people")
             logger.error(f"Error parsing GEDCOM file '{self.gedcom_file}': {e}")
         return people
 
@@ -683,7 +684,6 @@ class GeolocatedGedcom(Gedcom):
                     if lat and lon:
                         latlon = LatLon(lat.value, lon.value)
                         if latlon.is_valid():
-                            event.latlon = latlon
                             event.location = Location(position=latlon, address=place_tag.value)
 
             else:

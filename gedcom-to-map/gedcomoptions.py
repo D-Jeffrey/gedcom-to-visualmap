@@ -100,7 +100,7 @@ class gvOptions:
         self.panel = None
         self.selectedpeople = 0
         self.lastlines = None
-        self.timeframe = {'from': None, 'to': None}
+        self.resettimeframe()
         self.runavg = []
         self.SummaryOpen = True
         self.SummaryPlaces = True
@@ -192,7 +192,9 @@ class gvOptions:
         self.HeatMapTimeStep = HeatMapTimeStep
         self.HomeMarker = HomeMarker
     
-
+    def resettimeframe(self):
+        """ Reset the timeframe for the process """
+        self.timeframe = {'from': None, 'to': None}
     def addtimereference(self, timeRefrence: LifeEvent):
         """ 
         Update the over all timeframe with person event details

@@ -44,6 +44,9 @@ def doKML(gOp : gvOptions, people: list[Person]):
 #        placeTypes.append(['home[h]', '(e)', 'event'])
 
     
+    if placeTypes == []:
+        gOp.stopstep('Error select at least Birth or Death markers to map')
+        _log.error  ("Neither birth or death marker is selected")
 
     for (key, nametag, placeType) in placeTypes:
 

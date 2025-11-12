@@ -13,6 +13,7 @@ import re
 from typing import Dict, Union, Optional, List
 
 from models.LatLon import LatLon
+from models.location import Location
 from ged4py.model import Record, NameRec
 
 _log = logging.getLogger(__name__.lower())
@@ -151,8 +152,6 @@ class Person:
         # TODO Best Location should consider if in KML mode and what is selected  
         # If the location is set in the GED, using MAP attribute then that will be the best
         best = LatLon(None, None)
-#        if self.map and self.map.latlon.hasLocation():
-#            best = self.map.latlon
         if self.birth and self.birth.latlon and self.birth.latlon.hasLocation():
             best = self.birth.latlon
         elif self.death and self.death.latlon and self.death.latlon.hasLocation():
@@ -176,8 +175,8 @@ class LifeEvent:
         'date',
         'what',
         'record',
-        'location',
-        'latlon'
+        'location'
+        
     ]
     def __init__(self, place: str, atime, position: Optional[LatLon] = None, what=None, record: Optional[Record] = None):
         """
@@ -190,9 +189,9 @@ class LifeEvent:
         """
         self.place: Optional[str] = place
         self.date = atime
-        self.latlon : Optional[LatLon] = position
         self.what: Optional[str] = what
         self.record = record
+        self.location: Location = Location(position=position, address=place) if position or place else None
         
 
     def __repr__(self) -> str:
@@ -235,7 +234,7 @@ class LifeEvent:
 
     def getattr(self, attr):
         if attr == 'latlon':
-            return self.latlon
+            return self.location.latlon
         elif attr == 'when' or attr == 'date':
             return getattr(self.date, 'value', "")
         elif attr == 'where' or attr == 'place':

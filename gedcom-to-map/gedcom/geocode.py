@@ -203,7 +203,7 @@ class Geocode:
         """
         location = None
 
-        if not place:
+        if not place or (self.gOp and self.gOp.CacheOnly):
             return None
 
         max_retries = 3

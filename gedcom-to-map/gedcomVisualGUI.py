@@ -480,10 +480,11 @@ class VisualMapFrame(wx.Frame):
             #    if (panel.gOp.people[xh].bestlocation() == ''): 
             #        withoutaddr += 1
             # msg = f'Total People :\t{len(panel.gOp.people)}\n People without any address {withoutaddr}'
-            msg = f'Total People :{len(self.visual_map_panel.gOp.people)}\n'
+            self.visual_map_panel.gOp.totalGEDpeople = {len(self.visual_map_panel.gOp.people)}
+            msg = f'Total People :{self.visual_map_panel.gOp.totalGEDpeople}\n'
+            
             if self.visual_map_panel.gOp.timeframe:
-                timeline = "-".join(map(str, self.visual_map_panel.gOp.timeframe))
-                msg +=  f"\nTimeframe : {timeline}\n"
+                msg +=  f"\nTimeframe : {self.visual_map_panel.gOp.timeframe['from']}-{self.visual_map_panel.gOp.timeframe['to']}\n"
             if self.visual_map_panel.gOp.selectedpeople > 0:
                 msg += f"\nDirect  people {self.visual_map_panel.gOp.selectedpeople} in the heritage line\n"
                 
@@ -787,7 +788,7 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
                 self.gOp.newload = False
                 self.PopulateList(self.gOp.people, self.gOp.get('Main'), False)
                 self.gOp.BackgroundProcess.SayInfoMessage(f"Using '{personid}' as starting person with {len(self.gOp.Referenced)} direct ancestors", False)
-                self.gOp.BackgroundProcess.updategridmain = True
+                self.gOp.BackgroundProcess.updategridmain = self.gOp.people is not None
                 self.visual_map_panel.SetupButtonState()
 
 
@@ -893,6 +894,7 @@ class VisualMapPanel(wx.Panel):
         self.busystate = False
         self.busycounthack = 0
         self.inTimer = False
+        self.timeformat = '%H hr %M'
         self.SetAutoLayout(True)
         self.id = VisualGedcomIds()
         
@@ -928,7 +930,6 @@ class VisualMapPanel(wx.Panel):
         # Add all the labels, button and radiobox to Right Panel
         self.LayoutOptions(self.panelB)
 
-        self.Layout()
         self.lastruninstance = 0.0
         self.remaintime = 0
 
@@ -987,6 +988,8 @@ class VisualMapPanel(wx.Panel):
         defCounttryBox = wx.BoxSizer(wx.HORIZONTAL)
         defCounttryBox.AddMany([self.id.labelDefCountry,      (6,20),     self.id.TEXTDefaultCountry])
         self.id.CBAllEntities = wx.CheckBox(panel, self.id.IDs['ID_CBAllEntities'], "Map all people")#, wx.NO_BORDER)
+        self.id.CBBornMark = wx.CheckBox(panel, self.id.IDs['ID_CBBornMark'], "Marker for when Born")
+        self.id.CBDieMark = wx.CheckBox(panel, self.id.IDs['ID_CBDieMark'], "Marker for when Died")
         
         self.id.busyIndicator = wx.ActivityIndicator(panel)
 
@@ -997,7 +1000,10 @@ class VisualMapPanel(wx.Panel):
         box.AddMany([  self.id.CBUseGPS,
                        self.id.CBCacheOnly,
                        defCounttryBox,
-                       self.id.CBAllEntities])
+                       self.id.CBAllEntities,
+                       self.id.CBBornMark,
+                       self.id.CBDieMark
+])
         """
           HTML select controls in a Box
         """
@@ -1011,8 +1017,6 @@ class VisualMapPanel(wx.Panel):
         mapStyleLabel = wx.StaticText(hbox, -1, " Map Style")
         self.id.CBMarksOn = wx.CheckBox(hbox, self.id.IDs['ID_CBMarksOn'], "Markers",name='MarksOn')
 
-        self.id.CBBornMark = wx.CheckBox(hbox, self.id.IDs['ID_CBBornMark'], "Marker for when Born")
-        self.id.CBDieMark = wx.CheckBox(hbox, self.id.IDs['ID_CBDieMark'], "Marker for when Died")
         self.id.CBHomeMarker = wx.CheckBox(hbox, self.id.IDs['ID_CBHomeMarker'], "Marker point or homes")
         self.id.CBMarkStarOn = wx.CheckBox(hbox, self.id.IDs['ID_CBMarkStarOn'], "Marker starter with Star")
         self.id.CBMapTimeLine = wx.CheckBox(hbox, self.id.IDs['ID_CBMapTimeLine'], "Add Timeline")
@@ -1039,8 +1043,6 @@ class VisualMapPanel(wx.Panel):
         
         hboxIn.AddMany([
             self.id.CBMarksOn,
-            self.id.CBBornMark,
-            self.id.CBDieMark,
             self.id.CBHomeMarker,
             self.id.CBMarkStarOn,
             self.id.CBMapTimeLine,        
@@ -1140,15 +1142,26 @@ class VisualMapPanel(wx.Panel):
         gbox.SetSizer(gsizer)
         self.optionGbox = gbox
         
-        box.Add(gbox, 1, wx.LEFT, 5)
-        box.AddMany([self.id.RBResultOutType])
-        box.Add(hbox, 1, wx.LEFT, 5)
-        box.Add(kbox, 1, wx.LEFT, 5)
-        box.Add(sbox, 1, wx.LEFT, 5)
-        box.Add(k2box, 1, wx.LEFT, 5)
+        self.optionsStack = wx.BoxSizer(wx.VERTICAL)
+        # Add all option boxes to the same slot, but hide them initially
+        self.optionsStack.Add(self.optionHbox, 1, wx.EXPAND)
+        self.optionHbox.Hide()
 
-        self._needLayoutSet = True
-        
+        self.optionsStack.Add(self.optionKbox, 1, wx.EXPAND)
+        self.optionKbox.Hide()
+
+        self.optionsStack.Add(self.optionK2box, 1, wx.EXPAND)
+        self.optionK2box.Hide()
+
+        self.optionsStack.Add(self.optionSbox, 1, wx.EXPAND)
+        self.optionSbox.Hide()
+
+        box.Add(gbox, 0, wx.LEFT | wx.TOP, 5)
+        box.AddMany([self.id.RBResultOutType])
+        # Add the stack to the main layout
+        box.Add(self.optionsStack, 1, wx.EXPAND | wx.ALL, 5)
+        self.optionsStack.Layout()
+
 
         l1 = wx.BoxSizer(wx.HORIZONTAL)
         self.id.BTNLoad = wx.Button(panel, self.id.IDs['ID_BTNLoad'], "Load")
@@ -1226,7 +1239,8 @@ class VisualMapPanel(wx.Panel):
         self.Bind(wx.EVT_TIMER, self.OnMyTimer)
         self.myTimer = wx.Timer(self)
         self.myTimer.Start(250)
-
+        self.Layout()
+        self.Refresh()
 
     def NeedReload(self):
         if self.gOp:
@@ -1421,19 +1435,27 @@ class VisualMapPanel(wx.Panel):
             if self.gOp.running:
                 self.gOp.runningLast = 0
                 status = f"{status} - Processing"
-                runningtime = datetime.now().timestamp() - self.gOp.runningSince
+                nowtime = datetime.now().timestamp()
+                runningtime = nowtime - self.gOp.runningSince
                 runtime = f"Running {time.strftime('%H:%M:%S', time.gmtime(runningtime))}"
                 if self.gOp.countertarget > 0 and self.gOp.counter > 0 and self.gOp.counter != self.gOp.countertarget:
-                    if runningtime-1.5 > self.lastruninstance: 
-                        remaintimeInstant = runningtime * (self.gOp.countertarget/ self.gOp.counter)- runningtime
+                    if nowtime-1.0 > self.lastruninstance: 
+                        self.timeformat = '%H:%M:%S'
+                        remaintimeInstant = (nowtime - self.gOp.runningSinceStep) * (self.gOp.countertarget/ self.gOp.counter)-runningtime
+                        remaintimeInstant = remaintimeInstant if remaintimeInstant > 0 else 0.0
                         # Smoothed runtime average over last 10 seconds
                         self.gOp.runavg.append(remaintimeInstant)
-                        if len(self.gOp.runavg) > 20:
+                        if len(self.gOp.runavg) > 5:
                             self.gOp.runavg.pop(0)
                         remaintime = sum(self.gOp.runavg)/len(self.gOp.runavg)
-                        self.remaintime = runningtime * (self.gOp.countertarget/ self.gOp.counter)- runningtime
-                        self.lastruninstance = runningtime
-                    runtime = f"{runtime} ({time.strftime('%H:%M:%S', time.gmtime(self.remaintime))})"
+                        self.remaintime = remaintime
+                        self.lastruninstance = nowtime
+                        if self.remaintime> 3600:
+                            self.timeformat = '%H hr %M'
+                            if self.remaintime > 3600*24:
+                                self.timeformat = '%j %H hr %M'
+                                self.remaintime -= 3600*24
+                    runtime = f"{runtime} ({time.strftime(self.timeformat, time.gmtime(self.remaintime))})"
             else:
                 runtime = "Last {}".format( time.strftime('%H:%M:%S', time.gmtime(self.gOp.runningLast)))
                 # Rest the runtime average
@@ -1588,24 +1610,24 @@ class VisualMapPanel(wx.Panel):
         # layout the Summary box, and KML box in the same space as the HTML box (toggle them off and on to dsisplay)
         # also forward the boxes to be there maximinum size, they may ahve been made small when setup and rendering
         
-        self.optionKbox.SetPosition(wx.Point(self.optionKbox.GetPosition().x, self.optionHbox.GetPosition().y))
-        if self.optionKbox.GetSize() != self.optionKbox.GetBestSize():
-            self.optionKbox.SetSize(self.optionKbox.GetBestSize())
-        self.optionK2box.SetPosition(wx.Point(self.optionK2box.GetPosition().x, self.optionHbox.GetPosition().y))
-        if self.optionK2box.GetSize() != self.optionK2box.GetBestSize():
-            self.optionK2box.SetSize(self.optionK2box.GetBestSize())
-        self.optionSbox.SetPosition(wx.Point(self.optionSbox.GetPosition().x, self.optionHbox.GetPosition().y))
-        if self.optionSbox.GetSize() != self.optionSbox.GetBestSize():
-            self.optionSbox.SetSize(self.optionSbox.GetBestSize())
-        self.optionHbox.SetPosition(wx.Point(self.optionKbox.GetPosition().x, self.optionHbox.GetPosition().y))
-        if self.optionHbox.GetSize() != self.optionHbox.GetBestSize():
-            self.optionHbox.SetSize(self.optionHbox.GetBestSize())
+        # self.optionKbox.SetPosition(wx.Point(self.optionKbox.GetPosition().x, self.optionHbox.GetPosition().y))
+        # if self.optionKbox.GetSize() != self.optionKbox.GetBestSize():
+        #     self.optionKbox.SetSize(self.optionKbox.GetBestSize())
+        # self.optionK2box.SetPosition(wx.Point(self.optionK2box.GetPosition().x, self.optionHbox.GetPosition().y))
+        # if self.optionK2box.GetSize() != self.optionK2box.GetBestSize():
+        #     self.optionK2box.SetSize(self.optionK2box.GetBestSize())
+        # self.optionSbox.SetPosition(wx.Point(self.optionSbox.GetPosition().x, self.optionHbox.GetPosition().y))
+        # if self.optionSbox.GetSize() != self.optionSbox.GetBestSize():
+        #     self.optionSbox.SetSize(self.optionSbox.GetBestSize())
+        # self.optionHbox.SetPosition(wx.Point(self.optionKbox.GetPosition().x, self.optionHbox.GetPosition().y))
+        # if self.optionHbox.GetSize() != self.optionHbox.GetBestSize():
+        #     self.optionHbox.SetSize(self.optionHbox.GetBestSize())
         # Enable/disable controls based on result type (HTML vs KML vs Summary Mode )
-        if not self._needLayoutSet:
-            self.optionHbox.Hide()
-            self.optionSbox.Hide()
-            self.optionKbox.Hide()
-            self.optionK2box.Hide()
+        
+        self.optionHbox.Hide()
+        self.optionSbox.Hide()
+        self.optionKbox.Hide()
+        self.optionK2box.Hide()
         # self.optionGbox.SetSize(self.optionGbox.GetBestSize())
 
         if ResultTypeSelect is ResultsType.HTML:
@@ -1624,16 +1646,10 @@ class VisualMapPanel(wx.Panel):
                     self.id.LISTHeatMapTimeStep.Enable()
             for ctrl in kml_controls:
                 ctrl.Disable()        
-            if self._needLayoutSet:
-                self._needLayoutSet = False
-            else:
-                self.optionHbox.Show()
+            self.optionHbox.Show()
             
         elif ResultTypeSelect is ResultsType.SUM:
-            if self._needLayoutSet:
-                self._needLayoutSet = False
-            else:
-                self.optionSbox.Show()
+            self.optionSbox.Show()
 
         elif ResultTypeSelect is ResultsType.KML:
             # In KML mode, disable HTML controls and enable KML controls
@@ -1643,18 +1659,17 @@ class VisualMapPanel(wx.Panel):
                 ctrl.Enable()
             # This timeline just works differently in KML mode vs embedded code for HTML
             self.id.CBMapTimeLine.Enable()
-            if self._needLayoutSet:
-                self._needLayoutSet = False
-            else:
-                self.optionKbox.Show()
+            self.optionKbox.Show()
         elif ResultTypeSelect is ResultsType.KML2:
-            if self._needLayoutSet:
-                self._needLayoutSet = False
-            else:
-                self.optionK2box.Show()
+            self.optionK2box.Show()
 
        # Enable/disable trace button based on referenced data availability
         self.id.BTNTRACE.Enable(bool(self.gOp.Referenced and self.gOp.Result and ResultTypeSelect))
+
+        self.optionsStack.Layout()
+        self.Layout()
+        self.Refresh()
+
 
     def SetupOptions(self):
 
@@ -1686,6 +1701,7 @@ class VisualMapPanel(wx.Panel):
         self.id.CBMapTimeLine.SetValue(self.gOp.get('MapTimeLine'))
         self.id.CBUseAntPath.SetValue(self.gOp.get('UseAntPath'))
         self.id.CBUseGPS.SetValue(self.gOp.get('UseGPS'))
+        self.id.CBUseGPS.Disable()
         self.id.CBAllEntities.SetValue(self.gOp.get('AllEntities'))
         self.id.CBCacheOnly.SetValue(self.gOp.get('CacheOnly'))
         self.id.LISTHeatMapTimeStep.SetValue(self.gOp.get('HeatMapTimeStep'))
@@ -1734,7 +1750,7 @@ class VisualMapPanel(wx.Panel):
             if self.gOp.lookup and cachepath != sourcepath:
                 del self.gOp.lookup
                 self.gOp.lookup = None
-
+            self.gOp.step('Loading GEDCOM')
             self.background_process.Trigger(1)
         
     def DrawGEDCOM(self):
@@ -1789,6 +1805,7 @@ class VisualMapPanel(wx.Panel):
                         # TODO need a better command-line management than this
                         # cmdline = f"column -s, -t < {csvfile} | less -#2 -N -S"
             except Exception as e:
+                _log.exception("Issues in runCMDfile")
                 _log.error(f"Failed to open file: {e}")
 
         else:

@@ -221,5 +221,7 @@ class FuzzyAddressBook:
                     if (location and location.latlon is None or location.latlon.isNone()) or location is None : 
                         self.usedNone += 1
         hit = 1-(self.usedNone / self.used) if self.used > 0 else 0
-        self.stats = f"Unique addresses: {self.used} with unresolvable: {self.usedNone}\nAddress hit rate {hit:.1%}\n or is it correct???" 
+        self.stats = f"Unique addresses: {self.used} with unresolvable: {self.usedNone}\nAddress hit rate {hit:.1%}\n" 
+        if hit == 1:
+             self.stats = f"{self.stats}\nPerfect address lookup, Is this correct?"
         return self.stats

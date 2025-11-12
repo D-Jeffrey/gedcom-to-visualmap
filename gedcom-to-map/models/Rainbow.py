@@ -1,6 +1,8 @@
 __all__ = ['Tint', 'Rainbow']
 from models.Color import Color
+import logging
 
+_log = logging.getLogger(__name__.lower())
 
 def merge_color(color_a: Color, color_b: Color, coef):
     return Color(
@@ -55,8 +57,12 @@ class Rainbow:
             #TODO Need to improve this hack
 
             # raise
-            v = 0.9999
+            _log.info("Rainbow coef out of range: %f", v)
+            v = v % 1.0
         len_steps = len(self.steps ) - 1
         step = int(v * len_steps)
-        latlon = v % (1 / len_steps) * len_steps
-        return self.merge_color(self.steps[step], self.steps[step + 1], latlon)
+        # Alternate approach
+        #pos = v % (1 / len_steps) * len_steps
+        pos = (v * len_steps) - step
+        _log.debug(f"coef:{v}  step:{step}   pos:{pos}")
+        return self.merge_color(self.steps[step], self.steps[step + 1], pos)

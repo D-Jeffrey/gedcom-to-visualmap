@@ -4,7 +4,7 @@ import wx
 
 # Constants for gedcom-to-visualmap
 
-VERSION = "0.2.7.0.3"
+VERSION = "0.2.7.1"
 NAME = "gedcom-to-visualmap"
 GEOCODEUSERAGENT = NAME + "/" + VERSION + " GEDCOM-to-visualmap"
 GUINAME = 'GEDCOM Visual Map'

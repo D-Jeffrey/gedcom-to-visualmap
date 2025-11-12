@@ -21,7 +21,7 @@ class Location:
 
     Attributes:
         used (int): Usage count.
-        latlon (LatLon): Latitude/longitude.
+        latlon (LatLon): Latitude/longitude. 
         country_code (str): Country code.
         country_name (str): Country name.
         continent (str): Continent name.
@@ -39,6 +39,7 @@ class Location:
         used: int = 0,
         latitude: Optional[float] = None,
         longitude: Optional[float] = None,
+        position: Optional[LatLon] = None,
         country_code: Optional[str] = None,
         country_name: Optional[str] = None,
         continent: Optional[str] = None,
@@ -57,7 +58,12 @@ class Location:
         Initialize a Location object with geocoded information.
         """
         self.used = used
-        self.latlon = LatLon(latitude, longitude) if (latitude is not None and longitude is not None) else None
+        if (latitude is not None and longitude is not None):
+            self.latlon = LatLon(latitude, longitude)
+        elif position is not None:
+            self.latlon = position
+        else:
+            self.latlon = None
         self.country_code = country_code
         self.country_name = country_name
         self.continent = continent

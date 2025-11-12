@@ -44,6 +44,9 @@ def doKML(gOp : gvOptions, people: list[Person]):
 #        placeTypes.append(['home[h]', '(e)', 'event'])
 
     
+    if placeTypes == []:
+        gOp.stopstep('Error select at least Birth or Death markers to map')
+        _log.error  ("Neither birth or death marker is selected")
 
     for (key, nametag, placeType) in placeTypes:
 
@@ -261,7 +264,7 @@ def ParseAndGPS(gOp: gvOptions, stage: int = 0 ):
                 gedcom_file=input_path.resolve(), 
                 location_cache_file=cachefile,
                 default_country=defaultCountry,
-                always_geocode=not gOp.CacheOnly,
+                always_geocode=False,       # TODO, need a option for Force recheck
                 use_alt_places = not gOp.skip_file_alt_places,
                 alt_place_file_path=alt_place_file_path if not gOp.skip_file_alt_places else None,
 #                geo_config_path=geo_config_path if geo_config_path.exists() else None,

@@ -203,9 +203,9 @@ class KmlExporter:
                 event = "Unknown dates"
             event = f"<br>{event}</br>"
                 
-            if line.a.hasLocation() and mark in ['birth']:
+            if line.fromlocation.hasLocation() and mark in ['birth']:
                 connectWhere = self.folderBirth if foldermode else kml
-                pnt = connectWhere.newpoint(name=name + ntag, coords=[self.driftLatLon(line.a)], description="<![CDATA[ " + event + linage + familyLinage + " ]]>")
+                pnt = connectWhere.newpoint(name=name + ntag, coords=[self.driftLatLon(line.fromlocation)], description="<![CDATA[ " + event + linage + familyLinage + " ]]>")
                 self.gOp.Referenced.add(line.person.xref_id, 'kml-a',tag=pnt.id)
                 self.gOp.Referenced.add("#"+line.person.xref_id[1:-1], tag=pnt.id)
                 if self.gOp.MapTimeLine and getattr(line, 'whenFrom', None) and line.whenFrom: 
@@ -219,9 +219,9 @@ class KmlExporter:
                 # pnt.style.balloonstyle.text = linage
 
                 
-            if line.b.hasLocation() and mark in ['death']:
+            if line.tolocation.hasLocation() and mark in ['death']:
                 connectWhere = self.folderDeath if foldermode else kml
-                pnt = connectWhere.newpoint(name=name + ntag, coords=[self.driftLatLon(line.b)], description="<![CDATA[ " + event + linage  + familyLinage + " ]]>")
+                pnt = connectWhere.newpoint(name=name + ntag, coords=[self.driftLatLon(line.tolocation)], description="<![CDATA[ " + event + linage  + familyLinage + " ]]>")
 
                 self.gOp.Referenced.add(line.person.xref_id, 'kml-b')
                 self.gOp.Referenced.add("#"+line.person.xref_id[1:-1], tag=pnt.id)
@@ -237,11 +237,11 @@ class KmlExporter:
                 # pnt.style.balloonstyle = simplekml.BalloonStyle()
                 # pnt.style.balloonstyle.text = linage 
                 
-            if line.a.hasLocation() and line.b.hasLocation():
+            if line.fromlocation.hasLocation() and line.tolocation.hasLocation():
                 # Put the life span description in the line
                 event  = "<br>Lifespan: {} to {}, related as {}</br>".format(timeA if timeA else "Unknown", timeB if timeB else "Unknown", desend) 
                 connectWhere = self.folderLife if foldermode else kml
-                kml_line = connectWhere.newlinestring(name=name, description="<![CDATA[ " + event + linage + familyLinage + " ]]>", coords=[self.driftLatLon(line.a), self.driftLatLon(line.b)])
+                kml_line = connectWhere.newlinestring(name=name, description="<![CDATA[ " + event + linage + familyLinage + " ]]>", coords=[self.driftLatLon(line.fromlocation), self.driftLatLon(line.tolocation)])
                 kml_line.linestyle.color = line.color.to_hexa()
                 # - exponential decay function for the line width - Protect the exp from overflow for very long linages because the line is in pixels
                 kml_line.linestyle.width = max( int(self.max_line_weight/math.exp(0.5*min(line.prof,100))), .1 )
@@ -259,18 +259,18 @@ class KmlExporter:
                         kml_line.timestamp.when = timeA                       
                     elif timeB:
                         kml_line.timestamp.when = timeB
-                _log.info    (f"    line    {line.name} ({line.a.lon}, {line.a.lat}) ({line.b.lon}, {line.b.lat})")    
+                _log.info    (f"    line    {line.name} ({line.fromlocation.lon}, {line.fromlocation.lat}) ({line.tolocation.lon}, {line.tolocation.lat})")    
             else:
-                _log.warning (f"skipping {line.name} ({line.a.lon}, {line.a.lat}) ({line.b.lon}, {line.b.lat})")
+                _log.warning (f"skipping {line.name} ({line.fromlocation.lon}, {line.fromlocation.lat}) ({line.tolocation.lon}, {line.tolocation.lat})")
             self.gOp.totalpeople += 1
             # NOT WORKING YET
             if line.midpoints:
                 connectWhere = self.folderLife if foldermode else kml
                 for mid in line.midpoints:
-                    if mid.latlon and mid.latlon.hasLocation():
+                    if mid.location.latlon and mid.location.latlon is not None:
                         whatevent = mid.what if mid.what else "Event"
                         event = "<br>{}: {}</br>".format(whatevent, mid.date if mid.date else "Unknown") 
-                        pnt = connectWhere.newpoint(name=f"{name} ({whatevent})", coords=[self.driftLatLon(mid.latlon)], description="<![CDATA[ " + event + " ]]>")
+                        pnt = connectWhere.newpoint(name=f"{name} ({whatevent})", coords=[self.driftLatLon(mid.getattr('latlon'))], description="<![CDATA[ " + event + " ]]>")
                         pnt.style = simplekml.Style()
                         pnt.style.labelstyle.scale = 0.7 * styleA.labelstyle.scale
                         # pnt.style.iconstyle.icon.href = f'https://maps.google.com/mapfiles/kml/paddle/wht-blank.png'
@@ -281,8 +281,8 @@ class KmlExporter:
                                 pnt.timestamp.when = mid.date.value.date1.isoformat()
                         
                         
-                        _log.info    (f"    midpt   {line.name} ({mid.latlon.lon}, {mid.latlon.lat})")    
+                        _log.info    (f"    midpt   {line.name} ({mid.location.latlon.lon}, {mid.location.latlon.lat})")    
                     else:
-                        _log.warning (f"skipping {line.name} ({mid.latlon.lon}, {mid.latlon.lat})")
+                        _log.warning (f"skipping {line.name} ({mid.location.latlon.lon}, {mid.location.latlon.lat})")
 
 

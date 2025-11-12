@@ -69,7 +69,10 @@ class HTMLDialog(wx.Dialog):
     def on_ok(self, event):
         # Defensive: end modal loop; caller will Destroy() after ShowModal returns
         try:
-            self.EndModal(wx.ID_OK)
+            if self.IsModal():
+                self.EndModal(wx.ID_OK)
+            else:
+                self.Close()
         except Exception:
             # fallback: ensure dialog is closed
             self.Destroy()
@@ -338,8 +341,9 @@ class FamilyPanel(wx.Panel):
             self.grid.SetCellAlignment(row, 2, wx.ALIGN_RIGHT, wx.ALIGN_CENTER)  # Right-align numbers in the third column
             self.grid.SetCellAlignment(row, 3, wx.ALIGN_RIGHT, wx.ALIGN_CENTER)  # Right-align numbers in the third column
             self.grid.SetCellAlignment(row, 4, wx.ALIGN_RIGHT, wx.ALIGN_CENTER)  # Right-align numbers in the third column
-        self.grid.Bind(wx.grid.EVT_GRID_CELL_LEFT_CLICK, self.OnRowClick)
-        self.grid.Bind(wx.grid.EVT_GRID_LABEL_LEFT_CLICK, self.OnRowClick)
+        # Right Click for consisntancy with main grid  (That allose lieft click to select and copy text)
+        self.grid.Bind(wx.grid.EVT_GRID_CELL_RIGHT_CLICK, self.OnRowClick)
+        self.grid.Bind(wx.grid.EVT_GRID_LABEL_RIGHT_CLICK, self.OnRowClick)
 
     def OnRowClick(self, event: wx.grid.GridEvent):
         """Handle item activation (double-click) in the grid."""
@@ -549,8 +553,8 @@ class PersonDialog(wx.Dialog):
         # create the OK button
         ok_btn = wx.Button(self, wx.ID_OK)
         btn_sizer = wx.StdDialogButtonSizer()
-        # ensure OK ends the modal dialog reliably
-        ok_btn.Bind(wx.EVT_BUTTON, lambda evt: self.EndModal(wx.ID_OK))
+        # ensure OK ends the windows dialog reliably
+        ok_btn.Bind(wx.EVT_BUTTON, lambda evt: self.Close())
         btn_sizer.AddButton(ok_btn)
         btn_sizer.Realize()
         mainSizer.Add(btn_sizer, 0, wx.ALIGN_LEFT|wx.ALL, border=10)
@@ -700,6 +704,7 @@ and generating the output so that the GUI can continue to be responsive
                         self.people = ParseAndGPS(self.gOp, 1)
                     
                     except Exception as e:
+                        _log.exception("Issues in ParseAndGPS")
                         # Capture other exceptions
                         if hasattr(self, 'people'):
                             if self.people:                            

@@ -13,15 +13,15 @@ class Line:
     prof - how far from orginal, midpoint - (LifeEvent) array,
     person - reference to themeselves, 
     """
-    def __init__(self, name: str, a: LatLon, b: LatLon, color: Color, path: str, branch: float, prof: int, style : str = '', parentofperson : Person = None, 
+    def __init__(self, name: str, fromlocation: LatLon, tolocation: LatLon, color: Color, path: str, branch: float, prof: int, style : str = '', parentofperson : Person = None, 
                         midpoints:list[LifeEvent]=None, person=None, whenFrom = None, whenTo = None, tag:str='', linetype=''):
         self.name = name
         # TODO we need to use id to avoid problems with duplicate names
         # BUG
         self.whenFrom = None 
         self.whenTo = None
-        self.a = a
-        self.b = b
+        self.fromlocation = fromlocation
+        self.tolocation = tolocation
         self.color = color
 
         self.path = path
@@ -33,7 +33,7 @@ class Line:
         self.person = person
         self.tag = tag
 #        if len(when) > 1:
-#            (self.when.a, self.when.b) = (self.valueWhen(when[0]), self.valueWhen(when[1]))
+#            (self.when.fromlocation, self.when.tolocation) = (self.valueWhen(when[0]), self.valueWhen(when[1]))
 
         if whenFrom: # and len(whenFrom) > 1:
             #self.whenFrom= self.valueWhen(whenFrom[0])
@@ -48,7 +48,7 @@ class Line:
         
 
     def __repr__(self):
-        return f"( {self.a}, {self.b} )"
+        return f"( {self.fromlocation}, {self.tolocation} )"
 
     def valueWhen(self, newwhen):
         return DateFromField(newwhen)

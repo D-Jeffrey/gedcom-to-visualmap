@@ -278,13 +278,16 @@ python3 ..\gedcom-to-map\gedcom-to-map.py input.ged output -main "@I0000@" -form
 
 ## Issues
 - Linux does not save FileHistory
-- People dialog displays only one parent after Draw Update
-- list of background maps on Follium is not complete or presented, so currently only shows cartodbvoyager
 
 ### GUI
 - Need to separate the Load and GPS resolve steps (currently reloads after 30 seconds of looking up values)
 
 ## Releases
+### v0.2.7.1
+- Better feedback during load and geocode
+- regrouped and fix GUI layout issues
+- save addressbook perodically during long load and lookup
+- mid life events are in HTML and KML again
 ### v0.2.7.0.3
 - more bug fixes
 - Regrouping of options based on Output type

@@ -3,12 +3,10 @@ __all__ = ['GedcomParser', 'DateFormatter']
 import logging
 import re
 from datetime import datetime
-from pathlib import Path
 from typing import Dict
 
-from ged4py import GedcomReader
 from ged4py.date import DateValueVisitor
-from ged4py.model import NameRec, Record
+from ged4py.model import Record
 from gedcomoptions import gvOptions
 from models.Person import Person, LifeEvent
 from models.LatLon import LatLon

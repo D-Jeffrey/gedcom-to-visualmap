@@ -219,7 +219,7 @@ class foliumExporter:
                         tooltip: str, popup: str, icon_name: str, color: str) -> None:
         """Add a marker to the feature group"""
         if self.gOp.MarksOn:
-            marker = folium.features.Marker(
+            marker = folium.Marker(
                 point,
                 tooltip=tooltip,
                 popup=popup,
@@ -386,8 +386,8 @@ class foliumExporter:
         # Mark all locations
         for line in lines:
             self.gOp.step()
-            mycluster.mark(line.a)
-            mycluster.mark(line.b)
+            mycluster.mark(line.fromlocation)
+            mycluster.mark(line.tolocation)
             if line.midpoints:
                 for mids in line.midpoints:
                     mycluster.mark(mids.latlon, None)
@@ -530,36 +530,36 @@ class foliumExporter:
                 new_fg = True
 
             # Add start marker
-            if line.a and line.a.hasLocation():
-                start_point = [Drift(line.a.lat), Drift(line.a.lon)]
+            if line.fromlocation and line.fromlocation.hasLocation():
+                start_point = [Drift(line.fromlocation.lat), Drift(line.fromlocation.lon)]
                 if self.gOp.MarksOn and self.gOp.BornMark:
                     self._add_point_marker(fg, start_point, marker_options, 
                                        f"Life of {line.name}".replace("`", "‛").replace("'", "‛"), 
-                                       popup_content, marker_options['start_icon'], marker_options['start_color'])
+                                       popup_content + "\nbirth", marker_options['start_icon'], marker_options['start_color'])
 
             # Add end marker
-            if line.b and line.b.hasLocation():
-                end_point = [Drift(line.b.lat), Drift(line.b.lon)]
+            if line.tolocation and line.tolocation.hasLocation():
+                end_point = [Drift(line.tolocation.lat), Drift(line.tolocation.lon)]
                 if self.gOp.MarksOn and self.gOp.DieMark:
                     self._add_point_marker(fg, end_point, marker_options, 
                                        f"Life of {line.name}".replace("`", "‛").replace("'", "‛"), 
-                                       popup_content, marker_options['end_icon'], marker_options['end_color'])
+                                       popup_content + "\ndeath", marker_options['end_icon'], marker_options['end_color'])
 
             # Add midpoints
             fm_line = []
-            if line.a and line.a.hasLocation():
+            if line.fromlocation and line.fromlocation.hasLocation():
                 fm_line.append(tuple(start_point))
             if line.midpoints:
                 for mids in line.midpoints:
-                    mid_point = [Drift(mids.latlon.lat), Drift(mids.latlon.lon)]
+                    mid_point = [Drift(mids.location.latlon.lat), Drift(mids.location.latlon.lon)]
                     fm_line.append(tuple(mid_point))
                     if self.gOp.HomeMarker and self.gOp.MarksOn:
                         point_type = mids.what if mids.what in MidPointMarker else "Other"
                         marker = MidPointMarker[point_type][0]
                         color = MidPointMarker[point_type][1]
-                        tooltip = mids.what + ' ' + mids.place if mids.what else '?? ' + mids.place
+                        tooltip = mids.what + ' ' + mids.place.place if mids.what else '?? ' + mids.place.place
                         self._add_point_marker(fg, mid_point, marker_options, tooltip, popup_content, marker, color)
-            if line.b and line.b.hasLocation():
+            if line.tolocation and line.tolocation.hasLocation():
                 fm_line.append(tuple(end_point))
 
             # Add polyline
@@ -575,7 +575,7 @@ class foliumExporter:
 
             # Add feature group to map
             if new_fg:
-                fg.layer_name = f"{fg.layer_name} ({len(fm_line) + 1 if line.b else 0})"
+                fg.layer_name = f"{fg.layer_name} ({len(fm_line) + 1 if line.tolocation else 0})"
                 fm.add_child(fg)
 
         # Add feature groups to map for the sortby options

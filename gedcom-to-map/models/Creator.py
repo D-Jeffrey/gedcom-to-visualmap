@@ -45,8 +45,18 @@ class Creator:
             )
         color = (branch + DELTA / 2) / (SPACE ** (prof % 256))
         _log.info("{:8} {:8} {:2} {:.10f} {} {:20}".format(path, branch, prof, color, self.rainbow.get(color).to_hexa(), current.name))
+        midpoints = None
+        if current.home:
+            wyear = None
+            midpoints = []
+            for h in (range(0,len(current.home))):
+                if current.home[h].location and current.home[h].getattr('latlon') is not None:
+                    midpoints.append(LifeEvent(current.home[h].place, current.home[h].whenyear(), current.home[h].getattr('latlon'), current.home[h].what))
+                    wyear = wyear if wyear else current.home[h].whenyear()
         line = Line(f"{path:8}\t{current.name}", latlon, getAttrLatLonif(current, self.gpstype), self.rainbow.get(color), path, branch,prof, person=current,
-                    whenFrom=current.birth.whenyear() if getattr(current, 'birth',None) else None, whenTo=current.death.whenyear() if getattr(current, 'death', None) else None )
+                     whenFrom=current.birth.whenyear() if getattr(current, 'birth',None) else None, whenTo=current.death.whenyear() if getattr(current, 'death', None) else None,
+                     midpoints=midpoints)
+
         return self.link(getAttrLatLonif(current, self.gpstype), current, branch, prof, 0, path) + [line]
 
     def link(self, latlon: LatLon, current: Person, branch=0, prof=0, miss=0, path="") -> list[Line]:
@@ -128,8 +138,8 @@ class LifetimeCreator:
         wyear = None
         if current.home:
             for h in (range(0,len(current.home))):
-                if current.home[h].latlon and current.home[h].latlon.hasLocation():
-                    midpoints.append(LifeEvent(current.home[h].place, current.home[h].whenyear(), current.home[h].latlon, current.home[h].what))
+                if current.home[h].location and current.home[h].getattr('latlon') is not None:
+                    midpoints.append(LifeEvent(current.home[h].place, current.home[h].whenyear(), current.home[h].getattr('latlon'), current.home[h].what))
                     wyear = wyear if wyear else current.home[h].whenyear()
         bp = getAttrLatLonif(current, 'birth')
         bd = getAttrLatLonif(current, 'death')

@@ -682,9 +682,10 @@ class GeolocatedGedcom(Gedcom):
                     lon = map_tag.sub_tag('LONG')
                     if lat and lon:
                         latlon = LatLon(lat.value, lon.value)
-                        event.latlon = latlon if latlon.is_valid() else None
-                    else:
-                        event.latlon = None
+                        if latlon.is_valid():
+                            event.latlon = latlon
+                            event.location = Location(position=latlon, address=place_tag.value)
+
             else:
                 logger.info(f"No place tag found for event in record {record}")
         else:

@@ -1437,7 +1437,11 @@ class VisualMapPanel(wx.Panel):
                 status = f"{status} - Processing"
                 nowtime = datetime.now().timestamp()
                 runningtime = nowtime - self.gOp.runningSince
-                runtime = f"Running {time.strftime('%H:%M:%S', time.gmtime(runningtime))}"
+                if runningtime < 86400:     # 1 day
+                    runtime = f"Running {time.strftime('%H:%M:%S', time.gmtime(runningtime))}"
+                else:
+                    runtime = f"Running {time.strftime('%jD %H:%M', time.gmtime(runningtime - 86400))}" 
+                
                 if self.gOp.countertarget > 0 and self.gOp.counter > 0 and self.gOp.counter != self.gOp.countertarget:
                     if nowtime-1.0 > self.lastruninstance: 
                         self.timeformat = '%H:%M:%S'
@@ -1450,11 +1454,11 @@ class VisualMapPanel(wx.Panel):
                         remaintime = sum(self.gOp.runavg)/len(self.gOp.runavg)
                         self.remaintime = remaintime
                         self.lastruninstance = nowtime
-                        if self.remaintime> 3600:
+                        if self.remaintime> 3600: 
                             self.timeformat = '%H hr %M'
-                            if self.remaintime > 3600*24:
+                            if self.remaintime > 86400:  # 1 day
                                 self.timeformat = '%j %H hr %M'
-                                self.remaintime -= 3600*24
+                                self.remaintime -= 86400
                     runtime = f"{runtime} ({time.strftime(self.timeformat, time.gmtime(self.remaintime))})"
             else:
                 runtime = "Last {}".format( time.strftime('%H:%M:%S', time.gmtime(self.gOp.runningLast)))

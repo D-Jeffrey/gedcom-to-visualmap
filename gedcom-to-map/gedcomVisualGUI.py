@@ -532,7 +532,6 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
         self._LastGridOnlyFamily = self.GridOnlyFamily
         self.LastSearch = ""
         self.gOp = None
-        self.visual_map_panel = self.GetParent().GetParent()
 
         self.SetImageList(self.il, wx.IMAGE_LIST_SMALL)
         self.SetTextColour(self.id.GetColor('GRID_TEXT'))
@@ -681,11 +680,29 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
         if self.gOp and self.gOp.running:
             # Hack race condition
             if not wasrunning:
-                self.visual_map_panel.StopTimer()
+                vis = self.get_visual_map_panel()
+                if vis and getattr(vis, "StopTimer", None):
+                    try:
+                        vis.StopTimer()
+                    except Exception:
+                        _log.exception("StopTimer call failed on visual_map_panel")
             self.gOp.running = wasrunning
             
         self.active = False
 
+    def get_visual_map_panel(self):
+        vis = getattr(self, 'visual_map_panel', None)
+        if vis is None:
+            ancestor = self.GetParent()
+            while ancestor is not None:
+                vis = getattr(ancestor, 'visual_map_panel', None)
+                if vis is not None:
+                    break
+                ancestor = ancestor.GetParent()
+        if vis is None:
+            top = self.GetTopLevelParent()
+            vis = getattr(top, 'visual_map_panel', None)
+        return vis
    
     # Used by the ColumnSorterMixin, see wx/lib/mixins/listctrl.py
     def GetListCtrl(self):
@@ -742,7 +759,8 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
         return self
 
     def OnFind(self, event):
-        find_dialog = FindDialog(self.visual_map_panel, "Find", LastSearch=self.LastSearch)
+        parent_win = self.get_visual_map_panel() or self.GetTopLevelParent()
+        find_dialog = FindDialog(parent_win, "Find", LastSearch=self.LastSearch)
         if find_dialog.ShowModal() == wx.ID_OK:
             self.LastSearch = find_dialog.GetSearchString()
             if self.GetItemCount() > 1:
@@ -765,7 +783,8 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
         if self.gOp.BackgroundProcess.people:
             itm = self.GetItemText(self.currentItem, 2)
             if itm in self.gOp.BackgroundProcess.people:
-                dialog = PersonDialog(self.visual_map_panel, self.gOp.BackgroundProcess.people[itm], self.visual_map_panel, font_manager=self.font_manager, gOp=self.gOp)
+                parent_win = self.get_visual_map_panel() or self.GetTopLevelParent()
+                dialog = PersonDialog(parent_win, self.gOp.BackgroundProcess.people[itm], parent_win, font_manager=self.font_manager, gOp=self.gOp)
                 dialog.Bind(wx.EVT_CLOSE, lambda evt: dialog.Destroy())
                 dialog.Bind(wx.EVT_BUTTON, lambda evt: dialog.Destroy())
                 dialog.Show(True)
@@ -789,7 +808,9 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
                 self.PopulateList(self.gOp.people, self.gOp.get('Main'), False)
                 self.gOp.BackgroundProcess.SayInfoMessage(f"Using '{personid}' as starting person with {len(self.gOp.Referenced)} direct ancestors", False)
                 self.gOp.BackgroundProcess.updategridmain = self.gOp.people is not None
-                self.visual_map_panel.SetupButtonState()
+                vis = self.get_visual_map_panel()
+                if vis and getattr(vis, "SetupButtonState", None):
+                    vis.SetupButtonState()
 
 
     def OnColClick(self, event):
@@ -829,7 +850,7 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
 
 
 class PeopleListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
-    def __init__(self, parent, people, font_manager, *args, **kw):
+    def __init__(self, parent, people, *args, **kw):
         """    Initializes the PeopleListCtrlPanel.
 
     Args:
@@ -844,33 +865,70 @@ class PeopleListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
     Raises:
         None
         """
-        super().__init__(*args, **kw)
-        wx.Panel.__init__(self, parent, -1, style=wx.WANTS_CHARS, name="PeoplePanel")
+        super().__init__(parent, *args, **kw)
+
         # TODO This box defination still have a scroll overlap problem
         sizer = wx.BoxSizer(wx.VERTICAL)
         self.messagelog = "*  Select a file, Load it and Create Files or change Result Type, Open Geo Table to edit addresses  *"
         self.InfoBox = []
         for i in range(InfoBoxLines):
-            self.InfoBox.append(wx.StaticText(parent, -1, ' '))
-            sizer.Add(self.InfoBox[i], 0, wx.LEFT,5)
+            st = wx.StaticText(self, -1, ' ')
+            self.InfoBox.append(st)
+            sizer.Add(st, 0, wx.EXPAND | wx.LEFT, 5)
+        self.Bind(wx.EVT_SIZE, self._on_size_wrap_info)
         tID = wx.NewIdRef()
-        self.visual_map_panel = self.GetParent()
-        self.list = PeopleListCtrl(parent, tID,
+        self.list = PeopleListCtrl(self, tID,
                         style=wx.LC_REPORT | wx.BORDER_SUNKEN | wx.LC_SINGLE_SEL,
-                        size=wx.Size(600,600),
-                        font_manager=font_manager)
-        sizer.Add(self.list, -1, wx.EXPAND)
-
+                        size=wx.Size(600,600))
+        sizer.Add(self.list, 1, wx.EXPAND)
+ 
         self.list.PopulateList(people, None, True)
 
         self.currentItem = 0
-        parent.SetSizer(sizer)
+        self.SetSizer(sizer)
+        wx.CallAfter(self._on_size_wrap_info, None)
         
-    def setGOp(self, gOp):
+    def get_visual_map_panel(self):
+        vis = getattr(self, 'visual_map_panel', None)
+        if vis is None:
+            ancestor = self.GetParent()
+            while ancestor is not None:
+                vis = getattr(ancestor, 'visual_map_panel', None)
+                if vis is not None:
+                    break
+                ancestor = ancestor.GetParent()
+        if vis is None:
+            top = self.GetTopLevelParent()
+            vis = getattr(top, 'visual_map_panel', None)
+        return vis
+            
+    def SetGOp(self, gOp):
         self.gOp = gOp
         if self.list:
             self.list.SetGOp(gOp)
 
+    def _on_size_wrap_info(self, event):
+        """ Handle resizing of the info box area to wrap text appropriately. """
+        width = self.GetClientSize().width
+        for info in self.InfoBox:
+            info.SetMinSize((width - 10, -1))  # Subtracting some padding
+        self.Layout()
+        if event:
+            event.Skip()
+
+    def append_info_box(self, message):
+        nlines = (message+'\n'+self.messagelog).split('\n')
+        for i in range(InfoBoxLines):
+            if i>= (len(nlines)):
+                self.InfoBox[i].SetLabel('')
+            else:
+                self.InfoBox[i].SetLabel(nlines[i])
+        self.messagelog = '\n'.join(nlines[:InfoBoxLines])
+
+    def stop(self):
+        visual_map_panel = self.get_visual_map_panel()
+        if visual_map_panel:
+            visual_map_panel.StopTimer()
 
 class VisualMapPanel(wx.Panel):
     """
@@ -899,36 +957,29 @@ class VisualMapPanel(wx.Panel):
         self.id = VisualGedcomIds()
         
         # create a panel in the frame
-        self.panelA = wx.Panel(self, -1, size=(760,420),style=wx.SIMPLE_BORDER  )
-        self.panelB = wx.Panel(self, -1, size=(300,420),style=wx.SIMPLE_BORDER  )
+        self.panelA = wx.Panel(self, -1, size=(760,420), style=wx.SIMPLE_BORDER)
+        self.panelB = wx.Panel(self, -1, size=(300,420), style=wx.SIMPLE_BORDER)
         
         # https://docs.wxpython.org/wx.ColourDatabase.html#wx-colourdatabase
         self.panelA.SetBackgroundColour(self.id.GetColor('INFO_BOX_BACKGROUND'))
         self.panelB.SetBackgroundColour(wx.WHITE)
 
-        # Data Grid side
-        lcA = wx.LayoutConstraints()
-        lcA.top.SameAs( self, wx.Top, 5)
-        lcA.left.SameAs( self, wx.Left, 5)
-        lcA.bottom.SameAs( self, wx.Bottom, 5)
-        lcA.right.LeftOf( self.panelB, 5)
-        self.panelA.SetConstraints(lcA)
-
-        # TODO make the Controls side fixed in width and resize the Data Grid side
-        # Controls Side        
-        lc = wx.LayoutConstraints()
-        lc.top.SameAs( self, wx.Top, 5)
-        lc.right.SameAs( self, wx.Right, 5)
-        lc.bottom.SameAs( self, wx.Bottom, 5)
-        lc.left.PercentOf( self, wx.Right, 60)
-        self.panelB.SetConstraints(lc)
-        
+        main_hs = wx.BoxSizer(wx.HORIZONTAL)
+        main_hs.Add(self.panelA, 1, wx.EXPAND | wx.ALL, 5)
+        main_hs.Add(self.panelB, 0, wx.EXPAND | wx.ALL, 5)
+        self.SetSizer(main_hs)
+        self.Layout()
 
         # Add Data Grid on Left panel
-        self.peopleList = PeopleListCtrlPanel(self.panelA, self.id.m, font_manager=self.font_manager)
+        self.peopleList = PeopleListCtrlPanel(self.panelA, self.id.m)
         
         # Add all the labels, button and radiobox to Right Panel
         self.LayoutOptions(self.panelB)
+
+        pa_sizer = wx.BoxSizer(wx.VERTICAL)
+        pa_sizer.Add(self.peopleList, 1, wx.EXPAND | wx.ALL, 5)
+        self.panelA.SetSizer(pa_sizer)
+        self.panelA.Layout()
 
         self.lastruninstance = 0.0
         self.remaintime = 0
@@ -1564,13 +1615,7 @@ class VisualMapPanel(wx.Panel):
             newinfo = newinfo + '\n' + einfo if newinfo else einfo
             self.background_process.errorinfo = None
         if (newinfo):
-            nlines = (newinfo+'\n'+self.peopleList.messagelog).split("\n")
-            for i in range(InfoBoxLines):
-                if i >= len(nlines):
-                    self.peopleList.InfoBox[i].SetLabelMarkup('')
-                else:
-                    self.peopleList.InfoBox[i].SetLabelMarkup(nlines[i])  
-            self.peopleList.messagelog = "\n".join(nlines[:InfoBoxLines])
+            self.peopleList.append_info_box(newinfo)
 
     def SetupButtonState(self):
         """ based on the type of file output, enable/disable the interface """
@@ -1685,7 +1730,8 @@ class VisualMapPanel(wx.Panel):
             self.gOp.panel = self
             self.gOp.BackgroundProcess = self.background_process
             self.gOp.UpdateBackgroundEvent = UpdateBackgroundEvent
-            self.peopleList.setGOp(self.gOp)
+            # self.peopleList.setGOp(self.gOp)
+            self.peopleList.SetGOp(self.gOp)
 
         if self.gOp.get('ResultType'):
             self.id.RBResultOutType.SetSelection(0)

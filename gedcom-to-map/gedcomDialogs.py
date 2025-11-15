@@ -104,7 +104,11 @@ For more details and to contribute, visit the <a href="PROJECTLINK">GitHub repos
 """
 
         super().__init__(parent, title=title, icontype=wx.ART_INFORMATION, htmlbody=abouttype, width=55, font_manager=font_manager)
-
+        try:
+            if font_manager:
+                font_manager.apply_current_font_recursive(self)
+        except Exception:
+            _log.exception("AboutDialog: failed to apply font to dialog")
 class HelpDialog(HTMLDialog):
     def __init__(self, parent, title, font_manager: FontManager):
 
@@ -139,6 +143,11 @@ For more details and to contribute, visit the <a href="PROJECTLINK">GitHub repos
 """
 
         super().__init__(parent, title=title, icontype=wx.ART_INFORMATION, htmlbody=helppage, width=55, font_manager=font_manager)
+        try:
+            if font_manager:
+                font_manager.apply_current_font_recursive(self)
+        except Exception:
+            _log.exception("HelpDialog: failed to apply font to dialog")
 
 #==============================================================
 class ConfigDialog(wx.Frame):

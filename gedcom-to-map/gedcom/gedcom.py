@@ -611,7 +611,8 @@ class GeolocatedGedcom(Gedcom):
                 break
             # Save the cache every 100 locations
             if idx % 100 == 0:
-                self.save_location_cache() 
+                self.save_location_cache()
+        self.save_location_cache() # Final save
 
         logger.info(f"Geolocation of all {self.address_book.len()} places completed.")
 

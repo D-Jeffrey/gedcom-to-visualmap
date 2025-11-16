@@ -78,7 +78,7 @@ class VisualMapPanel(wx.Panel):
 
         self.SetMinSize((800,800))
         self.frame = self.TopLevelParent
-        self.gOp : Opetional['gvOptions'] = None
+        self.gOp : Optional['gvOptions'] = None
 
         self.id = {}
         

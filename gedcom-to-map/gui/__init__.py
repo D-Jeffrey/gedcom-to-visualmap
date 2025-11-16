@@ -8,16 +8,16 @@ __all__ = []
 from .visual_map_frame import VisualMapFrame  # type: ignore
 __all__.append("VisualMapFrame")
 
-from .gedcomVisualGUI import VisualMapPanel  # type: ignore
+from .visual_map_panel import VisualMapPanel  # type: ignore
 __all__.append("VisualMapPanel")
 
-from .gedcomVisualGUI import VisualGedcomIds  # type: ignore
+from .visual_gedcom_ids import VisualGedcomIds  # type: ignore
 __all__.append("VisualGedcomIds")
 
 from .people_list_ctrl import PeopleListCtrl  # type: ignore
 __all__.append("PeopleListCtrl")
 
-from .gedcomVisualGUI import PeopleListCtrlPanel  # type: ignore
+from .people_list_ctrl_panel import PeopleListCtrlPanel  # type: ignore
 __all__.append("PeopleListCtrlPanel")
 
 from .html_dialog import HTMLDialog  # type: ignore

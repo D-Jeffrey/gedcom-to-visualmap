@@ -25,7 +25,7 @@ except Exception:
     pass
 
 try:
-    from .gedcomVisualGUI import PeopleListCtrl  # type: ignore
+    from .people_list_ctrl import PeopleListCtrl  # type: ignore
     __all__.append("PeopleListCtrl")
 except Exception:
     pass

@@ -32,10 +32,10 @@ class PeopleListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
         tID = wx.NewIdRef()
         # The PeopleListCtrl class is provided by the main package module; import lazily to avoid cycles
         try:
-            from .gedcomVisualGUI import PeopleListCtrl  # type: ignore
+            from .people_list_ctrl import PeopleListCtrl  # type: ignore
         except Exception:
             try:
-                from gedcomVisualGUI import PeopleListCtrl  # type: ignore
+                from people_list_ctrl import PeopleListCtrl  # type: ignore
             except Exception:
                 PeopleListCtrl = wx.ListCtrl
 

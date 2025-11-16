@@ -6,6 +6,7 @@ import sys
 import subprocess
 import webbrowser
 from datetime import datetime
+from typing import Optional
 
 from const import GUINAME, KMLMAPSURL, LOG_CONFIG, NAME, VERSION
 
@@ -77,7 +78,7 @@ class VisualMapPanel(wx.Panel):
 
         self.SetMinSize((800,800))
         self.frame = self.TopLevelParent
-        self.gOp : gvOptions = None
+        self.gOp : Opetional['gvOptions'] = None
 
         self.id = {}
         

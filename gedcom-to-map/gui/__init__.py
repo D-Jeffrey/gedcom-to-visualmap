@@ -13,75 +13,75 @@ except Exception:
     pass
 
 try:
-    from .visual_map_panel import VisualMapPanel  # type: ignore
+    from .gedcomVisualGUI import VisualMapPanel  # type: ignore
     __all__.append("VisualMapPanel")
 except Exception:
     pass
 
 try:
-    from .visual_gedcom_ids import VisualGedcomIds  # type: ignore
+    from .gedcomVisualGUI import VisualGedcomIds  # type: ignore
     __all__.append("VisualGedcomIds")
 except Exception:
     pass
 
 try:
-    from .people_list_ctrl import PeopleListCtrl  # type: ignore
+    from .gedcomVisualGUI import PeopleListCtrl  # type: ignore
     __all__.append("PeopleListCtrl")
 except Exception:
     pass
 
 try:
-    from .people_list_ctrl_panel import PeopleListCtrlPanel  # type: ignore
+    from .gedcomVisualGUI import PeopleListCtrlPanel  # type: ignore
     __all__.append("PeopleListCtrlPanel")
 except Exception:
     pass
 
 # Dialogs & helpers
 try:
-    from .html_dialog import HTMLDialog  # type: ignore
+    from .gedcomDialogs import HTMLDialog  # type: ignore
     __all__.append("HTMLDialog")
 except Exception:
     pass
 
 try:
-    from .about_dialog import AboutDialog  # type: ignore
+    from .gedcomDialogs import AboutDialog  # type: ignore
     __all__.append("AboutDialog")
 except Exception:
     pass
 
 try:
-    from .help_dialog import HelpDialog  # type: ignore
+    from .gedcomDialogs import HelpDialog  # type: ignore
     __all__.append("HelpDialog")
 except Exception:
     pass
 
 try:
-    from .config_dialog import ConfigDialog  # type: ignore
+    from .gedcomDialogs import ConfigDialog  # type: ignore
     __all__.append("ConfigDialog")
 except Exception:
     pass
 
 try:
-    from .person_dialog import PersonDialog  # type: ignore
+    from .gedcomDialogs import PersonDialog  # type: ignore
     __all__.append("PersonDialog")
 except Exception:
     pass
 
 try:
-    from .find_dialog import FindDialog  # type: ignore
+    from .gedcomDialogs import FindDialog  # type: ignore
     __all__.append("FindDialog")
 except Exception:
     pass
 
 # Panels and background actions
 try:
-    from .family_panel import FamilyPanel  # type: ignore
+    from .gedcomDialogs import FamilyPanel  # type: ignore
     __all__.append("FamilyPanel")
 except Exception:
     pass
 
 try:
-    from .background_actions import BackgroundActions  # type: ignore
+    from .gedcomDialogs import BackgroundActions  # type: ignore
     __all__.append("BackgroundActions")
 except Exception:
     pass

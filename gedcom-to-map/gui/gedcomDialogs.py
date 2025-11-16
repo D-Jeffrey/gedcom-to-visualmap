@@ -1,4 +1,4 @@
-__all__ = ['AboutDialog', 'HelpDialog', 'ConfigDialog', 'PersonDialog', 'FindDialog', 'BackgroundActions']
+# __all__ = ['AboutDialog', 'HelpDialog', 'ConfigDialog', 'PersonDialog', 'FindDialog', 'BackgroundActions']
 
 import _thread
 import logging
@@ -38,50 +38,3 @@ maxPhotoHeight = 500  # Maximum Height for photos in the PersonDialog
 _log = logging.getLogger(__name__.lower())
 
 UpdateBackgroundEvent = None
-
-# Import small dialog helper modules (package-aware). These modules are lightweight.
-try:
-    from .html_dialog import HTMLDialog
-except Exception:
-    try:
-        from html_dialog import HTMLDialog
-    except Exception:
-        HTMLDialog = None
-
-# Load dialog classes from their extracted modules (they are small). Keep fallbacks.
-try:
-    from .about_dialog import AboutDialog
-except Exception:
-    AboutDialog = None
-
-try:
-    from .help_dialog import HelpDialog
-except Exception:
-    HelpDialog = None
-
-try:
-    from .config_dialog import ConfigDialog
-except Exception:
-    ConfigDialog = None
-
-try:
-    from .family_panel import FamilyPanel
-except Exception:
-    FamilyPanel = None
-
-try:
-    from .person_dialog import PersonDialog
-except Exception:
-    PersonDialog = None
-
-try:
-    from .find_dialog import FindDialog
-except Exception:
-    FindDialog = None
-
-# BackgroundActions has been moved and already does lazy imports internally.
-try:
-    from .background_actions import BackgroundActions
-except Exception:
-    BackgroundActions = None
-

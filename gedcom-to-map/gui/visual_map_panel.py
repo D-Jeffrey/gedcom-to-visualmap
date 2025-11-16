@@ -12,55 +12,14 @@ from const import GUINAME, KMLMAPSURL, LOG_CONFIG, NAME, VERSION
 
 import wx
 
-# Import the small modules directly where possible to avoid importing gedcomVisualGUI
-# (which would cause a circular import). Fall back to None stubs if modules aren't available.
-try:
-    from .visual_gedcom_ids import VisualGedcomIds  # type: ignore
-except Exception:
-    try:
-        from visual_gedcom_ids import VisualGedcomIds  # type: ignore
-    except Exception:
-        VisualGedcomIds = None
-
-try:
-    from .people_list_ctrl_panel import PeopleListCtrlPanel  # type: ignore
-except Exception:
-    try:
-        from people_list_ctrl_panel import PeopleListCtrlPanel  # type: ignore
-    except Exception:
-        PeopleListCtrlPanel = None
-
-try:
-    from .gedcomDialogs import FindDialog, PersonDialog  # type: ignore
-except Exception:
-    try:
-        from gedcomDialogs import FindDialog, PersonDialog  # type: ignore
-    except Exception:
-        FindDialog = None
-        PersonDialog = None
-
-# Prefer gvOptions under gui.gedcomoptions, fallback to other locations, or None
-try:
-    from gedcomoptions import gvOptions, ResultsType  # type: ignore
-except Exception:
-    try:
-        from .gedcomoptions import gvOptions, ResultsType  # type: ignore
-    except Exception:
-        try:
-            from gedcomoptions import gvOptions, ResultsType  # type: ignore
-        except Exception:
-            gvOptions = None
-            ResultsType = None
+from .visual_gedcom_ids import VisualGedcomIds  # type: ignore
+from .people_list_ctrl_panel import PeopleListCtrlPanel  # type: ignore
+from .person_dialog import PersonDialog  # type: ignore
+from .find_dialog import FindDialog  # type: ignore
+from gedcomoptions import gvOptions, ResultsType  # type: ignore
+from .background_actions import BackgroundActions
 
 (UpdateBackgroundEvent, EVT_UPDATE_STATE) = wx.lib.newevent.NewEvent()
-
-try:
-    from .gedcomDialogs import BackgroundActions
-except Exception:
-    try:
-        from gedcomDialogs import BackgroundActions
-    except Exception:
-        BackgroundActions = None
 
 _log = logging.getLogger(__name__.lower())
 

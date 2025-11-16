@@ -12,12 +12,11 @@ from const import GUINAME, KMLMAPSURL
 
 _log = logging.getLogger(__name__.lower())
 
-# gedcomDialogs helpers (package-aware import with fallback)
-try:
-    from .gedcomDialogs import AboutDialog, HelpDialog, ConfigDialog
-except Exception:
-    from gedcomDialogs import AboutDialog, HelpDialog, ConfigDialog
-
+from .config_dialog import ConfigDialog
+from .about_dialog import AboutDialog
+from .help_dialog import HelpDialog
+from .visual_map_panel import VisualMapPanel
+from .visual_gedcom_ids import VisualGedcomIds
 
 class VisualMapFrame(wx.Frame):
     def __init__(self, *args, **kw):
@@ -41,12 +40,6 @@ class VisualMapFrame(wx.Frame):
         self.StatusBar.SetFieldsCount(number=2, widths=[-1, widthMax])
         self.SetStatusText("Visual Mapping ready", 0)
         self.inTimer = False
-
-        # Lazy import VisualMapPanel to avoid circular imports at module import time
-        try:
-            from .gedcomVisualGUI import VisualMapPanel
-        except Exception:
-            from gedcomVisualGUI import VisualMapPanel
 
         # Create and set up the main panel within the frame
         self.visual_map_panel = VisualMapPanel(self, self.font_manager)  # pass the frame's FontManager into the panel
@@ -76,10 +69,6 @@ class VisualMapFrame(wx.Frame):
 
     def makeMenuBar(self):
         self.id = None
-        try:
-            from .gedcomVisualGUI import VisualGedcomIds
-        except Exception:
-            from gedcomVisualGUI import VisualGedcomIds
 
         self.id = VisualGedcomIds()
         self.menuBar = menuBar = wx.MenuBar()

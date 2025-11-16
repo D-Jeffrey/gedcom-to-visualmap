@@ -57,31 +57,6 @@ InfoBoxLines = 8
 from wx.lib.embeddedimage import PyEmbeddedImage
 
 
-# Use the moved VisualGedcomIds implementation
-try:
-    from .visual_gedcom_ids import VisualGedcomIds
-except Exception:
-    try:
-        from visual_gedcom_ids import VisualGedcomIds
-    except Exception:
-        # Minimal fallback so module import still succeeds in degraded environments
-        class VisualGedcomIds:
-            def __init__(self):
-                self.m = {}
-                self.ids = []
-                self.IDs = {}
-            def GetColor(self, _name, default=wx.WHITE):
-                return default
+from .visual_gedcom_ids import VisualGedcomIds
 
-# Use the moved PeopleListCtrlPanel implementation
-try:
-    from .people_list_ctrl_panel import PeopleListCtrlPanel
-except Exception:
-    try:
-        from people_list_ctrl_panel import PeopleListCtrlPanel
-    except Exception:
-        # fallback stub to avoid import-time failure
-        class PeopleListCtrlPanel(wx.Panel):
-            def __init__(self, parent, people, font_manager, *args, **kw):
-                super().__init__(parent, *args, **kw)
-                wx.StaticText(self, -1, "PeopleListCtrlPanel unavailable")
+from .people_list_ctrl_panel import PeopleListCtrlPanel

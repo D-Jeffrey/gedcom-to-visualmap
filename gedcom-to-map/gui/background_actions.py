@@ -5,6 +5,8 @@ from pathlib import Path
 
 import wx
 
+from .gedcomvisual import ParseAndGPS, doHTML, doKML, doKML2, doSUM, doTraceTo  # type: ignore
+
 _log = logging.getLogger(__name__.lower())
 
 
@@ -75,15 +77,6 @@ class BackgroundActions:
         circular dependencies with the GUI package.
         """
         self.SayInfoMessage(' ', True)  # prime the InfoBox
-        # lazy import of processing helpers
-        try:
-            from gui.gedcomvisual import ParseAndGPS, doHTML, doKML, doKML2, doSUM, doTraceTo  # type: ignore
-        except Exception:
-            try:
-                from gedcomvisual import ParseAndGPS, doHTML, doKML, doKML2, doSUM, doTraceTo  # type: ignore
-            except Exception:
-                ParseAndGPS = doHTML = doKML = doKML2 = doSUM = doTraceTo = None
-                _log.exception("Could not import gedcomvisual helpers in BackgroundActions")
 
         while self.keepGoing:
             if self.do != 0 and self.readyToDo:

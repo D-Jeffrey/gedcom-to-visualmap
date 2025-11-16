@@ -5,15 +5,7 @@ from style.stylemanager import FontManager
 
 _log = logging.getLogger(__name__.lower())
 
-# HTMLDialog moved earlier to gui/html_dialog.py; import with fallback.
-try:
-    from .html_dialog import HTMLDialog
-except Exception:
-    try:
-        from html_dialog import HTMLDialog
-    except Exception:
-        HTMLDialog = None
-
+from .html_dialog import HTMLDialog
 
 class HelpDialog(HTMLDialog):
     def __init__(self, parent, title, font_manager: FontManager):

@@ -12,7 +12,7 @@ import logging.config
 
 from const import LOG_CONFIG, NAME, VERSION
 from gedcomoptions import gvOptions, ResultsType
-from gedcomvisual import Geoheatmap, gedcom_to_map
+from gui.gedcomvisual import Geoheatmap, gedcom_to_map
 
 _log = logging.getLogger(__name__)
 

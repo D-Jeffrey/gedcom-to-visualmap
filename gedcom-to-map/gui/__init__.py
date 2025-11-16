@@ -5,85 +5,41 @@ callers can still import modules directly (e.g. `from gui.person_dialog import P
 """
 __all__ = []
 
-# Frames / Panels / Controls
-try:
-    from .visual_map_frame import VisualMapFrame  # type: ignore
-    __all__.append("VisualMapFrame")
-except Exception:
-    pass
+from .visual_map_frame import VisualMapFrame  # type: ignore
+__all__.append("VisualMapFrame")
 
-try:
-    from .gedcomVisualGUI import VisualMapPanel  # type: ignore
-    __all__.append("VisualMapPanel")
-except Exception:
-    pass
+from .gedcomVisualGUI import VisualMapPanel  # type: ignore
+__all__.append("VisualMapPanel")
 
-try:
-    from .gedcomVisualGUI import VisualGedcomIds  # type: ignore
-    __all__.append("VisualGedcomIds")
-except Exception:
-    pass
+from .gedcomVisualGUI import VisualGedcomIds  # type: ignore
+__all__.append("VisualGedcomIds")
 
-try:
-    from .people_list_ctrl import PeopleListCtrl  # type: ignore
-    __all__.append("PeopleListCtrl")
-except Exception:
-    pass
+from .people_list_ctrl import PeopleListCtrl  # type: ignore
+__all__.append("PeopleListCtrl")
 
-try:
-    from .gedcomVisualGUI import PeopleListCtrlPanel  # type: ignore
-    __all__.append("PeopleListCtrlPanel")
-except Exception:
-    pass
+from .gedcomVisualGUI import PeopleListCtrlPanel  # type: ignore
+__all__.append("PeopleListCtrlPanel")
 
-# Dialogs & helpers
-try:
-    from .gedcomDialogs import HTMLDialog  # type: ignore
-    __all__.append("HTMLDialog")
-except Exception:
-    pass
+from .html_dialog import HTMLDialog  # type: ignore
+__all__.append("HTMLDialog")
 
-try:
-    from .gedcomDialogs import AboutDialog  # type: ignore
-    __all__.append("AboutDialog")
-except Exception:
-    pass
+from .about_dialog import AboutDialog  # type: ignore
+__all__.append("AboutDialog")
 
-try:
-    from .gedcomDialogs import HelpDialog  # type: ignore
-    __all__.append("HelpDialog")
-except Exception:
-    pass
+from .help_dialog import HelpDialog  # type: ignore
+__all__.append("HelpDialog")
 
-try:
-    from .gedcomDialogs import ConfigDialog  # type: ignore
-    __all__.append("ConfigDialog")
-except Exception:
-    pass
+from .config_dialog import ConfigDialog  # type: ignore
+__all__.append("ConfigDialog")
 
-try:
-    from .gedcomDialogs import PersonDialog  # type: ignore
-    __all__.append("PersonDialog")
-except Exception:
-    pass
+from .person_dialog import PersonDialog  # type: ignore
+__all__.append("PersonDialog")
 
-try:
-    from .gedcomDialogs import FindDialog  # type: ignore
-    __all__.append("FindDialog")
-except Exception:
-    pass
+from .find_dialog import FindDialog  # type: ignore
+__all__.append("FindDialog")
 
-# Panels and background actions
-try:
-    from .gedcomDialogs import FamilyPanel  # type: ignore
-    __all__.append("FamilyPanel")
-except Exception:
-    pass
+from .family_panel import FamilyPanel  # type: ignore
+__all__.append("FamilyPanel")
 
-try:
-    from .gedcomDialogs import BackgroundActions  # type: ignore
-    __all__.append("BackgroundActions")
-except Exception:
-    pass
-
-# Utility: keep this file lightweight; import modules directly if you need full traceback.
+from .background_actions import BackgroundActions  # type: ignore
+__all__.append("BackgroundActions")

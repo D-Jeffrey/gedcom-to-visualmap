@@ -7,6 +7,8 @@ import wx
 
 from models.Person import Person, LifeEvent
 from gedcom.gedcomdate import CheckAge
+from .family_panel import FamilyPanel
+from .gedcomvisual import doTraceTo
 
 _log = logging.getLogger(__name__.lower())
 
@@ -94,17 +96,6 @@ class PersonDialog(wx.Dialog):
             sizer.Add(self.issuesTextCtrl, 1, wx.EXPAND|wx.ALL, border=5)
             self.issuesTextCtrl.SetBackgroundColour(wx.YELLOW)
     
-        # set the person's data in the UI controls
-        # formatPersonName is defined in gedcomDialogs; import at runtime to avoid circular import
-        try:
-            from .gedcomDialogs import formatPersonName
-        except Exception:
-            try:
-                from gedcomDialogs import formatPersonName
-            except Exception:
-                def formatPersonName(p, longForm=True):
-                    return f"{getattr(p,'firstname','')} {getattr(p,'surname','')}" if p else "<none>"
-
         self.nameTextCtrl.SetValue(formatPersonName(person))
 
         # Should be conditional
@@ -140,21 +131,7 @@ class PersonDialog(wx.Dialog):
         # lineage / family panel creation is deferred and imports FamilyPanel at runtime
         self.related = None
         if self.gOp and getattr(self.gOp, "Referenced", None) and showrefences:
-            try:
-                from .gedcomDialogs import FamilyPanel
-            except Exception:
-                try:
-                    from gedcomDialogs import FamilyPanel
-                except Exception:
-                    FamilyPanel = None
             if FamilyPanel and panel and getattr(panel, "gOp", None) and panel.gOp.Referenced.exists(person.xref_id):
-                try:
-                    from gui.gedcomvisual import doTraceTo
-                except Exception:
-                    try:
-                        from gedcomvisual import doTraceTo
-                    except Exception:
-                        doTraceTo = None
                 if doTraceTo:
                     hertiageList = doTraceTo(panel.gOp, person)
                     if hertiageList:
@@ -184,13 +161,6 @@ class PersonDialog(wx.Dialog):
                                     descript, 
                                     hid)
             childsize = None
-            try:
-                from .gedcomDialogs import FamilyPanel
-            except Exception:
-                try:
-                    from gedcomDialogs import FamilyPanel
-                except Exception:
-                    FamilyPanel = None
             if FamilyPanel:
                 childsize = FamilyPanel(self, childSet, isChildren=True)
             else:

@@ -4,18 +4,12 @@ import wx
 import wx.lib.mixins.listctrl as listmix
 
 from gedcom.gedcomdate import CheckAge
+from .person_dialog import PersonDialog
+from .find_dialog import FindDialog
+from .visual_gedcom_ids import VisualGedcomIds
+from .gedcomvisual import doTrace
 
 _log = logging.getLogger(__name__.lower())
-
-# Try to import VisualGedcomIds locally to avoid importing gedcomVisualGUI and creating a cycle
-try:
-    from .visual_gedcom_ids import VisualGedcomIds  # type: ignore
-except Exception:
-    try:
-        from visual_gedcom_ids import VisualGedcomIds  # type: ignore
-    except Exception:
-        VisualGedcomIds = None
-
 
 class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSorterMixin):
     def __init__(self, parent, ID, pos=wx.DefaultPosition,
@@ -261,10 +255,6 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
 
     def OnFind(self, event):
         parent_win = self.get_visual_map_panel() or self.GetTopLevelParent()
-        try:
-            from .gedcomDialogs import FindDialog
-        except Exception:
-            from gedcomDialogs import FindDialog
         find_dialog = FindDialog(parent_win, "Find", LastSearch=self.LastSearch)
         if find_dialog.ShowModal() == wx.ID_OK:
             self.LastSearch = find_dialog.GetSearchString()
@@ -288,10 +278,6 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
                 itm = self.GetItemText(self.currentItem, 2)
                 if itm in self.gOp.BackgroundProcess.people:
                     parent_win = self.get_visual_map_panel() or self.GetTopLevelParent()
-                    try:
-                        from .gedcomDialogs import PersonDialog
-                    except Exception:
-                        from gedcomDialogs import PersonDialog
                     dialog = PersonDialog(parent_win, self.gOp.BackgroundProcess.people[itm], parent_win, font_manager=self.font_manager, gOp=self.gOp)
                     dialog.Bind(wx.EVT_CLOSE, lambda evt: dialog.Destroy())
                     dialog.Bind(wx.EVT_BUTTON, lambda evt: dialog.Destroy())
@@ -309,10 +295,6 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
             if getattr(self.gOp.BackgroundProcess, "updategridmain", False):
                 _log.debug("Linage for: %s", personid)
                 self.gOp.BackgroundProcess.updategridmain = False
-                try:
-                    from gui.gedcomvisual import doTrace
-                except Exception:
-                    from gedcomvisual import doTrace
                 doTrace(self.gOp)
                 self.gOp.newload = False
                 self.PopulateList(self.gOp.people, self.gOp.get('Main'), False)

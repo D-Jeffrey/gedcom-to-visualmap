@@ -1,6 +1,7 @@
 import logging
 import wx
 import wx.lib.mixins.listctrl as listmix
+from .people_list_ctrl import PeopleListCtrl
 
 _log = logging.getLogger(__name__.lower())
 
@@ -30,14 +31,6 @@ class PeopleListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
             sizer.Add(st, 0, wx.EXPAND | wx.LEFT, 5)
         self.Bind(wx.EVT_SIZE, self._on_size_wrap_info)
         tID = wx.NewIdRef()
-        # The PeopleListCtrl class is provided by the main package module; import lazily to avoid cycles
-        try:
-            from .people_list_ctrl import PeopleListCtrl  # type: ignore
-        except Exception:
-            try:
-                from people_list_ctrl import PeopleListCtrl  # type: ignore
-            except Exception:
-                PeopleListCtrl = wx.ListCtrl
 
         self.list = PeopleListCtrl(self, tID,
                         style=wx.LC_REPORT | wx.BORDER_SUNKEN | wx.LC_SINGLE_SEL,

@@ -703,12 +703,6 @@ and generating the output so that the GUI can continue to be responsive
                     wx.PostEvent(self.win, UpdateBackgroundEvent(state='busy'))
                     wx.Yield()
                     _log.info("start ParseAndGPS")
-                    if hasattr(self, 'people'):
-                        if self.people:                            
-                            del self.people
-                            self.gOp.people = None
-                            self.people = None
-                    _log.info("ParseAndGPS")
                     try:
                         self.people = ParseAndGPS(self.gOp, 1)
                     

@@ -1066,7 +1066,7 @@ class VisualMapPanel(wx.Panel):
 
         # First select controls
 
-        self.id.CBUseGPS = wx.CheckBox(panel, self.id.IDs['ID_CBUseGPS'], "Use GPS lookup (uncheck if GPS is in file)")#,  wx.NO_BORDER)
+        self.id.CBUseGPS = wx.CheckBox(panel, self.id.IDs['ID_CBUseGPS'], "Lookup all address (ignore cache)")#,  wx.NO_BORDER)
         self.id.CBCacheOnly = wx.CheckBox(panel, self.id.IDs['ID_CBCacheOnly'], "Cache Only, do not lookup addresses")#, , wx.NO_BORDER)
         self.id.labelDefCountry = wx.StaticText(panel, -1,  "Default Country:   ") 
         self.id.TEXTDefaultCountry = wx.TextCtrl(panel, self.id.IDs['ID_TEXTDefaultCountry'], "", size=(250,20))
@@ -1689,18 +1689,6 @@ class VisualMapPanel(wx.Panel):
         # layout the Summary box, and KML box in the same space as the HTML box (toggle them off and on to dsisplay)
         # also forward the boxes to be there maximinum size, they may ahve been made small when setup and rendering
         
-        # self.optionKbox.SetPosition(wx.Point(self.optionKbox.GetPosition().x, self.optionHbox.GetPosition().y))
-        # if self.optionKbox.GetSize() != self.optionKbox.GetBestSize():
-        #     self.optionKbox.SetSize(self.optionKbox.GetBestSize())
-        # self.optionK2box.SetPosition(wx.Point(self.optionK2box.GetPosition().x, self.optionHbox.GetPosition().y))
-        # if self.optionK2box.GetSize() != self.optionK2box.GetBestSize():
-        #     self.optionK2box.SetSize(self.optionK2box.GetBestSize())
-        # self.optionSbox.SetPosition(wx.Point(self.optionSbox.GetPosition().x, self.optionHbox.GetPosition().y))
-        # if self.optionSbox.GetSize() != self.optionSbox.GetBestSize():
-        #     self.optionSbox.SetSize(self.optionSbox.GetBestSize())
-        # self.optionHbox.SetPosition(wx.Point(self.optionKbox.GetPosition().x, self.optionHbox.GetPosition().y))
-        # if self.optionHbox.GetSize() != self.optionHbox.GetBestSize():
-        #     self.optionHbox.SetSize(self.optionHbox.GetBestSize())
         # Enable/disable controls based on result type (HTML vs KML vs Summary Mode )
         
         self.optionHbox.Hide()
@@ -1781,7 +1769,6 @@ class VisualMapPanel(wx.Panel):
         self.id.CBMapTimeLine.SetValue(self.gOp.get('MapTimeLine'))
         self.id.CBUseAntPath.SetValue(self.gOp.get('UseAntPath'))
         self.id.CBUseGPS.SetValue(self.gOp.get('UseGPS'))
-        self.id.CBUseGPS.Disable()
         self.id.CBAllEntities.SetValue(self.gOp.get('AllEntities'))
         self.id.CBCacheOnly.SetValue(self.gOp.get('CacheOnly'))
         self.id.LISTHeatMapTimeStep.SetValue(self.gOp.get('HeatMapTimeStep'))

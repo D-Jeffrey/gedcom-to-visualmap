@@ -14,8 +14,8 @@ import _thread
 import logging
 import logging.config
 import os
+import math
 import os.path
-import platform
 from pathlib import Path
 import re
 import subprocess
@@ -448,7 +448,11 @@ class VisualMapFrame(wx.Frame):
     def Cleanup(self, *args):
         # A little extra cleanup is required for the FileHistory control
         del self.filehistory
-        self.menu.Destroy()
+        try:
+            if getattr(self, "menuBar", None):
+                self.menuBar.Destroy()
+        except Exception:
+            _log.exception("Cleanup: failed to destroy menuBar")
 
     def OnFileHistory(self, evt):
         # get the file based on the menu ID
@@ -532,7 +536,6 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
         self._LastGridOnlyFamily = self.GridOnlyFamily
         self.LastSearch = ""
         self.gOp = None
-        self.visual_map_panel = self.GetParent().GetParent()
 
         self.SetImageList(self.il, wx.IMAGE_LIST_SMALL)
         self.SetTextColour(self.id.GetColor('GRID_TEXT'))
@@ -681,17 +684,29 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
         if self.gOp and self.gOp.running:
             # Hack race condition
             if not wasrunning:
-                self.visual_map_panel.StopTimer()
+                vis = self.get_visual_map_panel()
+                if vis and getattr(vis, "StopTimer", None):
+                    try:
+                        vis.StopTimer()
+                    except Exception:
+                        _log.exception("StopTimer call failed on visual_map_panel")
             self.gOp.running = wasrunning
             
         self.active = False
 
-   
-    # Used by the ColumnSorterMixin, see wx/lib/mixins/listctrl.py
-    def GetListCtrl(self):
-        # print("GetListCtrl {} {}".format(self.GetSortState(), self.itemDataMap[1]))
-        return self.list
-
+    def get_visual_map_panel(self):
+        vis = getattr(self, 'visual_map_panel', None)
+        if vis is None:
+            ancestor = self.GetParent()
+            while ancestor is not None:
+                vis = getattr(ancestor, 'visual_map_panel', None)
+                if vis is not None:
+                    break
+                ancestor = ancestor.GetParent()
+        if vis is None:
+            top = self.GetTopLevelParent()
+            vis = getattr(top, 'visual_map_panel', None)
+        return vis
 
     # Specifically designed to deal with the 2nd return value from refyear
     def ParseDate(self, datestring):
@@ -742,7 +757,8 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
         return self
 
     def OnFind(self, event):
-        find_dialog = FindDialog(self.visual_map_panel, "Find", LastSearch=self.LastSearch)
+        parent_win = self.get_visual_map_panel() or self.GetTopLevelParent()
+        find_dialog = FindDialog(parent_win, "Find", LastSearch=self.LastSearch)
         if find_dialog.ShowModal() == wx.ID_OK:
             self.LastSearch = find_dialog.GetSearchString()
             if self.GetItemCount() > 1:
@@ -765,7 +781,8 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
         if self.gOp.BackgroundProcess.people:
             itm = self.GetItemText(self.currentItem, 2)
             if itm in self.gOp.BackgroundProcess.people:
-                dialog = PersonDialog(self.visual_map_panel, self.gOp.BackgroundProcess.people[itm], self.visual_map_panel, font_manager=self.font_manager, gOp=self.gOp)
+                parent_win = self.get_visual_map_panel() or self.GetTopLevelParent()
+                dialog = PersonDialog(parent_win, self.gOp.BackgroundProcess.people[itm], parent_win, font_manager=self.font_manager, gOp=self.gOp)
                 dialog.Bind(wx.EVT_CLOSE, lambda evt: dialog.Destroy())
                 dialog.Bind(wx.EVT_BUTTON, lambda evt: dialog.Destroy())
                 dialog.Show(True)
@@ -789,7 +806,9 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
                 self.PopulateList(self.gOp.people, self.gOp.get('Main'), False)
                 self.gOp.BackgroundProcess.SayInfoMessage(f"Using '{personid}' as starting person with {len(self.gOp.Referenced)} direct ancestors", False)
                 self.gOp.BackgroundProcess.updategridmain = self.gOp.people is not None
-                self.visual_map_panel.SetupButtonState()
+                vis = self.get_visual_map_panel()
+                if vis and getattr(vis, "SetupButtonState", None):
+                    vis.SetupButtonState()
 
 
     def OnColClick(self, event):
@@ -844,33 +863,84 @@ class PeopleListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
     Raises:
         None
         """
-        super().__init__(*args, **kw)
-        wx.Panel.__init__(self, parent, -1, style=wx.WANTS_CHARS, name="PeoplePanel")
+        super().__init__(parent, *args, **kw)
+
         # TODO This box defination still have a scroll overlap problem
         sizer = wx.BoxSizer(wx.VERTICAL)
         self.messagelog = "*  Select a file, Load it and Create Files or change Result Type, Open Geo Table to edit addresses  *"
         self.InfoBox = []
+        # store the raw (unwrapped) text for each line so we can re-wrap when width changes
+        self.InfoBoxRaw = [''] * InfoBoxLines
         for i in range(InfoBoxLines):
-            self.InfoBox.append(wx.StaticText(parent, -1, ' '))
-            sizer.Add(self.InfoBox[i], 0, wx.LEFT,5)
+            st = wx.StaticText(self, -1, ' ')
+            self.InfoBox.append(st)
+            sizer.Add(st, 0, wx.EXPAND | wx.LEFT, 5)
+        self.Bind(wx.EVT_SIZE, self._on_size_wrap_info)
         tID = wx.NewIdRef()
-        self.visual_map_panel = self.GetParent()
-        self.list = PeopleListCtrl(parent, tID,
+        self.list = PeopleListCtrl(self, tID,
                         style=wx.LC_REPORT | wx.BORDER_SUNKEN | wx.LC_SINGLE_SEL,
                         size=wx.Size(600,600),
                         font_manager=font_manager)
-        sizer.Add(self.list, -1, wx.EXPAND)
-
+        sizer.Add(self.list, 1, wx.EXPAND)
+ 
         self.list.PopulateList(people, None, True)
 
         self.currentItem = 0
-        parent.SetSizer(sizer)
+        self.SetSizer(sizer)
+        wx.CallAfter(self._on_size_wrap_info, None)
         
-    def setGOp(self, gOp):
+    def get_visual_map_panel(self):
+        vis = getattr(self, 'visual_map_panel', None)
+        if vis is None:
+            ancestor = self.GetParent()
+            while ancestor is not None:
+                vis = getattr(ancestor, 'visual_map_panel', None)
+                if vis is not None:
+                    break
+                ancestor = ancestor.GetParent()
+        if vis is None:
+            top = self.GetTopLevelParent()
+            vis = getattr(top, 'visual_map_panel', None)
+        return vis
+            
+    def SetGOp(self, gOp):
         self.gOp = gOp
         if self.list:
             self.list.SetGOp(gOp)
 
+    def _on_size_wrap_info(self, event):
+        """ Handle resizing of the info box area to wrap text appropriately. """
+        width = self.GetClientSize().width
+        wrap_width = max(10, width - 12)
+        # Use the raw text for wrapping so previous wrapped linebreaks are not preserved.
+        for i, info in enumerate(getattr(self, "InfoBox", [])):
+            try:
+                raw = self.InfoBoxRaw[i] if i < len(self.InfoBoxRaw) else ''
+                # set the unwrapped text then wrap to the current width
+                info.SetLabel(raw)
+                info.Wrap(wrap_width)
+            except Exception:
+                pass
+        self.Layout()
+        if event:
+            event.Skip()
+
+    def append_info_box(self, message):
+        nlines = (message+'\n'+self.messagelog).split('\n')
+        # update raw stored lines, then trigger wrapping to current width
+        for i in range(InfoBoxLines):
+            if i>= (len(nlines)):
+                self.InfoBoxRaw[i] = ''
+            else:
+                self.InfoBoxRaw[i] = nlines[i]
+        self.messagelog = '\n'.join(nlines[:InfoBoxLines])
+        # reflow to current width on the GUI thread
+        wx.CallAfter(self._on_size_wrap_info, None)
+
+    def stop(self):
+        visual_map_panel = self.get_visual_map_panel()
+        if visual_map_panel:
+            visual_map_panel.StopTimer()
 
 class VisualMapPanel(wx.Panel):
     """
@@ -899,44 +969,59 @@ class VisualMapPanel(wx.Panel):
         self.id = VisualGedcomIds()
         
         # create a panel in the frame
-        self.panelA = wx.Panel(self, -1, size=(760,420),style=wx.SIMPLE_BORDER  )
-        self.panelB = wx.Panel(self, -1, size=(300,420),style=wx.SIMPLE_BORDER  )
+        self.panelA = wx.Panel(self, -1, style=wx.SIMPLE_BORDER)
+        self.panelB = wx.Panel(self, -1, style=wx.SIMPLE_BORDER)
         
         # https://docs.wxpython.org/wx.ColourDatabase.html#wx-colourdatabase
         self.panelA.SetBackgroundColour(self.id.GetColor('INFO_BOX_BACKGROUND'))
         self.panelB.SetBackgroundColour(wx.WHITE)
 
-        # Data Grid side
-        lcA = wx.LayoutConstraints()
-        lcA.top.SameAs( self, wx.Top, 5)
-        lcA.left.SameAs( self, wx.Left, 5)
-        lcA.bottom.SameAs( self, wx.Bottom, 5)
-        lcA.right.LeftOf( self.panelB, 5)
-        self.panelA.SetConstraints(lcA)
-
-        # TODO make the Controls side fixed in width and resize the Data Grid side
-        # Controls Side        
-        lc = wx.LayoutConstraints()
-        lc.top.SameAs( self, wx.Top, 5)
-        lc.right.SameAs( self, wx.Right, 5)
-        lc.bottom.SameAs( self, wx.Bottom, 5)
-        lc.left.PercentOf( self, wx.Right, 60)
-        self.panelB.SetConstraints(lc)
-        
+        main_hs = wx.BoxSizer(wx.HORIZONTAL)
+        main_hs.Add(self.panelA, 1, wx.EXPAND | wx.ALL, 5)
+        main_hs.Add(self.panelB, 0, wx.EXPAND | wx.ALL, 5)
+        self.SetSizer(main_hs)
+        self.Layout()
 
         # Add Data Grid on Left panel
-        self.peopleList = PeopleListCtrlPanel(self.panelA, self.id.m, font_manager=self.font_manager)
+        self.peopleList = PeopleListCtrlPanel(self.panelA, self.id.m, self.font_manager)
         
         # Add all the labels, button and radiobox to Right Panel
         self.LayoutOptions(self.panelB)
 
+        pa_sizer = wx.BoxSizer(wx.VERTICAL)
+        pa_sizer.Add(self.peopleList, 1, wx.EXPAND | wx.ALL, 5)
+        self.panelA.SetSizer(pa_sizer)
+        self.panelA.Layout()
+
+        self._adjust_panelB_width()
+
         self.lastruninstance = 0.0
         self.remaintime = 0
+
+    def _adjust_panelB_width(self):
+        # Representative labels / longest control captions used in LayoutOptions
+        sample_texts = [
+            "Input file:   ", "Output file: ", "Default Country:   ",
+            "Default Country:", "Map Style", "HTML Options", "Create Files", "Geo Table"
+        ]
+        # measure longest text in pixels
+        max_text_len = max(len(s) for s in sample_texts)
+        text_px = self.font_manager.get_text_width(max_text_len)
+        # set panelB width with some padding
+        extra_for_controls = int(220 + (self.font_size * 6))
+        desired = max(300, text_px + extra_for_controls)
+        # Apply as minimum width so sizer keeps panelB readable
+        self.panelB.SetMinSize((desired, -1))
+        # Apply layout update
+        self.Layout()
+        self.Refresh()
 
     def set_current_font(self):
         self.font_manager.apply_current_font_recursive(self)
         self.font_manager.apply_current_font_recursive(self.peopleList) 
 
+        # adjust right-hand panel width to match new font metrics
+        wx.CallAfter(self._adjust_panelB_width)
         self.Layout()
         self.Refresh()
 
@@ -1007,66 +1092,62 @@ class VisualMapPanel(wx.Panel):
         """
           HTML select controls in a Box
         """
-        hbox = wx.StaticBox( panel, -1, "HTML Options", size=(300,-1))
-        hTopBorder, hOtherBorder = hbox.GetBordersForSizer()
-        hsizer = wx.BoxSizer(wx.VERTICAL)
-        hsizer.AddSpacer(hTopBorder)
+        hbox_container = wx.Panel(panel)
+        hbox = wx.StaticBox( hbox_container, -1, "HTML Options")
+        hsizer = wx.StaticBoxSizer(hbox, wx.VERTICAL)
+        # Small inner sizer for the controls
         hboxIn = wx.BoxSizer(wx.VERTICAL)
+        
         mapchoices =  sorted(self.id.AllMapTypes)
         mapboxsizer = wx.BoxSizer(wx.HORIZONTAL)
         mapStyleLabel = wx.StaticText(hbox, -1, " Map Style")
-        self.id.CBMarksOn = wx.CheckBox(hbox, self.id.IDs['ID_CBMarksOn'], "Markers",name='MarksOn')
+        self.id.CBMarksOn = wx.CheckBox(hbox_container, self.id.IDs['ID_CBMarksOn'], "Markers", name='MarksOn')
 
-        self.id.CBHomeMarker = wx.CheckBox(hbox, self.id.IDs['ID_CBHomeMarker'], "Marker point or homes")
-        self.id.CBMarkStarOn = wx.CheckBox(hbox, self.id.IDs['ID_CBMarkStarOn'], "Marker starter with Star")
-        self.id.CBMapTimeLine = wx.CheckBox(hbox, self.id.IDs['ID_CBMapTimeLine'], "Add Timeline")
-
-        self.id.LISTMapType = wx.Choice(hbox, self.id.IDs['ID_LISTMapStyle'], name="MapStyle", choices=mapchoices)
-        self.id.CBMapControl = wx.CheckBox(hbox, self.id.IDs['ID_CBMapControl'], "Open Map Controls",name='MapControl') 
-        self.id.CBMapMini = wx.CheckBox(hbox, self.id.IDs['ID_CBMapMini'], "Add Mini Map",name='MapMini') 
+        self.id.CBHomeMarker = wx.CheckBox(hbox_container, self.id.IDs['ID_CBHomeMarker'], "Marker point or homes")
+        self.id.CBMarkStarOn = wx.CheckBox(hbox_container, self.id.IDs['ID_CBMarkStarOn'], "Marker starter with Star")
+        self.id.CBMapTimeLine = wx.CheckBox(hbox_container, self.id.IDs['ID_CBMapTimeLine'], "Add Timeline")
+        self.id.LISTMapType = wx.Choice(hbox_container, self.id.IDs['ID_LISTMapStyle'], name="MapStyle", choices=mapchoices)
+        self.id.CBMapControl = wx.CheckBox(hbox_container, self.id.IDs['ID_CBMapControl'], "Open Map Controls",name='MapControl') 
+        self.id.CBMapMini = wx.CheckBox(hbox_container, self.id.IDs['ID_CBMapMini'], "Add Mini Map",name='MapMini') 
         
         
         
-        self.id.CBHeatMap = wx.CheckBox(hbox, self.id.IDs['ID_CBHeatMap'], "Heatmap", style = wx.NO_BORDER)
+        self.id.CBHeatMap = wx.CheckBox(hbox_container, self.id.IDs['ID_CBHeatMap'], "Heatmap", style = wx.NO_BORDER)
         
-        self.id.CBUseAntPath = wx.CheckBox(hbox, self.id.IDs['ID_CBUseAntPath'], "Ant paths")
+        self.id.CBUseAntPath = wx.CheckBox(hbox_container, self.id.IDs['ID_CBUseAntPath'], "Ant paths")
         
         TimeStepVal = 5
-        self.id.LISTHeatMapTimeStep = wx.Slider(hbox, self.id.IDs['ID_LISTHeatMapTimeStep'], TimeStepVal,1, 100, size=(250, 45),
+        self.id.LISTHeatMapTimeStep = wx.Slider(hbox_container, self.id.IDs['ID_LISTHeatMapTimeStep'], TimeStepVal,1, 100, size=(250, 45),
                 style=wx.SL_HORIZONTAL | wx.SL_AUTOTICKS | wx.SL_LABELS )
         self.id.LISTHeatMapTimeStep.SetTickFreq(5)
-        self.id.RBGroupBy  = wx.RadioBox(hbox, self.id.IDs['ID_RBGroupBy'], "Group by:", 
+        self.id.RBGroupBy  = wx.RadioBox(hbox_container, self.id.IDs['ID_RBGroupBy'], "Group by:", 
                                        choices = ['None', 'Last Name', 'Last Name (Soundex)','Person'], majorDimension= 2)
         mapboxsizer.Add(self.id.LISTMapType)
         mapboxsizer.Add( mapStyleLabel)
         
         
         hboxIn.AddMany([
-            self.id.CBMarksOn,
-            self.id.CBHomeMarker,
-            self.id.CBMarkStarOn,
-            self.id.CBMapTimeLine,        
-            self.id.RBGroupBy, 
-            mapboxsizer,
-            self.id.CBMapControl,
-            self.id.CBMapMini,
-            self.id.CBUseAntPath,
-            self.id.CBHeatMap,
-            (0,5),
-            self.id.LISTHeatMapTimeStep,
-            (0,5)
-            ])
-        hsizer.Add( hboxIn, wx.LEFT, hOtherBorder+5)
-        
-        hbox.SetSizer(hsizer)
-        self.optionHbox = hbox
+            (self.id.CBMarksOn, 0, wx.ALL, 2),
+            (self.id.CBHomeMarker, 0, wx.ALL, 2),
+            (self.id.CBMarkStarOn, 0, wx.ALL, 2),
+            (self.id.CBMapTimeLine, 0, wx.ALL, 2),        
+            (self.id.RBGroupBy, 0, wx.ALL, 2), 
+            (mapboxsizer, 0, wx.EXPAND | wx.ALL, 4),
+            (self.id.CBMapControl, 0, wx.ALL, 2),
+            (self.id.CBMapMini, 0, wx.ALL, 2),
+            (self.id.CBUseAntPath, 0, wx.ALL, 2),
+            (self.id.CBHeatMap, 0, wx.ALL, 2),
+            (self.id.LISTHeatMapTimeStep, 0, wx.EXPAND | wx.ALL, 4),
+        ])
+        hsizer.Add(hboxIn, 0, wx.EXPAND | wx.ALL, 4)
+        hbox_container.SetSizer(hsizer)
+        self.optionHbox = hbox_container
         #
         # KML select controls in a Box
         #
-        kbox = wx.StaticBox( panel, -1, "KML Options", size=(300,-1))
-        kTopBorder, kOtherBorder = kbox.GetBordersForSizer()
-        ksizer = wx.BoxSizer(wx.VERTICAL)
-        ksizer.AddSpacer(kTopBorder)
+        kbox_container = wx.Panel(panel)
+        kbox = wx.StaticBox( kbox_container, -1, "KML Options")
+        ksizer = wx.StaticBoxSizer(kbox, wx.VERTICAL)
         kboxIn = wx.BoxSizer(wx.VERTICAL)
         if False:
             txtMissing = wx.StaticText(kboxIn, -1,  "Max generation missing: ") 
@@ -1087,28 +1168,26 @@ class VisualMapPanel(wx.Panel):
         kboxs[3].AddMany([self.id.ID_INTMaxLineWeight, wx.StaticText(kbox, -1, " Max Line Weight")])
         kboxIn.AddMany(kboxs)
 
-        ksizer.Add( kboxIn, wx.LEFT, kOtherBorder+5)
-        kbox.SetSizer(ksizer)
-        self.optionKbox = kbox
+        ksizer.Add(kboxIn, 0, wx.EXPAND | wx.ALL, 4)
+        kbox_container.SetSizer(ksizer)
+        self.optionKbox = kbox_container
             #
         # KML select controls in a Box
         #
-        k2box = wx.StaticBox( panel, -1, "KML2 Options", size=(300,-1))
-        k2TopBorder, k2OtherBorder = k2box.GetBordersForSizer()
-        k2sizer = wx.BoxSizer(wx.VERTICAL)
-        k2sizer.AddSpacer(k2TopBorder)
+        k2box_container = wx.Panel(panel)
+        k2box = wx.StaticBox(k2box_container, -1, "KML2 Options")
+        k2sizer = wx.StaticBoxSizer(k2box, wx.VERTICAL)
         k2boxIn = wx.BoxSizer(wx.VERTICAL)
         
-        k2sizer.Add( k2boxIn, wx.LEFT, k2OtherBorder+5)
-        k2box.SetSizer(k2sizer)
-        self.optionK2box = k2box
+        k2sizer.Add(k2boxIn, 0, wx.EXPAND | wx.ALL, 4)
+        k2box_container.SetSizer(k2sizer)
+        self.optionK2box = k2box_container
         #
         # Summary select controls in a Box
         #
-        sbox = wx.StaticBox( panel, -1, "Summary Options", size=(300,-1))
-        sTopBorder, sOtherBorder = sbox.GetBordersForSizer()
-        ssizer = wx.BoxSizer(wx.VERTICAL)
-        ssizer.AddSpacer(sTopBorder)
+        sbox_container = wx.Panel(panel)
+        sbox = wx.StaticBox( sbox_container, -1, "Summary Options")
+        ssizer = wx.StaticBoxSizer(sbox, wx.VERTICAL)
         sboxIn = wx.BoxSizer(wx.VERTICAL)
         
         self.id.CBSummary = [wx.CheckBox(sbox, self.id.IDs['ID_CBSummary'], label="Open files after created", name="Open"),
@@ -1120,9 +1199,9 @@ class VisualMapPanel(wx.Panel):
                              wx.CheckBox(sbox, self.id.IDs['ID_CBSummary'], label="Alternate Places", name="AltPlaces")]
         
         sboxIn.AddMany(self.id.CBSummary)
-        ssizer.Add( sboxIn, wx.LEFT, sOtherBorder+5)
-        sbox.SetSizer(ssizer)
-        self.optionSbox = sbox
+        ssizer.Add(sboxIn, 0, wx.EXPAND | wx.ALL, 4)
+        sbox_container.SetSizer(ssizer)
+        self.optionSbox = sbox_container
 
 
         #
@@ -1130,17 +1209,17 @@ class VisualMapPanel(wx.Panel):
         #
         
         
-        gbox = wx.StaticBox( panel, -1, "Grid View Options",size=(300,40))
-        gTopBorder, gOtherBorder = gbox.GetBordersForSizer()
-        gsizer = wx.BoxSizer(wx.VERTICAL)
-        gsizer.AddSpacer(gTopBorder)
+        gbox_min_height = max(40, int(fh * 4))
+        gbox_container = wx.Panel(panel, size=(300, gbox_min_height))
+        gbox = wx.StaticBox(gbox_container, -1, "Grid View Options")
+        gsizer = wx.StaticBoxSizer(gbox, wx.VERTICAL)
         gboxIn = wx.BoxSizer(wx.VERTICAL)
-        self.id.CBGridView = wx.CheckBox(gbox, self.id.IDs['ID_CBGridView'],  'View Only Direct Ancestors')
+        self.id.CBGridView = wx.CheckBox(gbox_container, self.id.IDs['ID_CBGridView'],  'View Only Direct Ancestors')
         gboxIn.AddMany( [self.id.CBGridView])
-        gsizer.Add( gboxIn, wx.LEFT, gOtherBorder+5)
+        gsizer.Add( gboxIn, 0, wx.EXPAND | wx.ALL, 4)
         
-        gbox.SetSizer(gsizer)
-        self.optionGbox = gbox
+        gbox_container.SetSizer(gsizer)
+        self.optionGbox = gbox_container
         
         self.optionsStack = wx.BoxSizer(wx.VERTICAL)
         # Add all option boxes to the same slot, but hide them initially
@@ -1156,7 +1235,7 @@ class VisualMapPanel(wx.Panel):
         self.optionsStack.Add(self.optionSbox, 1, wx.EXPAND)
         self.optionSbox.Hide()
 
-        box.Add(gbox, 0, wx.LEFT | wx.TOP, 5)
+        box.Add(self.optionGbox, 0, wx.LEFT | wx.TOP, 5)
         box.AddMany([self.id.RBResultOutType])
         # Add the stack to the main layout
         box.Add(self.optionsStack, 1, wx.EXPAND | wx.ALL, 5)
@@ -1238,7 +1317,7 @@ class VisualMapPanel(wx.Panel):
         # Bind all EVT_TIMER events to self.OnMyTimer
         self.Bind(wx.EVT_TIMER, self.OnMyTimer)
         self.myTimer = wx.Timer(self)
-        self.myTimer.Start(250)
+        self.myTimer.Start(500)
         self.Layout()
         self.Refresh()
 
@@ -1445,9 +1524,11 @@ class VisualMapPanel(wx.Panel):
                 if self.gOp.countertarget > 0 and self.gOp.counter > 0 and self.gOp.counter != self.gOp.countertarget:
                     if nowtime-1.0 > self.lastruninstance: 
                         self.timeformat = '%H:%M:%S'
-                        remaintimeInstant = (nowtime - self.gOp.runningSinceStep) * (self.gOp.countertarget/ self.gOp.counter)-runningtime
-                        remaintimeInstant = remaintimeInstant if remaintimeInstant > 0 else 0.0
-                        # Smoothed runtime average over last 10 seconds
+                        stepsleft = self.gOp.countertarget-self.gOp.counter
+                        scaler = math.log(stepsleft, 100) if stepsleft > 1 else 1
+                        remaintimeInstant = (nowtime - self.gOp.runningSinceStep)/self.gOp.counter * stepsleft* scaler
+                        remaintimeInstant = remaintimeInstant if remaintimeInstant > 0 else 0
+                        # Smoothed runtime average over last 5 seconds
                         self.gOp.runavg.append(remaintimeInstant)
                         if len(self.gOp.runavg) > 5:
                             self.gOp.runavg.pop(0)
@@ -1564,13 +1645,7 @@ class VisualMapPanel(wx.Panel):
             newinfo = newinfo + '\n' + einfo if newinfo else einfo
             self.background_process.errorinfo = None
         if (newinfo):
-            nlines = (newinfo+'\n'+self.peopleList.messagelog).split("\n")
-            for i in range(InfoBoxLines):
-                if i >= len(nlines):
-                    self.peopleList.InfoBox[i].SetLabelMarkup('')
-                else:
-                    self.peopleList.InfoBox[i].SetLabelMarkup(nlines[i])  
-            self.peopleList.messagelog = "\n".join(nlines[:InfoBoxLines])
+            self.peopleList.append_info_box(newinfo)
 
     def SetupButtonState(self):
         """ based on the type of file output, enable/disable the interface """
@@ -1685,7 +1760,8 @@ class VisualMapPanel(wx.Panel):
             self.gOp.panel = self
             self.gOp.BackgroundProcess = self.background_process
             self.gOp.UpdateBackgroundEvent = UpdateBackgroundEvent
-            self.peopleList.setGOp(self.gOp)
+            # self.peopleList.setGOp(self.gOp)
+            self.peopleList.SetGOp(self.gOp)
 
         if self.gOp.get('ResultType'):
             self.id.RBResultOutType.SetSelection(0)

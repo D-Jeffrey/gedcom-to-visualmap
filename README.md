@@ -7,12 +7,25 @@
 # gedcom-to-visualmap
 
 Read a GEDCOM file and translate the locations into GPS addresses.
-The produces different KML map types which should timelines and movements around the earth.
-The produces HTML file which is interactive..
+- Produces different KML map types which should have timelines and movements around the earth.
+- Produces HTML file which is interactive.
+- Produces Summary stats on you places and locations involved
+- Allow you to example the family linage and desendance 
 
 This contains two interfaces: command-line and GUI (GUI is tested on Windows and Windows Sub-system for Linux, testing by @colin0brass on Mac)
 
 Orginally forked from [https://github.com/lmallez/gedcom-to-map]
+
+## Who Should Try This
+- Genealogy hobbyists wanting spatial context for life events.
+- Historians and researchers mapping migrations and demographic clusters.
+- Developers and data scientists who want GEDCOM-derived geodata for further analysis or visualization.
+
+# Quick Start Tips
+- Use the GUI to pick your GEDCOM, choose output type, then click Load to parse and resolve places.
+- Double-left-click a person in the GUI list to set the starting person for traces and timelines.
+- Edit `geo_cache.csv` to correct or refine geocoding, then save and re-run to apply fixes.
+- Export KML to inspect results in Google Earth Pro, Google MyMaps, or ArcGIS Earth.
 
 # How to Run
 
@@ -78,9 +91,8 @@ Once you have selected your options,
 TODO Needs more description.
 - `Trace` Create a list of the individuals from the starting person.  See below
 - `Browser` Open the web browser using the last current output html file
-- Use the `right-click` on the list of people to bring up some known **details** and how it 
-was geocoded
-![img](docs/img/python_2025-08.png)
+- Use the `right-click` on the list of people to bring up some known **details** and how it was geocoded
+
 The Age column can be very useful for testing to see if the parents are of the proper age, showing when thheir age when their child was born.
 ![img](docs/img/age_2025-08.png)
 
@@ -95,6 +107,11 @@ The Age column can be very useful for testing to see if the parents are of the p
 Unix may not like the Font size of 8.  If you get errors, then change the font size in const.py  The interface needs a smaller font or it will throw 
 off all the layout measurements.  (Need to add math to get actual font size)
 
+
+## Addresses and Alternative Address File
+The `geo_cache.csv` is created automatically as a function of looking up the addresses by loading the GEDCOM file. You can using an _alternative address file_ to in addition to the `.ged` by creating a file with the `.csv` extension in the same directory.  So if the GEDCOM file was `my_family.ged`, then the alternate address file would be `my_family.csv` in the same directory.  The structure of the CSV file is the same as output from the SUM '_cached.csv' file (as [example](samples/shakespeare_cache.csv)).
+
+Make sure that you do not have an CSV files 'locked' open by Excel or other application so they can not be read or updated (close those applications instances).
 
 # Results
 ## KML Example revised
@@ -124,49 +141,59 @@ If you do not have GPS location in your GEDCOM file, then use -born or -born -de
 
 
 
+## Examples using Royal92.ged 
+###  HTML
+Royal92.ged  No ordering 
+![img](docs/img/2025-11-15.png) 
 
-![img](docs/img/pres2020.png)
-```
-cd 
-python3 ..\gedcom-to-map\gedcom-to-map.py pres2020.ged pres2020 -main "@I1@" -format HTML -groupby 1 -nomarkstar -antpath
-```
+Royal92.ged Last Name
+![img](docs/img/2025-11-21.png)
 
-![img](docs/img/pres2020-2.png)
-```
-python3 ..\gedcom-to-map\gedcom-to-map.py pres2020.ged pres2020-2 -main "@I676@" -format HTML -groupby 1 -nomarkstar -antpath
-```
+Royal92.ged Full Name 
+![img](docs/img/2025-11-46.png) 
 
-* KML Output  : [samples/pres2020-2.kml](samples/pres2020-2.kml)
-```
-python3 ..\gedcom-to-map\gedcom-to-map.py pres2020.ged pres2020-2 -main "@I676@" -format KML
-```
+###  KML
+![img](docs/img/2025-11-16.png) 
+
+###  KML2
+![img](docs/img/2025-11-19.png)
 
 ## Trace button
 Load your GED file.  Make sure that you have set an output file (click on the `Output File` label for quick access to the Save As).  Make sure you have selecte HTML mode (not KML).  Double click on a person to trace from that person back.  Then all the traced individuals will light up as green (with the starting person in grey).  Then click on the Trace button.  
 This will produce a text file and the name will be shown be show in the Information section of the top left.  (Same directory as the output but with a different name '.trace.txt. instead of .HTML).  If you open this in Excel, you can reformat the last columns and then use that to identify the number of generations. 
 
-![img](docs/img/EXCEL_2025-02.png)
+See [same trace output](samples/shakespeare.trace.txt)
 
 ## Heatmap Timeline
 ![img](docs/img/Heatmap_2025-03.gif)
+
 ## Cluster Markers
-If you turn off the Markers, then it will turn on Clustered markers.  Trying that out and seeing if this become a better way to do markers.  This is W, working towards leverage this feature more consistantly.
+If you turn off the Markers in HTML mode, then it will turn on Clustered markers.  Trying that out and seeing if this become a better way to do markers.  This is W, working towards leverage this feature more consistantly.
 ![img](docs/img/markers-2025-03.png)
 
+# Parameter and settings
 ## Options Values
-KML Editor:     
-  googleearth.exe $n
-  "C:\Program Files\ArcGIS\Earth\ArcGISEarth.exe" "$n"
+
+You can set what CSV or KML viewer you want to option by access the menu Options -> Setup.  Within there you can set the command lines.  using `$n` to use as a placeholder for the filename the applicaiton will be used as part of the command like
+#### KML Editor options :
+  - `googleearth.exe $n` 
+  - `"C:\Program Files\ArcGIS\Earth\ArcGISEarth.exe" "$n"`
+  - `$n`
+#### CSV Editor or Trace Table Editor options :
+  - `numbers $n` 
+  - `$n`
+  - `soffice $n`
+  - `notepad $n`
 
 KML2 is an improved version of KML
 
 ## Summary
 SUM is a summary CSV files and plot of birth vs death related to continent and country
 
+#### Country Heatmap for Shakespeare
 ![img](samples/shakespeare_countries_heatmap.png)
-
-## Complex Export of MyHeritage - intereactive map
-![img](docs/img/msedge_2022-02-02_22-33-16.gif)
+#### Country Heatmap for Royal92
+![img](samples/royal92_countries_heatmap.png)
 
 ## Running on Linux
 - [See Running on WSL](docs/running-on-wsl.md)

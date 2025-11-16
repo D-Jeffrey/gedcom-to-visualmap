@@ -9,7 +9,7 @@ from pathlib import Path
 import sys
 
 
-from gedcomoptions import gvOptions
+from gedcom_options import gvOptions
 from models.Creator import Creator, LifetimeCreator, CreatorTrace, Person
 from models.LatLon import LatLon
 from render.foliumExp import foliumExporter

@@ -7,7 +7,7 @@ import random
 import re
 
 import simplekml as simplekml
-from gedcomoptions import gvOptions
+from gedcom_options import gvOptions
 from models.Line import Line
 from models.LatLon import LatLon
 from .Referenced import Referenced

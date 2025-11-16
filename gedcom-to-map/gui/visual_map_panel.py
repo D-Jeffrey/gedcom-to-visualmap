@@ -16,7 +16,7 @@ from .visual_gedcom_ids import VisualGedcomIds  # type: ignore
 from .people_list_ctrl_panel import PeopleListCtrlPanel  # type: ignore
 from .person_dialog import PersonDialog  # type: ignore
 from .find_dialog import FindDialog  # type: ignore
-from gedcomoptions import gvOptions, ResultsType  # type: ignore
+from gedcom_options import gvOptions, ResultsType  # type: ignore
 from .background_actions import BackgroundActions
 
 (UpdateBackgroundEvent, EVT_UPDATE_STATE) = wx.lib.newevent.NewEvent()

@@ -12,7 +12,7 @@ import xyzservices.providers as xyz
 
 from folium.plugins import (AntPath, FloatImage, GroupedLayerControl,
                             HeatMapWithTime, MiniMap, Search, MarkerCluster) 
-from gedcomoptions import gvOptions
+from gedcom_options import gvOptions
 from models.Line import Line
 from models.LatLon import LatLon
 from .Referenced import Referenced

@@ -21,7 +21,7 @@ from gedcomoptions import gvOptions, ResultsType
 from style.stylemanager import FontManager
 
 from const import VERSION, GUINAME, ABOUTLINK, NAME
-from gedcomvisual import ParseAndGPS, doHTML, doKML, doKML2, doSUM, doTraceTo
+from gui.gedcomvisual import ParseAndGPS, doHTML, doKML, doKML2, doSUM, doTraceTo
 
 maxPhotoWidth = 400  # Maximum width for photos in the PersonDialog
 maxPhotoHeight = 500  # Maximum Height for photos in the PersonDialog

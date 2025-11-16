@@ -17,7 +17,7 @@ import wx.lib.mixins.inspection as wit
 
 # Import constants and GUI components
 from const import GUINAME, LOG_CONFIG, NAME, VERSION
-from gedcomVisualGUI import VisualMapFrame
+from gui.gedcomVisualGUI import VisualMapFrame
 
 # Initialize logger for the application
 _log = logging.getLogger(__name__)

@@ -42,8 +42,8 @@ import xyzservices.providers as xyz
 
 from const import GUINAME, KMLMAPSURL, LOG_CONFIG, NAME, VERSION
 from gedcomoptions import gvOptions, ResultsType 
-from gedcomvisual import doTrace
-from gedcomDialogs import *
+from gui.gedcomvisual import doTrace
+from gui.gedcomDialogs import *
 from style.stylemanager import FontManager
 
 

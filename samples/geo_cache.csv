@@ -1,4 +1,713 @@
-continent,address,used,longitude,latitude,found_country,country_code,country_name,alt_addr
-,Stratford-upon-Avon,0,-1.70634,52.1927803,True,NONE,,
-,"Shottery, Warwickshire",0,-1.7276632,52.1909684,True,NONE,,
-,Unmarried,0,149.5481193,-33.4596678,True,NONE,,
+country_code,country_name,address,latitude,found_country,continent,used,alt_addr,longitude
+NONE,,Stratford-upon-Avon,52.1927803,True,,0,,-1.70634
+NONE,,"Shottery, Warwickshire",52.1909684,True,,0,,-1.7276632
+NONE,,Unmarried,-33.4596678,True,,0,,149.5481193
+IE,Ireland,"County Down, Ireland",53.3397486,True,Europe,0,,-6.2952117
+NONE,,"Haworth, Yorks.",-20.6315684,True,,0,,29.8425463
+NONE,,"Penzance, Cornwall",50.1194794,True,,0,,-5.5352463
+NONE,,"Clough House, High Town",51.8877641,True,,0,,-0.4120407
+NONE,,Howarth,50.7176876,True,,0,,-3.4919307
+NONE,,"Thornton, Nr. Bradford",53.7907753,True,,0,,-1.8540185
+NONE,,Scarborough,54.2820009,True,,0,,-0.4011868
+FR,France,"Lyon, France",45.7578137,True,Europe,0,,4.8320114
+NONE,,Saint-Etienne,45.4401467,True,,0,,4.3873058
+NONE,,Annecy,45.8992348,True,,0,,6.1288847
+NONE,,Cruseilles,46.0338359,True,,0,,6.1069469
+NONE,,Aix-les-Bains,45.6886292,True,,0,,5.9146362
+NONE,,Grenoble,45.1875602,True,,0,,5.7357819
+NONE,,Pers-Jussy,46.1066771,True,,0,,6.2676644
+NONE,,Frangy,46.0190661,True,,0,,5.9293421
+NONE,,Aviernoz,45.9756168,True,,0,,6.2298197
+GB,England,"Kensington,Palace,London,England",51.505099,True,Europe,0,,-0.1876332
+GB,England,"Osborne House,Isle of Wight,England",50.7505772,True,Europe,0,,-1.2700819
+GB,England,"Royal Mausoleum,Frogmore,Berkshire,England",51.4740348,True,Europe,0,,-0.5982911
+DE,Germany,"Schloss Rosenau,Near Coburg,Germany",51.1638175,True,Europe,0,,10.4478313
+GB,England,"Windsor Castle,Berkshire,England",51.4837886,True,Europe,0,,-0.6040419
+GB,England,"Royal Masoleum,Frogmore,Windsor,England",51.4756084,True,Europe,0,,-0.597552
+GB,England,"Buckingham,Palace,London,England",51.4978676,True,Europe,0,,-0.1438839
+GB,England,"Throne Room,Buckingham Palac,England",51.5008349,True,Europe,0,,-0.1430045
+NONE,,"Friedrichshof,Near,Kronberg,Taunus",50.1796561,True,,0,,8.5085855
+NONE,,"Friedenskirche,Potsdam",52.4012197,True,,0,,13.0435766
+GB,England,"Windsor,Berkshire,England",51.4837886,True,Europe,0,,-0.6040419
+DE,Germany,"Darmstadt,,,Germany",49.872775,True,Europe,0,,8.651177
+GB,England,"Schomberg House,Pall Mall,London,England",51.5052863,True,Europe,0,,-0.1373398
+GB,England,"Frogmore,,,England",51.7190385,True,Europe,0,,-0.3355844
+NONE,,"Bagshot Park,Surrey",51.3713707,True,,0,,-0.6931739
+NONE,,Cannes,43.5515198,True,,0,,7.0134418
+GB,England,"Bantridge Park,Balcombe,Sussex,England",51.0573017,True,Europe,0,,-0.1329998
+DK,Denmark,"Yellow Palace,Copenhagen,Denmark",55.6867243,True,Europe,0,,12.5700724
+GB,England,"Sandringham,,Norfolk,England",52.8427652,True,Europe,0,,0.4318137
+GB,England,"St. George Chap.,Windsor,Berkshire,England",51.4837886,True,Europe,0,,-0.6040419
+GB,England,"Frogmore House,Windsor,Berkshire,England",51.4743933,True,Europe,0,,-0.5944637
+GB,England,"Marlborough Hse,London,England",51.504975,True,Europe,0,,-0.1360297
+GB,England,"Windsor Castle,St. George Chap.,Berkshire,England",51.4534889,True,Europe,0,,-1.031873
+GB,England,"Marlborough,House,London,England",51.5704927,True,Europe,0,,-0.0953269
+GB,England,"Portman Square,London,England",51.516013,True,Europe,0,,-0.1547569
+GB,England,"Coppins,Iver,Bucks,England",51.7834994,True,Europe,0,,-0.8946441
+GB,England,"London,England",51.5074456,True,Europe,0,,-0.1277653
+DE,Germany,"Neues Palais,Potsdam,Germany",52.4013836,True,Europe,0,,13.0158969
+DE,Germany,"Friedenskirche,Potsdam,Germany",52.4012197,True,Europe,0,,13.0435766
+DE,Germany,"Berlin,Germany",52.5173885,True,Europe,0,,13.3951309
+NL,Netherlands,"Haus Doorn,Netherlands",52.030836,True,Europe,0,,5.3445416
+NONE,,Arolsen,51.3649894,True,,0,,9.0376388
+NONE,,Tyrol,47.223193,True,,0,,11.5261028
+GB,England,"Whippingham Ch.,Isle of Wight,England",50.740502,True,Europe,0,,-1.2703607
+NONE,,Lausanne,46.5218269,True,,0,,6.6327025
+GB,England,"St. George's,Chapel,Windsor Castle,England",51.4837886,True,Europe,0,,-0.6040419
+GB,England,"White Lodge,Richmond Park,Surrey,England",51.3368965,True,Europe,0,,-0.3008938
+FR,France,"Paris,,,France",48.8588897,True,Europe,0,,2.320041
+GB,England,"York Cottage,Sandringham,Norfolk,England",52.8262326,True,Europe,0,,0.5162681
+GB,England,"St. George Chap.,,Windsor,England",51.4837886,True,Europe,0,,-0.6040419
+GB,England,"Harewood House,Yorkshire,,England",53.8948932,True,Europe,0,,-1.5287425
+GB,Scotland,"Morven,,,Scotland",58.233703,True,Europe,0,,-3.6957832
+GB,England,"Wood Farm,Wolferton,Norfolk,England",52.8293207,True,Europe,0,,0.4625821
+RU,Russian Federation,"Tsarskoye Selo,Pushkin,,Russia",59.7205467,True,Europe,0,,30.4069376
+RU,Russian Federation,"Ekaterinburg,,,Russia",56.8382071,True,Europe,0,,60.6007886
+RU,Russian Federation,"Livadia,Crimea,Near Yalta,Russia",64.6863136,True,Europe,0,,97.7453061
+RU,Russian Federation,"Cathedral of the,Fortress of P&P,St. Petersburg,Russia",59.938732,True,Europe,0,,30.316229
+DK,Denmark,"Copenhagen,,,Denmark",55.6867243,True,Europe,0,,12.5700724
+RU,Russian Federation,"Alexander Palace,Tsarskoe Selo,,Russia",64.6863136,True,Europe,0,,97.7453061
+RU,Russian Federation,"Peterhof,Near,St. Petersburg,Russia",59.9372321,True,Europe,0,,30.2046418
+GB,England,"17 Bruton St.,London,W1,England",50.9241486,True,Europe,0,,0.4375916
+GB,Scotland,"Glamis Castle,,Angus,Scotland",56.620378,True,Europe,0,,-3.0019917
+GR,Greece,"Isle of Kerkira,Mon Repos,Corfu,Greece",39.6062313,True,Europe,0,,19.9261335
+GB,England,"Buckingham,Palace,Music Room,England",53.4011337,True,Europe,0,,-2.9690906
+GB,England,"Clarence House,St. James,,England",51.1323289,True,Europe,0,,0.2605632
+GB,England,",,,England",52.5310214,True,Europe,0,,-1.2649062
+GB,England,"Belgian Suite,Buckingham,Palace,England",51.4978676,True,Europe,0,,-0.1438839
+GB,England,"St. Mary's Hosp.,Paddington,London,England",51.517434,True,Europe,0,,-0.1743245
+GB,England,"Music Room,Buckingham,Palace,England",51.4978676,True,Europe,0,,-0.1438839
+GB,England,"Park House,Sandringham,Norfolk,England",52.8278528,True,Europe,0,,0.5059864
+GR,Greece,"Athens,Greece",37.9755648,True,Europe,0,,23.7348324
+GB,England,"Kensington,Palace,,England",51.505099,True,Europe,0,,-0.1876332
+GB,England,"3 Belgrave Sq.,,England",51.5001785,True,Europe,0,,-0.1543078
+US,USA,",,,U.S.A.",39.7837304,True,North America,0,,-100.445882
+DK,Denmark,"Charlottenlund,Denmark",55.7552973,True,Europe,0,,12.5671103
+DE,Germany,"Potsdam,Germany",52.4009309,True,Europe,0,,13.0591397
+DE,Germany,"Frankfurt,Germany",50.1106444,True,Europe,0,,8.6820917
+GR,Greece,"Tatoi,Near Athens,Greece",37.8806976,True,Europe,0,,23.9290924
+RU,Russian Federation,"Alapayevsk,Ural Mts.,,Russia",64.6863136,True,Europe,0,,97.7453061
+DE,Germany,"Hesse-Darmstadt,Palace,,Germany",52.5192592,True,Europe,0,,13.2986637
+GB,England,"Hadley Common,Hertfordshire,England",51.8400523,True,Europe,0,,-0.0978552
+GB,England,"Private Chapel,Windsor Castle,Berkshire,England",51.4837886,True,Europe,0,,-0.6040419
+GB,England,"Near,Wolverhampton,England",52.5847651,True,Europe,0,,-2.127567
+NONE,,Barnwell Church,35.4470624,True,,0,,-82.3184486
+RU,Russian Federation,"St. Petersburg,,,Russia",59.938732,True,Europe,0,,30.316229
+CH,Switzerland,"Zurich,,,Switzerland",47.3744489,True,Europe,0,,8.5410422
+GB,England,"Eastwell Park,Kent,England",51.2786846,True,Europe,0,,0.5375244
+RO,Romania,"Castle Pelesch,Sinaia,Romania",45.345476,True,Europe,0,,25.5481496
+MT,Malta,Malta,35.8885993,True,Europe,0,,14.4476911
+IE,Ireland,"Donegal Bay,County Sligo,Ireland",54.1929861,True,Europe,0,,-8.7305427
+GB,England,"Coppins,,England",51.5258257,True,Europe,0,,-0.5092749
+GB,England,"Thatched House,Lodge,,England",51.3114688,True,Europe,0,,0.1281046
+GB,England,"Thatched House,Lodge,Richmond Park,England",51.4577793,True,Europe,0,,-0.3108225
+NONE,,"Kings College,Hospital,Denmark Hill",51.468043,True,,0,,-0.0896031
+NONE,,Potsdam,52.4009309,True,,0,,13.0591397
+GB,England,"Clarence House,London,,England",51.5039837,True,Europe,0,,-0.1384107
+NONE,,Bagshot Park,51.3674201,True,,0,,-0.6939678
+SE,Sweden,"Stockholm,Sweden",59.3251172,True,Europe,0,,18.0710935
+NONE,,Helsingborg,56.0442098,True,,0,,12.703706
+NONE,,"Royal Cemetery,Haga Castle Park",22.4056056,True,,0,,113.9777082
+GB,England,"Mar Lodge,Braemar,Aberdeenshire,England",57.05529,True,Europe,0,,-2.1163757
+NONE,,Paris,48.8534951,True,,0,,2.3483915
+GB,England,"Castle Rising,Norfolk,England",52.7969167,True,Europe,0,,0.4673371
+GB,England,"Grey Friars,Church,London,England",51.2191789,True,Europe,0,,1.3777725
+GB,England,"Norfolk-House,St. James Square,London,England",50.6995104,True,Europe,0,,-1.2952483
+GB,England,"Windsor Castle,Windsor,Berkshire,England",51.4837886,True,Europe,0,,-0.6040419
+GB,England,"St. George Chap.,Windsor Castle,Berkshire,England",51.4837886,True,Europe,0,,-0.6040419
+NONE,,Mirow,53.2851568,True,,0,,12.847677
+NONE,,Kew Palace,51.4838317,True,,0,,-0.2950549
+GB,England,"Buckingham House,,London,England",51.4404664,True,Europe,0,,0.0810511
+GB,England,"Sidmouth,Devon,,England",50.6790033,True,Europe,0,,-3.237657
+NONE,,Coburg,50.2582226,True,,0,,10.964561
+GB,England,"Frogmore House,Windsor,,England",51.4743933,True,Europe,0,,-0.5944637
+NONE,,Thuringia,50.9014721,True,,0,,11.0377839
+NONE,,Carlton House,42.3531675,True,,0,,-71.0717763
+GB,England,"Claremont House,Esher,Surrey,England",51.3693938,True,Europe,0,,-0.365415
+RU,Russian Federation,"Fortress of,Peter and Paul,,Russia",59.9500646,True,Europe,0,,30.311686
+RU,Russian Federation,"Abbas Tuman,Caucasus,Russia",43.345,True,Europe,0,,42.44
+RU,Russian Federation,"Peter and Paul,Cathedral,,Russia",55.7445242,True,Europe,0,,37.6055105
+RU,Russian Federation,"Perm,,,Russia",58.0108531,True,Europe,0,,56.2318528
+CA,Canada,"East Toronto,Ontario,,Canada",43.6901603,True,North America,0,,-79.3250179
+CA,Canada,"York Cemetery,Toronto,Ontario,Canada",43.7642978,True,North America,0,,-79.4245953
+CH,Switzerland,Switzerland,46.7985624,True,Europe,0,,8.2319736
+GB,England,"27 Welbech St.,Marylebone,London,England",51.5196374,True,Europe,0,,-0.1519627
+NONE,,Birkhall,57.028846,True,,0,,-3.074175
+GB,England,"St. James Palace,London,England",51.4987815,True,Europe,0,,-0.1423506
+GB,England,"Rutland House,Arlington St.,London,England",51.5071834,True,Europe,0,,-0.1410021
+GB,England,"Buckingham House,St. James Park,London,England",51.4992816,True,Europe,0,,-0.1345942
+NONE,,Ludwigsburg,48.8953937,True,,0,,9.1895147
+NONE,,Buckingham House,51.5694535,True,,0,,-0.0955147
+NONE,,"Clarence House,St. James",51.1323289,True,,0,,0.2605632
+NONE,,"Frankfurt,-am-Main",50.0958411,True,,0,,8.5485912
+NONE,,Herrenhausen,52.407334,True,,0,,9.675882
+GB,England,"Gloucester House,Piccadilly,London,England",51.5039979,True,Europe,0,,-0.1492301
+NONE,,"Vicarage Place,Kensington",51.4989948,True,,0,,-0.1991229
+GB,England,"Royal Lodge,Windsor,Berkshire,England",51.4837886,True,Europe,0,,-0.6040419
+GB,England,"Augusta Lodge,Windsor,Berkshire,England",51.4837886,True,Europe,0,,-0.6040419
+NONE,,Meiningen,50.56761,True,,0,,10.4153029
+GB,England,"Near Stanmore,Middlesex,England",51.5460558,True,Europe,0,,-0.2537791
+NONE,,"Furstenhof,Hanover",52.3716259,True,,0,,9.7288366
+NONE,,St. James Palac,51.5045329,True,,0,,-0.1377553
+NONE,,Bushy Park,51.4168626,True,,0,,-0.3370444
+NONE,,Gottorp,58.5649996,True,,0,,15.4716503
+NONE,,Amalienborg,55.6839601,True,,0,,12.5930781
+DK,Denmark,"Roskilde,Denmark",55.6433478,True,Europe,0,,12.0819247
+NONE,,Cassel,51.3157833,True,,0,,9.4978479
+NONE,,Bernstorff,55.7584315,True,,0,,12.5523479
+NONE,,Salonika,4.631736,True,,0,,-74.0747515
+NONE,,Tatoi,38.0687218,True,,0,,23.7598529
+CH,Switzerland,"Lausanne,Switzerland",46.5218269,True,Europe,0,,6.6327025
+NONE,,"Schloss,Heiligenberg",47.8168027,True,,0,,9.309977
+GB,England,England,52.5310214,True,Europe,0,,-1.2649062
+IT,Italy,"Palermo,Italy",38.1112268,True,Europe,0,,13.3524434
+NONE,,Ostende,51.2258565,True,,0,,2.919496
+BE,Belgium,"Laeken,Belgium",50.883392,True,Europe,0,,4.3487134
+DE,Germany,"Hanover,Germany",52.3744779,True,Europe,0,,9.7385532
+NONE,,Hanover,52.3744779,True,,0,,9.7385532
+NONE,,Hildburghausen,50.4266327,True,,0,,10.7300263
+AT,Austria,"Gmunden,Austria",47.9185855,True,Europe,0,,13.8003048
+NONE,,Gmunden,47.9185855,True,,0,,13.8003048
+GB,Wales,"Caernarvon,Castle,Wales",51.6247029,True,Europe,0,,-3.9454009
+NONE,,"Berkeley Castle,Gloucestershire",51.6888596,True,,0,,-2.456937
+NONE,,"Gloucester,Cathedral",51.8673377,True,,0,,-2.2467498
+DE,Germany,"Sigmaringen,Germany",48.0869139,True,Europe,0,,9.2165039
+RO,Romania,"Sinaia,Romania",45.345476,True,Europe,0,,25.5481496
+GB,England,"Barnwell Church,,England",52.2161562,True,Europe,0,,0.1628335
+GB,England,"St. Marys Hosp.,Paddington,England",51.5161629,True,Europe,0,,-0.1744856
+NONE,Czech Republic,Czechoslovakia,49.7439047,True,,0,,15.3381061
+GB,England,"Chapel Royal,St. James Palace,England",51.4987815,True,Europe,0,,-0.1423506
+DE,Germany,"Herrenhausen,Palace,Hannover,Germany",52.3909854,True,Europe,0,,9.6972057
+GB,England,"Westminster,Abbey,London,England",51.4981579,True,Europe,0,,-0.1319441
+GB,England,"Leicester-House,,London,England",51.4676401,True,Europe,0,,-0.1057857
+NONE,,The Hague,52.0749456,True,,0,,4.2696802
+GB,England,"Cavendish Square,,London,England",51.5164887,True,Europe,0,,-0.1450325
+GB,England,"St. James Palace,,,England",51.4987815,True,Europe,0,,-0.1423506
+NONE,,Leicester House,51.4676401,True,,0,,-0.1057857
+NONE,,Hanau,50.132881,True,,0,,8.9169797
+GB,England,"Leicester House,London,England",51.4676401,True,Europe,0,,-0.1057857
+DK,Denmark,"Christiansborg,Denmark",55.6756505,True,Europe,0,,12.5800406
+NONE,,Gotha,50.9494849,True,,0,,10.7014435
+NONE,,Norfolk House,51.5073666,True,,0,,-0.1334353
+MC,Monaco,Monaco,43.7323492,True,Europe,0,,7.4276832
+NONE,,Gloucester House,53.4701954,True,,0,,-0.0158088
+NONE,,Celle,52.624056,True,,0,,10.081052
+DE,Germany,"Leineschloss,Osnabruck,Hanover,Germany",52.3744779,True,Europe,0,,9.7385532
+NONE,,Osnabruck,52.2719595,True,,0,,8.047635
+NONE,,"Moved in 1957 to,Herrenhausen",52.407334,True,,0,,9.675882
+DE,Germany,"Monbijou Palace,,Berlin,Germany",52.5173885,True,Europe,0,,13.3951309
+NONE,,Christiansborg,55.6756505,True,,0,,12.5800406
+NONE,,Dolzig,51.9866,True,,0,,17.0653695
+PT,Portugal,",,Portugal",39.6621648,True,Europe,0,,-8.1353519
+NONE,,"Aachen,West Germany",51.132302,True,,0,,6.4107342
+NONE,,Greiz,50.7783814,True,,0,,12.0763533
+NONE,,"Frankfurt an der,Oder",52.3365359,True,,0,,14.5466945
+ES,Spain,"San Ildefonso,,Spain",41.3632004,True,Europe,0,,2.0833386
+ES,Spain,"Madrid,,Spain",40.416782,True,Europe,0,,-3.703507
+FR,France,"Cannes,France",43.5515198,True,Europe,0,,7.0134418
+PT,Portugal,"Villa Mar y Sol,Estoril,Portugal",38.7095707,True,Europe,0,,-9.3901368
+GB,England,"Appleton House,Sandringham,Norfolk,England",52.8427652,True,Europe,0,,0.4318137
+NO,Norway,Norway,61.1529386,True,Europe,0,,8.7876653
+NO,Norway,"Skaugum,Near Oslo,Norway",61.1529386,True,Europe,0,,8.7876653
+SE,Sweden,"Drottningholm,Near Stockholm,Sweden",59.3294531,True,Europe,0,,18.0672982
+NONE,,Karlsruhe,49.0068705,True,,0,,8.4034195
+IT,Italy,"Rome,Italy",41.8933203,True,Europe,0,,12.4829321
+NONE,,Biebrich,50.3030289,True,,0,,7.9544958
+RO,Romania,"Pelesch,Sinaia,Romania",45.345476,True,Europe,0,,25.5481496
+DE,Germany,"Blankenburg,Harz,Germany",51.7902676,True,Europe,0,,10.9551991
+NONE,,Psychiko,38.0130854,True,,0,,23.772085
+IT,Italy,"Venice,Italy",45.4371908,True,Europe,0,,12.3345898
+NONE,,Belgrade,44.8178131,True,,0,,20.4568974
+FR,France,"Fontainebleau,France",48.4049375,True,Europe,0,,2.7015872
+FR,France,"Germain-en-Laye,France",48.9994177,True,Europe,0,,2.1022294
+FR,France,"St. Denis,France",48.935773,True,Europe,0,,2.3580232
+NONE,,Berlin,52.5173885,True,,0,,13.3951309
+NONE,,"Marmorpalais,Potsdam",52.4128012,True,,0,,13.0697772
+NONE,,Wolfenbuttel,52.1625283,True,,0,,10.5348215
+NONE,,Stettin,53.4298114,True,,0,,14.5928676
+NONE,,Charlottenburg,52.5050484,True,,0,,13.3045162
+GB,England,"Oatlands Park,Weybridge,Surrey,England",51.3753412,True,Europe,0,,-0.4422764
+NONE,,Prenzlau,53.3167,True,,0,,13.866575
+NONE,,"Oraniensaal,The Hague",52.0749456,True,,0,,4.2696802
+FI,Finland,"Near Borga,Finland,Finland",63.2467777,True,Europe,0,,25.9209164
+NONE,,Tiflis,41.6934591,True,,0,,44.8014495
+NONE,,Pembroke Castle,51.6772486,True,,0,,-4.9207686
+NONE,,Berkhamsted,51.7607271,True,,0,,-0.5652554
+CH,Switzerland,"Kussnacht,Switzerland",47.08385,True,Europe,0,,8.4386308
+NONE,,Laeken,50.883392,True,,0,,4.3487134
+BE,Belgium,"Brussels,Belgium",50.8465573,True,Europe,0,,4.351697
+BE,Belgium,"Near Brussels,Belgium",50.8453219,True,Europe,0,,4.368987
+NONE,,"Chateau de,Stuyvenberg",50.8424632,True,,0,,4.4600106
+NONE,,Haga Castle,47.5051993,True,,0,,19.0313539
+DE,Germany,"Hamburg,Germany",53.550341,True,Europe,0,,10.000654
+DK,Denmark,"Charlottenlund,Nr: Copenhagen,Denmark",55.7003305,True,Europe,0,,12.5588664
+NONE,,Schwerin,53.6288297,True,,0,,11.4148038
+NONE,,Copenhagen,55.6867243,True,,0,,12.5700724
+DK,Denmark,"Sorgenfri,Nr: Copenhagen,Denmark",55.7003305,True,Europe,0,,12.5588664
+DE,Germany,"Munich,Germany",48.1371079,True,Europe,0,,11.5753822
+DE,Germany,"Theatinerkirche,Munich,Germany",48.1420299,True,Europe,0,,11.5766146
+DE,Germany,"Mannheim,Germany",49.4892913,True,Europe,0,,8.4673098
+DE,Germany,"Schloss,Nymphenburg,Germany",48.1582569,True,Europe,0,,11.5032967
+NONE,,Theatinerkirche,48.1420299,True,,0,,11.5766146
+NL,Netherlands,"The Hague,Netherlands",52.0799838,True,Europe,0,,4.3113461
+NONE,,Tilburg,51.5856184,True,,0,,5.0660616
+NONE,,Het Loo,51.9713719,True,,0,,6.2813956
+NONE,,Jena,50.9281717,True,,0,,11.5879359
+NL,Netherlands,"Soetdijk,Palace,Netherlands",53.2180116,True,Europe,0,,6.5678847
+NONE,,Brunn,53.6711367,True,,0,,13.3706436
+NONE,,"Schloss,Wildenwart",47.8281102,True,,0,,12.3119011
+DE,Germany,"Dom Church,Munich,Germany",48.1371079,True,Europe,0,,11.5753822
+HU,Hungary,"Sarvar,Hungary",47.2517426,True,Europe,0,,16.9342165
+GB,England,"Whitehall,,England",51.5028139,True,Europe,0,,-0.1261997
+GB,England,"Hampton Court,Palace,England",51.508217,True,Europe,0,,-0.0761879
+GB,England,"Syon House,Brentford,Middlesex,England",51.5460558,True,Europe,0,,-0.2537791
+GB,England,"Berkeley House,,England",51.3330794,True,Europe,0,,-0.419637
+FR,France,"St. Germain-,en-Laye,France",48.8990413,True,Europe,0,,2.0942792
+GB,England,"Cranbourne Lodge,Near,Windsor,England",53.4534802,True,Europe,0,,-2.1453953
+NONE,,Whitehall,51.5028203,True,,0,,-0.1259778
+GB,England,"Richmond Palace,,England",51.4608257,True,Europe,0,,-0.3088135
+GB,England,"Richmond Palace,London,England",51.4608257,True,Europe,0,,-0.3088135
+FR,France,"Convent of,Chaillot,France",48.8689495,True,Europe,0,,2.2920996
+IT,Italy,"Frascati,,Italy",41.8082452,True,Europe,0,,12.6803684
+NONE,,Mons,50.4549568,True,,0,,3.951958
+IT,Italy,"Florence,,Italy",43.7697955,True,Europe,0,,11.2556404
+GB,Scotland,"Edinburgh Castle,,Scotland",55.9486867,True,Europe,0,,-3.2004175
+GB,England,"Theobalds Park,Hertfordshire,Herts,England",51.8400523,True,Europe,0,,-0.0978552
+NONE,,"Skanderborg,Castle",51.6247029,True,,0,,-3.9454009
+NONE,,"Hampton Court,Palace",51.406013,True,,0,,-0.340939
+NONE,,Stirling Castle,56.1240308,True,,0,,-3.9480016
+NONE,,Dunfermline,56.0713724,True,,0,,-3.4616183
+NONE,,Dalkeith Palace,55.9330206,True,,0,,-3.1660627
+NONE,,Linlithgow,55.977167,True,,0,,-3.6006234
+GB,Scotland,"Dunfermline,Scotland",56.0713724,True,Europe,0,,-3.4616183
+GB,England,"Whitehall Palace,,England",51.5045613,True,Europe,0,,-0.1240287
+GB,England,"St. George's,Chapel,Windsor,England",51.5060495,True,Europe,0,,-0.7019072
+NONE,,Stirling,56.1181242,True,,0,,-3.9360012
+NONE,,Greenwich Palace,51.4470989,True,,0,,0.0485919
+GB,England,"Stanwell Park,Middlesex,England",51.5460558,True,Europe,0,,-0.2537791
+NONE,,Haderslevhus,55.2498739,True,,0,,9.4914451
+NONE,,"Antvorslev,Castle",51.6247029,True,,0,,-3.9454009
+DK,Denmark,"Roskilde,Cathedral,Denmark",55.6426437,True,Europe,0,,12.0804349
+NONE,,Wismar,53.8909832,True,,0,,11.4647932
+NONE,,Nykobing,54.7646137,True,,0,,11.8709918
+FR,France,"Hotel du Louvre,Paris,France",48.8628245,True,Europe,0,,2.3356655
+FR,France,"Colombe,Near Paris,France",46.603354,True,Europe,0,,1.8883335
+NONE,,St. Denis,48.935773,True,,0,,2.3580232
+FR,France,"Pau,Navarre,France",49.098344,True,Europe,0,,-0.1922837
+GB,England,"Carisbrooke,Castle,Isle of Wight,England",50.6875557,True,Europe,0,,-1.3126773
+GB,England,"Oatlands,Surrey,England",51.1768683,True,Europe,0,,-0.1557724
+NONE,,Whitehall Palace,40.6547085,True,,0,,-75.4966678
+GB,England,"Bedford House,Exeter,England",50.7256138,True,Europe,0,,-3.5269209
+NONE,,St. Cloud,45.5616075,True,,0,,-94.1642004
+PT,Portugal,"Vila Vicosa,Lisbon,Portugal",38.7077507,True,Europe,0,,-9.1365919
+PT,Portugal,"Bemposta,Palace,Lisbon,Portugal",38.8000032,True,Europe,0,,-9.3850431
+NONE,,Belem,-1.45056,True,,0,,-48.4682453
+NONE,,Rendsborg,54.3000225,True,,0,,9.6516356
+NONE,,"Schloss Iburg,Near,Osnabruck",52.2719595,True,,0,,8.047635
+DE,Germany,"Berlin,Cathedral,Germany",53.8609125,True,Europe,0,,10.6857599
+DE,Prussia,"Konigsberg,Prussia",51.0416043,True,Europe,0,,7.173014
+GB,England,"Pembroke Castle,Pembrokeshire,England",52.5310214,True,Europe,0,,-1.2649062
+GB,England,"Richmond Palace,Richmond Surrey,England",51.3066341,True,Europe,0,,-0.7166168
+GB,England,"Henry VII Chapel,Westminster,Abbey,England",51.004756,True,Europe,0,,-2.2000702
+GB,England,"Westminster,Palace,London,England",51.4991508,True,Europe,0,,-0.1255492
+GB,England,"Tower of London,London,England",51.508217,True,Europe,0,,-0.0761879
+NONE,,"Henry VII Chapel,Westminster,Abbey,London",51.5346682,True,,0,,-0.1809044
+GB,England,"St. Swithin's,Priory,Winchester,England",50.8739049,True,Europe,0,,-1.1117686
+NONE,,Ludlow Castle,52.3671823,True,,0,,-2.7230141
+NONE,,Methven Castle,56.4168208,True,,0,,-3.5549253
+AR,Argentina,"Buenos Aires,Argentina",-34.6095579,True,South America,0,,-58.3887904
+GB,England,"Portland Hosp.,,England",50.5658306,True,Europe,0,,-2.4449716
+GB,England,"Greenwich Palace,,England",52.5310214,True,Europe,0,,-1.2649062
+GB,England,"Whitehall,London,England",51.5023278,True,Europe,0,,-0.1260912
+GB,England,"Eltham Palace,,England",51.4470989,True,Europe,0,,0.0485919
+GB,England,"Westhorpe,Suffolk,England",52.2820199,True,Europe,0,,0.9929034
+GB,England,"Bishops Hatfield,Herts,England",51.746687,True,Europe,0,,-0.2338423
+GB,England,"Tower of London,,England",51.508217,True,Europe,0,,-0.0761879
+ES,Spain,"Near Madrid,,Spain",39.3260685,True,Europe,0,,-4.8379791
+GB,England,"Kimbolton Castle,Hunts,England",53.0381735,True,Europe,0,,-1.3758361
+GB,England,"Peterborough,Cathedral,England",53.3827979,True,Europe,0,,-1.4693102
+GB,Scotland,"Linlithgow,,Scotland",55.977167,True,Europe,0,,-3.6006234
+FR,France,"Blois,France",47.5876861,True,Europe,0,,1.3337639
+GB,England,"Greenwich Palace,London,England",51.5074456,True,Europe,0,,-0.1277653
+GB,England,"Blickling Hall,Norfolk,England",52.811735,True,Europe,0,,1.2317081
+GB,England,"Chapel Royal,Tower of London,London,England",51.508217,True,Europe,0,,-0.0761879
+GB,England,"Greenwich,,England",51.4820845,True,Europe,0,,-0.0045417
+NONE,,"Wolf Hall,Savernake,Wilts",-27.9585585,True,,0,,30.2455894
+NONE,,Dusseldorf,51.2254018,True,,0,,6.7763137
+GB,England,"Chelsea,,England",51.4875167,True,Europe,0,,-0.1687007
+NONE,,Lambeth,51.4952111,True,,0,,-0.1163354
+GB,England,"Chapel Royal,London,England",51.4035262,True,Europe,0,,-0.3368838
+NONE,,Kendal Castle,54.3248665,True,,0,,-2.7364732
+NONE,,"Sudeley Castle,Gloucestershire",51.9473749,True,,0,,-1.9564293
+NONE,,"Sudeley Castle,Chapel",40.4344845,True,,0,,-75.545906
+NONE,,"Bradgate,Leicestershire",52.7896379,True,,0,,-1.2191206
+GB,England,"Tower of London,Tower Green,London,England",51.5307534,True,Europe,0,,-0.0538225
+GB,England,"Tower of London,Chapel Royal,London,England",51.4035262,True,Europe,0,,-0.3368838
+NONE,,Valladolid,41.6521807,True,,0,,-4.728605
+ES,Spain,"El Escorial,Palace,Madrid,Spain",40.4178245,True,Europe,0,,-3.7151134
+NONE,,Evesham,52.0940158,True,,0,,-1.9483083
+RS,Serbia,",,Yugoslavia",44.0243229,True,Europe,0,,21.0765743
+US,USA,U.S.A.,39.7837304,True,North America,0,,-100.445882
+US,USA,"Washington D.C.,U.S.A.",38.8950368,True,North America,0,,-77.0365427
+FR,France,"Versailles,France",48.8035403,True,Europe,0,,2.1266886
+ES,Spain,"Madrid,Spain,Spain",39.3260685,True,Europe,0,,-4.8379791
+ES,Spain,",,Spain",39.3260685,True,Europe,0,,-4.8379791
+NO,Norway,"Oslo,Norway",59.9133301,True,Europe,0,,10.7389701
+BR,Brazil,",,Brazil",-10.3333333,True,South America,0,,-53.2
+RO,Romania,"Roman,Romania",46.92528,True,Europe,0,,26.9284165
+NONE,,"Fotheringay,Castle",51.6247029,True,,0,,-3.9454009
+NONE,,Bosworth,39.469745,True,,0,,-93.3346524
+NONE,,"Grey Friars,Abbey,Leicester",52.6486906,True,,0,,-1.1369949
+GB,England,"Warwick Castle,Warwick,England",52.279527,True,Europe,0,,-1.5844827
+GB,England,"Middleham Castle,Yorkshire,England",54.284101,True,Europe,0,,-1.8068844
+FR,France,"Rouen,France",49.4404591,True,Europe,0,,1.0939658
+NONE,,"Grafton Regis,Northants",52.3106138,True,,0,,-0.865913
+NONE,,Bermondsey Abbey,51.4975728,True,,0,,-0.0788246
+GB,England,"Quarr Abbey,Isle of Wight,England",50.7315258,True,Europe,0,,-1.205039
+GB,England,"Sanctuary,Westminster,England",51.4979855,True,Europe,0,,-0.1302065
+NONE,,Shrewsbury,52.707755,True,,0,,-2.7540658
+NONE,,"Westminster,Palace",51.5008349,True,,0,,-0.1430045
+NONE,,Eltham Palace,51.4470989,True,,0,,0.0485919
+NONE,,Tiverton,50.9025623,True,,0,,-3.4875797
+NONE,,Dartford,51.4443059,True,,0,,0.21807
+GB,England,"Westminster,Palace,England",51.4991508,True,Europe,0,,-0.1255492
+NONE,,Tewkesbury,51.9937857,True,,0,,-2.1549574
+NONE,,Malmo,55.6052931,True,,0,,13.0001566
+AT,Austria,"Grunau,Austria",48.0990638,True,Europe,0,,15.5032811
+NONE,,Jassy,47.1615598,True,,0,,27.5837814
+PT,Portugal,"Estoril,Portugal",38.7095707,True,Europe,0,,-9.3901368
+NONE,,Stockholm,59.3251172,True,,0,,18.0710935
+NONE,,Stuttgart,48.7784485,True,,0,,9.1800132
+NONE,,"Het Loo,Apeldoorn",52.2342595,True,,0,,5.9539965
+RO,Romania,"Cotroceni Palace,Bucharest,Romania",44.4361414,True,Europe,0,,26.1027202
+DE,Germany,"Neuwied,Germany",50.4302393,True,Europe,0,,7.466302
+RO,Romania,"Curtea de Arges,Romania",45.1469341,True,Europe,0,,24.6779826
+NONE,,Possenhofen,47.9592147,True,,0,,11.3111908
+GB,England,"Highbury,London,England",51.5463679,True,Europe,0,,-0.1036544
+NONE,,Darmstadt,49.872775,True,,0,,8.651177
+DE,Germany,"Near,Heidelberg,Germany",49.4093582,True,Europe,0,,8.694724
+NONE,,Strassburg,48.584614,True,,0,,7.7507127
+NONE,,Nice,43.7009358,True,,0,,7.2683912
+NONE,,"St. Boniface,Church,Munich",48.1371079,True,,0,,11.5753822
+NONE,,Munich,48.1371079,True,,0,,11.5753822
+NONE,,"Schloss,Hohenschwangau",47.5575522,True,,0,,10.7496959
+NONE,,"Schloss,Nymphenburg",48.1582569,True,,0,,11.5032967
+NONE,,"Starnbergersee,Near Schloss,Berg",49.4307696,True,,0,,6.3111933
+NONE,,"St. Michaels,Church,Munich",48.1371079,True,,0,,11.5753822
+NONE,,"Near,Munich",48.1371079,True,,0,,11.5753822
+AT,Austria,"Salzburg,Austria",47.7981346,True,Europe,0,,13.0464806
+DE,Germany,"Bamberg,Germany",49.8916044,True,Europe,0,,10.8868478
+DE,Germany,"Sans Souci,Potsdam,Germany",52.3994327,True,Europe,0,,13.0653774
+NONE,,"Coln au Der,Spree",51.8426075,True,,0,,14.1392316
+NONE,,Grabow,53.2789153,True,,0,,11.5625238
+NONE,,Dotzingen,47.1208887,True,,0,,7.3435968
+NONE,,"Pont-a-Mousson,Lorraine",48.9025946,True,,0,,6.0547691
+NONE,,"Angers,Cathedral",47.4708864,True,,0,,-0.5580321
+NONE,,Monmouth,40.2932319,True,,0,,-74.1671114
+NONE,,"Bois de,Vincennes",48.831548,True,,0,,2.4341479
+NONE,,"Bermondsey,Abbey",51.4975728,True,,0,,-0.0788246
+NONE,,"Bolingbrooke,Castle",51.6247029,True,,0,,-3.9454009
+GB,England,"Canterbury,Cathedral,England",53.3827979,True,Europe,0,,-1.4693102
+NONE,,"Peterborough,Castle",52.6569988,True,,0,,-0.3000383
+NONE,,Kenilworth,42.0894728,True,,0,,-87.7149295
+NONE,,Beauge,47.7456327,True,,0,,0.4614741
+NONE,,Rouen,49.4404591,True,,0,,1.0939658
+NONE,,Bury St. Edmunds,52.2460367,True,,0,,0.7125173
+DE,Germany,Germany,51.1638175,True,Europe,0,,10.4478313
+NONE,,"Convent,of Vadstena",58.4483628,True,,0,,14.8920065
+NONE,,Sheen Palace,29.6575676,True,,0,,91.1170188
+NONE,,Valenciennes,50.3579317,True,,0,,3.5234846
+GB,England,"Woodstock,Oxfordshire,England",51.8474887,True,Europe,0,,-1.3545343
+GB,England,"Canterbury,Cathedral,London,England",51.4958266,True,Europe,0,,-0.1394181
+NONE,,Woodstock,42.0410578,True,,0,,-74.1182492
+NONE,,London,51.5074456,True,,0,,-0.1277653
+NONE,,Bayonne,43.4945144,True,,0,,-1.4736657
+NONE,,Hatfield Herts,51.7634675,True,,0,,-0.2258741
+BE,Belgium,"Antwerp,Belgium",51.2211097,True,Europe,0,,4.3997081
+IE,Ireland,"Dublin,Ireland",53.3493795,True,Europe,0,,-6.2605593
+NONE,,Ghent,51.0538286,True,,0,,3.7250121
+NONE,,Leicester Castle,52.6323702,True,,0,,-1.140593
+NONE,,"Kings Langley,Herts",51.7135573,True,,0,,-0.4503027
+NONE,,Tower of London,51.508217,True,,0,,-0.0761879
+NONE,,"Waltham,Near Winchester",51.0551516,True,,0,,-1.3290508
+NONE,,Calais,50.9524769,True,,0,,1.8538446
+FR,France,"Orleans,France",47.9027336,True,Europe,0,,1.9086066
+GB,Scotland,"Stirling,Scotland",56.1181242,True,Europe,0,,-3.9360012
+NONE,,"Eltham Palace,Kent",51.2070749,True,,0,,0.7210362
+NONE,,Perth,-31.9558967,True,,0,,115.8605784
+NONE,,Deventer,52.2694896,True,,0,,6.2364886
+NONE,,Hertford,36.3560545,True,,0,,-77.0115135
+NONE,,Near Carlisle,54.913312,True,,0,,-2.9192473
+NONE,,Castile,42.6289515,True,,0,,-78.0544514
+NONE,,"Herdeby,Near Grantham,Lincolnshire",53.1823034,True,,0,,-0.2031209
+GB,England,"Westminster,London,England",51.5013562,True,Europe,0,,-0.1249302
+NONE,,"Merton,Surrey",51.1423906,True,,0,,-0.4774898
+NONE,,Holy Land,45.0136777,True,,0,,-93.2470188
+PS,"Palestine, State of","Acre,Palestine",31.5197847,True,Asia,0,,35.0494777
+GB,England,"Clare,Suffolk,England",52.0793283,True,Europe,0,,0.5820634
+NONE,,Bordeaux,44.841225,True,,0,,-0.5800364
+NONE,,Brussels,50.8465573,True,,0,,4.351697
+NONE,,Kennington,51.4882861,True,,0,,-0.1058829
+NONE,,Amesbury,42.8579536,True,,0,,-70.9300921
+NONE,,Rhuddlan Castle,53.2891801,True,,0,,-3.4642147
+NONE,,Aquitaine,44.2462064,True,,0,,-0.1839979
+NONE,,"Marlborough,Castle",32.7432193,True,,0,,-117.1057795
+GB,England,"Brotherton,Yorkshire,England",53.7281813,True,Europe,0,,-1.2713416
+NONE,,Winchester,51.0612766,True,,0,,-1.3131692
+NONE,,"Winchester,Castle",51.064366,True,,0,,-1.3201176
+NONE,,Aix-en-Provence,43.5298424,True,,0,,5.4474738
+NONE,,"Amesbury,Wiltshire",51.1706875,True,,0,,-1.7706128
+NONE,,"Convent Church,Amesbury",42.8579536,True,,0,,-70.9300921
+NONE,,"Cupar Castle,Fife",56.3333331,True,,0,,-3.0000001
+NONE,,Westminster,51.5004439,True,,0,,-0.1265398
+NONE,,Maastricht,50.8579855,True,,0,,5.6969882
+PL,Poland,"Szczecin,Poland",53.4298114,True,Europe,0,,14.5928676
+DE,Germany,"Kiel,Germany",54.3227085,True,Europe,0,,10.135555
+LV,Latvia,"Jakobstadt,Latvia",56.4958638,True,Europe,0,,25.8687747
+RU,Russian Federation,"Near Moscow,Russia",55.7582857,True,Europe,0,,37.6043689
+NONE,,Lincoln,40.8088861,True,,0,,-96.7077751
+NONE,,Agincourt,48.7323472,True,,0,,6.236384
+GB,England,"Barking Abbey,Essex,England",51.7704679,True,Europe,0,,0.4646698
+IE,Ireland,",,,Ireland",52.865196,True,Europe,0,,-7.9794599
+GB,England,"Beaumont Palace,Oxford,England",51.7520131,True,Europe,0,,-1.2578499
+GB,England,"Newark Castle,Newark,Nottinghamshire,England",53.0802549,True,Europe,0,,-0.8131753
+NONE,,"Worcester,Cathedral",52.1895377,True,,0,,-2.2201692
+NONE,,Angouleme,45.6484505,True,,0,,0.1561947
+NONE,,Fontevraud,47.1813534,True,,0,,0.0378807
+GB,England,"Winchester,Castle,England",51.0630153,True,Europe,0,,-1.319524
+GB,England,"Newark Castle,Newark,England",53.0802549,True,Europe,0,,-0.8131753
+GB,England,"Gloucester,England",51.8653705,True,Europe,0,,-2.2458192
+GB,England,"Near London,England",53.4750463,True,Europe,0,,-2.2298879
+NONE,,Gloucester,51.8653705,True,,0,,-2.2458192
+NONE,,Foggia,41.5028106,True,,0,,15.4528939
+FR,France,"Montargis,France",47.9978628,True,Europe,0,,2.7310072
+NONE,,Le Mans,48.0073849,True,,0,,0.1967849
+NONE,,Chinon,47.1667182,True,,0,,0.2402095
+NONE,,Bordeaux/Berlin,52.598712,True,,0,,13.4357119
+GB,England,"Normandy,England",51.2550773,True,Europe,0,,-0.673856
+GB,England,"Wallingford,Castle,Berkshire,England",51.4837886,True,Europe,0,,-0.6040419
+NONE,,Bermondsey,51.4970125,True,,0,,-0.063268
+NONE,,Martel,44.9373274,True,,0,,1.6096276
+NONE,,Brunswick,52.2646577,True,,0,,10.5236066
+NONE,,"Chalus,Limousin",45.6516342,True,,0,,0.9798059
+NONE,,"Domfront,Normandy",48.5931801,True,,0,,-0.6473487
+NONE,,Burgos,42.343926,True,,0,,-3.696977
+NONE,,Angers,47.4739884,True,,0,,-0.5515588
+FR,France,"Falaise,Normandy,France",48.8964741,True,Europe,0,,-0.1999129
+FR,France,"Near Rouen,France",46.603354,True,Europe,0,,1.8883335
+NONE,,"St Stephen Abbey,Caen,Normandy",49.1813403,True,,0,,-0.3635615
+FR,France,"Flanders,France",50.6112375,True,Europe,0,,2.7451212
+NONE,,Caen,49.1813403,True,,0,,-0.3635615
+NONE,,"Holy Trinity,Abbey,Caen",48.9055604,True,,0,,-0.2040307
+FR,France,"Normandy,France",49.0677708,True,Europe,0,,0.3138532
+NONE,,Cardiff Castle,51.4823315,True,,0,,-3.181171
+NONE,,New Forest,50.8557268,True,,0,,-1.5956844
+NONE,,"Winchester,Cathedral",51.0607326,True,,0,,-1.3132458
+FR,France,"Marcigny-sur-,Loire,France",45.7538536,True,Europe,0,,4.0454737
+FR,France,"Brittany,France",48.2640845,True,Europe,0,,-2.9202408
+GB,England,"Selby,Yorkshire,England",53.785097,True,Europe,0,,-1.0990407
+NONE,,Reading Abbey,51.456203,True,,0,,-0.9650458
+BE,Belgium,"Louvain,Belgium",50.879202,True,Europe,0,,4.7011675
+NONE,,"Afflighem,Flanders",51.0962462,True,,0,,4.1786291
+NONE,,Dover Castle,51.1289759,True,,0,,1.3228764
+NONE,,Faversham Abbey,51.3171337,True,,0,,0.8948973
+NONE,,Boulogne,46.7947224,True,,0,,-1.3210389
+GB,England,"Hedingham Castle,Essex,England",51.9924915,True,Europe,0,,0.6014794
+NONE,,Toulouse,43.6044638,True,,0,,1.4442433
+NONE,,Utrecht,52.0907006,True,,0,,5.1215634
+NONE,,Chateau-du-Loir,47.6995205,True,,0,,0.4310474
+FR,France,"Bordeaux,France",44.841225,True,Europe,0,,-0.5800364
+NONE,,"Pontefract,Castle",53.695425,True,,0,,-1.3040108
+NONE,,Prague,50.0874654,True,,0,,14.4212535
+NONE,,Blois,47.5876861,True,,0,,1.3337639
+NONE,,"Celestines,Paris",48.8588897,True,,0,,2.320041
+GB,England,"Leicester,England",52.6362,True,Europe,0,,-1.1331969
+NONE,,Dublin,53.3493795,True,,0,,-6.2605593
+FR,France,"Niort,France",46.3239233,True,Europe,0,,-0.4646064
+FR,France,"St Cyr,France",49.4877114,True,Europe,0,,-1.4194777
+NONE,,St Cyr,49.4877114,True,,0,,-1.4194777
+AT,Austria,"Vienna,Austria",48.2083537,True,Europe,0,,16.3725042
+GB,Scotland,"Cardoss Castle,Firth of Clyde,Scotland",55.5035646,True,Europe,0,,-4.8515956
+GB,Scotland,"Edinburgh,Scotland",55.9533456,True,Europe,0,,-3.1883749
+GB,Scotland,"Roxburgh Castle,Scotland",55.5966085,True,Europe,0,,-2.4561649
+NONE,,St. Paul's,51.5155459,True,,0,,-0.0991304
+GB,England,"Islip,Oxfordshire,England",51.8231826,True,Europe,0,,-1.2364036
+NONE,,Hastings,50.8550976,True,,0,,0.5821779
+GB,England,"Shaftesbury,England",51.0056195,True,Europe,0,,-2.1955975
+GB,England,"Winchester,Cathedral,London,England",51.4958266,True,Europe,0,,-0.1394181
+GB,England,"Oxford,England",51.7520131,True,Europe,0,,-1.2578499
+GB,England,"St Clement Danes,London,England",51.5131211,True,Europe,0,,-0.1138393
+CA,Canada,"Cooksville,Near Toronto,Ontario,Canada",43.7784533,True,North America,0,,-79.1916644
+NONE,,Stockwell,51.472211,True,,0,,-0.1225014
+NONE,,Beaumaris Castle,53.2648344,True,,0,,-4.0897597
+NONE,,Pamplona,42.8181992,True,,0,,-1.6440089
+GB,England,"Havering atte,Bower,Essex,England",51.6203612,True,Europe,0,,0.1812697
+FR,France,"Talence,Gironde,France",44.8088438,True,Europe,0,,-0.5879629
+DE,Germany,"Heidelberg,Germany",49.4093582,True,Europe,0,,8.694724
+IT,Italy,"Milan,Italy",45.4641943,True,Europe,0,,9.1896346
+FR,France,"Pau,Bearn,France",43.3175502,True,Europe,0,,-0.3654323
+FR,France,"Marseilles,France",47.0706778,True,Europe,0,,3.0029271
+DK,Denmark,"Christiansborg,Nr: Copenhagen,Denmark",55.6764463,True,Europe,0,,12.5811865
+DK,Denmark,"Amalienborg,Denmark",55.6839601,True,Europe,0,,12.5930781
+DK,Denmark,"Fredensborg,Denmark",55.9821565,True,Europe,0,,12.3950911
+NONE,,Klausholm,56.441085,True,,0,,8.534191
+NONE,,Flensborg,54.7833021,True,,0,,9.4333264
+NONE,,Frederiksborg,55.9285735,True,,0,,12.3063909
+NONE,,Odense,55.3997225,True,,0,,10.3852104
+DK,Denmark,"Haderslev,Denmark",55.2500715,True,Europe,0,,9.4997871
+NONE,,Herzberg,51.6565219,True,,0,,10.3428415
+NONE,,Coldingen,6.7855644,True,,0,,-58.013347
+NONE,,Sonderburg,54.9089186,True,,0,,9.7897999
+NONE,,Kiel,54.3227085,True,,0,,10.135555
+NONE,,Keil,50.6271381,True,,0,,11.2234177
+NONE,,Ludwigslust,53.3300229,True,,0,,11.4993644
+NONE,,Glucksburg,54.8454449,True,,0,,9.5620334
+NONE,,Neustrelitz,53.3617163,True,,0,,13.0630004
+DE,Germany,"Oldenburg,Germany",53.1389753,True,Europe,0,,8.2146017
+DE,Germany,"Coburg,Germany",50.2582226,True,Europe,0,,10.964561
+FR,France,"St Marguerite,Cemetery,France",45.8057836,True,Europe,0,,-0.2101927
+NONE,,Claremont,34.0966764,True,,0,,-117.7197785
+FR,France,"Poissy,,,France",48.9274192,True,Europe,0,,2.0426301
+NONE,,Perpignan,42.6985304,True,,0,,2.8953121
+NONE,,"Tunis,,,Africa",36.8107673,True,,0,,10.1408787
+FR,France,"Auvergne,France",45.2968119,True,Europe,0,,4.6604809
+FR,France,"Vincennes,France",48.8474508,True,Europe,0,,2.4396714
+ES,Spain,"Seville,,,Spain",37.3886303,True,Europe,0,,-5.9953403
+NONE,,Glastonbury,51.14804,True,,0,,-2.716577
+NONE,,Malmesbury,51.58447,True,,0,,-2.0982042
+FR,France,"Cognac,France",45.6931647,True,Europe,0,,-0.3250175
+FR,France,"Rambouillet,France",48.6452851,True,Europe,0,,1.819207
+FR,France,"Abbey Barbeaux,Melun,France",48.539927,True,Europe,0,,2.6608169
+GB,England,"Wantage,,,England",51.5878072,True,Europe,0,,-1.4249258
+DE,Germany,"Goslar,,,Germany",51.9059936,True,Europe,0,,10.4266284
+BE,Belgium,"Liege,,,Belgium",50.4708135,True,Europe,0,,5.7735658
+NONE,,"Olesko,Now:,Ukraine,SSR",48.6371609,True,,0,,34.9027961
+PL,Poland,"Wilanow,Nr.,Warsaw,Poland",52.1530829,True,Europe,0,,21.1104411
+AT,Austria,"Graz,Austria",47.0708678,True,Europe,0,,15.4382786
+NONE,,"Nancy,Lorraine",48.6937223,True,,0,,6.1834097
+NONE,,"Saint-Germain,en-Laye",48.8990413,True,,0,,2.0942792
+FR,France,"Gonesse,Nr: Paris,France",46.603354,True,Europe,0,,1.8883335
+FR,France,"Mantes,France",43.1467407,True,Europe,0,,-0.3189166
+FR,France,"Vitry-en-Brie,France",46.603354,True,Europe,0,,1.8883335
+FR,France,"Lyons,France",49.5032625,True,Europe,0,,1.5854911
+FR,France,"Longchamp,France",47.260804,True,Europe,0,,5.2864826
+FR,France,"Nogent-le-Roi,France",48.6485761,True,Europe,0,,1.5322266
+FR,France,"Le Mans,France",48.0073849,True,Europe,0,,0.1967849
+FR,France,"Palace Royal,France,France",48.816118,True,Europe,0,,7.5331965
+FR,France,"Bourges,France",47.0811658,True,Europe,0,,2.399125
+FR,France,"Notre Dame,de Clery,France",47.820139,True,Europe,0,,1.755292
+NONE,,Amboise,47.4110351,True,,0,,0.983698
+NONE,,Modano,29.5463995,True,,0,,-95.4933307
+SE,Sweden,"Nora,Sweden",59.533333,True,Europe,0,,15.016667
+NONE,,"Bruges,Flanders",51.2085526,True,,0,,3.226772
+GB,England,"Sandringham,England",52.8427652,True,Europe,0,,0.4318137
+CA,Canada,Canada,61.0666922,True,North America,0,,-107.991707
+AT,Austria,Austria,47.59397,True,Europe,0,,14.12456
+FR,France,France,46.603354,True,Europe,0,,1.8883335
+FR,France,"Nr Cassel,France",50.8000011,True,Europe,0,,2.4868314
+NONE,,Zuidschote,50.9129617,True,,0,,2.8285726
+RU,Russian Federation,"Winter Palace,,St. Petersburg,Russia",59.9404625,True,Europe,0,,30.3151887
+NONE,,"Whippingham,Isle of Wight",50.740502,True,,0,,-1.2703607
+NONE,,"Chapel Royal,St. James Palace",51.5055097,True,,0,,-0.1368605
+NONE,,"Osborne House,Isle of Wight",50.7505772,True,,0,,-1.2700819
+GB,England,"St. Paul's,Cathedral,London,England",51.4958266,True,Europe,0,,-0.1394181
+FR,France,"Chateau de Cande,Monts,,France",47.2969202,True,Europe,0,,0.6642474
+GB,England,"Windsor Castle,,,England",51.4837886,True,Europe,0,,-0.6040419
+GB,England,"Windsor,England",51.4837886,True,Europe,0,,-0.6040419
+GB,England,"St. Margarets,Westminster,England",51.5004439,True,Europe,0,,-0.1265398
+NONE,,Caxton Hall,51.4986976,True,,0,,-0.134922
+GB,England,"Carlton House,London,England",51.5243471,True,Europe,0,,-0.0461637
+NONE,,"Chapel Royal,St. James",51.1270155,True,,0,,0.2599546
+ES,Spain,"Church of,San Jeronimo,Madrid,Spain",40.414505,True,Europe,0,,-3.6909511
+RO,Romania,"Bucharest,Romania",44.4361414,True,Europe,0,,26.1027202
+NO,Norway,"Oslo Cathedral,Oslo,Norway",59.9125115,True,Europe,0,,10.747012
+DE,Germany,"Tegernsee,,Bavaria",47.7099191,True,Europe,0,,11.7543337
+GB,England,"Chapel Royal,St. James,England",51.1270155,True,Europe,0,,0.2599546
+NONE,,Breda,51.5887845,True,,0,,4.7760237
+GB,England,"Dover,,England",51.1251275,True,Europe,0,,1.3134228
+NONE,,Monte Fiascone,45.6632366,True,,0,,13.7974382
+GB,England,"Canterbury,,England",51.2800275,True,Europe,0,,1.0802533
+GB,England,"Portsmouth,England",50.800031,True,Europe,0,,-1.0906023
+GB,England,"Westminster,,England",51.5004439,True,Europe,0,,-0.1265398
+GB,England,"Chichester,Register Office,England",51.4480097,True,Europe,0,,-0.32432
+GB,England,"Dummer,,England",51.2123026,True,Europe,0,,-1.1564776
+GB,England,"St. Pauls Cath.,London,England",51.5074456,True,Europe,0,,-0.1277653
+NONE,,Abbeville,50.1060835,True,,0,,1.8337029
+GB,England,"Grey Friars Ch.,Greenwich,England",51.4820845,True,Europe,0,,-0.0045417
+GB,England,"York Place,,England",51.5594233,True,Europe,0,,0.0690757
+GB,England,"Durham House,London,England",51.5091059,True,Europe,0,,-0.1234273
+DE,Germany,"Salem,Bavaria",53.6563082,True,Europe,0,,10.8253152
+FR,France,"Dinard,,France",48.6320379,True,Europe,0,,-2.0580178
+NO,Norway,"Asker,Near Oslo,Norway",61.1529386,True,Europe,0,,8.7876653
+NONE,,Odessa,46.4843023,True,,0,,30.7322878
+GB,England,"St. Stephen's,Chapel,Westminster,England",51.5105657,True,Europe,0,,-0.1198932
+BR,Brazil,"Rio de Janerio,Brazil",-10.3333333,True,South America,0,,-53.2
+NL,Netherlands,"Amsterdam,Netherlands",52.3730796,True,Europe,0,,4.8924534
+NONE,,"Titchfield,Abbey,Hants",44.9849414,True,,0,,-64.1114622
+NONE,,Troyes,48.2971626,True,,0,,4.0746257
+NONE,,Arundel Castle,50.856776,True,,0,,-0.5540305
+NONE,,York Minster,53.9623561,True,,0,,-1.0820834
+NONE,,Reading,51.4514953,True,,0,,-0.9836342
+NONE,,Las Huelgas,38.0135643,True,,0,,-3.7968446
+NONE,,"Canterbury,Cathedral",51.2797999,True,,0,,1.082766
+NONE,,Therouenne,48.444586,True,,0,,2.7526389
+NONE,,Leghorn,42.7902379,True,,0,,10.3402239
+NONE,,Mainz,49.9995205,True,,0,,8.2736253
+NONE,,Biarritz,43.4711438,True,,0,,-1.5527266
+NONE,,Roquefort,43.7589265,True,,0,,0.6032061
+FR,France,"St Jean-de-Luz,France",43.387219,True,Europe,0,,-1.6636947
+NONE,,Berwick-on-Tweed,55.7692442,True,,0,,-2.0026472
+DE,Germany,"Minden,Saxony,Germany",51.4161908,True,Europe,0,,9.6550096
+RU,Russian Federation,",,,Russia",64.6863136,True,Europe,0,,97.7453061
+NONE,,"Fawley,Bucks",51.7834994,True,,0,,-0.8946441
+DE,Germany,"Kaiserslautern,Germany",49.4432174,True,Europe,0,,7.7689951
+NONE,,Worms,49.6302618,True,,0,,8.3620898
+NONE,,York,53.9656579,True,,0,,-1.0743052
+NONE,,Ipswich,52.0579324,True,,0,,1.1528095
+DE,Germany,"Cologne,Germany",50.938361,True,Europe,0,,6.959974
+NONE,,Lund,55.7029296,True,,0,,13.1929449
+NONE,,Sceaux,47.5147285,True,,0,,4.0218449
+NONE,,Gluckstadt,53.787927,True,,0,,9.4238157
+NONE,,Lauenburg,53.3789803,True,,0,,10.5513889
+NONE,,Augustenburg,54.9506719,True,,0,,9.8743203
+NONE,,Compiegne,49.4179497,True,,0,,2.8263171
+GB,England,"Guildhall,London,England",51.5159067,True,Europe,0,,-0.092024
+GB,England,"St. George Chap.,Windsor,,England",51.4837886,True,Europe,0,,-0.6040419
+RU,Russian Federation,"Winter Palace,St. Petersburg,Russia",59.9404625,True,Europe,0,,30.3151887
+GB,England,"Sandringham,Norfolk,England",52.8427652,True,Europe,0,,0.4318137
+GB,England,",,London,England",51.5074456,True,Europe,0,,-0.1277653
+GB,England,"Westminster,Cathedral,London,England",51.4958266,True,Europe,0,,-0.1394181
+GB,England,"St. Marys Hosp.,Paddington,London,England",51.5161629,True,Europe,0,,-0.1744856
+GB,England,"Sandringham,Church,Norfolk,England",52.7099372,True,Europe,0,,1.5342585
+GB,England,",,England",52.5310214,True,Europe,0,,-1.2649062
+FR,France,"Paris,France",48.8588897,True,Europe,0,,2.320041
+GB,England,"Chapel Royal,St James Palace,,England",51.4987815,True,Europe,0,,-0.1423506
+GB,England,"Buckingham House,London,England",51.4404664,True,Europe,0,,0.0810511
+DK,Denmark,"Copenhagen,Denmark",55.6867243,True,Europe,0,,12.5700724
+GB,England,",London,England",51.5074456,True,Europe,0,,-0.1277653
+GB,England,"London,,,England",51.5074456,True,Europe,0,,-0.1277653
+DK,Denmark,"Frederiksborg,Denmark",55.9285735,True,Europe,0,,12.3063909
+IT,Italy,"Rome,,Italy",41.8933203,True,Europe,0,,12.4829321
+ES,Spain,"Madrid,Spain",40.416782,True,Europe,0,,-3.703507
+CH,Switzerland,",Switzerland",46.7985624,True,Europe,0,,8.2319736
+RU,Russian Federation,"St. Petersburg,Russia",59.938732,True,Europe,0,,30.316229
+GB,England,"Worcester House,London,England",51.4477594,True,Europe,0,,-0.2292103
+GB,England,"St. James Palace,,England",51.4987815,True,Europe,0,,-0.1423506
+FR,France,"Paris,,France",48.8588897,True,Europe,0,,2.320041
+GB,England,"Kensington,Palace,England",51.505099,True,Europe,0,,-0.1876332
+AR,Argentina,"Buenos Aires,,Argentina",-34.6095579,True,South America,0,,-58.3887904
+GB,England,"Greenwich,Palace,England",51.508217,True,Europe,0,,-0.0761879
+GB,England,"Winchester,Cathedral,,England",51.0607326,True,Europe,0,,-1.3132458
+GB,England,"Westminster,,London,England",51.5013562,True,Europe,0,,-0.1249302
+GB,England,"London,,England",51.5074456,True,Europe,0,,-0.1277653
+NONE,,"Bolingbroke,Castle",53.1651885,True,,0,,0.0165423
+GB,Scotland,"Linlithgow,Scotland",55.977167,True,Europe,0,,-3.6006234
+GB,England,",England",52.5310214,True,Europe,0,,-1.2649062
+NONE,,St Denis,48.935773,True,,0,,2.3580232
+FR,France,"St Germain-en-,Laye,France",48.9994177,True,Europe,0,,2.1022294
+GB,England,"Westminster,England",51.5004439,True,Europe,0,,-0.1265398
+NONE,,Bury St Edmunds,52.2460367,True,,0,,0.7125173
+IT,Italy,"Rome,,,Italy",41.8933203,True,Europe,0,,12.4829321
+ES,Spain,"Madrid,,,Spain",40.416782,True,Europe,0,,-3.703507
+DE,Germany,",Germany",51.1638175,True,Europe,0,,10.4478313
+IT,Italy,"Florence,Italy",43.7697955,True,Europe,0,,11.2556404

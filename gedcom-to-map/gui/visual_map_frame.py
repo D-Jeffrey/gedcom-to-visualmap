@@ -1,9 +1,5 @@
-import _thread
 import logging
 import os
-import time
-import webbrowser
-from datetime import datetime
 
 import wx
 

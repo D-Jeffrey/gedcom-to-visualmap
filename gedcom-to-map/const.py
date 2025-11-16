@@ -1,7 +1,3 @@
-import sys
-import platform
-import wx
-
 # Constants for gedcom-to-visualmap
 
 VERSION = "0.2.7.2"

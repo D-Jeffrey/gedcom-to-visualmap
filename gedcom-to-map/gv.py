@@ -17,7 +17,7 @@ import wx.lib.mixins.inspection as wit
 
 # Import constants and GUI components
 from const import GUINAME, LOG_CONFIG, NAME, VERSION
-from gui.visual_map_frame import VisualMapFrame
+from gui.gedcomVisualGUI import GedcomVisualGUI
 
 # Initialize logger for the application
 _log = logging.getLogger(__name__)
@@ -47,20 +47,20 @@ if __name__ == '__main__':
         app = wx.App()
 
     # Create the main application frame and panel
-    visualFrame = VisualMapFrame(None, title=GUINAME, size=(1024, 800), style=wx.DEFAULT_FRAME_STYLE)
+    frame = GedcomVisualGUI(None, title=GUINAME, size=(1024, 800), style=wx.DEFAULT_FRAME_STYLE)
     
     # Show the inspection tool if WITMODE is enabled
     if WITMODE:
         app.ShowInspectionTool()
 
     # Display the main frame
-    visualFrame.start()
+    frame.start()
     
     # Start the application's main event loop
     app.MainLoop()
 
     # Clean up and stop the application
-    visualFrame.stop()
+    frame.stop()
     _log.info('Finished')
 
     # Exit the program

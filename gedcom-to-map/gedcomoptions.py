@@ -155,7 +155,7 @@ class gvOptions:
                         'defaultCountry':2}
         self.logging_keys = ['models.person', 'models', 'ged4py.parser', 'ged4py', 'models.creator', 'models.location', 'gedcomoptions', 'gedcom.gedcomparser', 
                              'gedcom', 'gedcom.gedcom', 'gedcom.geocode','gedcom.geocache','gedcom.addressbook',
-                             'geopy', 'render.kmlexporter', 'render', 'render.foliumexp', 'gedcomvisual', 'gedcomdialogs', '__main__']
+                             'geopy', 'render.kmlexporter', 'render', 'render.foliumexp', 'gedcomvisual', '__main__']
         
         self.kml_keys = {'MaxLineWeight':1, 'MaxMissing':1, 'UseBalloonFlyto':0, 'KMLsort':0}
         # Old settings that should be removed from the config file

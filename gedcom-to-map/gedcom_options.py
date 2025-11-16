@@ -1,5 +1,4 @@
 __all__ = ['gvOptions']
-from calendar import c
 import logging
 import os
 import platform
@@ -7,13 +6,11 @@ import time
 from datetime import datetime
 import yaml
 
-from typing import Union, Dict
+from typing import Union, Dict, Optional
 from enum import Enum
 import configparser
 from const import OFFICECMDLINE
 from pathlib import Path
-from xmlrpc.client import boolean
-from wx import LogGeneric
 from models.Person import Person, LatLon, LifeEvent
 
 _log = logging.getLogger(__name__)
@@ -44,6 +41,7 @@ class ResultsType(Enum):
     KML2 = "KML2"
     SUM = "SUM"
 
+    @staticmethod
     def ResultsTypeEnforce(value):
         if isinstance(value, ResultsType):
             return value
@@ -144,19 +142,21 @@ class gvOptions:
                 _log.error("Error setting option '%s' type %s: %s", key, typ, e)
                     
     def set_marker_defaults(self):
-        marker_options = self.options.get('marker_options_defaults', {})
+        marker_options = self.options.get('marker_options_defaults', {}) or {}
         self.set_marker_options(marker_options)
 
-    def set_marker_options (self, marker_options: dict):
-        expected_keys = self.options.get('marker_options_list', [])
-        for key, value in self.options.get('marker_options_defaults', {}).items():
+    def set_marker_options(self, marker_options: dict):
+        expected_keys = self.options.get('marker_options_list', []) or []
+        # Apply provided defaults, warn about unknown keys
+        for key, value in marker_options.items():
             if key in expected_keys:
                 setattr(self, key, value)
             else:
-                _log.warning(f"Unknown marker option '{key}' in defaults; ignoring.")
+                _log.warning("Unknown marker option '%s' in defaults; ignoring.", key)
+        # Ensure missing expected keys get a safe default
         for key in expected_keys:
-            if key not in self.options.get('marker_options_defaults', {}):
-                _log.warning(f"Marker option '{key}' missing in defaults; setting to None.")
+            if not hasattr(self, key):
+                _log.warning("Marker option '%s' missing in defaults; setting to None.", key)
                 setattr(self, key, None)
     
     def resettimeframe(self):
@@ -185,10 +185,19 @@ class gvOptions:
                 self.timeframe['to'] = theyear
 
         
-    def setstatic(self,  GEDCOMinput:2, Result:2, ResultType: ResultsType, Main=None, MaxMissing:1 = 0, MaxLineWeight:1 = 20, UseGPS:bool = True, CacheOnly:bool = False,  AllEntities:bool = False):
+    def setstatic(self,
+                  GEDCOMinput: Optional[str],
+                  Result: Optional[str],
+                  ResultType: ResultsType,
+                  Main: Optional[str] = None,
+                  MaxMissing: int = 0,
+                  MaxLineWeight: int = 20,
+                  UseGPS: bool = True,
+                  CacheOnly: bool = False,
+                  AllEntities: bool = False):
         
         self.setInput(GEDCOMinput)
-        self.setResults(Result, ResultType)
+        self.setResults(Result or "", ResultType)
         self.Main = Main
         self.Name = None
         self.MaxMissing = MaxMissing
@@ -198,21 +207,66 @@ class gvOptions:
         self.AllEntities = AllEntities             # generte output of everyone in the system
         
     def loadsection(self, sectionName, keys=None):
-        for key, typ in keys.items():
+        import ast
+        import re
+        for key, typ in (keys or {}).items():
             value = self.gvConfig[sectionName].get(key, None)
-            if value is not None:
-                # Trap for manual editing of the configuration file
-                try:
-                    if typ == 'bool':  # Boolean
-                        setattr(self, key, value.lower() == 'true')
-                    elif typ == 'int':  # int
-                        setattr(self, key, int(value))
-                    elif typ == 'str':  # str
-                        setattr(self, key, value)
-                    else:  # complex
-                        setattr(self, key, eval(value))
-                except Exception as e:
-                    _log.error(f"Error loading setting '{key}' type {typ} in section {sectionName}: {e}")
+            if value is None:
+                continue
+            try:
+                if typ == 'bool':
+                    setattr(self, key, str(value).strip().lower() == 'true')
+                elif typ == 'int':
+                    setattr(self, key, int(value))
+                elif typ == 'str':
+                    setattr(self, key, value)
+                else:
+                    parsed = None
+                    # try yaml first (handles lists/dicts/numbers/null)
+                    try:
+                        parsed_yaml = yaml.safe_load(value)
+                    except Exception:
+                        parsed_yaml = None
+
+                    if parsed_yaml is not None and not isinstance(parsed_yaml, str):
+                        parsed = parsed_yaml
+                    else:
+                        # handle ResultsType like "ResultsType.HTML"
+                        m = re.match(r'^\s*ResultsType\.([A-Za-z_][A-Za-z0-9_]*)\s*$', value)
+                        if m:
+                            try:
+                                parsed = ResultsType.ResultsTypeEnforce(m.group(1))
+                            except Exception:
+                                parsed = value
+                        else:
+                            # handle LatLon(...) specifically
+                            m2 = re.match(r'^\s*LatLon\s*\((.*)\)\s*$', value)
+                            if m2:
+                                inside = m2.group(1)
+                                parts = [p.strip() for p in inside.split(',')]
+                                vals = []
+                                for p in parts:
+                                    if p.lower() == 'none' or p == '':
+                                        vals.append(None)
+                                    else:
+                                        try:
+                                            vals.append(float(p))
+                                        except Exception:
+                                            vals.append(p.strip('\'"'))
+                                try:
+                                    parsed = LatLon(vals[0], vals[1])
+                                except Exception:
+                                    parsed = value
+                            else:
+                                # last resort: safe literal eval, otherwise keep string
+                                try:
+                                    parsed = ast.literal_eval(value)
+                                except Exception:
+                                    parsed = value
+
+                    setattr(self, key, parsed)
+            except Exception as e:
+                _log.error("Error loading setting '%s' type %s in section %s: %s", key, typ, sectionName, e)
 
     def loadsettings(self):
         self.gvConfig = configparser.ConfigParser()
@@ -305,21 +359,24 @@ class gvOptions:
         else:
             self.setMainPerson(None)
 
-    def setResults(self, Result, OutputType: ResultsType):
+    def setResults(self, Result, OutputType):
         """ Set the Output file and type (Only the file name) """
-        self.ResultType = ResultsType.ResultsTypeEnforce(OutputType)
+        enforced = ResultsType.ResultsTypeEnforce(OutputType)
+        self.ResultType = enforced
+
         extension = "txt"
-        if OutputType is ResultsType.HTML:
+        if enforced is ResultsType.HTML:
             extension = "html"
-        elif OutputType is ResultsType.KML:
+        elif enforced is ResultsType.KML:
             extension = "kml"
-        elif OutputType is ResultsType.KML2:
+        elif enforced is ResultsType.KML2:
             extension = "kml"
-        elif OutputType is ResultsType.SUM:
+        elif enforced is ResultsType.SUM:
             extension = "txt"
         
-        self.Result, e = os.path.splitext(Result)                   # output file (could be of resulttype .html or .kml)
-        if self.Result != "":
+        base, _ = os.path.splitext(Result or "")
+        self.Result = base
+        if self.Result:
             self.Result = self.Result + "." + extension
         # TODO Update Visual value
 

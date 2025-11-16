@@ -5,6 +5,7 @@ import os
 import platform
 import time
 from datetime import datetime
+import yaml
 
 from typing import Union, Dict
 from enum import Enum
@@ -55,10 +56,15 @@ class ResultsType(Enum):
             raise TypeError(f"Cannot convert {type(value)} to ResultsType")
 
 class gvOptions:
+    GEDCOM_OPTIONS_FILE = 'gedcom_options.yaml'
+
     def __init__ (self):
+        file_path = Path(__file__).parent / self.GEDCOM_OPTIONS_FILE
+        with open(file_path, 'r') as file:
+            self.options = yaml.safe_load(file)
 
         self.gvConfig = None
-        self.defaults()
+        self.set_marker_defaults()
         self.settingsfile = settings_file_pathname("gedcom-visualmap.ini")
 
         self.GEDCOMinput = "gedcomfile.ged"
@@ -145,59 +151,30 @@ class gvOptions:
         self.totalGEDfamily = None
         self.fileHistory = None
 
-        # Types 0 - boolean, 1: int, 2: str, 3 : complex
-        self.html_keys = {'MarksOn':0, 'HeatMap':0, 'BornMark':0, 'DieMark':0,  'MarkStarOn':0, 'GroupBy':1, 
-                          'UseAntPath':0, 'MapTimeLine':0, 'HeatMapTimeStep':1, 'HomeMarker':0, 'showLayerControl':0, 
-                          'mapMini':0, 'MapStyle':2}
-        self.core_keys = {'UseGPS':0, 'CacheOnly':0, 'AllEntities':0, 'ResultType':3, 'KMLcmdline':2, 'CSVcmdline':2, 'Tracecmdline':2, 'badAge':0,
-                        'SummaryPlaces':0, 'SummaryPeople':0, 'SummaryCountries':0, 'SummaryCountriesGrid':0, 
-                        'SummaryCountries':0, 'SummaryGeocode':0, 'SummaryAltPlaces':0, 'SummaryOpen':0, 
-                        'defaultCountry':2}
-        self.logging_keys = ['models.person', 'models', 'ged4py.parser', 'ged4py', 'models.creator', 'models.location', 'gedcomoptions', 'gedcom.gedcomparser', 
-                             'gedcom', 'gedcom.gedcom', 'gedcom.geocode','gedcom.geocache','gedcom.addressbook',
-                             'geopy', 'render.kmlexporter', 'render', 'render.foliumexp', 'gedcomvisual', '__main__']
-        
-        self.kml_keys = {'MaxLineWeight':1, 'MaxMissing':1, 'UseBalloonFlyto':0, 'KMLsort':0}
-        # Old settings that should be removed from the config file
-        self.oldsettings = {'native': 'KML', 'born': 'KML', 'death':'KML', 'PlaceType': 'KML', 'HeatMapTimeLine': 'HTML', 
-                            'gedcom.gedcomparser': 'Logging'}
-
         if os.path.exists(self.settingsfile):
             self.loadsettings()            
 
 
-    def defaults(self):
-        
-        self.MarksOn = True
-        self.HeatMap = False
-        self.BornMark = True
-        self.DieMark = True
-        
-        self.MarkStarOn = True
-        self.GroupBy = 2
-        self.UseAntPath = False
-        self.MapTimeLine = False
-        self.HeatMapTimeStep = 20
-        self.HomeMarker = False
-        self.MapStyle = "CartoDB.Voyager"
+    def set_marker_defaults(self):
+        marker_options = self.options.get('marker_options_defaults', {})
+        self.set_marker_options(marker_options)
 
-    def setmarkers (self, MarksOn = True, HeatMap = False, MarkStarOn = True, BornMark = True, DieMark = True, MapStyle = 3, GroupBy=2, UseAntPath=False, MapTimeLine=False, HeatMapTimeStep=1, HomeMarker=False):
-        
-        self.MarksOn = MarksOn
-        self.HeatMap = HeatMap
-        self.BornMark = BornMark
-        self.DieMark = DieMark
-        self.MapStyle = MapStyle
-        self.MarkStarOn = MarkStarOn
-        self.GroupBy = GroupBy
-        self.UseAntPath = UseAntPath
-        self.MapTimeLine = MapTimeLine
-        self.HeatMapTimeStep = HeatMapTimeStep
-        self.HomeMarker = HomeMarker
+    def set_marker_options (self, marker_options: dict):
+        expected_keys = self.options.get('marker_options_list', [])
+        for key, value in self.options.get('marker_options_defaults', {}).items():
+            if key in expected_keys:
+                setattr(self, key, value)
+            else:
+                _log.warning(f"Unknown marker option '{key}' in defaults; ignoring.")
+        for key in expected_keys:
+            if key not in self.options.get('marker_options_defaults', {}):
+                _log.warning(f"Marker option '{key}' missing in defaults; setting to None.")
+                setattr(self, key, None)
     
     def resettimeframe(self):
         """ Reset the timeframe for the process """
         self.timeframe = {'from': None, 'to': None}
+
     def addtimereference(self, timeRefrence: LifeEvent):
         """ 
         Update the over all timeframe with person event details
@@ -238,16 +215,17 @@ class gvOptions:
             if value is not None:
                 # Trap for manual editing of the configuration file
                 try:
-                    if typ == 0:  # Boolean
+                    if typ == 'bool':  # Boolean
                         setattr(self, key, value.lower() == 'true')
-                    elif typ == 1:  # int
+                    elif typ == 'int':  # int
                         setattr(self, key, int(value))
-                    elif typ == 2:  # str
+                    elif typ == 'str':  # str
                         setattr(self, key, value)
                     else:  # complex
                         setattr(self, key, eval(value))
                 except Exception as e:
                     _log.error(f"Error loading setting '{key}' type {typ} in section {sectionName}: {e}")
+
     def loadsettings(self):
         self.gvConfig = configparser.ConfigParser()
         self.gvConfig.read(self.settingsfile)
@@ -256,12 +234,9 @@ class gvOptions:
         for section in ['Core', 'HTML', 'Logging', 'Gedcom.Main', 'KML']:
             if section not in self.gvConfig.sections():
                 self.gvConfig[section] = {}
-        # Load HTML settings
-        self.loadsection('HTML', self.html_keys)
-        # Load KML settings
-        self.loadsection('KML', self.kml_keys)
-        # Load Core settings
-        self.loadsection('Core', self.core_keys)
+            if section in ['Core', 'HTML', 'KML']:
+                section_keys = self.options.get('config_file_settings', {}).get(f'{section}', {})
+                self.loadsection(section, section_keys)
         
         self.setInput(self.gvConfig['Core'].get('InputFile', ''), generalRequest=False)
         self.resultpath, self.Result = os.path.split(self.gvConfig['Core'].get('OutputFile', ''))
@@ -282,13 +257,14 @@ class gvOptions:
             self.gvConfig = configparser.ConfigParser()
             for section in ['Core', 'HTML', 'Logging', 'Gedcom.Main', 'KML']:
                 self.gvConfig[section] = {}
-            
-        for key in self.core_keys:
+        core_keys = self.options.get('config_file_settings', {}).get('Core', {})
+        for key in core_keys:
             self.gvConfig['Core'][key] = str(getattr(self, key))
-        for key in self.html_keys:
+        html_keys = self.options.get('config_file_settings', {}).get('HTML', {})
+        for key in html_keys:
             self.gvConfig['HTML'][key] =  str(getattr(self, key))
-            
-        for key in self.kml_keys:
+        kml_keys = self.options.get('config_file_settings', {}).get('KML', {})
+        for key in kml_keys:
             self.gvConfig['KML'][key] =  str(getattr(self, key))
 
         self.gvConfig['Core']['InputFile'] =  self.GEDCOMinput
@@ -301,14 +277,16 @@ class gvOptions:
         #    self.gvConfig['Files'][key] = self.panel.fileConfig[key]
         
         loggerNames = list(logging.root.manager.loggerDict.keys())
+        logging_keys = self.options.get('config_file_settings', {}).get('Logging', [])
         for logName in loggerNames:
-            if logName in self.logging_keys:
+            if logName in logging_keys:
                 logLevel = logging.getLevelName(logging.getLogger(logName).level)
                 if logLevel == 'NOTSET':
                     self.gvConfig.remove_option('Logging', logName)
                 else:
                     self.gvConfig['Logging'][logName] = logging.getLevelName(logging.getLogger(logName).getEffectiveLevel())
-        for key, section  in self.oldsettings.items():
+        old_settings = self.options.get('config_file_settings', {}).get('old_settings', {})
+        for key, section  in old_settings.items():
             self.gvConfig.remove_option(section, key)
         with open(self.settingsfile, 'w') as configfile:
             self.gvConfig.write(configfile)

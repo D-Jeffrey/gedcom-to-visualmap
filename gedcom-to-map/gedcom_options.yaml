@@ -1,0 +1,115 @@
+marker_options_list: [
+    'MarksOn', 'HeatMap', 'BornMark', 'DieMark',
+    'MarkStarOn', 'GroupBy', 'UseAntPath',
+    'MapTimeLine', 'HeatMapTimeStep', 'HomeMarker', 'MapStyle'
+]
+
+marker_options_defaults:
+  MarksOn: True
+  HeatMap: False
+  BornMark: True
+  DieMark: True
+  
+  MarkStarOn: True
+  GroupBy: 2
+  UseAntPath: False
+  MapTimeLine: False
+  HeatMapTimeStep: 20
+  HomeMarker: False
+  MapStyle: "CartoDB.Voyager"
+
+config_file_settings:
+  section_keys: ['Core', 'HTML', 'Logging', 'Gedcom.Main', 'KML']
+  HTML: {
+    MarksOn: 'bool', HeatMap: 'bool', BornMark: 'bool', DieMark: 'bool', MarkStarOn: 'bool',
+    GroupBy: 1, UseAntPath: 'bool', MapTimeLine: 'bool', HeatMapTimeStep: 'int',
+    HomeMarker: 'bool', showLayerControl: 'bool', mapMini: 'bool', MapStyle: 'str' }
+  Core: {
+    UseGPS: 'bool', CacheOnly: 'bool', AllEntities: 'bool', ResultType: 'complex',
+    KMLcmdline: 'str', CSVcmdline: 'str', Tracecmdline: 'str',  badAge: 'bool' }
+  KML : {
+    'MaxLineWeight':'int', 'MaxMissing':'int', 'UseBalloonFlyto':'bool', 'KMLsort':'bool' }
+  # Old settings that should be removed from the config file
+  old_settings: {
+    'native': 'KML', 'born': 'KML', 'death':'KML', 'PlaceType': 'KML',
+    'HeatMapTimeLine': 'HTML', 'gedcom.gedcomparser': 'Logging'}
+  Logging:
+    - models.person
+    - models
+    - ged4py.parser
+    - ged4py
+    - models.creator
+    - models.location
+    - gedcomoptions
+    - gedcom.gedcomparser
+    - gedcom
+    - gedcom.gedcom
+    - gedcom.geocode
+    - gedcom.geocache
+    - gedcom.addressbook
+    - geopy
+    - render.kmlexporter
+    - render
+    - render.foliumexp
+    - gedcomvisual
+    - "__main__"
+
+gedcom_options_defaults:
+  GEDCOMinput: "gedcomfile.ged"
+  resultpath: None
+  Result: ''
+  ResultType: 'HTML'
+  Main: None
+  mainPerson: None
+  Name: None
+  mainPersonLatLon: None
+  MaxMissing: 0
+  MaxLineWeight: 20
+  UseGPS: True
+  CacheOnly: False
+  AllEntities: False
+  GridView: False
+  UseBalloonFlyto: True
+  KMLsort: True
+  badAge: True
+
+gedcom_gui_options:
+  showLayerControl: True
+  mapMini: True
+  counter: 0
+  countertarget: 0
+  running: False
+  runningLast: 0
+  runningSince: 0
+  runningSinceStep: 0
+  time: time.ctime()
+  parsed: False
+  newload: False
+  state: ''
+  gpsfile: None
+  stopping: False
+  lookup: None
+  totalpeople: None
+  stepinfo: ''
+  lastmax: 0
+  people: None
+  Referenced: None
+  panel: None
+  selectedpeople: 0
+  lastlines: None
+  resettimeframe: None
+  runavg: []
+  SummaryOpen: True
+  SummaryPlaces: True
+  SummaryPeople: True
+  SummaryCountries: False
+  SummaryCountriesGrid: True
+  SummaryCountries: False
+  SummaryGeocode: True
+  SummaryAltPlaces: False
+
+gedcom_file_options:
+  skip_file_geocache: False
+  skip_file_alt_places: False
+  defaultCountry: None
+  include_canonical: True

@@ -25,7 +25,7 @@ from models.location import Location
 from models.LatLon import LatLon
 from models.Person import Person, LifeEvent
 from .addressbook import FuzzyAddressBook
-from gedcomoptions import gvOptions
+from gedcom_options import gvOptions
 
 logger = logging.getLogger(__name__)
 

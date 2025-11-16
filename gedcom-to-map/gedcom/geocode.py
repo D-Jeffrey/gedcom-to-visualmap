@@ -25,7 +25,7 @@ from const import GEOCODEUSERAGENT
 from models.location import Location
 from .addressbook import FuzzyAddressBook
 from .geocache import GeoCache
-from gedcomoptions import gvOptions
+from gedcom_options import gvOptions
 
 # Re-use higher-level logger (inherits configuration from main script)
 logger = logging.getLogger(__name__)

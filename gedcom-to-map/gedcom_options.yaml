@@ -54,15 +54,39 @@ config_file_settings:
     - gedcomvisual
     - "__main__"
 
+gedcom_options_types: {
+  GEDCOMinput: 'str', resultpath: 'str', Result: 'str',
+  ResultType: 'str', Main: 'str', mainPerson: 'str',
+  Name: 'str', mainPersonLatLon: 'complex', MaxMissing: 'int',
+  MaxLineWeight: 'int', UseGPS: 'bool', CacheOnly: 'bool',
+  AllEntities: 'bool', GridView: 'bool', seBalloonFlyto: 'bool',
+  KMLsort: 'int', badAge: 'bool',
+
+  showLayerControl: 'bool', mapMini: 'bool', counter: 'int',
+  countertarget: 'int', running: 'bool', runningLast: 'int',
+  runningSince: 'int', runningSinceStep: 'int', parsed: 'bool',
+  newload: 'bool', state: 'str', gpsfile: 'str', stopping: 'bool',
+  lookup: 'str', totalpeople: 'str', stepinfo: 'str', lastmax: 'int',
+  Referenced: 'str', panel: 'str', selectedpeople: 'int',
+  lastlines: 'str', runavg: 'str', SummaryOpen: 'bool',
+  SummaryPlaces: 'bool', SummaryPeople: 'bool',
+  SummaryCountries: 'bool', SummaryCountriesGrid: 'bool',
+  SummaryGeocode: 'bool', SummaryAltPlaces: 'bool',
+  skip_file_geocache: 'bool', skip_file_alt_places: 'bool',
+  defaultCountry: 'str', include_canonical: 'bool',
+
+  heritage: 'str', UpdateBackgroundEvent: 'str', totalGEDpeople: 'str',
+  totalGEDfamily: 'str', fileHistory: 'str'
+}
 gedcom_options_defaults:
   GEDCOMinput: "gedcomfile.ged"
-  resultpath: None
+  resultpath: null
   Result: ''
-  ResultType: 'HTML'
-  Main: None
-  mainPerson: None
-  Name: None
-  mainPersonLatLon: None
+  ResultType: ResultsType.HTML
+  Main: null
+  mainPerson: null
+  Name: null
+  mainPersonLatLon: LatLon(None, None)
   MaxMissing: 0
   MaxLineWeight: 20
   UseGPS: True
@@ -70,10 +94,9 @@ gedcom_options_defaults:
   AllEntities: False
   GridView: False
   UseBalloonFlyto: True
-  KMLsort: True
+  KMLsort: 1
   badAge: True
 
-gedcom_gui_options:
   showLayerControl: True
   mapMini: True
   counter: 0
@@ -82,22 +105,18 @@ gedcom_gui_options:
   runningLast: 0
   runningSince: 0
   runningSinceStep: 0
-  time: time.ctime()
   parsed: False
   newload: False
   state: ''
-  gpsfile: None
+  gpsfile: null
   stopping: False
-  lookup: None
-  totalpeople: None
+  lookup: null
+  totalpeople: null
   stepinfo: ''
-  lastmax: 0
-  people: None
-  Referenced: None
-  panel: None
+  Referenced: null
+  panel: null
   selectedpeople: 0
-  lastlines: None
-  resettimeframe: None
+  lastlines: null
   runavg: []
   SummaryOpen: True
   SummaryPlaces: True
@@ -107,9 +126,13 @@ gedcom_gui_options:
   SummaryCountries: False
   SummaryGeocode: True
   SummaryAltPlaces: False
-
-gedcom_file_options:
   skip_file_geocache: False
   skip_file_alt_places: False
-  defaultCountry: None
+  defaultCountry: null
   include_canonical: True
+  
+  heritage: null
+  UpdateBackgroundEvent: null
+  totalGEDpeople: null
+  totalGEDfamily: null
+  fileHistory: null

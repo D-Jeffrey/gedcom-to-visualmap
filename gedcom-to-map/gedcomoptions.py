@@ -67,63 +67,13 @@ class gvOptions:
         self.set_marker_defaults()
         self.settingsfile = settings_file_pathname("gedcom-visualmap.ini")
 
-        self.GEDCOMinput = "gedcomfile.ged"
-        self.resultpath = None              # directory for .Result
-        self.Result = ''                    # output file (could be of resulttype .html or .kml)
-        self.ResultType : ResultsType = ResultsType.HTML
-        self.Main = None                    # xref_id
-        self.mainPerson = None               # point to Person
-        self.Name = None                    # name of person
-        self.mainPersonLatLon : LatLon = LatLon(None, None)
-        self.MaxMissing = 0
-        self.MaxLineWeight = 20
-        self.UseGPS = True
-        self.CacheOnly = False
-        self.AllEntities = False
-        self.GridView = False
-        self.UseBalloonFlyto = True
-        self.KMLsort = 1                  # 0 = none, 1 = folder
-        self.badAge = True
+        gedcom_options_types = self.options.get('gedcom_options_types', {})
+        gedcom_options_defaults = self.options.get('gedcom_options_defaults', {})
+        self.set_options(gedcom_options_types, gedcom_options_defaults)
 
-        self.showLayerControl = True
-        self.mapMini = True
-        self.counter = 0
-        self.countertarget = 0
-        self.running = False
-        self.runningLast = 0
-        self.runningSince = 0
-        self.runningSinceStep = 0
-        self.time = time.ctime()
-        self.parsed = False
-        self.newload = False
-        self.state = ''
-        self.gpsfile = None
-        self.stopping = False
-        self.lookup = None
-        self.totalpeople = None
-        self.stepinfo = ''
-        self.lastmax = self.counter
         self.people: Union[Dict[str, Person], None] = None
-        self.Referenced = None
-        self.panel = None
-        self.selectedpeople = 0
-        self.lastlines = None
+        self.time = time.ctime()
         self.resettimeframe()
-        self.runavg = []
-        self.SummaryOpen = True
-        self.SummaryPlaces = True
-        self.SummaryPeople = True
-        self.SummaryCountries = False
-        self.SummaryCountriesGrid = True
-        self.SummaryCountries = False
-        self.SummaryGeocode = True
-        self.SummaryAltPlaces = False
-        
-
-        self.skip_file_geocache = False
-        self.skip_file_alt_places = False
-        self.defaultCountry = None
-        self.include_canonical = True
         
         os_name = platform.system()
         if os_name == 'Windows':
@@ -145,16 +95,54 @@ class gvOptions:
             self.CSVcmdline = "notepad $n"
             self.Tracecmdline = "notepad $n"
 
-        self.heritage = None
-        self.UpdateBackgroundEvent = None
-        self.totalGEDpeople = None
-        self.totalGEDfamily = None
-        self.fileHistory = None
-
         if os.path.exists(self.settingsfile):
             self.loadsettings()            
 
 
+    def set_options(self, options_types, options_defaults):
+        for key, typ in options_types.items():
+            value = options_defaults.get(key, None)
+            # Explicitly accept YAML null -> Python None as a valid value
+            if value is None:
+                setattr(self, key, None)
+                continue
+            try:
+                # Accept native YAML types (bool/int/str) and fall back to parsing strings
+                if typ == 'bool':
+                    if isinstance(value, bool):
+                        parsed = value
+                    else:
+                        parsed = str(value).strip().lower() in ('1', 'true', 'yes', 'on', 'y', 't')
+                elif typ == 'int':
+                    if isinstance(value, int):
+                        parsed = value
+                    else:
+                        parsed = int(str(value).strip())
+                elif typ == 'str':
+                    parsed = str(value)
+                else:
+                    # For complex types: if YAML already provided a list/dict/number, keep it;
+                    # if it's a string try safe eval via yaml (or fallback to literal eval)
+                    if isinstance(value, (dict, list, int, float, bool)):
+                        parsed = value
+                    elif isinstance(value, str):
+                        try:
+                            # try to parse structured literal using yaml (safe)
+                            parsed = yaml.safe_load(value)
+                        except Exception:
+                            try:
+                                # final fallback: evaluate simple Python literal
+                                from ast import literal_eval
+                                parsed = literal_eval(value)
+                            except Exception:
+                                parsed = value
+                    else:
+                        parsed = value
+
+                setattr(self, key, parsed)
+            except Exception as e:
+                _log.error("Error setting option '%s' type %s: %s", key, typ, e)
+                    
     def set_marker_defaults(self):
         marker_options = self.options.get('marker_options_defaults', {})
         self.set_marker_options(marker_options)
@@ -399,8 +387,7 @@ class gvOptions:
             self.countertarget = target
             # logging.debug(">>>>>> stepped %d", self.counter)
         return self.ShouldStop()
-                
-        
+
     def stop(self):        
         self.running = False
         self.stopping = False
@@ -429,5 +416,3 @@ class gvOptions:
             self.setMain(value)
         else:
             setattr (self, attribute, value)
-
-

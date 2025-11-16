@@ -26,7 +26,7 @@ from datetime import datetime
 import webbrowser
 from warnings import catch_warnings
 from models.Person import Person
-from gedcom.GedcomParser import CheckAge 
+from gedcom.gedcomdate import CheckAge 
 from typing import Dict, Union
 
 import wx

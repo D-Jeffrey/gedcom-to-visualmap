@@ -8,7 +8,6 @@ Author: @colin0brass
 
 from typing import Dict, Optional, Tuple, List
 import logging
-import datetime
 import simplekml
 
 from models.location import LatLon

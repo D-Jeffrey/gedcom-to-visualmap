@@ -4,7 +4,7 @@ When you see people in your lineage with yellow, it means they did not pass the 
 - As a [Father](https://www.guinnessworldrecords.com/world-records/oldest-father-) they are too old or young or negative
 - As a [person](https://en.wikipedia.org/wiki/List_of_the_verified_oldest_people) they are too old or young or negative
 
-See [GedcomParser.py](../gedcom-to-map/gedcom/GedcomParser.py) for age range variables.
+See [gedcomdate.py](../gedcom-to-map/gedcom/gedcomdate.py) for age range variables.
 
 # KML Mode
 KML mode has two approaches to generating KML for your GED family.  The first is Native which assuming that you have GPS positional values in your GED file.  This is done using PLAC with a _LATI and _LONG (or LATI and LONG) attributes

@@ -10,7 +10,7 @@ import simplekml as simplekml
 from gedcomoptions import gvOptions
 from models.Line import Line
 from models.LatLon import LatLon
-from render.Referenced import Referenced
+from .Referenced import Referenced
 
 _log = logging.getLogger(__name__.lower())
 

@@ -16,7 +16,7 @@ import wx.html
 import wx.grid as gridlib
 from models.LatLon import LatLon
 from models.Person import Person, LifeEvent
-from gedcom.GedcomParser import CheckAge, maxage
+from gedcom.gedcomdate import CheckAge, maxage
 from gedcomoptions import gvOptions, ResultsType
 from style.stylemanager import FontManager
 
@@ -354,7 +354,7 @@ class FamilyPanel(wx.Panel):
         person = self.gOp.BackgroundProcess.people.get(person_id)
         if person:
             # pass the shared FontManager from the VisualMapPanel into the dialog
-            fm = getattr(self.visual_map_panel, "font_manager", None)
+            fm = getattr(self.gOp.panel, "font_manager", None)
             dialog = PersonDialog(self, person, self.visual_map_panel, font_manager=fm, gOp=self.gOp, showrefences=False)
             dialog.Show(True)
             dialog.Bind(wx.EVT_CLOSE, lambda evt: dialog.Destroy())

@@ -12,8 +12,8 @@ import logging
 import re
 from typing import Dict, Union, Optional, List
 
-from models.LatLon import LatLon
-from models.location import Location
+from .LatLon import LatLon
+from .location import Location
 from ged4py.model import Record, NameRec
 
 _log = logging.getLogger(__name__.lower())
@@ -201,7 +201,7 @@ class LifeEvent:
     
     def asEventstr(self):
         if self:
-            place = f" at {self.getattr('place')}" if self.place else ""
+            place = f" at {self.getattr('place')}" if self.place is not None else ""
             date = f" on {self.getattr('date')}" if self.date else ""
             return f"{date}{place}"
         return ""

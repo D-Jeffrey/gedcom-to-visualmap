@@ -159,7 +159,8 @@ class gvOptions:
         
         self.kml_keys = {'MaxLineWeight':1, 'MaxMissing':1, 'UseBalloonFlyto':0, 'KMLsort':0}
         # Old settings that should be removed from the config file
-        self.oldsettings = {'native': 'KML', 'born': 'KML', 'death':'KML', 'PlaceType': 'KML', 'HeatMapTimeLine': 'HTML'}
+        self.oldsettings = {'native': 'KML', 'born': 'KML', 'death':'KML', 'PlaceType': 'KML', 'HeatMapTimeLine': 'HTML', 
+                            'gedcom.gedcomparser': 'Logging'}
 
         if os.path.exists(self.settingsfile):
             self.loadsettings()            

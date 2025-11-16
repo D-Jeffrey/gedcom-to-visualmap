@@ -8,8 +8,7 @@ import webbrowser
 from pathlib import Path
 import sys
 
-# from gedcom.GedcomParser import GedcomParser
-# from gedcom.gpslookup import GEDComGPSLookup
+
 from gedcomoptions import gvOptions
 from models.Creator import Creator, LifetimeCreator, CreatorTrace, Person
 from models.LatLon import LatLon
@@ -232,13 +231,6 @@ def ParseAndGPS(gOp: gvOptions, stage: int = 0 ):
         gOp.newload = True
         if hasattr(gOp, "UpdateBackgroundEvent") and hasattr(gOp.UpdateBackgroundEvent, "updategrid"):
             gOp.UpdateBackgroundEvent.updategrid = True
-        # people = GedcomParser(gOp).create_people()
-        # gOp.people = people
-    # gOp.parsed = True
-    # gOp.goodmain = False
-    #if (stage == 2):
-    #    people = gOp.people
-    #if (people and gOp.UseGPS and (stage == 0 or stage == 2)):
     if (stage == 1):
             
             _log.info ("Starting Address to GPS resolution")

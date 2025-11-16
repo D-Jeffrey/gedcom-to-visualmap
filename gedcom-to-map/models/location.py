@@ -10,7 +10,7 @@ __all__ = ['Location']
 import logging
 from typing import Dict, Optional, Union
 from rapidfuzz import process, fuzz
-from models.LatLon import LatLon
+from .LatLon import LatLon
 
 # Re-use higher-level logger (inherits configuration from main script)
 logger = logging.getLogger(__name__)

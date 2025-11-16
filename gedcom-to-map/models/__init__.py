@@ -8,7 +8,7 @@ and person representation.
 
 from .Color import Color
 from .Creator import Creator
-from .Person import Person
+from .Person import Person, LifeEvent, DateFromField
 from .Line import Line
 from .LatLon import LatLon
 from .Rainbow import Rainbow
@@ -16,10 +16,12 @@ from .Rainbow import Rainbow
 __all__ = [
     "Color",
     "Creator",
+    "DateFromField",
     "Person",
+    'LifeEvent',
     "Line",
     "LatLon",
     "Rainbow"
 ]
 
-__author__ = "D-Jeffrey"
+__maintainer__ = "D-Jeffrey"

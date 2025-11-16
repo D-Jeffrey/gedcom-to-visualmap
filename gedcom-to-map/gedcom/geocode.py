@@ -7,10 +7,10 @@ Loads fallback continent mappings from geo_config.yaml.
 Author: @colin0brass
 """
 
-import os
-import csv
 import time
 import logging
+import random
+import re
 from pathlib import Path
 from typing import Optional, Tuple, Dict
 
@@ -18,6 +18,8 @@ import pycountry
 import pycountry_convert as pc
 import yaml  # Ensure PyYAML is installed
 from geopy.geocoders import Nominatim
+from geopy.exc import GeocoderTimedOut, GeocoderServiceError, GeocoderUnavailable
+
 from const import GEOCODEUSERAGENT
 
 from models.location import Location
@@ -65,7 +67,7 @@ class Geocode:
         'additional_countries_to_add', 'country_substitutions', 'default_country', 'geo_cache',
         'geolocator', 'countrynames', 'countrynames_lower', 'country_name_to_code_dict',
         'country_code_to_name_dict', 'country_code_to_continent_dict', 'fallback_continent_map',
-        'gOp'
+        'gOp', '_last_geocode_time'
     ]
     geocode_sleep_interval = 1  # Delay due to Nominatim request limit
 
@@ -99,6 +101,8 @@ class Geocode:
         self.additional_countries_to_add = list(self.additional_countries_codes_dict_to_add.keys())
         self.country_substitutions = geo_config.get('country_substitutions', {})
         self.default_country = default_country or geo_config.get('default_country', 'England')
+        if default_country == 'None':
+            default_country = None
 
         # Load fallback continent map from YAML if present, else use empty dict
         self.fallback_continent_map: Dict[str, str] = geo_config.get('fallback_continent_map', {})
@@ -208,20 +212,67 @@ class Geocode:
 
         max_retries = 3
         geo_location = None
-        for attempt in range(max_retries):
+        backoff_base = 0.5
+        # enforce rate limit using last request timestamp (avoid unconditional sleep)
+        last_ts = getattr(self, "_last_geocode_time", 0.0)
+        for attempt in range(1, max_retries + 1):
+            # wait only if we're inside the rate window
+            now = time.time()
+            to_wait = self.geocode_sleep_interval - (now - last_ts)
+            if to_wait > 0:
+                time.sleep(to_wait)
             try:
-                geo_location = self.geolocator.geocode(place, country_codes=country_code, timeout=10)
-                time.sleep(self.geocode_sleep_interval)
-                if geo_location:
+                geo_location = self.geolocator.geocode(
+                    place,
+                    country_codes=country_code or None,
+                    timeout=10,
+                    addressdetails=False,
+                    exactly_one=True
+                )
+                # record request time for rate limiting
+                self._last_geocode_time = time.time()
+
+                # If geopy returned None (HTTP 200 but no match), do not retry — it's not a transient error.
+                if geo_location is None:
+                    logger.debug("No geocoding result for %r (not retrying)", place)
                     break
-            except Exception as e:
-                logger.error(f"Error geocoding {place}: {e}")
-                if attempt < max_retries - 1:
-                    logger.info(f"Retrying geocode for {place} (attempt {attempt+2}/{max_retries}) after {self.geocode_sleep_interval} seconds...")
-                    time.sleep(self.geocode_sleep_interval)
+
+                # successful result
+                break
+            
+            except (GeocoderTimedOut, GeocoderServiceError, GeocoderUnavailable) as e:
+                # try to detect an HTTP status code when available; retry on 503/timeouts/unavailable
+                status = None
+                resp = getattr(e, "response", None)
+                if resp is not None:
+                    status = getattr(resp, "status_code", None)
+                elif hasattr(e, "status"):
+                    status = getattr(e, "status")
                 else:
-                    logger.error(f"Giving up on geocoding {place} after {max_retries} attempts.")
-                    time.sleep(self.geocode_sleep_interval)
+                    # best-effort parse of numeric HTTP code from message
+                    m = re.search(r"\b(5\d{2}|4\d{2})\b", str(e))
+                    if m:
+                        try:
+                            status = int(m.group(0))
+                        except Exception:
+                            status = None
+
+                # retry for transient server errors (5xx) or timeouts/unavailable
+                if status is not None and 500 <= status < 600:
+                    logger.warning("Server error (status=%s) geocoding %r (attempt %d/%d): %s", status, place, attempt, max_retries, e)
+                else:
+                    # treat as transient if it's a known transient exception type
+                    logger.warning("Transient geocoding exception for %r (attempt %d/%d): %s", place, attempt, max_retries, e)
+            except Exception as e:
+                logger.exception("Unexpected error geocoding %r (attempt %d/%d): %s", place, attempt, max_retries, e)
+
+            # exponential backoff with small jitter before next attempt
+            if attempt < max_retries:
+                sleep_time = backoff_base * (2 ** (attempt - 1)) + random.uniform(0, 0.2)
+                logger.info("Retrying geocode for %r (attempt %d/%d) after %.2fs", place, attempt + 1, max_retries, sleep_time)
+                time.sleep(sleep_time)
+            else:
+                logger.error("Giving up on geocoding %r after %d attempts.", place, max_retries)
 
         if geo_location:
             location = Location(

@@ -101,6 +101,8 @@ class Geocode:
         self.additional_countries_to_add = list(self.additional_countries_codes_dict_to_add.keys())
         self.country_substitutions = geo_config.get('country_substitutions', {})
         self.default_country = default_country or geo_config.get('default_country', 'England')
+        if default_country == 'None':
+            default_country = None
 
         # Load fallback continent map from YAML if present, else use empty dict
         self.fallback_continent_map: Dict[str, str] = geo_config.get('fallback_continent_map', {})

@@ -34,6 +34,22 @@ otherlocationtags = ('CHR', 'BAPM', 'BASM', 'BAPL', 'IMMI', 'NATU', 'ORDN','ORDI
                      'EVEN',  'CEME', 'CREM', 'FACT' )
 addrtags = ('ADR1', 'ADR2', 'ADR3', 'CITY', 'STAE', 'POST', 'CTRY')
 
+# Common pieces we want to remove when extracting the surname
+_TITLES = {
+    "mr", "mrs", "ms", "miss", "dr", "prof", "rev", "sir", "lady", "lord",
+    "capt", "major", "lt", "hon", "dame"
+}
+_SUFFIXES = {"jr", "sr", "ii", "iii", "iv", "v", "phd", "md", "esq"}
+
+# Prefix sequences (lowercased tokens) to include as part of the surname if they appear immediately before the final token(s).
+# Order matters: multi-token prefixes should appear before their single-token components.
+_PREFIX_SEQUENCES: List[List[str]] = [
+    ["de", "la"], ["de", "le"], ["del"], ["de", "los"], ["van", "der"], ["van", "de"],
+    ["st", "john"], ["st", "claire"], ["saint"], ["von"], ["van"],
+    ["de"], ["da"], ["di"], ["dos"], ["du"], ["do"], ["dei"], ["del"],
+    ["le"], ["mac"], ["mc"], ["ap"], ["fitz"], ["ibn"], ["bin"], ["binti"], ["ben"]
+]
+
 def getgdate (gstr):
     r = datetime.fromisocalendar(1000,1,1)
     d = m = y = None
@@ -192,6 +208,9 @@ class GedcomParser:
             person.surname = record.name.surname
             person.maidenname = record.name.maiden
             person.name = f'{record.name.format()}'
+            # Try and approxcimate the last name 
+            if person.surname == '':
+                person.surname = extract_surname(person.name)
         if person.name == '':
             person.firstname = 'Unknown'
             person.surname = 'Unknown'
@@ -692,3 +711,87 @@ class GeolocatedGedcom(Gedcom):
         else:
             logger.warning("No record found for event")
         return event
+    
+# Normalize token (strip punctuation except internal apostrophe or hyphen)
+def _normalize_token(tok: str) -> str:
+    tok = tok.strip()
+    # Remove leading/trailing punctuation but keep internal apostrophes and hyphens
+    tok = re.sub(r"^[^\w']+|[^\w']+$", "", tok, flags=re.UNICODE)
+    return tok
+
+def extract_surname(full_name: str) -> str:
+    """
+    Extracts the surname from a full personal name for genealogical usage.
+
+    Returns the surname as it appears in the input (preserves caps, apostrophes, hyphens).
+    If nothing recognizable, returns the last non-empty token.
+    """
+    if not full_name or not full_name.strip():
+        return ""
+
+    # Normalize whitespace and remove commas typically used to separate surname-first formats
+    name = re.sub(r"\s+", " ", full_name.strip())
+    # Remove trailing commas/spurious punctuation
+    name = name.strip(",;")
+
+    # Handle common "Surname, Given" formats: move last comma-separated piece to end if needed
+    if "," in name:
+        # Example: "Doe, John" or "Doe, John William"
+        parts = [p.strip() for p in name.split(",") if p.strip()]
+        if len(parts) >= 2:
+            # Assume first part is surname
+            return parts[0]
+
+    tokens_raw = name.split(" ")
+
+    # Remove leading titles
+    while tokens_raw and _normalize_token(tokens_raw[0]).lower() in _TITLES:
+        tokens_raw.pop(0)
+
+    # Remove trailing suffixes like Jr., III, PhD
+    while tokens_raw and _normalize_token(tokens_raw[-1]).lower().rstrip(".") in _SUFFIXES:
+        tokens_raw.pop(-1)
+
+    if not tokens_raw:
+        return ""
+
+    # Prepare tokens with original form and normalized lowercase forms
+    tokens = tokens_raw[:]  # keep originals for final return
+    lctoks = [_normalize_token(t).lower() for t in tokens]
+
+    # Start looking for a multi-token prefix immediately before the last token.
+    # Check sequences from longest to shortest.
+    surname_tokens = [tokens[-1]]  # default: last token
+    found_prefix_len = 0
+
+    # Try to match multi-token prefixes (we try up to 2 tokens before the last by list definition)
+    for seq in _PREFIX_SEQUENCES:
+        seq_len = len(seq)
+        if seq_len >= len(lctoks):
+            continue
+        # Check if the sequence matches the tokens immediately before the final token or includes final token for one-token prefix
+        # We want the sequence to appear directly before the final core token(s)
+        start_idx = len(lctoks) - 1 - seq_len
+        if start_idx >= 0:
+            window = lctoks[start_idx:start_idx + seq_len]
+            if window == seq:
+                # include these prefix tokens plus the final token(s)
+                surname_tokens = tokens[start_idx:]  # from prefix through end
+                found_prefix_len = seq_len
+                break
+
+    # Special handling for names where prefix is capitalized (e.g., "De Graf") but normalized matched
+    # Also handle cases like "Mac Something" and "McSomething" — we include "Mac" or "Mc" if present before last token
+    if found_prefix_len == 0 and len(lctoks) >= 2:
+        # If second-last looks like a prefix token (single-token prefix list)
+        single_prefixes = {seq[0] for seq in _PREFIX_SEQUENCES if len(seq) == 1}
+        if lctoks[-2] in single_prefixes:
+            surname_tokens = tokens[-2:]
+
+    # If only one token remains after stripping titles/suffixes, that's the surname
+    if len(tokens) == 1:
+        return tokens[0]
+
+    # Join surname tokens preserving original spacing/punctuation
+    surname = " ".join(surname_tokens).strip()
+    return surname

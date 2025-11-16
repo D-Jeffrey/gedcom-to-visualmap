@@ -1,8 +1,11 @@
 # Running gedcomVisualGUI on Linux (WSL)
 
+## Side by side
+Windows and Linux (WSL) running on Windows 11 - WSL version: 2.4.12.0 - Ubuntu 
+![img](img/2025-11-wsl-sideby.png)
+
 ## CoPilot Guided instuctions for WSL Ubuntu 24.04
 
-![img](img/windows+wsl-2025-10.png)
 1. Install GTK+ 3 Development Packages
 Most modern wxPython builds rely on GTK+ 3. You can install the necessary development files with:
 ```
@@ -112,9 +115,6 @@ I have not figured out how to use `venv` properly yet, so this a work in progres
 The egg seems to be generally working (thought I don't have a background understanding of eggs).  It appears eggs are obsolute.
 
 
-## Side by side
-Windows and Linux (WSL) running on Windows 11 - WSL version: 2.4.12.0 - Ubuntu 
-![img](img/Windows+wsl.png)
 
 
 # OLD -- OLD -- Saved for reference

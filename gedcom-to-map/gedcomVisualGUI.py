@@ -14,8 +14,8 @@ import _thread
 import logging
 import logging.config
 import os
+import math
 import os.path
-import platform
 from pathlib import Path
 import re
 import subprocess
@@ -1317,7 +1317,7 @@ class VisualMapPanel(wx.Panel):
         # Bind all EVT_TIMER events to self.OnMyTimer
         self.Bind(wx.EVT_TIMER, self.OnMyTimer)
         self.myTimer = wx.Timer(self)
-        self.myTimer.Start(250)
+        self.myTimer.Start(500)
         self.Layout()
         self.Refresh()
 
@@ -1524,9 +1524,11 @@ class VisualMapPanel(wx.Panel):
                 if self.gOp.countertarget > 0 and self.gOp.counter > 0 and self.gOp.counter != self.gOp.countertarget:
                     if nowtime-1.0 > self.lastruninstance: 
                         self.timeformat = '%H:%M:%S'
-                        remaintimeInstant = (nowtime - self.gOp.runningSinceStep) * (self.gOp.countertarget/ self.gOp.counter)-runningtime
-                        remaintimeInstant = remaintimeInstant if remaintimeInstant > 0 else 0.0
-                        # Smoothed runtime average over last 10 seconds
+                        stepsleft = self.gOp.countertarget-self.gOp.counter
+                        scaler = math.log(stepsleft, 100) if stepsleft > 1 else 1
+                        remaintimeInstant = (nowtime - self.gOp.runningSinceStep)/self.gOp.counter * stepsleft* scaler
+                        remaintimeInstant = remaintimeInstant if remaintimeInstant > 0 else 0
+                        # Smoothed runtime average over last 5 seconds
                         self.gOp.runavg.append(remaintimeInstant)
                         if len(self.gOp.runavg) > 5:
                             self.gOp.runavg.pop(0)

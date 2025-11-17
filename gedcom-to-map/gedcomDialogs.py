@@ -405,7 +405,8 @@ class PersonDialog(wx.Dialog):
         marrying = []
         if person.marriages:
             for marry in person.marriages:
-                marrying.append(f"{formatPersonName(people[marry.record.xref_id], False)}{marry.asEventstr()}")
+                if marry:
+                    marrying.append(f"{formatPersonName(people[marry.record.xref_id], False)}{marry.asEventstr()}")
         marriages = "\n".join(marrying)        
 
         homes = []
@@ -586,7 +587,7 @@ class PersonDialog(wx.Dialog):
         self.SetSizer(mainSizer)
         self.SetBackgroundColour(wx.TheColourDatabase.FindColour('WHITE'))
         self.Fit()
-        
+
     def _displayrecord(self):
         show_gedpy_record_dialog(None, self.person.xref_id, gOp=self.gOp, title=f"Record of {self.person.name}")
 

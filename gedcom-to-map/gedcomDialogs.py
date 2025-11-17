@@ -18,6 +18,7 @@ from models.LatLon import LatLon
 from models.Person import Person, LifeEvent
 from gedcom.gedcomdate import CheckAge, maxage
 from gedcomoptions import gvOptions, ResultsType
+from gedrecdisplay import show_gedpy_record_dialog
 from style.stylemanager import FontManager
 
 from const import VERSION, GUINAME, ABOUTLINK, NAME
@@ -565,11 +566,29 @@ class PersonDialog(wx.Dialog):
         # ensure OK ends the windows dialog reliably
         ok_btn.Bind(wx.EVT_BUTTON, lambda evt: self.Close())
         btn_sizer.AddButton(ok_btn)
+        
+        self.person = person
+        self.gOp = gOp
+
+        # BUG This BUTTON DOES NOT RENDER IN the Right spot
+        btn2_sizer = wx.StdDialogButtonSizer()
+        details_btn2 = wx.Button(self, -1, label="Record")
+        details_btn2.Bind(wx.EVT_BUTTON, lambda evt: self._displayrecord())
+        btn2_sizer.AddButton(details_btn2)
         btn_sizer.Realize()
-        mainSizer.Add(btn_sizer, 0, wx.ALIGN_LEFT|wx.ALL, border=10)
+        btn2_sizer.Realize()
+        
+        btn_box = wx.BoxSizer(wx.HORIZONTAL)
+        btn_box.Add(btn_sizer, 0, wx.LEFT, 10)
+        btn_box.Add(btn2_sizer, 0, wx.RIGHT)
+ 
+        mainSizer.Add(btn_box, 0, wx.ALIGN_LEFT|wx.LEFT| wx.BOTTOM, border=10)
         self.SetSizer(mainSizer)
         self.SetBackgroundColour(wx.TheColourDatabase.FindColour('WHITE'))
         self.Fit()
+        
+    def _displayrecord(self):
+        show_gedpy_record_dialog(None, self.person.xref_id, gOp=self.gOp, title=f"Record of {self.person.name}")
 
     
         

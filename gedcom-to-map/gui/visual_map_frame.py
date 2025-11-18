@@ -15,10 +15,11 @@ from .visual_map_panel import VisualMapPanel
 from .visual_gedcom_ids import VisualGedcomIds
 
 class VisualMapFrame(wx.Frame):
-    def __init__(self, gOp, *args, **kw):
+    def __init__(self, parent, *args, gOp=None, **kw):
         # ensure the parent's __init__ is called so the wx.frame is created
-        super().__init__(*args, **kw)
+        super().__init__(parent, *args, **kw)
 
+        # gOp may be provided explicitly or attached later by caller
         self.gOp = gOp
 
         self.font_manager = FontManager()
@@ -48,7 +49,7 @@ class VisualMapFrame(wx.Frame):
     def makeStatusBar(self):
         self.StatusBar = self.CreateStatusBar()
         self.SetStatusText("This is the statusbar")
-        self.StatusBar.SetFieldsCount(number=2, widths=[-1, 28 * self.font_size])
+        # Compute field widths once (use font manager to determine a sensible width)
         widthMax = self.font_manager.get_text_width(30)
         self.StatusBar.SetFieldsCount(number=2, widths=[-1, widthMax])
         self.SetStatusText("Visual Mapping ready", 0)
@@ -290,7 +291,7 @@ class VisualMapFrame(wx.Frame):
         try:
             msg = "No people loaded yet\n"
             if getattr(self.visual_map_panel, "gOp", None) and getattr(self.visual_map_panel.gOp, 'people', None):
-                self.visual_map_panel.gOp.totalGEDpeople = {len(self.visual_map_panel.gOp.people)}
+                self.visual_map_panel.gOp.totalGEDpeople = len(self.visual_map_panel.gOp.people)
                 msg = f'Total People :{self.visual_map_panel.gOp.totalGEDpeople}\n'
                 if self.visual_map_panel.gOp.timeframe:
                     msg += f"\nTimeframe : {self.visual_map_panel.gOp.timeframe.get('from','?')}-{self.visual_map_panel.gOp.timeframe.get('to','?')}\n"

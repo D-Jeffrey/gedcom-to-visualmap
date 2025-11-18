@@ -1,3 +1,18 @@
+"""
+visual_map_panel.py
+
+Main panel for the Visual Map GUI. Contains the control widgets, option panels,
+and coordinates with the background worker to load GEDCOM data and produce
+HTML/KML outputs.
+
+This module uses wxPython for UI and provides a VisualMapPanel class which is a
+wx.Panel hosting the primary user controls.
+
+Types:
+- gvOptions is the application options/state object (see gedcom_options.py).
+- BackgroundActions is the background worker class.
+"""
+from typing import Optional, List, Dict, Any
 import logging
 import time
 import math
@@ -6,9 +21,8 @@ import sys
 import subprocess
 import webbrowser
 from datetime import datetime
-from typing import Optional
 
-from const import GUINAME, KMLMAPSURL, LOG_CONFIG, NAME, VERSION
+from const import KMLMAPSURL
 
 import wx
 
@@ -25,10 +39,38 @@ _log = logging.getLogger(__name__.lower())
 
 class VisualMapPanel(wx.Panel):
     """
-    A Frame that says Visual Setup
+    Main panel used by the application's main frame.
+
+    Responsibilities:
+    - Build and manage the controls and option panels.
+    - Start/stop background processing.
+    - Reflect gvOptions state into the UI and vice-versa.
     """
 
-    def __init__(self, parent, font_manager, gOp, *args, **kw):
+    # Public attributes with types for static analysis and readability
+    font_manager: Any
+    font_name: str
+    font_size: int
+    frame: wx.Frame
+    gOp: Optional['gvOptions']
+    id: VisualGedcomIds
+    peopleList: PeopleListCtrlPanel
+    background_process: BackgroundActions
+    threads: List[Any]
+    myTimer: Optional[wx.Timer]
+    busystate: bool
+
+    def __init__(self, parent: wx.Window, font_manager: Any, gOp: Optional['gvOptions'],
+                 *args: Any, **kw: Any) -> None:
+        """
+        Initialize the VisualMapPanel.
+
+        Args:
+            parent: wx parent window.
+            font_manager: FontManager instance used to style controls.
+            gOp: Optional global options/state object. If not provided the panel
+                 will construct one in SetupOptions().
+        """
         # parent must be the wx parent for this panel; call panel initializer with it
         super().__init__(parent, *args, **kw)
 
@@ -82,17 +124,15 @@ class VisualMapPanel(wx.Panel):
         # Configure panel options
         self.SetupOptions()
 
-    def start(self):
+    def start(self) -> None:
+        """Perform any UI startup actions (enable/disable buttons etc.)."""
         try:
             self.SetupButtonState()
         except Exception:
             _log.exception("start: SetupButtonState failed")
 
     def stop(self):
-        try:
-            self.OnCloseWindow()
-        except Exception:
-            _log.exception("stop: OnCloseWindow failed")
+        pass
 
     def stop_timer(self):
         if self.myTimer and self.myTimer.IsRunning():
@@ -123,17 +163,17 @@ class VisualMapPanel(wx.Panel):
         self.Layout()
         self.Refresh()
 
-    def set_current_font(self):
+    def set_current_font(self) -> None:
+        """Apply current font from the font manager to this panel and children."""
         self.font_manager.apply_current_font_recursive(self)
-        self.font_manager.apply_current_font_recursive(self.peopleList) 
-
+        self.font_manager.apply_current_font_recursive(self.peopleList)
         # adjust right-hand panel width to match new font metrics
         wx.CallAfter(self._adjust_panelB_width)
         self.Layout()
         self.Refresh()
 
-    def LayoutOptions(self, panel):
-        """ Layout the panels in the proper nested manner """
+    def LayoutOptions(self, panel: wx.Panel) -> None:
+        """Create and layout the options controls on the provided panel."""
         # Top of the Panel
         box = wx.BoxSizer(wx.VERTICAL)
         titleFont = wx.Font(wx.FontInfo(self.font_size).FaceName(self.font_name).Bold())
@@ -606,7 +646,8 @@ class VisualMapPanel(wx.Panel):
         _log.debug('%s', event.GetSelection())
         self.gOp.HeatMapTimeStep = event.GetSelection()
 
-    def OnMyTimer(self, evt):
+    def OnMyTimer(self, evt: wx.TimerEvent) -> None:
+        """Periodic timer callback used to update UI state from background worker."""
         if self.inTimer:
             return
         self.inTimer = True
@@ -724,7 +765,8 @@ class VisualMapPanel(wx.Panel):
         self.busycounthack = 0
         wx.Yield()
 
-    def OnCreateFiles(self, evt):
+    def OnCreateFiles(self, evt: Any) -> None:
+        """Handle background updates: grid refresh, infobox messages, errors."""
         # proces evt state hand off
         if hasattr(evt, 'state'):
             if evt.state == 'busy': 
@@ -857,8 +899,8 @@ class VisualMapPanel(wx.Panel):
         self.Refresh()
 
 
-    def SetupOptions(self):
-
+    def SetupOptions(self) -> None:
+        """Ensure file config and gvOptions are created and populate UI from options."""
         if not self.fileConfig:
             self.fileConfig = wx.Config("gedcomVisualGUI")
         
@@ -1062,7 +1104,7 @@ class VisualMapPanel(wx.Panel):
     
         # Reload the tab
         browser_tab.reload()
-    def OnCloseWindow(self, evt):
+    def OnCloseWindow(self, evt=None):
         busy = wx.BusyInfo("One moment please, waiting for threads to die...")
         wx.Yield()
         self.myTimer.Stop()

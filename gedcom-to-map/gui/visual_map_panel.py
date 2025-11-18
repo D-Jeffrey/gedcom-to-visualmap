@@ -12,7 +12,7 @@ Types:
 - gvOptions is the application options/state object (see gedcom_options.py).
 - BackgroundActions is the background worker class.
 """
-from typing import Optional, List, Dict, Any
+from typing import Optional, List, Any
 import logging
 import time
 import math
@@ -28,8 +28,6 @@ import wx
 
 from .visual_gedcom_ids import VisualGedcomIds  # type: ignore
 from .people_list_ctrl_panel import PeopleListCtrlPanel  # type: ignore
-from .person_dialog import PersonDialog  # type: ignore
-from .find_dialog import FindDialog  # type: ignore
 from gedcom_options import gvOptions, ResultsType  # type: ignore
 from .background_actions import BackgroundActions
 
@@ -172,11 +170,62 @@ class VisualMapPanel(wx.Panel):
         self.Layout()
         self.Refresh()
 
+    def bind_events(self) -> None:
+        """Bind event handlers for the panel."""
+        self.Bind(wx.EVT_RADIOBOX, self.EvtRadioBox, id = self.id.IDs['ID_RBResultsType'])
+        self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.id.IDs['ID_CBMapControl'])
+        self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.id.IDs['ID_CBMapMini'])
+        self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.id.IDs['ID_CBMarksOn'])
+        self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.id.IDs['ID_CBBornMark'])
+        self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.id.IDs['ID_CBDieMark'])
+        self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.id.IDs['ID_CBHomeMarker'])
+        self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.id.IDs['ID_CBMarkStarOn'])
+        self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.id.IDs['ID_CBHeatMap'])
+        self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.id.IDs['ID_CBFlyTo'])
+        self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.id.IDs['ID_CBMapTimeLine'])
+        self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.id.IDs['ID_CBUseAntPath'])
+        self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.id.IDs['ID_CBUseGPS'])
+        self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.id.IDs['ID_CBCacheOnly'])
+        self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.id.IDs['ID_CBAllEntities'])
+        self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.id.IDs['ID_CBGridView'])
+        self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.id.IDs['ID_CBSummary'])
+        self.Bind(wx.EVT_RADIOBOX, self.EvtRadioBox, id = self.id.IDs['ID_RBKMLMode'])
+        self.Bind(wx.EVT_SPINCTRL, self.EvtSpinCtrl, id = self.id.IDs['ID_INTMaxLineWeight'])
+        self.Bind(wx.EVT_CHOICE, self.EvtListBox, id = self.id.IDs['ID_LISTMapStyle'])
+        self.Bind(wx.EVT_BUTTON, self.EvtButton, id = self.id.IDs['ID_BTNLoad'])
+        self.Bind(wx.EVT_BUTTON, self.EvtButton, id = self.id.IDs['ID_BTNCreateFiles'])
+        self.Bind(wx.EVT_BUTTON, self.EvtButton, id = self.id.IDs['ID_BTNCSV'])
+        self.Bind(wx.EVT_BUTTON, self.EvtButton, id = self.id.IDs['ID_BTNTRACE'])
+        self.Bind(wx.EVT_BUTTON, self.EvtButton, id = self.id.IDs['ID_BTNSTOP'])
+        self.Bind(wx.EVT_BUTTON, self.EvtButton, id = self.id.IDs['ID_BTNBROWSER'])
+        self.Bind(wx.EVT_TEXT, self.EvtText, id = self.id.IDs['ID_TEXTResult'])
+        self.Bind(wx.EVT_TEXT, self.EvtText, id = self.id.IDs['ID_TEXTDefaultCountry'])
+        self.OnBusyStop(-1)
+        self.Bind(wx.EVT_RADIOBOX, self.EvtRadioBox, id = self.id.IDs['ID_RBGroupBy'])
+        self.Bind(wx.EVT_SLIDER, self.EvtSlider, id = self.id.IDs['ID_LISTHeatMapTimeStep'])
+        self.NeedReload()
+        self.NeedRedraw()
+        self.Bind(wx.EVT_CLOSE, self.OnCloseWindow)
+        self.Bind(EVT_UPDATE_STATE, self.OnCreateFiles)
+
+    def start_threads_and_timer(self) -> None:
+        """Start background threads and the periodic timer."""
+        self.threads = []
+        self.background_process = BackgroundActions(self, 0)
+        self.threads.append(self.background_process)
+        for t in self.threads:
+            t.Start()
+        
+        # Bind all EVT_TIMER events to self.OnMyTimer
+        self.Bind(wx.EVT_TIMER, self.OnMyTimer)
+        self.myTimer = wx.Timer(self)
+        self.myTimer.Start(500)
+    
     def LayoutOptions(self, panel: wx.Panel) -> None:
         """Create and layout the options controls on the provided panel."""
         # Top of the Panel
         box = wx.BoxSizer(wx.VERTICAL)
-        titleFont = wx.Font(wx.FontInfo(self.font_size).FaceName(self.font_name).Bold())
+        titleFont = self.font_manager.get_font(bold=True, size_delta=0)
         fh = titleFont.GetPixelSize()[1]
         titleArea = wx.Panel(panel, size=(-1, fh + 10))
         titleArea.SetBackgroundColour(self.id.GetColor('TITLE_BACK')) 
@@ -187,13 +236,8 @@ class VisualMapPanel(wx.Panel):
         titleSizer.Add(title, 1, wx.ALIGN_CENTER)
         titleArea.SetSizer(titleSizer)
 
-        
         box.Add(titleArea, 0, wx.EXPAND | wx.BOTTOM, 0)
-
-        
-        
         box.Add(wx.StaticLine(panel), 0, wx.EXPAND)
-            
         
         self.id.txtinfile = wx.Button(panel, -1,  "Input file:   ") 
         self.id.txtinfile.SetBackgroundColour(self.id.GetColor('BTN_DIRECTORY'))
@@ -235,7 +279,7 @@ class VisualMapPanel(wx.Panel):
                        self.id.CBAllEntities,
                        self.id.CBBornMark,
                        self.id.CBDieMark
-])
+                    ])
         """
           HTML select controls in a Box
         """
@@ -257,8 +301,6 @@ class VisualMapPanel(wx.Panel):
         self.id.CBMapControl = wx.CheckBox(hbox_container, self.id.IDs['ID_CBMapControl'], "Open Map Controls",name='MapControl') 
         self.id.CBMapMini = wx.CheckBox(hbox_container, self.id.IDs['ID_CBMapMini'], "Add Mini Map",name='MapMini') 
         
-        
-        
         self.id.CBHeatMap = wx.CheckBox(hbox_container, self.id.IDs['ID_CBHeatMap'], "Heatmap", style = wx.NO_BORDER)
         
         self.id.CBUseAntPath = wx.CheckBox(hbox_container, self.id.IDs['ID_CBUseAntPath'], "Ant paths")
@@ -271,7 +313,6 @@ class VisualMapPanel(wx.Panel):
                                        choices = ['None', 'Last Name', 'Last Name (Soundex)','Person'], majorDimension= 2)
         mapboxsizer.Add(self.id.LISTMapType)
         mapboxsizer.Add( mapStyleLabel)
-        
         
         hboxIn.AddMany([
             (self.id.CBMarksOn, 0, wx.ALL, 2),
@@ -318,7 +359,7 @@ class VisualMapPanel(wx.Panel):
         ksizer.Add(kboxIn, 0, wx.EXPAND | wx.ALL, 4)
         kbox_container.SetSizer(ksizer)
         self.optionKbox = kbox_container
-            #
+        #
         # KML select controls in a Box
         #
         k2box_container = wx.Panel(panel)
@@ -350,11 +391,9 @@ class VisualMapPanel(wx.Panel):
         sbox_container.SetSizer(ssizer)
         self.optionSbox = sbox_container
 
-
         #
         # Grid View Options
         #
-        
         
         gbox_min_height = max(40, int(fh * 4))
         gbox_container = wx.Panel(panel, size=(300, gbox_min_height))
@@ -419,52 +458,9 @@ class VisualMapPanel(wx.Panel):
         
         # panel.SetSizeHints(box)
         panel.SetSizer(box)
-        self.Bind(wx.EVT_RADIOBOX, self.EvtRadioBox, id = self.id.IDs['ID_RBResultsType'])
-        self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.id.IDs['ID_CBMapControl'])
-        self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.id.IDs['ID_CBMapMini'])
-        self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.id.IDs['ID_CBMarksOn'])
-        self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.id.IDs['ID_CBBornMark'])
-        self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.id.IDs['ID_CBDieMark'])
-        self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.id.IDs['ID_CBHomeMarker'])
-        self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.id.IDs['ID_CBMarkStarOn'])
-        self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.id.IDs['ID_CBHeatMap'])
-        self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.id.IDs['ID_CBFlyTo'])
-        self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.id.IDs['ID_CBMapTimeLine'])
-        self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.id.IDs['ID_CBUseAntPath'])
-        self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.id.IDs['ID_CBUseGPS'])
-        self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.id.IDs['ID_CBCacheOnly'])
-        self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.id.IDs['ID_CBAllEntities'])
-        self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.id.IDs['ID_CBGridView'])
-        self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.id.IDs['ID_CBSummary'])
-        self.Bind(wx.EVT_RADIOBOX, self.EvtRadioBox, id = self.id.IDs['ID_RBKMLMode'])
-        self.Bind(wx.EVT_SPINCTRL, self.EvtSpinCtrl, id = self.id.IDs['ID_INTMaxLineWeight'])
-        self.Bind(wx.EVT_CHOICE, self.EvtListBox, id = self.id.IDs['ID_LISTMapStyle'])
-        self.Bind(wx.EVT_BUTTON, self.EvtButton, id = self.id.IDs['ID_BTNLoad'])
-        self.Bind(wx.EVT_BUTTON, self.EvtButton, id = self.id.IDs['ID_BTNCreateFiles'])
-        self.Bind(wx.EVT_BUTTON, self.EvtButton, id = self.id.IDs['ID_BTNCSV'])
-        self.Bind(wx.EVT_BUTTON, self.EvtButton, id = self.id.IDs['ID_BTNTRACE'])
-        self.Bind(wx.EVT_BUTTON, self.EvtButton, id = self.id.IDs['ID_BTNSTOP'])
-        self.Bind(wx.EVT_BUTTON, self.EvtButton, id = self.id.IDs['ID_BTNBROWSER'])
-        self.Bind(wx.EVT_TEXT, self.EvtText, id = self.id.IDs['ID_TEXTResult'])
-        self.Bind(wx.EVT_TEXT, self.EvtText, id = self.id.IDs['ID_TEXTDefaultCountry'])
-        self.OnBusyStop(-1)
-        self.Bind(wx.EVT_RADIOBOX, self.EvtRadioBox, id = self.id.IDs['ID_RBGroupBy'])
-        self.Bind(wx.EVT_SLIDER, self.EvtSlider, id = self.id.IDs['ID_LISTHeatMapTimeStep'])
-        self.NeedReload()
-        self.NeedRedraw()
-        self.Bind(wx.EVT_CLOSE, self.OnCloseWindow)
-        self.Bind(EVT_UPDATE_STATE, self.OnCreateFiles)
-        self.threads = []
-        self.background_process = BackgroundActions(self, 0)
-        self.threads.append(self.background_process)
-        for t in self.threads:
-            t.Start()
-        
+        self.bind_events()
+        self.start_threads_and_timer()
 
-        # Bind all EVT_TIMER events to self.OnMyTimer
-        self.Bind(wx.EVT_TIMER, self.OnMyTimer)
-        self.myTimer = wx.Timer(self)
-        self.myTimer.Start(500)
         self.Layout()
         self.Refresh()
 
@@ -748,8 +744,10 @@ class VisualMapPanel(wx.Panel):
                 self.busycounthack = 0
         wx.Yield()
         self.inTimer = False
+
     def StopTimer(self):
         self.gOp.runningLast = datetime.now().timestamp() - self.gOp.runningSince
+
     def OnBusyStart(self, evt):
         """ show the spinning Busy graphic """
         self.busystate = True
@@ -897,7 +895,6 @@ class VisualMapPanel(wx.Panel):
         self.optionsStack.Layout()
         self.Layout()
         self.Refresh()
-
 
     def SetupOptions(self) -> None:
         """Ensure file config and gvOptions are created and populate UI from options."""
@@ -1073,7 +1070,6 @@ class VisualMapPanel(wx.Panel):
             self.background_process.SayInfoMessage(f"Trace file {withall} saved: {tracepath}",True)
             self.runCMDfile(self.gOp.get('Tracecmdline'), tracepath)
 
-
     def OpenBrowser(self):
         if self.gOp.get('ResultType'):
             self.runCMDfile(self.gOp.get('KMLcmdline'), os.path.join(self.gOp.resultpath, self.gOp.Result), True)
@@ -1104,6 +1100,7 @@ class VisualMapPanel(wx.Panel):
     
         # Reload the tab
         browser_tab.reload()
+
     def OnCloseWindow(self, evt=None):
         busy = wx.BusyInfo("One moment please, waiting for threads to die...")
         wx.Yield()
@@ -1122,4 +1119,3 @@ class VisualMapPanel(wx.Panel):
             time.sleep(0.1)
 
         self.Destroy()
-    #==============================================================

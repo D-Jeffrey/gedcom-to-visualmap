@@ -29,10 +29,10 @@ import wx
 
 from .visual_gedcom_ids import VisualGedcomIds  # type: ignore
 from .people_list_ctrl_panel import PeopleListCtrlPanel  # type: ignore
-from gedcom_options import gvOptions, ResultsType  # type: ignore
 from .background_actions import BackgroundActions
 from .layout_options import LayoutOptions
 from .visual_map_event_handlers import VisualMapEventHandler
+from gedcom_options import gvOptions, ResultsType  # type: ignore
 
 (UpdateBackgroundEvent, EVT_UPDATE_STATE) = wx.lib.newevent.NewEvent()
 
@@ -57,7 +57,7 @@ class VisualMapPanel(wx.Panel):
     font_name: str
     font_size: int
     frame: wx.Frame
-    gOp: Optional['gvOptions']
+    gOp: gvOptions
     id: VisualGedcomIds
     peopleList: PeopleListCtrlPanel
     background_process: BackgroundActions
@@ -65,7 +65,7 @@ class VisualMapPanel(wx.Panel):
     myTimer: Optional[wx.Timer]
     busystate: bool
 
-    def __init__(self, parent: wx.Window, font_manager: Any, gOp: Optional['gvOptions'],
+    def __init__(self, parent: wx.Window, font_manager: Any, gOp: gvOptions,
                  *args: Any, **kw: Any) -> None:
         """
         Initialize the VisualMapPanel.
@@ -88,7 +88,7 @@ class VisualMapPanel(wx.Panel):
 
         self.SetMinSize((800,800))
         self.frame = self.TopLevelParent
-        self.gOp : Optional['gvOptions'] = None
+        self.gOp = gOp
 
         self.id = {}
         
@@ -115,7 +115,7 @@ class VisualMapPanel(wx.Panel):
         self.Layout()
 
         # Add Data Grid on Left panel
-        self.peopleList = PeopleListCtrlPanel(self.panelA, self.id.m, self.font_manager)
+        self.peopleList = PeopleListCtrlPanel(self.panelA, self.id.m, self.font_manager, self.gOp)
         
         # create handler first so LayoutOptions.build (which no longer binds)
         # can safely be used; handler will be used to wire event bindings next
@@ -176,7 +176,7 @@ class VisualMapPanel(wx.Panel):
          OnCreateFiles method so background updates can be applied to the UI.
          """
          self.threads = []
-         self.background_process = BackgroundActions(self, 0)
+         self.background_process = BackgroundActions(self, 0, self.gOp)
          self.threads.append(self.background_process)
          for t in self.threads:
              t.Start()
@@ -575,13 +575,11 @@ class VisualMapPanel(wx.Panel):
         if not self.fileConfig:
             self.fileConfig = wx.Config("gedcomVisualGUI")
         
-        if not self.gOp:
-            self.gOp = gvOptions()
-            self.gOp.panel = self
-            self.gOp.BackgroundProcess = self.background_process
-            self.gOp.UpdateBackgroundEvent = UpdateBackgroundEvent
-            # self.peopleList.setGOp(self.gOp)
-            self.peopleList.SetGOp(self.gOp)
+        self.gOp.panel = self
+        self.gOp.BackgroundProcess = self.background_process
+        self.gOp.UpdateBackgroundEvent = UpdateBackgroundEvent
+        # self.peopleList.setGOp(self.gOp)
+        self.peopleList.SetGOp(self.gOp)
 
         if self.gOp.get('ResultType'):
             self.id.RBResultOutType.SetSelection(0)
@@ -621,9 +619,6 @@ class VisualMapPanel(wx.Panel):
         self.id.CBSummary[6].SetValue(self.gOp.get('SummaryAltPlaces'))
         self.id.TEXTDefaultCountry.SetValue(self.gOp.get('defaultCountry', ifNone=""))
         self.SetupButtonState()
-
-        for t in self.threads:
-            t.DefgOps(self.gOp)
 
         # Load file history into the panel's configuration
         self.frame.filehistory.Load(self.fileConfig)

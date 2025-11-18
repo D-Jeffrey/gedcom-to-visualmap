@@ -38,6 +38,21 @@ config_file_settings:
     gedcom.gedcomparser, gedcom, gedcom.gedcom, gedcom.geocode, gedcom.geocache, gedcom.addressbook,
     geopy, render.kmlexporter, render, render.foliumexp, gedcomvisual, "__main__"]
 
+gui_options_types: {
+  infoBoxLines: 'int', autoRefreshInterval: 'int',
+  peopleListPageSize: 'int', mapWidthPercent: 'int',
+  mapHeightPercent: 'int', panelWidthPercent: 'int',
+  window_size: 'list'
+}
+gui_options_defaults:
+  infoBoxLines: 8
+  autoRefreshInterval: 5
+  peopleListPageSize: 100
+  mapWidthPercent: 70
+  mapHeightPercent: 80
+  panelWidthPercent: 30
+  window_size: [1024, 800]
+  
 gedcom_options_types: {
   GEDCOMinput: 'str', resultpath: 'str', Result: 'str',
   ResultType: 'str', Main: 'str', mainPerson: 'str',

@@ -45,7 +45,7 @@ class VisualMapFrame(wx.Frame):
     config_dialog: Optional[wx.Dialog]
     gOp: Optional["gvOptions"]
 
-    def __init__(self, parent: Optional[wx.Window], *args: Any, gOp: Optional["gvOptions"] = None, **kw: Any) -> None:
+    def __init__(self, parent: Optional[wx.Window], gOp: gvOptions, *args: Any, **kw: Any) -> None:
         """Construct the frame.
 
         Args:
@@ -56,9 +56,7 @@ class VisualMapFrame(wx.Frame):
         # ensure the parent's __init__ is called so the wx.frame is created
         super().__init__(parent, *args, **kw)
 
-        # gOp may be provided explicitly or attached later by caller
         self.gOp = gOp
-
         self.font_manager = FontManager()
         self.font_name, self.font_size = self.font_manager.get_font_name_size()
         self.set_current_font()

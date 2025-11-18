@@ -26,9 +26,6 @@ from .visual_map_frame import VisualMapFrame
 
 _log = logging.getLogger(__name__.lower())
 
-InfoBoxLines: int = 8
-
-
 class GedcomVisualGUI:
     """Lightweight wrapper that constructs and controls the main VisualMapFrame.
 
@@ -41,7 +38,6 @@ class GedcomVisualGUI:
     """
 
     def __init__(self, gOp: Any, parent: wx.Window | None, title: str,
-                 size: Tuple[int, int] = (1024, 800),
                  style: int = wx.DEFAULT_FRAME_STYLE) -> None:
         """
         Create the main application frame.
@@ -53,7 +49,8 @@ class GedcomVisualGUI:
             size: Initial window size as (width, height).
             style: wx frame style flags.
         """
-        self.frame: VisualMapFrame = VisualMapFrame(parent, title=title, size=size, style=style, gOp=gOp)
+        size: Tuple[int, int] = gOp.get('window_size', None)
+        self.frame: VisualMapFrame = VisualMapFrame(parent, gOp=gOp, title=title, size=size, style=style)
 
     def start(self) -> None:
         """Start the GUI by delegating to the main frame's start method."""

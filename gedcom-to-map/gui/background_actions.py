@@ -18,9 +18,9 @@ class BackgroundActions:
     (ParseAndGPS, doHTML, doKML, doKML2, doSUM, doTraceTo) are imported
     lazily inside Run().
     """
-    def __init__(self, win, threadnum):
+    def __init__(self, win, threadnum, gOp):
         self.win = win
-        self.gOp = None
+        self.gOp = gOp
         self.people = None
         self.threadnum = threadnum
         self.updategrid = False
@@ -31,10 +31,6 @@ class BackgroundActions:
         self.threadrunning = True
         self.do = -1
         self.readyToDo = True
-
-    def DefgOps(self, gOp):
-        # Pull the global variables into this thread - Critical to do this
-        self.gOp = gOp
 
     def Start(self):
         self.keepGoing = self.threadrunning = True

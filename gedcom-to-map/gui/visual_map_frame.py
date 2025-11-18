@@ -113,6 +113,11 @@ class VisualMapFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.OnOpenBrowser, id=self.id.IDs["ID_BTNBROWSER"])
 
     def populate_font_menus(self, optionsMenu: wx.Menu) -> None:
+        """Populate optionsMenu with font face and size submenus.
+
+        Creates two radio submenus (font face and font size) and binds their
+        items to handlers that update the application's FontManager.
+        """
         set_font_menu = wx.Menu()
         for fname in self.font_manager.PREDEFINED_FONTS:
             item = wx.MenuItem(set_font_menu, wx.ID_ANY, fname, kind=wx.ITEM_RADIO)
@@ -124,6 +129,7 @@ class VisualMapFrame(wx.Frame):
         for mi in set_font_menu.GetMenuItems():
             self.Bind(wx.EVT_MENU, self.on_font_menu_item, mi)
 
+        """Create and bind the font-size submenu under optionsMenu."""
         set_font_size_menu = wx.Menu()
         for fsize in self.font_manager.PREDEFINED_FONT_SIZES:
             item = wx.MenuItem(set_font_size_menu, wx.ID_ANY, str(fsize), kind=wx.ITEM_RADIO)
@@ -186,6 +192,10 @@ class VisualMapFrame(wx.Frame):
         self.Refresh()
 
     def on_font_menu_item(self, event: wx.CommandEvent) -> None:
+        """Handle selection of a font-face menu item.
+
+        Updates the FontManager and applies the new face across the UI.
+        """
         mi = self.GetMenuBar().FindItemById(event.GetId())
         if mi is None:
             return
@@ -196,6 +206,10 @@ class VisualMapFrame(wx.Frame):
             self.set_gui_font(self.font_name, self.font_size)
 
     def on_font_size_menu_item(self, event: wx.CommandEvent) -> None:
+        """Handle selection of a font-size menu item.
+
+        Parses the selected size and applies it via the FontManager.
+        """
         mi = self.GetMenuBar().FindItemById(event.GetId())
         if mi is None:
             return
@@ -225,18 +239,24 @@ class VisualMapFrame(wx.Frame):
             self.Close(True)
 
     def OnOpenCSV(self, event: wx.Event) -> None:
+        """Menu handler: open CSV/geo table using the panel helper."""
         try:
             self.visual_map_panel.OpenCSV()
         except Exception:
             _log.exception("OnOpenCSV failed")
 
     def OnOpenBrowser(self, event: wx.Event) -> None:
+        """Menu handler: open the generated result in a browser or KML viewer."""
         try:
             self.visual_map_panel.OpenBrowser()
         except Exception:
             _log.exception("OnOpenBrowser failed")
 
     def OnFileOpenDialog(self, evt: wx.Event) -> None:
+        """Show a file-open dialog for selecting a GEDCOM and load it if chosen.
+
+        Adds the selected file to the recent-file history and triggers LoadGEDCOM.
+        """
         dDir = os.getcwd()
         filen = ""
         if self.visual_map_panel and getattr(self.visual_map_panel, "gOp", None):
@@ -273,6 +293,10 @@ class VisualMapFrame(wx.Frame):
                 _log.exception("LoadGEDCOM failed")
 
     def OnFileResultDialog(self, evt: wx.Event) -> None:
+        """Show a save dialog to select an output result path (HTML or KML).
+
+        Updates gOp with the chosen result path and refreshes the radio selection.
+        """
         dDir = os.getcwd()
         dFile = "visgedcom.html"
         if self.visual_map_panel and getattr(self.visual_map_panel, "gOp", None):
@@ -307,6 +331,7 @@ class VisualMapFrame(wx.Frame):
         wx.Yield()
 
     def Cleanup(self, *args: Any) -> None:
+        """Tidy up frame resources (menu, history) before exit."""
         del self.filehistory
         try:
             if getattr(self, "menuBar", None):
@@ -315,6 +340,7 @@ class VisualMapFrame(wx.Frame):
             _log.exception("Cleanup: failed to destroy menuBar")
 
     def OnFileHistory(self, evt: wx.Event) -> None:
+        """Handle selection from the recent-file history and load the chosen file."""
         fileNum = evt.GetId() - wx.ID_FILE1
         path = self.filehistory.GetHistoryFile(fileNum)
         _log.debug("You selected %s", path)
@@ -359,12 +385,14 @@ class VisualMapFrame(wx.Frame):
             _log.exception("OnInfo failed")
 
     def OnFind(self, event: wx.Event) -> None:
+        """Delegate the Find action to the people list widget."""
         try:
             self.visual_map_panel.peopleList.list.OnFind(event)
         except Exception:
             _log.exception("OnFind failed")
 
     def onOptionsReset(self, event: wx.Event) -> None:
+        """Reset application options to defaults and refresh the UI."""
         try:
             if getattr(self.visual_map_panel, "gOp", None) and hasattr(self.visual_map_panel.gOp, "defaults"):
                 self.visual_map_panel.gOp.defaults()
@@ -374,7 +402,11 @@ class VisualMapFrame(wx.Frame):
             _log.exception("onOptionsReset failed")
 
     def onOptionsSetup(self, event: wx.Event) -> None:
-        """Open the configuration dialog and keep a reference to it."""
+        """Open the configuration dialog for editing application options.
+
+        The created dialog instance is kept on self.config_dialog so callers can
+        inspect or reuse it if needed.
+        """
         try:
             dialog = ConfigDialog(None, title="Configuration Options", gOp=getattr(self.visual_map_panel, "gOp", None))
             self.config_dialog = dialog

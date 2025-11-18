@@ -4,7 +4,7 @@ import os
 import wx
 
 from style.stylemanager import FontManager
-from const import GUINAME, KMLMAPSURL
+from const import GUINAME
 
 _log = logging.getLogger(__name__.lower())
 
@@ -15,57 +15,83 @@ from .visual_map_panel import VisualMapPanel
 from .visual_gedcom_ids import VisualGedcomIds
 
 class VisualMapFrame(wx.Frame):
-    def __init__(self, *args, **kw):
+    def __init__(self, gOp, *args, **kw):
         # ensure the parent's __init__ is called so the wx.frame is created
         super().__init__(*args, **kw)
 
-        self.font_manager = FontManager()
-        self.font_name, self.font_size = self.font_manager.get_font_name_size()
+        self.gOp = gOp
 
+        self.font_manager = FontManager()
         self.set_current_font()
 
         self.SetMinSize((800, 800))
-        self.StatusBar = self.CreateStatusBar()
-        self.SetStatusText("This is the statusbar")
-        # create a menu bar
-        self.makeMenuBar()
-        # and a status bar
 
-        self.StatusBar.SetFieldsCount(number=2, widths=[-1, 28 * self.font_size])
-        widthMax = self.font_manager.get_text_width(30)
-        self.StatusBar.SetFieldsCount(number=2, widths=[-1, widthMax])
-        self.SetStatusText("Visual Mapping ready", 0)
-        self.inTimer = False
+        self.makeStatusBar()
+        self.makeMenuBar()
 
         # Create and set up the main panel within the frame
-        self.visual_map_panel = VisualMapPanel(self, self.font_manager)  # pass the frame's FontManager into the panel
-        # Configure panel options (panel exposes SetupOptions)
-        try:
-            self.visual_map_panel.SetupOptions()
-        except Exception:
-            _log.exception("VisualMapFrame: SetupOptions failed")
+        self.visual_map_panel = VisualMapPanel(self, self.font_manager, self.gOp)
 
     def set_current_font(self):
+        if not getattr(self, 'font_name', None) or not getattr(self, 'font_size', None):
+            self.font_name, self.font_size = self.font_manager.get_font_name_size()
         self.font = self.font_manager.get_font()
         wx.Frame.SetFont(self, self.font)
 
     def start(self):
-        try:
-            self.visual_map_panel.SetupButtonState()
-        except Exception:
-            _log.exception("start: SetupButtonState failed")
+        self.visual_map_panel.start()
         self.Show()
 
     def stop(self):
-        if self.visual_map_panel:
-            try:
-                self.visual_map_panel.OnCloseWindow()
-            except Exception:
-                _log.exception("stop: OnCloseWindow failed")
+        self.visual_map_panel.stop()
+
+    def makeStatusBar(self):
+        self.StatusBar = self.CreateStatusBar()
+        self.SetStatusText("This is the statusbar")
+        self.StatusBar.SetFieldsCount(number=2, widths=[-1, 28 * self.font_size])
+        widthMax = self.font_manager.get_text_width(30)
+        self.StatusBar.SetFieldsCount(number=2, widths=[-1, widthMax])
+        self.SetStatusText("Visual Mapping ready", 0)
+
+    def bind_menu_events(self):
+        self.Bind(wx.EVT_MENU, self.OnFileOpenDialog, id=wx.ID_OPEN)
+        self.Bind(wx.EVT_MENU, self.OnFileResultDialog, id=wx.ID_SAVEAS)
+        self.Bind(wx.EVT_MENU, self.OnExit, id=wx.ID_EXIT)
+        self.Bind(wx.EVT_CLOSE, self.OnExit)
+        self.Bind(wx.EVT_MENU, self.OnInfo, id=wx.ID_INFO)
+        self.Bind(wx.EVT_MENU, self.OnAbout, id=wx.ID_ABOUT)
+        self.Bind(wx.EVT_MENU, self.OnAbout, id=wx.ID_HELP)
+        self.Bind(wx.EVT_MENU_RANGE, self.OnFileHistory, id=wx.ID_FILE1, id2=wx.ID_FILE9)
+        self.Bind(wx.EVT_MENU, self.onOptionsReset, id=wx.ID_REVERT)
+        self.Bind(wx.EVT_MENU, self.OnFind, id=wx.ID_FIND)
+        self.Bind(wx.EVT_MENU, self.onOptionsSetup, id=wx.ID_SETUP)
+        self.Bind(wx.EVT_MENU, self.OnOpenCSV, id=self.id.IDs['ID_BTNCSV'])
+        self.Bind(wx.EVT_MENU, self.OnOpenBrowser, id=self.id.IDs['ID_BTNBROWSER'])
+
+    def populate_font_menus(self, optionsMenu):
+        set_font_menu = wx.Menu()
+        for fname in self.font_manager.PREDEFINED_FONTS:
+            item = wx.MenuItem(set_font_menu, wx.ID_ANY, fname, kind=wx.ITEM_RADIO)
+            set_font_menu.Append(item)
+            current_face = self.font_manager._current.get("face") if self.font_manager._current else None
+            if current_face == fname:
+                item.Check(True)
+        optionsMenu.AppendSubMenu(set_font_menu, "Set Font")
+        for mi in set_font_menu.GetMenuItems():
+            self.Bind(wx.EVT_MENU, self.on_font_menu_item, mi)
+
+        set_font_size_menu = wx.Menu()
+        for fsize in self.font_manager.PREDEFINED_FONT_SIZES:
+            item = wx.MenuItem(set_font_size_menu, wx.ID_ANY, str(fsize), kind=wx.ITEM_RADIO)
+            set_font_size_menu.Append(item)
+            current_size = self.font_manager._current.get("size") if self.font_manager._current else None
+            if current_size == fsize:
+                item.Check(True)
+        optionsMenu.AppendSubMenu(set_font_size_menu, "Set Font Size")
+        for mi in set_font_size_menu.GetMenuItems():
+            self.Bind(wx.EVT_MENU, self.on_font_size_menu_item, mi)
 
     def makeMenuBar(self):
-        self.id = None
-
         self.id = VisualGedcomIds()
         self.menuBar = menuBar = wx.MenuBar()
         self.fileMenu = fileMenu = wx.Menu()
@@ -75,7 +101,6 @@ class VisualMapFrame(wx.Frame):
         fileMenu.AppendSeparator()
         fileMenu.Append(wx.ID_EXIT)
 
-        # file history
         self.filehistory = wx.FileHistory()
         self.filehistory.UseMenu(fileMenu)
 
@@ -100,64 +125,16 @@ class VisualMapFrame(wx.Frame):
 
         self.SetMenuBar(menuBar)
 
-        # bind menu events
-        self.Bind(wx.EVT_MENU, self.OnFileOpenDialog, id=wx.ID_OPEN)
-        self.Bind(wx.EVT_MENU, self.OnFileResultDialog, id=wx.ID_SAVEAS)
-        self.Bind(wx.EVT_MENU, self.OnExit, id=wx.ID_EXIT)
-        self.Bind(wx.EVT_CLOSE, self.OnExit)
-        self.Bind(wx.EVT_MENU, self.OnInfo, id=wx.ID_INFO)
-        self.Bind(wx.EVT_MENU, self.OnAbout, id=wx.ID_ABOUT)
-        self.Bind(wx.EVT_MENU, self.OnAbout, id=wx.ID_HELP)
-        self.Bind(wx.EVT_MENU_RANGE, self.OnFileHistory, id=wx.ID_FILE1, id2=wx.ID_FILE9)
-        self.Bind(wx.EVT_MENU, self.onOptionsReset, id=wx.ID_REVERT)
-        self.Bind(wx.EVT_MENU, self.OnFind, id=wx.ID_FIND)
-        self.Bind(wx.EVT_MENU, self.onOptionsSetup, id=wx.ID_SETUP)
-        self.Bind(wx.EVT_MENU, self.OnOpenCSV, id=self.id.IDs['ID_BTNCSV'])
-        self.Bind(wx.EVT_MENU, self.OnOpenBrowser, id=self.id.IDs['ID_BTNBROWSER'])
+        self.bind_menu_events()
 
-        # Font submenu
-        set_font_menu = wx.Menu()
-        for fname in self.font_manager.PREDEFINED_FONTS:
-            item = wx.MenuItem(set_font_menu, wx.ID_ANY, fname, kind=wx.ITEM_RADIO)
-            set_font_menu.Append(item)
-            current_face = self.font_manager._current.get("face") if self.font_manager._current else None
-            if current_face == fname:
-                item.Check(True)
-        optionsMenu.AppendSubMenu(set_font_menu, "Set Font")
-        for mi in set_font_menu.GetMenuItems():
-            self.Bind(wx.EVT_MENU, self.on_font_menu_item, mi)
-
-        set_font_size_menu = wx.Menu()
-        for fsize in self.font_manager.PREDEFINED_FONT_SIZES:
-            item = wx.MenuItem(set_font_size_menu, wx.ID_ANY, str(fsize), kind=wx.ITEM_RADIO)
-            set_font_size_menu.Append(item)
-            current_size = self.font_manager._current.get("size") if self.font_manager._current else None
-            if current_size == fsize:
-                item.Check(True)
-        optionsMenu.AppendSubMenu(set_font_size_menu, "Set Font Size")
-        for mi in set_font_size_menu.GetMenuItems():
-            self.Bind(wx.EVT_MENU, self.on_font_size_menu_item, mi)
+        self.populate_font_menus(optionsMenu)
 
     def set_gui_font(self, font_name, font_size):
         self.font_manager.apply_current_font_recursive(self)
-        try:
-            self.visual_map_panel.set_current_font()
-        except Exception:
-            _log.exception("set_gui_font: visual_map_panel.set_current_font failed")
+        self.font_manager.apply_current_font_recursive(self.GetMenuBar())
+        self.font_manager.apply_current_font_recursive(self.GetStatusBar())
 
-        font = wx.Font(pointSize=font_size, family=wx.FONTFAMILY_DEFAULT,
-                       style=wx.FONTSTYLE_NORMAL, weight=wx.FONTWEIGHT_NORMAL,
-                       faceName=font_name)
-        frame = self
-        frame.SetFont(font)
-        try:
-            frame.GetMenuBar().SetFont(font)
-        except Exception:
-            pass
-        try:
-            frame.GetStatusBar().SetFont(font)
-        except Exception:
-            pass
+        self.visual_map_panel.set_current_font()
 
         self.Layout()
         self.Refresh()
@@ -188,18 +165,8 @@ class VisualMapFrame(wx.Frame):
             self.set_gui_font(self.font_name, self.font_size)
 
     def OnExit(self, event):
-        try:
-            self.visual_map_panel.myTimer.Stop()
-        except Exception:
-            pass
-        try:
-            self.Unbind(wx.EVT_TIMER, self)
-        except Exception:
-            pass
-        try:
-            self.visual_map_panel.gOp.savesettings()
-        except Exception:
-            pass
+        self.visual_map_panel.stop_timer()
+        self.gOp.savesettings()
 
         if getattr(event, "GetEventType", None) and event.GetEventType() == wx.EVT_CLOSE.typeId:
             self.Destroy()

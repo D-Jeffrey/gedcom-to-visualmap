@@ -28,7 +28,7 @@ class VisualMapPanel(wx.Panel):
     A Frame that says Visual Setup
     """
 
-    def __init__(self, parent, font_manager, *args, **kw):
+    def __init__(self, parent, font_manager, gOp, *args, **kw):
         # parent must be the wx parent for this panel; call panel initializer with it
         super().__init__(parent, *args, **kw)
 
@@ -78,6 +78,32 @@ class VisualMapPanel(wx.Panel):
 
         self.lastruninstance = 0.0
         self.remaintime = 0
+
+        # Configure panel options
+        self.SetupOptions()
+
+    def start(self):
+        try:
+            self.SetupButtonState()
+        except Exception:
+            _log.exception("start: SetupButtonState failed")
+
+    def stop(self):
+        try:
+            self.OnCloseWindow()
+        except Exception:
+            _log.exception("stop: OnCloseWindow failed")
+
+    def stop_timer(self):
+        if self.myTimer and self.myTimer.IsRunning():
+            try:
+                self.myTimer.Stop()
+            except Exception:
+                pass
+            try:
+                self.Unbind(wx.EVT_TIMER, self)
+            except Exception:
+                pass
 
     def _adjust_panelB_width(self):
         # Representative labels / longest control captions used in LayoutOptions

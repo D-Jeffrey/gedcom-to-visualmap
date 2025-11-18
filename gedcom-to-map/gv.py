@@ -18,6 +18,7 @@ import wx.lib.mixins.inspection as wit
 # Import constants and GUI components
 from const import GUINAME, LOG_CONFIG, NAME, VERSION
 from gui.gedcomVisualGUI import GedcomVisualGUI
+from gedcom_options import gvOptions
 
 # Initialize logger for the application
 _log = logging.getLogger(__name__)
@@ -46,8 +47,11 @@ if __name__ == '__main__':
     else:  # Normal mode
         app = wx.App()
 
+    # Load gedcom options
+    gOp = gvOptions()
+
     # Create the main application frame and panel
-    frame = GedcomVisualGUI(None, title=GUINAME, size=(1024, 800), style=wx.DEFAULT_FRAME_STYLE)
+    frame = GedcomVisualGUI(gOp=gOp, parent=None, title=GUINAME)
     
     # Show the inspection tool if WITMODE is enabled
     if WITMODE:

@@ -12,15 +12,16 @@ __all__ = ['VisualGedcomIds', 'VisualMapFrame', 'PeopleListCtrl', 'PeopleListCtr
 
 import logging
 
-from gui.visual_map_frame import VisualMapFrame
+import wx
+from .visual_map_frame import VisualMapFrame
 
 _log = logging.getLogger(__name__.lower())
 
 InfoBoxLines = 8
 
 class GedcomVisualGUI:
-    def __init__(self, parent, title, size=(1024, 800), style=None):
-        self.frame = VisualMapFrame(parent, title=title, size=size, style=style)
+    def __init__(self, gOp, parent, title, size=(1024, 800), style=wx.DEFAULT_FRAME_STYLE):
+        self.frame = VisualMapFrame(gOp, parent, title=title, size=size, style=style)
 
     def start(self):
         self.frame.start()

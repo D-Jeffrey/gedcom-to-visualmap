@@ -294,44 +294,47 @@ class gvOptions:
     def savesettings(self):
         # Use this to remove old settings in sections
 
-        
-        if not self.gvConfig:
-            self.gvConfig = configparser.ConfigParser()
-            for section in ['Core', 'HTML', 'Logging', 'Gedcom.Main', 'KML']:
-                self.gvConfig[section] = {}
-        core_keys = self.options.get('config_file_settings', {}).get('Core', {})
-        for key in core_keys:
-            self.gvConfig['Core'][key] = str(getattr(self, key))
-        html_keys = self.options.get('config_file_settings', {}).get('HTML', {})
-        for key in html_keys:
-            self.gvConfig['HTML'][key] =  str(getattr(self, key))
-        kml_keys = self.options.get('config_file_settings', {}).get('KML', {})
-        for key in kml_keys:
-            self.gvConfig['KML'][key] =  str(getattr(self, key))
+        try:
+            if not self.gvConfig:
+                self.gvConfig = configparser.ConfigParser()
+                for section in ['Core', 'HTML', 'Logging', 'Gedcom.Main', 'KML']:
+                    self.gvConfig[section] = {}
+            core_keys = self.options.get('config_file_settings', {}).get('Core', {})
+            for key in core_keys:
+                self.gvConfig['Core'][key] = str(getattr(self, key))
+            html_keys = self.options.get('config_file_settings', {}).get('HTML', {})
+            for key in html_keys:
+                self.gvConfig['HTML'][key] =  str(getattr(self, key))
+            kml_keys = self.options.get('config_file_settings', {}).get('KML', {})
+            for key in kml_keys:
+                self.gvConfig['KML'][key] =  str(getattr(self, key))
 
-        self.gvConfig['Core']['InputFile'] =  self.GEDCOMinput
-        self.gvConfig['Core']['OutputFile'] = os.path.join(self.resultpath, self.Result)
-        self.gvConfig['Core']['KMLcmdline'] =  self.KMLcmdline
-        if self.GEDCOMinput and self.Main:
-            name = Path(self.GEDCOMinput).stem
-            self.gvConfig['Gedcom.Main'][name] = str(self.Main)
-        #for key in range(0, self.panel.fileConfig.filehistory.GetCount()):
-        #    self.gvConfig['Files'][key] = self.panel.fileConfig[key]
-        
-        loggerNames = list(logging.root.manager.loggerDict.keys())
-        logging_keys = self.options.get('config_file_settings', {}).get('Logging', [])
-        for logName in loggerNames:
-            if logName in logging_keys:
-                logLevel = logging.getLevelName(logging.getLogger(logName).level)
-                if logLevel == 'NOTSET':
-                    self.gvConfig.remove_option('Logging', logName)
-                else:
-                    self.gvConfig['Logging'][logName] = logging.getLevelName(logging.getLogger(logName).getEffectiveLevel())
-        old_settings = self.options.get('config_file_settings', {}).get('old_settings', {})
-        for key, section  in old_settings.items():
-            self.gvConfig.remove_option(section, key)
-        with open(self.settingsfile, 'w') as configfile:
-            self.gvConfig.write(configfile)
+            self.gvConfig['Core']['InputFile'] =  self.GEDCOMinput
+            self.gvConfig['Core']['OutputFile'] = os.path.join(self.resultpath, self.Result)
+            self.gvConfig['Core']['KMLcmdline'] =  self.KMLcmdline
+            if self.GEDCOMinput and self.Main:
+                name = Path(self.GEDCOMinput).stem
+                self.gvConfig['Gedcom.Main'][name] = str(self.Main)
+            #for key in range(0, self.panel.fileConfig.filehistory.GetCount()):
+            #    self.gvConfig['Files'][key] = self.panel.fileConfig[key]
+            
+            loggerNames = list(logging.root.manager.loggerDict.keys())
+            logging_keys = self.options.get('config_file_settings', {}).get('Logging', [])
+            for logName in loggerNames:
+                if logName in logging_keys:
+                    logLevel = logging.getLevelName(logging.getLogger(logName).level)
+                    if logLevel == 'NOTSET':
+                        self.gvConfig.remove_option('Logging', logName)
+                    else:
+                        self.gvConfig['Logging'][logName] = logging.getLevelName(logging.getLogger(logName).getEffectiveLevel())
+            old_settings = self.options.get('config_file_settings', {}).get('old_settings', {})
+            for key, section  in old_settings.items():
+                self.gvConfig.remove_option(section, key)
+            with open(self.settingsfile, 'w') as configfile:
+                self.gvConfig.write(configfile)
+
+        except Exception as e:
+            _log.error("Error saving settings to %s: %s", self.settingsfile, e)
     
     
     def setMainPerson(self, mainperson: Person):

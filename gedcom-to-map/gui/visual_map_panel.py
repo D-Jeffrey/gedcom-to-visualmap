@@ -1,16 +1,16 @@
 """
 visual_map_panel.py
 
-Main panel for the Visual Map GUI. Contains the control widgets, option panels,
-and coordinates with the background worker to load GEDCOM data and produce
-HTML/KML outputs.
+Main panel for the Visual Map GUI.
 
-This module uses wxPython for UI and provides a VisualMapPanel class which is a
-wx.Panel hosting the primary user controls.
+This module provides VisualMapPanel, a wx.Panel subclass that builds the UI
+controls, coordinates with the BackgroundActions worker, and reflects gvOptions
+state into the UI.
 
-Types:
-- gvOptions is the application options/state object (see gedcom_options.py).
-- BackgroundActions is the background worker class.
+Notes:
+- Event handling has been delegated to visual_map_event_handlers.VisualMapEventHandler.
+- Layout construction has been delegated to layout_options.LayoutOptions.
+- This file contains only panel-level behaviour and lifecycle management.
 """
 from typing import Optional, List, Any
 import logging
@@ -20,6 +20,7 @@ import os
 import sys
 import subprocess
 import webbrowser
+import shutil
 from datetime import datetime
 
 from const import KMLMAPSURL
@@ -30,6 +31,8 @@ from .visual_gedcom_ids import VisualGedcomIds  # type: ignore
 from .people_list_ctrl_panel import PeopleListCtrlPanel  # type: ignore
 from gedcom_options import gvOptions, ResultsType  # type: ignore
 from .background_actions import BackgroundActions
+from .layout_options import LayoutOptions
+from .visual_map_event_handlers import VisualMapEventHandler
 
 (UpdateBackgroundEvent, EVT_UPDATE_STATE) = wx.lib.newevent.NewEvent()
 
@@ -37,12 +40,16 @@ _log = logging.getLogger(__name__.lower())
 
 class VisualMapPanel(wx.Panel):
     """
-    Main panel used by the application's main frame.
+    Panel hosting primary controls and coordinating background processing.
 
     Responsibilities:
-    - Build and manage the controls and option panels.
-    - Start/stop background processing.
-    - Reflect gvOptions state into the UI and vice-versa.
+    - Construct and layout widgets (delegates layout to LayoutOptions).
+    - Start/stop background worker threads and a periodic timer.
+    - Mirror gvOptions state into UI controls and propagate UI changes back.
+    - Provide UI-safe helpers for status, busy indicators and file/command launching.
+
+    The heavy event logic is implemented in VisualMapEventHandler to keep this
+    class focused on layout/state and lifecycle management.
     """
 
     # Public attributes with types for static analysis and readability
@@ -64,10 +71,14 @@ class VisualMapPanel(wx.Panel):
         Initialize the VisualMapPanel.
 
         Args:
-            parent: wx parent window.
-            font_manager: FontManager instance used to style controls.
-            gOp: Optional global options/state object. If not provided the panel
-                 will construct one in SetupOptions().
+            parent: WX parent window.
+            font_manager: FontManager instance used to compute and apply fonts.
+            gOp: Optional gvOptions instance; if not supplied a new gvOptions will be
+                 created during SetupOptions().
+        Side-effects:
+            - Builds left/right sub-panels and people list.
+            - Constructs the options UI via LayoutOptions.build.
+            - Instantiates event handler and starts background threads/timer.
         """
         # parent must be the wx parent for this panel; call panel initializer with it
         super().__init__(parent, *args, **kw)
@@ -106,15 +117,24 @@ class VisualMapPanel(wx.Panel):
         # Add Data Grid on Left panel
         self.peopleList = PeopleListCtrlPanel(self.panelA, self.id.m, self.font_manager)
         
-        # Add all the labels, button and radiobox to Right Panel
-        self.LayoutOptions(self.panelB)
+        # create handler first so LayoutOptions.build (which no longer binds)
+        # can safely be used; handler will be used to wire event bindings next
+        self.handlers = VisualMapEventHandler(self)
+
+        # Add all the labels, button and radiobox to Right Panel using LayoutOptions helper
+        LayoutOptions.build(self, self.panelB)
 
         pa_sizer = wx.BoxSizer(wx.VERTICAL)
         pa_sizer.Add(self.peopleList, 1, wx.EXPAND | wx.ALL, 5)
         self.panelA.SetSizer(pa_sizer)
         self.panelA.Layout()
 
-        self._adjust_panelB_width()
+        # compute a sensible width for the right-hand options panel
+        LayoutOptions.adjust_panel_width(self)
+
+        # wire event bindings via the handler and start background threads/timer
+        self.handlers.bind()
+        self.start_threads_and_timer()
 
         self.lastruninstance = 0.0
         self.remaintime = 0
@@ -123,16 +143,13 @@ class VisualMapPanel(wx.Panel):
         self.SetupOptions()
 
     def start(self) -> None:
-        """Perform any UI startup actions (enable/disable buttons etc.)."""
-        try:
-            self.SetupButtonState()
-        except Exception:
-            _log.exception("start: SetupButtonState failed")
+        """Perform UI startup actions (currently triggers SetupButtonState)."""
 
     def stop(self):
-        pass
+        """Placeholder for panel shutdown logic (not implemented)."""
 
     def stop_timer(self):
+        """Stop the periodic wx.Timer if running and unbind associated handler."""
         if self.myTimer and self.myTimer.IsRunning():
             try:
                 self.myTimer.Stop()
@@ -143,337 +160,46 @@ class VisualMapPanel(wx.Panel):
             except Exception:
                 pass
 
-    def _adjust_panelB_width(self):
-        # Representative labels / longest control captions used in LayoutOptions
-        sample_texts = [
-            "Input file:   ", "Output file: ", "Default Country:   ",
-            "Default Country:", "Map Style", "HTML Options", "Create Files", "Geo Table"
-        ]
-        # measure longest text in pixels
-        max_text_len = max(len(s) for s in sample_texts)
-        text_px = self.font_manager.get_text_width(max_text_len)
-        # set panelB width with some padding
-        extra_for_controls = int(220 + (self.font_size * 6))
-        desired = max(300, text_px + extra_for_controls)
-        # Apply as minimum width so sizer keeps panelB readable
-        self.panelB.SetMinSize((desired, -1))
-        # Apply layout update
-        self.Layout()
-        self.Refresh()
-
     def set_current_font(self) -> None:
-        """Apply current font from the font manager to this panel and children."""
+        """Apply current font to panel and children and adjust layout accordingly."""
         self.font_manager.apply_current_font_recursive(self)
         self.font_manager.apply_current_font_recursive(self.peopleList)
         # adjust right-hand panel width to match new font metrics
-        wx.CallAfter(self._adjust_panelB_width)
+        wx.CallAfter(LayoutOptions.adjust_panel_width, self)
         self.Layout()
         self.Refresh()
-
-    def bind_events(self) -> None:
-        """Bind event handlers for the panel."""
-        self.Bind(wx.EVT_RADIOBOX, self.EvtRadioBox, id = self.id.IDs['ID_RBResultsType'])
-        self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.id.IDs['ID_CBMapControl'])
-        self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.id.IDs['ID_CBMapMini'])
-        self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.id.IDs['ID_CBMarksOn'])
-        self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.id.IDs['ID_CBBornMark'])
-        self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.id.IDs['ID_CBDieMark'])
-        self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.id.IDs['ID_CBHomeMarker'])
-        self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.id.IDs['ID_CBMarkStarOn'])
-        self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.id.IDs['ID_CBHeatMap'])
-        self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.id.IDs['ID_CBFlyTo'])
-        self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.id.IDs['ID_CBMapTimeLine'])
-        self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.id.IDs['ID_CBUseAntPath'])
-        self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.id.IDs['ID_CBUseGPS'])
-        self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.id.IDs['ID_CBCacheOnly'])
-        self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.id.IDs['ID_CBAllEntities'])
-        self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.id.IDs['ID_CBGridView'])
-        self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id = self.id.IDs['ID_CBSummary'])
-        self.Bind(wx.EVT_RADIOBOX, self.EvtRadioBox, id = self.id.IDs['ID_RBKMLMode'])
-        self.Bind(wx.EVT_SPINCTRL, self.EvtSpinCtrl, id = self.id.IDs['ID_INTMaxLineWeight'])
-        self.Bind(wx.EVT_CHOICE, self.EvtListBox, id = self.id.IDs['ID_LISTMapStyle'])
-        self.Bind(wx.EVT_BUTTON, self.EvtButton, id = self.id.IDs['ID_BTNLoad'])
-        self.Bind(wx.EVT_BUTTON, self.EvtButton, id = self.id.IDs['ID_BTNCreateFiles'])
-        self.Bind(wx.EVT_BUTTON, self.EvtButton, id = self.id.IDs['ID_BTNCSV'])
-        self.Bind(wx.EVT_BUTTON, self.EvtButton, id = self.id.IDs['ID_BTNTRACE'])
-        self.Bind(wx.EVT_BUTTON, self.EvtButton, id = self.id.IDs['ID_BTNSTOP'])
-        self.Bind(wx.EVT_BUTTON, self.EvtButton, id = self.id.IDs['ID_BTNBROWSER'])
-        self.Bind(wx.EVT_TEXT, self.EvtText, id = self.id.IDs['ID_TEXTResult'])
-        self.Bind(wx.EVT_TEXT, self.EvtText, id = self.id.IDs['ID_TEXTDefaultCountry'])
-        self.OnBusyStop(-1)
-        self.Bind(wx.EVT_RADIOBOX, self.EvtRadioBox, id = self.id.IDs['ID_RBGroupBy'])
-        self.Bind(wx.EVT_SLIDER, self.EvtSlider, id = self.id.IDs['ID_LISTHeatMapTimeStep'])
-        self.NeedReload()
-        self.NeedRedraw()
-        self.Bind(wx.EVT_CLOSE, self.OnCloseWindow)
-        self.Bind(EVT_UPDATE_STATE, self.OnCreateFiles)
-
-    def start_threads_and_timer(self) -> None:
-        """Start background threads and the periodic timer."""
-        self.threads = []
-        self.background_process = BackgroundActions(self, 0)
-        self.threads.append(self.background_process)
-        for t in self.threads:
-            t.Start()
-        
-        # Bind all EVT_TIMER events to self.OnMyTimer
-        self.Bind(wx.EVT_TIMER, self.OnMyTimer)
-        self.myTimer = wx.Timer(self)
-        self.myTimer.Start(500)
-    
-    def LayoutOptions(self, panel: wx.Panel) -> None:
-        """Create and layout the options controls on the provided panel."""
-        # Top of the Panel
-        box = wx.BoxSizer(wx.VERTICAL)
-        titleFont = self.font_manager.get_font(bold=True, size_delta=0)
-        fh = titleFont.GetPixelSize()[1]
-        titleArea = wx.Panel(panel, size=(-1, fh + 10))
-        titleArea.SetBackgroundColour(self.id.GetColor('TITLE_BACK')) 
-        title = wx.StaticText(titleArea, label="Visual Mapping Options",  style=wx.ALIGN_CENTER)
-        title.SetFont(titleFont)
-        # Center the title text in the title area
-        titleSizer = wx.BoxSizer(wx.HORIZONTAL)
-        titleSizer.Add(title, 1, wx.ALIGN_CENTER)
-        titleArea.SetSizer(titleSizer)
-
-        box.Add(titleArea, 0, wx.EXPAND | wx.BOTTOM, 0)
-        box.Add(wx.StaticLine(panel), 0, wx.EXPAND)
-        
-        self.id.txtinfile = wx.Button(panel, -1,  "Input file:   ") 
-        self.id.txtinfile.SetBackgroundColour(self.id.GetColor('BTN_DIRECTORY'))
-        self.id.TEXTGEDCOMinput = wx.TextCtrl(panel, self.id.IDs['ID_TEXTGEDCOMinput'], "", size=(250,20))
-        self.id.TEXTGEDCOMinput.Enable(False) 
-        self.id.txtoutfile = wx.Button(panel, -1, "Output file: ")
-        self.id.txtoutfile.SetBackgroundColour(self.id.GetColor('BTN_DIRECTORY'))
-        self.id.TEXTResult = wx.TextCtrl(panel, self.id.IDs['ID_TEXTResult'], "", size=(250,20))
-        self.id.txtinfile.Bind(wx.EVT_LEFT_DOWN, self.frame.OnFileOpenDialog)
-        self.id.txtoutfile.Bind(wx.EVT_LEFT_DOWN, self.frame.OnFileResultDialog)
-
-        l1 = wx.BoxSizer(wx.HORIZONTAL)
-        l1.AddMany([self.id.txtinfile,      (6,20),     self.id.TEXTGEDCOMinput])
-        l2 = wx.BoxSizer(wx.HORIZONTAL)
-        l2.AddMany([self.id.txtoutfile,     (0,20), self.id.TEXTResult])
-        box.AddMany([l1, (4,4,), l2])
-
-        # First select controls
-
-        self.id.CBUseGPS = wx.CheckBox(panel, self.id.IDs['ID_CBUseGPS'], "Use GPS lookup (uncheck if GPS is in file)")#,  wx.NO_BORDER)
-        self.id.CBCacheOnly = wx.CheckBox(panel, self.id.IDs['ID_CBCacheOnly'], "Cache Only, do not lookup addresses")#, , wx.NO_BORDER)
-        self.id.labelDefCountry = wx.StaticText(panel, -1,  "Default Country:   ") 
-        self.id.TEXTDefaultCountry = wx.TextCtrl(panel, self.id.IDs['ID_TEXTDefaultCountry'], "", size=(250,20))
-        defCounttryBox = wx.BoxSizer(wx.HORIZONTAL)
-        defCounttryBox.AddMany([self.id.labelDefCountry,      (6,20),     self.id.TEXTDefaultCountry])
-        self.id.CBAllEntities = wx.CheckBox(panel, self.id.IDs['ID_CBAllEntities'], "Map all people")#, wx.NO_BORDER)
-        self.id.CBBornMark = wx.CheckBox(panel, self.id.IDs['ID_CBBornMark'], "Marker for when Born")
-        self.id.CBDieMark = wx.CheckBox(panel, self.id.IDs['ID_CBDieMark'], "Marker for when Died")
-        
-        self.id.busyIndicator = wx.ActivityIndicator(panel)
-
-        self.id.busyIndicator.SetBackgroundColour(self.id.GetColor('BUSY_BACK'))
-        self.id.RBResultOutType =  wx.RadioBox(panel, self.id.IDs['ID_RBResultsType'], "Result Type", 
-                                           choices = ['HTML', 'KML', 'KML2', 'SUM'] , majorDimension= 5)
-
-        box.AddMany([  self.id.CBUseGPS,
-                       self.id.CBCacheOnly,
-                       defCounttryBox,
-                       self.id.CBAllEntities,
-                       self.id.CBBornMark,
-                       self.id.CBDieMark
-                    ])
-        """
-          HTML select controls in a Box
-        """
-        hbox_container = wx.Panel(panel)
-        hbox = wx.StaticBox( hbox_container, -1, "HTML Options")
-        hsizer = wx.StaticBoxSizer(hbox, wx.VERTICAL)
-        # Small inner sizer for the controls
-        hboxIn = wx.BoxSizer(wx.VERTICAL)
-        
-        mapchoices =  sorted(self.id.AllMapTypes)
-        mapboxsizer = wx.BoxSizer(wx.HORIZONTAL)
-        mapStyleLabel = wx.StaticText(hbox, -1, " Map Style")
-        self.id.CBMarksOn = wx.CheckBox(hbox_container, self.id.IDs['ID_CBMarksOn'], "Markers", name='MarksOn')
-
-        self.id.CBHomeMarker = wx.CheckBox(hbox_container, self.id.IDs['ID_CBHomeMarker'], "Marker point or homes")
-        self.id.CBMarkStarOn = wx.CheckBox(hbox_container, self.id.IDs['ID_CBMarkStarOn'], "Marker starter with Star")
-        self.id.CBMapTimeLine = wx.CheckBox(hbox_container, self.id.IDs['ID_CBMapTimeLine'], "Add Timeline")
-        self.id.LISTMapType = wx.Choice(hbox_container, self.id.IDs['ID_LISTMapStyle'], name="MapStyle", choices=mapchoices)
-        self.id.CBMapControl = wx.CheckBox(hbox_container, self.id.IDs['ID_CBMapControl'], "Open Map Controls",name='MapControl') 
-        self.id.CBMapMini = wx.CheckBox(hbox_container, self.id.IDs['ID_CBMapMini'], "Add Mini Map",name='MapMini') 
-        
-        self.id.CBHeatMap = wx.CheckBox(hbox_container, self.id.IDs['ID_CBHeatMap'], "Heatmap", style = wx.NO_BORDER)
-        
-        self.id.CBUseAntPath = wx.CheckBox(hbox_container, self.id.IDs['ID_CBUseAntPath'], "Ant paths")
-        
-        TimeStepVal = 5
-        self.id.LISTHeatMapTimeStep = wx.Slider(hbox_container, self.id.IDs['ID_LISTHeatMapTimeStep'], TimeStepVal,1, 100, size=(250, 45),
-                style=wx.SL_HORIZONTAL | wx.SL_AUTOTICKS | wx.SL_LABELS )
-        self.id.LISTHeatMapTimeStep.SetTickFreq(5)
-        self.id.RBGroupBy  = wx.RadioBox(hbox_container, self.id.IDs['ID_RBGroupBy'], "Group by:", 
-                                       choices = ['None', 'Last Name', 'Last Name (Soundex)','Person'], majorDimension= 2)
-        mapboxsizer.Add(self.id.LISTMapType)
-        mapboxsizer.Add( mapStyleLabel)
-        
-        hboxIn.AddMany([
-            (self.id.CBMarksOn, 0, wx.ALL, 2),
-            (self.id.CBHomeMarker, 0, wx.ALL, 2),
-            (self.id.CBMarkStarOn, 0, wx.ALL, 2),
-            (self.id.CBMapTimeLine, 0, wx.ALL, 2),        
-            (self.id.RBGroupBy, 0, wx.ALL, 2), 
-            (mapboxsizer, 0, wx.EXPAND | wx.ALL, 4),
-            (self.id.CBMapControl, 0, wx.ALL, 2),
-            (self.id.CBMapMini, 0, wx.ALL, 2),
-            (self.id.CBUseAntPath, 0, wx.ALL, 2),
-            (self.id.CBHeatMap, 0, wx.ALL, 2),
-            (self.id.LISTHeatMapTimeStep, 0, wx.EXPAND | wx.ALL, 4),
-        ])
-        hsizer.Add(hboxIn, 0, wx.EXPAND | wx.ALL, 4)
-        hbox_container.SetSizer(hsizer)
-        self.optionHbox = hbox_container
-        #
-        # KML select controls in a Box
-        #
-        kbox_container = wx.Panel(panel)
-        kbox = wx.StaticBox( kbox_container, -1, "KML Options")
-        ksizer = wx.StaticBoxSizer(kbox, wx.VERTICAL)
-        kboxIn = wx.BoxSizer(wx.VERTICAL)
-        if False:
-            txtMissing = wx.StaticText(kboxIn, -1,  "Max generation missing: ") 
-            self.id.INTMaxMissing = wx.TextCtrl(kboxIn, self.id.IDs['ID_INTMaxMissing'], "", size=(20,20))
-            l1 = wx.BoxSizer(wx.HORIZONTAL)
-            l1.AddMany([txtMissing,      (0,20),     self.id.INTMaxMissing])
-            
-            kboxIn.AddMany([l1, (4,4,), l2])
-        # self.id.ID_INTMaxMissing  'MaxMissing'
-        self.id.RBKMLMode  = wx.RadioBox(kbox, self.id.IDs['ID_RBKMLMode'], "Organize by:", 
-                                       choices = ['None', 'Folder'], majorDimension= 2)
-        
-        kboxs = [self.id.RBKMLMode, wx.BoxSizer(wx.HORIZONTAL), (4,4), wx.BoxSizer(wx.HORIZONTAL)]
-        self.id.CBFlyTo = wx.CheckBox(kbox, self.id.IDs['ID_CBFlyTo'], "FlyTo Balloon", style = wx.NO_BORDER)
-        self.id.ID_INTMaxLineWeight = wx.SpinCtrl(kbox, self.id.IDs['ID_INTMaxLineWeight'], "", min=1, max=100, initial=20)
-        
-        kboxs[1].AddMany([wx.StaticText(kbox, -1, "        "), self.id.CBFlyTo])
-        kboxs[3].AddMany([self.id.ID_INTMaxLineWeight, wx.StaticText(kbox, -1, " Max Line Weight")])
-        kboxIn.AddMany(kboxs)
-
-        ksizer.Add(kboxIn, 0, wx.EXPAND | wx.ALL, 4)
-        kbox_container.SetSizer(ksizer)
-        self.optionKbox = kbox_container
-        #
-        # KML select controls in a Box
-        #
-        k2box_container = wx.Panel(panel)
-        k2box = wx.StaticBox(k2box_container, -1, "KML2 Options")
-        k2sizer = wx.StaticBoxSizer(k2box, wx.VERTICAL)
-        k2boxIn = wx.BoxSizer(wx.VERTICAL)
-        
-        k2sizer.Add(k2boxIn, 0, wx.EXPAND | wx.ALL, 4)
-        k2box_container.SetSizer(k2sizer)
-        self.optionK2box = k2box_container
-        #
-        # Summary select controls in a Box
-        #
-        sbox_container = wx.Panel(panel)
-        sbox = wx.StaticBox( sbox_container, -1, "Summary Options")
-        ssizer = wx.StaticBoxSizer(sbox, wx.VERTICAL)
-        sboxIn = wx.BoxSizer(wx.VERTICAL)
-        
-        self.id.CBSummary = [wx.CheckBox(sbox, self.id.IDs['ID_CBSummary'], label="Open files after created", name="Open"),
-                             wx.CheckBox(sbox, self.id.IDs['ID_CBSummary'], label="Places", name="Places"),
-                             wx.CheckBox(sbox, self.id.IDs['ID_CBSummary'], label="People", name="People"),
-                             wx.CheckBox(sbox, self.id.IDs['ID_CBSummary'], label="Countries", name="Countries"),
-                             wx.CheckBox(sbox, self.id.IDs['ID_CBSummary'], label="Countries Grid", name="CountriesGrid"),
-                             wx.CheckBox(sbox, self.id.IDs['ID_CBSummary'], label="Geocode", name="Geocode"),
-                             wx.CheckBox(sbox, self.id.IDs['ID_CBSummary'], label="Alternate Places", name="AltPlaces")]
-        
-        sboxIn.AddMany(self.id.CBSummary)
-        ssizer.Add(sboxIn, 0, wx.EXPAND | wx.ALL, 4)
-        sbox_container.SetSizer(ssizer)
-        self.optionSbox = sbox_container
-
-        #
-        # Grid View Options
-        #
-        
-        gbox_min_height = max(40, int(fh * 4))
-        gbox_container = wx.Panel(panel, size=(300, gbox_min_height))
-        gbox = wx.StaticBox(gbox_container, -1, "Grid View Options")
-        gsizer = wx.StaticBoxSizer(gbox, wx.VERTICAL)
-        gboxIn = wx.BoxSizer(wx.VERTICAL)
-        self.id.CBGridView = wx.CheckBox(gbox_container, self.id.IDs['ID_CBGridView'],  'View Only Direct Ancestors')
-        gboxIn.AddMany( [self.id.CBGridView])
-        gsizer.Add( gboxIn, 0, wx.EXPAND | wx.ALL, 4)
-        
-        gbox_container.SetSizer(gsizer)
-        self.optionGbox = gbox_container
-        
-        self.optionsStack = wx.BoxSizer(wx.VERTICAL)
-        # Add all option boxes to the same slot, but hide them initially
-        self.optionsStack.Add(self.optionHbox, 1, wx.EXPAND)
-        self.optionHbox.Hide()
-
-        self.optionsStack.Add(self.optionKbox, 1, wx.EXPAND)
-        self.optionKbox.Hide()
-
-        self.optionsStack.Add(self.optionK2box, 1, wx.EXPAND)
-        self.optionK2box.Hide()
-
-        self.optionsStack.Add(self.optionSbox, 1, wx.EXPAND)
-        self.optionSbox.Hide()
-
-        box.Add(self.optionGbox, 0, wx.LEFT | wx.TOP, 5)
-        box.AddMany([self.id.RBResultOutType])
-        # Add the stack to the main layout
-        box.Add(self.optionsStack, 1, wx.EXPAND | wx.ALL, 5)
-        self.optionsStack.Layout()
-
-
-        l1 = wx.BoxSizer(wx.HORIZONTAL)
-        self.id.BTNLoad = wx.Button(panel, self.id.IDs['ID_BTNLoad'], "Load")
-        self.id.BTNCreateFiles = wx.Button(panel, self.id.IDs['ID_BTNCreateFiles'], "Create Files")
-        self.id.BTNCSV = wx.Button(panel, self.id.IDs['ID_BTNCSV'], "Geo Table")
-        self.id.BTNTRACE = wx.Button(panel, self.id.IDs['ID_BTNTRACE'], "Trace")
-        self.id.BTNSTOP = wx.Button(panel, self.id.IDs['ID_BTNSTOP'], "Stop")
-        self.id.BTNBROWSER = wx.Button(panel, self.id.IDs['ID_BTNBROWSER'], "Browser")
-        l1.Add (self.id.BTNLoad, 0, wx.EXPAND | wx.ALL, 5)
-        l1.Add (self.id.BTNCreateFiles, 0, wx.EXPAND | wx.ALL, 5)
-        l1.Add (self.id.BTNCSV, 0, wx.EXPAND | wx.ALL, 5)
-        l1.Add (self.id.BTNTRACE, 0, wx.EXPAND | wx.ALL, 5)
-        box.Add(l1, 0, wx.EXPAND | wx.ALL,0)
-        l1 = wx.BoxSizer(wx.HORIZONTAL)
-        l1.Add (self.id.busyIndicator, 0, wx.ALL | wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 5)
-        
-        l1.Add (self.id.BTNSTOP, 0, wx.EXPAND | wx.LEFT, 20)
-        l1.AddSpacer(20)
-        l1.Add (self.id.BTNBROWSER, wx.EXPAND | wx.ALL, 5)
-        l1.AddSpacer(20)
-        box.Add((0,10))
-        box.Add(l1, 0, wx.EXPAND | wx.ALL,0)
  
-        """    
-            self.id.ID_LISTMapStyle,
-            self.id.ID_TEXTMain,
-            self.id.ID_TEXTName,
-        """
-        
-        # panel.SetSizeHints(box)
-        panel.SetSizer(box)
-        self.bind_events()
-        self.start_threads_and_timer()
+    def start_threads_and_timer(self) -> None:
+         """Start background worker thread(s) and the periodic UI timer.
 
-        self.Layout()
-        self.Refresh()
-
+         This binds EVT_TIMER to OnMyTimer and EVT_UPDATE_STATE to the handler's
+         OnCreateFiles method so background updates can be applied to the UI.
+         """
+         self.threads = []
+         self.background_process = BackgroundActions(self, 0)
+         self.threads.append(self.background_process)
+         for t in self.threads:
+             t.Start()
+         # Bind timer events and the custom update event to the handler
+         self.Bind(wx.EVT_TIMER, self.OnMyTimer)
+         # Bind the background update event to the handler (EVT_UPDATE_STATE is module-level in this file)
+         self.Bind(EVT_UPDATE_STATE, self.handlers.OnCreateFiles)
+         self.myTimer = wx.Timer(self)
+         self.myTimer.Start(500)
+    
     def NeedReload(self):
+        """Mark options that a reload is required and update button visuals."""
         if self.gOp:
             self.gOp.parsed= False
         self.id.BTNLoad.SetBackgroundColour(self.id.GetColor('BTN_PRESS'))
         self.NeedRedraw()
 
     def NeedRedraw(self):
+        """Mark options that a redraw is required and update button visuals."""
         self.id.BTNCreateFiles.SetBackgroundColour(self.id.GetColor('BTN_PRESS'))
 
     def setInputFile(self, path):
+        """Set GEDCOM input path, update UI text and persist to config."""
         # set the state variables
         self.gOp.setInput(path)
         _, filen = os.path.split(self.gOp.get('GEDCOMinput'))
@@ -486,33 +212,8 @@ class VisualMapPanel(wx.Panel):
         self.NeedReload()
         self.SetupButtonState()
 
-    def EvtRadioBox(self, event):
-
-        _log.debug('%d is %d',  event.GetId(), event.GetInt())
-        if event.GetId() == self.id.IDs['ID_RBResultsType']:
-            if event.GetInt() == 0:
-                outType = ResultsType.HTML
-            elif event.GetInt() == 1:
-                outType = ResultsType.KML
-            elif event.GetInt() == 2:
-                outType = ResultsType.KML2
-            elif event.GetInt() == 3:
-                outType = ResultsType.SUM
-            self.gOp.setResults(self.gOp.get('Result'), outType)
-
-#            BackgroundProcess.updategridmain = True
-
-            self.id.TEXTResult.SetValue(self.gOp.get('Result'))
-            self.SetupButtonState()
-
-        elif event.GetId() ==  self.id.IDs['ID_RBGroupBy']:
-            self.gOp.GroupBy = event.GetSelection()
-
-        elif event.GetId() ==  self.id.IDs['ID_RBKMLMode']:
-            self.gOp.KMLsort = event.GetSelection()
-        else:
-            _log.error('We have a Problem 81')
-    def SetRestulTypeRadioBox(self):
+    def SetResultTypeRadioBox(self):
+        """Synchronize the result-type radio box selection with gOp.ResultType."""
         rType = self.gOp.get('ResultType')
         
         if rType is ResultsType.HTML:
@@ -526,206 +227,123 @@ class VisualMapPanel(wx.Panel):
         else:
             outType = 0
         self.id.RBResultOutType.SetSelection(outType)
-    
 
-    def EvtText(self, event):
-        cbid = event.GetId()
-        if event.GetId() == self.id.IDs['ID_TEXTResult'] or event.GetId() == self.id.IDs['ID_TEXTDefaultCountry']:
-            self.gOp.set(self.id.IDtoAttr[cbid][2], event.GetString())
-            _log.debug("TXT %s set value %s", self.id.IDtoAttr[cbid][0], self.id.IDtoAttr[cbid][2])
+    def get_runtime_string(self) -> str:
+        """Return a formatted running/ETA string based on gOp timing and counters.
+
+        The string is suitable for display in a status pane and does not touch UI.
+        """
+
+        nowtime = datetime.now().timestamp()
+        runningtime = nowtime - self.gOp.runningSince
+
+        # Base running label
+        if runningtime < 86400:     # 1 day
+            runtime = f"Running {time.strftime('%H:%M:%S', time.gmtime(runningtime))}"
         else:
-            _log.error("uncontrolled TEXT")
-            self.SetupButtonState()
-
-    def EvtCheckBox(self, event):
-
-        _log.debug('%s for %i', event.IsChecked(), event.GetId() )
-        cb = event.GetEventObject()
-        if cb.Is3State():
-            _log.debug("3StateValue: %s", cb.Get3StateValue())
-        cbid = event.GetId()
-        _log.debug('set %s to %s (%s)', self.id.IDtoAttr[cbid][0], cb.GetValue(), self.id.IDtoAttr[cbid][1] )
-        if cbid == self.id.IDs['ID_CBSummary']:
-            extra = cb.Name
-        else:
-            extra = ''
-        self.gOp.set( self.id.IDtoAttr[cbid][0]+extra, cb.GetValue())
+            runtime = f"Running {time.strftime('%jD %H:%M', time.gmtime(runningtime - 86400))}" 
         
-        if cbid == self.id.IDs['ID_CBHeatMap'] or cbid == self.id.IDs['ID_CBMapTimeLine'] or cbid == self.id.IDs['ID_CBMarksOn']:
-            self.SetupButtonState()
-        if ( self.id.IDtoAttr[cbid][1] == 'Redraw'):
-            self.NeedRedraw()
-        elif ( self.id.IDtoAttr[cbid][1] == 'Reload'):
-            self.NeedReload()
-        elif ( self.id.IDtoAttr[cbid][1] == 'Render'):
-            self.background_process.updategrid = True
-        elif ( self.id.IDtoAttr[cbid][1] == ''):
-            pass # Nothing to do for this one
-        else:
-            _log.error("uncontrolled CB %d with '%s'", cbid,   self.id.IDtoAttr[cbid][1])
-        if cbid == self.id.IDs['ID_CBAllEntities'] and cb.GetValue():
-            # TODO Fix this up
-            if self.gOp.get('ResultType'):
-                dlg = None
-                if getattr(self.background_process, 'people', None):
-                    if len(self.background_process.people) > 200:
-                        dlg = wx.MessageDialog(self, f'Caution, {len(self.background_process.people)} people in your tree\n it may create very large HTML files and may not open in the browser',
-                                   'Warning', wx.OK | wx.ICON_WARNING)
-                else:
-                    dlg = wx.MessageDialog(self, 'Caution, if you load a GEDCOM with lots of people in your tree\n it may create very large HTML files and may not open in the browser',
-                                   'Warning', wx.OK | wx.ICON_WARNING)
-
-                if dlg:                    
-                    dlg.ShowModal()
-                    dlg.Destroy()
-        
-
-    def EvtButton(self, event):
-        myid = event.GetId() 
-        _log.debug("Click! (%d)", myid)
-        # TODO HACK
-    #    self.SetupOptions()
-        if myid == self.id.IDs['ID_BTNLoad']:
-            self.LoadGEDCOM()
-                
-        elif myid == self.id.IDs['ID_BTNCreateFiles']:
-            self.DrawGEDCOM()
-                                
-        elif myid == self.id.IDs['ID_BTNCSV']:
-            self.OpenCSV()
-        elif myid == self.id.IDs['ID_BTNTRACE']:
-            self.SaveTrace()
-        elif myid == self.id.IDs['ID_BTNSTOP']:
-            self.gOp.set('stopping', True)
-            self.gOp.set('parsed', False)
-            self.NeedRedraw()
-            self.NeedReload()
-        elif myid == self.id.IDs['ID_BTNBROWSER']:
-            self.OpenBrowser()
-        else:
-            _log.error("uncontrolled ID : %d", myid)
-
-    def EvtListBox(self, event):
-
-        eventid = event.GetId()
-        _log.debug('%s, %s, %s', event.GetString(), event.IsSelection(), event.GetSelection())                            
-        _ = event.GetEventObject()
-        # if eventid == self.id.IDs['ID_LISTPlaceType']:
-        #     places = {}
-        #     for cstr in event.EventObject.CheckedStrings:
-        #         places[cstr] = cstr
-        #     if places == {}:
-        #         places = {'native':'native'}
-        #     panel.gOp.PlaceType = places
-        # el
-        if eventid == self.id.IDs['ID_LISTMapStyle']:
-            
-            self.gOp.MapStyle = sorted(self.id.AllMapTypes)[event.GetSelection()] 
-            self.NeedRedraw()
-        else:
-
-            _log.error ("Uncontrol LISTbox")
+        # ETA calculation if counters available
+        if self.gOp.countertarget > 0 and self.gOp.counter > 0 and self.gOp.counter != self.gOp.countertarget:
+            # update ETA display every second
+            if nowtime-1.0 > self.lastruninstance: 
+                self.timeformat = '%H:%M:%S'
+                stepsleft = self.gOp.countertarget-self.gOp.counter
+                scaler = math.log(stepsleft, 100) if stepsleft > 1 else 1
+                remaintimeInstant = (nowtime - self.gOp.runningSinceStep)/self.gOp.counter * stepsleft* scaler
+                remaintimeInstant = remaintimeInstant if remaintimeInstant > 0 else 0
+                # Smoothed runtime average over last 5 seconds
+                self.gOp.runavg.append(remaintimeInstant)
+                if len(self.gOp.runavg) > 5:
+                    self.gOp.runavg.pop(0)
+                remaintime = sum(self.gOp.runavg)/len(self.gOp.runavg)
+                self.remaintime = remaintime
+                self.lastruninstance = nowtime
+                if self.remaintime> 3600: 
+                    self.timeformat = '%H hr %M'
+                    if self.remaintime > 86400:  # 1 day
+                        self.timeformat = '%j %H hr %M'
+                        self.remaintime -= 86400
+            # append ETA to runtime display
+            runtime = f"{runtime} ({time.strftime(self.timeformat, time.gmtime(self.remaintime))})"
+        return runtime
     
-
-    def EvtSpinCtrl(self, event):
-        eventid = event.GetId()
-        _log.debug('%s, %s, %s', event.GetString(), event.IsSelection(), event.GetSelection())                            
-        _ = event.GetEventObject()
-        if eventid == self.id.IDs['ID_INTMaxLineWeight']:
-            self.gOp.MaxLineWeight = event.GetSelection()
-            self.NeedRedraw()
+    def update_stop_button_display(self, should_stop: bool, running: bool) -> None:
+        """Enable or disable the Stop button based on worker state flags."""
+        if should_stop or not running:
+            if self.id.BTNSTOP.IsEnabled():
+                self.id.BTNSTOP.Disable()
         else:
-            _log.error ("Uncontrol SPINbox")
+            self.id.BTNSTOP.Enable()
 
-    def EvtSlider(self, event):
-
-        _log.debug('%s', event.GetSelection())
-        self.gOp.HeatMapTimeStep = event.GetSelection()
-
-    def OnMyTimer(self, evt: wx.TimerEvent) -> None:
-        """Periodic timer callback used to update UI state from background worker."""
-        if self.inTimer:
-            return
-        self.inTimer = True
-        status = ''
-        if self.gOp:
-            if self.gOp.ShouldStop() or not self.gOp.running:
-                if self.id.BTNSTOP.IsEnabled():
-                    self.id.BTNSTOP.Disable()
+    def get_status_runtime_string(self, running: bool) -> str:
+        """Compose main status and short runtime string for the status bar."""
+        status = self.gOp.state
+        if running:
+            self.gOp.runningLast = 0
+            status = f"{status} - Processing"
+            runtime = self.get_runtime_string()
+        else:
+            runtime = "Last {}".format( time.strftime('%H:%M:%S', time.gmtime(self.gOp.runningLast)))
+            self.gOp.runavg = []
+        return status, runtime
+    
+    def get_status_progress_string(self, status: str) -> str:
+        """Append counter/progress information to the provided status string."""
+        if self.gOp.counter > 0:
+            if self.gOp.countertarget > 0:
+                status = f"{status} : {self.gOp.counter/self.gOp.countertarget*100:.0f}% ({self.gOp.counter}/{self.gOp.countertarget})  "
             else:
-                self.id.BTNSTOP.Enable()
-            status = self.gOp.state
-            if self.gOp.running:
-                self.gOp.runningLast = 0
-                status = f"{status} - Processing"
-                nowtime = datetime.now().timestamp()
-                runningtime = nowtime - self.gOp.runningSince
-                if runningtime < 86400:     # 1 day
-                    runtime = f"Running {time.strftime('%H:%M:%S', time.gmtime(runningtime))}"
-                else:
-                    runtime = f"Running {time.strftime('%jD %H:%M', time.gmtime(runningtime - 86400))}" 
-                
-                if self.gOp.countertarget > 0 and self.gOp.counter > 0 and self.gOp.counter != self.gOp.countertarget:
-                    if nowtime-1.0 > self.lastruninstance: 
-                        self.timeformat = '%H:%M:%S'
-                        stepsleft = self.gOp.countertarget-self.gOp.counter
-                        scaler = math.log(stepsleft, 100) if stepsleft > 1 else 1
-                        remaintimeInstant = (nowtime - self.gOp.runningSinceStep)/self.gOp.counter * stepsleft* scaler
-                        remaintimeInstant = remaintimeInstant if remaintimeInstant > 0 else 0
-                        # Smoothed runtime average over last 5 seconds
-                        self.gOp.runavg.append(remaintimeInstant)
-                        if len(self.gOp.runavg) > 5:
-                            self.gOp.runavg.pop(0)
-                        remaintime = sum(self.gOp.runavg)/len(self.gOp.runavg)
-                        self.remaintime = remaintime
-                        self.lastruninstance = nowtime
-                        if self.remaintime> 3600: 
-                            self.timeformat = '%H hr %M'
-                            if self.remaintime > 86400:  # 1 day
-                                self.timeformat = '%j %H hr %M'
-                                self.remaintime -= 86400
-                    runtime = f"{runtime} ({time.strftime(self.timeformat, time.gmtime(self.remaintime))})"
-            else:
-                runtime = "Last {}".format( time.strftime('%H:%M:%S', time.gmtime(self.gOp.runningLast)))
-                # Rest the runtime average
-                self.gOp.runavg = []
-            self.frame.SetStatusText(runtime,1) 
-            if self.gOp.counter > 0:
-                if self.gOp.countertarget > 0:
-                    status = f"{status} : {self.gOp.counter/self.gOp.countertarget*100:.0f}% ({self.gOp.counter}/{self.gOp.countertarget})  "
-                else:
-                    status = f"{status} : {self.gOp.counter}"
-                if self.gOp.stepinfo:
-                    status = f"{status} ({self.gOp.stepinfo})"
-            if self.gOp.ShouldStop():
+                status = f"{status} : {self.gOp.counter}"
+            if self.gOp.stepinfo:
+                status = f"{status} ({self.gOp.stepinfo})"
+        return status
+    
+    def check_if_should_stop(self, status) -> str:
+        """Return an updated status string if the background worker is stopping."""
+        if self.gOp.ShouldStop():
+            self.id.BTNCreateFiles.Enable()
+            status = f"{status} - please wait.. Stopping"
+        return status
+    
+    def update_load_create_buttons_display(self) -> None:
+        """Enable/disable Load/Create buttons depending on whether input is set."""
+        _, filen = os.path.split(self.gOp.get('GEDCOMinput'))
+        if filen == "":
+            self.id.BTNLoad.Disable()
+            self.id.BTNCreateFiles.Disable()
+        else:
+            if not self.id.BTNLoad.IsEnabled():
+                self.id.BTNLoad.Enable()
+            if not self.id.BTNLoad.IsEnabled():
                 self.id.BTNCreateFiles.Enable()
-                status = f"{status} - please wait.. Stopping"
 
-            _, filen = os.path.split(self.gOp.get('GEDCOMinput'))
-            if filen == "":
-                self.id.BTNLoad.Disable()
-                self.id.BTNCreateFiles.Disable()
-            else:
-                if not self.id.BTNLoad.IsEnabled():
-                    self.id.BTNLoad.Enable()
-                if not self.id.BTNLoad.IsEnabled():
-                    self.id.BTNCreateFiles.Enable()
-            if self.gOp.get('gpsfile') == '':
-                self.id.BTNCSV.Disable()
-            else:
-                if not self.id.BTNCSV.IsEnabled():
-                    self.id.BTNCSV.Enable()
+    def update_csv_button_display(self) -> None:
+        """Enable/disable CSV button depending on whether a GPS file is configured."""
+        if self.gOp.get('gpsfile') == '':
+            self.id.BTNCSV.Disable()
+        else:
+            if not self.id.BTNCSV.IsEnabled():
+                self.id.BTNCSV.Enable()
+
+    def get_status_if_ready(self, status: str) -> str:
+        """Return a 'Ready' status string when no work is in progress."""
         if not status or status == '':
             if self.gOp.selectedpeople and self.gOp.ResultType:
                 status = f'Ready - {self.gOp.selectedpeople} people selected'
             else:
                 status = 'Ready'
             self.OnBusyStop(-1)
-        if self.frame:
-            self.frame.SetStatusText(status)
+        return status
+    
+    def check_background_process(self, evt) -> None:
+        """Dispatch background-process update flags to OnCreateFiles when present."""
         if self.background_process:
             if self.background_process.updateinfo or self.background_process.errorinfo or self.background_process.updategrid:
                 self.OnCreateFiles(evt)
+
+    def check_update_running_state(self) -> None:
+        """Synchronize busy/ running state and trigger busy indicator transitions."""
         if self.busystate != self.gOp.running:
             logging.info("Busy %d not Running %d", self.busystate, self.gOp.running)
             if self.gOp.running:
@@ -733,7 +351,8 @@ class VisualMapPanel(wx.Panel):
                 self.OnBusyStart(-1)
             else:
                 self.OnBusyStop(-1)
-                self.StopTimer()
+                self.UpdateTimer()
+
         if not self.gOp.running:
            self.gOp.countertarget = 0
            self.gOp.stepinfo = ""
@@ -742,21 +361,60 @@ class VisualMapPanel(wx.Panel):
            if self.busycounthack > 40:
                 self.OnBusyStop(-1)
                 self.busycounthack = 0
+
+    def OnMyTimer(self, evt: wx.TimerEvent) -> None:
+        """Periodic timer callback to refresh status, enable/disable controls and
+        dispatch background updates to the UI.
+
+        This method is intentionally lightweight and defers complex logic to
+        helper methods so it remains robust when called frequently.
+        """
+        if self.inTimer:
+            return
+        self.inTimer = True
+
+        # if no gOp, nothing to do
+        if not getattr(self, "gOp", None):
+            self.inTimer = False
+            return
+    
+        # Enable/disable Stop button based on running state
+        self.update_stop_button_display(self.gOp.ShouldStop(), self.gOp.running)
+        self.update_load_create_buttons_display()
+        self.update_csv_button_display()
+
+        # Update status bar text
+        status, runtime = self.get_status_runtime_string(self.gOp.running)
+        self.frame.SetStatusText(runtime, 1)
+
+        # progress / counter text augmentation
+        status = self.get_status_progress_string(status)
+        status = self.check_if_should_stop(status)
+        status = self.get_status_if_ready(status)
+
+        if self.frame:
+            self.frame.SetStatusText(status)
+
+        self.check_background_process(evt)
+
+        self.check_update_running_state()
+
         wx.Yield()
         self.inTimer = False
 
-    def StopTimer(self):
+    def UpdateTimer(self):
+        """Update the runningLast elapsed time computed from runningSince."""
         self.gOp.runningLast = datetime.now().timestamp() - self.gOp.runningSince
 
     def OnBusyStart(self, evt):
-        """ show the spinning Busy graphic """
+        """Show and start the busy indicator (spinner)."""
         self.busystate = True
         self.id.busyIndicator.Start()
         self.id.busyIndicator.Show()
         wx.Yield()
             
     def OnBusyStop(self, evt):
-        """ remove the spinning Busy graphic """
+        """Stop and hide the busy indicator and reset temporary counters."""
         self.id.busyIndicator.Stop()
         self.id.busyIndicator.Hide()
         self.busystate = False
@@ -764,14 +422,21 @@ class VisualMapPanel(wx.Panel):
         wx.Yield()
 
     def OnCreateFiles(self, evt: Any) -> None:
-        """Handle background updates: grid refresh, infobox messages, errors."""
+        """Apply updates coming from the background worker to the UI.
+
+        Handles:
+        - busy/done state transitions from the event `state` attribute.
+        - grid/list population when updategrid is set.
+        - appending info and error messages into the people list infobox.
+        """
         # proces evt state hand off
         if hasattr(evt, 'state'):
             if evt.state == 'busy': 
                 self.OnBusyStart(evt)
             if evt.state == 'done': 
                 self.OnBusyStop(evt)
-                self.StopTimer()
+                self.UpdateTimer()
+
         if self.background_process.updategrid:
             self.background_process.updategrid = False
             saveBusy = self.busystate
@@ -781,23 +446,30 @@ class VisualMapPanel(wx.Panel):
                 self.peopleList.list.ShowSelectedLinage(self.gOp.get('Main'))
             if not saveBusy:
                 self.OnBusyStop(evt)
+
         newinfo = None
         if self.background_process.updateinfo:
             _log.debug("Infobox: %s", self.background_process.updateinfo)
             newinfo = self.background_process.updateinfo
             self.background_process.updateinfo = None
+
         if self.background_process.errorinfo:
             _log.debug("Infobox-Err: %s", self.background_process.errorinfo)
             einfo = f"<span foreground='red'><b>{self.background_process.errorinfo}</b></span>"
             newinfo = newinfo + '\n' + einfo if newinfo else einfo
             self.background_process.errorinfo = None
+
         if (newinfo):
             self.peopleList.append_info_box(newinfo)
 
     def SetupButtonState(self):
-        """ based on the type of file output, enable/disable the interface """
+        """Enable/disable controls according to selected ResultType and options.
+
+        This method lays out which groups of controls are active in HTML, KML,
+        KML2 and Summary modes and refreshes the options stack visibility.
+        """
         ResultTypeSelect = self.gOp.get('ResultType')
-        self.SetRestulTypeRadioBox()
+        self.SetResultTypeRadioBox()
         # Always enabled
             # self.id.CBUseGPS
             # self.id.CBAllEntities
@@ -823,7 +495,6 @@ class VisualMapPanel(wx.Panel):
             self.id.RBKMLMode,
             self.id.CBFlyTo,
             self.id.ID_INTMaxLineWeight
-                    
         ]
 
         # Enable/Disable marker-dependent controls if markers are off
@@ -897,7 +568,10 @@ class VisualMapPanel(wx.Panel):
         self.Refresh()
 
     def SetupOptions(self) -> None:
-        """Ensure file config and gvOptions are created and populate UI from options."""
+        """Create/configure gvOptions and populate UI controls from stored options.
+
+        Also binds gvOptions to background threads and restores file history.
+        """
         if not self.fileConfig:
             self.fileConfig = wx.Config("gedcomVisualGUI")
         
@@ -954,7 +628,6 @@ class VisualMapPanel(wx.Panel):
         # Load file history into the panel's configuration
         self.frame.filehistory.Load(self.fileConfig)
 
-
     def updateOptions(self):
         pass
 
@@ -988,11 +661,19 @@ class VisualMapPanel(wx.Panel):
             self.OnBusyStart(-1)
             self.background_process.Trigger(2 | 4)
 
-
     def OpenCSV(self):
         self.runCMDfile(self.gOp.get('CSVcmdline'), self.gOp.get('gpsfile'))
 
     def runCMDfile(self, cmdline, datafile, isHTML=False):
+        """Run an external command or open a file/URL suggested by application options.
+
+        - If isHTML then open datafile in a browser.
+        - If cmdline == '$n' attempt to open the datafile with the platform default.
+        - If cmdline contains '$n' substitute the datafile and shell-execute the result.
+        - Otherwise try to launch the command with datafile as an argument.
+
+        Exceptions are logged rather than raised to keep the UI responsive.
+        """
         orgcmdline = cmdline
         if datafile and datafile != '' and datafile != None:
             cmdline = cmdline.replace('$n', f'{datafile}')
@@ -1038,6 +719,8 @@ class VisualMapPanel(wx.Panel):
             _log.error(f"Error: runCMDfile-unknwon cmdline {datafile}")
     
     def SaveTrace(self):
+        """Dump a trace file describing each referenced person and optionally open it."""
+
         if self.gOp.Result and self.gOp.Referenced:
             if not self.gOp.lastlines:
                 logging.error("No lastline values in SaveTrace (do draw first using HTML Mode for this to work)")
@@ -1071,6 +754,7 @@ class VisualMapPanel(wx.Panel):
             self.runCMDfile(self.gOp.get('Tracecmdline'), tracepath)
 
     def OpenBrowser(self):
+        """Open the generated result in a browser or the default KML viewer."""
         if self.gOp.get('ResultType'):
             self.runCMDfile(self.gOp.get('KMLcmdline'), os.path.join(self.gOp.resultpath, self.gOp.Result), True)
             
@@ -1081,6 +765,10 @@ class VisualMapPanel(wx.Panel):
     #TODO FIX ME UP            
 
     def open_html_file(self, html_path):
+        """(Deprecated) older helper to attempt activation/reload of a browser tab.
+
+        Kept for reference but not used; prefer runCMDfile / webbrowser.open instead.
+        """
         # Open the HTML file in a new tab and store the web browser instance
         browser = webbrowser.get()
         browser_tab = browser.open_new_tab(html_path)
@@ -1102,6 +790,12 @@ class VisualMapPanel(wx.Panel):
         browser_tab.reload()
 
     def OnCloseWindow(self, evt=None):
+        """Gracefully stop worker threads and schedule safe destruction of the panel.
+
+        This method performs a best-effort shutdown and then calls Destroy once
+        background threads have terminated. It tolerates partially-initialised
+        state when called during application teardown.
+        """
         busy = wx.BusyInfo("One moment please, waiting for threads to die...")
         wx.Yield()
         self.myTimer.Stop()

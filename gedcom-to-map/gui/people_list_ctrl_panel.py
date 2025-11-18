@@ -103,6 +103,6 @@ class PeopleListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
         visual_map_panel = self.get_visual_map_panel()
         if visual_map_panel:
             try:
-                visual_map_panel.StopTimer()
+                visual_map_panel.UpdateTimer()
             except Exception:
                 _log.exception("PeopleListCtrlPanel.stop failed")

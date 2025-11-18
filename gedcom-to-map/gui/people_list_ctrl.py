@@ -187,11 +187,11 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
         if self.gOp and getattr(self.gOp, "running", False):
             if not wasrunning:
                 vis = self.get_visual_map_panel()
-                if vis and getattr(vis, "StopTimer", None):
+                if vis and getattr(vis, "UpdateTimer", None):
                     try:
-                        vis.StopTimer()
+                        vis.UpdateTimer()
                     except Exception:
-                        _log.exception("StopTimer call failed on visual_map_panel")
+                        _log.exception("UpdateTimer call failed on visual_map_panel")
             try:
                 self.gOp.running = wasrunning
             except Exception:

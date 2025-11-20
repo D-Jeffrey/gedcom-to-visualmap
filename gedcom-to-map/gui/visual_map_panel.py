@@ -504,23 +504,7 @@ class VisualMapPanel(wx.Panel):
         else:
             for ctrl in marks_controls:
                 ctrl.Disable()
-        # layout the Summary box, and KML box in the same space as the HTML box (toggle them off and on to dsisplay)
-        # also forward the boxes to be there maximinum size, they may ahve been made small when setup and rendering
-        
-        # self.optionKbox.SetPosition(wx.Point(self.optionKbox.GetPosition().x, self.optionHbox.GetPosition().y))
-        # if self.optionKbox.GetSize() != self.optionKbox.GetBestSize():
-        #     self.optionKbox.SetSize(self.optionKbox.GetBestSize())
-        # self.optionK2box.SetPosition(wx.Point(self.optionK2box.GetPosition().x, self.optionHbox.GetPosition().y))
-        # if self.optionK2box.GetSize() != self.optionK2box.GetBestSize():
-        #     self.optionK2box.SetSize(self.optionK2box.GetBestSize())
-        # self.optionSbox.SetPosition(wx.Point(self.optionSbox.GetPosition().x, self.optionHbox.GetPosition().y))
-        # if self.optionSbox.GetSize() != self.optionSbox.GetBestSize():
-        #     self.optionSbox.SetSize(self.optionSbox.GetBestSize())
-        # self.optionHbox.SetPosition(wx.Point(self.optionKbox.GetPosition().x, self.optionHbox.GetPosition().y))
-        # if self.optionHbox.GetSize() != self.optionHbox.GetBestSize():
-        #     self.optionHbox.SetSize(self.optionHbox.GetBestSize())
-        # Enable/disable controls based on result type (HTML vs KML vs Summary Mode )
-        
+
         self.optionHbox.Hide()
         self.optionSbox.Hide()
         self.optionKbox.Hide()
@@ -599,7 +583,7 @@ class VisualMapPanel(wx.Panel):
         self.id.CBMapTimeLine.SetValue(self.gOp.get('MapTimeLine'))
         self.id.CBUseAntPath.SetValue(self.gOp.get('UseAntPath'))
         self.id.CBUseGPS.SetValue(self.gOp.get('UseGPS'))
-        self.id.CBUseGPS.Disable()
+
         self.id.CBAllEntities.SetValue(self.gOp.get('AllEntities'))
         self.id.CBCacheOnly.SetValue(self.gOp.get('CacheOnly'))
         self.id.LISTHeatMapTimeStep.SetValue(self.gOp.get('HeatMapTimeStep'))

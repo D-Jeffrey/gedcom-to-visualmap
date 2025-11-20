@@ -234,11 +234,11 @@ class LifeEvent:
 
     def getattr(self, attr):
         if attr == 'latlon':
-            return self.location.latlon
+            return self.location.latlon if self.location else None
         elif attr == 'when' or attr == 'date':
             return getattr(self.date, 'value', "")
         elif attr == 'where' or attr == 'place':
-            return self.place if self.place else ""
+            return self.place if self.place else None
         elif attr == 'what':
             return self.what if self.what else ""
         _log.warning("LifeEvent attr: %s' object has no attribute '%s'", type(self).__name__, attr)    

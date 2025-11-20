@@ -88,7 +88,8 @@ class GedcomParser:
     """
     __slots__ = [
         'gedcom_file',
-        'gOp'
+        'gOp',
+        '_cached_people', '_cached_address_book'
     ]
 
     LINE_RE = re.compile(
@@ -104,6 +105,9 @@ class GedcomParser:
         """
         self.gedcom_file = self.check_fix_gedcom(gedcom_file)
         self.gOp = gOp
+        # caches populated by _load_people_and_places()
+        self._cached_people: Optional[Dict[str, Person]] = None
+        self._cached_address_book: Optional[FuzzyAddressBook] = None
 
     def close(self):
         """Placeholder for compatibility."""
@@ -369,17 +373,10 @@ class GedcomParser:
         Returns:
             Dict[str, Person]: Dictionary of Person objects.
         """
-        people = {}
-        try:
-            with GedcomReader(str(self.gedcom_file)) as parser:
-                records = parser.records0
-                people = self.__create_people(records)
-                people = self.__add_marriages(people, records)
-        except Exception as e:
-            logger.exception("Issues in parse_people")
-            logger.error(f"Error parsing GEDCOM file '{self.gedcom_file}': {e}")
-        return people
-
+        if self._cached_people:
+            return self._cached_people
+        self._load_people_and_places()
+        return self._cached_people if self._cached_people else {}
 
     def _fast_count(self):
         def _count_gedcom_records( path, encoding):
@@ -412,15 +409,10 @@ class GedcomParser:
         # If we get here, all encodings failed
         logger.error(f"Could not decode GEDCOM file '{self.gedcom_file}' with any known encoding")
 
-    def get_full_address_book(self) -> FuzzyAddressBook:
+    def _load_people_and_places(self):
         """
-        Returns address book of all places found in the GEDCOM file.
-
-        Returns:
-            FuzzyAddressBook: Address book of places.
+        Loads people and places from the GEDCOM file.
         """
-        iteration = 0
-        address_book = FuzzyAddressBook()
 
         # Calculate total for people and families in the GEDCOM for progress tracking
         if self.gOp:
@@ -429,42 +421,68 @@ class GedcomParser:
             self.gOp.totalGEDfamily = 0
             # Super fast counter rather than parsing the whole file (using instead of using gedpy)
             self._fast_count()
-        try:
 
+        try:
+            # Single pass: build people and then addresses
             with GedcomReader(str(self.gedcom_file)) as g:
+                records = g.records0
+                if self.gOp:
+                    self.gOp.step("Loading people from GED", target=self.gOp.totalGEDpeople)
+                self._cached_people = self.__create_people(records)
+                if self.gOp:
+                    self.gOp.step("Linking families from GED", target=self.gOp.totalGEDfamily)
+                self._cached_people = self.__add_marriages(self._cached_people, records)
+
                 if self.gOp:
                     self.gOp.step("Loading addresses from GED", target=self.gOp.totalGEDpeople+self.gOp.totalGEDfamily)
                 # Individuals: collect PLAC under any event (BIRT/DEAT/BAPM/MARR/etc.)
-                for indi in g.records0("INDI"):
+
+                # Now extract places
+                # (considered to extract from people, however suspect that might risk missing some record types)
+                iteration = 0
+                self._cached_address_book = FuzzyAddressBook()
+                for indi in records('INDI'):
                     for ev in indi.sub_records:
                         plac = ev.sub_tag_value("PLAC")
                         if plac:
                             place = plac.strip()
-                            address_book.fuzzy_add_address(place, None)
+                            self._cached_address_book.fuzzy_add_address(place, None)
                     if self.gOp:
+                        if self.gOp.ShouldStop():
+                            break
                         iteration += 1
-                        if iteration % 250 == 0:
+                        if iteration % 100 == 0:
                             self.gOp.stepCounter(iteration)
-                            if self.gOp.ShouldStop():
-                                break
 
-                # Families: marriages/divorce places, etc.
-                for fam in g.records0("FAM"):
+                for fam in records('FAM'):
                     for ev in fam.sub_records:
                         plac = ev.sub_tag_value("PLAC")
                         if plac:
                             place = plac.strip()
-                            address_book.fuzzy_add_address(place, None)
+                            self._cached_address_book.fuzzy_add_address(place, None)
                     if self.gOp:
+                        if self.gOp.ShouldStop():
+                            break
                         iteration += 1
                         if iteration % 100 == 0:
                             self.gOp.stepCounter(iteration)
-                            if self.gOp.ShouldStop():
-                                break
 
         except Exception as e:
-            logger.error(f"Error extracting places from GEDCOM file '{self.gedcom_file}': {e}")
-        return address_book
+            logger.error(f"Error extracting people & places from GEDCOM file '{self.gedcom_file}': {e}")
+
+    def get_full_address_book(self) -> FuzzyAddressBook:
+        """
+        Returns address book of all places found in the GEDCOM file.
+
+        Returns:
+            FuzzyAddressBook: Address book of places.
+        """
+
+        # Return cached if available
+        if self._cached_address_book:
+            return self._cached_address_book
+        self._load_people_and_places()
+        return self._cached_address_book if self._cached_address_book else FuzzyAddressBook()
 
 class Gedcom:
     """

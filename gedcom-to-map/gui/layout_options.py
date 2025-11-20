@@ -88,7 +88,7 @@ class LayoutOptions:
     def _add_basic_checks(vm_panel: Any, panel: wx.Panel, sizer: wx.Sizer) -> None:
         """Add the top-level checkbox controls (GPS, cache, defaults, entity flags)."""
         vm_panel.id.CBUseGPS = wx.CheckBox(panel, vm_panel.id.IDs["ID_CBUseGPS"],
-                                          "Use GPS lookup (uncheck if GPS is in file)")
+                                          "Lookup all address (ignore cache)")
         vm_panel.id.CBCacheOnly = wx.CheckBox(panel, vm_panel.id.IDs["ID_CBCacheOnly"],
                                              "Cache Only, do not lookup addresses")
         vm_panel.id.labelDefCountry = wx.StaticText(panel, -1, "Default Country:   ")

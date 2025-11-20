@@ -73,13 +73,27 @@ class FontManager:
         return cls.DEFAULT["face"], cls.DEFAULT["size"]
     
     @classmethod
-    def get_font(cls):
+    def get_font(cls, bold: bool = False, italic: bool = False, size_delta: int = 0):
+        """
+        Construct a wx.Font using current face/size and optional bold/italic flags.
+
+        Args:
+            bold: if True request a bold weight.
+            italic: if True request an italic style.
+            size_delta: integer to add to the configured font size.
+        """
         face, size = cls.get_font_name_size()
+        size += size_delta
+
+        style = wx.FONTSTYLE_ITALIC if italic else wx.FONTSTYLE_NORMAL
+        weight = wx.FONTWEIGHT_BOLD if bold else wx.FONTWEIGHT_NORMAL
+
         # wx.Font expects integer point sizes on Windows; cast safely
         try:
-            return wx.Font(int(size), wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, face)
+            return wx.Font(int(size), wx.FONTFAMILY_DEFAULT, style, weight, False, face)
         except Exception as e:
-            _log.warning("Failed to construct font %s@%s, falling back to system font: %s", face, size, e)
+            _log.warning("Failed to construct font %s@%s (bold=%s, italic=%s), falling back to system font: %s",
+                         face, size, bold, italic, e)
             return wx.SystemSettings.GetFont(wx.SYS_DEFAULT_GUI_FONT)
     
     @classmethod

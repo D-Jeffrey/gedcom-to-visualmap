@@ -11,8 +11,8 @@ import logging
 import logging.config
 
 from const import LOG_CONFIG, NAME, VERSION
-from gedcomoptions import gvOptions, ResultsType
-from gedcomvisual import Geoheatmap, gedcom_to_map
+from gedcom_options import gvOptions, ResultsType
+from gui.gedcomvisual import Geoheatmap, gedcom_to_map
 
 _log = logging.getLogger(__name__)
 
@@ -69,15 +69,18 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
     
     myGeoOptions = gvOptions()
-    myGeoOptions.setmarkers    (BornMark = not arg_parse.args.bornmarksoff, MarksOn = not arg_parse.args.marksoff, 
-                                     HeatMap = not arg_parse.args.heatmapoff,
-                                     MapStyle = arg_parse.args.maptiletype, 
-                                     MarkStarOn = not arg_parse.args.markstaroff, 
-                                     GroupBy = arg_parse.args.groupby,
-                                     UseAntPath = arg_parse.args.antpath, 
-                                     MapTimeLine = arg_parse.args.heattime,
-                                     HeatMapTimeStep = arg_parse.args.heatstep,
-                                     HomeMarker = arg_parse.args.markhomes)
+    myGeoOptions.set_marker_options    ({
+        'MarksOn': not arg_parse.args.marksoff,
+        'HeatMap': not arg_parse.args.heatmapoff,
+        'MarkStarOn': not arg_parse.args.markstaroff,
+        'BornMark': not arg_parse.args.bornmarksoff,
+        'MapStyle': arg_parse.args.maptiletype,
+        'GroupBy': arg_parse.args.groupby,
+        'UseAntPath': arg_parse.args.antpath,
+        'MapTimeLine': arg_parse.args.heattime,
+        'HeatMapTimeStep': arg_parse.args.heatstep,
+        'HomeMarker': arg_parse.args.markhomes
+    })
     #TODO needs to be fixed
     
     _log.fatal(" ERROR Module gedcom-to-map.py needs to be updated to support new code base")

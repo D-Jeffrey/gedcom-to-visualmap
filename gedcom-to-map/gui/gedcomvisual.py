@@ -8,9 +8,8 @@ import webbrowser
 from pathlib import Path
 import sys
 
-# from gedcom.GedcomParser import GedcomParser
-# from gedcom.gpslookup import GEDComGPSLookup
-from gedcomoptions import gvOptions
+
+from gedcom_options import gvOptions
 from models.Creator import Creator, LifetimeCreator, CreatorTrace, Person
 from models.LatLon import LatLon
 from render.foliumExp import foliumExporter
@@ -103,8 +102,25 @@ def doKML2(gOp : gvOptions, people: list[Person]):
             bg.SayInfoMessage(f"No KML output created - No data selected to map")
 
 def doSUM(gOp : gvOptions):
-# HACK this in
-    args = None
+    def doSUM(gOp: gvOptions):
+        """
+        Generates various summaries based on the provided GEDCOM data and options.
+        Args:
+            gOp (gvOptions): An object containing options and configurations for generating summaries.
+        Summaries:
+            - Places Summary: If `gOp.SummaryPlaces` is True, writes a summary of places to a CSV file.
+            - People Summary: If `gOp.SummaryPeople` is True, writes a summary of people to a CSV file.
+            - Countries Summary: If `gOp.SummaryCountries` or `gOp.SummaryCountriesGrid` is True, writes a summary of 
+                birth and death countries to a CSV file and optionally generates a graphical representation.
+            - Geocode Summary: If `gOp.SummaryGeocode` is True, writes a geocode cache summary to a file.
+            - Alternative Places Summary: If `gOp.SummaryAltPlaces` is True, writes a summary of alternative places to a CSV file.
+        Behavior:
+            - Outputs are written to the folder specified by `gOp.resultpath`.
+            - File names are derived from the base name of the input GEDCOM file.
+            - If a background process (`gOp.BackgroundProcess`) is provided, informational messages 
+              are sent to it.
+            - If `gOp.SummaryOpen` is True, the generated files are opened using the `gOp.panel.runCMDfile` method.
+        """
 
     base_file_name = Path(gOp.GEDCOMinput).stem
     output_folder = Path(gOp.resultpath)
@@ -232,22 +248,10 @@ def ParseAndGPS(gOp: gvOptions, stage: int = 0 ):
         gOp.newload = True
         if hasattr(gOp, "UpdateBackgroundEvent") and hasattr(gOp.UpdateBackgroundEvent, "updategrid"):
             gOp.UpdateBackgroundEvent.updategrid = True
-        # people = GedcomParser(gOp).create_people()
-        # gOp.people = people
-    # gOp.parsed = True
-    # gOp.goodmain = False
-    #if (stage == 2):
-    #    people = gOp.people
-    #if (people and gOp.UseGPS and (stage == 0 or stage == 2)):
     if (stage == 1):
-            
+            if gOp.lookup:
+                del gOp.lookup
             _log.info ("Starting Address to GPS resolution")
-        # TODO This could cause issues
-        # Check for change in the datetime of CSV
-#        if gOp.lookup:
-#            lookupresults = gOp.lookup
-#        else:
-            # lookupresults = GEDComGPSLookup(people, gOp)
             input_path = Path(gOp.GEDCOMinput)
             if not input_path.is_absolute():
                 input_path = (Path.cwd() / input_path).resolve()
@@ -264,19 +268,12 @@ def ParseAndGPS(gOp: gvOptions, stage: int = 0 ):
                 gedcom_file=input_path.resolve(), 
                 location_cache_file=cachefile,
                 default_country=defaultCountry,
-                always_geocode=False,       # TODO, need a option for Force recheck
+                always_geocode=gOp.UseGPS,
                 use_alt_places = not gOp.skip_file_alt_places,
                 alt_place_file_path=alt_place_file_path if not gOp.skip_file_alt_places else None,
-#                geo_config_path=geo_config_path if geo_config_path.exists() else None,
-#                file_geo_cache_path=file_geo_cache_path if not gOp.skip_file_geocache else None,
-#                include_canonical= gOp.include_canonical,         # TODO make this an option
                 gOp=gOp
             )
             _log.info ("Completed Geocode")
-#            gOp.lookup = lookupresults
-#        lookupresults.resolve_addresses(people)
-            gOp.step('Saving Address Cache')
-#        lookupresults.saveAddressCache()
             gOp.lookup.save_location_cache()
             gOp.people = gOp.lookup.people
             _log.info ("Completed resolves")
@@ -289,6 +286,28 @@ def ParseAndGPS(gOp: gvOptions, stage: int = 0 ):
     return people
 
 def doTrace(gOp : gvOptions):
+    """
+    Trace and collect referenced people in the genealogical data starting from a main person.
+    This function initializes the tracing process by finding all related people connected
+    to a specified starting person (gOp.Main) and stores their references along with their
+    relationship paths.
+    Args:
+        gOp (gvOptions): Options object containing:
+            - people (dict): Dictionary of all people in the genealogical data
+            - Main (str): The xref_id of the starting person for the trace
+            - Referenced (Referenced): Set to store all found people references
+            - totalpeople (int): Counter for total people processed
+    Returns:
+        None: Modifies gOp in-place by populating Referenced and totalpeople.
+    Raises:
+        Logs errors if:
+            - No people data is available
+            - The specified starting person (gOp.Main) is not found in the people data
+    Side Effects:
+        - Initializes gOp.Referenced as an empty Referenced set
+        - Populates gOp.Referenced with xref_ids and their relationship paths
+        - Logs the total count of people found in the trace
+    """
     
     gOp.Referenced = Referenced()
     gOp.totalpeople = 0
@@ -302,7 +321,7 @@ def doTrace(gOp : gvOptions):
         return
     gOp.Referenced.add(gOp.Main)
     lifeline = CreatorTrace(people)
-    #for h in people.keys():
+
     creator = lifeline.create(gOp.Main)
 
     _log.info  ("Trace:Total of %i people.", len(creator)) 

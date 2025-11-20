@@ -1,0 +1,137 @@
+marker_options_list: [
+    'MarksOn', 'HeatMap', 'BornMark', 'DieMark',
+    'MarkStarOn', 'GroupBy', 'UseAntPath',
+    'MapTimeLine', 'HeatMapTimeStep', 'HomeMarker', 'MapStyle'
+]
+
+marker_options_defaults:
+  MarksOn: True
+  HeatMap: False
+  BornMark: True
+  DieMark: True
+  
+  MarkStarOn: True
+  GroupBy: 2
+  UseAntPath: False
+  MapTimeLine: False
+  HeatMapTimeStep: 20
+  HomeMarker: False
+  MapStyle: "CartoDB.Voyager"
+
+config_file_settings:
+  section_keys: ['Core', 'HTML', 'Logging', 'Gedcom.Main', 'KML']
+  HTML: {
+    MarksOn: 'bool', HeatMap: 'bool', BornMark: 'bool', DieMark: 'bool', MarkStarOn: 'bool',
+    GroupBy: 1, UseAntPath: 'bool', MapTimeLine: 'bool', HeatMapTimeStep: 'int',
+    HomeMarker: 'bool', showLayerControl: 'bool', mapMini: 'bool', MapStyle: 'str' }
+  Core: {
+    UseGPS: 'bool', CacheOnly: 'bool', AllEntities: 'bool', ResultType: 'complex',
+    KMLcmdline: 'str', CSVcmdline: 'str', Tracecmdline: 'str',  badAge: 'bool' }
+  KML : {
+    'MaxLineWeight':'int', 'MaxMissing':'int', 'UseBalloonFlyto':'bool', 'KMLsort':'bool' }
+  # Old settings that should be removed from the config file
+  old_settings: {
+    'native': 'KML', 'born': 'KML', 'death':'KML', 'PlaceType': 'KML',
+    'HeatMapTimeLine': 'HTML', 'gedcom.gedcomparser': 'Logging'}
+  Logging: [models.person, models, ged4py.parser, ged4py,
+    models.creator, models.location, gedcomoptions,
+    gedcom.gedcomparser, gedcom, gedcom.gedcom, gedcom.geocode, gedcom.geocache, gedcom.addressbook,
+    geopy, render.kmlexporter, render, render.foliumexp, gedcomvisual, "__main__"]
+
+gui_options_types: {
+  infoBoxLines: 'int', autoRefreshInterval: 'int',
+  peopleListPageSize: 'int', mapWidthPercent: 'int',
+  mapHeightPercent: 'int', panelWidthPercent: 'int',
+  window_size: 'list'
+}
+gui_options_defaults:
+  infoBoxLines: 8
+  autoRefreshInterval: 5
+  peopleListPageSize: 100
+  mapWidthPercent: 70
+  mapHeightPercent: 80
+  panelWidthPercent: 30
+  window_size: [1024, 800]
+  
+gedcom_options_types: {
+  GEDCOMinput: 'str', resultpath: 'str', Result: 'str',
+  ResultType: 'str', Main: 'str', mainPerson: 'str',
+  Name: 'str', mainPersonLatLon: 'complex', MaxMissing: 'int',
+  MaxLineWeight: 'int', UseGPS: 'bool', CacheOnly: 'bool',
+  AllEntities: 'bool', GridView: 'bool', seBalloonFlyto: 'bool',
+  KMLsort: 'int', badAge: 'bool',
+
+  showLayerControl: 'bool', mapMini: 'bool', counter: 'int',
+  countertarget: 'int', running: 'bool', runningLast: 'int',
+  runningSince: 'int', runningSinceStep: 'int', parsed: 'bool',
+  newload: 'bool', state: 'str', gpsfile: 'str', stopping: 'bool',
+  lookup: 'str', totalpeople: 'str', stepinfo: 'str', lastmax: 'int',
+  Referenced: 'str', panel: 'str', selectedpeople: 'int',
+  lastlines: 'str', runavg: 'str', SummaryOpen: 'bool',
+  SummaryPlaces: 'bool', SummaryPeople: 'bool',
+  SummaryCountries: 'bool', SummaryCountriesGrid: 'bool',
+  SummaryGeocode: 'bool', SummaryAltPlaces: 'bool',
+  skip_file_geocache: 'bool', skip_file_alt_places: 'bool',
+  defaultCountry: 'str', include_canonical: 'bool',
+
+  heritage: 'str', UpdateBackgroundEvent: 'str', totalGEDpeople: 'str',
+  totalGEDfamily: 'str', fileHistory: 'str'
+}
+gedcom_options_defaults:
+  GEDCOMinput: "gedcomfile.ged"
+  resultpath: null
+  Result: ''
+  ResultType: ResultsType.HTML
+  Main: null
+  mainPerson: null
+  Name: null
+  mainPersonLatLon: LatLon(None, None)
+  MaxMissing: 0
+  MaxLineWeight: 20
+  UseGPS: True
+  CacheOnly: False
+  AllEntities: False
+  GridView: False
+  UseBalloonFlyto: True
+  KMLsort: 1
+  badAge: True
+
+  showLayerControl: True
+  mapMini: True
+  counter: 0
+  countertarget: 0
+  running: False
+  runningLast: 0
+  runningSince: 0
+  runningSinceStep: 0
+  parsed: False
+  newload: False
+  state: ''
+  gpsfile: null
+  stopping: False
+  lookup: null
+  totalpeople: null
+  stepinfo: ''
+  Referenced: null
+  panel: null
+  selectedpeople: 0
+  lastlines: null
+  runavg: []
+  SummaryOpen: True
+  SummaryPlaces: True
+  SummaryPeople: True
+  SummaryCountries: False
+  SummaryCountriesGrid: True
+  SummaryCountries: False
+  SummaryGeocode: True
+  SummaryAltPlaces: False
+  skip_file_geocache: False
+  skip_file_alt_places: False
+  defaultCountry: null
+  include_canonical: True
+  
+  heritage: null
+  UpdateBackgroundEvent: null
+  totalGEDpeople: null
+  totalGEDfamily: null
+  fileHistory: null

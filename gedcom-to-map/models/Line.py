@@ -2,9 +2,9 @@ __all__ = ['Line']
 
 #TODO need to improved this subclass
 from ged4py.date import DateValueVisitor
-from models.Color import Color
-from models.Person import Person, LifeEvent, DateFromField
-from models.LatLon import LatLon
+from .Color import Color
+from .Person import Person, LifeEvent, DateFromField
+from .LatLon import LatLon
 
 
 class Line:

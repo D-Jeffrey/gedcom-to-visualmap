@@ -16,16 +16,18 @@ from typing import Optional, Tuple, Dict
 
 import pycountry
 import pycountry_convert as pc
+import requests
 import yaml  # Ensure PyYAML is installed
 from geopy.geocoders import Nominatim
 from geopy.exc import GeocoderTimedOut, GeocoderServiceError, GeocoderUnavailable
+from geopy.adapters import AdapterHTTPError
 
 from const import GEOCODEUSERAGENT
 
 from models.location import Location
 from .addressbook import FuzzyAddressBook
 from .geocache import GeoCache
-from gedcomoptions import gvOptions
+from gedcom_options import gvOptions
 
 # Re-use higher-level logger (inherits configuration from main script)
 logger = logging.getLogger(__name__)
@@ -121,6 +123,8 @@ class Geocode:
 
         self.gOp = gOp
 
+        self._last_geocode_time = 0.0  # Timestamp of last geocode request
+
     def save_geo_cache(self) -> None:
         """
         Save address cache if applicable.
@@ -213,24 +217,25 @@ class Geocode:
         max_retries = 3
         geo_location = None
         backoff_base = 0.5
-        # enforce rate limit using last request timestamp (avoid unconditional sleep)
-        last_ts = getattr(self, "_last_geocode_time", 0.0)
         for attempt in range(1, max_retries + 1):
-            # wait only if we're inside the rate window
+            # refresh last request timestamp each iteration
+            last_ts = getattr(self, "_last_geocode_time", 0.0)
             now = time.time()
             to_wait = self.geocode_sleep_interval - (now - last_ts)
             if to_wait > 0:
                 time.sleep(to_wait)
             try:
+                # record request time for rate limiting (ensure we register the request even if it fails)
+                self._last_geocode_time = time.time()
+                ccodes = country_code if (country_code and country_code.lower() != 'none') else None
+                logger.debug("Geocoding %r country=%r attempt=%d", place, ccodes, attempt)
                 geo_location = self.geolocator.geocode(
                     place,
-                    country_codes=country_code or None,
+                    country_codes=ccodes,
                     timeout=10,
                     addressdetails=False,
                     exactly_one=True
                 )
-                # record request time for rate limiting
-                self._last_geocode_time = time.time()
 
                 # If geopy returned None (HTTP 200 but no match), do not retry — it's not a transient error.
                 if geo_location is None:
@@ -240,8 +245,8 @@ class Geocode:
                 # successful result
                 break
             
-            except (GeocoderTimedOut, GeocoderServiceError, GeocoderUnavailable) as e:
-                # try to detect an HTTP status code when available; retry on 503/timeouts/unavailable
+            except (GeocoderTimedOut, GeocoderServiceError, GeocoderUnavailable, AdapterHTTPError, requests.RequestException) as e:
+                # Determine HTTP status when available and treat 5xx as transient (retryable).
                 status = None
                 resp = getattr(e, "response", None)
                 if resp is not None:
@@ -273,6 +278,8 @@ class Geocode:
                 time.sleep(sleep_time)
             else:
                 logger.error("Giving up on geocoding %r after %d attempts.", place, max_retries)
+                # ensure we don't propagate the last exception to callers
+                geo_location = None
 
         if geo_location:
             location = Location(
@@ -281,7 +288,7 @@ class Geocode:
                 longitude=geo_location.longitude,
                 country_code=country_code.upper(),
                 country_name=country_name,
-                continent=self.country_code_to_continent_dict.get(country_code, ''),
+                continent=self.country_code_to_continent_dict.get(country_code.upper(), ''),
                 found_country=bool(found_country),
                 address=geo_location.address
             )
@@ -336,6 +343,10 @@ class Geocode:
         if not self.always_geocode:
             use_place_name, cache_entry = self.geo_cache.lookup_geo_cache_entry(place)
 
+        if cache_entry and cache_entry.get("no_result"):
+            logger.info(f"Place '{place}' marked as no_result in cache; skipping geocoding.")
+            return None
+        
         (place_with_country, country_code, country_name, found_country) = self.get_place_and_countrycode(use_place_name)
 
         if cache_entry and not self.always_geocode:
@@ -348,7 +359,7 @@ class Geocode:
                         location.found_country = True
                         location.country_code = country_code.upper()
                         location.country_name = country_name
-                        location.continent = self.country_code_to_continent_dict.get(country_code, "Unknown")
+                        location.continent = self.country_code_to_continent_dict.get(country_code.upper(), "Unknown")
                         self.geo_cache.add_geo_cache_entry(place, location)
                     else:
                         logger.info(f"Unable to add country from geo cache lookup for {use_place_name}")
@@ -361,6 +372,9 @@ class Geocode:
                 location.address = place
                 self.geo_cache.add_geo_cache_entry(place, location)
                 logger.info(f"Geocoded {place} to {location.latlon}")
+            else: # record negative cache so we avoid re-trying repeatedly
+                self.geo_cache.add_no_result_entry(place)
+                logger.info(f"Geocoding couldn't find {place}, so marked as no_result to reduce fruitless attempts.")
 
         if location:
             continent = location.continent

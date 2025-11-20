@@ -372,73 +372,27 @@ python3 ..\gedcom-to-map\gedcom-to-map.py input.ged output -main "@I0000@" -form
 - bumped folium version
 - Added a dynamic Legend to replace the static pixely image
 - Large refactored of FoliumExp, including - Tiles selection (move to GUI for selection), Added Cluster Markers, Additional icons for locations types, 
-### v0.2.5.5
-- Improved Person dialog
-- Improved sorting by of GEDCOM ids in the grid
-- Linux compatible fixing/testing (fixed SSL Verifcation errors, Geo Table button, get from github)
-### v0.2.5.4
-- Busy control is not working
-- Refactored GUI classes into new modules gedcomDialogs
-- minor bugs: Title layout, selected person coloring
-- Fixed grid Sorting... for sure this time
-- Fixed kml plotting errors
-- Fixed colors on kml and  missing alpha
+- Linux compatible fixing/testing
 - Added color to kml markers and provide different born, death and native types
-### v0.2.5.3
-- Update Colors, and centralize code for color choices
+- Update Colors and centralize code for color choices
+- Multiple marriage
+- Load tested to 132K GEDCOM records loads in less than 5 minutes, 1600 people loads in 9 seconds.
 - Person show list of all direct F/M + ancestors + years
 - View only direct ancestors
-- Sort code re-write
-- Better save the state of the options for next use
-- Removed icon at the front of people's name in grid
-- Multiple marriage is better
-- Load tested to 132K GEDCOM records loads in less than 5 minutes, 1600 people loads in 9 seconds.
-### v0.2.5.2
-- Improved Person info, now should delta between Active and displayed person
-- Finally fixed the Sort issue (mostly).
 - Sorts all dates include BC/B.C.
 - Added a Find found to search names.
 - Provides information about relation to selected person
-### v0.2.5.1
-- Worked on KML version of family loop detection
 - Added option to open program for KML (or use a http address)
 - Better saving of previous options, remembers selection Main person
 ### v0.2.5
-- Performance increased, feedback, corrected double grid load
-- Added detection for family loops
-- Fixed Logging options so they work
 - Added `Trace` to trace from selected person and dump to a text file
-- Added `Save As` Dialog
-- Enriched Help About
-- Now tracking time
+- Help & About
 - Estimating the number of addresses to resolve
-- Periodic saving of Address resolution (ever 5 minutes or 500 addresses)
-### v0.2.4.2
-- Refactoring
-### v0.2.4.1
-- Converted it back to Python 3.8 from 3.10
-### v0.2.4
-- Major performance increases
-- Improved sorting for Last Name, People and None
-- Change the HTML layer to deal with license changes to Leaflet map layers
-- Added save state to config file
-- finally got error messages in color
-- improved logging
-- fine tune person dialog
-- May have fixed busy icon
-- Code refactors
-- #bug - loading pres2020.ged and sorting on ID, may be other cases
-- Improved Statistics Summary
-### v0.2.3.5
-- Adjusted Sorting for People list, adjusted adddress and year value for unknown.
-- Try and fix the busy icon
-- Error catching for parsing input of Gedcom files
-- fixed - Uses the correct cache file from the Selected input GED directory
+- Sorting for Last Name, People and None
+- Person dialog shows delta between Active and displayed person
 - file selection dialog automatically opens file
-### v0.2.3.4
 - Added dynamic highlighting based on main selection for HTML
 - Added Statistics menu under Actions
-### v0.2.3.3
 - Adjustable GUI Font (See const.py to set it)
 ### v0.2.3
 - re-org the project files

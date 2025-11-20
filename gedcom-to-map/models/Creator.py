@@ -3,10 +3,10 @@ __all__ = ['Creator', 'LifetimeCreator', 'DELTA', 'SPACE']
 import logging
 from typing import Dict
 
-from models.Person import Person, LifeEvent
-from models.Line import Line
-from models.LatLon import LatLon
-from models.Rainbow import Rainbow
+from .Person import Person, LifeEvent
+from .Line import Line
+from .LatLon import LatLon
+from .Rainbow import Rainbow
 
 _log = logging.getLogger(__name__.lower())
 
@@ -25,6 +25,123 @@ def getAttrLatLonif(obj, attname, attvaluename = 'latlon') -> LatLon:
     return LatLon(None, None)
     
 class Creator:
+    """
+    Creator
+    Class for traversing a family tree of Person objects and producing Line objects
+    that represent genealogical connections (using person events that have GPS/latlon
+    information). Traversal proceeds recursively along parents (father and mother)
+    and records each visited person to protect against infinite loops. The class
+    also supports emitting "other" people not reachable from a chosen root by
+    extending a provided list in-place.
+    Parameters
+    ----------
+    people : Dict[str, Person]
+        Mapping of person xref_id -> Person instance used as the graph to traverse.
+    max_missing : int, optional
+        Maximum number of consecutive ancestors to traverse that lack the chosen
+        geographic event (gpstype). If 0 (default), missing events are not allowed
+        to be skipped (i.e. traversal stops when the event is missing). A non-zero
+        integer allows skipping up to that many consecutive missing events.
+    gpstype : str, optional
+        Name of the Person attribute to use as the event containing geographic
+        information (e.g. "birth", "home", "residence"). Defaults to "birth".
+    Attributes
+    ----------
+    people : Dict[str, Person]
+        Same as the constructor parameter.
+    rainbow : Rainbow
+        Color generator used to assign a color to each generated Line based on
+        traversal parameters.
+    max_missing : int
+        Same as the constructor parameter.
+    alltheseids : Dict
+        A temporary registry of visited person xref_ids used to detect and stop
+        traversal loops during a single traversal invocation.
+    gpstype : str
+        Same as the constructor parameter.
+    Public Methods
+    --------------
+    line(latlon, current, branch, prof, miss, path="")
+        Create Line(s) for the given current Person and continue traversal to the
+        person's parents as appropriate. Performs loop detection (using
+        self.alltheseids) and respects the max_missing policy: if the current
+        person lacks the requested gpstype event, the method either stops or calls
+        link() to continue while incrementing the missing counter. When the person
+        has the requested event, it constructs a Line object including optional
+        midpoints collected from 'home' events and returns the Line for the
+        current person plus any Lines produced by continuing parent traversal.
+        Parameters:
+          - latlon (LatLon or None): the lat/lon of the origin point used to build
+            the Line segment for the current person.
+          - current (Person): the person to process.
+          - branch (numeric): horizontal branch offset used to compute color.
+          - prof (int): generation depth / profile used to compute color and
+            traversal depth.
+          - miss (int): current count of consecutive missing gpstype events.
+          - path (str): string encoding of traversal path (e.g. "FM...") for
+            debugging and labels.
+        Returns
+          - list[Line]: list of Line objects produced by this call (may be empty).
+    link(latlon, current, branch=0, prof=0, miss=0, path="")
+        Helper that continues traversal to the current person's parents. It calls
+        line() for father and mother (if present), adjusting branch/prof/miss/path
+        values appropriately and concatenates the results.
+        Parameters:
+          - latlon (LatLon or None): origin lat/lon for parent lines.
+          - current (Person): person whose parents are to be traversed.
+          - branch, prof, miss, path: same semantics as in line().
+        Returns
+          - list[Line]: concatenated list of Lines from parent traversal.
+    create(main_id)
+        Entry point to create lines for a tree rooted at main_id. Validates that
+        main_id exists in the people mapping and raises IndexError if not found.
+        The method computes the initial position (using getAttrLatLonif for the
+        configured gpstype) and initiates traversal by calling link() and line()
+        for the root person. The returned list is the concatenation of the root's
+        ancestor lines and the root person's own Line.
+        Parameters:
+          - main_id (str): xref_id of the root person to start traversal from.
+        Returns
+          - list[Line]: list of generated Line objects for the traversal.
+        Raises
+          - IndexError: when main_id is not present in self.people.
+    createothers(listof)
+        Inspect all Person objects in self.people and append Line objects for any
+        persons whose xref_id is not already represented in the provided list.
+        The method expects listof to be a list-like collection of objects that
+        expose a .person attribute with an .xref_id (the code commonly uses
+        previously created Line objects). For each missing person it calls line()
+        and extends listof in-place with any produced Lines.
+        Parameters:
+          - listof (list): a mutable list (typically of Line objects) to which new
+            Lines will be appended. This argument is mutated in-place.
+        Side effects
+          - Modifies listof in-place by extending it with new Line objects.
+          - Logs debug information for each "other" person added.
+    Behavioral Notes
+    ----------------
+    - Loop detection: During a single traversal invocation, self.alltheseids
+      stores visited xref_ids; when a person is revisited a loop is logged and
+      traversal for that branch stops returning an empty list.
+    - Missing GPS events: When a person lacks the configured gpstype, the traversal
+      will either stop (respecting max_missing) or attempt to skip the person and
+      continue toward the parents by invoking link() with an incremented miss
+      counter.
+    - Color assignment: Colors for Lines are computed from the branch and prof
+      parameters and are obtained from the internal Rainbow instance.
+    - Side effects: createothers mutates the supplied list parameter; traversal
+      methods update self.alltheseids. Logging is used extensively for progress
+      and loop diagnostics.
+    Dependencies / Expectations
+    --------------------------
+    This class expects the following helper items to be available in the module:
+    - Person objects with attributes such as xref_id, name, father, mother, birth,
+      death, home (iterable of events), and event attributes that can expose a
+      latlon via getAttrLatLonif().
+    - Line and LifeEvent types used to represent output.
+    - Functions/objects used in the implementation such as getAttrLatLonif(),
+      Rainbow, DELTA, SPACE and a configured logger _log.
+    """
     def __init__(self, people: Dict[str, Person], max_missing: int =0, gpstype="birth"):
         self.people = people
         self.rainbow = Rainbow()
@@ -81,6 +198,96 @@ class Creator:
                 listof.extend(self.line(getAttrLatLonif(self.people[person], self.gpstype), self.people[person], len(listof)/10, 5, 0, path=""))
 
 class CreatorTrace:
+    """
+    CreatorTrace class
+    Tracks and builds ancestry "lines" (Line objects) for Person objects in a family graph.
+    Parameters
+    ----------
+    people : Dict[str, Person]
+        Mapping from person xref_id to Person instances used as the data source for traces.
+    max_missing : int, optional
+        Maximum allowed missing ancestors (unused in current implementation but stored for consumers),
+        by default 0
+    Attributes
+    ----------
+    people : Dict[str, Person]
+        Same mapping provided at construction.
+    rainbow : Rainbow
+        An instance of Rainbow constructed for potential coloring/visualization use.
+    max_missing : int
+        The stored maximum missing count passed at init.
+    alltheseids : Dict[str, str]
+        Temporary set/dict used during a single trace to detect and prevent loops (keys are xref_ids).
+    Methods
+    -------
+    line(current, branch, prof, path="")
+        Build a Line representing `current` and recursively attach Lines for `current`'s parents.
+        - Parameters:
+            current (Person): the Person to build the Line for.
+            branch: branch identifier passed through to Line (used by consumer code).
+            prof: recursion depth or "generation" counter (incremented for parents).
+            path (str): ancestry path prefix (e.g., "", "F", "M", "FF").
+        - Returns: list[Line]
+            A list consisting of Lines produced from parents (via link) plus the Line for `current`.
+        - Behavior and side-effects:
+            * Uses self.alltheseids to detect loops. If current.xref_id already seen, logs an error and
+              stops that branch (returns empty list).
+            * Logs tracing info and constructs a Line with:
+              - label/name combining path and current.name
+              - person=current
+              - whenFrom/from birth.whenyear() if birth present
+              - whenTo/from death.whenyear() if death present
+            * Appends parent Lines produced by link(current, ...), so result is parent lines first,
+              then the current person's Line.
+    link(current, branch=0, prof=0, path="")
+        Recursively produce Lines for the father and mother of `current`.
+        - Parameters:
+            current (Person): the Person whose parents will be traced.
+            branch (int): branch id for the immediate call (passed to constructed Lines).
+            prof (int): current recursion depth/profession counter (incremented when descending).
+            path (str): current ancestry path prefix.
+        - Returns: list[Line]
+            Concatenation of father branch Lines (if father exists) and mother branch Lines (if mother exists).
+        - Notes:
+            * For each parent present, calls line(parent_person, branch_value, prof+1, updated_path).
+    create(main_id)
+        Start a trace from the person identified by main_id.
+        - Parameters:
+            main_id (str): xref_id key into self.people to start the trace.
+        - Returns: list[Line]
+            Lines produced by following parents of the starting person (i.e., result of link(current)).
+        - Raises:
+            IndexError: if main_id is not found in self.people (also logs an error).
+    createothers(listof)
+        Ensure every Person in self.people is represented in the provided list-like collection by
+        appending Lines for those who are not already present in `listof`.
+        - Parameters:
+            listof (list): a mutable sequence expected to contain Line-like objects (the implementation
+            expects elements with a `.person.xref_id` attribute).
+        - Behavior and side-effects:
+            * Iterates over keys of self.people and builds a list `c` of existing xref_ids from `listof`
+              using `creates.person.xref_id`.
+            * For any person id not present in `c`, logs a debug message and extends `listof` with the
+              result of self.line(...) for that person. This mutates the supplied list in place.
+        - Notes and caveats:
+            * The function mutates the input list and uses the presence of `.person.xref_id` on its items;
+              callers should ensure `listof` elements follow that shape (or accept that a different shape
+              will raise an AttributeError).
+            * The code currently passes len(listof)/10 as a branch value to line(), which produces a float
+              rather than an integer branch identifier; callers should be aware of this behavior.
+            * alltheseids is used across line/link calls for loop detection; if createothers is called
+              repeatedly without clearing alltheseids between independent traces, loop detection may be
+              affected. Caller code should re-instantiate CreatorTrace or clear alltheseids between
+              independent trace runs if needed.
+    Logging
+    -------
+    This class uses a module-level logger (_log) to emit info/debug/error messages during tracing,
+    including a specific error message when a recursion loop is detected.
+    Examples
+    --------
+    - Construct a CreatorTrace with a people mapping and call create(main_id) to obtain ancestry lines.
+    - Pass an existing list of Line-like objects to createothers(list_of_lines) to add missing people.
+    """
     def __init__(self, people: Dict[str, Person], max_missing=0):
         self.people = people
         self.rainbow = Rainbow()
@@ -119,6 +326,33 @@ class CreatorTrace:
 
 
 class LifetimeCreator:
+    """
+    LifetimeCreator
+    A class responsible for generating lifetime visualization lines for genealogical data.
+    Creates Line objects representing the lifetime journey of individuals and their ancestral
+    connections, with color-coding based on branch and profundity levels.
+    Attributes:
+        people (Dict[str, Person]): Dictionary mapping person IDs to Person objects
+        rainbow (Rainbow): Color gradient generator for visual distinction
+        max_missing (int): Maximum number of missing parents allowed before stopping recursion
+        alltheseids (Dict): Cache of processed person IDs to prevent infinite loops
+    Methods:
+        selfline(current: Person, branch, prof, miss, path="") -> list[Line]:
+            Creates a Line object representing a person's lifetime from birth to death location,
+            including intermediate home locations as waypoints.
+        line(latlon: LatLon, parent: Person, branch, prof, miss, path="", linestyle="", forperson: Person = None) -> list[Line]:
+            Generates a Line from a given location to a parent's birth location, with loop
+            detection. Returns empty list if parent already processed or recursion limits reached.
+        link(latlon: LatLon, current: Person, branch=0, prof=0, miss=0, path="") -> list[Line]:
+            Recursively generates lines for a person and their ancestors (both parents) up to
+            maximum recursion depth of 480 generations, splitting branches for each parent.
+        create(main_id: str) -> list[Line]:
+            Entry point to generate complete ancestral lifetime visualization starting from
+            a specified person ID. Raises IndexError if person not found.
+        createothers(listof) -> None:
+            Extends the provided list with lifetime lines for all people not already included,
+            using list length for branch and profundity calculations.
+    """
     def __init__(self, people: Dict[str, Person], max_missing=0):
         self.people = people
         self.rainbow = Rainbow()

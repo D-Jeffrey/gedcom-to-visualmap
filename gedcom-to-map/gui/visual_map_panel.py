@@ -23,8 +23,6 @@ import webbrowser
 import shutil
 from datetime import datetime
 
-from style.stylemanager import FontManager
-
 from const import KMLMAPSURL
 
 import wx
@@ -35,6 +33,7 @@ from .background_actions import BackgroundActions
 from .layout_options import LayoutOptions
 from .visual_map_event_handlers import VisualMapEventHandler
 from gedcom_options import gvOptions, ResultsType  # type: ignore
+from style.stylemanager import FontManager
 
 (UpdateBackgroundEvent, EVT_UPDATE_STATE) = wx.lib.newevent.NewEvent()
 
@@ -83,11 +82,11 @@ class VisualMapPanel(wx.Panel):
         # parent must be the wx parent for this panel; call panel initializer with it
         super().__init__(parent, *args, **kw)
 
+        self.gOp = gOp
         self.font_manager = font_manager
 
         self.SetMinSize((800,800))
         self.frame = self.TopLevelParent
-        self.gOp = gOp
 
         self.fileConfig = None
         self.busystate = False
@@ -97,6 +96,20 @@ class VisualMapPanel(wx.Panel):
         self.SetAutoLayout(True)
         self.id = VisualGedcomIds()
         
+        self.make_panels()
+
+        # wire event bindings via the handler and start background threads/timer
+        self.handlers.bind()
+        self.start_threads_and_timer()
+
+        self.lastruninstance = 0.0
+        self.remaintime = 0
+
+        # Configure panel options
+        self.SetupOptions()
+
+    def make_panels(self) -> None:
+        """Construct left/right sub-panels and people list."""
         # create a panel in the frame
         self.panelA = wx.Panel(self, -1, style=wx.SIMPLE_BORDER)
         self.panelB = wx.Panel(self, -1, style=wx.SIMPLE_BORDER)
@@ -128,16 +141,6 @@ class VisualMapPanel(wx.Panel):
 
         # compute a sensible width for the right-hand options panel
         LayoutOptions.adjust_panel_width(self)
-
-        # wire event bindings via the handler and start background threads/timer
-        self.handlers.bind()
-        self.start_threads_and_timer()
-
-        self.lastruninstance = 0.0
-        self.remaintime = 0
-
-        # Configure panel options
-        self.SetupOptions()
 
     def start(self) -> None:
         """Perform UI startup actions (currently triggers SetupButtonState)."""

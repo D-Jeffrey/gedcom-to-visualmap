@@ -13,7 +13,6 @@ import os
 
 import wx
 
-from style.stylemanager import FontManager
 from const import GUINAME
 
 _log = logging.getLogger(__name__.lower())
@@ -23,7 +22,8 @@ from .about_dialog import AboutDialog
 from .help_dialog import HelpDialog
 from .visual_map_panel import VisualMapPanel
 from .visual_gedcom_ids import VisualGedcomIds
-from gedcom_options import gvOptions, ResultsType
+from gedcom_options import gvOptions
+from style.stylemanager import FontManager
 
 class VisualMapFrame(wx.Frame):
     """Main application window/frame.
@@ -41,9 +41,9 @@ class VisualMapFrame(wx.Frame):
     filehistory: wx.FileHistory
     id: VisualGedcomIds
     config_dialog: Optional[wx.Dialog]
-    gOp: Optional["gvOptions"]
+    gOp: gvOptions
 
-    def __init__(self, parent: Optional[wx.Window], gOp: gvOptions, *args: Any, **kw: Any) -> None:
+    def __init__(self, parent: wx.Window, gOp: gvOptions, font_manager: FontManager, *args: Any, **kw: Any) -> None:
         """Construct the frame.
 
         Args:
@@ -55,7 +55,7 @@ class VisualMapFrame(wx.Frame):
         super().__init__(parent, *args, **kw)
 
         self.gOp = gOp
-        self.font_manager = FontManager()
+        self.font_manager = font_manager
         self.set_current_font()
 
         self.SetMinSize((800, 800))

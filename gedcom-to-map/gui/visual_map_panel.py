@@ -27,10 +27,10 @@ from const import KMLMAPSURL
 
 import wx
 
-from .visual_gedcom_ids import VisualGedcomIds  # type: ignore
 from .people_list_ctrl_panel import PeopleListCtrlPanel  # type: ignore
 from .background_actions import BackgroundActions
 from .layout_options import LayoutOptions
+from .visual_gedcom_ids import VisualGedcomIds
 from .visual_map_event_handlers import VisualMapEventHandler
 from gedcom_options import gvOptions, ResultsType  # type: ignore
 from style.stylemanager import FontManager
@@ -494,7 +494,7 @@ class VisualMapPanel(wx.Panel):
         kml_controls = [
             self.id.RBKMLMode,
             self.id.CBFlyTo,
-            self.id.ID_INTMaxLineWeight
+            self.id.INTMaxLineWeight
         ]
 
         # Enable/Disable marker-dependent controls if markers are off
@@ -571,29 +571,12 @@ class VisualMapPanel(wx.Panel):
             if self.id.RBResultOutType.GetSelection() not in [1,2]:
                 self.id.RBResultOutType.SetSelection(1)
         
-        self.id.CBMapControl.SetValue(self.gOp.get('showLayerControl'))
-        self.id.CBMapMini.SetValue(self.gOp.get('mapMini'))
-        self.id.CBMarksOn.SetValue(self.gOp.get('MarksOn'))
-        self.id.CBBornMark.SetValue(self.gOp.get('BornMark'))
-        self.id.CBDieMark.SetValue(self.gOp.get('DieMark'))
-        self.id.CBHomeMarker.SetValue(self.gOp.get('HomeMarker'))
-        self.id.CBMarkStarOn.SetValue(self.gOp.get('MarkStarOn'))
-        self.id.CBHeatMap.SetValue(self.gOp.get('HeatMap'))
-        self.id.CBFlyTo.SetValue(self.gOp.get('UseBalloonFlyto'))
-        self.id.CBMapTimeLine.SetValue(self.gOp.get('MapTimeLine'))
-        self.id.CBUseAntPath.SetValue(self.gOp.get('UseAntPath'))
-        self.id.CBUseGPS.SetValue(self.gOp.get('UseGPS'))
+        # Populate UI widgets from gOp using the panel method (VisualGedcomIds is metadata-only)
+        try:
+            self.apply_controls_from_options(self.gOp)
+        except Exception:
+            _log.exception("SetupOptions: apply_controls_from_options failed")
 
-        self.id.CBAllEntities.SetValue(self.gOp.get('AllEntities'))
-        self.id.CBCacheOnly.SetValue(self.gOp.get('CacheOnly'))
-        self.id.LISTHeatMapTimeStep.SetValue(self.gOp.get('HeatMapTimeStep'))
-        self.id.LISTMapType.SetSelection(self.id.LISTMapType.FindString(self.gOp.get('MapStyle')))
-        self.id.ID_INTMaxLineWeight.SetValue(self.gOp.get('MaxLineWeight'))
-        self.id.RBGroupBy.SetSelection(self.gOp.get('GroupBy'))
-        self.id.TEXTResult.SetValue(self.gOp.get('Result'))
-
-        _, filen = os.path.split(self.gOp.get('GEDCOMinput', ifNone='first.ged')) 
-        self.id.TEXTGEDCOMinput.SetValue(filen)
         self.id.CBSummary[0].SetValue(self.gOp.get('SummaryOpen'))
         self.id.CBSummary[1].SetValue(self.gOp.get('SummaryPlaces'))
         self.id.CBSummary[2].SetValue(self.gOp.get('SummaryPeople'))
@@ -601,7 +584,13 @@ class VisualMapPanel(wx.Panel):
         self.id.CBSummary[4].SetValue(self.gOp.get('SummaryCountriesGrid'))
         self.id.CBSummary[5].SetValue(self.gOp.get('SummaryGeocode'))
         self.id.CBSummary[6].SetValue(self.gOp.get('SummaryAltPlaces'))
+
         self.id.TEXTDefaultCountry.SetValue(self.gOp.get('defaultCountry', ifNone=""))
+
+        self.id.CBMarkStarOn.SetValue(self.gOp.get('MarkStarOn'))
+
+        self.id.LISTMapType.SetSelection(self.id.LISTMapType.FindString(self.gOp.get('MapStyle')))
+
         self.SetupButtonState()
 
         # Load file history into the panel's configuration
@@ -792,3 +781,116 @@ class VisualMapPanel(wx.Panel):
             time.sleep(0.1)
 
         self.Destroy()
+
+    def apply_controls_from_options(self, gOp: Any) -> None:
+        """Apply values from gOp to actual wx controls using id metadata.
+
+        This keeps UI updates on the panel (where we have window context)
+        while VisualGedcomIds remains a metadata-only helper.
+        """
+        if not getattr(self, "id", None):
+            return
+        for name, idref, wtype, gop_attr, action in self.id.iter_controls():
+            # resolve numeric id
+            try:
+                wid = int(idref)
+            except Exception:
+                try:
+                    wid = idref.GetId()  # fallback for other idref types
+                except Exception:
+                    _log.debug("apply_controls_from_options: cannot resolve idref %r", idref)
+                    continue
+
+            # find the control within this panel/window hierarchy
+            control = wx.FindWindowById(wid, self)
+            # read the value from gOp
+            try:
+                if gop_attr:
+                    if hasattr(gOp, gop_attr):
+                        value = getattr(gOp, gop_attr)
+                    elif hasattr(gOp, "get"):
+                        # fallback to get(key, default)
+                        value = gOp.get(gop_attr, None)
+                    else:
+                        value = None
+                else:
+                    value = None
+            except Exception:
+                _log.exception("apply_controls_from_options: failed to read %s from gOp", gop_attr)
+                value = None
+
+            if control is None:
+                # control not created yet (or not a child of this panel) — skip
+                continue
+
+            try:
+                # handle special named controls first
+                if name == "LISTMapStyle":
+                    ms = value or gOp.get("MapStyle", "") if hasattr(gOp, "get") else value
+                    try:
+                        idx = self.id.AllMapTypes.index(ms)
+                    except Exception:
+                        idx = 0
+                    try:
+                        control.SetSelection(idx)
+                    except Exception:
+                        _log.debug("LISTMapStyle: SetSelection failed for %r", control)
+                    continue
+
+                if name == "RBResultsType":
+                    order = ("HTML", "KML", "KML2", "SUM")
+                    rt = getattr(gOp, "ResultType", None)
+                    if hasattr(rt, "value"):
+                        rt_name = rt.value
+                    else:
+                        rt_name = str(rt) if rt is not None else ""
+                    try:
+                        idx = order.index(rt_name)
+                    except ValueError:
+                        idx = 0
+                    try:
+                        control.SetSelection(idx)
+                    except Exception:
+                        _log.debug("RBResultsType: SetSelection failed for %r", control)
+                    continue
+
+                # generic handlers by widget type
+                if wtype == "Text":
+                    # TEXTGEDCOMinput should show filename only
+                    if name == "TEXTGEDCOMinput":
+                        infile = gOp.get("GEDCOMinput", "") if hasattr(gOp, "get") else ""
+                        _, filen = os.path.split(infile)
+                        val = filen
+                    else:
+                        val = "" if value is None else str(value)
+                    try:
+                        control.SetValue(val)
+                    except Exception:
+                        try:
+                            control.SetLabel(val)
+                        except Exception:
+                            _log.debug("Text set failed for %s", name)
+
+                elif wtype == "CheckBox":
+                    try:
+                        control.SetValue(bool(value))
+                    except Exception:
+                        _log.debug("CheckBox set failed for %s", name)
+
+                elif wtype in ("RadioButton", "List"):
+                    try:
+                        control.SetSelection(int(value) if value is not None else 0)
+                    except Exception:
+                        _log.debug("Radio/List set failed for %s", name)
+
+                elif wtype in ("Slider", "Int", "SpinCtrl"):
+                    try:
+                        control.SetValue(int(value))
+                    except Exception:
+                        _log.debug("Slider/Int set failed for %s", name)
+
+                else:
+                    _log.debug("Unhandled control type %r for control %s", wtype, name)
+
+            except Exception:
+                _log.exception("apply_controls_from_options failed for control %s (id=%r)", name, idref)

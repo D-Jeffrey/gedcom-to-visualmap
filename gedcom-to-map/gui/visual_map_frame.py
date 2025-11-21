@@ -102,8 +102,8 @@ class VisualMapFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.onOptionsReset, id=wx.ID_REVERT)
         self.Bind(wx.EVT_MENU, self.OnFind, id=wx.ID_FIND)
         self.Bind(wx.EVT_MENU, self.onOptionsSetup, id=wx.ID_SETUP)
-        self.Bind(wx.EVT_MENU, self.OnOpenCSV, id=self.id.IDs["ID_BTNCSV"])
-        self.Bind(wx.EVT_MENU, self.OnOpenBrowser, id=self.id.IDs["ID_BTNBROWSER"])
+        self.Bind(wx.EVT_MENU, self.OnOpenCSV, id=self.id.IDs["BTNCSV"])
+        self.Bind(wx.EVT_MENU, self.OnOpenBrowser, id=self.id.IDs["BTNBROWSER"])
 
     def populate_font_menus(self, optionsMenu: wx.Menu) -> None:
         """Populate optionsMenu with font face and size submenus.
@@ -155,8 +155,8 @@ class VisualMapFrame(wx.Frame):
         self.ActionMenu = ActionMenu = wx.Menu()
         ActionMenu.Append(wx.ID_FIND, "&Find\tCtrl-F", "Find by name")
         ActionMenu.Append(wx.ID_INFO, "Statistics Sumary")
-        ActionMenu.Append(self.id.IDs['ID_BTNBROWSER'], "Open Result in &Browser")
-        ActionMenu.Append(self.id.IDs['ID_BTNCSV'], "Open &CSV")
+        ActionMenu.Append(self.id.IDs['BTNBROWSER'], "Open Result in &Browser")
+        ActionMenu.Append(self.id.IDs['BTNCSV'], "Open &CSV")
 
         helpMenu = wx.Menu()
         helpMenu.Append(wx.ID_HELP, "Help")

@@ -18,6 +18,7 @@ import platform
 import time
 from datetime import datetime
 import yaml
+import re
 
 from typing import Union, Dict, Optional
 from enum import Enum
@@ -60,7 +61,7 @@ class ResultsType(Enum):
     SUM = "SUM"
 
     @staticmethod
-    def ResultsTypeEnforce(value):
+    def ResultsTypeEnforce(value) -> "ResultsType":
         """Coerce a value to a ResultsType.
 
         Accepts an existing ResultsType or a string (case-insensitive). Raises
@@ -69,12 +70,30 @@ class ResultsType(Enum):
         if isinstance(value, ResultsType):
             return value
         elif isinstance(value, str):
+            # handle ResultsType like "ResultsType.HTML"
+            m = re.match(r'^\s*ResultsType\.([A-Za-z_][A-Za-z0-9_]*)\s*$', value)
+            if m:
+                value = m.group(1)
             try:
                 return ResultsType[value.upper()]
             except KeyError:
                 raise ValueError(f"Invalid ResultsType string: {value}")
         else:
             raise TypeError(f"Cannot convert {type(value)} to ResultsType")
+    
+    def name(self) -> str:
+        """Return the enum member's name value for human-readable display."""
+        return self.value
+    
+    @staticmethod
+    def list_values() -> list[str]:
+        """Return a list of all ResultsType values as strings."""
+        return [rt.value for rt in ResultsType]
+    
+    def index(self) -> int:
+        """Return the integer index of a ResultsType value."""
+        rt = ResultsType.ResultsTypeEnforce(self)
+        return list(ResultsType).index(rt)
 
 class gvOptions:
     """Application options and transient runtime state.
@@ -162,24 +181,26 @@ class gvOptions:
                 elif typ == 'list' or typ == 'dict':
                     if isinstance(value, (list, dict)):
                         parsed = value
+                elif typ == 'result':
+                    parsed = ResultsType.ResultsTypeEnforce(value)
+                # For complex types: if YAML already provided a list/dict/number, keep it;
+                # if it's a string try safe eval via yaml (or fallback to literal eval)
+                elif isinstance(value, (dict, list, int, float, bool)):
+                    parsed = value
+                elif isinstance(value, str):
+                    try:
+                        # try to parse structured literal using yaml (safe)
+                        parsed = yaml.safe_load(value)
+                    except Exception:
+                        _log.error("YAML parsing failed for option '%s'; trying literal_eval", key)
+                        # try:
+                        #     # final fallback: evaluate simple Python literal
+                        #     from ast import literal_eval
+                        #     parsed = literal_eval(value)
+                        # except Exception:
+                        #     parsed = value
                 else:
-                    # For complex types: if YAML already provided a list/dict/number, keep it;
-                    # if it's a string try safe eval via yaml (or fallback to literal eval)
-                    if isinstance(value, (dict, list, int, float, bool)):
-                        parsed = value
-                    elif isinstance(value, str):
-                        try:
-                            # try to parse structured literal using yaml (safe)
-                            parsed = yaml.safe_load(value)
-                        except Exception:
-                            try:
-                                # final fallback: evaluate simple Python literal
-                                from ast import literal_eval
-                                parsed = literal_eval(value)
-                            except Exception:
-                                parsed = value
-                    else:
-                        parsed = value
+                    parsed = value
 
                 setattr(self, key, parsed)
             except Exception as e:
@@ -273,6 +294,15 @@ class gvOptions:
                     setattr(self, key, int(value))
                 elif typ == 'str':
                     setattr(self, key, value)
+                elif typ == 'result':
+                    # handle ResultsType like "ResultsType.HTML"
+                    m = re.match(r'^\s*ResultsType\.([A-Za-z_][A-Za-z0-9_]*)\s*$', value)
+                    if m:
+                        value = m.group(1)
+                    try:
+                        parsed = ResultsType.ResultsTypeEnforce(value)
+                    except Exception:
+                        _log("Invalid ResultsType string in settings for '%s': %s", key, value)
                 else:
                     parsed = None
                     # try yaml first (handles lists/dicts/numbers/null)
@@ -284,38 +314,30 @@ class gvOptions:
                     if parsed_yaml is not None and not isinstance(parsed_yaml, str):
                         parsed = parsed_yaml
                     else:
-                        # handle ResultsType like "ResultsType.HTML"
-                        m = re.match(r'^\s*ResultsType\.([A-Za-z_][A-Za-z0-9_]*)\s*$', value)
-                        if m:
+                        # handle LatLon(...) specifically
+                        m2 = re.match(r'^\s*LatLon\s*\((.*)\)\s*$', value)
+                        if m2:
+                            inside = m2.group(1)
+                            parts = [p.strip() for p in inside.split(',')]
+                            vals = []
+                            for p in parts:
+                                if p.lower() == 'none' or p == '':
+                                    vals.append(None)
+                                else:
+                                    try:
+                                        vals.append(float(p))
+                                    except Exception:
+                                        vals.append(p.strip('\'"'))
                             try:
-                                parsed = ResultsType.ResultsTypeEnforce(m.group(1))
+                                parsed = LatLon(vals[0], vals[1])
                             except Exception:
                                 parsed = value
                         else:
-                            # handle LatLon(...) specifically
-                            m2 = re.match(r'^\s*LatLon\s*\((.*)\)\s*$', value)
-                            if m2:
-                                inside = m2.group(1)
-                                parts = [p.strip() for p in inside.split(',')]
-                                vals = []
-                                for p in parts:
-                                    if p.lower() == 'none' or p == '':
-                                        vals.append(None)
-                                    else:
-                                        try:
-                                            vals.append(float(p))
-                                        except Exception:
-                                            vals.append(p.strip('\'"'))
-                                try:
-                                    parsed = LatLon(vals[0], vals[1])
-                                except Exception:
-                                    parsed = value
-                            else:
-                                # last resort: safe literal eval, otherwise keep string
-                                try:
-                                    parsed = ast.literal_eval(value)
-                                except Exception:
-                                    parsed = value
+                            # last resort: safe literal eval, otherwise keep string
+                            try:
+                                parsed = ast.literal_eval(value)
+                            except Exception:
+                                parsed = value
 
                     setattr(self, key, parsed)
             except Exception as e:

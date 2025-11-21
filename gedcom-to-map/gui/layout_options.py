@@ -65,11 +65,11 @@ class LayoutOptions:
         """Create input/output file controls and add to sizer."""
         vm_panel.id.txtinfile = wx.Button(panel, -1, "Input file:   ")
         vm_panel.id.txtinfile.SetBackgroundColour(vm_panel.id.GetColor("BTN_DIRECTORY"))
-        vm_panel.id.TEXTGEDCOMinput = wx.TextCtrl(panel, vm_panel.id.IDs["ID_TEXTGEDCOMinput"], "", size=(250, 20))
+        vm_panel.id.TEXTGEDCOMinput = wx.TextCtrl(panel, vm_panel.id.IDs["TEXTGEDCOMinput"], "", size=(250, 20))
         vm_panel.id.TEXTGEDCOMinput.Enable(False)
         vm_panel.id.txtoutfile = wx.Button(panel, -1, "Output file: ")
         vm_panel.id.txtoutfile.SetBackgroundColour(vm_panel.id.GetColor("BTN_DIRECTORY"))
-        vm_panel.id.TEXTResult = wx.TextCtrl(panel, vm_panel.id.IDs["ID_TEXTResult"], "", size=(250, 20))
+        vm_panel.id.TEXTResult = wx.TextCtrl(panel, vm_panel.id.IDs["TEXTResult"], "", size=(250, 20))
         vm_panel.id.txtinfile.Bind(wx.EVT_LEFT_DOWN, vm_panel.frame.OnFileOpenDialog)
         vm_panel.id.txtoutfile.Bind(wx.EVT_LEFT_DOWN, vm_panel.frame.OnFileResultDialog)
 
@@ -82,22 +82,23 @@ class LayoutOptions:
     @staticmethod
     def _add_basic_checks(vm_panel: Any, panel: wx.Panel, sizer: wx.Sizer) -> None:
         """Add the top-level checkbox controls (GPS, cache, defaults, entity flags)."""
-        vm_panel.id.CBUseGPS = wx.CheckBox(panel, vm_panel.id.IDs["ID_CBUseGPS"],
+        vm_panel.id.CBUseGPS = wx.CheckBox(panel, vm_panel.id.IDs["CBUseGPS"],
                                           "Lookup all address (ignore cache)")
-        vm_panel.id.CBCacheOnly = wx.CheckBox(panel, vm_panel.id.IDs["ID_CBCacheOnly"],
+        vm_panel.id.CBCacheOnly = wx.CheckBox(panel, vm_panel.id.IDs["CBCacheOnly"],
                                              "Cache Only, do not lookup addresses")
         vm_panel.id.labelDefCountry = wx.StaticText(panel, -1, "Default Country:   ")
-        vm_panel.id.TEXTDefaultCountry = wx.TextCtrl(panel, vm_panel.id.IDs["ID_TEXTDefaultCountry"], "", size=(250, 20))
+        vm_panel.id.TEXTDefaultCountry = wx.TextCtrl(panel, vm_panel.id.IDs["TEXTDefaultCountry"], "", size=(250, 20))
         defCountryBox = wx.BoxSizer(wx.HORIZONTAL)
         defCountryBox.AddMany([vm_panel.id.labelDefCountry, (6, 20), vm_panel.id.TEXTDefaultCountry])
-        vm_panel.id.CBAllEntities = wx.CheckBox(panel, vm_panel.id.IDs["ID_CBAllEntities"], "Map all people")
-        vm_panel.id.CBBornMark = wx.CheckBox(panel, vm_panel.id.IDs["ID_CBBornMark"], "Marker for when Born")
-        vm_panel.id.CBDieMark = wx.CheckBox(panel, vm_panel.id.IDs["ID_CBDieMark"], "Marker for when Died")
+        vm_panel.id.CBAllEntities = wx.CheckBox(panel, vm_panel.id.IDs["CBAllEntities"], "Map all people")
+        vm_panel.id.CBBornMark = wx.CheckBox(panel, vm_panel.id.IDs["CBBornMark"], "Marker for when Born")
+        vm_panel.id.CBDieMark = wx.CheckBox(panel, vm_panel.id.IDs["CBDieMark"], "Marker for when Died")
 
         vm_panel.id.busyIndicator = wx.ActivityIndicator(panel)
         vm_panel.id.busyIndicator.SetBackgroundColour(vm_panel.id.GetColor("BUSY_BACK"))
-        vm_panel.id.RBResultOutType = wx.RadioBox(panel, vm_panel.id.IDs["ID_RBResultsType"], "Result Type",
-                                                  choices=["HTML", "KML", "KML2", "SUM"], majorDimension=5)
+        vm_panel.id.RBResultOutType = wx.RadioBox(panel, vm_panel.id.IDs["RBResultsType"], "Result Type",
+                                                #   choices=["HTML", "KML", "KML2", "SUM"], majorDimension=5)
+                                                  choices=vm_panel.gOp.ResultType.list_values(), majorDimension=5)
 
         sizer.AddMany(
             [
@@ -121,26 +122,25 @@ class LayoutOptions:
         mapchoices = sorted(vm_panel.id.AllMapTypes)
         mapboxsizer = wx.BoxSizer(wx.HORIZONTAL)
         mapStyleLabel = wx.StaticText(hbox, -1, " Map Style")
-        vm_panel.id.CBMarksOn = wx.CheckBox(hbox_container, vm_panel.id.IDs["ID_CBMarksOn"], "Markers", name="MarksOn")
-        vm_panel.id.CBHomeMarker = wx.CheckBox(hbox_container, vm_panel.id.IDs["ID_CBHomeMarker"], "Marker point or homes")
-        vm_panel.id.CBMarkStarOn = wx.CheckBox(hbox_container, vm_panel.id.IDs["ID_CBMarkStarOn"], "Marker starter with Star")
-        vm_panel.id.CBMapTimeLine = wx.CheckBox(hbox_container, vm_panel.id.IDs["ID_CBMapTimeLine"], "Add Timeline")
-        vm_panel.id.LISTMapType = wx.Choice(hbox_container, vm_panel.id.IDs["ID_LISTMapStyle"], name="MapStyle",
+        vm_panel.id.CBMarksOn = wx.CheckBox(hbox_container, vm_panel.id.IDs["CBMarksOn"], "Markers", name="MarksOn")
+        vm_panel.id.CBHomeMarker = wx.CheckBox(hbox_container, vm_panel.id.IDs["CBHomeMarker"], "Marker point or homes")
+        vm_panel.id.CBMarkStarOn = wx.CheckBox(hbox_container, vm_panel.id.IDs["CBMarkStarOn"], "Marker starter with Star")
+        vm_panel.id.CBMapTimeLine = wx.CheckBox(hbox_container, vm_panel.id.IDs["CBMapTimeLine"], "Add Timeline")
+        vm_panel.id.LISTMapType = wx.Choice(hbox_container, vm_panel.id.IDs["LISTMapStyle"], name="MapStyle",
                                            choices=mapchoices)
-        vm_panel.id.CBMapControl = wx.CheckBox(hbox_container, vm_panel.id.IDs["ID_CBMapControl"], "Open Map Controls",
+        vm_panel.id.CBMapControl = wx.CheckBox(hbox_container, vm_panel.id.IDs["CBMapControl"], "Open Map Controls",
                                               name="MapControl")
-        vm_panel.id.CBMapMini = wx.CheckBox(hbox_container, vm_panel.id.IDs["ID_CBMapMini"], "Add Mini Map",
+        vm_panel.id.CBMapMini = wx.CheckBox(hbox_container, vm_panel.id.IDs["CBMapMini"], "Add Mini Map",
                                             name="MapMini")
-        vm_panel.id.CBHeatMap = wx.CheckBox(hbox_container, vm_panel.id.IDs["ID_CBHeatMap"], "Heatmap",
+        vm_panel.id.CBHeatMap = wx.CheckBox(hbox_container, vm_panel.id.IDs["CBHeatMap"], "Heatmap",
                                             style=wx.NO_BORDER)
-        vm_panel.id.CBUseAntPath = wx.CheckBox(hbox_container, vm_panel.id.IDs["ID_CBUseAntPath"], "Ant paths")
-
+        vm_panel.id.CBUseAntPath = wx.CheckBox(hbox_container, vm_panel.id.IDs["CBUseAntPath"], "Ant paths")
         TimeStepVal = 5
-        vm_panel.id.LISTHeatMapTimeStep = wx.Slider(hbox_container, vm_panel.id.IDs["ID_LISTHeatMapTimeStep"],
+        vm_panel.id.LISTHeatMapTimeStep = wx.Slider(hbox_container, vm_panel.id.IDs["LISTHeatMapTimeStep"],
                                                     TimeStepVal, 1, 100, size=(250, 45),
                                                     style=wx.SL_HORIZONTAL | wx.SL_AUTOTICKS | wx.SL_LABELS)
         vm_panel.id.LISTHeatMapTimeStep.SetTickFreq(5)
-        vm_panel.id.RBGroupBy = wx.RadioBox(hbox_container, vm_panel.id.IDs["ID_RBGroupBy"], "Group by:",
+        vm_panel.id.RBGroupBy = wx.RadioBox(hbox_container, vm_panel.id.IDs["RBGroupBy"], "Group by:",
                                            choices=["None", "Last Name", "Last Name (Soundex)", "Person"],
                                            majorDimension=2)
         mapboxsizer.Add(vm_panel.id.LISTMapType)
@@ -173,16 +173,16 @@ class LayoutOptions:
         ksizer = wx.StaticBoxSizer(kbox, wx.VERTICAL)
         kboxIn = wx.BoxSizer(wx.VERTICAL)
 
-        vm_panel.id.RBKMLMode = wx.RadioBox(kbox, vm_panel.id.IDs["ID_RBKMLMode"], "Organize by:",
+        vm_panel.id.RBKMLMode = wx.RadioBox(kbox, vm_panel.id.IDs["RBKMLMode"], "Organize by:",
                                            choices=["None", "Folder"], majorDimension=2)
 
         kboxs = [vm_panel.id.RBKMLMode, wx.BoxSizer(wx.HORIZONTAL), (4, 4), wx.BoxSizer(wx.HORIZONTAL)]
-        vm_panel.id.CBFlyTo = wx.CheckBox(kbox, vm_panel.id.IDs["ID_CBFlyTo"], "FlyTo Balloon", style=wx.NO_BORDER)
-        vm_panel.id.ID_INTMaxLineWeight = wx.SpinCtrl(kbox, vm_panel.id.IDs["ID_INTMaxLineWeight"], "",
+        vm_panel.id.CBFlyTo = wx.CheckBox(kbox, vm_panel.id.IDs["CBFlyTo"], "FlyTo Balloon", style=wx.NO_BORDER)
+        vm_panel.id.INTMaxLineWeight = wx.SpinCtrl(kbox, vm_panel.id.IDs["INTMaxLineWeight"], "",
                                                      min=1, max=100, initial=20)
 
         kboxs[1].AddMany([wx.StaticText(kbox, -1, "        "), vm_panel.id.CBFlyTo])
-        kboxs[3].AddMany([vm_panel.id.ID_INTMaxLineWeight, wx.StaticText(kbox, -1, " Max Line Weight")])
+        kboxs[3].AddMany([vm_panel.id.INTMaxLineWeight, wx.StaticText(kbox, -1, " Max Line Weight")])
         kboxIn.AddMany(kboxs)
 
         ksizer.Add(kboxIn, 0, wx.EXPAND | wx.ALL, 4)
@@ -209,13 +209,13 @@ class LayoutOptions:
         sboxIn = wx.BoxSizer(wx.VERTICAL)
 
         vm_panel.id.CBSummary = [
-            wx.CheckBox(sbox, vm_panel.id.IDs["ID_CBSummary"], label="Open files after created", name="Open"),
-            wx.CheckBox(sbox, vm_panel.id.IDs["ID_CBSummary"], label="Places", name="Places"),
-            wx.CheckBox(sbox, vm_panel.id.IDs["ID_CBSummary"], label="People", name="People"),
-            wx.CheckBox(sbox, vm_panel.id.IDs["ID_CBSummary"], label="Countries", name="Countries"),
-            wx.CheckBox(sbox, vm_panel.id.IDs["ID_CBSummary"], label="Countries Grid", name="CountriesGrid"),
-            wx.CheckBox(sbox, vm_panel.id.IDs["ID_CBSummary"], label="Geocode", name="Geocode"),
-            wx.CheckBox(sbox, vm_panel.id.IDs["ID_CBSummary"], label="Alternate Places", name="AltPlaces"),
+            wx.CheckBox(sbox, vm_panel.id.IDs["CBSummary0"], label="Open files after created", name="Open"),
+            wx.CheckBox(sbox, vm_panel.id.IDs["CBSummary1"], label="Places", name="Places"),
+            wx.CheckBox(sbox, vm_panel.id.IDs["CBSummary2"], label="People", name="People"),
+            wx.CheckBox(sbox, vm_panel.id.IDs["CBSummary3"], label="Countries", name="Countries"),
+            wx.CheckBox(sbox, vm_panel.id.IDs["CBSummary4"], label="Countries Grid", name="CountriesGrid"),
+            wx.CheckBox(sbox, vm_panel.id.IDs["CBSummary5"], label="Geocode", name="Geocode"),
+            wx.CheckBox(sbox, vm_panel.id.IDs["CBSummary6"], label="Alternate Places", name="AltPlaces"),
         ]
 
         sboxIn.AddMany(vm_panel.id.CBSummary)
@@ -236,7 +236,7 @@ class LayoutOptions:
         gbox = wx.StaticBox(gbox_container, -1, "Grid View Options")
         gsizer = wx.StaticBoxSizer(gbox, wx.VERTICAL)
         gboxIn = wx.BoxSizer(wx.VERTICAL)
-        vm_panel.id.CBGridView = wx.CheckBox(gbox_container, vm_panel.id.IDs["ID_CBGridView"], "View Only Direct Ancestors")
+        vm_panel.id.CBGridView = wx.CheckBox(gbox_container, vm_panel.id.IDs["CBGridView"], "View Only Direct Ancestors")
         gboxIn.AddMany([vm_panel.id.CBGridView])
         gsizer.Add(gboxIn, 0, wx.EXPAND | wx.ALL, 4)
 
@@ -265,12 +265,12 @@ class LayoutOptions:
     def _add_buttons_row(vm_panel: Any, panel: wx.Panel, sizer: wx.Sizer) -> None:
         """Create the action buttons row (Load, Create, CSV, Trace, Stop, Browser)."""
         l1 = wx.BoxSizer(wx.HORIZONTAL)
-        vm_panel.id.BTNLoad = wx.Button(panel, vm_panel.id.IDs["ID_BTNLoad"], "Load")
-        vm_panel.id.BTNCreateFiles = wx.Button(panel, vm_panel.id.IDs["ID_BTNCreateFiles"], "Create Files")
-        vm_panel.id.BTNCSV = wx.Button(panel, vm_panel.id.IDs["ID_BTNCSV"], "Geo Table")
-        vm_panel.id.BTNTRACE = wx.Button(panel, vm_panel.id.IDs["ID_BTNTRACE"], "Trace")
-        vm_panel.id.BTNSTOP = wx.Button(panel, vm_panel.id.IDs["ID_BTNSTOP"], "Stop")
-        vm_panel.id.BTNBROWSER = wx.Button(panel, vm_panel.id.IDs["ID_BTNBROWSER"], "Browser")
+        vm_panel.id.BTNLoad = wx.Button(panel, vm_panel.id.IDs["BTNLoad"], "Load")
+        vm_panel.id.BTNCreateFiles = wx.Button(panel, vm_panel.id.IDs["BTNCreateFiles"], "Create Files")
+        vm_panel.id.BTNCSV = wx.Button(panel, vm_panel.id.IDs["BTNCSV"], "Geo Table")
+        vm_panel.id.BTNTRACE = wx.Button(panel, vm_panel.id.IDs["BTNTRACE"], "Trace")
+        vm_panel.id.BTNSTOP = wx.Button(panel, vm_panel.id.IDs["BTNSTOP"], "Stop")
+        vm_panel.id.BTNBROWSER = wx.Button(panel, vm_panel.id.IDs["BTNBROWSER"], "Browser")
         l1.Add(vm_panel.id.BTNLoad, 0, wx.EXPAND | wx.ALL, 5)
         l1.Add(vm_panel.id.BTNCreateFiles, 0, wx.EXPAND | wx.ALL, 5)
         l1.Add(vm_panel.id.BTNCSV, 0, wx.EXPAND | wx.ALL, 5)

@@ -2,88 +2,134 @@
 VisualGedcomIds moved out of gedcomVisualGUI.py
 """
 import logging
+import os
 import wx
 from wx.lib.embeddedimage import PyEmbeddedImage
+from typing import Any
+
+from gedcom_options import gvOptions  # type: ignore
 
 _log = logging.getLogger(__name__.lower())
 
 
-class VisualGedcomIds():
-    def __init__(self):
+class VisualGedcomIds:
+    """
+    Small helper that centralises control IDs used by the UI.
+
+    Adjust or extend attributes below to match the names used across the project.
+    Using wx.NewIdRef() when available yields unique IDs compatible with modern wx.
+    """
+    def __init__(self) -> None:
+        new_id = getattr(wx, "NewIdRef", None)
+        if callable(new_id):
+            make = lambda: new_id()
+        else:
+            make = lambda: wx.NewId()
+
+        id_attributes = [ # ID name: (type, gOp attribute, action)
+            ('CBMarksOn', ('CheckBox', 'MarksOn', 'Redraw')),
+            ('CBHeatMap', ('CheckBox', 'HeatMap', '')),
+            ('CBFlyTo', ('CheckBox', 'UseBalloonFlyto', 'Redraw')),
+            ('CBBornMark', ('CheckBox', 'BornMark', 'Redraw')),
+            ('CBDieMark', ('CheckBox', 'DieMark', 'Redraw')),
+
+            ('LISTMapStyle', ('List', 'MapStyle', 'Redraw')),
+
+            ('CBMarkStarOn', ('CheckBox', 'MarkStarOn', 'Redraw')),
+
+            ('RBGroupBy', ('RadioButton', 'GroupBy', 'Redraw')),
+
+            ('CBUseAntPath', ('CheckBox', 'UseAntPath', 'Redraw')),
+            ('CBMapTimeLine', ('CheckBox', 'MapTimeLine', 'Redraw')),
+            ('CBHomeMarker', ('CheckBox', 'HomeMarker', 'Redraw')),
+
+            ('LISTHeatMapTimeStep', ('Slider', 'HeatMapTimeStep', 'Redraw')),
+
+            ('TEXTGEDCOMinput', ('Text', 'GEDCOMinput', 'Reload')),
+            ('TEXTResult', ('Text', 'Result', 'Redraw')),
+
+            ('RBResultsType', ('RadioButton', 'ResultType', 'Redraw')),
+
+            ('TEXTMain', ('Text', 'Main', 'Reload')),
+            ('TEXTName', ('Text', 'Name', '')),
+
+            ('RBKMLMode', ('RadioButton', 'KMLMode', 'Redraw')),
+
+            ('INTMaxMissing', ('Int', 'MaxMissing', 'Reload')),
+            ('INTMaxLineWeight', ('SpinCtrl', 'MaxLineWeight', 'Reload')),
+
+            ('CBUseGPS', ('CheckBox', 'UseGPS', 'Reload')),
+            ('CBCacheOnly', ('CheckBox', 'CacheOnly', 'Reload')),
+            ('CBAllEntities', ('CheckBox', 'AllEntities', 'Redraw')),
+            ('CBMapControl', ('CheckBox', 'showLayerControl', 'Redraw')),
+            ('CBMapMini', ('CheckBox', 'mapMini', 'Redraw')),
+
+            ('BTNLoad', ('Button', None, 'Load')),
+            ('BTNCreateFiles', ('Button', None, 'CreateFiles')),
+            ('BTNCSV', ('Button', None, 'OpenCSV')),
+            ('BTNTRACE', ('Button', None, 'Trace')),
+            ('BTNSTOP', ('Button', None, 'Stop')),
+            ('BTNBROWSER', ('Button', None, 'OpenBrowser')),
+            ('CBGridView', ('CheckBox', 'GridView', 'Render')),
+            ('CBSummary', ('CheckBox', 'Summary', 'Redraw')),
+
+            ('TEXTDefaultCountry', ('Text', 'defaultCountry', 'Reload', 'defaultCountry')),
+        ]
+        # Build id lookup and id->attribute mapping in a single pass
+        self.IDs = {}
+        self.IDtoAttr2 = {}
+        for name, mapping in id_attributes:
+            idref = wx.NewIdRef()
+            self.IDs[name] = idref
+            if mapping is not None:
+                self.IDtoAttr2[idref] = mapping
         
-        self.ids = [
-            'ID_CBMarksOn', 'ID_CBHeatMap', 'ID_CBFlyTo', 'ID_CBBornMark', 'ID_CBDieMark', 'ID_LISTMapStyle',
-            'ID_CBMarkStarOn', 'ID_RBGroupBy', 'ID_CBUseAntPath', 'ID_CBMapTimeLine',
-            'ID_CBHomeMarker', 'ID_LISTHeatMapTimeStep', 'ID_TEXTGEDCOMinput', 'ID_TEXTResult',
-            'ID_RBResultsType', 'ID_TEXTMain', 'ID_TEXTName', 'ID_RBKMLMode', 'ID_INTMaxMissing', 'ID_INTMaxLineWeight',
-            'ID_CBUseGPS', 'ID_CBCacheOnly', 'ID_CBAllEntities',  'ID_CBMapControl',
-            'ID_CBMapMini', 'ID_BTNLoad', 'ID_BTNCreateFiles', 'ID_BTNCSV', 'ID_BTNTRACE', 'ID_BTNSTOP', 'ID_BTNBROWSER',
-            'ID_CBGridView', 'CBYougeAge', 'ID_CBSummary', 'ID_TEXTDefaultCountry'
-        ]
-        self.IDs = {name: wx.NewIdRef() for name in self.ids}
-        # ID = Attribute (in gOp), Action impact
-        self.IDtoAttr = {
-            self.IDs['ID_CBMarksOn']: ('MarksOn', 'Redraw'),
-            self.IDs['ID_CBHeatMap']: ('HeatMap', ''),
-            self.IDs['ID_CBBornMark']: ('BornMark', 'Redraw'),
-            self.IDs['ID_CBDieMark']: ('DieMark', 'Redraw'),
-            self.IDs['ID_LISTMapStyle']: ('MapStyle', 'Redraw'),
-            self.IDs['ID_CBMarkStarOn']: ('MarkStarOn', 'Redraw'),
-            self.IDs['ID_RBGroupBy']: ('GroupBy', 'Redraw'),
-            self.IDs['ID_CBUseAntPath']: ('UseAntPath', 'Redraw'),
-            self.IDs['ID_CBMapTimeLine']: ('MapTimeLine', 'Redraw'),
-            self.IDs['ID_CBHomeMarker']: ('HomeMarker', 'Redraw'),
-            self.IDs['ID_CBFlyTo']: ('UseBalloonFlyto', 'Redraw'),
-            self.IDs['ID_LISTHeatMapTimeStep']: ('MapTimeLine', 'Redraw'),
-            self.IDs['ID_TEXTGEDCOMinput']: ('GEDCOMinput', 'Reload'),
-            self.IDs['ID_TEXTResult']: ('Result', 'Redraw', 'Result'),
-            self.IDs['ID_RBResultsType']: ('ResultType', 'Redraw'),
-            self.IDs['ID_TEXTMain']: ('Main', 'Reload'),
-            self.IDs['ID_TEXTName']: ('Name', ''),
-            self.IDs['ID_RBKMLMode']: ('KMLMode', 'Redraw'),
-            self.IDs['ID_INTMaxMissing']: ('MaxMissing', 'Reload'),
-            self.IDs['ID_INTMaxLineWeight']: ('MaxLineWeight', 'Reload'),
-            self.IDs['ID_CBUseGPS']: ('UseGPS', 'Reload'),
-            self.IDs['ID_CBCacheOnly']: ('CacheOnly', 'Reload'),
-            self.IDs['ID_CBAllEntities']: ('AllEntities', 'Redraw'),
-            self.IDs['ID_CBMapControl']: ('showLayerControl', 'Redraw'),
-            self.IDs['ID_CBMapMini']: ('mapMini', 'Redraw'),
-            self.IDs['ID_BTNLoad']: 'Load',
-            self.IDs['ID_BTNCreateFiles']: 'CreateFiles',
-            self.IDs['ID_BTNCSV']: 'OpenCSV',
-            self.IDs['ID_BTNTRACE']: 'Trace',
-            self.IDs['ID_BTNSTOP']: 'Stop',
-            self.IDs['ID_BTNBROWSER']: 'OpenBrowser',
-            self.IDs['ID_CBGridView']: ('GridView', 'Render'),
-            self.IDs['ID_TEXTDefaultCountry']: ('defaultCountry', 'Reload', 'defaultCountry'),
-            self.IDs['ID_CBSummary']: ('Summary','Redraw')
+        summary_row_attribute_mapping = {
+            0: 'SummaryOpen',
+            1: 'SummaryPlaces',
+            2: 'SummaryPeople',
+            3: 'SummaryCountries',
+            4: 'SummaryCountriesGrid',
+            5: 'SummaryGeocode',
+            6: 'SummaryAltPlaces'
         }
+        for row, attr in summary_row_attribute_mapping.items():
+            idref = wx.NewIdRef()
+            name = f'CBSummary{row}'
+            self.IDs[name] = idref
+            self.IDtoAttr2[idref] = ('CheckBox', attr, 'Redraw')
 
-        self.colors = [
-            'BTN_PRESS', 'BTN_DIRECTORY', 'BTN_DONE', 'SELECTED', 'ANCESTOR', 'MAINPERSON', 'INFO_BOX_BACKGROUND', 'OTHERPERSON', 
-            'GRID_TEXT', 'GRID_BACK', 'SELECTED_TEXT', 'TITLE_TEXT', 'TITLE_BACK', 'BUSY_BACK'
+        # Define color defaults as (name, default_colour_string) pairs and build
+        # COLORs (name->idref) and COLORid (idref -> [colour_name, wx.Colour])
+        color_pairs = [
+            ('BTN_PRESS', 'TAN'),
+            ('BTN_DIRECTORY', 'WHEAT'),
+            ('BTN_DONE', 'WHITE'),
+            ('SELECTED', 'NAVY'),
+            ('SELECTED_TEXT', 'BLACK'),
+            ('ANCESTOR', 'MEDIUM GOLDENROD'),
+            ('MAINPERSON', 'KHAKI'),
+            ('OTHERPERSON', 'WHITE'),
+            ('INFO_BOX_BACKGROUND', 'GOLDENROD'),
+            ('GRID_TEXT', 'BLACK'),
+            ('GRID_BACK', 'WHITE'),
+            ('TITLE_TEXT', 'WHITE'),
+            ('TITLE_BACK', 'KHAKI'),
+            ('BUSY_BACK', 'YELLOW'),
         ]
-        self.COLORs = {name: wx.NewIdRef() for name in self.colors}
-        # For color selections see https://docs.wxpython.org/wx.ColourDatabase.html#wx-colourdatabase
-        self.COLORid = {
-            self.COLORs['BTN_PRESS']: ['TAN'],              # Alternate WHITE or THISTLE
-            self.COLORs['BTN_DIRECTORY']: ['WHEAT'],
-            self.COLORs['BTN_DONE']: ['WHITE'],
-            self.COLORs['SELECTED']: ['NAVY'],              # Does not currently work
-            self.COLORs['SELECTED_TEXT']: ['BLACK'],        # Does not currently work
-            self.COLORs['ANCESTOR']: ['MEDIUM GOLDENROD'],
-            self.COLORs['MAINPERSON']: ['KHAKI'],
-            self.COLORs['OTHERPERSON']: ['WHITE'],
-            self.COLORs['INFO_BOX_BACKGROUND']: ['GOLDENROD'],
-            self.COLORs['GRID_TEXT']: ['BLACK'],            # Alternate DIM GREY
-            self.COLORs['GRID_BACK']: ['WHITE'],            # Alternate DARK SLATE GREY
-            self.COLORs['TITLE_TEXT']: ['WHITE'],
-            self.COLORs['TITLE_BACK']: ['KHAKI'],
-            self.COLORs['BUSY_BACK']: ['YELLOW']
 
-        }
-        for colorToValue in self.colors:
-            self.COLORid[self.COLORs[colorToValue]].append( wx.TheColourDatabase.FindColour(self.COLORid[self.COLORs[colorToValue]][0]))
+        self.colors = [name for name, _ in color_pairs]
+        self.COLORs = {}
+        self.COLORid = {}
+        for name, default in color_pairs:
+            idref = wx.NewIdRef()
+            self.COLORs[name] = idref
+            # store [default_name, wx.Colour_or_None]
+            try:
+                col = wx.TheColourDatabase.FindColour(default)
+            except Exception:
+                col = None
+            self.COLORid[idref] = [default, col]
         
         self.SmallUpArrow = PyEmbeddedImage(
             b"iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAADxJ"
@@ -111,9 +157,66 @@ class VisualGedcomIds():
             "CartoDB.DarkMatter"
             ]
         
+        # Define setup controls and their target gvOptions attribute in one place
+        vmp_pairs = [
+            ('CBMapControl', 'showLayerControl'),
+            ('CBMapMini', 'mapMini'),
+            ('CBMarksOn', 'MarksOn'),
+            ('CBBornMark', 'BornMark'),
+            ('CBDieMark', 'DieMark'),
+            ('CBHomeMarker', 'HomeMarker'),
+            ('CBMarkStarOn', 'MarkStarOn'),
+            ('CBHeatMap', 'HeatMap'),
+            ('CBFlyTo', 'UseBalloonFlyto'),
+            ('CBMapTimeLine', 'MapTimeLine'),
+            ('CBUseAntPath', 'UseAntPath'),
+            ('CBUseGPS', 'UseGPS'),
+            ('CBAllEntities', 'AllEntities'),
+            ('CBCacheOnly', 'CacheOnly'),
+            ('LISTHeatMapTimeStep', 'HeatMapTimeStep'),
+            ('LISTMapType', 'MapStyle'),
+            ('ID_INTMaxLineWeight', 'MaxLineWeight'),
+            ('RGBroupBy', 'GroupBy'),
+            ('TEXTResult', 'Result'),
+        ]
+
+        # Build id lookup and id->attribute mapping
+        self.VMP_SETUP_OPTION_CONTROLS = {}
+        self.VMP_SETUP_OPTIONS_CONTROL_TO_ATTR = {}
+        for name, attr in vmp_pairs:
+            idref = wx.NewIdRef()
+            self.VMP_SETUP_OPTION_CONTROLS[name] = idref
+            self.VMP_SETUP_OPTIONS_CONTROL_TO_ATTR[idref] = attr
 
     def GetColor(self, colorID):
         if colorID in self.colors:
             return self.COLORid[self.COLORs[colorID]][1]
         _log.error(f'Color not defined : {colorID}')
         raise ValueError(f'Color not defined : {colorID} Color to Attributer table error')
+    
+    def iter_controls(self):
+        """
+        Yield metadata for controls defined by this helper.
+
+        Yields tuples: (control_name, idref, widget_type, gop_attribute, action)
+        This keeps VisualGedcomIds purely a metadata provider. Actual UI
+        updates should be performed by the panel (apply_controls_from_options).
+        """
+        for name, idref in getattr(self, "IDs", {}).items():
+            mapping = self.IDtoAttr2.get(idref)
+            if not mapping:
+                continue
+            wtype = mapping[0] if len(mapping) > 0 else None
+            gop_attr = mapping[1] if len(mapping) > 1 else None
+            action = mapping[2] if len(mapping) > 2 else None
+            yield name, idref, wtype, gop_attr, action
+
+    def get_id_attributes(self, idref: Any) -> dict:
+        """Get the (type, gOp attribute, action) tuple for a given control ID."""
+        attr: dict = {}
+        try:
+            attr = self.IDtoAttr2[idref]
+        except Exception:
+            _log.error(f"ID {idref} not found in IDtoAttr2 mapping.")
+        return {'type': attr[0], 'gOp_attribute': attr[1], 'action': attr[2]}
+

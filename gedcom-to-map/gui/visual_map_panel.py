@@ -156,7 +156,7 @@ class VisualMapPanel(wx.Panel):
             except Exception:
                 pass
             try:
-                self.Unbind(wx.EVT_TIMER, self)
+                self.Unbind(wx.EVT_TIMER, handler=self.OnMyTimer)
             except Exception:
                 pass
 
@@ -315,7 +315,7 @@ class VisualMapPanel(wx.Panel):
         else:
             if not self.id.BTNLoad.IsEnabled():
                 self.id.BTNLoad.Enable()
-            if not self.id.BTNLoad.IsEnabled():
+            if not self.id.BTNCreateFiles.IsEnabled():
                 self.id.BTNCreateFiles.Enable()
 
     def update_csv_button_display(self) -> None:
@@ -345,7 +345,7 @@ class VisualMapPanel(wx.Panel):
     def check_update_running_state(self) -> None:
         """Synchronize busy/ running state and trigger busy indicator transitions."""
         if self.busystate != self.gOp.running:
-            logging.info("Busy %d not Running %d", self.busystate, self.gOp.running)
+            _log.info("Busy %d not Running %d", self.busystate, self.gOp.running)
             if self.gOp.running:
                 self.gOp.runningSince = datetime.now().timestamp()
                 self.OnBusyStart(-1)
@@ -702,14 +702,14 @@ class VisualMapPanel(wx.Panel):
 
         if self.gOp.Result and self.gOp.Referenced:
             if not self.gOp.lastlines:
-                logging.error("No lastline values in SaveTrace (do draw first using HTML Mode for this to work)")
+                _log.error("No lastline values in SaveTrace (do draw first using HTML Mode for this to work)")
                 return 
             tracepath = os.path.splitext(self.gOp.Result)[0] + ".trace.txt"
             # indentpath = os.path.splitext(self.gOp.Result)[0] + ".indent.txt"
             try:
                 trace = open(tracepath , 'w')
             except Exception as e:
-                logging.error("Error: Could not open trace file %s for writing %s", tracepath, e)
+                _log.error("Error: Could not open trace file %s for writing %s", tracepath, e)
                 self.background_process.SayErrorMessage(f"Error: Could not open trace file {tracepath} for writing {e}")
                 return
             # indent = open(indentpath , 'w')

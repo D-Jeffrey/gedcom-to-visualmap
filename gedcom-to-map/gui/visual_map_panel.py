@@ -23,6 +23,8 @@ import webbrowser
 import shutil
 from datetime import datetime
 
+from style.stylemanager import FontManager
+
 from const import KMLMAPSURL
 
 import wx
@@ -53,9 +55,7 @@ class VisualMapPanel(wx.Panel):
     """
 
     # Public attributes with types for static analysis and readability
-    font_manager: Any
-    font_name: str
-    font_size: int
+    font_manager: FontManager
     frame: wx.Frame
     gOp: gvOptions
     id: VisualGedcomIds
@@ -65,7 +65,7 @@ class VisualMapPanel(wx.Panel):
     myTimer: Optional[wx.Timer]
     busystate: bool
 
-    def __init__(self, parent: wx.Window, font_manager: Any, gOp: gvOptions,
+    def __init__(self, parent: wx.Window, font_manager: FontManager, gOp: gvOptions,
                  *args: Any, **kw: Any) -> None:
         """
         Initialize the VisualMapPanel.
@@ -84,14 +84,11 @@ class VisualMapPanel(wx.Panel):
         super().__init__(parent, *args, **kw)
 
         self.font_manager = font_manager
-        self.font_name, self.font_size = self.font_manager.get_font_name_size()
 
         self.SetMinSize((800,800))
         self.frame = self.TopLevelParent
         self.gOp = gOp
 
-        self.id = {}
-        
         self.fileConfig = None
         self.busystate = False
         self.busycounthack = 0

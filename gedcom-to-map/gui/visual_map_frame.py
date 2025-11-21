@@ -35,8 +35,6 @@ class VisualMapFrame(wx.Frame):
 
     # runtime attributes with basic type hints
     font_manager: FontManager
-    font_name: Optional[str]
-    font_size: Optional[int]
     StatusBar: wx.StatusBar
     menuBar: wx.MenuBar
     visual_map_panel: "VisualMapPanel"
@@ -58,7 +56,6 @@ class VisualMapFrame(wx.Frame):
 
         self.gOp = gOp
         self.font_manager = FontManager()
-        self.font_name, self.font_size = self.font_manager.get_font_name_size()
         self.set_current_font()
 
         self.SetMinSize((800, 800))
@@ -71,8 +68,6 @@ class VisualMapFrame(wx.Frame):
 
     def set_current_font(self) -> None:
         """Ensure the frame uses the current font from the FontManager."""
-        if not getattr(self, "font_name", None) or not getattr(self, "font_size", None):
-            self.font_name, self.font_size = self.font_manager.get_font_name_size()
         self.font = self.font_manager.get_font()
         wx.Frame.SetFont(self, self.font)
 
@@ -178,7 +173,7 @@ class VisualMapFrame(wx.Frame):
 
         self.populate_font_menus(optionsMenu)
 
-    def set_gui_font(self, font_name: str, font_size: int) -> None:
+    def set_gui_font(self) -> None:
         """Apply a new GUI font (propagate to frame, menus, statusbar and panel)."""
         self.font_manager.apply_current_font_recursive(self)
         self.font_manager.apply_current_font_recursive(self.GetMenuBar())
@@ -200,8 +195,7 @@ class VisualMapFrame(wx.Frame):
         face = mi.GetItemLabelText()
         success = self.font_manager.set_font(face)
         if success:
-            self.font_name = face
-            self.set_gui_font(self.font_name, self.font_size)
+            self.set_gui_font()
 
     def on_font_size_menu_item(self, event: wx.CommandEvent) -> None:
         """Handle selection of a font-size menu item.
@@ -219,8 +213,7 @@ class VisualMapFrame(wx.Frame):
             return
         success = self.font_manager.set_font_size(size)
         if success:
-            self.font_size = size
-            self.set_gui_font(self.font_name, self.font_size)
+            self.set_gui_font()
 
     def OnExit(self, event: wx.Event) -> None:
         """Handle application exit: stop timers, save settings and close the window."""

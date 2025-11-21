@@ -12,11 +12,6 @@ API:
 from typing import Any
 from matplotlib.pyplot import _log
 import wx
-import time
-import shutil
-import subprocess
-import webbrowser
-
 
 class LayoutOptions:
     """Helper to construct the options UI previously embedded in VisualMapPanel.

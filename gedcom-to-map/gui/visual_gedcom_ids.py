@@ -77,12 +77,12 @@ class VisualGedcomIds:
         ]
         # Build id lookup and id->attribute mapping in a single pass
         self.IDs = {}
-        self.IDtoAttr2 = {}
+        self.IDtoAttr = {}
         for name, mapping in id_attributes:
             idref = wx.NewIdRef()
             self.IDs[name] = idref
             if mapping is not None:
-                self.IDtoAttr2[idref] = mapping
+                self.IDtoAttr[idref] = mapping
         
         summary_row_attribute_mapping = {
             0: 'SummaryOpen',
@@ -97,7 +97,7 @@ class VisualGedcomIds:
             idref = wx.NewIdRef()
             name = f'CBSummary{row}'
             self.IDs[name] = idref
-            self.IDtoAttr2[idref] = ('CheckBox', attr, 'Redraw')
+            self.IDtoAttr[idref] = ('CheckBox', attr, 'Redraw')
 
         # Define color defaults as (name, default_colour_string) pairs and build
         # COLORs (name->idref) and COLORid (idref -> [colour_name, wx.Colour])
@@ -156,37 +156,6 @@ class VisualGedcomIds:
             "CartoDB.VoyagerOnlyLabels",
             "CartoDB.DarkMatter"
             ]
-        
-        # Define setup controls and their target gvOptions attribute in one place
-        vmp_pairs = [
-            ('CBMapControl', 'showLayerControl'),
-            ('CBMapMini', 'mapMini'),
-            ('CBMarksOn', 'MarksOn'),
-            ('CBBornMark', 'BornMark'),
-            ('CBDieMark', 'DieMark'),
-            ('CBHomeMarker', 'HomeMarker'),
-            ('CBMarkStarOn', 'MarkStarOn'),
-            ('CBHeatMap', 'HeatMap'),
-            ('CBFlyTo', 'UseBalloonFlyto'),
-            ('CBMapTimeLine', 'MapTimeLine'),
-            ('CBUseAntPath', 'UseAntPath'),
-            ('CBUseGPS', 'UseGPS'),
-            ('CBAllEntities', 'AllEntities'),
-            ('CBCacheOnly', 'CacheOnly'),
-            ('LISTHeatMapTimeStep', 'HeatMapTimeStep'),
-            ('LISTMapType', 'MapStyle'),
-            ('ID_INTMaxLineWeight', 'MaxLineWeight'),
-            ('RGBroupBy', 'GroupBy'),
-            ('TEXTResult', 'Result'),
-        ]
-
-        # Build id lookup and id->attribute mapping
-        self.VMP_SETUP_OPTION_CONTROLS = {}
-        self.VMP_SETUP_OPTIONS_CONTROL_TO_ATTR = {}
-        for name, attr in vmp_pairs:
-            idref = wx.NewIdRef()
-            self.VMP_SETUP_OPTION_CONTROLS[name] = idref
-            self.VMP_SETUP_OPTIONS_CONTROL_TO_ATTR[idref] = attr
 
     def GetColor(self, colorID):
         if colorID in self.colors:
@@ -203,7 +172,7 @@ class VisualGedcomIds:
         updates should be performed by the panel (apply_controls_from_options).
         """
         for name, idref in getattr(self, "IDs", {}).items():
-            mapping = self.IDtoAttr2.get(idref)
+            mapping = self.IDtoAttr.get(idref)
             if not mapping:
                 continue
             wtype = mapping[0] if len(mapping) > 0 else None
@@ -215,8 +184,7 @@ class VisualGedcomIds:
         """Get the (type, gOp attribute, action) tuple for a given control ID."""
         attr: dict = {}
         try:
-            attr = self.IDtoAttr2[idref]
+            attr = self.IDtoAttr[idref]
         except Exception:
-            _log.error(f"ID {idref} not found in IDtoAttr2 mapping.")
+            _log.error(f"ID {idref} not found in IDtoAttr mapping.")
         return {'type': attr[0], 'gOp_attribute': attr[1], 'action': attr[2]}
-

@@ -10,8 +10,10 @@ API:
         panel: the wx.Panel instance where options controls are created
 """
 from typing import Any
-from matplotlib.pyplot import _log
+import logging
 import wx
+
+_log = logging.getLogger(__name__.lower())
 
 class LayoutOptions:
     """Helper to construct the options UI previously embedded in VisualMapPanel.
@@ -74,10 +76,16 @@ class LayoutOptions:
         vm_panel.id.txtoutfile.Bind(wx.EVT_LEFT_DOWN, vm_panel.frame.OnFileResultDialog)
 
         l1 = wx.BoxSizer(wx.HORIZONTAL)
-        l1.AddMany([vm_panel.id.txtinfile, (6, 20), vm_panel.id.TEXTGEDCOMinput])
+        l1.Add(vm_panel.id.txtinfile)
+        l1.AddSpacer(6)               # 6 px gap
+        l1.Add(vm_panel.id.TEXTGEDCOMinput, 0, wx.ALIGN_CENTER_VERTICAL)
         l2 = wx.BoxSizer(wx.HORIZONTAL)
-        l2.AddMany([vm_panel.id.txtoutfile, (0, 20), vm_panel.id.TEXTResult])
-        sizer.AddMany([l1, (4, 4,), l2])
+        l2.Add(vm_panel.id.txtoutfile)
+        l2.AddSpacer(6)               # 6 px gap
+        l2.Add(vm_panel.id.TEXTResult, 0, wx.ALIGN_CENTER_VERTICAL)
+        sizer.Add(l1, 0, wx.EXPAND)
+        sizer.AddSpacer(4)
+        sizer.Add(l2, 0, wx.EXPAND)
 
     @staticmethod
     def _add_basic_checks(vm_panel: Any, panel: wx.Panel, sizer: wx.Sizer) -> None:
@@ -208,17 +216,19 @@ class LayoutOptions:
         ssizer = wx.StaticBoxSizer(sbox, wx.VERTICAL)
         sboxIn = wx.BoxSizer(wx.VERTICAL)
 
+        # Parent controls to the container panel (not to the StaticBox object)
         vm_panel.id.CBSummary = [
-            wx.CheckBox(sbox, vm_panel.id.IDs["CBSummary0"], label="Open files after created", name="Open"),
-            wx.CheckBox(sbox, vm_panel.id.IDs["CBSummary1"], label="Places", name="Places"),
-            wx.CheckBox(sbox, vm_panel.id.IDs["CBSummary2"], label="People", name="People"),
-            wx.CheckBox(sbox, vm_panel.id.IDs["CBSummary3"], label="Countries", name="Countries"),
-            wx.CheckBox(sbox, vm_panel.id.IDs["CBSummary4"], label="Countries Grid", name="CountriesGrid"),
-            wx.CheckBox(sbox, vm_panel.id.IDs["CBSummary5"], label="Geocode", name="Geocode"),
-            wx.CheckBox(sbox, vm_panel.id.IDs["CBSummary6"], label="Alternate Places", name="AltPlaces"),
+            wx.CheckBox(sbox_container, vm_panel.id.IDs["CBSummary0"], label="Open files after created", name="Open"),
+            wx.CheckBox(sbox_container, vm_panel.id.IDs["CBSummary1"], label="Places", name="Places"),
+            wx.CheckBox(sbox_container, vm_panel.id.IDs["CBSummary2"], label="People", name="People"),
+            wx.CheckBox(sbox_container, vm_panel.id.IDs["CBSummary3"], label="Countries", name="Countries"),
+            wx.CheckBox(sbox_container, vm_panel.id.IDs["CBSummary4"], label="Countries Grid", name="CountriesGrid"),
+            wx.CheckBox(sbox_container, vm_panel.id.IDs["CBSummary5"], label="Geocode", name="Geocode"),
+            wx.CheckBox(sbox_container, vm_panel.id.IDs["CBSummary6"], label="Alternate Places", name="AltPlaces"),
         ]
 
-        sboxIn.AddMany(vm_panel.id.CBSummary)
+        # Add with padding so the checkboxes are not flush against each other
+        sboxIn.AddMany([(cb, 0, wx.ALL, 2) for cb in vm_panel.id.CBSummary])
         ssizer.Add(sboxIn, 0, wx.EXPAND | wx.ALL, 4)
         sbox_container.SetSizer(ssizer)
         vm_panel.optionSbox = sbox_container

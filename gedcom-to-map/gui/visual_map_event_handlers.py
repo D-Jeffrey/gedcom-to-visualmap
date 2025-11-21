@@ -70,7 +70,7 @@ class VisualMapEventHandler:
     # ---- helpers --------------------------------------------------------
     def _id_attrs(self, event_id: int) -> Optional[Any]:
         try:
-            return self.panel.id.IDtoAttr2.get(event_id)
+            return self.panel.id.IDtoAttr.get(event_id)
         except Exception:
             _log.exception("_id_attrs lookup failed for %s", event_id)
             return None

@@ -93,7 +93,6 @@ class LayoutOptions:
         cb_born_mark = LayoutHelpers.add_checkbox_with_id(vm_panel, panel, "CBBornMark", "Marker for when Born")
         cb_die_mark = LayoutHelpers.add_checkbox_with_id(vm_panel, panel, "CBDieMark", "Marker for when Died")
 
-        LayoutHelpers.add_busy_indicator(vm_panel, panel, "busyIndicator", color="BUSY_BACK")
         LayoutHelpers.add_radio_box_with_id(vm_panel, panel, "RBResultType", "Result Type",
                                            ResultType.list_values(), majorDimension=5)
 
@@ -259,27 +258,30 @@ class LayoutOptions:
     @staticmethod
     def _add_buttons_row(vm_panel: Any, panel: wx.Panel, sizer: wx.Sizer) -> None:
         """Create the action buttons row (Load, Create, CSV, Trace, Stop, Browser)."""
-        l1 = wx.BoxSizer(wx.HORIZONTAL)
-        vm_panel.id.BTNLoad = wx.Button(panel, vm_panel.id.IDs["BTNLoad"], "Load")
-        vm_panel.id.BTNCreateFiles = wx.Button(panel, vm_panel.id.IDs["BTNCreateFiles"], "Create Files")
-        vm_panel.id.BTNCSV = wx.Button(panel, vm_panel.id.IDs["BTNCSV"], "Geo Table")
-        vm_panel.id.BTNTRACE = wx.Button(panel, vm_panel.id.IDs["BTNTRACE"], "Trace")
-        vm_panel.id.BTNSTOP = wx.Button(panel, vm_panel.id.IDs["BTNSTOP"], "Stop")
-        vm_panel.id.BTNBROWSER = wx.Button(panel, vm_panel.id.IDs["BTNBROWSER"], "Browser")
-        l1.Add(vm_panel.id.BTNLoad, 0, wx.EXPAND | wx.ALL, 5)
-        l1.Add(vm_panel.id.BTNCreateFiles, 0, wx.EXPAND | wx.ALL, 5)
-        l1.Add(vm_panel.id.BTNCSV, 0, wx.EXPAND | wx.ALL, 5)
-        l1.Add(vm_panel.id.BTNTRACE, 0, wx.EXPAND | wx.ALL, 5)
-        sizer.Add(l1, 0, wx.EXPAND | wx.ALL, 0)
+        bt_load = LayoutHelpers.add_button_with_id(vm_panel, panel, "BTNLoad", "Load", color=None)
+        bt_create = LayoutHelpers.add_button_with_id(vm_panel, panel, "BTNCreateFiles", "Create Files", color=None)
+        bt_csv = LayoutHelpers.add_button_with_id(vm_panel, panel, "BTNCSV", "Geo Table", color=None)
+        bt_trace = LayoutHelpers.add_button_with_id(vm_panel, panel, "BTNTRACE", "Trace", color=None)
 
         l1 = wx.BoxSizer(wx.HORIZONTAL)
-        l1.Add(vm_panel.id.busyIndicator, 0, wx.ALL | wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 5)
-        l1.Add(vm_panel.id.BTNSTOP, 0, wx.EXPAND | wx.LEFT, 20)
-        l1.AddSpacer(20)
-        l1.Add(vm_panel.id.BTNBROWSER, proportion=0, flag=wx.EXPAND | wx.ALL, border=5)
-        l1.AddSpacer(20)
-        sizer.Add((0, 10))
+        l1.Add(bt_load, 0, wx.EXPAND | wx.ALL, 5)
+        l1.Add(bt_create, 0, wx.EXPAND | wx.ALL, 5)
+        l1.Add(bt_csv, 0, wx.EXPAND | wx.ALL, 5)
+        l1.Add(bt_trace, 0, wx.EXPAND | wx.ALL, 5)
         sizer.Add(l1, 0, wx.EXPAND | wx.ALL, 0)
+
+        busy_indicator = LayoutHelpers.add_busy_indicator(vm_panel, panel, "busyIndicator", color="BUSY_BACK")
+        bt_stop = LayoutHelpers.add_button_with_id(vm_panel, panel, "BTNSTOP", "Stop", color=None)
+        bt_browser = LayoutHelpers.add_button_with_id(vm_panel, panel, "BTNBROWSER", "Browser", color=None)
+
+        l2 = wx.BoxSizer(wx.HORIZONTAL)
+        l2.Add(busy_indicator, 0, wx.ALL | wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 5)
+        l2.Add(bt_stop, 0, wx.EXPAND | wx.LEFT, 20)
+        l2.AddSpacer(20)
+        l2.Add(bt_browser, proportion=0, flag=wx.EXPAND | wx.ALL, border=5)
+        l2.AddSpacer(20)
+        sizer.Add((0, 10))
+        sizer.Add(l2, 0, wx.EXPAND | wx.ALL, 0)
 
     @staticmethod
     def adjust_panel_width(vm_panel: Any) -> None:

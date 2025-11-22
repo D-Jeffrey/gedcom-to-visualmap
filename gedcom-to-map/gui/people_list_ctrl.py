@@ -7,7 +7,6 @@ from gedcom.gedcomdate import CheckAge
 from .person_dialog import PersonDialog
 from .find_dialog import FindDialog
 from .visual_gedcom_ids import VisualGedcomIds
-from .gedcomvisual import doTrace
 
 _log = logging.getLogger(__name__.lower())
 
@@ -292,10 +291,12 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
     def ShowSelectedLinage(self, personid: str):
         if self.gOp:
             self.gOp.setMain(personid)
+            panel_actions = getattr(getattr(self.gOp, "panel", None), "actions", None)
             if getattr(self.gOp.BackgroundProcess, "updategridmain", False):
                 _log.debug("Linage for: %s", personid)
                 self.gOp.BackgroundProcess.updategridmain = False
-                doTrace(self.gOp)
+                if panel_actions and getattr(panel_actions, "doTrace", None):
+                    panel_actions.doTrace(self.gOp)
                 self.gOp.newload = False
                 self.PopulateList(self.gOp.people, self.gOp.get('Main'), False)
                 try:

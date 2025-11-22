@@ -9,7 +9,7 @@ from models.Person import Person, LifeEvent
 from gedcom.gedcomdate import CheckAge
 from gedrecdisplay import show_gedpy_record_dialog
 from .family_panel import FamilyPanel
-from .gedcomvisual import doTraceTo
+from .visual_map_actions import VisualMapActions
 
 _log = logging.getLogger(__name__.lower())
 
@@ -132,10 +132,11 @@ class PersonDialog(wx.Dialog):
 
         # lineage / family panel creation is deferred and imports FamilyPanel at runtime
         self.related = None
+        panel_actions = getattr(getattr(self.gOp, "panel", None), "actions", None)
         if self.gOp and getattr(self.gOp, "Referenced", None) and showrefences:
             if FamilyPanel and panel and getattr(panel, "gOp", None) and panel.gOp.Referenced.exists(person.xref_id):
-                if doTraceTo:
-                    hertiageList = doTraceTo(panel.gOp, person)
+                if panel_actions.doTraceTo:
+                    hertiageList = panel_actions.doTraceTo(panel.gOp, person)
                     if hertiageList:
                         hertiageSet = {}
                         for (hertiageparent, hertiageperson, hyear, hid) in hertiageList:

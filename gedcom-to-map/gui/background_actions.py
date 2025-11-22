@@ -5,7 +5,7 @@ from pathlib import Path
 
 import wx
 
-from .gedcomvisual import ParseAndGPS, doHTML, doKML, doKML2, doSUM, doTraceTo  # type: ignore
+from .visual_map_actions import VisualMapActions
 
 _log = logging.getLogger(__name__.lower())
 
@@ -82,6 +82,7 @@ class BackgroundActions:
                 wx.Yield()
                 # Obtain event type from gOp if available
                 UpdateBackgroundEvent = getattr(self.gOp, "UpdateBackgroundEvent", None)
+                panel_actions = getattr(getattr(self.gOp, "panel", None), "actions", None)
                 try:
                     if self.do & 1 or (self.do & 4 and not getattr(self.gOp, "parsed", False)):
                         if UpdateBackgroundEvent:
@@ -97,9 +98,9 @@ class BackgroundActions:
                             self.people = None
                         _log.info("ParseAndGPS")
                         try:
-                            if ParseAndGPS:
+                            if panel_actions.ParseAndGPS:
                                 # ParseAndGPS may take time; ensure it can be interrupted by cooperative checks in that code
-                                self.people = ParseAndGPS(self.gOp, 1)
+                                self.people = panel_actions.ParseAndGPS(self.gOp, 1)
                             else:
                                 self.people = None
                         except Exception as e:
@@ -150,20 +151,17 @@ class BackgroundActions:
                                 result_type_name = getattr(self.gOp, "ResultType", None).name
                                 try:
                                     if getattr(self.gOp, "ResultType", None) and result_type_name == "HTML":
-                                        if doHTML:
-                                            doHTML(self.gOp, self.people, True)
+                                        panel_actions.doHTML(self.gOp, self.people, True)
                                         self.SayInfoMessage(f"HTML generated for {getattr(self.gOp, 'totalpeople', '?')} people ({fname})")
                                     elif getattr(self.gOp, "ResultType", None) and result_type_name == "KML":
-                                        if doKML:
-                                            doKML(self.gOp, self.people)
+                                        panel_actions.doKML(self.gOp, self.people)
                                         self.SayInfoMessage(f"KML file generated for {getattr(self.gOp, 'totalpeople', '?')} people/points ({fname})")
                                     elif getattr(self.gOp, "ResultType", None) and result_type_name == "KML2":
-                                        if doKML2:
-                                            doKML2(self.gOp, self.people)
+                                        if panel_actions.doKML2:
+                                            panel_actions.doKML2(self.gOp, self.people)
                                         self.SayInfoMessage(f"KML2 file generated for {getattr(self.gOp, 'totalpeople', '?')} people/points ({fname})")
                                     elif getattr(self.gOp, "ResultType", None) and result_type_name == "SUM":
-                                        if doSUM:
-                                            doSUM(self.gOp)
+                                        panel_actions.doSUM(self.gOp)
                                         self.SayInfoMessage(f"Summary files generated ({fname})")
                                     else:
                                         self.SayErrorMessage(f"Error: Unknown Result Type {result_type_name}", True)

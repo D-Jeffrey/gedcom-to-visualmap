@@ -81,9 +81,25 @@ class ResultsType(Enum):
         else:
             raise TypeError(f"Cannot convert {type(value)} to ResultsType")
     
-    def name(self) -> str:
+    def __str__(self) -> str:
         """Return the enum member's name value for human-readable display."""
         return self.value
+    
+    def long_name(self) -> str:
+        """Return a long-form identifier for the ResultsType, e.g. 'ResultsType.HTML'."""
+        
+        # Support classes that (incorrectly) define name() as a method as well
+        # as standard enum members that expose .name attribute.
+        try:
+            name_attr = getattr(self, "name")
+            if callable(name_attr):
+                name_str = name_attr()
+            else:
+                name_str = name_attr
+        except Exception:
+            # Fallback to value if anything unexpected happens
+            name_str = str(self.value)
+        return f"ResultsType.{name_str}"
     
     @staticmethod
     def list_values() -> list[str]:

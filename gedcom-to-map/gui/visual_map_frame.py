@@ -314,7 +314,7 @@ class VisualMapFrame(wx.Frame):
             try:
                 self.visual_map_panel.gOp.setResults(path, isHTML)
                 self.visual_map_panel.id.TEXTResult.SetValue(path)
-                self.visual_map_panel.id.RBResultOutType.SetSelection(0 if isHTML else 1)
+                self.visual_map_panel.id.RBResultsType.SetSelection(0 if isHTML else 1)
                 self.visual_map_panel.SetupButtonState()
             except Exception:
                 _log.exception("OnFileResultDialog: failed to set results")
@@ -403,3 +403,14 @@ class VisualMapFrame(wx.Frame):
             self.config_dialog = dialog
         except Exception:
             _log.exception("onOptionsSetup failed")
+
+    def OnCloseWindow(self, event):
+        try:
+            if getattr(self, "visual_map_panel", None):
+                try:
+                    self.visual_map_panel._shutdown_background()
+                except Exception:
+                    _log.exception("visual_map_panel._shutdown_background failed")
+        finally:
+            # then allow normal close/destroy
+            event.Skip()

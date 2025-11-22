@@ -98,6 +98,7 @@ class BackgroundActions:
                         _log.info("ParseAndGPS")
                         try:
                             if ParseAndGPS:
+                                # ParseAndGPS may take time; ensure it can be interrupted by cooperative checks in that code
                                 self.people = ParseAndGPS(self.gOp, 1)
                             else:
                                 self.people = None
@@ -146,35 +147,39 @@ class BackgroundActions:
                             fname = getattr(self.gOp, "Result", None)
                             if getattr(self.gOp, "ResultType", None) is not None:
                                 # call appropriate generation function if available
+                                result_type_name = getattr(self.gOp, "ResultType", None).name
                                 try:
-                                    if getattr(self.gOp, "ResultType", None) and self.gOp.ResultType.name == "HTML":
+                                    if getattr(self.gOp, "ResultType", None) and result_type_name == "HTML":
                                         if doHTML:
                                             doHTML(self.gOp, self.people, True)
                                         self.SayInfoMessage(f"HTML generated for {getattr(self.gOp, 'totalpeople', '?')} people ({fname})")
-                                    elif getattr(self.gOp, "ResultType", None) and self.gOp.ResultType.name == "KML":
+                                    elif getattr(self.gOp, "ResultType", None) and result_type_name == "KML":
                                         if doKML:
                                             doKML(self.gOp, self.people)
                                         self.SayInfoMessage(f"KML file generated for {getattr(self.gOp, 'totalpeople', '?')} people/points ({fname})")
-                                    elif getattr(self.gOp, "ResultType", None) and self.gOp.ResultType.name == "KML2":
+                                    elif getattr(self.gOp, "ResultType", None) and result_type_name == "KML2":
                                         if doKML2:
                                             doKML2(self.gOp, self.people)
                                         self.SayInfoMessage(f"KML2 file generated for {getattr(self.gOp, 'totalpeople', '?')} people/points ({fname})")
-                                    elif getattr(self.gOp, "ResultType", None) and self.gOp.ResultType.name == "SUM":
+                                    elif getattr(self.gOp, "ResultType", None) and result_type_name == "SUM":
                                         if doSUM:
                                             doSUM(self.gOp)
                                         self.SayInfoMessage(f"Summary files generated ({fname})")
+                                    else:
+                                        self.SayErrorMessage(f"Error: Unknown Result Type {result_type_name}", True)
                                 except Exception:
                                     _log.exception("Error while generating output")
                         else:
                             _log.info("not parsed")
 
                     _log.debug("=======================GOING TO IDLE %d", self.threadnum)
+                    # reset work flags
                     self.do = 0
                     self.readyToDo = True
                     try:
                         self.gOp.stop()
                     except Exception:
-                        pass
+                        _log.exception("BackgroundActions: gOp.stop() failed")
                     if UpdateBackgroundEvent:
                         wx.PostEvent(self.win, UpdateBackgroundEvent(state='done'))
                 except Exception:
@@ -182,3 +187,4 @@ class BackgroundActions:
             else:
                 time.sleep(0.3)
         self.threadrunning = False
+        _log.info("BackgroundActions thread %d exiting", self.threadnum)

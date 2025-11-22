@@ -58,7 +58,10 @@ class VisualMapEventHandler:
                 _log.debug("No binding for widget id %s (type=%r)", wid, wtype)
 
         # panel-level close remains panel's responsibility
-        p.Bind(wx.EVT_CLOSE, p.OnCloseWindow)
+        top = p.GetTopLevelParent()
+        if top:
+            top.Bind(wx.EVT_CLOSE, p.OnCloseWindow)
+
         # restore initial UI state after binding
         try:
             p.OnBusyStop(-1)

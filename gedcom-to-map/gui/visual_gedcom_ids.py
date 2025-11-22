@@ -55,7 +55,6 @@ class VisualGedcomIds:
 
             ('RBKMLMode', ('RadioButton', 'KMLMode', 'Redraw')),
 
-            ('INTMaxMissing', ('Int', 'MaxMissing', 'Reload')),
             ('INTMaxLineWeight', ('SpinCtrl', 'MaxLineWeight', 'Reload')),
 
             ('CBUseGPS', ('CheckBox', 'UseGPS', 'Reload')),

@@ -226,7 +226,7 @@ class VisualMapPanel(wx.Panel):
             outType = 3
         else:
             outType = 0
-        self.id.RBResultOutType.SetSelection(outType)
+        self.id.RBResultsType.SetSelection(outType)
 
     def get_runtime_string(self) -> str:
         """Return a formatted running/ETA string based on gOp timing and counters.
@@ -566,10 +566,10 @@ class VisualMapPanel(wx.Panel):
         self.peopleList.SetGOp(self.gOp)
 
         if self.gOp.get('ResultType'):
-            self.id.RBResultOutType.SetSelection(0)
+            self.id.RBResultsType.SetSelection(0)
         else:
-            if self.id.RBResultOutType.GetSelection() not in [1,2]:
-                self.id.RBResultOutType.SetSelection(1)
+            if self.id.RBResultsType.GetSelection() not in [1,2]:
+                self.id.RBResultsType.SetSelection(1)
         
         # Populate UI widgets from gOp using the panel method (VisualGedcomIds is metadata-only)
         try:
@@ -780,7 +780,38 @@ class VisualMapPanel(wx.Panel):
 
             time.sleep(0.1)
 
-        self.Destroy()
+        for child in self.GetChildren():
+            child.Destroy()
+        for attr in ("peopleList", "panelA", "panelB", "optionSbox", "optionHbox", "optionKbox", "optionK2box", "id"):
+            try:
+                obj = getattr(self, attr, None)
+                if obj and getattr(obj, "SetSizer", None):
+                    try:
+                        obj.SetSizer(None)
+                    except Exception:
+                        pass
+                try:
+                    setattr(self, attr, None)
+                except Exception:
+                    pass
+            except Exception:
+                _log.exception("OnCloseWindow: failed to delattr %s", attr)
+        try:
+            self.DestroyChildren()
+        except Exception:
+            _log.exception("OnCloseWindow: DestroyChildren failed")
+        
+        try:
+            wx.CallAfter(self.Destroy)
+        except Exception:
+            _log.exception("OnCloseWindow: CallAfter Destroy failed")
+        finally:
+            try:
+                del busy
+            except Exception:
+                pass
+            if evt is not None:
+                evt.Skip()
 
     def apply_controls_from_options(self, gOp: Any) -> None:
         """Apply values from gOp to actual wx controls using id metadata.

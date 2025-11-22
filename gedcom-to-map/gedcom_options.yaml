@@ -28,7 +28,9 @@ config_file_settings:
     UseGPS: 'bool', CacheOnly: 'bool', AllEntities: 'bool', ResultType: 'result',
     KMLcmdline: 'str', CSVcmdline: 'str', Tracecmdline: 'str',  badAge: 'bool' }
   KML : {
-    'MaxLineWeight':'int', 'MaxMissing':'int', 'UseBalloonFlyto':'bool', 'KMLsort':'bool' }
+    'MaxLineWeight':'int',
+    # 'MaxMissing':'int',
+    'UseBalloonFlyto':'bool', 'KMLsort':'bool' }
   # Old settings that should be removed from the config file
   old_settings: {
     'native': 'KML', 'born': 'KML', 'death':'KML', 'PlaceType': 'KML',

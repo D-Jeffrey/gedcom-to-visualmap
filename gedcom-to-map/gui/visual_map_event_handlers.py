@@ -228,9 +228,10 @@ class VisualMapEventHandler:
     def EvtListBox(self, event: wx.CommandEvent) -> None:
         """Handle choice/listbox selection changes (map style etc)."""
         try:
-            eid = event.GetId()
-            mapping = self._id_attrs(eid)
-            if mapping and mapping[0] == "MapStyle" or (isinstance(mapping, tuple) and mapping[0] == "MapStyle"):
+            event_id = event.GetId()
+            attributes = self.panel.id.get_id_attributes(event_id)
+            attrname = attributes.get("gOp_attribute", None)
+            if attributes and attrname == "MapStyle":
                 # MapStyle stored as set/list of types; UI stores selection index
                 try:
                     self.panel.gOp.MapStyle = sorted(self.panel.id.AllMapTypes)[event.GetSelection()]
@@ -238,20 +239,21 @@ class VisualMapEventHandler:
                     return
                 except Exception:
                     _log.exception("EvtListBox MapStyle handling failed")
-            _log.error("Uncontrolled LISTbox %s", eid)
+            _log.error("Uncontrolled LISTbox %s", event_id)
         except Exception:
             _log.exception("EvtListBox failed")
 
     def EvtSpinCtrl(self, event: wx.CommandEvent) -> None:
         """Handle spin control changes (MaxLineWeight etc)."""
         try:
-            eid = event.GetId()
-            mapping = self._id_attrs(eid)
-            if mapping and mapping[0] == "MaxLineWeight":
+            event_id = event.GetId()
+            attributes = self.panel.id.get_id_attributes(event_id)
+            attrname = attributes.get("gOp_attribute", None)
+            if attributes and attrname == "MaxLineWeight":
                 self.panel.gOp.MaxLineWeight = event.GetSelection()
                 self.panel.NeedRedraw()
                 return
-            _log.error("Uncontrolled SPIN %s", eid)
+            _log.error("Uncontrolled SPIN %s", event_id)
         except Exception:
             _log.exception("EvtSpinCtrl failed")
 

@@ -72,7 +72,7 @@ def doKML(gOp : gvOptions, people: list[Person]):
         if bg:
             bg.SayInfoMessage(f"KML output to : {cmdfile}")
         if gOp.KMLcmdline:
-            gOp.panel.runCMDfile(gOp.KMLcmdline, cmdfile)
+            gOp.panel.actions.runCMDfile(gOp.KMLcmdline, cmdfile)
         else:
             _log.error("Use Options -> Options Setup to define a command line to run")
     else:
@@ -93,7 +93,7 @@ def doKML2(gOp : gvOptions, people: list[Person]):
         if bg:
             bg.SayInfoMessage(f"KML(2) output to : {resultFile}")
         if gOp.KMLcmdline:
-            gOp.panel.runCMDfile(gOp.KMLcmdline, resultFile)
+            gOp.panel.actions.runCMDfile(gOp.KMLcmdline, resultFile)
         else:
             _log.error("Use Options -> Options Setup to define a command line to run")
     else:
@@ -135,7 +135,7 @@ def doSUM(gOp : gvOptions):
             if bg:
                 bg.SayInfoMessage(f"Places Summary: {places_summary_file}")
             if gOp.SummaryOpen:
-                gOp.panel.runCMDfile("$n", str(places_summary_file))
+                gOp.panel.actions.runCMDfile("$n", str(places_summary_file))
     if gOp.SummaryPeople:
         people_summary_file = output_folder / f"{base_file_name}_people.csv"
         people_summary_file = people_summary_file.resolve()
@@ -145,7 +145,7 @@ def doSUM(gOp : gvOptions):
             if bg:
                 bg.SayInfoMessage(f"People Summary: {people_summary_file}")
             if gOp.SummaryOpen:
-                gOp.panel.runCMDfile("$n", str(people_summary_file))
+                gOp.panel.actions.runCMDfile("$n", str(people_summary_file))
 
     if gOp.SummaryCountries or gOp.SummaryCountriesGrid:
         countries_summary_file = output_folder / f"{base_file_name}_countries.csv"
@@ -156,12 +156,12 @@ def doSUM(gOp : gvOptions):
             if bg:
                 bg.SayInfoMessage(f"Countries summary: {countries_summary_file}")
             if gOp.SummaryOpen:
-                gOp.panel.runCMDfile("$n", str(countries_summary_file))
+                gOp.panel.actions.runCMDfile("$n", str(countries_summary_file))
         if gOp.SummaryCountriesGrid and img_file:
             if bg:
                 bg.SayInfoMessage(f"Countries summary Graph: {img_file}")
             if gOp.SummaryOpen:
-                gOp.panel.runCMDfile("$n", str(img_file))
+                gOp.panel.actions.runCMDfile("$n", str(img_file))
 
     if gOp.SummaryGeocode:
         per_file_cache = output_folder / f"{base_file_name}{FILE_GEOCACHE_FILENAME_SUFFIX}"
@@ -172,7 +172,7 @@ def doSUM(gOp : gvOptions):
             if bg:
                 bg.SayInfoMessage(f"geo cache: {per_file_cache}")
             if gOp.SummaryOpen:
-                gOp.panel.runCMDfile("$n", str(per_file_cache))
+                gOp.panel.actions.runCMDfile("$n", str(per_file_cache))
 
     if gOp.SummaryAltPlaces:
         alt_places_summary_file = output_folder / f"{base_file_name}_alt_places.csv"
@@ -183,7 +183,7 @@ def doSUM(gOp : gvOptions):
             if bg:
                 bg.SayInfoMessage(f"Alternative places summary: {alt_places_summary_file}")
             if gOp.SummaryOpen:
-                gOp.panel.runCMDfile("$n", str(alt_places_summary_file))
+                gOp.panel.actions.runCMDfile("$n", str(alt_places_summary_file))
 
 
 def Geoheatmap(gOp : gvOptions):

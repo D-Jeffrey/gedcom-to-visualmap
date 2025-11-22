@@ -232,14 +232,14 @@ class VisualMapFrame(wx.Frame):
     def OnOpenCSV(self, event: wx.Event) -> None:
         """Menu handler: open CSV/geo table using the panel helper."""
         try:
-            self.visual_map_panel.OpenCSV()
+            self.visual_map_panel.actions.OpenCSV()
         except Exception:
             _log.exception("OnOpenCSV failed")
 
     def OnOpenBrowser(self, event: wx.Event) -> None:
         """Menu handler: open the generated result in a browser or KML viewer."""
         try:
-            self.visual_map_panel.OpenBrowser()
+            self.visual_map_panel.actions.OpenBrowser()
         except Exception:
             _log.exception("OnOpenBrowser failed")
 
@@ -279,7 +279,7 @@ class VisualMapFrame(wx.Frame):
         wx.Yield()
         if Proceed:
             try:
-                self.visual_map_panel.LoadGEDCOM()
+                self.visual_map_panel.actions.LoadGEDCOM()
             except Exception:
                 _log.exception("LoadGEDCOM failed")
 
@@ -340,7 +340,7 @@ class VisualMapFrame(wx.Frame):
             self.filehistory.AddFileToHistory(path)
             self.visual_map_panel.setInputFile(path)
             wx.Yield()
-            self.visual_map_panel.LoadGEDCOM()
+            self.visual_map_panel.actions.LoadGEDCOM()
         except Exception:
             _log.exception("OnFileHistory failed")
 

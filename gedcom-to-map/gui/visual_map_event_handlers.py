@@ -90,7 +90,7 @@ class VisualMapEventHandler:
         }
         fn_name = mapping.get(action)
         if fn_name:
-            fn = getattr(self.panel, fn_name, None)
+            fn = getattr(self.panel.actions, fn_name, None)
             if callable(fn):
                 try:
                     fn()

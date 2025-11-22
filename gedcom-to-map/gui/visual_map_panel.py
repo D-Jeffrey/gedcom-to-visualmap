@@ -32,6 +32,7 @@ from .background_actions import BackgroundActions
 from .layout_options import LayoutOptions
 from .visual_gedcom_ids import VisualGedcomIds
 from .visual_map_event_handlers import VisualMapEventHandler
+from .visual_map_actions import VisualMapActions
 from gedcom_options import gvOptions, ResultType  # type: ignore
 from style.stylemanager import FontManager
 
@@ -130,6 +131,8 @@ class VisualMapPanel(wx.Panel):
         # create handler first so LayoutOptions.build (which no longer binds)
         # can safely be used; handler will be used to wire event bindings next
         self.handlers = VisualMapEventHandler(self)
+        # action helpers handle commands that previously lived on this panel
+        self.actions = VisualMapActions(self)
 
         # Add all the labels, button and radiobox to Right Panel using LayoutOptions helper
         LayoutOptions.build(self, self.panelB)
@@ -570,164 +573,6 @@ class VisualMapPanel(wx.Panel):
 
     def updateOptions(self):
         pass
-
-    def LoadGEDCOM(self):
-        #TODO stop the previous actions and then do the load... need to be improved
-        if self.background_process.IsTriggered(): 
-            self.gOp.stopping = True
-        else:
-            self.OnBusyStart(-1)
-            time.sleep(0.1)
-            self.gOp.set('GridView', False)
-            self.id.CBGridView.SetValue(False)
-        
-            cachepath, _ = os.path.split(self.gOp.get('GEDCOMinput'))
-            if self.gOp.get('gpsfile'):
-                sourcepath, _ = os.path.split(self.gOp.get('gpsfile'))
-            else:
-                sourcepath = None
-            if self.gOp.lookup and cachepath != sourcepath:
-                del self.gOp.lookup
-                self.gOp.lookup = None
-            self.gOp.step('Loading GEDCOM')
-            self.background_process.Trigger(1)
-        
-    def DrawGEDCOM(self):
-
-        if not self.gOp.get('ResultFile') or self.gOp.get('ResultFile') == '':
-            _log.error("Error: Not output file name set")
-            self.background_process.SayErrorMessage("Error: Please set the Output file name")
-        else:
-            self.OnBusyStart(-1)
-            self.background_process.Trigger(2 | 4)
-
-    def OpenCSV(self):
-        self.runCMDfile(self.gOp.get('CSVcmdline'), self.gOp.get('gpsfile'))
-
-    def runCMDfile(self, cmdline, datafile, isHTML=False):
-        """Run an external command or open a file/URL suggested by application options.
-
-        - If isHTML then open datafile in a browser.
-        - If cmdline == '$n' attempt to open the datafile with the platform default.
-        - If cmdline contains '$n' substitute the datafile and shell-execute the result.
-        - Otherwise try to launch the command with datafile as an argument.
-
-        Exceptions are logged rather than raised to keep the UI responsive.
-        """
-        orgcmdline = cmdline
-        if datafile and datafile != '' and datafile != None:
-            cmdline = cmdline.replace('$n', f'{datafile}')
-            try:
-                if isHTML:          # Force it to run in a browsers
-                    _log.info(f'browserstart {cmdline}')
-                    webbrowser.open(datafile, new = 0, autoraise = True)
-                elif orgcmdline == '$n':
-                    if sys.platform == "win32":
-                        _log.info(f'startfile {datafile}')
-                        os.startfile(datafile)          # Native Windows method
-                    elif sys.platform == "darwin":
-                        opener = "open"
-                        _log.info(f'subprocess.Popen {datafile}')
-                        subprocess.Popen([opener, datafile])
-                    else:
-                        opener ="xdg-open"
-                        if not shutil.which(opener):
-                            raise EnvironmentError(f"{opener} not found. Install it or use a different method.")
-                        _log.info(f'subprocess.Popen {datafile}')
-                        subprocess.Popen([opener, datafile])
-                else:
-                    # it is suggesting a web URL
-                    if cmdline.startswith('http'):
-                        _log.info(f'webbrowswer run  `{cmdline}`')
-                        webbrowser.open(cmdline, new = 0, autoraise = True)
-                    else:
-                        # does the command line contain the $n placeholder
-                        if '$n' in orgcmdline:
-                            _log.info(f'subprocess.Popen file {cmdline}')
-                            subprocess.Popen(cmdline, shell=True)
-                        else:
-                            _log.info(f'subprocess.Popen line {cmdline};{datafile}')
-                            subprocess.Popen([cmdline, datafile], shell=True)
-
-                        # TODO need a better command-line management than this
-                        # cmdline = f"column -s, -t < {csvfile} | less -#2 -N -S"
-            except Exception as e:
-                _log.exception("Issues in runCMDfile")
-                _log.error(f"Failed to open file: {e}")
-
-        else:
-            _log.error(f"Error: runCMDfile-unknwon cmdline {datafile}")
-    
-    def SaveTrace(self):
-        """Dump a trace file describing each referenced person and optionally open it."""
-
-        if self.gOp.ResultFile and self.gOp.Referenced:
-            if not self.gOp.lastlines:
-                _log.error("No lastline values in SaveTrace (do draw first using HTML Mode for this to work)")
-                return 
-            tracepath = os.path.splitext(self.gOp.ResultFile)[0] + ".trace.txt"
-            # indentpath = os.path.splitext(self.gOp.ResultFile)[0] + ".indent.txt"
-            try:
-                trace = open(tracepath , 'w')
-            except Exception as e:
-                _log.error("Error: Could not open trace file %s for writing %s", tracepath, e)
-                self.background_process.SayErrorMessage(f"Error: Could not open trace file {tracepath} for writing {e}")
-                return
-            # indent = open(indentpath , 'w')
-            trace.write("id\tName\tYear\tWhere\tGPS\tPath\n")
-            # indent.write("this is an indented file with the number of generations driven by the parents\nid\tName\tYear\tWhere\tGPS\n") 
-            people = self.background_process.people
-            # Create a dictionary from the lines array with xid as the key
-            for h in people:
-                if self.gOp.Referenced.exists(people[h].xref_id):
-                    refyear, _ = people[h].refyear()
-                    (location, where) = people[h].bestlocation()
-                    personpath = self.gOp.lastlines[people[h].xref_id].path
-                    trace.write(f"{people[h].xref_id}\t{people[h].name}\t{refyear}\t{where}\t{location}\t" + "\t".join(personpath) + "\n") 
-                    # indent.write("\t".join(personpath) + f",{people[h].xref_id}\t{people[h].name}\t{refyear}\t{where}\t{location}\n") 
-            trace.close()
-            # indent.close()
-            _log.info(f"Trace file saved {tracepath}")
-            # _log.info(f"Indent file saved {indentpath}")
-            withall = "with all people" if self.gOp.get('AllEntities') else ""
-            self.background_process.SayInfoMessage(f"Trace file {withall} saved: {tracepath}",True)
-            self.runCMDfile(self.gOp.get('Tracecmdline'), tracepath)
-
-    def OpenBrowser(self):
-        """Open the generated result in a browser or the default KML viewer."""
-        if self.gOp.get('ResultType'):
-            self.runCMDfile(self.gOp.get('KMLcmdline'), os.path.join(self.gOp.resultpath, self.gOp.ResultFile), True)
-            
-        else:
-            self.runCMDfile('$n', KMLMAPSURL, True)
-            
-    #################################################
-    #TODO FIX ME UP            
-
-    def open_html_file(self, html_path):
-        """(Deprecated) older helper to attempt activation/reload of a browser tab.
-
-        Kept for reference but not used; prefer runCMDfile / webbrowser.open instead.
-        """
-        # Open the HTML file in a new tab and store the web browser instance
-        browser = webbrowser.get()
-        browser_tab = browser.open_new_tab(html_path)
-    
-        # Wait for the page to load
-        time.sleep(1)
-    
-        # Find the browser window that contains the tab and activate it
-        for window in browser.windows():
-            for tab in window.tabs:
-                if tab == browser_tab:
-                    window.activate()
-                    break
-            else:
-                continue
-            break
-    
-        # Reload the tab
-        browser_tab.reload()
 
     def OnCloseWindow(self, evt=None):
         """Gracefully stop worker threads and schedule safe destruction of the panel.

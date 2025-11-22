@@ -469,46 +469,23 @@ class VisualMapPanel(wx.Panel):
             # self.id.CBUseGPS
             # self.id.CBAllEntities
             # self.id.CBCacheOnly
-            
-        # Define control groups for HTML and KML modes
-        html_controls = [
-            self.id.LISTMapStyle, 
-            self.id.CBMapControl,
-            self.id.CBMapMini,
-            self.id.CBHeatMap,
-            self.id.CBUseAntPath,
-            self.id.RBGroupBy,
-            self.id.LISTHeatMapTimeStep
-        ]
-        marks_controls = [
-            self.id.CBBornMark,
-            self.id.CBDieMark,
-            self.id.CBHomeMarker,
-            self.id.CBMarkStarOn,
-            ]
-        kml_controls = [
-            self.id.RBKMLMode,
-            self.id.CBFlyTo,
-            self.id.INTMaxLineWeight
-        ]
 
         # Enable/Disable marker-dependent controls if markers are off
-        if self.gOp.get('MarksOn'):
-            for ctrl in marks_controls:
+        marks_on = self.gOp.get('MarksOn')
+        for ctrl in LayoutOptions.get_marks_controls_list(self):
+            if marks_on:
                 ctrl.Enable()
-        else:
-            for ctrl in marks_controls:
+            else:
                 ctrl.Disable()
 
-        self.optionHbox.Hide()
-        self.optionSbox.Hide()
-        self.optionKbox.Hide()
-        self.optionK2box.Hide()
+        self.optionHbox.Hide() # HTML options
+        self.optionSbox.Hide() # Summary options
+        self.optionKbox.Hide() # KML options
+        self.optionK2box.Hide() # KML2 options
         # self.optionGbox.SetSize(self.optionGbox.GetBestSize())
 
         if ResultTypeSelect is ResultType.HTML:
-            # Enable HTML-specific controls
-            for ctrl in html_controls:
+            for ctrl in self.optionHbox.GetChildren():
                 ctrl.Enable()
             
             # Handle heat map related controls
@@ -520,7 +497,7 @@ class VisualMapPanel(wx.Panel):
                 # Only enable time step if timeline is enabled
                 if self.gOp.get('MapTimeLine'):
                     self.id.LISTHeatMapTimeStep.Enable()
-            for ctrl in kml_controls:
+            for ctrl in self.optionKbox.GetChildren():
                 ctrl.Disable()        
             self.optionHbox.Show()
             
@@ -529,9 +506,9 @@ class VisualMapPanel(wx.Panel):
 
         elif ResultTypeSelect is ResultType.KML:
             # In KML mode, disable HTML controls and enable KML controls
-            for ctrl in html_controls:
+            for ctrl in self.optionHbox.GetChildren():
                 ctrl.Disable()
-            for ctrl in kml_controls:
+            for ctrl in self.optionKbox.GetChildren():
                 ctrl.Enable()
             # This timeline just works differently in KML mode vs embedded code for HTML
             self.id.CBMapTimeLine.Enable()
@@ -809,50 +786,99 @@ class VisualMapPanel(wx.Panel):
                 evt.Skip()
 
     def apply_controls_from_options(self, gOp: Any) -> None:
-        """Apply values from gOp to actual wx controls using id metadata.
-
-        This keeps UI updates on the panel (where we have window context)
-        while VisualGedcomIds remains a metadata-only helper.
-        """
+        """Apply values from gOp to wx controls using id metadata (clearer, helper-based)."""
         if not getattr(self, "id", None):
             return
+
+        def resolve_value(gop_attr: str) -> Any:
+            if not gop_attr:
+                return None
+            try:
+                if hasattr(gOp, gop_attr):
+                    return getattr(gOp, gop_attr)
+                if hasattr(gOp, "get"):
+                    return gOp.get(gop_attr, None)
+            except Exception:
+                _log.exception("resolve_value failed for %s", gop_attr)
+            return None
+
+        def set_text(control: wx.Window, name: str, value: Any) -> None:
+            try:
+                if name == "TEXTGEDCOMinput":
+                    infile = gOp.get("GEDCOMinput", "") if hasattr(gOp, "get") else ""
+                    _, filen = os.path.split(infile)
+                    val = filen
+                else:
+                    val = "" if value is None else str(value)
+                # Prefer ChangeValue (no EVT_TEXT) and fall back to SetValue/SetLabel
+                try:
+                    if getattr(control, "GetValue", None) and control.GetValue() != val:
+                        if getattr(control, "ChangeValue", None):
+                            control.ChangeValue(val)
+                        else:
+                            control.SetValue(val)
+                except Exception:
+                    try:
+                        control.SetLabel(val)
+                    except Exception:
+                        _log.debug("Text set failed for %s", name)
+            except Exception:
+                _log.exception("set_text failed for %s", name)
+
+        def set_checkbox(control: wx.Window, value: Any) -> None:
+            try:
+                control.SetValue(bool(value))
+            except Exception:
+                _log.debug("CheckBox set failed for %r", control)
+
+        def set_selection(control: wx.Window, value: Any) -> None:
+            try:
+                control.SetSelection(int(value) if value is not None else 0)
+            except Exception:
+                _log.debug("Selection set failed for %r", control)
+
+        def set_int(control: wx.Window, value: Any) -> None:
+            try:
+                control.SetValue(int(value))
+            except Exception:
+                _log.debug("Int/Slider set failed for %r", control)
+
+        def set_button(control: wx.Window, value: Any) -> None:
+            _log.debug("Button no settings applied yet for %r", control)
+
+        # dispatch mapping by wtype
+        handlers = {
+            "Text": set_text,
+            "CheckBox": set_checkbox,
+            "RadioButton": set_selection,
+            "List": set_selection,
+            "Slider": set_int,
+            "Int": set_int,
+            "SpinCtrl": set_int,
+            "Button": set_button,
+        }
+
         for name, idref, wtype, gop_attr, action in self.id.iter_controls():
             # resolve numeric id
             try:
                 wid = int(idref)
             except Exception:
                 try:
-                    wid = idref.GetId()  # fallback for other idref types
+                    wid = idref.GetId()
                 except Exception:
                     _log.debug("apply_controls_from_options: cannot resolve idref %r", idref)
                     continue
 
-            # find the control within this panel/window hierarchy
             control = wx.FindWindowById(wid, self)
-            # read the value from gOp
-            try:
-                if gop_attr:
-                    if hasattr(gOp, gop_attr):
-                        value = getattr(gOp, gop_attr)
-                    elif hasattr(gOp, "get"):
-                        # fallback to get(key, default)
-                        value = gOp.get(gop_attr, None)
-                    else:
-                        value = None
-                else:
-                    value = None
-            except Exception:
-                _log.exception("apply_controls_from_options: failed to read %s from gOp", gop_attr)
-                value = None
-
             if control is None:
-                # control not created yet (or not a child of this panel) — skip
                 continue
 
+            value = resolve_value(gop_attr)
+
             try:
-                # handle special named controls first
+                # special controls
                 if name == "LISTMapStyle":
-                    ms = value or gOp.get("MapStyle", "") if hasattr(gOp, "get") else value
+                    ms = value or (gOp.get("MapStyle", "") if hasattr(gOp, "get") else value)
                     try:
                         idx = self.id.AllMapTypes.index(ms)
                     except Exception:
@@ -866,10 +892,7 @@ class VisualMapPanel(wx.Panel):
                 if name == "RBResultType":
                     order = ("HTML", "KML", "KML2", "SUM")
                     rt = getattr(gOp, "ResultType", None)
-                    if hasattr(rt, "value"):
-                        rt_name = rt.value
-                    else:
-                        rt_name = str(rt) if rt is not None else ""
+                    rt_name = getattr(rt, "value", str(rt) if rt is not None else "")
                     try:
                         idx = order.index(rt_name)
                     except ValueError:
@@ -880,41 +903,10 @@ class VisualMapPanel(wx.Panel):
                         _log.debug("RBResultType: SetSelection failed for %r", control)
                     continue
 
-                # generic handlers by widget type
-                if wtype == "Text":
-                    # TEXTGEDCOMinput should show filename only
-                    if name == "TEXTGEDCOMinput":
-                        infile = gOp.get("GEDCOMinput", "") if hasattr(gOp, "get") else ""
-                        _, filen = os.path.split(infile)
-                        val = filen
-                    else:
-                        val = "" if value is None else str(value)
-                    try:
-                        control.SetValue(val)
-                    except Exception:
-                        try:
-                            control.SetLabel(val)
-                        except Exception:
-                            _log.debug("Text set failed for %s", name)
-
-                elif wtype == "CheckBox":
-                    try:
-                        control.SetValue(bool(value))
-                    except Exception:
-                        _log.debug("CheckBox set failed for %s", name)
-
-                elif wtype in ("RadioButton", "List"):
-                    try:
-                        control.SetSelection(int(value) if value is not None else 0)
-                    except Exception:
-                        _log.debug("Radio/List set failed for %s", name)
-
-                elif wtype in ("Slider", "Int", "SpinCtrl"):
-                    try:
-                        control.SetValue(int(value))
-                    except Exception:
-                        _log.debug("Slider/Int set failed for %s", name)
-
+                # generic handler dispatch
+                handler = handlers.get(wtype)
+                if handler:
+                    handler(control, name, value) if handler is set_text else handler(control, value)
                 else:
                     _log.debug("Unhandled control type %r for control %s", wtype, name)
 

@@ -102,6 +102,16 @@ class LayoutOptions:
                                          cb_all_entities, cb_born_mark, cb_die_mark])
 
     @staticmethod
+    def get_marks_controls_list(vm_panel: Any) -> list:
+        """Return the list of marker-dependent controls for enabling/disabling."""
+        return [
+            vm_panel.id.CBBornMark,
+            vm_panel.id.CBDieMark,
+            vm_panel.id.CBHomeMarker,
+            vm_panel.id.CBMarkStarOn,
+        ]
+    
+    @staticmethod
     def _add_html_options(vm_panel: Any, panel: wx.Panel, sizer: wx.Sizer) -> None:
         """Create and add the HTML-specific option group."""
         hbox_container = wx.Panel(panel)

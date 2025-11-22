@@ -477,7 +477,7 @@ class VisualMapPanel(wx.Panel):
             
         # Define control groups for HTML and KML modes
         html_controls = [
-            self.id.LISTMapType, 
+            self.id.LISTMapStyle, 
             self.id.CBMapControl,
             self.id.CBMapMini,
             self.id.CBHeatMap,
@@ -589,7 +589,7 @@ class VisualMapPanel(wx.Panel):
 
         self.id.CBMarkStarOn.SetValue(self.gOp.get('MarkStarOn'))
 
-        self.id.LISTMapType.SetSelection(self.id.LISTMapType.FindString(self.gOp.get('MapStyle')))
+        self.id.LISTMapStyle.SetSelection(self.id.LISTMapStyle.FindString(self.gOp.get('MapStyle')))
 
         self.SetupButtonState()
 

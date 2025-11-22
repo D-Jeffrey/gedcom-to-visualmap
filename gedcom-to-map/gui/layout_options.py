@@ -13,6 +13,7 @@ from typing import Any
 import logging
 import wx
 from .layout_helpers import LayoutHelpers
+from gedcom_options import ResultType
 
 _log = logging.getLogger(__name__.lower())
 
@@ -69,12 +70,12 @@ class LayoutOptions:
         LayoutHelpers.add_button_with_id(vm_panel, panel, "txtinfile", "Input file:   ", "BTN_DIRECTORY")
         LayoutHelpers.add_textctrl_with_id(vm_panel, panel, "TEXTGEDCOMinput", size=(250, 20), enable=False)
         LayoutHelpers.add_button_with_id(vm_panel, panel, "txtoutfile", "Output file: ", "BTN_DIRECTORY")
-        LayoutHelpers.add_textctrl_with_id(vm_panel, panel, "TEXTResult", size=(250, 20))
+        LayoutHelpers.add_textctrl_with_id(vm_panel, panel, "TEXTResultFile", size=(250, 20))
         vm_panel.id.txtinfile.Bind(wx.EVT_LEFT_DOWN, vm_panel.frame.OnFileOpenDialog)
         vm_panel.id.txtoutfile.Bind(wx.EVT_LEFT_DOWN, vm_panel.frame.OnFileResultDialog)
 
         l1 = LayoutHelpers.add_multi_horizontal_by_id(vm_panel, ["txtinfile", "TEXTGEDCOMinput"], spacer=6)
-        l2 = LayoutHelpers.add_multi_horizontal_by_id(vm_panel, ["txtoutfile", "TEXTResult"], spacer=6)
+        l2 = LayoutHelpers.add_multi_horizontal_by_id(vm_panel, ["txtoutfile", "TEXTResultFile"], spacer=6)
         sizer.Add(l1, proportion=0, flag=wx.EXPAND | wx.ALL, border=2)
         sizer.Add(l2, proportion=0, flag=wx.EXPAND | wx.ALL, border=2)
 
@@ -93,8 +94,8 @@ class LayoutOptions:
         cb_die_mark = LayoutHelpers.add_checkbox_with_id(vm_panel, panel, "CBDieMark", "Marker for when Died")
 
         LayoutHelpers.add_busy_indicator(vm_panel, panel, "busyIndicator", color="BUSY_BACK")
-        LayoutHelpers.add_radio_box_with_id(vm_panel, panel, "RBResultsType", "Result Type",
-                                           vm_panel.gOp.ResultType.list_values(), majorDimension=5)
+        LayoutHelpers.add_radio_box_with_id(vm_panel, panel, "RBResultType", "Result Type",
+                                           ResultType.list_values(), majorDimension=5)
 
         LayoutHelpers.add_many_to_sizer(sizer,
                                         [cb_use_gps, cb_cache_only, defCountryBox,
@@ -241,7 +242,7 @@ class LayoutOptions:
         vm_panel.optionSbox.Hide()
 
         sizer.Add(vm_panel.optionGbox, 0, wx.LEFT | wx.TOP, 5)
-        sizer.AddMany([vm_panel.id.RBResultsType])
+        sizer.AddMany([vm_panel.id.RBResultType])
         sizer.Add(vm_panel.optionsStack, 1, wx.EXPAND | wx.ALL, 5)
         vm_panel.optionsStack.Layout()
 

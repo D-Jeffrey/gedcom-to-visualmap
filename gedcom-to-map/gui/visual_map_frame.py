@@ -22,7 +22,7 @@ from .about_dialog import AboutDialog
 from .help_dialog import HelpDialog
 from .visual_map_panel import VisualMapPanel
 from .visual_gedcom_ids import VisualGedcomIds
-from gedcom_options import gvOptions
+from gedcom_options import gvOptions, ResultType
 from style.stylemanager import FontManager
 
 class VisualMapFrame(wx.Frame):
@@ -291,7 +291,7 @@ class VisualMapFrame(wx.Frame):
         dDir = os.getcwd()
         dFile = "visgedcom.html"
         if self.visual_map_panel and getattr(self.visual_map_panel, "gOp", None):
-            resultfile = self.visual_map_panel.gOp.get('Result')
+            resultfile = self.visual_map_panel.gOp.get('ResultFile')
             if resultfile:
                 dDir, dFile = os.path.split(resultfile)
             else:
@@ -310,11 +310,13 @@ class VisualMapFrame(wx.Frame):
             path = dlg.GetPath()
             _log.debug("Output selected %s", path)
             filetype = os.path.splitext(path)[1]
-            isHTML = not (filetype.lower() in ['.kml'])
+            output_type = ResultType.for_file_extension(filetype)
+            isHTML = output_type == ResultType.HTML
+            _, fname = os.path.split(path or "")
             try:
-                self.visual_map_panel.gOp.setResults(path, isHTML)
-                self.visual_map_panel.id.TEXTResult.SetValue(path)
-                self.visual_map_panel.id.RBResultsType.SetSelection(0 if isHTML else 1)
+                self.visual_map_panel.gOp.setResultsFile(fname, output_type)
+                self.visual_map_panel.id.TEXTResultFile.SetValue(fname)
+                self.visual_map_panel.id.RBResultType.SetSelection(0 if isHTML else 1)
                 self.visual_map_panel.SetupButtonState()
             except Exception:
                 _log.exception("OnFileResultDialog: failed to set results")

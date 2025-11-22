@@ -32,7 +32,7 @@ from .background_actions import BackgroundActions
 from .layout_options import LayoutOptions
 from .visual_gedcom_ids import VisualGedcomIds
 from .visual_map_event_handlers import VisualMapEventHandler
-from gedcom_options import gvOptions, ResultsType  # type: ignore
+from gedcom_options import gvOptions, ResultType  # type: ignore
 from style.stylemanager import FontManager
 
 (UpdateBackgroundEvent, EVT_UPDATE_STATE) = wx.lib.newevent.NewEvent()
@@ -208,7 +208,7 @@ class VisualMapPanel(wx.Panel):
         self.fileConfig.Write("GEDCOMinput", path)
         #TODO Fix this
         #TODO Fix this
-        self.id.TEXTResult.SetValue(self.gOp.get('Result'))
+        self.id.TEXTResultFile.SetValue(self.gOp.get('ResultFile'))
         self.NeedReload()
         self.SetupButtonState()
 
@@ -216,17 +216,17 @@ class VisualMapPanel(wx.Panel):
         """Synchronize the result-type radio box selection with gOp.ResultType."""
         rType = self.gOp.get('ResultType')
         
-        if rType is ResultsType.HTML:
+        if rType is ResultType.HTML:
             outType = 0
-        elif rType is ResultsType.KML:
+        elif rType is ResultType.KML:
             outType = 1
-        elif rType is ResultsType.KML2:
+        elif rType is ResultType.KML2:
             outType = 2
-        elif rType is ResultsType.SUM:
+        elif rType is ResultType.SUM:
             outType = 3
         else:
             outType = 0
-        self.id.RBResultsType.SetSelection(outType)
+        self.id.RBResultType.SetSelection(outType)
 
     def get_runtime_string(self) -> str:
         """Return a formatted running/ETA string based on gOp timing and counters.
@@ -511,7 +511,7 @@ class VisualMapPanel(wx.Panel):
         self.optionK2box.Hide()
         # self.optionGbox.SetSize(self.optionGbox.GetBestSize())
 
-        if ResultTypeSelect is ResultsType.HTML:
+        if ResultTypeSelect is ResultType.HTML:
             # Enable HTML-specific controls
             for ctrl in html_controls:
                 ctrl.Enable()
@@ -529,10 +529,10 @@ class VisualMapPanel(wx.Panel):
                 ctrl.Disable()        
             self.optionHbox.Show()
             
-        elif ResultTypeSelect is ResultsType.SUM:
+        elif ResultTypeSelect is ResultType.SUM:
             self.optionSbox.Show()
 
-        elif ResultTypeSelect is ResultsType.KML:
+        elif ResultTypeSelect is ResultType.KML:
             # In KML mode, disable HTML controls and enable KML controls
             for ctrl in html_controls:
                 ctrl.Disable()
@@ -541,11 +541,11 @@ class VisualMapPanel(wx.Panel):
             # This timeline just works differently in KML mode vs embedded code for HTML
             self.id.CBMapTimeLine.Enable()
             self.optionKbox.Show()
-        elif ResultTypeSelect is ResultsType.KML2:
+        elif ResultTypeSelect is ResultType.KML2:
             self.optionK2box.Show()
 
        # Enable/disable trace button based on referenced data availability
-        self.id.BTNTRACE.Enable(bool(self.gOp.Referenced and self.gOp.Result and ResultTypeSelect))
+        self.id.BTNTRACE.Enable(bool(self.gOp.Referenced and self.gOp.ResultFile and ResultTypeSelect))
 
         self.optionsStack.Layout()
         self.Layout()
@@ -566,10 +566,10 @@ class VisualMapPanel(wx.Panel):
         self.peopleList.SetGOp(self.gOp)
 
         if self.gOp.get('ResultType'):
-            self.id.RBResultsType.SetSelection(0)
+            self.id.RBResultType.SetSelection(0)
         else:
-            if self.id.RBResultsType.GetSelection() not in [1,2]:
-                self.id.RBResultsType.SetSelection(1)
+            if self.id.RBResultType.GetSelection() not in [1,2]:
+                self.id.RBResultType.SetSelection(1)
         
         # Populate UI widgets from gOp using the panel method (VisualGedcomIds is metadata-only)
         try:
@@ -622,7 +622,7 @@ class VisualMapPanel(wx.Panel):
         
     def DrawGEDCOM(self):
 
-        if not self.gOp.get('Result') or self.gOp.get('Result') == '':
+        if not self.gOp.get('ResultFile') or self.gOp.get('ResultFile') == '':
             _log.error("Error: Not output file name set")
             self.background_process.SayErrorMessage("Error: Please set the Output file name")
         else:
@@ -689,12 +689,12 @@ class VisualMapPanel(wx.Panel):
     def SaveTrace(self):
         """Dump a trace file describing each referenced person and optionally open it."""
 
-        if self.gOp.Result and self.gOp.Referenced:
+        if self.gOp.ResultFile and self.gOp.Referenced:
             if not self.gOp.lastlines:
                 _log.error("No lastline values in SaveTrace (do draw first using HTML Mode for this to work)")
                 return 
-            tracepath = os.path.splitext(self.gOp.Result)[0] + ".trace.txt"
-            # indentpath = os.path.splitext(self.gOp.Result)[0] + ".indent.txt"
+            tracepath = os.path.splitext(self.gOp.ResultFile)[0] + ".trace.txt"
+            # indentpath = os.path.splitext(self.gOp.ResultFile)[0] + ".indent.txt"
             try:
                 trace = open(tracepath , 'w')
             except Exception as e:
@@ -724,7 +724,7 @@ class VisualMapPanel(wx.Panel):
     def OpenBrowser(self):
         """Open the generated result in a browser or the default KML viewer."""
         if self.gOp.get('ResultType'):
-            self.runCMDfile(self.gOp.get('KMLcmdline'), os.path.join(self.gOp.resultpath, self.gOp.Result), True)
+            self.runCMDfile(self.gOp.get('KMLcmdline'), os.path.join(self.gOp.resultpath, self.gOp.ResultFile), True)
             
         else:
             self.runCMDfile('$n', KMLMAPSURL, True)
@@ -868,7 +868,7 @@ class VisualMapPanel(wx.Panel):
                         _log.debug("LISTMapStyle: SetSelection failed for %r", control)
                     continue
 
-                if name == "RBResultsType":
+                if name == "RBResultType":
                     order = ("HTML", "KML", "KML2", "SUM")
                     rt = getattr(gOp, "ResultType", None)
                     if hasattr(rt, "value"):
@@ -882,7 +882,7 @@ class VisualMapPanel(wx.Panel):
                     try:
                         control.SetSelection(idx)
                     except Exception:
-                        _log.debug("RBResultsType: SetSelection failed for %r", control)
+                        _log.debug("RBResultType: SetSelection failed for %r", control)
                     continue
 
                 # generic handlers by widget type

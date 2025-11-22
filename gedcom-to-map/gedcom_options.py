@@ -3,7 +3,7 @@
 Configuration and runtime options for gedcom-to-visualmap.
 
 Provides:
-- ResultsType: typed enum of supported output types.
+- ResultType: typed enum of supported output types.
 - gvOptions: central options/state container that loads defaults from YAML,
   persists a small INI-style config, and exposes helpers used by the UI and
   background workers.
@@ -54,39 +54,39 @@ def settings_file_pathname(file_name):
     _log.debug (f"Settings file location: {settings_file_path}")
     return settings_file_path
     
-class ResultsType(Enum):
+class ResultType(Enum):
     HTML = "HTML"
     KML = "KML"
     KML2 = "KML2"
     SUM = "SUM"
 
     @staticmethod
-    def ResultsTypeEnforce(value) -> "ResultsType":
-        """Coerce a value to a ResultsType.
+    def ResultTypeEnforce(value) -> "ResultType":
+        """Coerce a value to a ResultType.
 
-        Accepts an existing ResultsType or a string (case-insensitive). Raises
+        Accepts an existing ResultType or a string (case-insensitive). Raises
         TypeError/ValueError for unsupported values.
         """
-        if isinstance(value, ResultsType):
+        if isinstance(value, ResultType):
             return value
         elif isinstance(value, str):
-            # handle ResultsType like "ResultsType.HTML"
-            m = re.match(r'^\s*ResultsType\.([A-Za-z_][A-Za-z0-9_]*)\s*$', value)
+            # handle ResultType like "ResultType.HTML"
+            m = re.match(r'^\s*ResultType\.([A-Za-z_][A-Za-z0-9_]*)\s*$', value)
             if m:
                 value = m.group(1)
             try:
-                return ResultsType[value.upper()]
+                return ResultType[value.upper()]
             except KeyError:
-                raise ValueError(f"Invalid ResultsType string: {value}")
+                raise ValueError(f"Invalid ResultType string: {value}")
         else:
-            raise TypeError(f"Cannot convert {type(value)} to ResultsType")
+            raise TypeError(f"Cannot convert {type(value)} to ResultType")
     
     def __str__(self) -> str:
         """Return the enum member's name value for human-readable display."""
         return self.value
     
     def long_name(self) -> str:
-        """Return a long-form identifier for the ResultsType, e.g. 'ResultsType.HTML'."""
+        """Return a long-form identifier for the ResultType, e.g. 'ResultType.HTML'."""
         
         # Support classes that (incorrectly) define name() as a method as well
         # as standard enum members that expose .name attribute.
@@ -99,17 +99,49 @@ class ResultsType(Enum):
         except Exception:
             # Fallback to value if anything unexpected happens
             name_str = str(self.value)
-        return f"ResultsType.{name_str}"
+        return f"ResultType.{name_str}"
     
     @staticmethod
     def list_values() -> list[str]:
-        """Return a list of all ResultsType values as strings."""
-        return [rt.value for rt in ResultsType]
+        """Return a list of all ResultType values as strings."""
+        return [rt.value for rt in ResultType]
     
     def index(self) -> int:
-        """Return the integer index of a ResultsType value."""
-        rt = ResultsType.ResultsTypeEnforce(self)
-        return list(ResultsType).index(rt)
+        """Return the integer index of a ResultType value."""
+        rt = ResultType.ResultTypeEnforce(self)
+        return list(ResultType).index(rt)
+    
+    @staticmethod
+    def for_file_extension(file_extension: str) -> "ResultType":
+        """Return the appropriate ResultType for a given file extension.
+
+        Raises ValueError if the extension is not recognised.
+        """
+        ext = file_extension.lower()
+        type = ResultType.HTML
+        if ext == '.html' or ext == 'html':
+            type = ResultType.HTML
+        elif ext == '.kml' or ext == 'kml':
+            type = ResultType.KML
+        elif ext == '.txt' or ext == 'txt':
+            type = ResultType.SUM
+        else:
+            type = ResultType.HTML
+            _log.warning(f"Unsupported file extension for ResultType: {file_extension}; reverting to HTML")
+        return type
+
+    @staticmethod
+    def file_extension(result_type: "ResultType") -> str:
+        """Return the standard file extension for a given ResultType."""
+        rt = ResultType.ResultTypeEnforce(result_type)
+        if rt == ResultType.HTML:
+            return 'html'
+        elif rt == ResultType.KML or rt == ResultType.KML2:
+            return 'kml'
+        elif rt == ResultType.SUM:
+            return 'txt'
+        else:
+            return 'html'
 
 class gvOptions:
     """Application options and transient runtime state.
@@ -198,7 +230,7 @@ class gvOptions:
                     if isinstance(value, (list, dict)):
                         parsed = value
                 elif typ == 'result':
-                    parsed = ResultsType.ResultsTypeEnforce(value)
+                    parsed = ResultType.ResultTypeEnforce(value)
                 # For complex types: if YAML already provided a list/dict/number, keep it;
                 # if it's a string try safe eval via yaml (or fallback to literal eval)
                 elif isinstance(value, (dict, list, int, float, bool)):
@@ -276,8 +308,8 @@ class gvOptions:
         
     def setstatic(self,
                   GEDCOMinput: Optional[str],
-                  Result: Optional[str],
-                  ResultType: ResultsType,
+                  ResultFile: Optional[str],
+                  ResultType: ResultType,
                   Main: Optional[str] = None,
                   MaxMissing: int = 0,
                   MaxLineWeight: int = 20,
@@ -286,7 +318,7 @@ class gvOptions:
                   AllEntities: bool = False):
         """Convenience setter for a typical group of static options used at startup."""
         self.setInput(GEDCOMinput)
-        self.setResults(Result or "", ResultType)
+        self.setResultsFile(ResultFile or "", ResultType)
         self.Main = Main
         self.Name = None
         self.MaxMissing = MaxMissing
@@ -311,14 +343,14 @@ class gvOptions:
                 elif typ == 'str':
                     setattr(self, key, value)
                 elif typ == 'result':
-                    # handle ResultsType like "ResultsType.HTML"
-                    m = re.match(r'^\s*ResultsType\.([A-Za-z_][A-Za-z0-9_]*)\s*$', value)
+                    # handle ResultType like "ResultType.HTML"
+                    m = re.match(r'^\s*ResultType\.([A-Za-z_][A-Za-z0-9_]*)\s*$', value)
                     if m:
                         value = m.group(1)
                     try:
-                        parsed = ResultsType.ResultsTypeEnforce(value)
+                        parsed = ResultType.ResultTypeEnforce(value)
                     except Exception:
-                        _log("Invalid ResultsType string in settings for '%s': %s", key, value)
+                        _log("Invalid ResultType string in settings for '%s': %s", key, value)
                 else:
                     parsed = None
                     # try yaml first (handles lists/dicts/numbers/null)
@@ -373,8 +405,8 @@ class gvOptions:
                 self.loadsection(section, section_keys)
         
         self.setInput(self.gvConfig['Core'].get('InputFile', ''), generalRequest=False)
-        self.resultpath, self.Result = os.path.split(self.gvConfig['Core'].get('OutputFile', ''))
-        self.setResults(self.Result, self.ResultType)
+        self.resultpath, self.ResultFile = os.path.split(self.gvConfig['Core'].get('OutputFile', ''))
+        self.setResultsFile(self.ResultFile, self.ResultType)
         self.KMLcmdline = self.gvConfig['Core'].get('KMLcmdline', '')
 
         # Load logging settings
@@ -406,7 +438,7 @@ class gvOptions:
                 self.gvConfig['KML'][key] =  str(getattr(self, key))
 
             self.gvConfig['Core']['InputFile'] =  self.GEDCOMinput
-            self.gvConfig['Core']['OutputFile'] = os.path.join(self.resultpath, self.Result)
+            self.gvConfig['Core']['OutputFile'] = os.path.join(self.resultpath, self.ResultFile)
             self.gvConfig['Core']['KMLcmdline'] =  self.KMLcmdline
             if self.GEDCOMinput and self.Main:
                 name = Path(self.GEDCOMinput).stem
@@ -459,25 +491,17 @@ class gvOptions:
         else:
             self.setMainPerson(None)
 
-    def setResults(self, Result, OutputType):
+    def setResultsFile(self, ResultFile, OutputType):
         """Set the output filename (base) and enforce an extension based on OutputType."""
-        enforced = ResultsType.ResultsTypeEnforce(OutputType)
+        enforced = ResultType.ResultTypeEnforce(OutputType)
         self.ResultType = enforced
 
-        extension = "txt"
-        if enforced is ResultsType.HTML:
-            extension = "html"
-        elif enforced is ResultsType.KML:
-            extension = "kml"
-        elif enforced is ResultsType.KML2:
-            extension = "kml"
-        elif enforced is ResultsType.SUM:
-            extension = "txt"
+        extension = ResultType.file_extension(enforced)
         
-        base, _ = os.path.splitext(Result or "")
-        self.Result = base
-        if self.Result:
-            self.Result = self.Result + "." + extension
+        base, _ = os.path.splitext(ResultFile or "")
+        self.ResultFile = base
+        if self.ResultFile:
+            self.ResultFile = self.ResultFile + "." + extension
         # TODO Update Visual value
 
     def setInput(self, theInput, generalRequest=True):
@@ -507,7 +531,7 @@ class gvOptions:
             if org != self.GEDCOMinput:
                 self.resultpath = os.path.dirname(self.GEDCOMinput)
                 # Force the output to match the name and location of the input
-                self.setResults(filen, self.ResultType)
+                self.setResultsFile(filen, self.ResultType)
         else:
             self.resultpath = None
         if org != self.GEDCOMinput:

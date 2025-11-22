@@ -68,7 +68,7 @@ def doKML(gOp : gvOptions, people: list[Person]):
     bg = getattr(gOp, "BackgroundProcess", None)
     if kmlInstance:
         kmlInstance.Done()
-        cmdfile = os.path.join(gOp.resultpath, gOp.Result)
+        cmdfile = os.path.join(gOp.resultpath, gOp.ResultFile)
         if bg:
             bg.SayInfoMessage(f"KML output to : {cmdfile}")
         if gOp.KMLcmdline:
@@ -84,7 +84,7 @@ def doKML2(gOp : gvOptions, people: list[Person]):
     if (not gOp.lookup):
         _log.error("doKML2: GeolocatedGedcom is not processed")
         return
-    resultFile = os.path.join(gOp.resultpath, gOp.Result)
+    resultFile = os.path.join(gOp.resultpath, gOp.ResultFile)
 
     kml_life_lines = KML_Life_Lines(gedcom=gOp.lookup, kml_file=str(resultFile),
                                         connect_parents=True, save=True)
@@ -212,7 +212,7 @@ def doHTML(gOp : gvOptions, people, fullresult ):
 
     foliumExporter(gOp).export(people[gOp.Main], creator, fullresult)
     if (fullresult):
-        result_path = Path(gOp.resultpath) / gOp.Result
+        result_path = Path(gOp.resultpath) / gOp.ResultFile
         result_path = result_path.resolve()
         if result_path.exists():
             url = result_path.as_uri()

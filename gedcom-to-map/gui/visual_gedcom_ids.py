@@ -46,9 +46,9 @@ class VisualGedcomIds:
             ('LISTHeatMapTimeStep', ('Slider', 'HeatMapTimeStep', 'Redraw')),
 
             ('TEXTGEDCOMinput', ('Text', 'GEDCOMinput', 'Reload')),
-            ('TEXTResult', ('Text', 'Result', 'Redraw')),
+            ('TEXTResultFile', ('Text', 'ResultFile', 'Redraw')),
 
-            ('RBResultsType', ('RadioButton', 'ResultType', 'Redraw')),
+            ('RBResultType', ('RadioButton', 'ResultType', 'Redraw')),
 
             ('TEXTMain', ('Text', 'Main', 'Reload')),
             ('TEXTName', ('Text', 'Name', '')),

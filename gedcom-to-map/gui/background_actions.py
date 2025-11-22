@@ -144,7 +144,7 @@ class BackgroundActions:
                     if self.do & 2:
                         _log.info("start do 2")
                         if getattr(self.gOp, "parsed", False):
-                            fname = getattr(self.gOp, "Result", None)
+                            fname = getattr(self.gOp, "ResultFile", None)
                             if getattr(self.gOp, "ResultType", None) is not None:
                                 # call appropriate generation function if available
                                 result_type_name = getattr(self.gOp, "ResultType", None).name

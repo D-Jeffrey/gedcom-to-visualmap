@@ -12,7 +12,7 @@ import logging
 import time
 import wx
 
-from gedcom_options import ResultsType  # type: ignore
+from gedcom_options import ResultType  # type: ignore
 
 _log = logging.getLogger(__name__.lower())
 
@@ -26,12 +26,12 @@ class VisualMapEventHandler:
 
     def __init__(self, panel: Any) -> None:
         self.panel = panel
-        # map radio-index -> ResultsType for the results-type radiobox
+        # map radio-index -> ResultType for the results-type radiobox
         self._results_type_map = (
-            ResultsType.HTML,
-            ResultsType.KML,
-            ResultsType.KML2,
-            ResultsType.SUM,
+            ResultType.HTML,
+            ResultType.KML,
+            ResultType.KML2,
+            ResultType.SUM,
         )
 
     def bind(self) -> None:
@@ -106,14 +106,14 @@ class VisualMapEventHandler:
         """Handle radiobox changes (ResultType, GroupBy, KML mode)."""
         try:
             event_id = event.GetId()
-            # Results-type radiobox: map index -> ResultsType
-            if event_id == self.panel.id.IDs.get("RBResultsType"):
+            # Results-type radiobox: map index -> ResultType
+            if event_id == self.panel.id.IDs.get("RBResultType"):
                 idx = max(0, min(len(self._results_type_map) - 1, event.GetInt()))
                 outType = self._results_type_map[idx]
-                self.panel.gOp.setResults(self.panel.gOp.get("Result"), outType)
+                self.panel.gOp.setResultsFile(self.panel.gOp.get("ResultFile"), outType)
                 # mirror text field and update UI
                 try:
-                    self.panel.id.TEXTResult.SetValue(self.panel.gOp.get("Result"))
+                    self.panel.id.TEXTResultFile.SetValue(self.panel.gOp.get("ResultFile"))
                 except Exception:
                     pass
                 self.panel.SetupButtonState()
@@ -135,17 +135,29 @@ class VisualMapEventHandler:
     def EvtText(self, event: wx.CommandEvent) -> None:
         """Handle text changes for configured text controls."""
         try:
+            tx = event.GetEventObject()
             event_id = event.GetId()
             attributes = self.panel.id.get_id_attributes(event_id)
-            if event_id in (self.panel.id.IDs.get("TEXTResult"),
+            attrname = attributes.get("gOp_attribute", None)
+            if event_id in (self.panel.id.IDs.get("TEXTResultFile"),
                             self.panel.id.IDs.get("TEXTDefaultCountry")):
-                # special case: results text needs to update gOp Result and ResultType
-                attrname = attributes.get("gOp_attribute", None)
+                # special case: results text needs to update gOp ResultFile and ResultType
                 self.panel.gOp.set(attrname, event.GetString())
                 self.panel.gOp.set(attrname, event.GetString())
                 _log.debug("Text set %s = %s", attrname, event.GetString())
             else:
-                _log.error("Uncontrolled TEXT id %s", event_id)
+                pass  # no other text controls currently handled
+            # if attrname:
+            #     if event_id == self.panel.id.IDs.get("TEXTResultFile"):
+            #         desired = str(self.panel.gOp.get(attrname) or "")
+            #         try:
+            #             # ChangeValue does not emit EVT_TEXT; only set if different.
+            #             if tx.GetValue() != desired:
+            #                 tx.ChangeValue(desired)
+            #         except Exception:
+            #             # fallback if ChangeValue not available
+            #             if tx.GetValue() != desired:
+            #                 tx.SetValue(desired)
             self.panel.SetupButtonState()
         except Exception:
             _log.exception("EvtText failed")

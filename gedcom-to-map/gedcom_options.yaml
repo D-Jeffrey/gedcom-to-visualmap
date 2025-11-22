@@ -56,7 +56,7 @@ gui_options_defaults:
   window_size: [1024, 800]
 
 gedcom_options_types: {
-  GEDCOMinput: 'str', resultpath: 'str', Result: 'str',
+  GEDCOMinput: 'str', resultpath: 'str', ResultFile: 'str',
   ResultType: 'str', Main: 'str', mainPerson: 'str',
   Name: 'str', mainPersonLatLon: 'complex', MaxMissing: 'int',
   MaxLineWeight: 'int', UseGPS: 'bool', CacheOnly: 'bool',
@@ -82,8 +82,8 @@ gedcom_options_types: {
 gedcom_options_defaults:
   GEDCOMinput: "gedcomfile.ged"
   resultpath: null
-  Result: ''
-  ResultType: ResultsType.HTML
+  ResultFile: ''
+  ResultType: ResultType.HTML
   Main: null
   mainPerson: null
   Name: null

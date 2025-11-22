@@ -142,7 +142,7 @@ class MyMarkClusters:
 
 class foliumExporter:
     def __init__(self, gOp : gvOptions):
-        self.file_name = os.path.join(gOp.resultpath, gOp.Result)
+        self.file_name = os.path.join(gOp.resultpath, gOp.ResultFile)
         self.max_line_weight = gOp.MaxLineWeight
         self.gOp = gOp
         self.fglastname = dict()

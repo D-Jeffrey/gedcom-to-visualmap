@@ -349,6 +349,7 @@ class gvOptions:
                         value = m.group(1)
                     try:
                         parsed = ResultType.ResultTypeEnforce(value)
+                        setattr(self, key, parsed)
                     except Exception:
                         _log("Invalid ResultType string in settings for '%s': %s", key, value)
                 else:

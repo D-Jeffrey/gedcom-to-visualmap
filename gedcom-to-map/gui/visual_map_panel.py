@@ -215,18 +215,13 @@ class VisualMapPanel(wx.Panel):
     def SetResultTypeRadioBox(self):
         """Synchronize the result-type radio box selection with gOp.ResultType."""
         rType = self.gOp.get('ResultType')
-        
-        if rType is ResultType.HTML:
-            outType = 0
-        elif rType is ResultType.KML:
-            outType = 1
-        elif rType is ResultType.KML2:
-            outType = 2
-        elif rType is ResultType.SUM:
-            outType = 3
-        else:
-            outType = 0
-        self.id.RBResultType.SetSelection(outType)
+        try:
+            type_index = rType.index()
+        except Exception:
+            type_index = 0
+            _log.error("SetResultTypeRadioBox: unknown ResultType %s", str(rType))
+
+        self.id.RBResultType.SetSelection(type_index)
 
     def get_runtime_string(self) -> str:
         """Return a formatted running/ETA string based on gOp timing and counters.

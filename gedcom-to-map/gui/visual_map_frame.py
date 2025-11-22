@@ -309,13 +309,12 @@ class VisualMapFrame(wx.Frame):
         if dlg.ShowModal() == wx.ID_OK:
             path = dlg.GetPath()
             _log.debug("Output selected %s", path)
-            filetype = os.path.splitext(path)[1]
-            output_type = ResultType.for_file_extension(filetype)
-            isHTML = output_type == ResultType.HTML
+            result_type = self.visual_map_panel.gOp.get('ResultType')
+            isHTML = result_type == ResultType.HTML
             _, fname = os.path.split(path or "")
             try:
-                self.visual_map_panel.gOp.setResultsFile(fname, output_type)
-                self.visual_map_panel.id.TEXTResultFile.SetValue(fname)
+                self.visual_map_panel.gOp.setResultsFile(fname, result_type)
+                self.visual_map_panel.id.TEXTResultFile.SetValue(self.visual_map_panel.gOp.get("ResultFile"))
                 self.visual_map_panel.id.RBResultType.SetSelection(0 if isHTML else 1)
                 self.visual_map_panel.SetupButtonState()
             except Exception:

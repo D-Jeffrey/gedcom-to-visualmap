@@ -147,17 +147,6 @@ class VisualMapEventHandler:
                 _log.debug("Text set %s = %s", attrname, event.GetString())
             else:
                 pass  # no other text controls currently handled
-            # if attrname:
-            #     if event_id == self.panel.id.IDs.get("TEXTResultFile"):
-            #         desired = str(self.panel.gOp.get(attrname) or "")
-            #         try:
-            #             # ChangeValue does not emit EVT_TEXT; only set if different.
-            #             if tx.GetValue() != desired:
-            #                 tx.ChangeValue(desired)
-            #         except Exception:
-            #             # fallback if ChangeValue not available
-            #             if tx.GetValue() != desired:
-            #                 tx.SetValue(desired)
             self.panel.SetupButtonState()
         except Exception:
             _log.exception("EvtText failed")

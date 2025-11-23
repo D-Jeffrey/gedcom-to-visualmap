@@ -26,7 +26,8 @@ config_file_settings:
     HomeMarker: 'bool', showLayerControl: 'bool', mapMini: 'bool', MapStyle: 'str' }
   Core: {
     UseGPS: 'bool', CacheOnly: 'bool', AllEntities: 'bool', ResultType: 'result',
-    KMLcmdline: 'str', CSVcmdline: 'str', Tracecmdline: 'str',  badAge: 'bool' }
+    KMLcmdline: 'str', CSVcmdline: 'str', Tracecmdline: 'str',  Defaultcmdline: 'str',
+    badAge: 'bool' }
   KML : {
     'MaxLineWeight':'int',
     # 'MaxMissing':'int',

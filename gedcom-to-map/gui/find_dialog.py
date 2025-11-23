@@ -1,9 +1,11 @@
 import wx
+from style.stylemanager import FontManager
 
 class FindDialog(wx.Dialog):
-    def __init__(self, parent, title, LastSearch=""):
+    def __init__(self, parent: wx.Window, font_manager: FontManager, title: str = "Find", LastSearch: str = ""):
         super().__init__(parent, title=title, size=(300, 150))
 
+        self.font_manager = font_manager
         self.LastSearch = LastSearch
 
         # Layout
@@ -31,6 +33,8 @@ class FindDialog(wx.Dialog):
         # Event bindings
         self.okButton.Bind(wx.EVT_BUTTON, self.OnOk)
         self.cancelButton.Bind(wx.EVT_BUTTON, self.OnCancel)
+
+        self.font_manager.apply_current_font_recursive(self)
 
     def OnOk(self, event):
         self.LastSearch = self.SearchText.GetValue()

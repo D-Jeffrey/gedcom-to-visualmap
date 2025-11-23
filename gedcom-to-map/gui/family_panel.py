@@ -2,18 +2,19 @@ import logging
 import wx
 import wx.grid as gridlib
 from gedcom.gedcomdate import maxage
+from style.stylemanager import FontManager
 
 _log = logging.getLogger(__name__.lower())
 
 
 class FamilyPanel(wx.Panel):
-    def __init__(self, parent, hertiageData, isLineage=False, *args, **kwargs) -> None:
+    def __init__(self, parent: wx.Window, hertiageData: dict, font_manager: FontManager, isLineage: bool = False, *args, **kwargs) -> None:
+        """Initialize FamilyPanel to display family/lineage data in a grid."""
         super().__init__(parent, *args, **kwargs)
 
-        # Data structure: Family data with parent-child relationships
-        # Example: {"parent_id": ("Name", "Mother/Father", BornYear, DeathYear, BornAddress, [children_born_years], id)}
         self.hertiageData = hertiageData
         self.gOp = getattr(parent, "gOp", None)
+        self.font_manager = font_manager
 
         # Create a grid
         rows = max(1, len(self.hertiageData))
@@ -36,6 +37,8 @@ class FamilyPanel(wx.Panel):
 
         self.populateGrid(isLineage=isLineage)
 
+        self.update_fonts(self.font_manager)
+
         sizer = wx.BoxSizer(wx.VERTICAL)
         sizer.Add(self.grid, 1, wx.EXPAND | wx.ALL, 10)
         self.SetSizer(sizer)
@@ -50,8 +53,24 @@ class FamilyPanel(wx.Panel):
         self.grid.Bind(wx.grid.EVT_GRID_CELL_RIGHT_CLICK, self.OnRowClick)
         self.grid.Bind(wx.grid.EVT_GRID_LABEL_RIGHT_CLICK, self.OnRowClick)
 
+    def update_fonts(self, font_manager: FontManager) -> None:
+        """Update the fonts of the grid based on the current font manager."""
+        fm = font_manager if font_manager else self.font_manager
+        if fm:
+            grid_font = fm.get_font()
+            if grid_font:
+                self.grid.SetDefaultCellFont(grid_font)
+                self.grid.SetLabelFont(grid_font)
+                self.SetFont(grid_font)
+                self.grid.ForceRefresh()
+
     def populateGrid(self, isLineage=False) -> None:
-        """Populate the grid with family data and calculate the age dynamically."""
+        """Populate the grid with family data and calculate the age dynamically.
+        
+        Args:
+            isLineage: If True, calculates parent age at child birth.
+                      If False, calculates lifespan age. Default: False.
+        """
         child_born_year = None
         for row, (key, details) in enumerate(self.hertiageData.items()):
             name, mother_father, born_year, death_year, born_address, descrip, id_ = details
@@ -102,7 +121,11 @@ class FamilyPanel(wx.Panel):
             self.grid.SetCellAlignment(r, 4, wx.ALIGN_RIGHT, wx.ALIGN_CENTER)
 
     def OnRowClick(self, event: wx.grid.GridEvent) -> None:
-        """Open PersonDialog for the selected row (ID in column 7)."""
+        """Open PersonDialog for the selected row (ID in column 7).
+        
+        Args:
+            event: Grid event containing row information.
+        """
         row = event.GetRow()
         person_id = self.grid.GetCellValue(row, 7)
         person = None
@@ -123,7 +146,9 @@ class FamilyPanel(wx.Panel):
 
             fm = getattr(self.gOp.panel, "font_manager", None) if self.gOp and getattr(self.gOp, "panel", None) else None
             if PersonDialog:
-                dlg = PersonDialog(self, person, self.visual_map_panel, font_manager=fm, gOp=self.gOp, showreferences=False)
+                # Use self.font_manager if available, otherwise fall back to fm from gOp.panel
+                font_mgr = self.font_manager if self.font_manager else fm
+                dlg = PersonDialog(self, person, self.visual_map_panel, font_manager=font_mgr, gOp=self.gOp, showreferences=False)
                 dlg.Bind(wx.EVT_CLOSE, lambda evt: dlg.Destroy())
                 dlg.Show(True)
         else:

@@ -17,6 +17,9 @@ from const import GUINAME
 
 _log = logging.getLogger(__name__.lower())
 
+# UI Constants
+STATUS_BAR_RIGHT_FIELD_CHARS = 30  # Width of right status bar field in characters
+
 from .config_dialog import ConfigDialog
 from .about_dialog import AboutDialog
 from .help_dialog import HelpDialog
@@ -34,14 +37,16 @@ class VisualMapFrame(wx.Frame):
     """
 
     # runtime attributes with basic type hints
-    font_manager: FontManager
-    StatusBar: wx.StatusBar
-    menuBar: wx.MenuBar
-    visual_map_panel: "VisualMapPanel"
-    filehistory: wx.FileHistory
-    id: VisualGedcomIds
-    config_dialog: Optional[wx.Dialog]
-    gOp: gvOptions
+    font_manager: FontManager  # Initialized in __init__
+    StatusBar: wx.StatusBar  # Created in makeStatusBar()
+    menuBar: wx.MenuBar  # Created in makeMenuBar()
+    visual_map_panel: VisualMapPanel  # Created in __init__
+    filehistory: wx.FileHistory  # Created in makeMenuBar()
+    id: VisualGedcomIds  # Created in makeMenuBar()
+    gOp: gvOptions  # Initialized in __init__
+    fileMenu: wx.Menu  # Created in makeMenuBar()
+    ActionMenu: wx.Menu  # Created in makeMenuBar()
+    font: wx.Font  # Set in set_current_font()
 
     def __init__(self, parent: wx.Window, gOp: gvOptions, font_manager: FontManager, *args: Any, **kw: Any) -> None:
         """Construct the frame.
@@ -85,7 +90,7 @@ class VisualMapFrame(wx.Frame):
         self.StatusBar = self.CreateStatusBar()
         self.SetStatusText("This is the statusbar")
         # Compute field widths once (use font manager to determine a sensible width)
-        widthMax = self.font_manager.get_text_width(30)
+        widthMax = self.font_manager.get_text_width(STATUS_BAR_RIGHT_FIELD_CHARS)
         self.StatusBar.SetFieldsCount(number=2, widths=[-1, widthMax])
         self.SetStatusText("Visual Mapping ready", 0)
 
@@ -175,11 +180,14 @@ class VisualMapFrame(wx.Frame):
 
     def set_gui_font(self) -> None:
         """Apply a new GUI font (propagate to frame, menus, statusbar and panel)."""
+        # Apply recursively to frame (includes menu bar and status bar)
         self.font_manager.apply_current_font_recursive(self)
-        self.font_manager.apply_current_font_recursive(self.GetMenuBar())
-        self.font_manager.apply_current_font_recursive(self.GetStatusBar())
 
+        # Explicitly update panel (may have special font handling)
         self.visual_map_panel.set_current_font()
+
+        # Notify any registered dialogs/panels of the font change
+        self.font_manager.notify_font_change()
 
         self.Layout()
         self.Refresh()
@@ -362,11 +370,11 @@ class VisualMapFrame(wx.Frame):
             msg = "No people loaded yet\n"
             if getattr(self.visual_map_panel, "gOp", None) and getattr(self.visual_map_panel.gOp, "people", None):
                 self.visual_map_panel.gOp.totalGEDpeople = len(self.visual_map_panel.gOp.people)
-                msg = f"Total People :{self.visual_map_panel.gOp.totalGEDpeople}\n"
+                msg = f"Total People: {self.visual_map_panel.gOp.totalGEDpeople}\n"
                 if self.visual_map_panel.gOp.timeframe:
-                    msg += f"\nTimeframe : {self.visual_map_panel.gOp.timeframe.get('from','?')}-{self.visual_map_panel.gOp.timeframe.get('to','?')}\n"
+                    msg += f"\nTimeframe: {self.visual_map_panel.gOp.timeframe.get('from','?')}-{self.visual_map_panel.gOp.timeframe.get('to','?')}\n"
                 if getattr(self.visual_map_panel.gOp, "selectedpeople", 0) > 0:
-                    msg += f"\nDirect  people {self.visual_map_panel.gOp.selectedpeople} in the heritage line\n"
+                    msg += f"\nDirect people: {self.visual_map_panel.gOp.selectedpeople} in the heritage line\n"
                 else:
                     msg += "\nSelect main person for heritage line\n"
             if hasattr(self.visual_map_panel.gOp, "lookup") and getattr(self.visual_map_panel.gOp.lookup, "address_book", None):
@@ -394,14 +402,11 @@ class VisualMapFrame(wx.Frame):
             _log.exception("onOptionsReset failed")
 
     def onOptionsSetup(self, event: wx.Event) -> None:
-        """Open the configuration dialog for editing application options.
-
-        The created dialog instance is kept on self.config_dialog so callers can
-        inspect or reuse it if needed.
-        """
+        """Open the configuration dialog for editing application options."""
         try:
             dialog = ConfigDialog(None, title="Configuration Options", gOp=getattr(self.visual_map_panel, "gOp", None))
-            self.config_dialog = dialog
+            dialog.ShowModal()
+            dialog.Destroy()
         except Exception:
             _log.exception("onOptionsSetup failed")
 

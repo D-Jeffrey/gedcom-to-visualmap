@@ -34,19 +34,7 @@ class PersonDialog(wx.Dialog):
     """
 
     def __init__(self, parent: wx.Window, person: Person, panel: wx.Panel, font_manager: FontManager, gOp: gvOptions, showreferences: bool = True):
-        """Initialize the PersonDialog.
-        
-        Args:
-            parent: Parent window.
-            person: Person object to display details for.
-            panel: Parent panel (provides access to gOp and actions).
-            font_manager: FontManager instance for UI text sizing.
-            gOp: Global options containing GEDCOM data and settings.
-            showreferences: If True, display lineage/ancestry panel (default: True).
-        
-        Note:
-            font_manager is required; ensures text sizing is consistent with the rest of the UI.
-        """
+        """Initialize the PersonDialog."""
         super().__init__(parent, title="Person Details", size=(600, 600), style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER)
         
         self.gOp = gOp
@@ -57,7 +45,28 @@ class PersonDialog(wx.Dialog):
         self.font_size = getattr(font_manager, "size", 12) if font_manager else 12
         self.people = gOp.BackgroundProcess.people if gOp and getattr(gOp, "BackgroundProcess", None) else {}
 
+        self.lineage_panel: FamilyPanel = None
+        self.spouses_panel: FamilyPanel = None
+        self.children_panel: FamilyPanel = None
+
         self.build(panel, self.people, person)
+        
+        # Register with font_manager to receive updates
+        if self.font_manager and hasattr(self.font_manager, 'register_font_change_callback'):
+            self.font_manager.register_font_change_callback(self.update_fonts)
+        
+        # Clean up on close - use EVT_WINDOW_DESTROY instead
+        self.Bind(wx.EVT_WINDOW_DESTROY, self.on_destroy)
+    
+    def on_destroy(self, event):
+        """Clean up when dialog closes."""
+        # Unregister from font_manager (safe to call multiple times)
+        if self.font_manager and hasattr(self.font_manager, 'unregister_font_change_callback'):
+            try:
+                self.font_manager.unregister_font_change_callback(self.update_fonts)
+            except Exception:
+                pass  # Already unregistered or font_manager gone
+        event.Skip()
 
     def build(self, panel: wx.Panel, people: dict, person: Person):
         """Build and layout all dialog components.
@@ -72,23 +81,23 @@ class PersonDialog(wx.Dialog):
         """
         # Build person, lineage and children details sections
         sizer = self._add_person_details(people, person)
-        lineage_sizer = self._add_lineage_details(panel, people, person)
-        spouses_sizer = self._add_spouses_details(people, person)
-        children_sizer = self._add_children_details(people, person)
+        self.lineage_panel = self._add_lineage_details(panel, people, person)
+        self.spouses_panel = self._add_spouses_details(people, person)
+        self.children_panel = self._add_children_details(people, person)
         photo = self._add_photo(panel, person)
         button_sizer = self._add_buttons()
 
-        if lineage_sizer:
+        if self.lineage_panel:
             sizer.Add(wx.StaticText(self, label="Lineage: "), 0, wx.LEFT|wx.TOP, border=5)
-            sizer.Add(lineage_sizer, 1, wx.EXPAND, border=5)
+            sizer.Add(self.lineage_panel, 1, wx.EXPAND, border=5)
 
-        if spouses_sizer:
+        if self.spouses_panel:
             sizer.Add(wx.StaticText(self, label="Spouses: "), 0, wx.LEFT|wx.TOP, border=5)
-            sizer.Add(spouses_sizer, 1, wx.EXPAND, border=5)
+            sizer.Add(self.spouses_panel, 1, wx.EXPAND, border=5)
 
-        if children_sizer:
+        if self.children_panel:
              sizer.Add(wx.StaticText(self, label="Children: "), 0, wx.LEFT|wx.TOP, border=5)
-             sizer.Add(children_sizer, 1, wx.EXPAND, border=5)
+             sizer.Add(self.children_panel, 1, wx.EXPAND, border=5)
 
         mainSizer = wx.BoxSizer(wx.VERTICAL)
         if photo:
@@ -102,15 +111,35 @@ class PersonDialog(wx.Dialog):
         mainSizer.Add(button_sizer, 0, wx.ALIGN_LEFT|wx.LEFT| wx.BOTTOM, border=10)
 
         self.SetSizer(mainSizer)
+
+        self.update_fonts()
+
         self.SetBackgroundColour(wx.TheColourDatabase.FindColour('WHITE'))
         self.Fit()
 
+    def update_fonts(self) -> None:
+        """Update fonts of all dialog components based on the current font manager."""
+        if self.font_manager:
+            grid_font = self.font_manager.get_font()
+            if grid_font:
+                # self.SetFont(grid_font)
+                self.font_manager.apply_current_font_recursive(self)
+            if self.lineage_panel:
+                if hasattr(self.lineage_panel, "update_fonts"):
+                    self.lineage_panel.update_fonts(self.font_manager)
+            if self.spouses_panel:
+                if hasattr(self.spouses_panel, "update_fonts"):
+                    self.spouses_panel.update_fonts(self.font_manager)
+            if self.children_panel:
+                if hasattr(self.children_panel, "update_fonts"):
+                    self.children_panel.update_fonts(self.font_manager)
+                
     def _get_marriages_list(self, people: dict, person: Person) -> str:
         """Return a newline-separated string listing all marriages for the person.
         
         Args:
             people: Dictionary of all people keyed by xref_id.
-            person: Person whose marriages to list.
+            person: Person object to display details for.
         
         Returns:
             Formatted string with one marriage per line (partner name + date/place).
@@ -246,20 +275,8 @@ class PersonDialog(wx.Dialog):
 
         return sizer
 
-    def _add_lineage_details(self, panel: wx.Panel, people: dict = None, person: Person = None):
-        """Build lineage/family panel showing ancestry path to the selected main person.
-        
-        Uses panel.actions.doTraceTo() to compute ancestry and displays it in a FamilyPanel.
-        Only shown if showreferences=True and the person is referenced in the current map.
-        
-        Args:
-            panel: Parent panel (provides access to gOp and actions).
-            people: Dictionary of all people keyed by xref_id.
-            person: Person whose lineage to display.
-        
-        Returns:
-            FamilyPanel widget or wx.StaticText with message, or None if not applicable.
-        """
+    def _add_lineage_details(self, panel: wx.Panel, people: dict = None, person: Person = None) -> wx.Panel | wx.StaticText | None:
+        """Build lineage/family panel showing ancestry path to the selected main person."""
         if not people or not person:
             return None
         
@@ -271,10 +288,10 @@ class PersonDialog(wx.Dialog):
         if referenced and showreferences and getattr(referenced, "exists", None):
             if FamilyPanel and panel and getattr(panel, "gOp", None) and referenced.exists(person.xref_id):
                 if panel_actions and getattr(panel_actions, "doTraceTo", None):
-                    hertiageList = panel_actions.doTraceTo(panel.gOp, person)
-                    if hertiageList:
-                        hertiageSet = {}
-                        for (hertiageparent, hertiageperson, hyear, hid) in hertiageList:
+                    heritageList = panel_actions.doTraceTo(panel.gOp, person)
+                    if heritageList:
+                        heritageSet = {}
+                        for (heritageparent, heritageperson, hyear, hid) in heritageList:
                             try:
                                 p = people.get(hid)
                                 if not p:
@@ -284,8 +301,8 @@ class PersonDialog(wx.Dialog):
                                 death_year = p.death.whenyear() if getattr(p, "death", None) else None
                                 birth = getattr(p, "birth", None)
                                 birth_place = getattr(birth, 'place', None) if birth else None
-                                hertiageSet[hid] = (hertiageperson,
-                                                    hertiageparent,
+                                heritageSet[hid] = (heritageperson,
+                                                    heritageparent,
                                                     birth_year,
                                                     death_year,
                                                     birth_place,
@@ -293,24 +310,13 @@ class PersonDialog(wx.Dialog):
                                                     hid)
                             except Exception:
                                 _log.exception("Error building lineage entry for %s", hid)
-                        related = FamilyPanel(self, hertiageSet, isLineage=True)
+                        related = FamilyPanel(self, heritageSet, isLineage=True, font_manager=self.font_manager)
             if not related:
                 related = wx.StaticText(self, label="No lineage to selected main person")
         return related
 
     def _add_spouses_details(self, people: dict = None, person: Person = None):
-        """Build spouses panel showing all spouses/partners of the person.
-        
-        Creates a FamilyPanel displaying name, birth, death, and title for each spouse/partner.
-        Uses person.partners list to identify all marriage partners.
-        
-        Args:
-            people: Dictionary of all people keyed by xref_id.
-            person: Person whose spouses to display.
-        
-        Returns:
-            FamilyPanel widget or wx.StaticText fallback, or None if no spouses.
-        """
+        """Build spouses panel showing all spouses/partners of the person."""
         if not people or not person:
             return None
         
@@ -327,7 +333,6 @@ class PersonDialog(wx.Dialog):
                     death_year = p.death.whenyear() if getattr(p, "death", None) else None
                     birth = getattr(p, "birth", None)
                     birth_place = getattr(birth, 'place', None) if birth else None
-                    # Person.name may be a property/method, handle both
                     try:
                         spouse_name = p.name if hasattr(p, "name") else ""
                     except Exception:
@@ -342,25 +347,14 @@ class PersonDialog(wx.Dialog):
                 except Exception:
                     _log.exception("Error building spouse entry for %s", hid)
             if FamilyPanel:
-                spousesize = FamilyPanel(self, spouseSet, isLineage=False)
+                spousesize = FamilyPanel(self, spouseSet, isLineage=False, font_manager=self.font_manager)
             else:
                 spousesize = wx.StaticText(self, label="Spouses panel unavailable")
 
         return spousesize
     
     def _add_children_details(self, people: dict = None, person: Person = None):
-        """Build children panel showing all children of the person.
-        
-        Creates a FamilyPanel (in children mode) displaying name, birth, death, and
-        title for each child.
-        
-        Args:
-            people: Dictionary of all people keyed by xref_id.
-            person: Person whose children to display.
-        
-        Returns:
-            FamilyPanel widget or wx.StaticText fallback, or None if no children.
-        """
+        """Build children panel showing all children of the person."""
         if not people or not person:
             return None
         
@@ -377,7 +371,6 @@ class PersonDialog(wx.Dialog):
                     death_year = p.death.whenyear() if getattr(p, "death", None) else None
                     birth = getattr(p, "birth", None)
                     birth_place = getattr(birth, 'place', None) if birth else None
-                    # Person.name may be a property/method, handle both
                     try:
                         child_name = p.name if hasattr(p, "name") else ""
                     except Exception:
@@ -392,7 +385,7 @@ class PersonDialog(wx.Dialog):
                 except Exception:
                     _log.exception("Error building child entry for %s", hid)
             if FamilyPanel:
-                childsize = FamilyPanel(self, childSet, isLineage=False)
+                childsize = FamilyPanel(self, childSet, isLineage=False, font_manager=self.font_manager)
             else:
                 childsize = wx.StaticText(self, label="Children panel unavailable")
 

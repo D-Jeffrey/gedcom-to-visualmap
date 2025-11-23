@@ -7,6 +7,7 @@ from gedcom.gedcomdate import CheckAge
 from .person_dialog import PersonDialog
 from .find_dialog import FindDialog
 from .visual_gedcom_ids import VisualGedcomIds
+from style.stylemanager import FontManager
 
 _log = logging.getLogger(__name__.lower())
 
@@ -254,7 +255,7 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
 
     def OnFind(self, event):
         parent_win = self.get_visual_map_panel() or self.GetTopLevelParent()
-        find_dialog = FindDialog(parent_win, "Find", LastSearch=self.LastSearch)
+        find_dialog = FindDialog(parent_win, font_manager=self.font_manager, title ="Find", LastSearch=self.LastSearch)
         if find_dialog.ShowModal() == wx.ID_OK:
             self.LastSearch = find_dialog.GetSearchString()
             if self.GetItemCount() > 1:

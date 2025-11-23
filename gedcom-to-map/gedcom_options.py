@@ -143,6 +143,35 @@ class ResultType(Enum):
         else:
             return 'html'
 
+class FileOpenCommandLines:
+    def __init__(self):
+        self.commands: Dict[str, str] = {}
+        self.process: Optional[str] = None
+
+    def add_file_type_command(self, file_type: str, command_line: str):
+        file_type_lower = file_type.lower()
+        found_key = file_type
+        for key in self.commands.keys():
+            if key.lower() == file_type_lower:
+                _log.warning(f"Overwriting existing command for file type '{file_type}': '{self.commands[key]}' -> '{command_line}'")
+                found_key = key
+                break
+        self.commands[found_key] = command_line
+        
+    def get_command_for_file_type(self, file_type: str) -> Optional[str]:
+        file_type_lower = file_type.lower()
+        for key, value in self.commands.items():
+            if key.lower() == file_type_lower:
+                return value
+        return None
+    
+    def exists_command_for_file_type(self, file_type: str) -> bool:
+        file_type_lower = file_type.lower()
+        return any(key.lower() == file_type_lower for key in self.commands.keys())
+    
+    def list_file_types(self) -> list[str]:
+        return list(self.commands.keys())
+    
 class gvOptions:
     """Application options and transient runtime state.
 
@@ -176,25 +205,37 @@ class gvOptions:
         self.time = time.ctime()
         self.resettimeframe()
         
+        self.file_open_commands = FileOpenCommandLines()
         os_name = platform.system()
         if os_name == 'Windows':
-            self.KMLcmdline = "notepad $n"
-            self.CSVcmdline = "$n"
-            self.Tracecmdline = "notepad $n"
+            kml_cmd_line = "notepad $n"
+            csv_cmd_line = "$n"
+            trace_cmd_line = "notepad $n"
+            default_cmd_line = "$n"
         
         elif os_name == 'Darwin':
-            self.KMLcmdline = "Numbers $n"
-            self.CSVcmdline = OFFICECMDLINE + " --calc $n"
-            self.Tracecmdline = "Numbers $n"
+            kml_cmd_line = "open -a Numbers $n"
+            csv_cmd_line = OFFICECMDLINE + " --calc $n"
+            trace_cmd_line = "open -a Numbers $n"
+            default_cmd_line = "open $n"
+
         elif os_name == 'Linux':
-            self.KMLcmdline = "nano $n"
-            self.CSVcmdline = OFFICECMDLINE + " --calc $n"
-            self.Tracecmdline = OFFICECMDLINE + " --calc $n"
+            kml_cmd_line = "nano $n"
+            csv_cmd_line = OFFICECMDLINE + " --calc $n"
+            trace_cmd_line = OFFICECMDLINE + " --calc $n"
+            default_cmd_line = "xdg-open $n"
 
         else:
-            self.KMLcmdline = "notepad $n"
-            self.CSVcmdline = "notepad $n"
-            self.Tracecmdline = "notepad $n"
+            kml_cmd_line = "notepad $n"
+            csv_cmd_line = "notepad $n"
+            trace_cmd_line = "notepad $n"
+            default_cmd_line = "notepad $n"
+
+        self.file_open_commands.add_file_type_command('KML', kml_cmd_line)
+        self.file_open_commands.add_file_type_command('CSV', csv_cmd_line)
+        self.file_open_commands.add_file_type_command('Trace', trace_cmd_line)
+        self.file_open_commands.add_file_type_command('HTML', 'webbrowser $n')
+        self.file_open_commands.add_file_type_command('Default', default_cmd_line)
 
         if os.path.exists(self.settingsfile):
             self.loadsettings()            
@@ -408,7 +449,13 @@ class gvOptions:
         self.setInput(self.gvConfig['Core'].get('InputFile', ''), generalRequest=False)
         self.resultpath, self.ResultFile = os.path.split(self.gvConfig['Core'].get('OutputFile', ''))
         self.setResultsFile(self.ResultFile, self.ResultType)
-        self.KMLcmdline = self.gvConfig['Core'].get('KMLcmdline', '')
+        for file_type in self.file_open_commands.list_file_types():
+            cmd = self.gvConfig['Core'].get(f'{file_type}cmdline', '')
+            if cmd:
+                self.file_open_commands.add_file_type_command(file_type, cmd)
+            else:
+                cmd = self.file_open_commands.get_command_for_file_type(file_type)
+            setattr(self, f'{file_type}cmdline', cmd)
 
         # Load logging settings
         for itm, lvl in self.gvConfig.items('Logging'):
@@ -440,7 +487,10 @@ class gvOptions:
 
             self.gvConfig['Core']['InputFile'] =  self.GEDCOMinput
             self.gvConfig['Core']['OutputFile'] = os.path.join(self.resultpath, self.ResultFile)
-            self.gvConfig['Core']['KMLcmdline'] =  self.KMLcmdline
+            for file_type in self.file_open_commands.list_file_types():
+                cmd = self.file_open_commands.get_command_for_file_type(file_type)
+                if cmd:
+                    self.gvConfig['Core'][f'{file_type}cmdline'] = cmd
             if self.GEDCOMinput and self.Main:
                 name = Path(self.GEDCOMinput).stem
                 self.gvConfig['Gedcom.Main'][name] = str(self.Main)

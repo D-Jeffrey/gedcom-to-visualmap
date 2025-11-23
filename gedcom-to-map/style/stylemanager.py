@@ -149,3 +149,23 @@ class FontManager:
         face, size = cls.get_font_name_size()
         isMono = face in ["Consolas", "Courier New", "DejaVu Sans Mono"]
         return cls.approx_text_width(num_chars, sizePt=size, isMono=isMono)
+    
+    def register_font_change_callback(self, callback):
+        """Register a callback function to be called when font changes."""
+        if not hasattr(self, "_callbacks"):
+            self._callbacks = []
+        self._callbacks.append(callback)
+
+    def unregister_font_change_callback(self, callback):
+        """Unregister a previously registered callback function."""
+        if hasattr(self, "_callbacks") and callback in self._callbacks:
+            self._callbacks.remove(callback)
+
+    def notify_font_change(self):
+        """Notify all registered callbacks of a font change."""
+        if hasattr(self, "_callbacks"):
+            for callback in self._callbacks:
+                try:
+                    callback()
+                except Exception as e:
+                    _log.warning("Font change callback failed: %s", e)

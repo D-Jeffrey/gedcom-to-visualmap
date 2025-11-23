@@ -35,7 +35,6 @@ class BackgroundActions:
     def Start(self):
         self.keepGoing = self.threadrunning = True
         self.do = 0
-        logging.info("Started thread %d from thread %d", self.threadnum, _thread.get_ident())
         _thread.start_new_thread(self.Run, ())
 
     def Stop(self):

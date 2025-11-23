@@ -17,10 +17,6 @@ import logging
 import time
 import math
 import os
-import sys
-import subprocess
-import webbrowser
-import shutil
 from datetime import datetime
 
 from const import KMLMAPSURL
@@ -447,7 +443,6 @@ class VisualMapPanel(wx.Panel):
 
         newinfo = None
         if self.background_process.updateinfo:
-            _log.debug("Infobox: %s", self.background_process.updateinfo)
             newinfo = self.background_process.updateinfo
             self.background_process.updateinfo = None
 
@@ -689,7 +684,7 @@ class VisualMapPanel(wx.Panel):
                 _log.debug("Int/Slider set failed for %r", control)
 
         def set_button(control: wx.Window, value: Any) -> None:
-            _log.debug("Button no settings applied yet for %r", control)
+            pass
 
         # dispatch mapping by wtype
         handlers = {

@@ -144,7 +144,6 @@ class VisualMapEventHandler:
                 # special case: results text needs to update gOp ResultFile and ResultType
                 self.panel.gOp.set(attrname, event.GetString())
                 self.panel.gOp.set(attrname, event.GetString())
-                _log.debug("Text set %s = %s", attrname, event.GetString())
             else:
                 pass  # no other text controls currently handled
             self.panel.SetupButtonState()

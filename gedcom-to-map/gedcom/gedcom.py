@@ -352,9 +352,13 @@ class GedcomParser:
                     # BUG this causes the xref_id to be overwritten sometime between husband and wife processing
                     marriage_event.record.xref_id = wife_record.xref_id if wife_record else None
                     husband.marriages.append(marriage_event)
+                    if wife_record:
+                        husband.partners.append(wife_record.xref_id)
                 if wife:
                     marriage_event.record.xref_id = husband_record.xref_id if husband_record else None
                     wife.marriages.append(marriage_event)
+                    if husband_record:
+                        wife.partners.append(husband_record.xref_id)
             for child in record.sub_tags('CHIL'):
                 if child.xref_id in people:
                     if people[child.xref_id]:

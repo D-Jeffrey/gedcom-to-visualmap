@@ -351,7 +351,7 @@ class gvOptions:
                         parsed = ResultType.ResultTypeEnforce(value)
                         setattr(self, key, parsed)
                     except Exception:
-                        _log("Invalid ResultType string in settings for '%s': %s", key, value)
+                        _log.error("Invalid ResultType string in settings for '%s': %s", key, value)
                 else:
                     parsed = None
                     # try yaml first (handles lists/dicts/numbers/null)

@@ -186,18 +186,35 @@ class VisualMapActions:
         except Exception:
             _log.exception("open_html_file failed")
 
-    def doHTML(self, gOp: gvOptions, people, fullresult ):
+    def doHTML(self, gOp: gvOptions, people, fullresult):
+        """Generate HTML map output using folium exporter.
         
+        Creates lifetime lines for all selected people and exports to HTML/folium map.
+        Optionally opens result in browser if fullresult=True.
+        
+        Args:
+            gOp: Global options containing settings and paths.
+            people: Dictionary of Person objects keyed by xref_id.
+            fullresult: If True, opens result in browser after generation.
+        
+        Returns:
+            bool: True if successful, False if errors occurred.
+        """
         if (not people):
-            return
+            _log.error("doHTML: no people provided")
+            return False
+        
         _log.debug  ("Creating Lifeline (fullresult:%s)", fullresult)
         lifeline = LifetimeCreator(people, gOp.MaxMissing)    
         _log.debug  ("Creating People ")
         creator = lifeline.create(gOp.Main)    
         if gOp.Main not in people:
             _log.error ("Could not find your starting person: %s", gOp.Main)
-            gOp.stopstep('Error could not find first person')
-            return
+            try:
+                gOp.stopstep('Error could not find first person')
+            except Exception:
+                pass
+            return False
         
         gOp.setMainPerson(people[gOp.Main])
         if gOp.AllEntities:
@@ -206,7 +223,12 @@ class VisualMapActions:
             _log.info ("Total of %i people & events.", len(creator))   
         gOp.totalpeople = len(creator)
 
-        foliumExporter(gOp).export(people[gOp.Main], creator, fullresult)
+        try:
+            foliumExporter(gOp).export(people[gOp.Main], creator, fullresult)
+        except Exception:
+            _log.exception("doHTML: folium export failed")
+            return False
+        
         if (fullresult):
             result_path = Path(gOp.resultpath) / gOp.ResultFile
             result_path = result_path.resolve()
@@ -223,11 +245,25 @@ class VisualMapActions:
                         os.startfile(str(result_path))
             else:
                 _log.error("Result file not found: %s", result_path)
-    
+                return False
+        return True
+
     def Geoheatmap(self, gOp : gvOptions):
-        """Generate HTML output for the supplied people/options (moved from gedcomvisual.doHTML)."""
+        """Parse GEDCOM, geocode, and generate HTML heatmap with browser open.
+        
+        Convenience wrapper that calls ParseAndGPS followed by doHTML with fullresult=True.
+        
+        Args:
+            gOp: Global options containing GEDCOM path and settings.
+        
+        Returns:
+            bool: True if successful, False otherwise.
+        """
         people = self.ParseAndGPS(gOp)
-        self.doHTML(gOp, people, True)
+        if not people:
+            _log.error("Geoheatmap: ParseAndGPS returned no people")
+            return False
+        return self.doHTML(gOp, people, True)
 
     def doKML(self, gOp: gvOptions, people: list[Person]) -> None:
         """Generate KML output for the supplied people/options (moved from gedcomvisual.doKML)."""
@@ -299,25 +335,54 @@ class VisualMapActions:
                 bg.SayInfoMessage("No KML output created - No data selected to map")
 
     def doKML2(self, gOp: gvOptions, people: list[Person]) -> None:
+        """Create KML (legacy / alternate exporter) and open it via configured command.
+
+        Defensive: checks gOp.lookup/result paths, imports exporter with fallback,
+        catches exceptions and uses self.runCMDfile to open results.
+        
+        Args:
+            gOp: Global options with lookup (GeolocatedGedcom) and output paths.
+            people: List of Person objects (unused by this exporter).
+        """
         if (not gOp.lookup):
             _log.error("doKML2: GeolocatedGedcom is not processed")
             return
         resultFile = os.path.join(gOp.resultpath, gOp.ResultFile)
 
-        kml_life_lines = KML_Life_Lines(gedcom=gOp.lookup, kml_file=str(resultFile),
-                                            connect_parents=True, save=True)
+        try:
+            kml_life_lines = KML_Life_Lines(gedcom=gOp.lookup, kml_file=str(resultFile),
+                                                connect_parents=True, save=True)
+        except Exception:
+            _log.exception("doKML2: KML_Life_Lines creation/export failed")
+            bg = getattr(gOp, "BackgroundProcess", None)
+            if bg:
+                try:
+                    bg.SayInfoMessage("KML(2) generation failed")
+                except Exception:
+                    pass
+            return
+        
         bg = getattr(gOp, "BackgroundProcess", None)
         if kml_life_lines:
             if bg:
-                bg.SayInfoMessage(f"KML(2) output to : {resultFile}")
+                try:
+                    bg.SayInfoMessage(f"KML(2) output to : {resultFile}")
+                except Exception:
+                    pass
             if gOp.KMLcmdline:
-                gOp.panel.actions.runCMDfile(gOp.KMLcmdline, resultFile)
+                try:
+                    self.runCMDfile(gOp.KMLcmdline, resultFile)
+                except Exception:
+                    _log.exception("doKML2: failed to open result via runCMDfile")
             else:
                 _log.error("Use Options -> Options Setup to define a command line to run")
         else:
             _log.error("No KML output created")
             if bg:
-                bg.SayInfoMessage(f"No KML output created - No data selected to map")
+                try:
+                    bg.SayInfoMessage(f"No KML output created - No data selected to map")
+                except Exception:
+                    pass
 
     def doSUM(self, gOp: gvOptions) -> None:
         """Generate various summary files (places, people, countries, geocache, alt places).
@@ -430,8 +495,7 @@ class VisualMapActions:
                 alt_place_file_path = input_path.parent / f"{base_file_name}{FILE_ALT_PLACE_FILENAME_SUFFIX}"
                 file_geo_cache_path = input_path.parent / f"{base_file_name}{FILE_GEOCACHE_FILENAME_SUFFIX}"
                 geo_config_path = Path(__file__).parent.resolve() / GEO_CONFIG_FILENAME
-                defaultCountry = gOp.get('defaultCountry')
-                if defaultCountry == "": defaultCountry = None
+                defaultCountry = gOp.get('defaultCountry') or None
                 gOp.lookup = GeolocatedGedcom(
                     gedcom_file=input_path.resolve(), 
                     location_cache_file=cachefile,
@@ -454,29 +518,46 @@ class VisualMapActions:
         return people
 
     def gedcom_to_map(self, gOp: gvOptions):
+        """Parse GEDCOM, geocode, and generate KML output.
         
+        Convenience wrapper that parses/geocodes via ParseAndGPS then generates KML.
+        
+        Args:
+            gOp: Global options containing GEDCOM path and output settings.
+        """
         people = self.ParseAndGPS(gOp)
+        if not people:
+            _log.error("gedcom_to_map: ParseAndGPS returned no people")
+            return
         panel_actions = getattr(getattr(gOp, "panel", None), "actions", None)
-        panel_actions.doKML(gOp, people)
+        if panel_actions:
+            panel_actions.doKML(gOp, people)
+        else:
+            _log.error("gedcom_to_map: panel actions not available")
 
     def doTrace(self, gOp: gvOptions):
         """
         Trace and collect referenced people in the genealogical data starting from a main person.
+        
         This function initializes the tracing process by finding all related people connected
         to a specified starting person (gOp.Main) and stores their references along with their
         relationship paths.
+        
         Args:
             gOp (gvOptions): Options object containing:
                 - people (dict): Dictionary of all people in the genealogical data
                 - Main (str): The xref_id of the starting person for the trace
                 - Referenced (Referenced): Set to store all found people references
                 - totalpeople (int): Counter for total people processed
+        
         Returns:
-            None: Modifies gOp in-place by populating Referenced and totalpeople.
+            int: Total count of people found in trace, or 0 if error.
+        
         Raises:
             Logs errors if:
                 - No people data is available
                 - The specified starting person (gOp.Main) is not found in the people data
+        
         Side Effects:
             - Initializes gOp.Referenced as an empty Referenced set
             - Populates gOp.Referenced with xref_ids and their relationship paths
@@ -488,11 +569,11 @@ class VisualMapActions:
         
         if not gOp.people:
             _log.error ("Trace:References no people.")
-            return
+            return 0
         people = gOp.people
         if gOp.Main not in people:
             _log.error  ("Trace:Could not find your starting person: %s", gOp.Main)
-            return
+            return 0
         gOp.Referenced.add(gOp.Main)
         lifeline = CreatorTrace(people)
 
@@ -502,11 +583,34 @@ class VisualMapActions:
         if  creator:
             for c in creator:
                 gOp.Referenced.add(c.person.xref_id,tag=c.path)
+        
+        gOp.totalpeople = len(creator) if creator else 0
+        return gOp.totalpeople
 
     # Trace from the main person to this ID
     def doTraceTo(self, gOp: gvOptions, ToID : Person):
+        """Trace lineage path from main person to specified person.
+        
+        Builds a list of ancestors connecting gOp.mainPerson to ToID by following
+        the relationship tags stored in gOp.Referenced. Calls doTrace() first if
+        Referenced is not yet populated.
+        
+        Args:
+            gOp: Global options with mainPerson, people dict, and Referenced set.
+            ToID: Target Person to trace lineage to.
+        
+        Returns:
+            list: List of tuples (relationship, name, birth_year, xref_id) forming
+                  the ancestry path from main person to ToID. Returns list with
+                  single "NotDirect" entry if no relationship exists.
+        """
         if not gOp.Referenced:
             self.doTrace(gOp)
+        
+        if not getattr(gOp, "mainPerson", None):
+            _log.error("doTraceTo: gOp.mainPerson not set")
+            return []
+        
         people = gOp.people
         heritage = []
         heritage = [("", gOp.mainPerson.name, gOp.mainPerson.refyear()[0], gOp.mainPerson.xref_id)]
@@ -516,16 +620,24 @@ class VisualMapActions:
             if personRelated:    
                 for r in personRelated:
                     if r == "F":
-                        personTrace = people[personTrace.father]
+                        try:
+                            personTrace = people[personTrace.father]
+                        except KeyError:
+                            _log.error("doTraceTo: father %s not in people dict", personTrace.father)
+                            break
                         tag = "Father"
                     elif r == "M":
-                        personTrace = people[personTrace.mother]
+                        try:
+                            personTrace = people[personTrace.mother]
+                        except KeyError:
+                            _log.error("doTraceTo: mother %s not in people dict", personTrace.mother)
+                            break
                         tag = "Mother"
                     else:
                         _log.error("doTrace - neither Father or Mother, how did we get here?")
                         tag = "?????"
                     heritage.append((f"[{tag}]",personTrace.name, personTrace.refyear()[0], personTrace.xref_id))
         else:
-            heritage.append([("NotDirect", ToID.name)])
+            heritage.append(("NotDirect", ToID.name, None, ToID.xref_id))
         gOp.heritage = heritage
         return heritage

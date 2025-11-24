@@ -95,8 +95,8 @@ class Person:
         self.maidenname : Optional[str] = None
         self.sex : Optional[str] = None
         self.title : Optional[str] = None
-        self.children : List[str] = []    # xref_id of children NOT YET USED
-        self.partners : List[str] = []    # xref_id of partners NOT YET USED
+        self.children : List[str] = []
+        self.partners : List[str] = []
         self.age = None           # This can be age number or a including the cause of death
         self.photo = None         # URL or file path to photo
         self.location = None

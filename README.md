@@ -9,12 +9,10 @@
 Read a GEDCOM file and translate the locations into GPS addresses.
 - Produces different KML map types which should have timelines and movements around the earth.
 - Produces HTML file which is interactive.
-- Produces Summary stats on you places and locations involved
-- Allow you to example the family linage and desendance 
+- Produces Summary stats on you places and locations (Geocoding addresses to 95%+)
+- Allow you to see the family linage - ascendants and descendants.
 
-This contains two interfaces: command-line and GUI (GUI is tested on Windows and Windows Sub-system for Linux, testing by @colin0brass on Mac)
-
-Orginally forked from [https://github.com/lmallez/gedcom-to-map]
+In collaboration with [colin0brass](https://github.com/colin0brass). This contains two interfaces: command-line and GUI (GUI is tested on Windows MacOS and and Windows Sub-system for Linux). Orginally forked from [https://github.com/lmallez/gedcom-to-map]
 
 ## Who Should Try This
 - Genealogy hobbyists wanting spatial context for life events.
@@ -26,10 +24,11 @@ Orginally forked from [https://github.com/lmallez/gedcom-to-map]
 - Double-left-click a person in the GUI list to set the starting person for traces and timelines.
 - Edit `geo_cache.csv` to correct or refine geocoding, then save and re-run to apply fixes.
 - Export KML to inspect results in Google Earth Pro, Google MyMaps, or ArcGIS Earth.
+- Generate tables and CSV files listing People, places and lifelines.
 
 # How to Run
 
-Assuming you have Python installed otherwise... https://github.com/PackeTsar/Install-Python#readme
+Assuming you have Python installed (otherwise see https://github.com/PackeTsar/Install-Python#readme)
 
 1. Clone the repository: (in powershell or bash)
 ```
@@ -70,6 +69,13 @@ Start the command line  (Not recommended as there are so many options)
 ```
 cd gedcom-to-map
 python3 gedcom-to-map.py /users/darren/documents/myhertitagetree.ged myTree -main "@I500003@" 
+```
+
+5. Later on you can update your code by using the command:
+```
+cd gedcom-to-map
+git pull https://github.com/D-Jeffrey/gedcom-to-visualmap
+pip install -r requirements.txt
 ```
 
 ## GUI
@@ -310,6 +316,8 @@ python3 ..\gedcom-to-map\gedcom-to-map.py input.ged output -main "@I0000@" -form
 - Need to separate the Load and GPS resolve steps (currently reloads after 30 seconds of looking up values)
 
 ## Releases
+### V0.2.8.0
+- Major regorganation of the GUI code base
 ### v0.2.7.1
 - Better feedback during load and geocode
 - regrouped and fix GUI layout issues

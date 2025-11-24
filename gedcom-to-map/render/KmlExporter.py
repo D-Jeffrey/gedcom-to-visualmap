@@ -18,7 +18,7 @@ _log = logging.getLogger(__name__.lower())
 
 class KmlExporter:
     def __init__(self, gOp: gvOptions):
-        self.file_name = os.path.join(gOp.resultpath, gOp.Result)
+        self.file_name = os.path.join(gOp.resultpath, gOp.ResultFile)
         self.max_line_weight = gOp.MaxLineWeight
         self.kml = None
         self.gOp = gOp

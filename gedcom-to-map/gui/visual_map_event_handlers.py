@@ -12,212 +12,247 @@ import logging
 import time
 import wx
 
-from gedcom_options import ResultsType  # type: ignore
+from gedcom_options import ResultType  # type: ignore
 
 _log = logging.getLogger(__name__.lower())
 
 
 class VisualMapEventHandler:
-    """Event handler delegate for VisualMapPanel. Holds a reference to the panel."""
+    """Lightweight, readable event-handler delegate for VisualMapPanel.
+
+    This version centralises common patterns (attr lookup, action dispatch)
+    so individual event handlers are short and easier to maintain.
+    """
 
     def __init__(self, panel: Any) -> None:
         self.panel = panel
+        # map radio-index -> ResultType for the results-type radiobox
+        self._results_type_map = (
+            ResultType.HTML,
+            ResultType.KML,
+            ResultType.KML2,
+            ResultType.SUM,
+        )
 
     def bind(self) -> None:
-        """Wire up wx event bindings that delegate to handler methods or panel handlers."""
+        """Bind events for all known IDs using the id metadata on the panel."""
         p = self.panel
-        # Radio / checkbox / choice / spin / slider / text / button bindings
-        p.Bind(wx.EVT_RADIOBOX, self.EvtRadioBox, id=p.id.IDs["ID_RBResultsType"])
-        p.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id=p.id.IDs["ID_CBMapControl"])
-        p.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id=p.id.IDs["ID_CBMapMini"])
-        p.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id=p.id.IDs["ID_CBMarksOn"])
-        p.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id=p.id.IDs["ID_CBBornMark"])
-        p.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id=p.id.IDs["ID_CBDieMark"])
-        p.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id=p.id.IDs["ID_CBHomeMarker"])
-        p.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id=p.id.IDs["ID_CBMarkStarOn"])
-        p.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id=p.id.IDs["ID_CBHeatMap"])
-        p.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id=p.id.IDs["ID_CBFlyTo"])
-        p.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id=p.id.IDs["ID_CBMapTimeLine"])
-        p.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id=p.id.IDs["ID_CBUseAntPath"])
-        p.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id=p.id.IDs["ID_CBUseGPS"])
-        p.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id=p.id.IDs["ID_CBCacheOnly"])
-        p.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id=p.id.IDs["ID_CBAllEntities"])
-        p.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id=p.id.IDs["ID_CBGridView"])
-        p.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id=p.id.IDs["ID_CBSummary"])
-        p.Bind(wx.EVT_RADIOBOX, self.EvtRadioBox, id=p.id.IDs["ID_RBKMLMode"])
-        p.Bind(wx.EVT_SPINCTRL, self.EvtSpinCtrl, id=p.id.IDs["ID_INTMaxLineWeight"])
-        p.Bind(wx.EVT_CHOICE, self.EvtListBox, id=p.id.IDs["ID_LISTMapStyle"])
-        p.Bind(wx.EVT_BUTTON, self.EvtButton, id=p.id.IDs["ID_BTNLoad"])
-        p.Bind(wx.EVT_BUTTON, self.EvtButton, id=p.id.IDs["ID_BTNCreateFiles"])
-        p.Bind(wx.EVT_BUTTON, self.EvtButton, id=p.id.IDs["ID_BTNCSV"])
-        p.Bind(wx.EVT_BUTTON, self.EvtButton, id=p.id.IDs["ID_BTNTRACE"])
-        p.Bind(wx.EVT_BUTTON, self.EvtButton, id=p.id.IDs["ID_BTNSTOP"])
-        p.Bind(wx.EVT_BUTTON, self.EvtButton, id=p.id.IDs["ID_BTNBROWSER"])
-        p.Bind(wx.EVT_TEXT, self.EvtText, id=p.id.IDs["ID_TEXTResult"])
-        p.Bind(wx.EVT_TEXT, self.EvtText, id=p.id.IDs["ID_TEXTDefaultCountry"])
-        # GroupBy and slider
-        p.Bind(wx.EVT_RADIOBOX, self.EvtRadioBox, id=p.id.IDs["ID_RBGroupBy"])
-        p.Bind(wx.EVT_SLIDER, self.EvtSlider, id=p.id.IDs["ID_LISTHeatMapTimeStep"])
-        # Keep panel-level close handling (panel implements safe destroy)
-        p.Bind(wx.EVT_CLOSE, p.OnCloseWindow)
-        # initial UI state calls previously in panel.bind_events:
-        p.OnBusyStop(-1)
-        p.NeedReload()
-        p.NeedRedraw()
+        for wid in p.id.IDs.values():
+            attrs = p.id.get_id_attributes(wid) or {}
+            wtype = attrs.get("type", "").lower()
+            if wtype == "button":
+                p.Bind(wx.EVT_BUTTON, self.EvtButton, id=wid)
+            elif wtype == "checkbox":
+                p.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, id=wid)
+            elif wtype == "radiobutton":
+                p.Bind(wx.EVT_RADIOBOX, self.EvtRadioBox, id=wid)
+            elif wtype == "text":
+                p.Bind(wx.EVT_TEXT, self.EvtText, id=wid)
+            elif wtype == "slider":
+                p.Bind(wx.EVT_SLIDER, self.EvtSlider, id=wid)
+            elif wtype == "spinctrl":
+                p.Bind(wx.EVT_SPINCTRL, self.EvtSpinCtrl, id=wid)
+            elif wtype == "list":
+                p.Bind(wx.EVT_CHOICE, self.EvtListBox, id=wid)
+            else:
+                _log.debug("No binding for widget id %s (type=%r)", wid, wtype)
 
-    def EvtRadioBox(self, event: wx.CommandEvent) -> None:
-        """Handle RadioBox changes (ResultType / GroupBy / KML mode)."""
+        # panel-level close remains panel's responsibility
+        top = p.GetTopLevelParent()
+        if top:
+            top.Bind(wx.EVT_CLOSE, p.OnCloseWindow)
+
+        # restore initial UI state after binding
         try:
-            if event.GetId() == self.panel.id.IDs["ID_RBResultsType"]:
-                if event.GetInt() == 0:
-                    outType = ResultsType.HTML
-                elif event.GetInt() == 1:
-                    outType = ResultsType.KML
-                elif event.GetInt() == 2:
-                    outType = ResultsType.KML2
-                elif event.GetInt() == 3:
-                    outType = ResultsType.SUM
-                else:
-                    outType = ResultsType.HTML
-                self.panel.gOp.setResults(self.panel.gOp.get("Result"), outType)
-                self.panel.id.TEXTResult.SetValue(self.panel.gOp.get("Result"))
+            p.OnBusyStop(-1)
+            p.NeedReload()
+            p.NeedRedraw()
+        except Exception:
+            _log.exception("Initial UI state calls failed")
+
+    # ---- helpers --------------------------------------------------------
+    def _id_attrs(self, event_id: int) -> Optional[Any]:
+        try:
+            return self.panel.id.IDtoAttr.get(event_id)
+        except Exception:
+            _log.exception("_id_attrs lookup failed for %s", event_id)
+            return None
+
+    def _do_action_for_attr(self, action: str) -> None:
+        """Dispatch simple button-like actions to panel methods."""
+        mapping = {
+            "Load": "LoadGEDCOM",
+            "CreateFiles": "DrawGEDCOM",
+            "OpenCSV": "OpenCSV",
+            "Trace": "SaveTrace",
+            "OpenBrowser": "OpenBrowser",
+            # 'Stop' handled inline because it manipulates gOp state
+        }
+        fn_name = mapping.get(action)
+        if fn_name:
+            fn = getattr(self.panel.actions, fn_name, None)
+            if callable(fn):
+                try:
+                    fn()
+                except Exception:
+                    _log.exception("Action %s failed", fn_name)
+            else:
+                _log.error("Panel missing handler %s for action %s", fn_name, action)
+        else:
+            _log.debug("No mapped panel action for %s", action)
+
+    # ---- event handlers -----------------------------------------------
+    def EvtRadioBox(self, event: wx.CommandEvent) -> None:
+        """Handle radiobox changes (ResultType, GroupBy, KML mode)."""
+        try:
+            event_id = event.GetId()
+            # Results-type radiobox: map index -> ResultType
+            if event_id == self.panel.id.IDs.get("RBResultType"):
+                idx = max(0, min(len(self._results_type_map) - 1, event.GetInt()))
+                outType = self._results_type_map[idx]
+                self.panel.gOp.setResultsFile(self.panel.gOp.get("ResultFile"), outType)
+                # mirror text field and update UI
+                try:
+                    self.panel.id.TEXTResultFile.SetValue(self.panel.gOp.get("ResultFile"))
+                except Exception:
+                    pass
                 self.panel.SetupButtonState()
                 return
 
-            if event.GetId() == self.panel.id.IDs["ID_RBGroupBy"]:
+            # GroupBy and KML mode are simple integer selections
+            if event_id == self.panel.id.IDs.get("RBGroupBy"):
                 self.panel.gOp.GroupBy = event.GetSelection()
                 return
 
-            if event.GetId() == self.panel.id.IDs["ID_RBKMLMode"]:
+            if event_id == self.panel.id.IDs.get("RBKMLMode"):
                 self.panel.gOp.KMLsort = event.GetSelection()
                 return
 
-            _log.error("Unhandled radio id %s", event.GetId())
+            _log.debug("Unhandled radio id %s", event_id)
         except Exception:
             _log.exception("EvtRadioBox failed")
 
     def EvtText(self, event: wx.CommandEvent) -> None:
         """Handle text changes for configured text controls."""
         try:
-            cbid = event.GetId()
-            if cbid in (self.panel.id.IDs["ID_TEXTResult"], self.panel.id.IDs["ID_TEXTDefaultCountry"]):
-                attr = self.panel.id.IDtoAttr[cbid][2]
-                self.panel.gOp.set(attr, event.GetString())
-                _log.debug("TXT %s set value %s", self.panel.id.IDtoAttr[cbid][0], attr)
+            tx = event.GetEventObject()
+            event_id = event.GetId()
+            attributes = self.panel.id.get_id_attributes(event_id)
+            attrname = attributes.get("gOp_attribute", None)
+            if event_id in (self.panel.id.IDs.get("TEXTResultFile"),
+                            self.panel.id.IDs.get("TEXTDefaultCountry")):
+                # special case: results text needs to update gOp ResultFile and ResultType
+                self.panel.gOp.set(attrname, event.GetString())
+                self.panel.gOp.set(attrname, event.GetString())
             else:
-                _log.error("uncontrolled TEXT %s", cbid)
+                pass  # no other text controls currently handled
             self.panel.SetupButtonState()
         except Exception:
             _log.exception("EvtText failed")
 
     def EvtCheckBox(self, event: wx.CommandEvent) -> None:
-        """Handle checkbox toggles and forward changes to gOp / trigger UI updates."""
+        """Handle checkbox toggles and forward changes to gOp / trigger updates."""
         try:
             cb = event.GetEventObject()
-            cbid = event.GetId()
-            _log.debug("checkbox %s for %i", cb.GetValue(), cbid)
-            if cb.Is3State():
-                _log.debug("3StateValue: %s", cb.Get3StateValue())
-
-            if cbid == self.panel.id.IDs["ID_CBSummary"]:
-                extra = cb.Name
+            event_id = event.GetId()
+            attributes = self.panel.id.get_id_attributes(event_id)
+            attrname = attributes.get("gOp_attribute", None)
+            action = attributes.get("action", None)
+            if not attrname:
+                _log.error("Uncontrolled checkbox id %s", event_id)
             else:
-                extra = ""
+                # compute attribute name (handle legacy 'CBSummary' extra name)
+                # attrname = mapping[0] if isinstance(mapping, tuple) else None
+                # extra = cb.Name if event_id == self.panel.id.IDs.get("CBSummary") else ""
+                # attrname = attrname + (extra or "")
+                value = cb.GetValue()
+                self.panel.gOp.set(attrname, value)
+                _log.debug("Checkbox %s -> %s", attrname, value)
 
-            attrname = self.panel.id.IDtoAttr[cbid][0] + extra
-            self.panel.gOp.set(attrname, cb.GetValue())
-            _log.debug("set %s to %s (%s)", self.panel.id.IDtoAttr[cbid][0], cb.GetValue(), self.panel.id.IDtoAttr[cbid][1])
+                # action dispatch
+                if event_id in (
+                    self.panel.id.IDs.get("CBHeatMap"),
+                    self.panel.id.IDs.get("CBMapTimeLine"),
+                    self.panel.id.IDs.get("CBMarksOn"),
+                ):
+                    self.panel.SetupButtonState()
+                if action == "Redraw":
+                    self.panel.NeedRedraw()
+                elif action == "Reload":
+                    self.panel.NeedReload()
+                elif action == "Render":
+                    if getattr(self.panel, "background_process", None):
+                        self.panel.background_process.updategrid = True
+                elif action:
+                    _log.debug("Checkbox action '%s' not explicitly handled", action)
 
-            # Actions depending on attribute semantics
-            action = self.panel.id.IDtoAttr[cbid][1]
-            if cbid in (
-                self.panel.id.IDs["ID_CBHeatMap"],
-                self.panel.id.IDs["ID_CBMapTimeLine"],
-                self.panel.id.IDs["ID_CBMarksOn"],
-            ):
-                self.panel.SetupButtonState()
-            if action == "Redraw":
-                self.panel.NeedRedraw()
-            elif action == "Reload":
-                self.panel.NeedReload()
-            elif action == "Render":
-                self.panel.background_process.updategrid = True
-            elif action == "":
-                pass
-            else:
-                _log.error("uncontrolled CB %d with '%s'", cbid, action)
-
-            # Special-case AllEntities: warn about large trees
-            if cbid == self.panel.id.IDs["ID_CBAllEntities"] and cb.GetValue():
-                dlg = None
-                if self.panel.background_process and getattr(self.panel.background_process, "people", None):
-                    if len(self.panel.background_process.people) > 200:
+                # special-case large-tree warning for AllEntities
+                if event_id == self.panel.id.IDs.get("CBAllEntities") and value:
+                    people = getattr(self.panel.background_process, "people", None)
+                    if people and len(people) > 200:
                         dlg = wx.MessageDialog(
                             self.panel,
-                            f"Caution, {len(self.panel.background_process.people)} people in your tree\n it may create very large HTML files and may not open in the browser",
+                            f"Caution, {len(people)} people in your tree\n it may create very large HTML files and may not open in the browser",
                             "Warning",
                             wx.OK | wx.ICON_WARNING,
                         )
-                else:
-                    dlg = wx.MessageDialog(
-                        self.panel,
-                        "Caution, if you load a GEDCOM with lots of people in your tree\n it may create very large HTML files and may not open in the browser",
-                        "Warning",
-                        wx.OK | wx.ICON_WARNING,
-                    )
-                if dlg:
-                    dlg.ShowModal()
-                    dlg.Destroy()
+                        try:
+                            dlg.ShowModal()
+                        finally:
+                            dlg.Destroy()
         except Exception:
             _log.exception("EvtCheckBox failed")
 
     def EvtButton(self, event: wx.CommandEvent) -> None:
         """Handle button clicks and dispatch panel actions."""
         try:
-            myid = event.GetId()
-            _log.debug("Click! (%d)", myid)
-            if myid == self.panel.id.IDs["ID_BTNLoad"]:
-                self.panel.LoadGEDCOM()
-            elif myid == self.panel.id.IDs["ID_BTNCreateFiles"]:
-                self.panel.DrawGEDCOM()
-            elif myid == self.panel.id.IDs["ID_BTNCSV"]:
-                self.panel.OpenCSV()
-            elif myid == self.panel.id.IDs["ID_BTNTRACE"]:
-                self.panel.SaveTrace()
-            elif myid == self.panel.id.IDs["ID_BTNSTOP"]:
+            event_id = event.GetId()
+            attributes = self.panel.id.get_id_attributes(event_id)
+            action = attributes.get("action", None)
+            if action == "Stop":
                 self.panel.gOp.set("stopping", True)
                 self.panel.gOp.set("parsed", False)
                 self.panel.NeedRedraw()
                 self.panel.NeedReload()
-            elif myid == self.panel.id.IDs["ID_BTNBROWSER"]:
-                self.panel.OpenBrowser()
-            else:
-                _log.error("uncontrolled ID : %d", myid)
+                return
+
+            if action:
+                self._do_action_for_attr(action)
+                return
+
+            _log.error("uncontrolled BUTTON id: %s action=%r", event_id, action)
         except Exception:
             _log.exception("EvtButton failed")
 
     def EvtListBox(self, event: wx.CommandEvent) -> None:
-        """Handle choice/listbox selection changes."""
+        """Handle choice/listbox selection changes (map style etc)."""
         try:
-            eventid = event.GetId()
-            _log.debug("%s, %s, %s", event.GetString(), event.IsSelection(), event.GetSelection())
-            if eventid == self.panel.id.IDs["ID_LISTMapStyle"]:
-                self.panel.gOp.MapStyle = sorted(self.panel.id.AllMapTypes)[event.GetSelection()]
-                self.panel.NeedRedraw()
-            else:
-                _log.error("Uncontrolled LISTbox %s", eventid)
+            event_id = event.GetId()
+            attributes = self.panel.id.get_id_attributes(event_id)
+            attrname = attributes.get("gOp_attribute", None)
+            if attributes and attrname == "MapStyle":
+                # MapStyle stored as set/list of types; UI stores selection index
+                try:
+                    self.panel.gOp.MapStyle = sorted(self.panel.id.AllMapTypes)[event.GetSelection()]
+                    self.panel.NeedRedraw()
+                    return
+                except Exception:
+                    _log.exception("EvtListBox MapStyle handling failed")
+            _log.error("Uncontrolled LISTbox %s", event_id)
         except Exception:
             _log.exception("EvtListBox failed")
 
     def EvtSpinCtrl(self, event: wx.CommandEvent) -> None:
-        """Handle spin control changes."""
+        """Handle spin control changes (MaxLineWeight etc)."""
         try:
-            eventid = event.GetId()
-            if eventid == self.panel.id.IDs["ID_INTMaxLineWeight"]:
+            event_id = event.GetId()
+            attributes = self.panel.id.get_id_attributes(event_id)
+            attrname = attributes.get("gOp_attribute", None)
+            if attributes and attrname == "MaxLineWeight":
                 self.panel.gOp.MaxLineWeight = event.GetSelection()
                 self.panel.NeedRedraw()
-            else:
-                _log.error("Uncontrol SPINbox %s", eventid)
+                return
+            _log.error("Uncontrolled SPIN %s", event_id)
         except Exception:
             _log.exception("EvtSpinCtrl failed")
 
@@ -229,34 +264,42 @@ class VisualMapEventHandler:
             _log.exception("EvtSlider failed")
 
     def OnCreateFiles(self, evt: Any) -> None:
-        """Handle background updates: grid refresh, infobox messages, errors."""
+        """Apply updates coming from the background worker to the UI."""
         try:
             panel = self.panel
-            # process evt state hand off
+            # process event state hand off (busy/done)
             if hasattr(evt, "state"):
                 if evt.state == "busy":
                     panel.OnBusyStart(evt)
-                if evt.state == "done":
+                elif evt.state == "done":
                     panel.OnBusyStop(evt)
                     panel.UpdateTimer()
-            if panel.background_process.updategrid:
+
+            # grid/list update
+            if getattr(panel.background_process, "updategrid", False):
                 panel.background_process.updategrid = False
                 saveBusy = panel.busystate
                 panel.OnBusyStart(evt)
-                panel.peopleList.list.PopulateList(panel.background_process.people, panel.gOp.get("Main"), True)
+                try:
+                    panel.peopleList.list.PopulateList(panel.background_process.people, panel.gOp.get("Main"), True)
+                except Exception:
+                    _log.exception("PopulateList failed")
                 if panel.gOp.newload:
-                    panel.peopleList.list.ShowSelectedLinage(panel.gOp.get("Main"))
+                    try:
+                        panel.peopleList.list.ShowSelectedLinage(panel.gOp.get("Main"))
+                    except Exception:
+                        _log.exception("ShowSelectedLinage failed")
                 if not saveBusy:
                     panel.OnBusyStop(evt)
+
+            # infobox and error aggregation
             newinfo = None
-            if panel.background_process.updateinfo:
-                _log.debug("Infobox: %s", panel.background_process.updateinfo)
+            if getattr(panel.background_process, "updateinfo", None):
                 newinfo = panel.background_process.updateinfo
                 panel.background_process.updateinfo = None
-            if panel.background_process.errorinfo:
-                _log.debug("Infobox-Err: %s", panel.background_process.errorinfo)
+            if getattr(panel.background_process, "errorinfo", None):
                 einfo = f"<span foreground='red'><b>{panel.background_process.errorinfo}</b></span>"
-                newinfo = newinfo + "\n" + einfo if newinfo else einfo
+                newinfo = (newinfo + "\n" + einfo) if newinfo else einfo
                 panel.background_process.errorinfo = None
             if newinfo:
                 panel.peopleList.append_info_box(newinfo)

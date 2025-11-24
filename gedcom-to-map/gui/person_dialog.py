@@ -9,170 +9,406 @@ from models.Person import Person, LifeEvent
 from gedcom.gedcomdate import CheckAge
 from gedrecdisplay import show_gedpy_record_dialog
 from .family_panel import FamilyPanel
-from .gedcomvisual import doTraceTo
+from gedcom_options import gvOptions
+from style.stylemanager import FontManager
 
 _log = logging.getLogger(__name__.lower())
 
-__all__ = ['PersonDialog', 'formatPersonName']
-
-def formatPersonName(person: Person, longForm=True):
-    if person:
-        if longForm:
-            maidenname = f" ({person.maidenname})" if person.maidenname else ""
-            title = f" - {person.title}" if person.title else ""
-        else:
-            maidenname = ""
-            title = ""
-        return f"{person.firstname} {person.surname}{maidenname}{title}" 
-    else:
-        return "<none>"
+__all__ = ['PersonDialog']
 
 class PersonDialog(wx.Dialog):
-    def __init__(self, parent, person: Person, panel, font_manager, gOp, showrefences=True):
-        """
-        NOTE: font_manager is required by callers; pass the FontManager instance used by the UI.
-        Keep signature backwards-compatible in source order but require font_manager parameter.
-        """
-        if font_manager is None:
-            raise ValueError("font_manager is required for PersonDialog")
+    """Dialog displaying detailed information about a person from the GEDCOM data.
+    
+    Shows personal details (name, birth, death, marriages, homes), lineage to the
+    selected main person, children, and an optional photo. Provides buttons to
+    close the dialog or view the raw GEDCOM record.
+    
+    Attributes:
+        gOp (gvOptions): Global options and settings.
+        font_manager (FontManager): Font configuration for the UI.
+        person (Person): The person whose details are displayed.
+        panel (wx.Panel): Parent panel (used to access actions and context).
+        showreferences (bool): Whether to show lineage information.
+        font_size (int): Base font size for text controls.
+        people (dict): Dictionary of all people keyed by xref_id.
+    """
+
+    def __init__(self, parent: wx.Window, person: Person, panel: wx.Panel, font_manager: FontManager, gOp: gvOptions, showreferences: bool = True):
+        """Initialize the PersonDialog."""
         super().__init__(parent, title="Person Details", size=(600, 600), style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER)
         
         self.gOp = gOp
         self.font_manager = font_manager
-        self.font_name, self.font_size = self.font_manager.get_font_name_size()
+        self.person = person
+        self.panel = panel
+        self.showreferences = showreferences
+        self.font_size = getattr(font_manager, "size", 12) if font_manager else 12
+        self.people = gOp.BackgroundProcess.people if gOp and getattr(gOp, "BackgroundProcess", None) else {}
 
-        def sizeAttr(attr,pad=1):
-            return (min(len(attr),3)+pad)*(self.font_size+5)  if attr else self.font_size
+        self.lineage_panel: FamilyPanel = None
+        self.spouses_panel: FamilyPanel = None
+        self.children_panel: FamilyPanel = None
+
+        self.build(panel, self.people, person)
         
-        people = self.gOp.BackgroundProcess.people if self.gOp and getattr(self.gOp, "BackgroundProcess", None) else {}
-        # Display the marriage information including the marriage location and date                
+        # Register with font_manager to receive updates
+        if self.font_manager and hasattr(self.font_manager, 'register_font_change_callback'):
+            self.font_manager.register_font_change_callback(self.update_fonts)
+        
+        # Clean up on close - use EVT_WINDOW_DESTROY instead
+        self.Bind(wx.EVT_WINDOW_DESTROY, self.on_destroy)
+    
+    def on_destroy(self, event):
+        """Clean up when dialog closes."""
+        # Unregister from font_manager (safe to call multiple times)
+        if self.font_manager and hasattr(self.font_manager, 'unregister_font_change_callback'):
+            try:
+                self.font_manager.unregister_font_change_callback(self.update_fonts)
+            except Exception:
+                pass  # Already unregistered or font_manager gone
+        event.Skip()
+
+    def build(self, panel: wx.Panel, people: dict, person: Person):
+        """Build and layout all dialog components.
+        
+        Creates person details grid, lineage panel, children panel, photo, and buttons.
+        Arranges them in sizers and applies to the dialog.
+        
+        Args:
+            panel: Parent panel (for context/actions).
+            people: Dictionary of all people keyed by xref_id.
+            person: Person object to display.
+        """
+        # Build person, lineage and children details sections
+        sizer = self._add_person_details(people, person)
+        self.lineage_panel = self._add_lineage_details(panel, people, person)
+        self.spouses_panel = self._add_spouses_details(people, person)
+        self.children_panel = self._add_children_details(people, person)
+        photo = self._add_photo(panel, person)
+        button_sizer = self._add_buttons()
+
+        if self.lineage_panel:
+            sizer.Add(wx.StaticText(self, label="Lineage: "), 0, wx.LEFT|wx.TOP, border=5)
+            sizer.Add(self.lineage_panel, 1, wx.EXPAND, border=5)
+
+        if self.spouses_panel:
+            sizer.Add(wx.StaticText(self, label="Spouses: "), 0, wx.LEFT|wx.TOP, border=5)
+            sizer.Add(self.spouses_panel, 1, wx.EXPAND, border=5)
+
+        if self.children_panel:
+             sizer.Add(wx.StaticText(self, label="Children: "), 0, wx.LEFT|wx.TOP, border=5)
+             sizer.Add(self.children_panel, 1, wx.EXPAND, border=5)
+
+        mainSizer = wx.BoxSizer(wx.VERTICAL)
+        if photo:
+            wrapper = wx.BoxSizer(wx.HORIZONTAL)
+            wrapper.Add(sizer, 1, wx.ALL|wx.EXPAND, border=5)
+            wrapper.Add(photo, 0, wx.TOP, border=5)
+            mainSizer.Add(wrapper, 1, wx.EXPAND| wx.ALL, border=5)
+        else:
+            mainSizer.Add(sizer, 1, wx.EXPAND| wx.ALL, border=5)
+        
+        mainSizer.Add(button_sizer, 0, wx.ALIGN_LEFT|wx.LEFT| wx.BOTTOM, border=10)
+
+        self.SetSizer(mainSizer)
+
+        self.update_fonts()
+
+        self.SetBackgroundColour(wx.TheColourDatabase.FindColour('WHITE'))
+        self.Fit()
+
+    def update_fonts(self) -> None:
+        """Update fonts of all dialog components based on the current font manager."""
+        if self.font_manager:
+            grid_font = self.font_manager.get_font()
+            if grid_font:
+                # self.SetFont(grid_font)
+                self.font_manager.apply_current_font_recursive(self)
+            if self.lineage_panel:
+                if hasattr(self.lineage_panel, "update_fonts"):
+                    self.lineage_panel.update_fonts(self.font_manager)
+            if self.spouses_panel:
+                if hasattr(self.spouses_panel, "update_fonts"):
+                    self.spouses_panel.update_fonts(self.font_manager)
+            if self.children_panel:
+                if hasattr(self.children_panel, "update_fonts"):
+                    self.children_panel.update_fonts(self.font_manager)
+                
+    def _get_marriages_list(self, people: dict, person: Person) -> str:
+        """Return a newline-separated string listing all marriages for the person.
+        
+        Args:
+            people: Dictionary of all people keyed by xref_id.
+            person: Person object to display details for.
+        
+        Returns:
+            Formatted string with one marriage per line (partner name + date/place).
+            Returns empty string if no marriages.
+        """
         marrying = []
         if person.marriages:
             for marry in person.marriages:
-                if marry:
-                    marrying.append(f"{formatPersonName(people[marry.record.xref_id], False)}{marry.asEventstr()}")
-        marriages = "\n".join(marrying)        
-
+                if marry and getattr(marry, 'record', None):
+                    try:
+                        marrying.append(f"{self.formatPersonName(people[marry.record.xref_id], False)}{marry.asEventstr()}")
+                    except KeyError:
+                        _log.debug("Marriage partner %s not in people dict", marry.record.xref_id)
+                    except Exception:
+                        _log.exception("Error formatting marriage for %s", person.xref_id)
+        return "\n".join(marrying)
+    
+    def _get_homes_list(self, person: Person) -> str:
+        """Return a newline-separated string listing all home/residence events.
+        
+        Args:
+            person: Person whose home events to list.
+        
+        Returns:
+            Formatted string with one home event per line (date + place).
+            Returns empty string if no home events.
+        """
         homes = []
         if person.home:
             for homedesc in person.home:
                 homes.append(f"{LifeEvent.asEventstr(homedesc)}")
-        homelist = "\n".join(homes)
-        photourl = person.photo
+        return "\n".join(homes)
+    
+    def _add_person_details(self, people, person) -> wx.FlexGridSizer:
+        """Build and populate the person detail grid (name, birth, death, etc.).
+        
+        Creates read-only TextCtrls for name, title, parents, birth, death, sex,
+        marriages, homes, and age problems. Arranges them in a two-column FlexGridSizer.
+        
+        Args:
+            people: Dictionary of all people keyed by xref_id.
+            person: Person whose details to display.
+        
+        Returns:
+            wx.FlexGridSizer containing all detail controls.
+        """
+        if not people or not person:
+            _log.error("_add_person_details: missing people dict or person")
+            return wx.FlexGridSizer(cols=2)
+        
+        def sizeAttr(attr, pad=1):
+            return (min(len(attr), 3) + pad) * (self.font_size + 5) if attr else self.font_size
+
+        marriages = self._get_marriages_list(people, person)
+        homelist = self._get_homes_list(person)
+
         issues = CheckAge(people, person.xref_id)
-        self.nameTextCtrl = wx.TextCtrl(self, style=wx.TE_READONLY, size=(550,-1))
-        self.titleTextCtrl = wx.TextCtrl(self, style=wx.TE_READONLY)
-        self.fatherTextCtrl = wx.TextCtrl(self, style=wx.TE_READONLY)
-        self.motherTextCtrl = wx.TextCtrl(self, style=wx.TE_READONLY)
-        self.birthTextCtrl = wx.TextCtrl(self, style=wx.TE_READONLY)
-        self.deathTextCtrl = wx.TextCtrl(self, style=wx.TE_READONLY)
-        self.sexTextCtrl = wx.TextCtrl(self, style=wx.TE_READONLY)
-        self.marriageTextCtrl = wx.TextCtrl(self, style=wx.TE_READONLY|wx.TE_MULTILINE, size=(-1,sizeAttr(marriages)))
-        self.homeTextCtrl = wx.TextCtrl(self, style=wx.TE_READONLY|wx.TE_MULTILINE, size=(-1,sizeAttr(homelist)))
-        if issues:
-            self.issuesTextCtrl = wx.TextCtrl(self, style=wx.TE_READONLY|wx.TE_MULTILINE, size=(-1,sizeAttr(issues)))
+
+        grid_details = [
+            {"wx_name": "nameTextCtrl", "label": "Name:", "size": (550, -1)},
+            {"wx_name": "titleTextCtrl", "label": "Title:"},
+            {"wx_name": "fatherTextCtrl", "label": "Father:"},
+            {"wx_name": "motherTextCtrl", "label": "Mother:"},
+            {"wx_name": "birthTextCtrl", "label": "Birth:"},
+            {"wx_name": "deathTextCtrl", "label": "Death:"},
+            {"wx_name": "sexTextCtrl", "label": "Sex:"},
+            {"wx_name": "marriageTextCtrl", "label": "Marriages:", "size": (-1, sizeAttr(marriages))},
+            {"wx_name": "homeTextCtrl", "label": "Homes:", "size": (-1, sizeAttr(homelist))},
+            {"wx_name": "issuesTextCtrl", "label": "Age Problems:", "size": (-1, sizeAttr(issues))} if issues else None,
+        ]
 
         # Layout the relative grid
         sizer = wx.FlexGridSizer(cols=2, hgap=5, vgap=5)
 
-        sizer.Add(wx.StaticText(self, label="Name: "), 0, wx.LEFT|wx.TOP, border=5)
-        sizer.Add(self.nameTextCtrl, 0, wx.EXPAND, border=5)
-        sizer.Add(wx.StaticText(self, label="Title: "), 0, wx.LEFT|wx.TOP, border=5)
-        sizer.Add(self.titleTextCtrl, 0, wx.EXPAND)
-        sizer.Add(wx.StaticText(self, label="Father: "), 0, wx.LEFT|wx.TOP, border=5)
-        sizer.Add(self.fatherTextCtrl, 1, wx.EXPAND)
-        sizer.Add(wx.StaticText(self, label="Mother: "), 0, wx.LEFT|wx.TOP, border=5)
-        sizer.Add(self.motherTextCtrl, 1, wx.EXPAND)
-        sizer.Add(wx.StaticText(self, label="Birth: "), 0, wx.LEFT|wx.TOP, border=5)
-        sizer.Add(self.birthTextCtrl, 0, wx.EXPAND)
-        sizer.Add(wx.StaticText(self, label="Death: "), 0, wx.LEFT|wx.TOP, border=5)
-        sizer.Add(self.deathTextCtrl, 0, wx.EXPAND)
-        sizer.Add(wx.StaticText(self, label="Sex: "), 0, wx.LEFT|wx.TOP, border=5)
-        sizer.Add(self.sexTextCtrl, 0, wx.EXPAND)
-        sizer.Add(wx.StaticText(self, label="Marriages: "), 0, wx.LEFT|wx.TOP, border=5)
-        sizer.Add(self.marriageTextCtrl, 1, wx.EXPAND|wx.ALL, border=5)
-        sizer.Add(wx.StaticText(self, label="Homes: "), 0, wx.LEFT|wx.TOP, border=5)
-        sizer.Add(self.homeTextCtrl, 1, wx.EXPAND|wx.ALL, border=5)
-        if issues:
-            sizer.Add(wx.StaticText(self, label="Age Problems:"), 0, wx.LEFT|wx.TOP, border=5)
-            sizer.Add(self.issuesTextCtrl, 1, wx.EXPAND|wx.ALL, border=5)
-            self.issuesTextCtrl.SetBackgroundColour(wx.YELLOW)
-    
-        self.nameTextCtrl.SetValue(formatPersonName(person))
+        # Create all TextCtrls
+        for line in grid_details:
+            if line:
+                style = wx.TE_READONLY
+                proportion = 0
+                if line["label"] in ["Marriages:", "Homes:", "Age Problems:"]:
+                    style |= wx.TE_MULTILINE
+                    proportion = 1
+                sizer.Add(wx.StaticText(self, label=line["label"]), 0, wx.LEFT | wx.TOP, border=5)
+                setattr(self, line["wx_name"], wx.TextCtrl(self, style=style, size=line.get("size", (-1, -1))))
+                sizer.Add(getattr(self, line["wx_name"]), proportion, wx.EXPAND, border=5)
 
-        # Should be conditional
+        if issues:
+            self.issuesTextCtrl.SetBackgroundColour(wx.YELLOW)
+
+        # Populate values
+        self.nameTextCtrl.SetValue(self.formatPersonName(person))
         self.titleTextCtrl.SetValue(person.title if person.title else "")
 
         if person.father:
             try:
-                self.fatherTextCtrl.SetValue(formatPersonName(people[person.father]))
+                self.fatherTextCtrl.SetValue(self.formatPersonName(people[person.father]))
+            except KeyError:
+                _log.debug("Father %s not in people dict", person.father)
             except Exception:
-                pass
+                _log.exception("Error setting father for %s", person.xref_id)
+
         if person.mother:
             try:
-                self.motherTextCtrl.SetValue(formatPersonName(people[person.mother]))
+                self.motherTextCtrl.SetValue(self.formatPersonName(people[person.mother]))
+            except KeyError:
+                _log.debug("Mother %s not in people dict", person.mother)
             except Exception:
-                pass
-        self.birthTextCtrl.SetValue(f"{person.birth.asEventstr()}" if person.birth else "")  
+                _log.exception("Error setting mother for %s", person.xref_id)
+
+        self.birthTextCtrl.SetValue(f"{person.birth.asEventstr()}" if person.birth else "")
         if person.death and person.birth and person.death.when and person.birth.when:
-            age = f"(age ~{person.age})" if hasattr( person, "age") else f"(age ~{person.death.whenyearnum() - person.birth.whenyearnum()})" 
+            age = f"(age ~{person.age})" if hasattr(person, "age") else f"(age ~{person.death.whenyearnum() - person.birth.whenyearnum()})"
         else:
             age = ""
+
         self.deathTextCtrl.SetValue(f"{LifeEvent.asEventstr(person.death)}" if person.death else "")
         sex = person.sex if person.sex else ""
         self.sexTextCtrl.SetValue(f"{sex} {age}")
         self.marriageTextCtrl.SetValue(marriages)
-        
+
         if issues:
             self.issuesTextCtrl.SetValue("\n".join(issues))
-        
-        self.homeTextCtrl.SetValue(homelist)
-        if len(homes) > 3:
-            sizer.AddGrowableRow(8)
 
-        # lineage / family panel creation is deferred and imports FamilyPanel at runtime
-        self.related = None
-        if self.gOp and getattr(self.gOp, "Referenced", None) and showrefences:
-            if FamilyPanel and panel and getattr(panel, "gOp", None) and panel.gOp.Referenced.exists(person.xref_id):
-                if doTraceTo:
-                    hertiageList = doTraceTo(panel.gOp, person)
-                    if hertiageList:
-                        hertiageSet = {}
-                        for (hertiageparent, hertiageperson, hyear, hid) in hertiageList:
-                            descript = f"{people[hid].title}"
-                            hertiageSet[hid] = (hertiageperson, 
-                                                hertiageparent, 
-                                                people[hid].birth.whenyear() if people[hid].birth else None, 
-                                                people[hid].death.whenyear() if people[hid].death else None, 
-                                                people[hid].birth.getattr('place') if people[hid].birth else None, 
-                                                descript, 
-                                                hid)
-                        self.related = FamilyPanel(self, hertiageSet)
-            if not self.related:
-               self.related = wx.StaticText(self, label="No lineage to selected main person")
-            
+        self.homeTextCtrl.SetValue(homelist)
+        # Make the homes row growable if it has multiple entries (find actual row index dynamically)
+        home_row_idx = None
+        for idx, line in enumerate(grid_details):
+            if line and line["label"] == "Homes:":
+                home_row_idx = idx
+                break
+        if home_row_idx is not None and homelist.count('\n') > 2:
+            sizer.AddGrowableRow(home_row_idx)
+
+        return sizer
+
+    def _add_lineage_details(self, panel: wx.Panel, people: dict = None, person: Person = None) -> wx.Panel | wx.StaticText | None:
+        """Build lineage/family panel showing ancestry path to the selected main person."""
+        if not people or not person:
+            return None
+        
+        related = None
+        panel_actions = getattr(getattr(self.gOp, "panel", None), "actions", None)
+        showreferences = getattr(self, "showreferences", True)
+        
+        referenced = getattr(self.gOp, "Referenced", None)
+        if referenced and showreferences and getattr(referenced, "exists", None):
+            if FamilyPanel and panel and getattr(panel, "gOp", None) and referenced.exists(person.xref_id):
+                if panel_actions and getattr(panel_actions, "doTraceTo", None):
+                    heritageList = panel_actions.doTraceTo(panel.gOp, person)
+                    if heritageList:
+                        heritageSet = {}
+                        for (heritageparent, heritageperson, hyear, hid) in heritageList:
+                            try:
+                                p = people.get(hid)
+                                if not p:
+                                    continue
+                                descript = f"{p.title}" if getattr(p, "title", None) else ""
+                                birth_year = p.birth.whenyear() if getattr(p, "birth", None) else None
+                                death_year = p.death.whenyear() if getattr(p, "death", None) else None
+                                birth = getattr(p, "birth", None)
+                                birth_place = getattr(birth, 'place', None) if birth else None
+                                heritageSet[hid] = (heritageperson,
+                                                    heritageparent,
+                                                    birth_year,
+                                                    death_year,
+                                                    birth_place,
+                                                    descript,
+                                                    hid)
+                            except Exception:
+                                _log.exception("Error building lineage entry for %s", hid)
+                        related = FamilyPanel(self, heritageSet, isLineage=True, font_manager=self.font_manager)
+            if not related:
+                related = wx.StaticText(self, label="No lineage to selected main person")
+        return related
+
+    def _add_spouses_details(self, people: dict = None, person: Person = None):
+        """Build spouses panel showing all spouses/partners of the person."""
+        if not people or not person:
+            return None
+        
+        spousesize = None
+        if person.partners:
+            spouseSet = {}
+            for hid in person.partners:
+                try:
+                    p = people.get(hid)
+                    if not p:
+                        continue
+                    descript = f"{p.title}" if getattr(p, "title", None) else ""
+                    birth_year = p.birth.whenyear() if getattr(p, "birth", None) else None
+                    death_year = p.death.whenyear() if getattr(p, "death", None) else None
+                    birth = getattr(p, "birth", None)
+                    birth_place = getattr(birth, 'place', None) if birth else None
+                    try:
+                        spouse_name = p.name if hasattr(p, "name") else ""
+                    except Exception:
+                        spouse_name = ""
+                    spouseSet[hid] = (spouse_name,
+                                     "",
+                                     birth_year,
+                                     death_year,
+                                     birth_place,
+                                     descript,
+                                     hid)
+                except Exception:
+                    _log.exception("Error building spouse entry for %s", hid)
+            if FamilyPanel:
+                spousesize = FamilyPanel(self, spouseSet, isLineage=False, font_manager=self.font_manager)
+            else:
+                spousesize = wx.StaticText(self, label="Spouses panel unavailable")
+
+        return spousesize
+    
+    def _add_children_details(self, people: dict = None, person: Person = None):
+        """Build children panel showing all children of the person."""
+        if not people or not person:
+            return None
+        
+        childsize = None
         if person.children:
             childSet = {}
             for hid in person.children:
-                descript = f"{people[hid].title}"
-                childSet[hid] = (people[hid].name, 
-                                    "", 
-                                    people[hid].birth.whenyear() if people[hid].birth else None, 
-                                    people[hid].death.whenyear() if people[hid].death else None, 
-                                    people[hid].birth.getattr('place') if people[hid].birth else None, 
-                                    descript, 
-                                    hid)
-            childsize = None
+                try:
+                    p = people.get(hid)
+                    if not p:
+                        continue
+                    descript = f"{p.title}" if getattr(p, "title", None) else ""
+                    birth_year = p.birth.whenyear() if getattr(p, "birth", None) else None
+                    death_year = p.death.whenyear() if getattr(p, "death", None) else None
+                    birth = getattr(p, "birth", None)
+                    birth_place = getattr(birth, 'place', None) if birth else None
+                    try:
+                        child_name = p.name if hasattr(p, "name") else ""
+                    except Exception:
+                        child_name = ""
+                    childSet[hid] = (child_name,
+                                     "",
+                                     birth_year,
+                                     death_year,
+                                     birth_place,
+                                     descript,
+                                     hid)
+                except Exception:
+                    _log.exception("Error building child entry for %s", hid)
             if FamilyPanel:
-                childsize = FamilyPanel(self, childSet, isChildren=True)
+                childsize = FamilyPanel(self, childSet, isLineage=False, font_manager=self.font_manager)
             else:
                 childsize = wx.StaticText(self, label="Children panel unavailable")
-            # add to sizer
-            sizer.Add(wx.StaticText(self, label="Childred: "), 0, wx.LEFT|wx.TOP, border=5)
-            sizer.Add(childsize, 1, wx.EXPAND, border=5)
 
+        return childsize
+    
+    def _add_photo(self, panel: wx.Panel, person: Person = None):
+        """Fetch and display the person's photo if available.
+        
+        Supports both HTTP URLs and local file paths. Images are scaled to fit
+        within 400x500 pixels.
+        
+        Args:
+            panel: Parent panel (used to resolve relative photo paths).
+            person: Person whose photo to display (uses person.photo URL/path).
+        
+        Returns:
+            wx.StaticBitmap with the photo, or None if unavailable or error.
+        """
         image = None
         image_content = None
+        photo = None
+
+        photourl = person.photo if person else None
         if photourl:
             if photourl.find("http")==0:
                 try:
@@ -184,7 +420,12 @@ class PersonDialog(wx.Dialog):
                     image = None
                     image_content = None
             else:
-                infile = panel.gOp.get('GEDCOMinput') if panel and getattr(panel, "gOp", None) else None
+                infile = None
+                if panel and getattr(panel, "gOp", None):
+                    try:
+                        infile = panel.gOp.get('GEDCOMinput')
+                    except Exception:
+                        pass
                 if infile is not None:
                     dDir =  Path(infile).parent
                 else:
@@ -192,7 +433,11 @@ class PersonDialog(wx.Dialog):
                 image_content = Path(photourl) if Path(photourl).is_absolute() else dDir / photourl
             if image_content:
                 try:
-                    image = wx.Image(str(image_content), wx.BITMAP_TYPE_ANY)
+                    # Handle both BytesIO (HTTP) and Path (local file)
+                    if isinstance(image_content, BytesIO):
+                        image = wx.Image(image_content, wx.BITMAP_TYPE_ANY)
+                    else:
+                        image = wx.Image(str(image_content), wx.BITMAP_TYPE_ANY)
                 except Exception as e:
                     _log.error(f"Error reading photo {photourl}:\n      {e}")
                     image = None
@@ -203,42 +448,51 @@ class PersonDialog(wx.Dialog):
                     image.Rescale(maxPhotoWidth, int(image.GetHeight()*maxPhotoWidth/image.GetWidth()))
                 if image.GetHeight() > maxPhotoHeight:
                     image.Rescale(int(image.GetWidth()*maxPhotoHeight/image.GetHeight()),maxPhotoHeight)
-                self.photo = wx.StaticBitmap(self, bitmap=wx.Bitmap(image))
+                photo = wx.StaticBitmap(self, bitmap=wx.Bitmap(image))
+        return photo
 
-        mainSizer = wx.BoxSizer(wx.VERTICAL)
-        if image:
-            wrapper = wx.BoxSizer(wx.HORIZONTAL)
-            wrapper.Add(sizer, 1, wx.ALL|wx.EXPAND, border=5)
-            wrapper.Add(self.photo, 0, wx.TOP, border=5)
-            mainSizer.Add(wrapper, 1, wx.EXPAND| wx.ALL, border=5)
-        else:
-            mainSizer.Add(sizer, 1, wx.EXPAND| wx.ALL, border=5)
+    def _add_buttons(self):
+        """Create and bind OK and Record buttons.
         
-        # create the OK button
-        ok_btn = wx.Button(self, wx.ID_OK)
-        btn_sizer = wx.StdDialogButtonSizer()
-        ok_btn.Bind(wx.EVT_BUTTON, lambda evt: self.Close())
-        btn_sizer.AddButton(ok_btn)
+        Returns:
+            wx.BoxSizer containing OK and Record buttons arranged horizontally.
+        """
+        btn_ok = wx.Button(self, wx.ID_OK)
+        btn_ok.Bind(wx.EVT_BUTTON, lambda evt: self.Close())
 
-        self.person = person
-        # BUG This BUTTON DOES NOT RENDER IN the Right spot
-        btn2_sizer = wx.StdDialogButtonSizer()
-        details_btn2 = wx.Button(self, -1, label="Record")
-        details_btn2.Bind(wx.EVT_BUTTON, lambda evt: self._displayrecord())
-        btn2_sizer.AddButton(details_btn2)
-
-        btn_sizer.Realize()
-        btn2_sizer.Realize()
+        btn_record = wx.Button(self, -1, label="Record")
+        btn_record.Bind(wx.EVT_BUTTON, lambda evt: self._displayrecord())
 
         btn_box = wx.BoxSizer(wx.HORIZONTAL)
-        btn_box.Add(btn_sizer, 0, wx.LEFT, 10)
-        btn_box.Add(btn2_sizer, 0, wx.RIGHT)
+        btn_box.Add(btn_ok, 0, wx.RIGHT, border=10)
+        btn_box.Add(btn_record, 0, wx.RIGHT, border=10)
 
-        mainSizer.Add(btn_box, 0, wx.ALIGN_LEFT|wx.LEFT| wx.BOTTOM, border=10)
-
-        self.SetSizer(mainSizer)
-        self.SetBackgroundColour(wx.TheColourDatabase.FindColour('WHITE'))
-        self.Fit()
-
+        return btn_box
+    
     def _displayrecord(self):
+        """Display the raw GEDCOM record for the person in a separate dialog."""
         show_gedpy_record_dialog(None, self.person.xref_id, self.gOp, title=f"Record of {self.person.name}")
+
+    def formatPersonName(self, person: Person, longForm=True):
+        """Format a person's name for display.
+        
+        Args:
+            person: Person whose name to format.
+            longForm: If True, include maiden name and title (default: True).
+        
+        Returns:
+            Formatted name string, or "<none>" if person is None.
+        """
+        if not person:
+             return "<none>"
+        
+        if longForm:
+            maidenname = f" ({person.maidenname})" if getattr(person, "maidenname", None) else ""
+            title = f" - {person.title}" if getattr(person, "title", None) else ""
+        else:
+            maidenname = ""
+            title = ""
+        
+        firstname = getattr(person, "firstname", "")
+        surname = getattr(person, "surname", "")
+        return f"{firstname} {surname}{maidenname}{title}".strip()

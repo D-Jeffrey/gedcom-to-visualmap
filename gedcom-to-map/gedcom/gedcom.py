@@ -340,6 +340,7 @@ class GedcomParser:
         Returns:
             Dict[str, Person]: Updated dictionary of Person objects.
         """
+        idx = 0
         for record in records('FAM'):
             husband_record = record.sub_tag('HUSB')
             wife_record = record.sub_tag('WIFE')
@@ -352,9 +353,13 @@ class GedcomParser:
                     # BUG this causes the xref_id to be overwritten sometime between husband and wife processing
                     marriage_event.record.xref_id = wife_record.xref_id if wife_record else None
                     husband.marriages.append(marriage_event)
+                    if wife_record:
+                        husband.partners.append(wife_record.xref_id)
                 if wife:
                     marriage_event.record.xref_id = husband_record.xref_id if husband_record else None
                     wife.marriages.append(marriage_event)
+                    if husband_record:
+                        wife.partners.append(husband_record.xref_id)
             for child in record.sub_tags('CHIL'):
                 if child.xref_id in people:
                     if people[child.xref_id]:
@@ -364,6 +369,9 @@ class GedcomParser:
                         if wife:
                             people[child.xref_id].mother = wife.xref_id
                             wife.children.append(child.xref_id)
+            idx += 1
+            if self.gOp and idx % 1000==0:
+                self.gOp.step(plusStep=1000)
         return people
 
     def parse_people(self) -> Dict[str, Person]:
@@ -629,7 +637,7 @@ class GeolocatedGedcom(Gedcom):
             if self.gOp.ShouldStop():
                 return
             if idx % 250 == 0:
-                self.gOp.step(info=f"Geolocated {idx}")
+                self.gOp.step(plusStep=250)
 
         num_non_cached_places = non_cached_places.len()
         self.gOp.step(f"Geolocating uncached places...", target=num_non_cached_places) if self.gOp else None

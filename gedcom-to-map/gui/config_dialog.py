@@ -5,7 +5,7 @@ import wx.grid as gridlib
 _log = logging.getLogger(__name__.lower())
 
 
-class ConfigDialog(wx.Frame):
+class ConfigDialog(wx.Dialog):
     def __init__(self, parent, title, gOp):
         super().__init__(parent, title=title, size=(500, 650))
 
@@ -16,18 +16,21 @@ class ConfigDialog(wx.Frame):
 
         TEXTkmlcmdlinelbl = wx.StaticText(cfgpanel, -1, " KML Editor Command line:   ")
         self.TEXTkmlcmdline = wx.TextCtrl(cfgpanel, wx.ID_FILE1, "", size=(250, 20))
-        if getattr(gOp, "KMLcmdline", None):
-            self.TEXTkmlcmdline.SetValue(gOp.KMLcmdline)
+        kml_cmd = gOp.file_open_commands.get_command_for_file_type('kml')
+        if kml_cmd:
+            self.TEXTkmlcmdline.SetValue(kml_cmd)
 
         TEXTcsvcmdlinelbl = wx.StaticText(cfgpanel, -1, " CSV Table Editor Command line:   ")
         self.TEXTcsvcmdline = wx.TextCtrl(cfgpanel, wx.ID_FILE1, "", size=(250, 20))
-        if getattr(gOp, "CSVcmdline", None):
-            self.TEXTcsvcmdline.SetValue(gOp.CSVcmdline)
+        csv_cmd = gOp.file_open_commands.get_command_for_file_type('csv')
+        if csv_cmd:
+            self.TEXTcsvcmdline.SetValue(csv_cmd)
 
         TEXTtracecmdlinelbl = wx.StaticText(cfgpanel, -1, " Trace Table Editor Command line:   ")
         self.TEXTtracecmdline = wx.TextCtrl(cfgpanel, wx.ID_FILE1, "", size=(250, 20))
-        if getattr(gOp, "Tracecmdline", None):
-            self.TEXTtracecmdline.SetValue(gOp.Tracecmdline)
+        trace_cmd = gOp.file_open_commands.get_command_for_file_type('trace')
+        if trace_cmd:
+            self.TEXTtracecmdline.SetValue(trace_cmd)
 
         self.CBBadAge = wx.CheckBox(cfgpanel, -1, 'Flag if age is off')
         self.CBBadAge.SetValue(getattr(gOp, "badAge", False))
@@ -114,9 +117,9 @@ class ConfigDialog(wx.Frame):
             logLevel = self.GRIDctl.GetCellValue(row, 1)
             updatelog = logging.getLogger(loggerName)
             updatelog.setLevel(getattr(logging, logLevel))
-        self.gOp.KMLcmdline = self.TEXTkmlcmdline.GetValue()
-        self.gOp.CSVcmdline = self.TEXTcsvcmdline.GetValue()
-        self.gOp.Tracecmdline = self.TEXTtracecmdline.GetValue()
+        self.gOp.file_open_commands.add_file_type_command('kml', self.TEXTkmlcmdline.GetValue())
+        self.gOp.file_open_commands.add_file_type_command('csv', self.TEXTcsvcmdline.GetValue())
+        self.gOp.file_open_commands.add_file_type_command('trace', self.TEXTtracecmdline.GetValue())
         self.gOp.badAge = self.CBBadAge.GetValue()
         try:
             self.gOp.savesettings()

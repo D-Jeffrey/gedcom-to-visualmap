@@ -26,7 +26,7 @@ https://www.amyjohnsoncrow.com/what-kind-of-online-family-tree-is-right-for-you/
 https://progenygenealogy.com/downloads/timeline-files/
 
 
-## MyHertiage Resarch
+## Myheritage Resarch
 https://www.myheritage.com/research/catalog
 
 ## ERSI Story Maps

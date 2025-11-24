@@ -3,7 +3,7 @@
 Configuration and runtime options for gedcom-to-visualmap.
 
 Provides:
-- ResultsType: typed enum of supported output types.
+- ResultType: typed enum of supported output types.
 - gvOptions: central options/state container that loads defaults from YAML,
   persists a small INI-style config, and exposes helpers used by the UI and
   background workers.
@@ -18,6 +18,7 @@ import platform
 import time
 from datetime import datetime
 import yaml
+import re
 
 from typing import Union, Dict, Optional
 from enum import Enum
@@ -53,29 +54,124 @@ def settings_file_pathname(file_name):
     _log.debug (f"Settings file location: {settings_file_path}")
     return settings_file_path
     
-class ResultsType(Enum):
+class ResultType(Enum):
     HTML = "HTML"
     KML = "KML"
     KML2 = "KML2"
     SUM = "SUM"
 
     @staticmethod
-    def ResultsTypeEnforce(value):
-        """Coerce a value to a ResultsType.
+    def ResultTypeEnforce(value) -> "ResultType":
+        """Coerce a value to a ResultType.
 
-        Accepts an existing ResultsType or a string (case-insensitive). Raises
+        Accepts an existing ResultType or a string (case-insensitive). Raises
         TypeError/ValueError for unsupported values.
         """
-        if isinstance(value, ResultsType):
+        if isinstance(value, ResultType):
             return value
         elif isinstance(value, str):
+            # handle ResultType like "ResultType.HTML"
+            m = re.match(r'^\s*ResultType\.([A-Za-z_][A-Za-z0-9_]*)\s*$', value)
+            if m:
+                value = m.group(1)
             try:
-                return ResultsType[value.upper()]
+                return ResultType[value.upper()]
             except KeyError:
-                raise ValueError(f"Invalid ResultsType string: {value}")
+                raise ValueError(f"Invalid ResultType string: {value}")
         else:
-            raise TypeError(f"Cannot convert {type(value)} to ResultsType")
+            raise TypeError(f"Cannot convert {type(value)} to ResultType")
+    
+    def __str__(self) -> str:
+        """Return the enum member's name value for human-readable display."""
+        return self.value
+    
+    def long_name(self) -> str:
+        """Return a long-form identifier for the ResultType, e.g. 'ResultType.HTML'."""
+        
+        # Support classes that (incorrectly) define name() as a method as well
+        # as standard enum members that expose .name attribute.
+        try:
+            name_attr = getattr(self, "name")
+            if callable(name_attr):
+                name_str = name_attr()
+            else:
+                name_str = name_attr
+        except Exception:
+            # Fallback to value if anything unexpected happens
+            name_str = str(self.value)
+        return f"ResultType.{name_str}"
+    
+    @staticmethod
+    def list_values() -> list[str]:
+        """Return a list of all ResultType values as strings."""
+        return [rt.value for rt in ResultType]
+    
+    def index(self) -> int:
+        """Return the integer index of a ResultType value."""
+        rt = ResultType.ResultTypeEnforce(self)
+        return list(ResultType).index(rt)
+    
+    @staticmethod
+    def for_file_extension(file_extension: str) -> "ResultType":
+        """Return the appropriate ResultType for a given file extension.
 
+        Raises ValueError if the extension is not recognised.
+        """
+        ext = file_extension.lower()
+        type = ResultType.HTML
+        if ext == '.html' or ext == 'html':
+            type = ResultType.HTML
+        elif ext == '.kml' or ext == 'kml':
+            type = ResultType.KML
+        elif ext == '.txt' or ext == 'txt':
+            type = ResultType.SUM
+        else:
+            type = ResultType.HTML
+            _log.warning(f"Unsupported file extension for ResultType: {file_extension}; reverting to HTML")
+        return type
+
+    @staticmethod
+    def file_extension(result_type: "ResultType") -> str:
+        """Return the standard file extension for a given ResultType."""
+        rt = ResultType.ResultTypeEnforce(result_type)
+        if rt == ResultType.HTML:
+            return 'html'
+        elif rt == ResultType.KML or rt == ResultType.KML2:
+            return 'kml'
+        elif rt == ResultType.SUM:
+            return 'txt'
+        else:
+            return 'html'
+
+class FileOpenCommandLines:
+    def __init__(self):
+        self.commands: Dict[str, str] = {}
+        self.process: Optional[str] = None
+
+    def add_file_type_command(self, file_type: str, command_line: str):
+        file_type_lower = file_type.lower()
+        found_key = file_type
+        for key in self.commands.keys():
+            if key.lower() == file_type_lower:
+                _log.warning(f"Overwriting existing command for file type '{file_type}': '{self.commands[key]}' -> '{command_line}'")
+                found_key = key
+                break
+        self.commands[found_key] = command_line
+        
+    def get_command_for_file_type(self, file_type: str) -> Optional[str]:
+        file_type_lower = file_type.lower()
+        for key, value in self.commands.items():
+            if key.lower() == file_type_lower:
+                return value
+        return None
+    
+    def exists_command_for_file_type(self, file_type: str) -> bool:
+        file_type_lower = file_type.lower()
+        return any(key.lower() == file_type_lower for key in self.commands.keys())
+    
+    def list_file_types(self) -> list[str]:
+        return list(self.commands.keys())
+    
 class gvOptions:
     """Application options and transient runtime state.
 
@@ -109,25 +205,37 @@ class gvOptions:
         self.time = time.ctime()
         self.resettimeframe()
         
+        self.file_open_commands = FileOpenCommandLines()
         os_name = platform.system()
         if os_name == 'Windows':
-            self.KMLcmdline = "notepad $n"
-            self.CSVcmdline = "$n"
-            self.Tracecmdline = "notepad $n"
+            kml_cmd_line = "notepad $n"
+            csv_cmd_line = "$n"
+            trace_cmd_line = "notepad $n"
+            default_cmd_line = "$n"
         
         elif os_name == 'Darwin':
-            self.KMLcmdline = "Numbers $n"
-            self.CSVcmdline = OFFICECMDLINE + " --calc $n"
-            self.Tracecmdline = "Numbers $n"
+            kml_cmd_line = "open -a Numbers $n"
+            csv_cmd_line = OFFICECMDLINE + " --calc $n"
+            trace_cmd_line = "open -a Numbers $n"
+            default_cmd_line = "open $n"
+
         elif os_name == 'Linux':
-            self.KMLcmdline = "nano $n"
-            self.CSVcmdline = OFFICECMDLINE + " --calc $n"
-            self.Tracecmdline = OFFICECMDLINE + " --calc $n"
+            kml_cmd_line = "nano $n"
+            csv_cmd_line = OFFICECMDLINE + " --calc $n"
+            trace_cmd_line = OFFICECMDLINE + " --calc $n"
+            default_cmd_line = "xdg-open $n"
 
         else:
-            self.KMLcmdline = "notepad $n"
-            self.CSVcmdline = "notepad $n"
-            self.Tracecmdline = "notepad $n"
+            kml_cmd_line = "notepad $n"
+            csv_cmd_line = "notepad $n"
+            trace_cmd_line = "notepad $n"
+            default_cmd_line = "notepad $n"
+
+        self.file_open_commands.add_file_type_command('KML', kml_cmd_line)
+        self.file_open_commands.add_file_type_command('CSV', csv_cmd_line)
+        self.file_open_commands.add_file_type_command('Trace', trace_cmd_line)
+        self.file_open_commands.add_file_type_command('HTML', 'webbrowser $n')
+        self.file_open_commands.add_file_type_command('Default', default_cmd_line)
 
         if os.path.exists(self.settingsfile):
             self.loadsettings()            
@@ -162,24 +270,26 @@ class gvOptions:
                 elif typ == 'list' or typ == 'dict':
                     if isinstance(value, (list, dict)):
                         parsed = value
+                elif typ == 'result':
+                    parsed = ResultType.ResultTypeEnforce(value)
+                # For complex types: if YAML already provided a list/dict/number, keep it;
+                # if it's a string try safe eval via yaml (or fallback to literal eval)
+                elif isinstance(value, (dict, list, int, float, bool)):
+                    parsed = value
+                elif isinstance(value, str):
+                    try:
+                        # try to parse structured literal using yaml (safe)
+                        parsed = yaml.safe_load(value)
+                    except Exception:
+                        _log.error("YAML parsing failed for option '%s'; trying literal_eval", key)
+                        # try:
+                        #     # final fallback: evaluate simple Python literal
+                        #     from ast import literal_eval
+                        #     parsed = literal_eval(value)
+                        # except Exception:
+                        #     parsed = value
                 else:
-                    # For complex types: if YAML already provided a list/dict/number, keep it;
-                    # if it's a string try safe eval via yaml (or fallback to literal eval)
-                    if isinstance(value, (dict, list, int, float, bool)):
-                        parsed = value
-                    elif isinstance(value, str):
-                        try:
-                            # try to parse structured literal using yaml (safe)
-                            parsed = yaml.safe_load(value)
-                        except Exception:
-                            try:
-                                # final fallback: evaluate simple Python literal
-                                from ast import literal_eval
-                                parsed = literal_eval(value)
-                            except Exception:
-                                parsed = value
-                    else:
-                        parsed = value
+                    parsed = value
 
                 setattr(self, key, parsed)
             except Exception as e:
@@ -239,8 +349,8 @@ class gvOptions:
         
     def setstatic(self,
                   GEDCOMinput: Optional[str],
-                  Result: Optional[str],
-                  ResultType: ResultsType,
+                  ResultFile: Optional[str],
+                  ResultType: ResultType,
                   Main: Optional[str] = None,
                   MaxMissing: int = 0,
                   MaxLineWeight: int = 20,
@@ -249,7 +359,7 @@ class gvOptions:
                   AllEntities: bool = False):
         """Convenience setter for a typical group of static options used at startup."""
         self.setInput(GEDCOMinput)
-        self.setResults(Result or "", ResultType)
+        self.setResultsFile(ResultFile or "", ResultType)
         self.Main = Main
         self.Name = None
         self.MaxMissing = MaxMissing
@@ -273,6 +383,16 @@ class gvOptions:
                     setattr(self, key, int(value))
                 elif typ == 'str':
                     setattr(self, key, value)
+                elif typ == 'result':
+                    # handle ResultType like "ResultType.HTML"
+                    m = re.match(r'^\s*ResultType\.([A-Za-z_][A-Za-z0-9_]*)\s*$', value)
+                    if m:
+                        value = m.group(1)
+                    try:
+                        parsed = ResultType.ResultTypeEnforce(value)
+                        setattr(self, key, parsed)
+                    except Exception:
+                        _log.error("Invalid ResultType string in settings for '%s': %s", key, value)
                 else:
                     parsed = None
                     # try yaml first (handles lists/dicts/numbers/null)
@@ -284,38 +404,30 @@ class gvOptions:
                     if parsed_yaml is not None and not isinstance(parsed_yaml, str):
                         parsed = parsed_yaml
                     else:
-                        # handle ResultsType like "ResultsType.HTML"
-                        m = re.match(r'^\s*ResultsType\.([A-Za-z_][A-Za-z0-9_]*)\s*$', value)
-                        if m:
+                        # handle LatLon(...) specifically
+                        m2 = re.match(r'^\s*LatLon\s*\((.*)\)\s*$', value)
+                        if m2:
+                            inside = m2.group(1)
+                            parts = [p.strip() for p in inside.split(',')]
+                            vals = []
+                            for p in parts:
+                                if p.lower() == 'none' or p == '':
+                                    vals.append(None)
+                                else:
+                                    try:
+                                        vals.append(float(p))
+                                    except Exception:
+                                        vals.append(p.strip('\'"'))
                             try:
-                                parsed = ResultsType.ResultsTypeEnforce(m.group(1))
+                                parsed = LatLon(vals[0], vals[1])
                             except Exception:
                                 parsed = value
                         else:
-                            # handle LatLon(...) specifically
-                            m2 = re.match(r'^\s*LatLon\s*\((.*)\)\s*$', value)
-                            if m2:
-                                inside = m2.group(1)
-                                parts = [p.strip() for p in inside.split(',')]
-                                vals = []
-                                for p in parts:
-                                    if p.lower() == 'none' or p == '':
-                                        vals.append(None)
-                                    else:
-                                        try:
-                                            vals.append(float(p))
-                                        except Exception:
-                                            vals.append(p.strip('\'"'))
-                                try:
-                                    parsed = LatLon(vals[0], vals[1])
-                                except Exception:
-                                    parsed = value
-                            else:
-                                # last resort: safe literal eval, otherwise keep string
-                                try:
-                                    parsed = ast.literal_eval(value)
-                                except Exception:
-                                    parsed = value
+                            # last resort: safe literal eval, otherwise keep string
+                            try:
+                                parsed = ast.literal_eval(value)
+                            except Exception:
+                                parsed = value
 
                     setattr(self, key, parsed)
             except Exception as e:
@@ -335,9 +447,15 @@ class gvOptions:
                 self.loadsection(section, section_keys)
         
         self.setInput(self.gvConfig['Core'].get('InputFile', ''), generalRequest=False)
-        self.resultpath, self.Result = os.path.split(self.gvConfig['Core'].get('OutputFile', ''))
-        self.setResults(self.Result, self.ResultType)
-        self.KMLcmdline = self.gvConfig['Core'].get('KMLcmdline', '')
+        self.resultpath, self.ResultFile = os.path.split(self.gvConfig['Core'].get('OutputFile', ''))
+        self.setResultsFile(self.ResultFile, self.ResultType)
+        for file_type in self.file_open_commands.list_file_types():
+            cmd = self.gvConfig['Core'].get(f'{file_type}cmdline', '')
+            if cmd:
+                self.file_open_commands.add_file_type_command(file_type, cmd)
+            else:
+                cmd = self.file_open_commands.get_command_for_file_type(file_type)
+            setattr(self, f'{file_type}cmdline', cmd)
 
         # Load logging settings
         for itm, lvl in self.gvConfig.items('Logging'):
@@ -368,8 +486,11 @@ class gvOptions:
                 self.gvConfig['KML'][key] =  str(getattr(self, key))
 
             self.gvConfig['Core']['InputFile'] =  self.GEDCOMinput
-            self.gvConfig['Core']['OutputFile'] = os.path.join(self.resultpath, self.Result)
-            self.gvConfig['Core']['KMLcmdline'] =  self.KMLcmdline
+            self.gvConfig['Core']['OutputFile'] = os.path.join(self.resultpath, self.ResultFile)
+            for file_type in self.file_open_commands.list_file_types():
+                cmd = self.file_open_commands.get_command_for_file_type(file_type)
+                if cmd:
+                    self.gvConfig['Core'][f'{file_type}cmdline'] = cmd
             if self.GEDCOMinput and self.Main:
                 name = Path(self.GEDCOMinput).stem
                 self.gvConfig['Gedcom.Main'][name] = str(self.Main)
@@ -421,25 +542,17 @@ class gvOptions:
         else:
             self.setMainPerson(None)
 
-    def setResults(self, Result, OutputType):
+    def setResultsFile(self, ResultFile, OutputType):
         """Set the output filename (base) and enforce an extension based on OutputType."""
-        enforced = ResultsType.ResultsTypeEnforce(OutputType)
+        enforced = ResultType.ResultTypeEnforce(OutputType)
         self.ResultType = enforced
 
-        extension = "txt"
-        if enforced is ResultsType.HTML:
-            extension = "html"
-        elif enforced is ResultsType.KML:
-            extension = "kml"
-        elif enforced is ResultsType.KML2:
-            extension = "kml"
-        elif enforced is ResultsType.SUM:
-            extension = "txt"
+        extension = ResultType.file_extension(enforced)
         
-        base, _ = os.path.splitext(Result or "")
-        self.Result = base
-        if self.Result:
-            self.Result = self.Result + "." + extension
+        base, _ = os.path.splitext(ResultFile or "")
+        self.ResultFile = base
+        if self.ResultFile:
+            self.ResultFile = self.ResultFile + "." + extension
         # TODO Update Visual value
 
     def setInput(self, theInput, generalRequest=True):
@@ -469,7 +582,7 @@ class gvOptions:
             if org != self.GEDCOMinput:
                 self.resultpath = os.path.dirname(self.GEDCOMinput)
                 # Force the output to match the name and location of the input
-                self.setResults(filen, self.ResultType)
+                self.setResultsFile(filen, self.ResultType)
         else:
             self.resultpath = None
         if org != self.GEDCOMinput:

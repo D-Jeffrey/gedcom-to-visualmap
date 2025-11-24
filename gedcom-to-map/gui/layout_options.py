@@ -10,13 +10,12 @@ API:
         panel: the wx.Panel instance where options controls are created
 """
 from typing import Any
-from matplotlib.pyplot import _log
+import logging
 import wx
-import time
-import shutil
-import subprocess
-import webbrowser
+from .layout_helpers import LayoutHelpers
+from gedcom_options import ResultType
 
+_log = logging.getLogger(__name__.lower())
 
 class LayoutOptions:
     """Helper to construct the options UI previously embedded in VisualMapPanel.
@@ -68,53 +67,49 @@ class LayoutOptions:
     @staticmethod
     def _add_file_controls(vm_panel: Any, panel: wx.Panel, sizer: wx.Sizer) -> None:
         """Create input/output file controls and add to sizer."""
-        vm_panel.id.txtinfile = wx.Button(panel, -1, "Input file:   ")
-        vm_panel.id.txtinfile.SetBackgroundColour(vm_panel.id.GetColor("BTN_DIRECTORY"))
-        vm_panel.id.TEXTGEDCOMinput = wx.TextCtrl(panel, vm_panel.id.IDs["ID_TEXTGEDCOMinput"], "", size=(250, 20))
-        vm_panel.id.TEXTGEDCOMinput.Enable(False)
-        vm_panel.id.txtoutfile = wx.Button(panel, -1, "Output file: ")
-        vm_panel.id.txtoutfile.SetBackgroundColour(vm_panel.id.GetColor("BTN_DIRECTORY"))
-        vm_panel.id.TEXTResult = wx.TextCtrl(panel, vm_panel.id.IDs["ID_TEXTResult"], "", size=(250, 20))
+        LayoutHelpers.add_button_with_id(vm_panel, panel, "txtinfile", "Input file:   ", "BTN_DIRECTORY")
+        LayoutHelpers.add_textctrl_with_id(vm_panel, panel, "TEXTGEDCOMinput", size=(250, 20), enable=False)
+        LayoutHelpers.add_button_with_id(vm_panel, panel, "txtoutfile", "Output file: ", "BTN_DIRECTORY")
+        LayoutHelpers.add_textctrl_with_id(vm_panel, panel, "TEXTResultFile", size=(250, 20))
         vm_panel.id.txtinfile.Bind(wx.EVT_LEFT_DOWN, vm_panel.frame.OnFileOpenDialog)
         vm_panel.id.txtoutfile.Bind(wx.EVT_LEFT_DOWN, vm_panel.frame.OnFileResultDialog)
 
-        l1 = wx.BoxSizer(wx.HORIZONTAL)
-        l1.AddMany([vm_panel.id.txtinfile, (6, 20), vm_panel.id.TEXTGEDCOMinput])
-        l2 = wx.BoxSizer(wx.HORIZONTAL)
-        l2.AddMany([vm_panel.id.txtoutfile, (0, 20), vm_panel.id.TEXTResult])
-        sizer.AddMany([l1, (4, 4,), l2])
+        l1 = LayoutHelpers.add_multi_horizontal_by_id(vm_panel, ["txtinfile", "TEXTGEDCOMinput"], spacer=6)
+        l2 = LayoutHelpers.add_multi_horizontal_by_id(vm_panel, ["txtoutfile", "TEXTResultFile"], spacer=6)
+        sizer.Add(l1, proportion=0, flag=wx.EXPAND | wx.ALL, border=2)
+        sizer.Add(l2, proportion=0, flag=wx.EXPAND | wx.ALL, border=2)
 
     @staticmethod
     def _add_basic_checks(vm_panel: Any, panel: wx.Panel, sizer: wx.Sizer) -> None:
         """Add the top-level checkbox controls (GPS, cache, defaults, entity flags)."""
-        vm_panel.id.CBUseGPS = wx.CheckBox(panel, vm_panel.id.IDs["ID_CBUseGPS"],
-                                          "Lookup all address (ignore cache)")
-        vm_panel.id.CBCacheOnly = wx.CheckBox(panel, vm_panel.id.IDs["ID_CBCacheOnly"],
-                                             "Cache Only, do not lookup addresses")
-        vm_panel.id.labelDefCountry = wx.StaticText(panel, -1, "Default Country:   ")
-        vm_panel.id.TEXTDefaultCountry = wx.TextCtrl(panel, vm_panel.id.IDs["ID_TEXTDefaultCountry"], "", size=(250, 20))
-        defCountryBox = wx.BoxSizer(wx.HORIZONTAL)
-        defCountryBox.AddMany([vm_panel.id.labelDefCountry, (6, 20), vm_panel.id.TEXTDefaultCountry])
-        vm_panel.id.CBAllEntities = wx.CheckBox(panel, vm_panel.id.IDs["ID_CBAllEntities"], "Map all people")
-        vm_panel.id.CBBornMark = wx.CheckBox(panel, vm_panel.id.IDs["ID_CBBornMark"], "Marker for when Born")
-        vm_panel.id.CBDieMark = wx.CheckBox(panel, vm_panel.id.IDs["ID_CBDieMark"], "Marker for when Died")
+        cb_use_gps = LayoutHelpers.add_checkbox_with_id(vm_panel, panel, "CBUseGPS", "Lookup all address (ignore cache)")
+        cb_cache_only = LayoutHelpers.add_checkbox_with_id(vm_panel, panel, "CBCacheOnly", "Cache Only, do not lookup addresses")
+        _ = LayoutHelpers.add_static_text_with_id(vm_panel, panel, "labelDefCountry", "Default Country:   ")
+        _ = LayoutHelpers.add_textctrl_with_id(vm_panel, panel, "TEXTDefaultCountry", size=(250, 20))
 
-        vm_panel.id.busyIndicator = wx.ActivityIndicator(panel)
-        vm_panel.id.busyIndicator.SetBackgroundColour(vm_panel.id.GetColor("BUSY_BACK"))
-        vm_panel.id.RBResultOutType = wx.RadioBox(panel, vm_panel.id.IDs["ID_RBResultsType"], "Result Type",
-                                                  choices=["HTML", "KML", "KML2", "SUM"], majorDimension=5)
+        defCountryBox = LayoutHelpers.add_multi_horizontal_by_id(vm_panel, ["labelDefCountry", "TEXTDefaultCountry"], spacer=6)
 
-        sizer.AddMany(
-            [
-                vm_panel.id.CBUseGPS,
-                vm_panel.id.CBCacheOnly,
-                defCountryBox,
-                vm_panel.id.CBAllEntities,
-                vm_panel.id.CBBornMark,
-                vm_panel.id.CBDieMark,
-            ]
-        )
+        cb_all_entities = LayoutHelpers.add_checkbox_with_id(vm_panel, panel, "CBAllEntities", "Map all people")
+        cb_born_mark = LayoutHelpers.add_checkbox_with_id(vm_panel, panel, "CBBornMark", "Marker for when Born")
+        cb_die_mark = LayoutHelpers.add_checkbox_with_id(vm_panel, panel, "CBDieMark", "Marker for when Died")
 
+        LayoutHelpers.add_radio_box_with_id(vm_panel, panel, "RBResultType", "Result Type",
+                                           ResultType.list_values(), majorDimension=5)
+
+        LayoutHelpers.add_many_to_sizer(sizer,
+                                        [cb_use_gps, cb_cache_only, defCountryBox,
+                                         cb_all_entities, cb_born_mark, cb_die_mark])
+
+    @staticmethod
+    def get_marks_controls_list(vm_panel: Any) -> list:
+        """Return the list of marker-dependent controls for enabling/disabling."""
+        return [
+            vm_panel.id.CBBornMark,
+            vm_panel.id.CBDieMark,
+            vm_panel.id.CBHomeMarker,
+            vm_panel.id.CBMarkStarOn,
+        ]
+    
     @staticmethod
     def _add_html_options(vm_panel: Any, panel: wx.Panel, sizer: wx.Sizer) -> None:
         """Create and add the HTML-specific option group."""
@@ -126,44 +121,36 @@ class LayoutOptions:
         mapchoices = sorted(vm_panel.id.AllMapTypes)
         mapboxsizer = wx.BoxSizer(wx.HORIZONTAL)
         mapStyleLabel = wx.StaticText(hbox, -1, " Map Style")
-        vm_panel.id.CBMarksOn = wx.CheckBox(hbox_container, vm_panel.id.IDs["ID_CBMarksOn"], "Markers", name="MarksOn")
-        vm_panel.id.CBHomeMarker = wx.CheckBox(hbox_container, vm_panel.id.IDs["ID_CBHomeMarker"], "Marker point or homes")
-        vm_panel.id.CBMarkStarOn = wx.CheckBox(hbox_container, vm_panel.id.IDs["ID_CBMarkStarOn"], "Marker starter with Star")
-        vm_panel.id.CBMapTimeLine = wx.CheckBox(hbox_container, vm_panel.id.IDs["ID_CBMapTimeLine"], "Add Timeline")
-        vm_panel.id.LISTMapType = wx.Choice(hbox_container, vm_panel.id.IDs["ID_LISTMapStyle"], name="MapStyle",
-                                           choices=mapchoices)
-        vm_panel.id.CBMapControl = wx.CheckBox(hbox_container, vm_panel.id.IDs["ID_CBMapControl"], "Open Map Controls",
-                                              name="MapControl")
-        vm_panel.id.CBMapMini = wx.CheckBox(hbox_container, vm_panel.id.IDs["ID_CBMapMini"], "Add Mini Map",
-                                            name="MapMini")
-        vm_panel.id.CBHeatMap = wx.CheckBox(hbox_container, vm_panel.id.IDs["ID_CBHeatMap"], "Heatmap",
-                                            style=wx.NO_BORDER)
-        vm_panel.id.CBUseAntPath = wx.CheckBox(hbox_container, vm_panel.id.IDs["ID_CBUseAntPath"], "Ant paths")
-
-        TimeStepVal = 5
-        vm_panel.id.LISTHeatMapTimeStep = wx.Slider(hbox_container, vm_panel.id.IDs["ID_LISTHeatMapTimeStep"],
-                                                    TimeStepVal, 1, 100, size=(250, 45),
-                                                    style=wx.SL_HORIZONTAL | wx.SL_AUTOTICKS | wx.SL_LABELS)
-        vm_panel.id.LISTHeatMapTimeStep.SetTickFreq(5)
-        vm_panel.id.RBGroupBy = wx.RadioBox(hbox_container, vm_panel.id.IDs["ID_RBGroupBy"], "Group by:",
-                                           choices=["None", "Last Name", "Last Name (Soundex)", "Person"],
-                                           majorDimension=2)
-        mapboxsizer.Add(vm_panel.id.LISTMapType)
+        cb_marks_on = LayoutHelpers.add_checkbox_with_id(vm_panel, hbox_container, "CBMarksOn", "Markers")
+        cb_home_marker = LayoutHelpers.add_checkbox_with_id(vm_panel, hbox_container, "CBHomeMarker", "Marker point or homes")
+        cb_mark_star_on = LayoutHelpers.add_checkbox_with_id(vm_panel, hbox_container, "CBMarkStarOn", "Marker starter with Star")
+        cb_map_time_line = LayoutHelpers.add_checkbox_with_id(vm_panel, hbox_container, "CBMapTimeLine", "Add Timeline")
+        ch_map_style = LayoutHelpers.add_choice_with_id(vm_panel, hbox_container, "LISTMapStyle", choices=mapchoices)
+        
+        cb_map_control = LayoutHelpers.add_checkbox_with_id(vm_panel, hbox_container, "CBMapControl", "Open Map Controls")
+        cb_map_mini = LayoutHelpers.add_checkbox_with_id(vm_panel, hbox_container, "CBMapMini", "Add Mini Map")
+        cb_heat_map = LayoutHelpers.add_checkbox_with_id(vm_panel, hbox_container, "CBHeatMap", "Heatmap", style=wx.NO_BORDER)
+        cb_use_ant_path = LayoutHelpers.add_checkbox_with_id(vm_panel, hbox_container, "CBUseAntPath", "Ant paths")
+        sl_heat_map_time_step = LayoutHelpers.add_slider_with_id(vm_panel, hbox_container, "LISTHeatMapTimeStep", value=5, min_val=1, max_val=100, tick_freq=5)
+        rb_group_by = LayoutHelpers.add_radio_box_with_id(vm_panel, hbox_container, "RBGroupBy", "Group by:",
+                                                          choices=["None", "Last Name", "Last Name (Soundex)", "Person"],
+                                                          majorDimension=2)
+        mapboxsizer.Add(ch_map_style)
         mapboxsizer.Add(mapStyleLabel)
 
         hboxIn.AddMany(
             [
-                (vm_panel.id.CBMarksOn, 0, wx.ALL, 2),
-                (vm_panel.id.CBHomeMarker, 0, wx.ALL, 2),
-                (vm_panel.id.CBMarkStarOn, 0, wx.ALL, 2),
-                (vm_panel.id.CBMapTimeLine, 0, wx.ALL, 2),
-                (vm_panel.id.RBGroupBy, 0, wx.ALL, 2),
+                (cb_marks_on, 0, wx.ALL, 2),
+                (cb_home_marker, 0, wx.ALL, 2),
+                (cb_mark_star_on, 0, wx.ALL, 2),
+                (cb_map_time_line, 0, wx.ALL, 2),
+                (rb_group_by, 0, wx.ALL, 2),
                 (mapboxsizer, 0, wx.EXPAND | wx.ALL, 4),
-                (vm_panel.id.CBMapControl, 0, wx.ALL, 2),
-                (vm_panel.id.CBMapMini, 0, wx.ALL, 2),
-                (vm_panel.id.CBUseAntPath, 0, wx.ALL, 2),
-                (vm_panel.id.CBHeatMap, 0, wx.ALL, 2),
-                (vm_panel.id.LISTHeatMapTimeStep, 0, wx.EXPAND | wx.ALL, 4),
+                (cb_map_control, 0, wx.ALL, 2),
+                (cb_map_mini, 0, wx.ALL, 2),
+                (cb_use_ant_path, 0, wx.ALL, 2),
+                (cb_heat_map, 0, wx.ALL, 2),
+                (sl_heat_map_time_step, 0, wx.EXPAND | wx.ALL, 4),
             ]
         )
         hsizer.Add(hboxIn, 0, wx.EXPAND | wx.ALL, 4)
@@ -178,16 +165,16 @@ class LayoutOptions:
         ksizer = wx.StaticBoxSizer(kbox, wx.VERTICAL)
         kboxIn = wx.BoxSizer(wx.VERTICAL)
 
-        vm_panel.id.RBKMLMode = wx.RadioBox(kbox, vm_panel.id.IDs["ID_RBKMLMode"], "Organize by:",
-                                           choices=["None", "Folder"], majorDimension=2)
+        rb_kml_mode = LayoutHelpers.add_radio_box_with_id(vm_panel, kbox_container, "RBKMLMode", "Organize by:",
+                                                          choices=["None", "Folder"], majorDimension=2)
 
-        kboxs = [vm_panel.id.RBKMLMode, wx.BoxSizer(wx.HORIZONTAL), (4, 4), wx.BoxSizer(wx.HORIZONTAL)]
-        vm_panel.id.CBFlyTo = wx.CheckBox(kbox, vm_panel.id.IDs["ID_CBFlyTo"], "FlyTo Balloon", style=wx.NO_BORDER)
-        vm_panel.id.ID_INTMaxLineWeight = wx.SpinCtrl(kbox, vm_panel.id.IDs["ID_INTMaxLineWeight"], "",
+        kboxs = [rb_kml_mode, wx.BoxSizer(wx.HORIZONTAL), (4, 4), wx.BoxSizer(wx.HORIZONTAL)]
+        cb_fly_to = LayoutHelpers.add_checkbox_with_id(vm_panel, kbox, "CBFlyTo", "FlyTo Balloon", style=wx.NO_BORDER)
+        vm_panel.id.INTMaxLineWeight = wx.SpinCtrl(kbox, vm_panel.id.IDs["INTMaxLineWeight"], "",
                                                      min=1, max=100, initial=20)
 
-        kboxs[1].AddMany([wx.StaticText(kbox, -1, "        "), vm_panel.id.CBFlyTo])
-        kboxs[3].AddMany([vm_panel.id.ID_INTMaxLineWeight, wx.StaticText(kbox, -1, " Max Line Weight")])
+        kboxs[1].AddMany([wx.StaticText(kbox, -1, "        "), cb_fly_to])
+        kboxs[3].AddMany([vm_panel.id.INTMaxLineWeight, wx.StaticText(kbox, -1, " Max Line Weight")])
         kboxIn.AddMany(kboxs)
 
         ksizer.Add(kboxIn, 0, wx.EXPAND | wx.ALL, 4)
@@ -213,17 +200,19 @@ class LayoutOptions:
         ssizer = wx.StaticBoxSizer(sbox, wx.VERTICAL)
         sboxIn = wx.BoxSizer(wx.VERTICAL)
 
+        # Parent controls to the container panel (not to the StaticBox object)
         vm_panel.id.CBSummary = [
-            wx.CheckBox(sbox, vm_panel.id.IDs["ID_CBSummary"], label="Open files after created", name="Open"),
-            wx.CheckBox(sbox, vm_panel.id.IDs["ID_CBSummary"], label="Places", name="Places"),
-            wx.CheckBox(sbox, vm_panel.id.IDs["ID_CBSummary"], label="People", name="People"),
-            wx.CheckBox(sbox, vm_panel.id.IDs["ID_CBSummary"], label="Countries", name="Countries"),
-            wx.CheckBox(sbox, vm_panel.id.IDs["ID_CBSummary"], label="Countries Grid", name="CountriesGrid"),
-            wx.CheckBox(sbox, vm_panel.id.IDs["ID_CBSummary"], label="Geocode", name="Geocode"),
-            wx.CheckBox(sbox, vm_panel.id.IDs["ID_CBSummary"], label="Alternate Places", name="AltPlaces"),
+            wx.CheckBox(sbox_container, vm_panel.id.IDs["CBSummary0"], label="Open files after created", name="Open"),
+            wx.CheckBox(sbox_container, vm_panel.id.IDs["CBSummary1"], label="Places", name="Places"),
+            wx.CheckBox(sbox_container, vm_panel.id.IDs["CBSummary2"], label="People", name="People"),
+            wx.CheckBox(sbox_container, vm_panel.id.IDs["CBSummary3"], label="Countries", name="Countries"),
+            wx.CheckBox(sbox_container, vm_panel.id.IDs["CBSummary4"], label="Countries Grid", name="CountriesGrid"),
+            wx.CheckBox(sbox_container, vm_panel.id.IDs["CBSummary5"], label="Geocode", name="Geocode"),
+            wx.CheckBox(sbox_container, vm_panel.id.IDs["CBSummary6"], label="Alternate Places", name="AltPlaces"),
         ]
 
-        sboxIn.AddMany(vm_panel.id.CBSummary)
+        # Add with padding so the checkboxes are not flush against each other
+        sboxIn.AddMany([(cb, 0, wx.ALL, 2) for cb in vm_panel.id.CBSummary])
         ssizer.Add(sboxIn, 0, wx.EXPAND | wx.ALL, 4)
         sbox_container.SetSizer(ssizer)
         vm_panel.optionSbox = sbox_container
@@ -241,7 +230,7 @@ class LayoutOptions:
         gbox = wx.StaticBox(gbox_container, -1, "Grid View Options")
         gsizer = wx.StaticBoxSizer(gbox, wx.VERTICAL)
         gboxIn = wx.BoxSizer(wx.VERTICAL)
-        vm_panel.id.CBGridView = wx.CheckBox(gbox_container, vm_panel.id.IDs["ID_CBGridView"], "View Only Direct Ancestors")
+        vm_panel.id.CBGridView = wx.CheckBox(gbox_container, vm_panel.id.IDs["CBGridView"], "View Only Direct Ancestors")
         gboxIn.AddMany([vm_panel.id.CBGridView])
         gsizer.Add(gboxIn, 0, wx.EXPAND | wx.ALL, 4)
 
@@ -262,34 +251,37 @@ class LayoutOptions:
         vm_panel.optionSbox.Hide()
 
         sizer.Add(vm_panel.optionGbox, 0, wx.LEFT | wx.TOP, 5)
-        sizer.AddMany([vm_panel.id.RBResultOutType])
+        sizer.AddMany([vm_panel.id.RBResultType])
         sizer.Add(vm_panel.optionsStack, 1, wx.EXPAND | wx.ALL, 5)
         vm_panel.optionsStack.Layout()
 
     @staticmethod
     def _add_buttons_row(vm_panel: Any, panel: wx.Panel, sizer: wx.Sizer) -> None:
         """Create the action buttons row (Load, Create, CSV, Trace, Stop, Browser)."""
-        l1 = wx.BoxSizer(wx.HORIZONTAL)
-        vm_panel.id.BTNLoad = wx.Button(panel, vm_panel.id.IDs["ID_BTNLoad"], "Load")
-        vm_panel.id.BTNCreateFiles = wx.Button(panel, vm_panel.id.IDs["ID_BTNCreateFiles"], "Create Files")
-        vm_panel.id.BTNCSV = wx.Button(panel, vm_panel.id.IDs["ID_BTNCSV"], "Geo Table")
-        vm_panel.id.BTNTRACE = wx.Button(panel, vm_panel.id.IDs["ID_BTNTRACE"], "Trace")
-        vm_panel.id.BTNSTOP = wx.Button(panel, vm_panel.id.IDs["ID_BTNSTOP"], "Stop")
-        vm_panel.id.BTNBROWSER = wx.Button(panel, vm_panel.id.IDs["ID_BTNBROWSER"], "Browser")
-        l1.Add(vm_panel.id.BTNLoad, 0, wx.EXPAND | wx.ALL, 5)
-        l1.Add(vm_panel.id.BTNCreateFiles, 0, wx.EXPAND | wx.ALL, 5)
-        l1.Add(vm_panel.id.BTNCSV, 0, wx.EXPAND | wx.ALL, 5)
-        l1.Add(vm_panel.id.BTNTRACE, 0, wx.EXPAND | wx.ALL, 5)
-        sizer.Add(l1, 0, wx.EXPAND | wx.ALL, 0)
+        bt_load = LayoutHelpers.add_button_with_id(vm_panel, panel, "BTNLoad", "Load", color=None)
+        bt_create = LayoutHelpers.add_button_with_id(vm_panel, panel, "BTNCreateFiles", "Create Files", color=None)
+        bt_csv = LayoutHelpers.add_button_with_id(vm_panel, panel, "BTNCSV", "Geo Table", color=None)
+        bt_trace = LayoutHelpers.add_button_with_id(vm_panel, panel, "BTNTRACE", "Trace", color=None)
 
         l1 = wx.BoxSizer(wx.HORIZONTAL)
-        l1.Add(vm_panel.id.busyIndicator, 0, wx.ALL | wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 5)
-        l1.Add(vm_panel.id.BTNSTOP, 0, wx.EXPAND | wx.LEFT, 20)
-        l1.AddSpacer(20)
-        l1.Add(vm_panel.id.BTNBROWSER, wx.EXPAND | wx.ALL, 5)
-        l1.AddSpacer(20)
-        sizer.Add((0, 10))
+        l1.Add(bt_load, 0, wx.EXPAND | wx.ALL, 5)
+        l1.Add(bt_create, 0, wx.EXPAND | wx.ALL, 5)
+        l1.Add(bt_csv, 0, wx.EXPAND | wx.ALL, 5)
+        l1.Add(bt_trace, 0, wx.EXPAND | wx.ALL, 5)
         sizer.Add(l1, 0, wx.EXPAND | wx.ALL, 0)
+
+        busy_indicator = LayoutHelpers.add_busy_indicator(vm_panel, panel, "busyIndicator", color="BUSY_BACK")
+        bt_stop = LayoutHelpers.add_button_with_id(vm_panel, panel, "BTNSTOP", "Stop", color=None)
+        bt_browser = LayoutHelpers.add_button_with_id(vm_panel, panel, "BTNBROWSER", "Browser", color=None)
+
+        l2 = wx.BoxSizer(wx.HORIZONTAL)
+        l2.Add(busy_indicator, 0, wx.ALL | wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 5)
+        l2.Add(bt_stop, 0, wx.EXPAND | wx.LEFT, 20)
+        l2.AddSpacer(20)
+        l2.Add(bt_browser, proportion=0, flag=wx.EXPAND | wx.ALL, border=5)
+        l2.AddSpacer(20)
+        sizer.Add((0, 10))
+        sizer.Add(l2, 0, wx.EXPAND | wx.ALL, 0)
 
     @staticmethod
     def adjust_panel_width(vm_panel: Any) -> None:

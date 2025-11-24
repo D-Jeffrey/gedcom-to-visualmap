@@ -25,10 +25,13 @@ config_file_settings:
     GroupBy: 1, UseAntPath: 'bool', MapTimeLine: 'bool', HeatMapTimeStep: 'int',
     HomeMarker: 'bool', showLayerControl: 'bool', mapMini: 'bool', MapStyle: 'str' }
   Core: {
-    UseGPS: 'bool', CacheOnly: 'bool', AllEntities: 'bool', ResultType: 'complex',
-    KMLcmdline: 'str', CSVcmdline: 'str', Tracecmdline: 'str',  badAge: 'bool' }
+    UseGPS: 'bool', CacheOnly: 'bool', AllEntities: 'bool', ResultType: 'result',
+    KMLcmdline: 'str', CSVcmdline: 'str', Tracecmdline: 'str',  Defaultcmdline: 'str',
+    badAge: 'bool' }
   KML : {
-    'MaxLineWeight':'int', 'MaxMissing':'int', 'UseBalloonFlyto':'bool', 'KMLsort':'bool' }
+    'MaxLineWeight':'int',
+    # 'MaxMissing':'int',
+    'UseBalloonFlyto':'bool', 'KMLsort':'bool' }
   # Old settings that should be removed from the config file
   old_settings: {
     'native': 'KML', 'born': 'KML', 'death':'KML', 'PlaceType': 'KML',
@@ -52,9 +55,9 @@ gui_options_defaults:
   mapHeightPercent: 80
   panelWidthPercent: 30
   window_size: [1024, 800]
-  
+
 gedcom_options_types: {
-  GEDCOMinput: 'str', resultpath: 'str', Result: 'str',
+  GEDCOMinput: 'str', resultpath: 'str', ResultFile: 'str',
   ResultType: 'str', Main: 'str', mainPerson: 'str',
   Name: 'str', mainPersonLatLon: 'complex', MaxMissing: 'int',
   MaxLineWeight: 'int', UseGPS: 'bool', CacheOnly: 'bool',
@@ -80,8 +83,8 @@ gedcom_options_types: {
 gedcom_options_defaults:
   GEDCOMinput: "gedcomfile.ged"
   resultpath: null
-  Result: ''
-  ResultType: ResultsType.HTML
+  ResultFile: ''
+  ResultType: ResultType.HTML
   Main: null
   mainPerson: null
   Name: null

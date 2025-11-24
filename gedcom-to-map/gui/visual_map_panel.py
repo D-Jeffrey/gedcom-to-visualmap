@@ -17,22 +17,20 @@ import logging
 import time
 import math
 import os
-import sys
-import subprocess
-import webbrowser
-import shutil
 from datetime import datetime
 
 from const import KMLMAPSURL
 
 import wx
 
-from .visual_gedcom_ids import VisualGedcomIds  # type: ignore
 from .people_list_ctrl_panel import PeopleListCtrlPanel  # type: ignore
 from .background_actions import BackgroundActions
 from .layout_options import LayoutOptions
+from .visual_gedcom_ids import VisualGedcomIds
 from .visual_map_event_handlers import VisualMapEventHandler
-from gedcom_options import gvOptions, ResultsType  # type: ignore
+from .visual_map_actions import VisualMapActions
+from gedcom_options import gvOptions, ResultType  # type: ignore
+from style.stylemanager import FontManager
 
 (UpdateBackgroundEvent, EVT_UPDATE_STATE) = wx.lib.newevent.NewEvent()
 
@@ -53,9 +51,7 @@ class VisualMapPanel(wx.Panel):
     """
 
     # Public attributes with types for static analysis and readability
-    font_manager: Any
-    font_name: str
-    font_size: int
+    font_manager: FontManager
     frame: wx.Frame
     gOp: gvOptions
     id: VisualGedcomIds
@@ -65,7 +61,7 @@ class VisualMapPanel(wx.Panel):
     myTimer: Optional[wx.Timer]
     busystate: bool
 
-    def __init__(self, parent: wx.Window, font_manager: Any, gOp: gvOptions,
+    def __init__(self, parent: wx.Window, font_manager: FontManager, gOp: gvOptions,
                  *args: Any, **kw: Any) -> None:
         """
         Initialize the VisualMapPanel.
@@ -83,15 +79,12 @@ class VisualMapPanel(wx.Panel):
         # parent must be the wx parent for this panel; call panel initializer with it
         super().__init__(parent, *args, **kw)
 
+        self.gOp = gOp
         self.font_manager = font_manager
-        self.font_name, self.font_size = self.font_manager.get_font_name_size()
 
         self.SetMinSize((800,800))
         self.frame = self.TopLevelParent
-        self.gOp = gOp
 
-        self.id = {}
-        
         self.fileConfig = None
         self.busystate = False
         self.busycounthack = 0
@@ -100,6 +93,20 @@ class VisualMapPanel(wx.Panel):
         self.SetAutoLayout(True)
         self.id = VisualGedcomIds()
         
+        self.make_panels()
+
+        # wire event bindings via the handler and start background threads/timer
+        self.handlers.bind()
+        self.start_threads_and_timer()
+
+        self.lastruninstance = 0.0
+        self.remaintime = 0
+
+        # Configure panel options
+        self.SetupOptions()
+
+    def make_panels(self) -> None:
+        """Construct left/right sub-panels and people list."""
         # create a panel in the frame
         self.panelA = wx.Panel(self, -1, style=wx.SIMPLE_BORDER)
         self.panelB = wx.Panel(self, -1, style=wx.SIMPLE_BORDER)
@@ -120,6 +127,8 @@ class VisualMapPanel(wx.Panel):
         # create handler first so LayoutOptions.build (which no longer binds)
         # can safely be used; handler will be used to wire event bindings next
         self.handlers = VisualMapEventHandler(self)
+        # action helpers handle commands that previously lived on this panel
+        self.actions = VisualMapActions(self)
 
         # Add all the labels, button and radiobox to Right Panel using LayoutOptions helper
         LayoutOptions.build(self, self.panelB)
@@ -131,16 +140,6 @@ class VisualMapPanel(wx.Panel):
 
         # compute a sensible width for the right-hand options panel
         LayoutOptions.adjust_panel_width(self)
-
-        # wire event bindings via the handler and start background threads/timer
-        self.handlers.bind()
-        self.start_threads_and_timer()
-
-        self.lastruninstance = 0.0
-        self.remaintime = 0
-
-        # Configure panel options
-        self.SetupOptions()
 
     def start(self) -> None:
         """Perform UI startup actions (currently triggers SetupButtonState)."""
@@ -156,7 +155,7 @@ class VisualMapPanel(wx.Panel):
             except Exception:
                 pass
             try:
-                self.Unbind(wx.EVT_TIMER, self)
+                self.Unbind(wx.EVT_TIMER, handler=self.OnMyTimer)
             except Exception:
                 pass
 
@@ -208,25 +207,20 @@ class VisualMapPanel(wx.Panel):
         self.fileConfig.Write("GEDCOMinput", path)
         #TODO Fix this
         #TODO Fix this
-        self.id.TEXTResult.SetValue(self.gOp.get('Result'))
+        self.id.TEXTResultFile.SetValue(self.gOp.get('ResultFile'))
         self.NeedReload()
         self.SetupButtonState()
 
     def SetResultTypeRadioBox(self):
         """Synchronize the result-type radio box selection with gOp.ResultType."""
         rType = self.gOp.get('ResultType')
-        
-        if rType is ResultsType.HTML:
-            outType = 0
-        elif rType is ResultsType.KML:
-            outType = 1
-        elif rType is ResultsType.KML2:
-            outType = 2
-        elif rType is ResultsType.SUM:
-            outType = 3
-        else:
-            outType = 0
-        self.id.RBResultOutType.SetSelection(outType)
+        try:
+            type_index = rType.index()
+        except Exception:
+            type_index = 0
+            _log.error("SetResultTypeRadioBox: unknown ResultType %s", str(rType))
+
+        self.id.RBResultType.SetSelection(type_index)
 
     def get_runtime_string(self) -> str:
         """Return a formatted running/ETA string based on gOp timing and counters.
@@ -315,7 +309,7 @@ class VisualMapPanel(wx.Panel):
         else:
             if not self.id.BTNLoad.IsEnabled():
                 self.id.BTNLoad.Enable()
-            if not self.id.BTNLoad.IsEnabled():
+            if not self.id.BTNCreateFiles.IsEnabled():
                 self.id.BTNCreateFiles.Enable()
 
     def update_csv_button_display(self) -> None:
@@ -345,7 +339,7 @@ class VisualMapPanel(wx.Panel):
     def check_update_running_state(self) -> None:
         """Synchronize busy/ running state and trigger busy indicator transitions."""
         if self.busystate != self.gOp.running:
-            logging.info("Busy %d not Running %d", self.busystate, self.gOp.running)
+            _log.info("Busy %d not Running %d", self.busystate, self.gOp.running)
             if self.gOp.running:
                 self.gOp.runningSince = datetime.now().timestamp()
                 self.OnBusyStart(-1)
@@ -449,7 +443,6 @@ class VisualMapPanel(wx.Panel):
 
         newinfo = None
         if self.background_process.updateinfo:
-            _log.debug("Infobox: %s", self.background_process.updateinfo)
             newinfo = self.background_process.updateinfo
             self.background_process.updateinfo = None
 
@@ -474,46 +467,23 @@ class VisualMapPanel(wx.Panel):
             # self.id.CBUseGPS
             # self.id.CBAllEntities
             # self.id.CBCacheOnly
-            
-        # Define control groups for HTML and KML modes
-        html_controls = [
-            self.id.LISTMapType, 
-            self.id.CBMapControl,
-            self.id.CBMapMini,
-            self.id.CBHeatMap,
-            self.id.CBUseAntPath,
-            self.id.RBGroupBy,
-            self.id.LISTHeatMapTimeStep
-        ]
-        marks_controls = [
-            self.id.CBBornMark,
-            self.id.CBDieMark,
-            self.id.CBHomeMarker,
-            self.id.CBMarkStarOn,
-            ]
-        kml_controls = [
-            self.id.RBKMLMode,
-            self.id.CBFlyTo,
-            self.id.ID_INTMaxLineWeight
-        ]
 
         # Enable/Disable marker-dependent controls if markers are off
-        if self.gOp.get('MarksOn'):
-            for ctrl in marks_controls:
+        marks_on = self.gOp.get('MarksOn')
+        for ctrl in LayoutOptions.get_marks_controls_list(self):
+            if marks_on:
                 ctrl.Enable()
-        else:
-            for ctrl in marks_controls:
+            else:
                 ctrl.Disable()
 
-        self.optionHbox.Hide()
-        self.optionSbox.Hide()
-        self.optionKbox.Hide()
-        self.optionK2box.Hide()
+        self.optionHbox.Hide() # HTML options
+        self.optionSbox.Hide() # Summary options
+        self.optionKbox.Hide() # KML options
+        self.optionK2box.Hide() # KML2 options
         # self.optionGbox.SetSize(self.optionGbox.GetBestSize())
 
-        if ResultTypeSelect is ResultsType.HTML:
-            # Enable HTML-specific controls
-            for ctrl in html_controls:
+        if ResultTypeSelect is ResultType.HTML:
+            for ctrl in self.optionHbox.GetChildren():
                 ctrl.Enable()
             
             # Handle heat map related controls
@@ -525,27 +495,27 @@ class VisualMapPanel(wx.Panel):
                 # Only enable time step if timeline is enabled
                 if self.gOp.get('MapTimeLine'):
                     self.id.LISTHeatMapTimeStep.Enable()
-            for ctrl in kml_controls:
+            for ctrl in self.optionKbox.GetChildren():
                 ctrl.Disable()        
             self.optionHbox.Show()
             
-        elif ResultTypeSelect is ResultsType.SUM:
+        elif ResultTypeSelect is ResultType.SUM:
             self.optionSbox.Show()
 
-        elif ResultTypeSelect is ResultsType.KML:
+        elif ResultTypeSelect is ResultType.KML:
             # In KML mode, disable HTML controls and enable KML controls
-            for ctrl in html_controls:
+            for ctrl in self.optionHbox.GetChildren():
                 ctrl.Disable()
-            for ctrl in kml_controls:
+            for ctrl in self.optionKbox.GetChildren():
                 ctrl.Enable()
             # This timeline just works differently in KML mode vs embedded code for HTML
             self.id.CBMapTimeLine.Enable()
             self.optionKbox.Show()
-        elif ResultTypeSelect is ResultsType.KML2:
+        elif ResultTypeSelect is ResultType.KML2:
             self.optionK2box.Show()
 
        # Enable/disable trace button based on referenced data availability
-        self.id.BTNTRACE.Enable(bool(self.gOp.Referenced and self.gOp.Result and ResultTypeSelect))
+        self.id.BTNTRACE.Enable(bool(self.gOp.Referenced and self.gOp.ResultFile and ResultTypeSelect))
 
         self.optionsStack.Layout()
         self.Layout()
@@ -566,34 +536,17 @@ class VisualMapPanel(wx.Panel):
         self.peopleList.SetGOp(self.gOp)
 
         if self.gOp.get('ResultType'):
-            self.id.RBResultOutType.SetSelection(0)
+            self.id.RBResultType.SetSelection(0)
         else:
-            if self.id.RBResultOutType.GetSelection() not in [1,2]:
-                self.id.RBResultOutType.SetSelection(1)
+            if self.id.RBResultType.GetSelection() not in [1,2]:
+                self.id.RBResultType.SetSelection(1)
         
-        self.id.CBMapControl.SetValue(self.gOp.get('showLayerControl'))
-        self.id.CBMapMini.SetValue(self.gOp.get('mapMini'))
-        self.id.CBMarksOn.SetValue(self.gOp.get('MarksOn'))
-        self.id.CBBornMark.SetValue(self.gOp.get('BornMark'))
-        self.id.CBDieMark.SetValue(self.gOp.get('DieMark'))
-        self.id.CBHomeMarker.SetValue(self.gOp.get('HomeMarker'))
-        self.id.CBMarkStarOn.SetValue(self.gOp.get('MarkStarOn'))
-        self.id.CBHeatMap.SetValue(self.gOp.get('HeatMap'))
-        self.id.CBFlyTo.SetValue(self.gOp.get('UseBalloonFlyto'))
-        self.id.CBMapTimeLine.SetValue(self.gOp.get('MapTimeLine'))
-        self.id.CBUseAntPath.SetValue(self.gOp.get('UseAntPath'))
-        self.id.CBUseGPS.SetValue(self.gOp.get('UseGPS'))
+        # Populate UI widgets from gOp using the panel method (VisualGedcomIds is metadata-only)
+        try:
+            self.apply_controls_from_options(self.gOp)
+        except Exception:
+            _log.exception("SetupOptions: apply_controls_from_options failed")
 
-        self.id.CBAllEntities.SetValue(self.gOp.get('AllEntities'))
-        self.id.CBCacheOnly.SetValue(self.gOp.get('CacheOnly'))
-        self.id.LISTHeatMapTimeStep.SetValue(self.gOp.get('HeatMapTimeStep'))
-        self.id.LISTMapType.SetSelection(self.id.LISTMapType.FindString(self.gOp.get('MapStyle')))
-        self.id.ID_INTMaxLineWeight.SetValue(self.gOp.get('MaxLineWeight'))
-        self.id.RBGroupBy.SetSelection(self.gOp.get('GroupBy'))
-        self.id.TEXTResult.SetValue(self.gOp.get('Result'))
-
-        _, filen = os.path.split(self.gOp.get('GEDCOMinput', ifNone='first.ged')) 
-        self.id.TEXTGEDCOMinput.SetValue(filen)
         self.id.CBSummary[0].SetValue(self.gOp.get('SummaryOpen'))
         self.id.CBSummary[1].SetValue(self.gOp.get('SummaryPlaces'))
         self.id.CBSummary[2].SetValue(self.gOp.get('SummaryPeople'))
@@ -601,7 +554,13 @@ class VisualMapPanel(wx.Panel):
         self.id.CBSummary[4].SetValue(self.gOp.get('SummaryCountriesGrid'))
         self.id.CBSummary[5].SetValue(self.gOp.get('SummaryGeocode'))
         self.id.CBSummary[6].SetValue(self.gOp.get('SummaryAltPlaces'))
+
         self.id.TEXTDefaultCountry.SetValue(self.gOp.get('defaultCountry', ifNone=""))
+
+        self.id.CBMarkStarOn.SetValue(self.gOp.get('MarkStarOn'))
+
+        self.id.LISTMapStyle.SetSelection(self.id.LISTMapStyle.FindString(self.gOp.get('MapStyle')))
+
         self.SetupButtonState()
 
         # Load file history into the panel's configuration
@@ -609,164 +568,6 @@ class VisualMapPanel(wx.Panel):
 
     def updateOptions(self):
         pass
-
-    def LoadGEDCOM(self):
-        #TODO stop the previous actions and then do the load... need to be improved
-        if self.background_process.IsTriggered(): 
-            self.gOp.stopping = True
-        else:
-            self.OnBusyStart(-1)
-            time.sleep(0.1)
-            self.gOp.set('GridView', False)
-            self.id.CBGridView.SetValue(False)
-        
-            cachepath, _ = os.path.split(self.gOp.get('GEDCOMinput'))
-            if self.gOp.get('gpsfile'):
-                sourcepath, _ = os.path.split(self.gOp.get('gpsfile'))
-            else:
-                sourcepath = None
-            if self.gOp.lookup and cachepath != sourcepath:
-                del self.gOp.lookup
-                self.gOp.lookup = None
-            self.gOp.step('Loading GEDCOM')
-            self.background_process.Trigger(1)
-        
-    def DrawGEDCOM(self):
-
-        if not self.gOp.get('Result') or self.gOp.get('Result') == '':
-            _log.error("Error: Not output file name set")
-            self.background_process.SayErrorMessage("Error: Please set the Output file name")
-        else:
-            self.OnBusyStart(-1)
-            self.background_process.Trigger(2 | 4)
-
-    def OpenCSV(self):
-        self.runCMDfile(self.gOp.get('CSVcmdline'), self.gOp.get('gpsfile'))
-
-    def runCMDfile(self, cmdline, datafile, isHTML=False):
-        """Run an external command or open a file/URL suggested by application options.
-
-        - If isHTML then open datafile in a browser.
-        - If cmdline == '$n' attempt to open the datafile with the platform default.
-        - If cmdline contains '$n' substitute the datafile and shell-execute the result.
-        - Otherwise try to launch the command with datafile as an argument.
-
-        Exceptions are logged rather than raised to keep the UI responsive.
-        """
-        orgcmdline = cmdline
-        if datafile and datafile != '' and datafile != None:
-            cmdline = cmdline.replace('$n', f'{datafile}')
-            try:
-                if isHTML:          # Force it to run in a browsers
-                    _log.info(f'browserstart {cmdline}')
-                    webbrowser.open(datafile, new = 0, autoraise = True)
-                elif orgcmdline == '$n':
-                    if sys.platform == "win32":
-                        _log.info(f'startfile {datafile}')
-                        os.startfile(datafile)          # Native Windows method
-                    elif sys.platform == "darwin":
-                        opener = "open"
-                        _log.info(f'subprocess.Popen {datafile}')
-                        subprocess.Popen([opener, datafile])
-                    else:
-                        opener ="xdg-open"
-                        if not shutil.which(opener):
-                            raise EnvironmentError(f"{opener} not found. Install it or use a different method.")
-                        _log.info(f'subprocess.Popen {datafile}')
-                        subprocess.Popen([opener, datafile])
-                else:
-                    # it is suggesting a web URL
-                    if cmdline.startswith('http'):
-                        _log.info(f'webbrowswer run  `{cmdline}`')
-                        webbrowser.open(cmdline, new = 0, autoraise = True)
-                    else:
-                        # does the command line contain the $n placeholder
-                        if '$n' in orgcmdline:
-                            _log.info(f'subprocess.Popen file {cmdline}')
-                            subprocess.Popen(cmdline, shell=True)
-                        else:
-                            _log.info(f'subprocess.Popen line {cmdline};{datafile}')
-                            subprocess.Popen([cmdline, datafile], shell=True)
-
-                        # TODO need a better command-line management than this
-                        # cmdline = f"column -s, -t < {csvfile} | less -#2 -N -S"
-            except Exception as e:
-                _log.exception("Issues in runCMDfile")
-                _log.error(f"Failed to open file: {e}")
-
-        else:
-            _log.error(f"Error: runCMDfile-unknwon cmdline {datafile}")
-    
-    def SaveTrace(self):
-        """Dump a trace file describing each referenced person and optionally open it."""
-
-        if self.gOp.Result and self.gOp.Referenced:
-            if not self.gOp.lastlines:
-                logging.error("No lastline values in SaveTrace (do draw first using HTML Mode for this to work)")
-                return 
-            tracepath = os.path.splitext(self.gOp.Result)[0] + ".trace.txt"
-            # indentpath = os.path.splitext(self.gOp.Result)[0] + ".indent.txt"
-            try:
-                trace = open(tracepath , 'w')
-            except Exception as e:
-                logging.error("Error: Could not open trace file %s for writing %s", tracepath, e)
-                self.background_process.SayErrorMessage(f"Error: Could not open trace file {tracepath} for writing {e}")
-                return
-            # indent = open(indentpath , 'w')
-            trace.write("id\tName\tYear\tWhere\tGPS\tPath\n")
-            # indent.write("this is an indented file with the number of generations driven by the parents\nid\tName\tYear\tWhere\tGPS\n") 
-            people = self.background_process.people
-            # Create a dictionary from the lines array with xid as the key
-            for h in people:
-                if self.gOp.Referenced.exists(people[h].xref_id):
-                    refyear, _ = people[h].refyear()
-                    (location, where) = people[h].bestlocation()
-                    personpath = self.gOp.lastlines[people[h].xref_id].path
-                    trace.write(f"{people[h].xref_id}\t{people[h].name}\t{refyear}\t{where}\t{location}\t" + "\t".join(personpath) + "\n") 
-                    # indent.write("\t".join(personpath) + f",{people[h].xref_id}\t{people[h].name}\t{refyear}\t{where}\t{location}\n") 
-            trace.close()
-            # indent.close()
-            _log.info(f"Trace file saved {tracepath}")
-            # _log.info(f"Indent file saved {indentpath}")
-            withall = "with all people" if self.gOp.get('AllEntities') else ""
-            self.background_process.SayInfoMessage(f"Trace file {withall} saved: {tracepath}",True)
-            self.runCMDfile(self.gOp.get('Tracecmdline'), tracepath)
-
-    def OpenBrowser(self):
-        """Open the generated result in a browser or the default KML viewer."""
-        if self.gOp.get('ResultType'):
-            self.runCMDfile(self.gOp.get('KMLcmdline'), os.path.join(self.gOp.resultpath, self.gOp.Result), True)
-            
-        else:
-            self.runCMDfile('$n', KMLMAPSURL, True)
-            
-    #################################################
-    #TODO FIX ME UP            
-
-    def open_html_file(self, html_path):
-        """(Deprecated) older helper to attempt activation/reload of a browser tab.
-
-        Kept for reference but not used; prefer runCMDfile / webbrowser.open instead.
-        """
-        # Open the HTML file in a new tab and store the web browser instance
-        browser = webbrowser.get()
-        browser_tab = browser.open_new_tab(html_path)
-    
-        # Wait for the page to load
-        time.sleep(1)
-    
-        # Find the browser window that contains the tab and activate it
-        for window in browser.windows():
-            for tab in window.tabs:
-                if tab == browser_tab:
-                    window.activate()
-                    break
-            else:
-                continue
-            break
-    
-        # Reload the tab
-        browser_tab.reload()
 
     def OnCloseWindow(self, evt=None):
         """Gracefully stop worker threads and schedule safe destruction of the panel.
@@ -791,4 +592,163 @@ class VisualMapPanel(wx.Panel):
 
             time.sleep(0.1)
 
-        self.Destroy()
+        for child in self.GetChildren():
+            child.Destroy()
+        for attr in ("peopleList", "panelA", "panelB", "optionSbox", "optionHbox", "optionKbox", "optionK2box", "id"):
+            try:
+                obj = getattr(self, attr, None)
+                if obj and getattr(obj, "SetSizer", None):
+                    try:
+                        obj.SetSizer(None)
+                    except Exception:
+                        pass
+                try:
+                    setattr(self, attr, None)
+                except Exception:
+                    pass
+            except Exception:
+                _log.exception("OnCloseWindow: failed to delattr %s", attr)
+        try:
+            self.DestroyChildren()
+        except Exception:
+            _log.exception("OnCloseWindow: DestroyChildren failed")
+        
+        try:
+            wx.CallAfter(self.Destroy)
+        except Exception:
+            _log.exception("OnCloseWindow: CallAfter Destroy failed")
+        finally:
+            try:
+                del busy
+            except Exception:
+                pass
+            if evt is not None:
+                evt.Skip()
+
+    def apply_controls_from_options(self, gOp: Any) -> None:
+        """Apply values from gOp to wx controls using id metadata (clearer, helper-based)."""
+        if not getattr(self, "id", None):
+            return
+
+        def resolve_value(gop_attr: str) -> Any:
+            if not gop_attr:
+                return None
+            try:
+                if hasattr(gOp, gop_attr):
+                    return getattr(gOp, gop_attr)
+                if hasattr(gOp, "get"):
+                    return gOp.get(gop_attr, None)
+            except Exception:
+                _log.exception("resolve_value failed for %s", gop_attr)
+            return None
+
+        def set_text(control: wx.Window, name: str, value: Any) -> None:
+            try:
+                if name == "TEXTGEDCOMinput":
+                    infile = gOp.get("GEDCOMinput", "") if hasattr(gOp, "get") else ""
+                    _, filen = os.path.split(infile)
+                    val = filen
+                else:
+                    val = "" if value is None else str(value)
+                # Prefer ChangeValue (no EVT_TEXT) and fall back to SetValue/SetLabel
+                try:
+                    if getattr(control, "GetValue", None) and control.GetValue() != val:
+                        if getattr(control, "ChangeValue", None):
+                            control.ChangeValue(val)
+                        else:
+                            control.SetValue(val)
+                except Exception:
+                    try:
+                        control.SetLabel(val)
+                    except Exception:
+                        _log.debug("Text set failed for %s", name)
+            except Exception:
+                _log.exception("set_text failed for %s", name)
+
+        def set_checkbox(control: wx.Window, value: Any) -> None:
+            try:
+                control.SetValue(bool(value))
+            except Exception:
+                _log.debug("CheckBox set failed for %r", control)
+
+        def set_selection(control: wx.Window, value: Any) -> None:
+            try:
+                control.SetSelection(int(value) if value is not None else 0)
+            except Exception:
+                _log.debug("Selection set failed for %r", control)
+
+        def set_int(control: wx.Window, value: Any) -> None:
+            try:
+                control.SetValue(int(value))
+            except Exception:
+                _log.debug("Int/Slider set failed for %r", control)
+
+        def set_button(control: wx.Window, value: Any) -> None:
+            pass
+
+        # dispatch mapping by wtype
+        handlers = {
+            "Text": set_text,
+            "CheckBox": set_checkbox,
+            "RadioButton": set_selection,
+            "List": set_selection,
+            "Slider": set_int,
+            "Int": set_int,
+            "SpinCtrl": set_int,
+            "Button": set_button,
+        }
+
+        for name, idref, wtype, gop_attr, action in self.id.iter_controls():
+            # resolve numeric id
+            try:
+                wid = int(idref)
+            except Exception:
+                try:
+                    wid = idref.GetId()
+                except Exception:
+                    _log.debug("apply_controls_from_options: cannot resolve idref %r", idref)
+                    continue
+
+            control = wx.FindWindowById(wid, self)
+            if control is None:
+                continue
+
+            value = resolve_value(gop_attr)
+
+            try:
+                # special controls
+                if name == "LISTMapStyle":
+                    ms = value or (gOp.get("MapStyle", "") if hasattr(gOp, "get") else value)
+                    try:
+                        idx = self.id.AllMapTypes.index(ms)
+                    except Exception:
+                        idx = 0
+                    try:
+                        control.SetSelection(idx)
+                    except Exception:
+                        _log.debug("LISTMapStyle: SetSelection failed for %r", control)
+                    continue
+
+                if name == "RBResultType":
+                    order = ("HTML", "KML", "KML2", "SUM")
+                    rt = getattr(gOp, "ResultType", None)
+                    rt_name = getattr(rt, "value", str(rt) if rt is not None else "")
+                    try:
+                        idx = order.index(rt_name)
+                    except ValueError:
+                        idx = 0
+                    try:
+                        control.SetSelection(idx)
+                    except Exception:
+                        _log.debug("RBResultType: SetSelection failed for %r", control)
+                    continue
+
+                # generic handler dispatch
+                handler = handlers.get(wtype)
+                if handler:
+                    handler(control, name, value) if handler is set_text else handler(control, value)
+                else:
+                    _log.debug("Unhandled control type %r for control %s", wtype, name)
+
+            except Exception:
+                _log.exception("apply_controls_from_options failed for control %s (id=%r)", name, idref)

@@ -13,17 +13,20 @@ import os
 
 import wx
 
-from style.stylemanager import FontManager
 from const import GUINAME
 
 _log = logging.getLogger(__name__.lower())
+
+# UI Constants
+STATUS_BAR_RIGHT_FIELD_CHARS = 30  # Width of right status bar field in characters
 
 from .config_dialog import ConfigDialog
 from .about_dialog import AboutDialog
 from .help_dialog import HelpDialog
 from .visual_map_panel import VisualMapPanel
 from .visual_gedcom_ids import VisualGedcomIds
-from gedcom_options import gvOptions, ResultsType
+from gedcom_options import gvOptions, ResultType
+from style.stylemanager import FontManager
 
 class VisualMapFrame(wx.Frame):
     """Main application window/frame.
@@ -34,18 +37,18 @@ class VisualMapFrame(wx.Frame):
     """
 
     # runtime attributes with basic type hints
-    font_manager: FontManager
-    font_name: Optional[str]
-    font_size: Optional[int]
-    StatusBar: wx.StatusBar
-    menuBar: wx.MenuBar
-    visual_map_panel: "VisualMapPanel"
-    filehistory: wx.FileHistory
-    id: VisualGedcomIds
-    config_dialog: Optional[wx.Dialog]
-    gOp: Optional["gvOptions"]
+    font_manager: FontManager  # Initialized in __init__
+    StatusBar: wx.StatusBar  # Created in makeStatusBar()
+    menuBar: wx.MenuBar  # Created in makeMenuBar()
+    visual_map_panel: VisualMapPanel  # Created in __init__
+    filehistory: wx.FileHistory  # Created in makeMenuBar()
+    id: VisualGedcomIds  # Created in makeMenuBar()
+    gOp: gvOptions  # Initialized in __init__
+    fileMenu: wx.Menu  # Created in makeMenuBar()
+    ActionMenu: wx.Menu  # Created in makeMenuBar()
+    font: wx.Font  # Set in set_current_font()
 
-    def __init__(self, parent: Optional[wx.Window], gOp: gvOptions, *args: Any, **kw: Any) -> None:
+    def __init__(self, parent: wx.Window, gOp: gvOptions, font_manager: FontManager, *args: Any, **kw: Any) -> None:
         """Construct the frame.
 
         Args:
@@ -57,8 +60,7 @@ class VisualMapFrame(wx.Frame):
         super().__init__(parent, *args, **kw)
 
         self.gOp = gOp
-        self.font_manager = FontManager()
-        self.font_name, self.font_size = self.font_manager.get_font_name_size()
+        self.font_manager = font_manager
         self.set_current_font()
 
         self.SetMinSize((800, 800))
@@ -71,8 +73,6 @@ class VisualMapFrame(wx.Frame):
 
     def set_current_font(self) -> None:
         """Ensure the frame uses the current font from the FontManager."""
-        if not getattr(self, "font_name", None) or not getattr(self, "font_size", None):
-            self.font_name, self.font_size = self.font_manager.get_font_name_size()
         self.font = self.font_manager.get_font()
         wx.Frame.SetFont(self, self.font)
 
@@ -90,7 +90,7 @@ class VisualMapFrame(wx.Frame):
         self.StatusBar = self.CreateStatusBar()
         self.SetStatusText("This is the statusbar")
         # Compute field widths once (use font manager to determine a sensible width)
-        widthMax = self.font_manager.get_text_width(30)
+        widthMax = self.font_manager.get_text_width(STATUS_BAR_RIGHT_FIELD_CHARS)
         self.StatusBar.SetFieldsCount(number=2, widths=[-1, widthMax])
         self.SetStatusText("Visual Mapping ready", 0)
 
@@ -107,8 +107,8 @@ class VisualMapFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.onOptionsReset, id=wx.ID_REVERT)
         self.Bind(wx.EVT_MENU, self.OnFind, id=wx.ID_FIND)
         self.Bind(wx.EVT_MENU, self.onOptionsSetup, id=wx.ID_SETUP)
-        self.Bind(wx.EVT_MENU, self.OnOpenCSV, id=self.id.IDs["ID_BTNCSV"])
-        self.Bind(wx.EVT_MENU, self.OnOpenBrowser, id=self.id.IDs["ID_BTNBROWSER"])
+        self.Bind(wx.EVT_MENU, self.OnOpenCSV, id=self.id.IDs["BTNCSV"])
+        self.Bind(wx.EVT_MENU, self.OnOpenBrowser, id=self.id.IDs["BTNBROWSER"])
 
     def populate_font_menus(self, optionsMenu: wx.Menu) -> None:
         """Populate optionsMenu with font face and size submenus.
@@ -160,8 +160,8 @@ class VisualMapFrame(wx.Frame):
         self.ActionMenu = ActionMenu = wx.Menu()
         ActionMenu.Append(wx.ID_FIND, "&Find\tCtrl-F", "Find by name")
         ActionMenu.Append(wx.ID_INFO, "Statistics Sumary")
-        ActionMenu.Append(self.id.IDs['ID_BTNBROWSER'], "Open Result in &Browser")
-        ActionMenu.Append(self.id.IDs['ID_BTNCSV'], "Open &CSV")
+        ActionMenu.Append(self.id.IDs['BTNBROWSER'], "Open Result in &Browser")
+        ActionMenu.Append(self.id.IDs['BTNCSV'], "Open &CSV")
 
         helpMenu = wx.Menu()
         helpMenu.Append(wx.ID_HELP, "Help")
@@ -178,13 +178,16 @@ class VisualMapFrame(wx.Frame):
 
         self.populate_font_menus(optionsMenu)
 
-    def set_gui_font(self, font_name: str, font_size: int) -> None:
+    def set_gui_font(self) -> None:
         """Apply a new GUI font (propagate to frame, menus, statusbar and panel)."""
+        # Apply recursively to frame (includes menu bar and status bar)
         self.font_manager.apply_current_font_recursive(self)
-        self.font_manager.apply_current_font_recursive(self.GetMenuBar())
-        self.font_manager.apply_current_font_recursive(self.GetStatusBar())
 
+        # Explicitly update panel (may have special font handling)
         self.visual_map_panel.set_current_font()
+
+        # Notify any registered dialogs/panels of the font change
+        self.font_manager.notify_font_change()
 
         self.Layout()
         self.Refresh()
@@ -200,8 +203,7 @@ class VisualMapFrame(wx.Frame):
         face = mi.GetItemLabelText()
         success = self.font_manager.set_font(face)
         if success:
-            self.font_name = face
-            self.set_gui_font(self.font_name, self.font_size)
+            self.set_gui_font()
 
     def on_font_size_menu_item(self, event: wx.CommandEvent) -> None:
         """Handle selection of a font-size menu item.
@@ -219,8 +221,7 @@ class VisualMapFrame(wx.Frame):
             return
         success = self.font_manager.set_font_size(size)
         if success:
-            self.font_size = size
-            self.set_gui_font(self.font_name, self.font_size)
+            self.set_gui_font()
 
     def OnExit(self, event: wx.Event) -> None:
         """Handle application exit: stop timers, save settings and close the window."""
@@ -239,14 +240,14 @@ class VisualMapFrame(wx.Frame):
     def OnOpenCSV(self, event: wx.Event) -> None:
         """Menu handler: open CSV/geo table using the panel helper."""
         try:
-            self.visual_map_panel.OpenCSV()
+            self.visual_map_panel.actions.OpenCSV()
         except Exception:
             _log.exception("OnOpenCSV failed")
 
     def OnOpenBrowser(self, event: wx.Event) -> None:
         """Menu handler: open the generated result in a browser or KML viewer."""
         try:
-            self.visual_map_panel.OpenBrowser()
+            self.visual_map_panel.actions.OpenBrowser()
         except Exception:
             _log.exception("OnOpenBrowser failed")
 
@@ -286,7 +287,7 @@ class VisualMapFrame(wx.Frame):
         wx.Yield()
         if Proceed:
             try:
-                self.visual_map_panel.LoadGEDCOM()
+                self.visual_map_panel.actions.LoadGEDCOM()
             except Exception:
                 _log.exception("LoadGEDCOM failed")
 
@@ -298,7 +299,7 @@ class VisualMapFrame(wx.Frame):
         dDir = os.getcwd()
         dFile = "visgedcom.html"
         if self.visual_map_panel and getattr(self.visual_map_panel, "gOp", None):
-            resultfile = self.visual_map_panel.gOp.get('Result')
+            resultfile = self.visual_map_panel.gOp.get('ResultFile')
             if resultfile:
                 dDir, dFile = os.path.split(resultfile)
             else:
@@ -316,12 +317,13 @@ class VisualMapFrame(wx.Frame):
         if dlg.ShowModal() == wx.ID_OK:
             path = dlg.GetPath()
             _log.debug("Output selected %s", path)
-            filetype = os.path.splitext(path)[1]
-            isHTML = not (filetype.lower() in ['.kml'])
+            result_type = self.visual_map_panel.gOp.get('ResultType')
+            isHTML = result_type == ResultType.HTML
+            _, fname = os.path.split(path or "")
             try:
-                self.visual_map_panel.gOp.setResults(path, isHTML)
-                self.visual_map_panel.id.TEXTResult.SetValue(path)
-                self.visual_map_panel.id.RBResultOutType.SetSelection(0 if isHTML else 1)
+                self.visual_map_panel.gOp.setResultsFile(fname, result_type)
+                self.visual_map_panel.id.TEXTResultFile.SetValue(self.visual_map_panel.gOp.get("ResultFile"))
+                self.visual_map_panel.id.RBResultType.SetSelection(0 if isHTML else 1)
                 self.visual_map_panel.SetupButtonState()
             except Exception:
                 _log.exception("OnFileResultDialog: failed to set results")
@@ -346,7 +348,7 @@ class VisualMapFrame(wx.Frame):
             self.filehistory.AddFileToHistory(path)
             self.visual_map_panel.setInputFile(path)
             wx.Yield()
-            self.visual_map_panel.LoadGEDCOM()
+            self.visual_map_panel.actions.LoadGEDCOM()
         except Exception:
             _log.exception("OnFileHistory failed")
 
@@ -368,11 +370,11 @@ class VisualMapFrame(wx.Frame):
             msg = "No people loaded yet\n"
             if getattr(self.visual_map_panel, "gOp", None) and getattr(self.visual_map_panel.gOp, "people", None):
                 self.visual_map_panel.gOp.totalGEDpeople = len(self.visual_map_panel.gOp.people)
-                msg = f"Total People :{self.visual_map_panel.gOp.totalGEDpeople}\n"
+                msg = f"Total People: {self.visual_map_panel.gOp.totalGEDpeople}\n"
                 if self.visual_map_panel.gOp.timeframe:
-                    msg += f"\nTimeframe : {self.visual_map_panel.gOp.timeframe.get('from','?')}-{self.visual_map_panel.gOp.timeframe.get('to','?')}\n"
+                    msg += f"\nTimeframe: {self.visual_map_panel.gOp.timeframe.get('from','?')}-{self.visual_map_panel.gOp.timeframe.get('to','?')}\n"
                 if getattr(self.visual_map_panel.gOp, "selectedpeople", 0) > 0:
-                    msg += f"\nDirect  people {self.visual_map_panel.gOp.selectedpeople} in the heritage line\n"
+                    msg += f"\nDirect people: {self.visual_map_panel.gOp.selectedpeople} in the heritage line\n"
                 else:
                     msg += "\nSelect main person for heritage line\n"
             if hasattr(self.visual_map_panel.gOp, "lookup") and getattr(self.visual_map_panel.gOp.lookup, "address_book", None):
@@ -400,13 +402,21 @@ class VisualMapFrame(wx.Frame):
             _log.exception("onOptionsReset failed")
 
     def onOptionsSetup(self, event: wx.Event) -> None:
-        """Open the configuration dialog for editing application options.
-
-        The created dialog instance is kept on self.config_dialog so callers can
-        inspect or reuse it if needed.
-        """
+        """Open the configuration dialog for editing application options."""
         try:
             dialog = ConfigDialog(None, title="Configuration Options", gOp=getattr(self.visual_map_panel, "gOp", None))
-            self.config_dialog = dialog
+            dialog.ShowModal()
+            dialog.Destroy()
         except Exception:
             _log.exception("onOptionsSetup failed")
+
+    def OnCloseWindow(self, event):
+        try:
+            if getattr(self, "visual_map_panel", None):
+                try:
+                    self.visual_map_panel._shutdown_background()
+                except Exception:
+                    _log.exception("visual_map_panel._shutdown_background failed")
+        finally:
+            # then allow normal close/destroy
+            event.Skip()

@@ -340,6 +340,7 @@ class GedcomParser:
         Returns:
             Dict[str, Person]: Updated dictionary of Person objects.
         """
+        idx = 0
         for record in records('FAM'):
             husband_record = record.sub_tag('HUSB')
             wife_record = record.sub_tag('WIFE')
@@ -368,6 +369,9 @@ class GedcomParser:
                         if wife:
                             people[child.xref_id].mother = wife.xref_id
                             wife.children.append(child.xref_id)
+            idx += 1
+            if self.gOp and idx % 1000==0:
+                self.gOp.step(plusStep=1000)
         return people
 
     def parse_people(self) -> Dict[str, Person]:
@@ -633,7 +637,7 @@ class GeolocatedGedcom(Gedcom):
             if self.gOp.ShouldStop():
                 return
             if idx % 250 == 0:
-                self.gOp.step(info=f"Geolocated {idx}")
+                self.gOp.step(plusStep=250)
 
         num_non_cached_places = non_cached_places.len()
         self.gOp.step(f"Geolocating uncached places...", target=num_non_cached_places) if self.gOp else None

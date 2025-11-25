@@ -264,6 +264,11 @@ class VisualMapActions:
                 _log.warning("Custom HTML command failed, falling back to webbrowser: %s", e)
         
         # Fallback to default browser
+        # Convert file path to proper file:// URI if needed
+        if not datafile.startswith(('http://', 'https://', 'file://')):
+            datafile = Path(datafile).resolve().as_uri()
+        
+        _log.info('Opening URI in browser: %s', datafile)
         webbrowser.open(datafile, new=0, autoraise=True)
 
     def _open_url(self, url: str) -> None:

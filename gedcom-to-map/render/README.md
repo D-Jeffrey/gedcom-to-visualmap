@@ -1,0 +1,76 @@
+# render Module
+
+This module provides export and rendering utilities for visualizing GEDCOM data, including KML generation, Folium-based mapping, and reference handling.
+
+## Key Features
+
+- **KML Export:** Generate KML files for use in Google Earth, MyMaps, ArcGIS Earth, and other GIS tools.
+- **Folium/HTML Export:** Create interactive HTML maps using Folium, with support for clustering, heatmaps, and timeline visualization.
+- **Name Processing:** Utilities for name normalization, comparison, and soundex, all via the `NameProcessor` class.
+- **Summary Statistics:** Generate CSV and summary files for places, geocoding, and birth/death heatmaps.
+- **Reference Handling:** Manage references and links between people, places, and events.
+
+## Main Classes & Functions
+
+- `KmlExporter`, `KmlExporterRefined`, `KML_Life_Lines_Creator`, `KML_Life_Lines`: KML export and visualization.
+- `foliumExporter`, `MyMarkClusters`, `Legend`: Folium/HTML map export and marker clustering.
+- `NameProcessor`: Name utilities (use static methods: `isValidName`, `compareNames`, `simplifyLastName`, `soundex`).
+- `Referenced`: Reference management.
+- `save_birth_death_heatmap_matrix`, `write_alt_places_summary`, `write_birth_death_countries_summary`, `write_geocache_summary`, `write_places_summary`: Summary and reporting utilities.
+
+## Example Usage
+
+```python
+from render import KmlExporterRefined, foliumExporter, NameProcessor
+
+# Export KML
+kml_exporter = KmlExporterRefined("output.kml")
+# ... add people, places, lines, etc. ...
+kml_exporter.save()
+
+# Export HTML map
+folium_exporter = foliumExporter(gOp)
+folium_exporter.export(main_location, lines)
+
+# Name utilities
+is_valid = NameProcessor.isValidName("John Doe")
+soundex_code = NameProcessor.soundex("Smith")
+```
+
+## Directory Structure
+
+```
+render/
+├── __init__.py
+├── kml.py
+├── KmlExporter.py
+├── foliumExp.py
+├── Referenced.py
+├── name_processor.py
+├── summary.py
+└── README.md
+```
+
+## Requirements
+
+- [simplekml](https://pypi.org/project/simplekml/)
+- [folium](https://pypi.org/project/folium/)
+- [xyzservices](https://pypi.org/project/xyzservices/)
+- [branca](https://pypi.org/project/branca/)
+- [pandas](https://pypi.org/project/pandas/)
+- [seaborn](https://pypi.org/project/seaborn/)
+- [matplotlib](https://pypi.org/project/matplotlib/)
+
+## Notes
+
+- See the main project README for setup and usage instructions.
+- This module is intended to be used as part of the larger `gedcom-to-visualmap` project.
+
+## Authors
+
+- @colin0brass
+- @D-jeffrey
+
+## License
+
+See the main repository LICENSE.txt for details.

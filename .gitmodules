@@ -1,0 +1,3 @@
+[submodule "gedcom-to-map/geo_gedcom"]
+	path = gedcom-to-map/geo_gedcom
+	url = git@github.com:colin0brass/geo_gedcom.git

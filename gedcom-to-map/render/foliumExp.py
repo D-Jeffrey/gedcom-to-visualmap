@@ -13,11 +13,11 @@ import xyzservices.providers as xyz
 from folium.plugins import (AntPath, FloatImage, GroupedLayerControl,
                             HeatMapWithTime, MiniMap, Search, MarkerCluster) 
 from gedcom_options import gvOptions
-from models.Line import Line
-from models.LatLon import LatLon
-from .Referenced import Referenced
-from .naming import simplifyLastName, soundex
-from models.Creator import DELTA, getAttrLatLonif
+from models.line import Line
+from geo_gedcom.lat_lon import LatLon
+from .referenced import Referenced
+from .name_processor import NameProcessor
+from models.creator import DELTA
 
 
 _log = logging.getLogger(__name__.lower())
@@ -77,21 +77,24 @@ legend_template = f"""
 """
 # Use MacroElement to add the template to the map
 class Legend(MacroElement):
+    """A Folium MacroElement for displaying a map legend."""
     def __init__(self):
+        """Initialize the legend with a predefined template."""
         super().__init__()
         self._template = Template(legend_template)
 
-# --------------------------------------------------------------------------------------------------
-# Drift is used to create some distance between point so when multiple come/live in the same place, 
-# the lines and pins will have some distances and the are not stack on top of each other
-#
-def Drift(l):
-    d  = ((random.random() * 0.001) - 0.0005)
-    #d = 0
-    if (l):
-        return (float(l)+d)
-    else:
-        return None
+def Drift(l: float) -> float:
+    """
+    Apply a small random drift to a coordinate value to avoid marker overlap.
+
+    Args:
+        l (float): The original coordinate value.
+
+    Returns:
+        float: The drifted coordinate value.
+    """
+    d = ((random.random() * 0.001) - 0.0005)
+    return float(l) + d if l is not None else None
 
 # --------------------------------------------------------------------------------------------------
 # Classes
@@ -106,42 +109,90 @@ function(cluster) {
 }"""
 
 class MyMarkClusters:
-    def __init__(self, mymap, step):
+    """
+    Manages marker clusters for a Folium map.
+
+    Attributes:
+        mymap (folium.Map): The Folium map instance.
+        step (int): The time step for clustering.
+    """
+    def __init__(self, mymap: folium.Map, step: int):
+        """
+        Initialize the marker cluster manager.
+
+        Args:
+            mymap (folium.Map): The map to add clusters to.
+            step (int): The time step for clustering.
+        """
         self.pmarker = dict()
         self.cmarker = dict()
         self.markercluster = dict()
         self.mymap = mymap
         self.step = step
 
-    def mark (self, spot : LatLon, when=None):
+    def mark(self, spot: LatLon, when: int = None) -> None:
+        """
+        Add a marker to the cluster.
+
+        Args:
+            spot (LatLon): The location to mark.
+            when (int, optional): The year or time for the marker.
+        """
         if spot and spot.hasLocation():
             cnt = 1
-            if (when):
-                # TODO this is a range date hack
-                if isinstance(type(when), str):
-                    when = when[0:4]
+            if when is not None:
                 when = int(when) - (int(when) % self.step)
-                markname = str(spot.lat)+ str(spot.lon)  + str(when)
+                markname = f"{spot.lat}{spot.lon}{when}"
             else:
-                markname = str(spot.lat)+","+ str(spot.lon)
-            if (markname in self.pmarker.keys()):
-                cnt = self.pmarker[markname][2]+1
+                markname = f"{spot.lat},{spot.lon}"
+            if markname in self.pmarker:
+                cnt = self.pmarker[markname][2] + 1
             self.pmarker[markname] = (spot.lat, spot.lon, cnt, when)
-            
-    
-    def checkmarker(self, lat, long, name):
-        if lat and long:
-            markname = str(lat)+","+ str(long)
-            if (self.cmarker[markname] == 1):
+
+    def checkmarker(self, lat: float, long: float, name: str):
+        """
+        Check or create a marker cluster for a given location.
+
+        Args:
+            lat (float): Latitude.
+            long (float): Longitude.
+            name (str): Name for the cluster.
+
+        Returns:
+            MarkerCluster or None: The marker cluster object.
+        """
+        if lat is not None and long is not None:
+            markname = f"{lat},{long}"
+            if self.cmarker.get(markname) == 1:
                 return None
-            if (markname in self.markercluster.keys()):
+            if markname in self.markercluster:
                 return self.markercluster[markname]
             else:
                 self.markercluster[markname] = folium.plugins.MarkerCluster(name).add_to(self.mymap)
                 return self.markercluster[markname]
 
 class foliumExporter:
-    def __init__(self, gOp : gvOptions):
+    """
+    Exports genealogical data to an interactive Folium map.
+
+    Attributes:
+        file_name (str): Output HTML file path.
+        max_line_weight (int): Maximum line weight for polylines.
+        gOp (gvOptions): Options/configuration object.
+        fglastname (dict): Feature groups by last name.
+        saveresult (bool): Whether to save the result.
+        fm (folium.Map): The Folium map instance.
+        locations (list): List of marker locations.
+        popups (list): List of popup contents.
+        soundexLast (bool): Whether to use Soundex for grouping.
+    """
+    def __init__(self, gOp: gvOptions):
+        """
+        Initialize the Folium exporter.
+
+        Args:
+            gOp (gvOptions): The options/configuration object.
+        """
         self.file_name = os.path.join(gOp.resultpath, gOp.ResultFile)
         self.max_line_weight = gOp.MaxLineWeight
         self.gOp = gOp
@@ -255,9 +306,9 @@ class foliumExporter:
         """
         # TODO could offer an option on which name folding to use (Maybe use SoundEx)
         if self.soundexLast:
-            simpleLastName = soundex(thename)
+            simpleLastName = NameProcessor.soundex(thename)
         else:
-            simpleLastName = simplifyLastName(thename)
+            simpleLastName = NameProcessor.simplifyLastName(thename)
         if not simpleLastName in self.fglastname:
             self.fglastname[simpleLastName] = [folium.FeatureGroup(name= thename, show=False), 0, 0, thename]
                              
@@ -271,20 +322,28 @@ class foliumExporter:
         minyear = maxyear = None
         
         # Add birth location if available
-        if line.person.birth and getAttrLatLonif(line.person, 'birth') and line.person.birth.date:
-            mycluster.mark(getAttrLatLonif(line.person, 'birth'), line.person.birth.whenyearnum())
-            minyear = line.person.birth.whenyearnum()
+        birth_event = line.person.birth if line.person else None
+        birth_latlon = birth_event.getattr('latlon') if birth_event else None
+        birth_date = birth_event.getattr('date') if birth_event else None
+        birth_year_num = birth_date.year_num if birth_date else None
+
+        if line.person.birth and birth_latlon and birth_date:
+            mycluster.mark(birth_latlon, birth_year_num)
+            minyear = birth_year_num
         
         # Add death year if available
-        if line.person.death and line.person.death.date:
-            maxyear = line.person.death.whenyearnum(True)
+        death_event = line.person.death if line.person else None
+        death_date = death_event.getattr('date') if death_event else None
+        death_year_num = death_date.year_num if death_date else None
+        if line.person.death and death_date:
+            maxyear = death_year_num
         else:
             # Process midpoints for min/max year determination
             for mids in line.midpoints:
-                start_year = mids.whenyearnum()
+                start_year = mids.date.year_num
                 if start_year:
                     minyear = min(int(start_year), minyear) if minyear else int(start_year)
-                end_year = mids.whenyearnum(True)
+                end_year = mids.date.year_num
                 if end_year:
                     maxyear = max(int(end_year), maxyear) if maxyear else int(end_year)
         
@@ -294,13 +353,15 @@ class foliumExporter:
         """Build position data for each year in the timeline"""
         if not (minyear and maxyear):
             return
-            
-        activepos = getAttrLatLonif(line.person, 'birth')
+        
+        birth_event = line.person.birth if line.person else None
+        birth_latlon = birth_event.getattr('latlon') if birth_event else None
+        activepos = birth_latlon
             
         for year in range(minyear, maxyear):
             # Update active position if we have a midpoint for this year
             for mids in line.midpoints:
-                if mids.whenyearnum() == year:
+                if mids.date.year_num == year:
                     activepos = mids.latlon
             if activepos and activepos.lat and activepos.lon:
                 mycluster.mark(activepos, year)
@@ -332,14 +393,18 @@ class foliumExporter:
                 
             if not (getattr(line, 'style', None) == 'Life'):
                 continue
-                
-            self.gOp.Referenced.add(line.person.xref_id, 'heat')
+
+            person = line.person    
+            self.gOp.Referenced.add(person.xref_id, 'heat')
             minyear, maxyear = self._process_timeline_data(line, mycluster)
             self._build_yearly_positions(line, minyear, maxyear, mycluster)
             
             # Add death location if available
-            if line.person.death and getAttrLatLonif(line.person, 'death'):
-                mycluster.mark(getAttrLatLonif(line.person, 'death'), line.person.death.whenyearnum())
+            death_event = person.death if person else None
+            death_latlon = death_event.getattr('latlon') if death_event else None
+            death_year_num = death_event.getattr('when_year_num') if death_event else None
+            if death_latlon:
+                mycluster.mark(death_latlon, death_year_num)
 
         # Extract unique years from markers
         years = sorted(set(
@@ -390,11 +455,12 @@ class foliumExporter:
             mycluster.mark(line.tolocation)
             if line.midpoints:
                 for mids in line.midpoints:
-                    mycluster.mark(mids.latlon, None)
+                    event_latlon = mids.getattr('latlon') if mids else None
+                    mycluster.mark(event_latlon, None)
 
         # Create feature group and heat data
         fg = folium.FeatureGroup(
-            name=lgd_txt.format(txt='Heatmap', col='black'),
+            name=lgd_txt.format(txt= 'Heatmap', col='black'),
             show=self.gOp.HeatMap
         )
         
@@ -415,6 +481,14 @@ class foliumExporter:
     # In the export method, replace the heatmap section with:
     def export(self, main: LatLon,  lines: list[Line], saveresult = True):
         
+        if not self.gOp.people:
+            _log.warning("No people to plot on map.")
+            return
+        
+        people = self.gOp.people
+        main_person = self.gOp.mainPerson if self.gOp.mainPerson else None
+        main_person_latlon = getattr(main_person, 'latlon', None) if main_person else None
+
         if not self.fm:
             # if (self.gOp.MapStyle < 1 or self.gOp.MapStyle > len(backTypes)):
               #  self.gOp.MapStyle = 3
@@ -423,16 +497,19 @@ class foliumExporter:
                 tile = xyz.query_name(self.gOp.MapStyle)
             except Exception as e:
                 tile = xyz.CartoDB
-            if self.gOp.people and (getAttrLatLonif(self.gOp.mainPerson, 'death') or getAttrLatLonif(self.gOp.mainPerson, 'birth')):
+
+            birth_event = getattr(self.gOp.mainPerson, 'birth', None)
+            death_event = getattr(self.gOp.mainPerson, 'death', None)
+            birth_latlon = birth_event.getattr('latlon') if birth_event else None
+            death_latlon = death_event.getattr('latlon') if death_event else None
+
+            if death_latlon or birth_latlon:
                 self.fm = folium.Map(location=[0, 0], zoom_start=4, tiles= tile)
             else:
-                lat = float(self.gOp.mainPerson.latlon.lat)
-                lon = float(self.gOp.mainPerson.latlon.lon)
-                self.fm = folium.Map(location=[lat,lon], zoom_start=4, tiles = tile)
+                self.fm = folium.Map(location=main_person_latlon, zoom_start=4, tiles = tile)
             if (self.gOp.mapMini):
                 folium.plugins.MiniMap(toggle_display=True).add_to(self.fm)
             
-
             random.seed()
 
             self.gOp.Referenced = Referenced()
@@ -441,6 +518,7 @@ class foliumExporter:
                 if (getattr(line,'style', None) == 'Life'):
                     self.gOp.Referenced.add(line.person.xref_id, 'quick')
             self.gOp.lastlines = {}
+
             # make a Dict array of lines 
             for line in lines:
                 self.gOp.lastlines[line.person.xref_id] = line
@@ -455,13 +533,9 @@ class foliumExporter:
         self.gOp.step("Preparing")
         self.fglastname = dict()
         
-
         flr = folium.FeatureGroup(name= lgd_txt.format(txt= 'Relations', col='green'), show=False  )
         flp = folium.FeatureGroup(name= lgd_txt.format(txt= 'People', col='Black'), show=False  )
         mycluster = MyMarkClusters(fm, self.gOp.HeatMapTimeStep)
-
-
-        
 
         # *****************************  
         #    HEAT MAP Section            
@@ -472,7 +546,6 @@ class foliumExporter:
         else:
             self._create_static_heatmap(lines, mycluster, fm)
         
-            
         #My to use the jquery hack to MAGIC HACK fix the Folium code to use Font Awesome! 
         # missing tag a the end on purpose
         fm.default_js.append(['hack.js', 'https://use.fontawesome.com/releases/v6.5.1/js/all.js" data-auto-replace-svg="nest'])
@@ -481,8 +554,6 @@ class foliumExporter:
         #     Line Drawing Section      
         # ***************************** 
         
-
-
         i = 0
         self.gOp.step("Building lines")
         lines_sorted = lines if SortByLast else sorted(
@@ -511,8 +582,11 @@ class foliumExporter:
             group_name = lgd_txt.format(txt=label_name, col=marker_options['line_color'])
             
             # Generate popup content
-            birth_info = f"{line.person.birth.whenyear()} (Born)" if line.person.birth and line.person.birth.date else ''
-            death_info = f"{line.person.death.whenyear()} (Died)" if line.person.death and line.person.death.date else ''
+            person = line.person
+            birth_year_num = person.birth.date.year_num if person.birth and person.birth.date else None
+            death_year_num = person.death.date.year_num if person.death and person.death.date else None
+            birth_info = f"{birth_year_num} (Born)" if birth_year_num else ''
+            death_info = f"{death_year_num} (Died)" if death_year_num else ''
             popup_content = self._create_popup_content(line, birth_info, death_info)
 
             # Initialize feature group
@@ -599,10 +673,13 @@ class foliumExporter:
             marker_cluster.add_to(fm)
         folium.map.LayerControl('topleft', collapsed=sc).add_to(fm)
 
-        if main and getAttrLatLonif(main, 'birth'):
-            loc = getAttrLatLonif(main, 'birth')
-            if not loc.isNone():
-                folium.Marker([Drift(loc.lat), Drift(loc.lon)], tooltip=main.name, opacity=0.5, icon=folium.Icon(color='lightred', icon='star', prefix='fa', iconSize=['50%', '50%'])).add_to(fm)
+        birth_event = getattr(main, 'birth', None)
+        birth_latlon = birth_event.getattr('latlon') if birth_event else None
+        if main and birth_latlon:
+            lat = birth_latlon.lat
+            lon = birth_latlon.lon
+            if not birth_latlon.isNone():
+                folium.Marker([Drift(lat), Drift(lon)], tooltip=main.name, opacity=0.5, icon=folium.Icon(color='lightred', icon='star', prefix='fa', iconSize=['50%', '50%'])).add_to(fm)
         else:
             _log.warning("No GPS locations to generate a Star on the map.")
 

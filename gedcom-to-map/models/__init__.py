@@ -6,22 +6,24 @@ from GEDCOM data, including color schemes, positional logic,
 and person representation.
 """
 
-from .Color import Color
-from .Creator import Creator
-from .Person import Person, LifeEvent, DateFromField
-from .Line import Line
-from .LatLon import LatLon
-from .Rainbow import Rainbow
+from .color import Color
+from .creator import Creator
+from .line import Line
+from .rainbow import Rainbow
+
+# If you want to expose these from geo_gedcom, import them here:
+from geo_gedcom.person import Person
+from geo_gedcom.life_event import LifeEvent
+from geo_gedcom.lat_lon import LatLon
 
 __all__ = [
     "Color",
     "Creator",
-    "DateFromField",
-    "Person",
-    'LifeEvent',
     "Line",
+    "Rainbow",
+    "Person",
+    "LifeEvent",
     "LatLon",
-    "Rainbow"
 ]
 
 __maintainer__ = "D-Jeffrey"

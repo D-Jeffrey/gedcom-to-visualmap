@@ -2,9 +2,10 @@ __all__ = ['Line']
 
 #TODO need to improved this subclass
 from ged4py.date import DateValueVisitor
-from .Color import Color
-from .Person import Person, LifeEvent, DateFromField
-from .LatLon import LatLon
+from .color import Color
+from geo_gedcom.person import Person
+from geo_gedcom.life_event import LifeEvent
+from geo_gedcom.lat_lon import LatLon
 
 
 class Line:
@@ -32,35 +33,24 @@ class Line:
         self.midpoints : LifeEvent =  midpoints
         self.person = person
         self.tag = tag
-#        if len(when) > 1:
-#            (self.when.fromlocation, self.when.tolocation) = (self.valueWhen(when[0]), self.valueWhen(when[1]))
 
-        if whenFrom: # and len(whenFrom) > 1:
-            #self.whenFrom= self.valueWhen(whenFrom[0])
-        #else:
-            self.whenFrom= self.valueWhen(whenFrom)
-        
-        if whenTo: # and len(whenTo) > 1:
-            #self.whenTo= self.valueWhen(whenTo[0])
-        #else:
-            self.whenTo= self.valueWhen(whenTo)
+        self.whenFrom = whenFrom if whenFrom else None
+        self.whenTo= whenTo if whenTo else None
         self.linetype = linetype
         
 
     def __repr__(self):
         return f"( {self.fromlocation}, {self.tolocation} )"
 
-    def valueWhen(self, newwhen):
-        return DateFromField(newwhen)
-
     def updateWhen(self, newwhen):
-        newwhen = self.valueWhen(newwhen)
+        newwhen = newwhen
         if newwhen and not self.whenFrom:
             self.whenFrom = newwhen
         if self.whenFrom and newwhen and newwhen < self.whenFrom:
             self.whenFrom = newwhen
+
     def updateWhenTo(self, newwhen):
-        newwhen = self.valueWhen(newwhen)
+        newwhen = newwhen
         if newwhen and not self.whenTo:
             self.whenTo = newwhen
         if self.whenTo and newwhen and newwhen > self.whenTo:

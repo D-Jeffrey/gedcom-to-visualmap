@@ -16,7 +16,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-from gedcom.addressbook import FuzzyAddressBook
+from geo_gedcom.addressbook import FuzzyAddressBook
 
 logger = logging.getLogger(__name__)
 # Avoid using any interactive backends
@@ -80,12 +80,12 @@ def write_people_summary(people: Dict[str, Any], output_file: str) -> None:
             'Name': person.name,
             'birth_place': birth_place,
             'birth_alt_addr': getattr(getattr(person.birth, 'location', None), 'alt_addr', '') if person.birth else '',
-            'birth_date': person.birth.date_year() if person.birth else '',
+            'birth_date': person.birth.date.year_num if person.birth else '',
             'birth_country': getattr(getattr(person.birth, 'location', None), 'country_name', '') if person.birth else '',
             'birth_continent': birth_continent,
             'death_place': person.death.place if person.death else '',
             'death_alt_addr': getattr(getattr(person.death, 'location', None), 'alt_addr', '') if person.death else '',
-            'death_date': person.death.date_year() if person.death else '',
+            'death_date': person.death.date.year_num if person.death else '',
             'death_country': getattr(getattr(person.death, 'location', None), 'country_name', '') if person.death else '',
             'death_continent': getattr(getattr(person.death, 'location', None), 'continent', '') if person.death else ''
         })

@@ -5,12 +5,12 @@ from pathlib import Path
 import requests
 import wx
 
-from models.Person import Person, LifeEvent
-from gedcom.gedcomdate import CheckAge
-from gedrecdisplay import show_gedpy_record_dialog
+from geo_gedcom.person import Person
+from geo_gedcom.life_event import LifeEvent
+from .ged_rec_display import GedRecordDialog
 from .family_panel import FamilyPanel
 from gedcom_options import gvOptions
-from style.stylemanager import FontManager
+from .font_manager import FontManager
 
 _log = logging.getLogger(__name__.lower())
 
@@ -147,12 +147,16 @@ class PersonDialog(wx.Dialog):
         """
         marrying = []
         if person.marriages:
-            for marry in person.marriages:
-                if marry and getattr(marry, 'record', None):
+            for marriage in person.marriages:
+                partner = marriage.partner(person)
+                marriage_event = marriage.event if marriage else None
+                if not marriage_event or not partner:
+                    continue
+                if marriage and partner:
                     try:
-                        marrying.append(f"{self.formatPersonName(people[marry.record.xref_id], False)}{marry.asEventstr()}")
+                        marrying.append(f"{self.formatPersonName(people[partner.xref_id], False)}{marriage_event.event_str}")
                     except KeyError:
-                        _log.debug("Marriage partner %s not in people dict", marry.record.xref_id)
+                        _log.debug("Marriage partner %s not in people dict", partner.xref_id)
                     except Exception:
                         _log.exception("Error formatting marriage for %s", person.xref_id)
         return "\n".join(marrying)
@@ -168,9 +172,9 @@ class PersonDialog(wx.Dialog):
             Returns empty string if no home events.
         """
         homes = []
-        if person.home:
-            for homedesc in person.home:
-                homes.append(f"{LifeEvent.asEventstr(homedesc)}")
+        if person.residences:
+            for homedesc in person.residences:
+                homes.append(f"{homedesc.event_str}")
         return "\n".join(homes)
     
     def _add_person_details(self, people, person) -> wx.FlexGridSizer:
@@ -196,7 +200,7 @@ class PersonDialog(wx.Dialog):
         marriages = self._get_marriages_list(people, person)
         homelist = self._get_homes_list(person)
 
-        issues = CheckAge(people, person.xref_id)
+        issues = person.check_age_problems(people)  # List of age problem strings
 
         grid_details = [
             {"wx_name": "nameTextCtrl", "label": "Name:", "size": (550, -1)},
@@ -249,13 +253,13 @@ class PersonDialog(wx.Dialog):
             except Exception:
                 _log.exception("Error setting mother for %s", person.xref_id)
 
-        self.birthTextCtrl.SetValue(f"{person.birth.asEventstr()}" if person.birth else "")
-        if person.death and person.birth and person.death.when and person.birth.when:
-            age = f"(age ~{person.age})" if hasattr(person, "age") else f"(age ~{person.death.whenyearnum() - person.birth.whenyearnum()})"
+        self.birthTextCtrl.SetValue(f"{person.birth.event_str}" if person.birth else "")
+        if person.death and person.birth and getattr(person.death, "when", None) and getattr(person.birth, "when", None):
+            age = f"(age ~{person.age})" if hasattr(person, "age") else f"(age ~{person.death.date.year_num - person.birth.date.year_num})"
         else:
             age = ""
 
-        self.deathTextCtrl.SetValue(f"{LifeEvent.asEventstr(person.death)}" if person.death else "")
+        self.deathTextCtrl.SetValue(f"{person.death.event_str}" if person.death else "")
         sex = person.sex if person.sex else ""
         self.sexTextCtrl.SetValue(f"{sex} {age}")
         self.marriageTextCtrl.SetValue(marriages)
@@ -297,8 +301,8 @@ class PersonDialog(wx.Dialog):
                                 if not p:
                                     continue
                                 descript = f"{p.title}" if getattr(p, "title", None) else ""
-                                birth_year = p.birth.whenyear() if getattr(p, "birth", None) else None
-                                death_year = p.death.whenyear() if getattr(p, "death", None) else None
+                                birth_year = p.birth.date.year_num if getattr(p, "birth", None) else None
+                                death_year = p.death.date.year_num if getattr(p, "death", None) else None
                                 birth = getattr(p, "birth", None)
                                 birth_place = getattr(birth, 'place', None) if birth else None
                                 heritageSet[hid] = (heritageperson,
@@ -329,8 +333,8 @@ class PersonDialog(wx.Dialog):
                     if not p:
                         continue
                     descript = f"{p.title}" if getattr(p, "title", None) else ""
-                    birth_year = p.birth.whenyear() if getattr(p, "birth", None) else None
-                    death_year = p.death.whenyear() if getattr(p, "death", None) else None
+                    birth_year = p.birth.date.year_num if getattr(p, "birth", None) else None
+                    death_year = p.death.date.year_num if getattr(p, "death", None) else None
                     birth = getattr(p, "birth", None)
                     birth_place = getattr(birth, 'place', None) if birth else None
                     try:
@@ -367,8 +371,8 @@ class PersonDialog(wx.Dialog):
                     if not p:
                         continue
                     descript = f"{p.title}" if getattr(p, "title", None) else ""
-                    birth_year = p.birth.whenyear() if getattr(p, "birth", None) else None
-                    death_year = p.death.whenyear() if getattr(p, "death", None) else None
+                    birth_year = p.birth.date.year_num if getattr(p, "birth", None) else None
+                    death_year = p.death.date.year_num if getattr(p, "death", None) else None
                     birth = getattr(p, "birth", None)
                     birth_place = getattr(birth, 'place', None) if birth else None
                     try:
@@ -471,7 +475,7 @@ class PersonDialog(wx.Dialog):
     
     def _displayrecord(self):
         """Display the raw GEDCOM record for the person in a separate dialog."""
-        show_gedpy_record_dialog(None, self.person.xref_id, self.gOp, title=f"Record of {self.person.name}")
+        GedRecordDialog.show_gedpy_record_dialog(None, self.person.xref_id, self.gOp, title=f"Record of {self.person.name}")
 
     def formatPersonName(self, person: Person, longForm=True):
         """Format a person's name for display.

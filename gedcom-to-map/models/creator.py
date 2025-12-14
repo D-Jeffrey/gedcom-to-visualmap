@@ -3,26 +3,17 @@ __all__ = ['Creator', 'LifetimeCreator', 'DELTA', 'SPACE']
 import logging
 from typing import Dict
 
-from .Person import Person, LifeEvent
-from .Line import Line
-from .LatLon import LatLon
-from .Rainbow import Rainbow
+from geo_gedcom.person import Person
+from geo_gedcom.life_event import LifeEvent
+from .line import Line
+from geo_gedcom.life_event import LatLon
+from .rainbow import Rainbow
 
 _log = logging.getLogger(__name__.lower())
 
 
 SPACE = 2.5     # These values drive how colors are selected
 DELTA = 1.5     # These values drive how colors are selected
-
-#TODO fix up this function and write it better
-def getAttrLatLonif(obj, attname, attvaluename = 'latlon') -> LatLon:
-    if obj:
-        if hasattr(obj, attname):
-            a = getattr(obj, attname)
-            if hasattr(a, 'location'):
-                if hasattr(a.location, attvaluename):
-                    return getattr(a.location, attvaluename)
-    return LatLon(None, None)
     
 class Creator:
     """
@@ -154,27 +145,43 @@ class Creator:
             _log.error("Looping Problem: {:2} -LOOP STOP - {} {} -Looping= {:20}".format(  prof, self.people[current.xref_id].name, current.xref_id, path))
             return []
         self.alltheseids[current.xref_id] = current.xref_id
+
+        event = getattr(current, self.gpstype, None) if current else None
+        event_latlon = event.getattr('latlon') if event else None
+        event_year_num = event.getattr('when_year_num') if event else None
+
         if not getattr(current, self.gpstype):
             return (
                 []
                 if self.max_missing != 0 and miss >= self.max_missing
-                else self.link(getAttrLatLonif(current, self.gpstype), current, branch, prof, miss + 1, path)
+                else self.link(event_latlon, current, branch, prof, miss + 1, path)
             )
         color = (branch + DELTA / 2) / (SPACE ** (prof % 256))
         _log.info("{:8} {:8} {:2} {:.10f} {} {:20}".format(path, branch, prof, color, self.rainbow.get(color).to_hexa(), current.name))
         midpoints = None
-        if current.home:
+        residences = getattr(current, 'residences', None)
+        if residences:
             wyear = None
             midpoints = []
-            for h in (range(0,len(current.home))):
-                if current.home[h].location and current.home[h].getattr('latlon') is not None:
-                    midpoints.append(LifeEvent(current.home[h].place, current.home[h].whenyear(), current.home[h].getattr('latlon'), current.home[h].what))
-                    wyear = wyear if wyear else current.home[h].whenyear()
-        line = Line(f"{path:8}\t{current.name}", latlon, getAttrLatLonif(current, self.gpstype), self.rainbow.get(color), path, branch,prof, person=current,
-                     whenFrom=current.birth.whenyear() if getattr(current, 'birth',None) else None, whenTo=current.death.whenyear() if getattr(current, 'death', None) else None,
+            for h in (range(0,len(residences))):
+                home = residences[h]
+                home_latlon = home.getattr('latlon') if home else None
+                home_year_num = home.getattr('when_year_num') if home else None
+                if home_latlon and home.date and home.date.year_num:
+                    midpoints.append(LifeEvent(home.place, home_year_num, home_latlon, home.what))
+                    wyear = wyear if wyear else home.date.year_num
+
+        birth_event = getattr(current, 'birth', None) if current else None
+        birth_year_num = birth_event.getattr('when_year_num') if birth_event else None
+
+        death_event = getattr(current, 'death', None) if current else None
+        death_year_num = death_event.getattr('when_year_num') if death_event else None
+
+        line = Line(f"{path:8}\t{current.name}", latlon, event_latlon, self.rainbow.get(color), path, branch,prof, person=current,
+                     whenFrom=birth_year_num, whenTo=death_year_num,
                      midpoints=midpoints)
 
-        return self.link(getAttrLatLonif(current, self.gpstype), current, branch, prof, 0, path) + [line]
+        return self.link(event_latlon, current, branch, prof, 0, path) + [line]
 
     def link(self, latlon: LatLon, current: Person, branch=0, prof=0, miss=0, path="") -> list[Line]:
         return (self.line(latlon, self.people[current.father], branch*SPACE, prof+1, miss, f"{path}F") if current.father else []) \
@@ -186,16 +193,21 @@ class Creator:
             raise IndexError(f"Missing starting person {main_id}")
 
         current = self.people[main_id]
-        createpos = getAttrLatLonif(current, self.gpstype, 'latlon')
-        return self.link(createpos, current) + \
-            self.line(createpos, current, 0, 0, 0, "")
+        event = getattr(current, self.gpstype, None) if current else None
+        event_latlon = event.getattr('latlon') if event else (None,None)
+        return self.link(event_latlon, current) + \
+            self.line(event_latlon, current, 0, 0, 0, "")
 
     def createothers(self,listof):
         for person in self.people:
             c = [creates.person.xref_id for creates in listof]
             if person not in c:
                 _log.debug("Others: + %s (%s) (%d)", self.people[person].name, person, len(listof))
-                listof.extend(self.line(getAttrLatLonif(self.people[person], self.gpstype), self.people[person], len(listof)/10, 5, 0, path=""))
+                event = getattr(self.people[person], self.gpstype, None) if self.people[person] else None
+                event_latlon = event.getattr('latlon') if event else (None,None)
+                line = self.line(event_latlon, self.people[person], len(listof)/10, 5, 0, path="")
+                if line:
+                    listof.extend(line)
 
 class CreatorTrace:
     """
@@ -235,8 +247,8 @@ class CreatorTrace:
             * Logs tracing info and constructs a Line with:
               - label/name combining path and current.name
               - person=current
-              - whenFrom/from birth.whenyear() if birth present
-              - whenTo/from death.whenyear() if death present
+              - whenFrom/from birth.date.year_num if birth present
+              - whenTo/from death.date.year_num if death present
             * Appends parent Lines produced by link(current, ...), so result is parent lines first,
               then the current person's Line.
     link(current, branch=0, prof=0, path="")
@@ -302,7 +314,7 @@ class CreatorTrace:
         
         _log.info("{:8} {:8} {:2} {:20}".format(path, branch, prof, current.name))
         line = Line(f"{path:8}\t{current.name}", None, None, None, path, branch,prof, person=current, 
-                    whenFrom=current.birth.whenyear() if getattr(current, 'birth', None) else None , whenTo=current.death.whenyear() if getattr(current, 'death', None)  else None)
+                    whenFrom=current.birth.date.year_num if getattr(current, 'birth', None) else None , whenTo=current.death.date.year_num if getattr(current, 'death', None)  else None)
         return self.link(current, branch, prof, path) + [line]
 
     def link(self, current: Person, branch=0, prof=0,  path="") -> list[Line]:
@@ -364,21 +376,29 @@ class LifetimeCreator:
         self.alltheseids[current.xref_id] = current.xref_id
         color = (branch + DELTA / 2) / (SPACE ** (prof % 256))
         if current.birth and current.death:
-            if current.birth and current.death.latlon:
+            if current.birth and current.death:
                 _log.info("{:8} {:8} {:2} {:.10f} {} Self {:20}".format(path, branch, prof, color, self.rainbow.get(color).to_hexa(), current.name))
             else:
                 _log.info("{:8} {:8} {:2} {:.10f} {} Self {:20}".format(" ", " ", " ", 0, "-SKIP-", current.name))
         midpoints = []
         wyear = None
-        if current.home:
-            for h in (range(0,len(current.home))):
-                if current.home[h].location and current.home[h].getattr('latlon') is not None:
-                    midpoints.append(LifeEvent(current.home[h].place, current.home[h].whenyear(), current.home[h].getattr('latlon'), current.home[h].what))
-                    wyear = wyear if wyear else current.home[h].whenyear()
-        bp = getAttrLatLonif(current, 'birth')
-        bd = getAttrLatLonif(current, 'death')
-        line = Line(f"{path:8}\t{current.name}", bp, bd, self.rainbow.get(color), path, branch, prof, 'Life', 
-                    None, midpoints, current, whenFrom=current.birth.whenyear() if getattr(current, 'birth', None)  else None , whenTo=current.death.whenyear() if getattr(current, 'death', None) else None)
+        if current.residences:
+            for h in (range(0,len(current.residences))):
+                if current.residences[h].location and current.residences[h].getattr('latlon') is not None:
+                    midpoints.append(LifeEvent(current.residences[h].place, current.residences[h].date.year_num, current.residences[h].getattr('latlon'), current.residences[h].what))
+                    wyear = wyear if wyear else current.residences[h].date.year_num
+
+        birth_event = getattr(current, 'birth', None) if current else None
+        birth_latlon = birth_event.getattr('latlon') if birth_event else None
+        birth_year_num = birth_event.getattr('when_year_num') if birth_event else None
+
+        death_event = getattr(current, 'death', None) if current else None
+        death_latlon = death_event.getattr('latlon') if death_event else None
+        death_year_num = death_event.getattr('when_year_num') if death_event else None
+
+        line = Line(f"{path:8}\t{current.name}", birth_latlon, death_latlon, self.rainbow.get(color), path, branch, prof, 'Life', 
+                    None, midpoints, current, whenFrom=birth_year_num, whenTo=death_year_num)
+
         return [line]
         
     # Draw a line from the parents birth to the child birth location
@@ -391,9 +411,19 @@ class LifetimeCreator:
         if getattr(parent, 'birth', None):
             color = (branch + DELTA / 2) / (SPACE ** prof)
             _log.info("{:8} {:8} {:2} {:.10f} {} {:20} from {:20}".format(path, branch, prof, color, self.rainbow.get(color).to_hexa(), parent.name, forperson.name))
-            line = Line(f"{path:8}\t{parent.name}", latlon, getAttrLatLonif(parent, 'birth'), self.rainbow.get(color), path, branch, prof, linestyle,  
-                            forperson,  person=parent, whenFrom=parent.birth.whenyear() if getattr(parent, 'birth', None) else None , whenTo=parent.death.whenyear() if getattr(parent, 'death', None) else None)
-            return self.link(parent.birth.latlon, parent, branch, prof, 0, path) + [line]
+
+            parent_birth = getattr(parent, 'birth', None) if parent else None
+            parent_birth_latlon = parent_birth.getattr('latlon') if parent_birth else None
+            parent_birth_year = parent_birth.getattr('when_year_num') if parent_birth else None
+
+            parent_death = getattr(parent, 'death', None) if parent else None
+            parent_death_year = parent_death.getattr('when_year_num') if parent_death else None
+
+            line = Line(f"{path:8}\t{parent.name}", latlon, parent_birth_latlon,
+                        self.rainbow.get(color), path, branch, prof, linestyle,
+                        forperson, person=parent,
+                        whenFrom=parent_birth_year, whenTo=parent_death_year)
+            return self.link(parent_birth_latlon, parent, branch, prof, 0, path) + [line]
         else:
             if self.max_missing != 0 and miss >= self.max_missing:
                 _log.info("{:8} {:8} {:2} {:.10f} {} Self {:20}".format(" ", " ", " ", 0, "-STOP-", parent.name))
@@ -416,9 +446,11 @@ class LifetimeCreator:
         if main_id not in self.people.keys():
             _log.error ("Could not find your starting person: %s", main_id)
             raise IndexError(f"Missing starting person {main_id}")
-        current = self.people[main_id]
+        current_person = self.people[main_id]
+        birth_event = getattr(current_person, 'birth', None) if current_person else None
+        birth_latlon = birth_event.getattr('latlon') if birth_event else None
 
-        return self.link(getAttrLatLonif(current, 'birth'), current) 
+        return self.link(birth_latlon, current_person) 
     
     def createothers(self,listof):
         for person in self.people:

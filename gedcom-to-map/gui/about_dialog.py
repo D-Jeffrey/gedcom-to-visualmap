@@ -1,7 +1,7 @@
 import logging
 import wx
 
-from style.stylemanager import FontManager
+from .font_manager import FontManager
 from const import VERSION, GUINAME, ABOUTLINK, NAME
 
 _log = logging.getLogger(__name__.lower())

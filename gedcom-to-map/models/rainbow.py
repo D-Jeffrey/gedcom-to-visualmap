@@ -1,5 +1,5 @@
 __all__ = ['Tint', 'Rainbow']
-from .Color import Color
+from .color import Color
 import logging
 
 _log = logging.getLogger(__name__.lower())

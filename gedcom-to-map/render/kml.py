@@ -10,9 +10,9 @@ from typing import Dict, Optional, Tuple, List
 import logging
 import simplekml
 
-from models.location import LatLon
-from models.Person import Person
-from gedcom.gedcom import GeolocatedGedcom
+from geo_gedcom.lat_lon import LatLon
+from geo_gedcom.person import Person
+from geo_gedcom.geolocated_gedcom import GeolocatedGedcom
 
 
 logger = logging.getLogger(__name__)
@@ -216,8 +216,8 @@ class KML_Life_Lines_Creator:
         location = getattr(event, 'location', None)
         latlon = getattr(location, 'latlon', None)
         if event and latlon and latlon.is_valid():
-            description =  f'{event_type} {event.date_year()}<br>{event.place}<br>'
-            placemark_id, point_id = self.kml_instance.add_point(event_type, current.name, latlon, event.date_year(), description)
+            description =  f'{event_type} {event.date.year_str}<br>{event.place}<br>'
+            placemark_id, point_id = self.kml_instance.add_point(event_type, current.name, latlon, event.date.year_num if event.date.year_num is not None else 0, description)
             self.kml_point_to_person_lookup[point_id] = current.xref_id
             self.kml_person_to_point_lookup[current.xref_id] = point_id
             self.kml_person_to_placemark_lookup[current.xref_id] = placemark_id
@@ -229,12 +229,20 @@ class KML_Life_Lines_Creator:
         Args:
             current (Person): The person.
         """
-        if current.birth and getattr(current.birth, 'location', None) and getattr(current.birth.location, 'latlon', None) and current.birth.location.latlon.is_valid():
+        birth_event = current.birth if current.birth else None
+        current_birth_latlon = birth_event.getattr('latlon') if birth_event else None
+        if current.birth and current_birth_latlon and current_birth_latlon.is_valid():
             self._add_point(current, current.birth, "Birth")
-        for marriage_event in getattr(current, 'marriages', []):
-            if marriage_event and getattr(marriage_event, 'location', None) and getattr(marriage_event.location, 'latlon', None) and marriage_event.location.latlon.is_valid():
+
+        for marriage in current.marriages:
+            marriage_event = marriage.event if marriage.event else None
+            marriage_latlon = marriage_event.getattr('latlon') if marriage_event else None
+            if marriage_event and marriage_latlon and marriage_latlon.is_valid():
                 self._add_point(current, marriage_event, "Marriage")
-        if getattr(current, 'death', None) and getattr(current.death, 'location', None) and getattr(current.death.location, 'latlon', None) and current.death.location.latlon.is_valid():
+
+        death_event = current.death if current.death else None
+        current_death_latlon = death_event.getattr('latlon') if death_event else None
+        if current.death and current_death_latlon and current_death_latlon.is_valid():
             self._add_point(current, current.death, "Death")
 
     def update_person_description(self, point: simplekml.featgeom.Point, current: Person) -> None:
@@ -275,7 +283,7 @@ class KML_Life_Lines_Creator:
         """
         Add all people from the GEDCOM to the KML.
         """
-        for person_id, person in self.gedcom.people.items():
+        for _, person in self.gedcom.people.items():
             self.add_person(person)
 
         for g in self.kml_instance.kml.allgeometries:
@@ -287,16 +295,16 @@ class KML_Life_Lines_Creator:
         Draw lines connecting each person to their parents.
         """
         line_type = 'Parents'
-        for person_id, person in self.gedcom.people.items():
+        for _, person in self.gedcom.people.items():
             logger.info(f'person: {person}')
             if person.latlon and person.latlon.is_valid():
-                begin_date = person.birth.date_year() if person.birth and person.birth.date else None
+                begin_date = person.birth.date.year_num if person.birth and person.birth.date else None
 
                 if person.father:
                     father = self.gedcom.people[person.father]
                     line_name = f'Father: {father.name}'
                     if father.latlon and father.latlon.is_valid():
-                        end_date = father.birth.date_year() if father.birth and father.birth.date else None
+                        end_date = father.birth.date.year_num if father.birth and father.birth.date else None
                         self.kml_instance.draw_line(line_type, line_name, person.latlon, father.latlon,
                                                     begin_date, end_date, simplekml.Color.blue)
 
@@ -304,7 +312,7 @@ class KML_Life_Lines_Creator:
                     mother = self.gedcom.people[person.mother]
                     line_name = f'Mother: {mother.name}'
                     if mother.latlon and mother.latlon.is_valid():
-                        end_date = mother.birth.date_year() if mother.birth and mother.birth.date else None
+                        end_date = mother.birth.date.year_num if mother.birth and mother.birth.date else None
                         self.kml_instance.draw_line(line_type, line_name, person.latlon, mother.latlon,
                                                     begin_date, end_date, simplekml.Color.red)
 
@@ -317,8 +325,8 @@ class KML_Life_Lines_Creator:
         """
         person = self.gedcom.people.get(person_id)
         if person and person.latlon and person.latlon.is_valid():
-            begin_year = person.birth.date_year() if person.birth and person.birth.date else None
-            end_year = person.death.date_year() if person.death and person.death.date else None
+            begin_year = person.birth.date.year_num if person.birth and person.birth.date else None
+            end_year = person.death.date.year_num if person.death and person.death.date else None
             self.kml_instance.lookat(latlon=person.latlon, begin_year=begin_year, end_year=end_year)
 
     def save_kml(self) -> None:

@@ -1,6 +1,6 @@
 import pytest
 import os
-from render.kml_exporter import KmlExporter
+from render.kml1.kml_exporter import KmlExporter
 from geo_gedcom.lat_lon import LatLon
 from models.line import Line
 

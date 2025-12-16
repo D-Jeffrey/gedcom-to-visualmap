@@ -1,5 +1,5 @@
 import pytest
-from render.name_processor import NameProcessor
+from render.folium.name_processor import NameProcessor
 
 def test_parse_name_and_format():
     np = NameProcessor("John Quincy Adams")

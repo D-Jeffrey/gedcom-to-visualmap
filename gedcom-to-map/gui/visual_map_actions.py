@@ -12,9 +12,9 @@ from typing import Any, Optional, Dict, List, Tuple
 from pathlib import Path
 
 from models.creator import Creator, LifetimeCreator, CreatorTrace, Person
-from render.foliumExp import foliumExporter
-from render.kml_exporter import KmlExporter
-from render.kml import KML_Life_Lines
+from render.folium.folium_exporter import foliumExporter
+from render.kml1.kml_exporter import KmlExporter
+from render.kml2 import KML_Life_Lines
 from render.referenced import Referenced
 from render.summary import write_places_summary, write_people_summary, write_birth_death_countries_summary, write_geocache_summary, write_alt_places_summary
 

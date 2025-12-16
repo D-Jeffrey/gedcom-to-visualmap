@@ -1,12 +1,8 @@
+"""
+Utilities for processing and handling personal names.
+"""
 __all__ = ["NameProcessor"]
 
-"""
-naming.py
-
-This module provides utilities for processing and handling names associated with people.
-
-*** Might look at replacing some of this with Pyphonetics
-"""
 import unicodedata
 import string
 import re
@@ -15,22 +11,19 @@ class NameProcessor:
     """
     A class to handle various operations related to processing people's names.
     """
-
-    def __init__(self, fullName: str):
+    def __init__(self, fullName: str) -> None:
         """
         Initialize the NameProcessor with a full name.
-
         Args:
             fullName (str): The full name of the person.
         """
-        self.fullName = fullName
-        self.firstName = None
-        self.lastName = None
-        self.middleNames = []
-
+        self.fullName: str = fullName
+        self.firstName: str | None = None
+        self.lastName: str | None = None
+        self.middleNames: list[str] = []
         self._parse_name()
 
-    def _parse_name(self):
+    def _parse_name(self) -> None:
         """
         Parse the full name into first name, last name, and middle names.
         """
@@ -45,7 +38,6 @@ class NameProcessor:
     def getInitials(self) -> str:
         """
         Get the initials of the person's name.
-
         Returns:
             str: The initials of the name.
         """
@@ -55,7 +47,6 @@ class NameProcessor:
     def formatName(self) -> str:
         """
         Format the name in "Last, First Middle" format.
-
         Returns:
             str: The formatted name.
         """

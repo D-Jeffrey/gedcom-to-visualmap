@@ -6,10 +6,10 @@ import os.path
 import random
 import re
 
-import simplekml as simplekml
+import simplekml
 from models.line import Line
 from geo_gedcom.lat_lon import LatLon
-from .referenced import Referenced
+from render.referenced import Referenced
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -17,10 +17,14 @@ if TYPE_CHECKING:
 
 _log = logging.getLogger(__name__.lower())
 
-                
-
 class KmlExporter:
-    def __init__(self, gOp: "gvOptions"):
+    """
+    Exports genealogical data to KML format for visualization in Google Earth (legacy version).
+
+    Args:
+        gOp (gvOptions): Options and configuration for KML export.
+    """
+    def __init__(self, gOp: "gvOptions") -> None:
         self.file_name = os.path.join(gOp.resultpath, gOp.ResultFile)
         self.max_line_weight = gOp.MaxLineWeight
         self.kml = None
@@ -34,12 +38,23 @@ class KmlExporter:
         self.styles = []
             
 
-    def driftLatLon(self, l : LatLon):
+    def driftLatLon(self, l: LatLon) -> tuple[float | None, float | None]:
+        """
+        Optionally add a small random drift to a LatLon for privacy or visual separation.
+
+        Args:
+            l (LatLon): The original LatLon.
+        Returns:
+            tuple[float | None, float | None]: Drifted (lon, lat) or (None, None) if input is None.
+        """
         if not l or not self.driftOn:
             return (l.lon, l.lat) if l else (None, None)
         return ((float(l.lon)+(random.random() * 0.001) - 0.0005), float(l.lat)+(random.random() * 0.001) - 0.0005)
         
-    def Done(self):
+    def Done(self) -> None:
+        """
+        Finalize and save the KML file, fixing up placemark links and cleaning up descriptions.
+        """
         alist = []
         glist = []
         self.gOp.step("Finalizing KML")
@@ -71,7 +86,16 @@ class KmlExporter:
         # self.gOp.stop()
         # self.kml = None
 
-    def export(self, main: LatLon, lines: list[Line], ntag: str = "", mark: str = "native"):
+    def export(self, main: LatLon, lines: list[Line], ntag: str = "", mark: str = "native") -> None:
+        """
+        Export the main person and lines to KML, creating placemarks and lines for each.
+
+        Args:
+            main (LatLon): Main person's location.
+            lines (list[Line]): List of Line objects to export.
+            ntag (str, optional): Tag to append to names. Defaults to "".
+            mark (str, optional): Marker type. Defaults to "native".
+        """
         foldermode = self.gOp.KMLsort == 1
         marktype = self._get_mark_type(mark)
         colorA, colorB = "ylw", "ltblu"
@@ -90,6 +114,13 @@ class KmlExporter:
             self._process_line(line, ntag, mark, foldermode, kml, styleA, styleB)
 
     def _get_mark_type(self, mark: str) -> str:
+        """
+        Get the marker type string for a given mark.
+        Args:
+            mark (str): Marker type.
+        Returns:
+            str: Marker type string for KML icon.
+        """
         if mark == 'death':
             return "stars"
         elif mark == "birth":
@@ -97,7 +128,17 @@ class KmlExporter:
         else:
             return "blank"
 
-    def _setup_kml_and_styles(self, colorA: str, colorB: str, marktype: str, foldermode: bool):
+    def _setup_kml_and_styles(self, colorA: str, colorB: str, marktype: str, foldermode: bool) -> tuple[simplekml.Kml, simplekml.Style, simplekml.Style]:
+        """
+        Set up the KML document and styles for placemarks and lines.
+        Args:
+            colorA (str): Color for style A.
+            colorB (str): Color for style B.
+            marktype (str): Marker type string.
+            foldermode (bool): Whether to use folders for event types.
+        Returns:
+            tuple: (Kml, styleA, styleB)
+        """
         if self.kml:
             kml = self.kml
             styleA = self.styleA
@@ -132,7 +173,10 @@ class KmlExporter:
             self.styleB = styleB
         return kml, styleA, styleB
 
-    def _process_line(self, line: Line, ntag: str, mark: str, foldermode: bool, kml, styleA, styleB):
+    def _process_line(self, line: Line, ntag: str, mark: str, foldermode: bool, kml: simplekml.Kml, styleA: simplekml.Style, styleB: simplekml.Style) -> None:
+        """
+        Process a single Line object, adding placemarks and lines to the KML.
+        """
         (desend, name) = line.name.split("\t")
         linage = self._format_parent_links(line, foldermode)
         familyLinage = self._format_children_links(line, foldermode)
@@ -151,6 +195,9 @@ class KmlExporter:
             self._add_midpoints(line, name, foldermode, kml, styleA)
 
     def _format_parent_links(self, line: Line, foldermode: bool) -> str:
+        """
+        Format HTML links for a person's parents.
+        """
         linage = ""
         if line.person.father:
             if self.gOp.UseBalloonFlyto:
@@ -167,6 +214,9 @@ class KmlExporter:
         return linage
 
     def _format_children_links(self, line: Line, foldermode: bool) -> str:
+        """
+        Format HTML links for a person's children.
+        """
         children = line.person.children
         if not children:
             return ""
@@ -181,6 +231,9 @@ class KmlExporter:
             return '<br>Children: {}</br>'.format(", ".join(family_names))
 
     def _format_event(self, line: Line) -> str:
+        """
+        Format the event string for a line (birth/death/lifespan).
+        """
         timeA = getattr(line, 'whenFrom', None)
         timeB = getattr(line, 'whenTo', None)
         if timeA and timeB:
@@ -193,7 +246,10 @@ class KmlExporter:
             event = "Unknown dates"
         return f"<br>{event}</br>"
 
-    def _add_birth_point(self, line, ntag, event, linage, familyLinage, foldermode, kml, styleA):
+    def _add_birth_point(self, line: Line, ntag: str, event: str, linage: str, familyLinage: str, foldermode: bool, kml: simplekml.Kml, styleA: simplekml.Style) -> None:
+        """
+        Add a birth placemark to the KML.
+        """
         connectWhere = self.folderBirth if foldermode else kml
         pnt = connectWhere.newpoint(
             name=line.name.split("\t")[1] + ntag,
@@ -208,7 +264,10 @@ class KmlExporter:
         pnt.style.labelstyle.scale = styleA.labelstyle.scale
         pnt.style.iconstyle.icon.href = styleA.iconstyle.icon.href
 
-    def _add_death_point(self, line, ntag, event, linage, familyLinage, foldermode, kml, styleB):
+    def _add_death_point(self, line: Line, ntag: str, event: str, linage: str, familyLinage: str, foldermode: bool, kml: simplekml.Kml, styleB: simplekml.Style) -> None:
+        """
+        Add a death placemark to the KML.
+        """
         connectWhere = self.folderDeath if foldermode else kml
         pnt = connectWhere.newpoint(
             name=line.name.split("\t")[1] + ntag,
@@ -223,7 +282,10 @@ class KmlExporter:
         pnt.style.labelstyle.scale = styleB.labelstyle.scale
         pnt.style.iconstyle.icon.href = styleB.iconstyle.icon.href
 
-    def _add_life_line(self, line, desend, event, linage, familyLinage, foldermode, kml):
+    def _add_life_line(self, line: Line, desend: str, event: str, linage: str, familyLinage: str, foldermode: bool, kml: simplekml.Kml) -> None:
+        """
+        Add a life line (polyline) to the KML.
+        """
         connectWhere = self.folderLife if foldermode else kml
         timeA = getattr(line, 'whenFrom', None)
         timeB = getattr(line, 'whenTo', None)
@@ -250,13 +312,19 @@ class KmlExporter:
                 kml_line.timestamp.when = timeB
         _log.info(f"    line    {line.name} ({line.fromlocation.lon}, {line.fromlocation.lat}) ({line.tolocation.lon}, {line.tolocation.lat})")
 
-    def _log_skipped_line(self, line):
+    def _log_skipped_line(self, line: Line) -> None:
+        """
+        Log a warning for a skipped line (missing location).
+        """
         if line.fromlocation and line.tolocation:
             _log.warning(f"skipping {line.name} ({line.fromlocation.lon}, {line.fromlocation.lat}) ({line.tolocation.lon}, {line.tolocation.lat})")
         else:
             _log.warning(f"skipping {line.name} (no location): {line}")
 
-    def _add_midpoints(self, line, name, foldermode, kml, styleA):
+    def _add_midpoints(self, line: Line, name: str, foldermode: bool, kml: simplekml.Kml, styleA: simplekml.Style) -> None:
+        """
+        Add midpoint placemarks for events along a line.
+        """
         connectWhere = self.folderLife if foldermode else kml
         for mid in line.midpoints:
             event_location = getattr(mid, 'location', None)

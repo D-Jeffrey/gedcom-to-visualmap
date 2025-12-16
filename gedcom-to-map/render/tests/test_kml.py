@@ -1,5 +1,7 @@
 import pytest
-from render.kml import KmlExporterRefined, KML_Life_Lines_Creator, KML_Life_Lines
+from render.kml2.kml_exporter_refined import KmlExporterRefined
+from render.kml2.kml_life_lines_creator import KML_Life_Lines_Creator
+from render.kml2.kml_life_lines import KML_Life_Lines
 from geo_gedcom.geolocated_gedcom import GeolocatedGedcom
 
 def test_kml_exporter_refined_init(tmp_path):

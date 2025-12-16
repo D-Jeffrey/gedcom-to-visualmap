@@ -5,11 +5,13 @@ Provides export and rendering utilities for visualizing GEDCOM data,
 including KML generation, Folium-based mapping, and reference handling.
 """
 
-from .kml import KmlExporterRefined, KML_Life_Lines_Creator, KML_Life_Lines
-from .kml_exporter import KmlExporter
+from .kml1.kml_exporter import KmlExporter
+from .kml2.kml_life_lines import KmlExporterRefined, KML_Life_Lines_Creator, KML_Life_Lines
 from .referenced import Referenced
-from .name_processor import NameProcessor
-from .foliumExp import foliumExporter, MyMarkClusters, Legend
+from .folium.folium_exporter import foliumExporter
+from .folium.mark_clusters import MyMarkClusters
+from .folium.legend import Legend
+from .folium.name_processor import NameProcessor
 from .summary import (
     save_birth_death_heatmap_matrix,
     write_alt_places_summary,

@@ -1,5 +1,7 @@
 import pytest
-from render.foliumExp import foliumExporter, MyMarkClusters, Legend
+from render.folium.folium_exporter import foliumExporter
+from render.folium.mark_clusters import MyMarkClusters
+from render.folium.legend import Legend
 import folium
 
 class DummyGOp:

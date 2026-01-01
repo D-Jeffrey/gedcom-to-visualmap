@@ -1295,3 +1295,27 @@ class VisualMapActions:
             heritage.append(("NotDirect", ToID.name, None, ToID.xref_id))
         gOp.heritage = heritage
         return heritage
+    
+    def updatestats(self):
+        # count of 
+        count_of = ['arrivals', 'baptism', 'departures', 'marriages', 'military', 'residences']
+        used = 0
+        usedNone = 0
+        totaladdr = 0
+        my_gedcom: Optional[GeolocatedGedcom] = getattr(self.panel.gOp, "lookup", None)
+        if hasattr(my_gedcom, 'address_book') and my_gedcom.address_book:
+            for place,location in my_gedcom.address_book.addresses().items():
+                
+                if (getattr(location, 'used',0) > 0): 
+                    used += 1
+                    totaladdr += getattr(location, 'used',0)
+                    if (location and location.latlon is None or location.latlon.isNone()) or location is None : 
+                        usedNone += 1
+        hit = 1-(usedNone / used) if used > 0 else 0
+        self.stats = f"Unique addresses: {used} with unresolvable: {usedNone}\nAddress hit rate {hit:.1%}\n" 
+        people_list = getattr(self.panel.gOp, "people", None)
+        if people_list:
+            surname_list = list(person.surname.lower() for person in people_list.values() if person.surname )
+            total_surname = len(set(surname_list))
+            self.stats += f"Unique surnames: {total_surname}\n"
+        return self.stats

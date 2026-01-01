@@ -201,6 +201,8 @@ class PersonDialog(wx.Dialog):
         homelist = self._get_homes_list(person)
 
         issues = person.check_age_problems(people)  # List of age problem strings
+        
+        extras = ["Has military Service records."] if person.military else []
 
         grid_details = [
             {"wx_name": "nameTextCtrl", "label": "Name:", "size": (550, -1)},
@@ -212,7 +214,7 @@ class PersonDialog(wx.Dialog):
             {"wx_name": "sexTextCtrl", "label": "Sex:"},
             {"wx_name": "marriageTextCtrl", "label": "Marriages:", "size": (-1, sizeAttr(marriages))},
             {"wx_name": "homeTextCtrl", "label": "Homes:", "size": (-1, sizeAttr(homelist))},
-            {"wx_name": "issuesTextCtrl", "label": "Age Problems:", "size": (-1, sizeAttr(issues))} if issues else None,
+            {"wx_name": "issuesTextCtrl", "label": "Of Note:", "size": (-1, sizeAttr(issues))} if issues or extras else None,
         ]
 
         # Layout the relative grid
@@ -223,7 +225,7 @@ class PersonDialog(wx.Dialog):
             if line:
                 style = wx.TE_READONLY
                 proportion = 0
-                if line["label"] in ["Marriages:", "Homes:", "Age Problems:"]:
+                if line["label"] in ["Marriages:", "Homes:", "Of Note:"]:
                     style |= wx.TE_MULTILINE
                     proportion = 1
                 sizer.Add(wx.StaticText(self, label=line["label"]), 0, wx.LEFT | wx.TOP, border=5)
@@ -263,9 +265,10 @@ class PersonDialog(wx.Dialog):
         sex = person.sex if person.sex else ""
         self.sexTextCtrl.SetValue(f"{sex} {age}")
         self.marriageTextCtrl.SetValue(marriages)
-
-        if issues:
-            self.issuesTextCtrl.SetValue("\n".join(issues))
+        
+            
+        if issues or extras:
+            self.issuesTextCtrl.SetValue("\n".join(issues) +  "\n".join(extras))
 
         self.homeTextCtrl.SetValue(homelist)
         # Make the homes row growable if it has multiple entries (find actual row index dynamically)

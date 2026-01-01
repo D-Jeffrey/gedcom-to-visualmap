@@ -332,15 +332,15 @@ class gvOptions:
         """ Reset the timeframe for the process """
         self.timeframe = {'from': None, 'to': None}
 
-    def addtimereference(self, timeRefrence: LifeEvent):
+    def addtimereference(self, timeReference: LifeEvent):
         """Extend the global timeframe with a LifeEvent's year (if available)."""
         """ 
         Update the over all timeframe with person event details
         timeRefrence: LifeEvent
         """
-        if not timeRefrence:
+        if not timeReference:
             return
-        theyear = timeRefrence.year_num
+        theyear = timeReference.year_num
         if theyear is None:
             return
         if self.timeframe['from'] is None:

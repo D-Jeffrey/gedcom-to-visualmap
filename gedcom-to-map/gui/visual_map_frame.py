@@ -378,7 +378,7 @@ class VisualMapFrame(wx.Frame):
                 else:
                     msg += "\nSelect main person for heritage line\n"
             if hasattr(self.visual_map_panel.gOp, "lookup") and getattr(self.visual_map_panel.gOp.lookup, "address_book", None):
-                stats = self.visual_map_panel.gOp.lookup.address_book.updatestats()
+                stats = self.visual_map_panel.actions.updatestats()
                 msg += f"\nTotal cached addresses: {self.visual_map_panel.gOp.lookup.address_book.len()}\n{stats}"
             wx.MessageBox(msg, "Statistics", wx.OK | wx.ICON_INFORMATION)
         except Exception:

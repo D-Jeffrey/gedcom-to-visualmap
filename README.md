@@ -42,8 +42,9 @@ Assuming you have Python installed (see [Install-Python](https://github.com/Pack
 
 1. **Clone the repository:**
     ```sh
-    git clone https://github.com/D-Jeffrey/gedcom-to-visualmap
+    git clone --recurse-submodules https://github.com/D-Jeffrey/gedcom-to-visualmap
     cd gedcom-to-visualmap
+    git submodule update --init --recursive
     ```
     *Or download and unzip the latest [release](https://github.com/D-Jeffrey/gedcom-to-visualmap/releases).*
 
@@ -52,18 +53,19 @@ Assuming you have Python installed (see [Install-Python](https://github.com/Pack
     For Windows (PowerShell):
     ```sh
     python3 -m venv venv
-    venv\Scripts\activate
+    venv\Scripts\activate.ps1
     ```
 
     For Linux and Mac:
     ```sh
     python3 -m venv venv
-    source venv/bin/activate
+    source venv/Scripts/activate
     ```
 
 3. **Install dependencies:**
     ```sh
     pip install -r requirements.txt
+    pip install -r gedcom-to-map/geo_gedcom/requirements.txt
     ```
 
 4. **Run the GUI interface:**

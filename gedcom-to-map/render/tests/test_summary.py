@@ -42,6 +42,13 @@ class DummyPerson:
         self.birth = birth
         self.death = death
 
+    def get_event(self, event_type):
+        if event_type == 'birth':
+            return self.birth
+        elif event_type == 'death':
+            return self.death
+        return None
+
 def test_write_places_summary(tmp_path):
     ab = DummyAddressBook()
     out = tmp_path / "places.csv"

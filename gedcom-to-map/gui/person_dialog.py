@@ -146,8 +146,9 @@ class PersonDialog(wx.Dialog):
             Returns empty string if no marriages.
         """
         marrying = []
-        if person.marriages:
-            for marriage in person.marriages:
+        marriages = person.get_events('marriage') if person else []
+        if marriages:
+            for marriage in marriages:
                 partner = marriage.partner(person)
                 marriage_event = marriage.event if marriage else None
                 if not marriage_event or not partner:
@@ -172,8 +173,9 @@ class PersonDialog(wx.Dialog):
             Returns empty string if no home events.
         """
         homes = []
-        if person.residences:
-            for homedesc in person.residences:
+        residence_events = person.get_events('residence') if person else []
+        if residence_events:
+            for homedesc in residence_events:
                 homes.append(f"{homedesc.event_str}")
         return "\n".join(homes)
     
@@ -255,13 +257,15 @@ class PersonDialog(wx.Dialog):
             except Exception:
                 _log.exception("Error setting mother for %s", person.xref_id)
 
-        self.birthTextCtrl.SetValue(f"{person.birth.event_str}" if person.birth else "")
-        if person.death and person.birth and getattr(person.death, "when", None) and getattr(person.birth, "when", None):
-            age = f"(age ~{person.age})" if hasattr(person, "age") else f"(age ~{person.death.date.year_num - person.birth.date.year_num})"
+        birth_event = person.get_event('birth')
+        death_event = person.get_event('death')
+        self.birthTextCtrl.SetValue(f"{birth_event.event_str}" if birth_event else "")
+        if death_event and birth_event and getattr(death_event, "when", None) and getattr(birth_event, "when", None):
+            age = f"(age ~{person.age})" if hasattr(person, "age") else f"(age ~{death_event.date.year_num - birth_event.date.year_num})"
         else:
             age = ""
 
-        self.deathTextCtrl.SetValue(f"{person.death.event_str}" if person.death else "")
+        self.deathTextCtrl.SetValue(f"{death_event.event_str}" if death_event else "")
         sex = person.sex if person.sex else ""
         self.sexTextCtrl.SetValue(f"{sex} {age}")
         self.marriageTextCtrl.SetValue(marriages)
@@ -304,10 +308,11 @@ class PersonDialog(wx.Dialog):
                                 if not p:
                                     continue
                                 descript = f"{p.title}" if getattr(p, "title", None) else ""
-                                birth_year = p.birth.date.year_num if getattr(p, "birth", None) else None
-                                death_year = p.death.date.year_num if getattr(p, "death", None) else None
-                                birth = getattr(p, "birth", None)
-                                birth_place = getattr(birth, 'place', None) if birth else None
+                                birth_event = p.get_event('birth')
+                                death_event = p.get_event('death')
+                                birth_year = birth_event.date.year_num if birth_event else None
+                                death_year = death_event.date.year_num if death_event else None
+                                birth_place = getattr(birth_event, 'place', None) if birth_event else None
                                 heritageSet[hid] = (heritageperson,
                                                     heritageparent,
                                                     birth_year,
@@ -336,10 +341,11 @@ class PersonDialog(wx.Dialog):
                     if not p:
                         continue
                     descript = f"{p.title}" if getattr(p, "title", None) else ""
-                    birth_year = p.birth.date.year_num if getattr(p, "birth", None) else None
-                    death_year = p.death.date.year_num if getattr(p, "death", None) else None
-                    birth = getattr(p, "birth", None)
-                    birth_place = getattr(birth, 'place', None) if birth else None
+                    birth_event = p.get_event('birth')
+                    death_event = p.get_event('death')
+                    birth_year = birth_event.date.year_num if birth_event else None
+                    death_year = death_event.date.year_num if death_event else None
+                    birth_place = getattr(birth_event, 'place', None) if birth_event else None
                     try:
                         spouse_name = p.name if hasattr(p, "name") else ""
                     except Exception:
@@ -374,10 +380,11 @@ class PersonDialog(wx.Dialog):
                     if not p:
                         continue
                     descript = f"{p.title}" if getattr(p, "title", None) else ""
-                    birth_year = p.birth.date.year_num if getattr(p, "birth", None) else None
-                    death_year = p.death.date.year_num if getattr(p, "death", None) else None
-                    birth = getattr(p, "birth", None)
-                    birth_place = getattr(birth, 'place', None) if birth else None
+                    birth_event = p.get_event('birth')
+                    death_event = p.get_event('death')
+                    birth_year = birth_event.date.year_num if birth_event else None
+                    death_year = death_event.date.year_num if death_event else None
+                    birth_place = getattr(birth_event, 'place', None) if birth_event else None
                     try:
                         child_name = p.name if hasattr(p, "name") else ""
                     except Exception:

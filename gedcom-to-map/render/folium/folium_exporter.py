@@ -167,20 +167,20 @@ class foliumExporter:
         minyear = maxyear = None
         
         # Add birth location if available
-        birth_event = line.person.birth if line.person else None
+        birth_event = line.person.get_event('birth') if line.person else None
         birth_latlon = birth_event.getattr('latlon') if birth_event else None
         birth_date = birth_event.getattr('date') if birth_event else None
         birth_year_num = birth_date.year_num if birth_date else None
 
-        if line.person.birth and birth_latlon and birth_date:
+        if birth_event and birth_latlon and birth_date:
             mycluster.mark(birth_latlon, birth_year_num)
             minyear = birth_year_num
         
         # Add death year if available
-        death_event = line.person.death if line.person else None
+        death_event = line.person.get_event('death') if line.person else None
         death_date = death_event.getattr('date') if death_event else None
         death_year_num = death_date.year_num if death_date else None
-        if line.person.death and death_date:
+        if death_event and death_date:
             maxyear = death_year_num
         else:
             # Process midpoints for min/max year determination
@@ -199,7 +199,7 @@ class foliumExporter:
         if not (minyear and maxyear):
             return
         
-        birth_event = line.person.birth if line.person else None
+        birth_event = line.person.get_event('birth') if line.person else None
         birth_latlon = birth_event.getattr('latlon') if birth_event else None
         activepos = birth_latlon
             
@@ -233,7 +233,7 @@ class foliumExporter:
             self._build_yearly_positions(line, minyear, maxyear, mycluster)
             
             # Add death location if available
-            death_event = person.death if person else None
+            death_event = person.get_event('death') if person else None
             death_latlon = death_event.getattr('latlon') if death_event else None
             death_year_num = death_event.getattr('when_year_num') if death_event else None
             if death_latlon:
@@ -360,8 +360,9 @@ class foliumExporter:
         except Exception:
             tile = xyz.CartoDB
 
-        birth_event = getattr(self.gOp.mainPerson, 'birth', None)
-        death_event = getattr(self.gOp.mainPerson, 'death', None)
+        main_person = self.gOp.mainPerson if self.gOp.mainPerson else None
+        birth_event = main_person.get_event('birth') if main_person else None
+        death_event = main_person.get_event('death') if main_person else None
         birth_latlon = birth_event.getattr('latlon') if birth_event else None
         death_latlon = death_event.getattr('latlon') if death_event else None
 
@@ -430,8 +431,10 @@ class foliumExporter:
         label_name = line.name[:25] + "..." if len(line.name) > 25 else line.name
         group_name = lgd_txt.format(txt=label_name, col=marker_options['line_color'])
         person = line.person
-        birth_year_num = person.birth.date.year_num if person.birth and person.birth.date else None
-        death_year_num = person.death.date.year_num if person.death and person.death.date else None
+        birth_event = person.get_event('birth') if person else None
+        death_event = person.get_event('death') if person else None
+        birth_year_num = birth_event.date.year_num if birth_event and birth_event.date else None
+        death_year_num = death_event.date.year_num if death_event and death_event.date else None
         birth_info = f"{birth_year_num} (Born)" if birth_year_num else ''
         death_info = f"{death_year_num} (Died)" if death_year_num else ''
         popup_content = self._create_popup_content(line, birth_info, death_info)

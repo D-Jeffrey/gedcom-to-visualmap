@@ -71,23 +71,26 @@ def write_people_summary(people: Dict[str, Any], output_file: str) -> None:
     """
     people_summary = []
     for person_id, person in people.items():
-        birth_place = person.birth.place if person.birth else ''
-        birth_continent = getattr(getattr(person.birth, 'location', None), 'continent', '') if person.birth else ''
+        birth_event = person.get_event('birth') if person else None
+        death_event = person.get_event('death') if person else None
+
+        birth_place = birth_event.place if birth_event else ''
+        birth_continent = getattr(getattr(birth_event, 'location', None), 'continent', '') if birth_event else ''
         if birth_place and not birth_continent:
             logger.warning(f"Birth continent not found for {person.name}; place: {birth_place}; continent: {birth_continent}")
         people_summary.append({
             'ID': person_id,
             'Name': person.name,
             'birth_place': birth_place,
-            'birth_alt_addr': getattr(getattr(person.birth, 'location', None), 'alt_addr', '') if person.birth else '',
-            'birth_date': person.birth.date.year_num if person.birth else '',
-            'birth_country': getattr(getattr(person.birth, 'location', None), 'country_name', '') if person.birth else '',
+            'birth_alt_addr': getattr(getattr(birth_event, 'location', None), 'alt_addr', '') if birth_event else '',
+            'birth_date': birth_event.date.year_num if birth_event else '',
+            'birth_country': getattr(getattr(birth_event, 'location', None), 'country_name', '') if birth_event else '',
             'birth_continent': birth_continent,
-            'death_place': person.death.place if person.death else '',
-            'death_alt_addr': getattr(getattr(person.death, 'location', None), 'alt_addr', '') if person.death else '',
-            'death_date': person.death.date.year_num if person.death else '',
-            'death_country': getattr(getattr(person.death, 'location', None), 'country_name', '') if person.death else '',
-            'death_continent': getattr(getattr(person.death, 'location', None), 'continent', '') if person.death else ''
+            'death_place': death_event.place if death_event else '',
+            'death_alt_addr': getattr(getattr(death_event, 'location', None), 'alt_addr', '') if death_event else '',
+            'death_date': death_event.date.year_num if death_event else '',
+            'death_country': getattr(getattr(death_event, 'location', None), 'country_name', '') if death_event else '',
+            'death_continent': getattr(getattr(death_event, 'location', None), 'continent', '') if death_event else ''
         })
 
     try:
@@ -350,8 +353,10 @@ def write_birth_death_countries_summary( people: Dict[str, Any], output_file: st
     birth_death_countries_summary = {}
 
     for person_id, person in people.items():
-        birth_location = getattr(person.birth, 'location', None) if person.birth else None
-        death_location = getattr(person.death, 'location', None) if person.death else None
+        birth_event = person.get_event('birth') if person else None
+        death_event = person.get_event('death') if person else None
+        birth_location = getattr(birth_event, 'location', None) if birth_event else None
+        death_location = getattr(death_event, 'location', None) if death_event else None
 
         birth_country = getattr(birth_location, 'country_name', 'none') if birth_location else 'none'
         birth_country_continent = getattr(birth_location, 'continent', 'none') if birth_location else 'none'

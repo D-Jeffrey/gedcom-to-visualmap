@@ -188,6 +188,18 @@ pytest
 ```
 All core modules and models are covered by pytest-based tests. See the `tests/` and `models/tests/` directories for details.
 
+# Running Address Book Performance Tests
+
+To run the address book/geocoding performance test and see detailed output in the terminal, use:
+
+```
+pytest -s gedcom-to-map/geo_gedcom/tests/test_addressbook_performance.py
+```
+
+The `-s` option ensures that all print statements from the test are shown in the terminal.
+Note: it requires some geo_cache files that may not be checked-in to the repo by default, so might need to be generated manually using the "SUM" output option first.
+
+
 ---
 
 ## Releases

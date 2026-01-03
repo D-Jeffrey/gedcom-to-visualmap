@@ -80,17 +80,14 @@ def performance_results():
               f"{r['fuzzy_success']/r['t_fuzzy']:,.1f}/s|{r['get_success']/r['t_get']:,.1f}/s|" + 
               f"{(r['t_location']):.5f}s|{(r['t_add']-r['t_location']):.5f}s|{r['t_fuzzy']:.5f}s|{r['t_get']:.5f}s|{r['fuzzy_success']}|{r['get_success']}")
 
-# Note: some of these cache files are not currently included in the online repository
-# They should be created from GEDCOM samples with geo-coding enabled, using the "SUM" output option.
 @pytest.mark.parametrize("label,cache_file_path", [
     ('simple', 'gedcom-samples/geo_cache.csv'),
     ('pres2020', 'gedcom-samples/pres/geo_cache.csv'),
     ('royal92', 'gedcom-samples/royal/geo_cache.csv'),
-    # these are in the online repository:
     ('ivar', 'gedcom-samples/ivar/geo_cache.csv'),
     ('bourbon', 'gedcom-samples/sample-bourbon/geo_cache.csv'),
     ('kennedy', 'gedcom-samples/sample-kennedy/geo_cache.csv'),
-    # ('longsword', 'gedcom-to-map/geo_gedcom/gedcom-samples/longsword/geo_cache.csv'),
+    # ('longsword', 'gedcom-samples/longsword/geo_cache.csv'),
 ])
 def test_addressbook_performance(label, cache_file_path, performance_results):
     geo_cache = load_geo_cache(cache_file_path)

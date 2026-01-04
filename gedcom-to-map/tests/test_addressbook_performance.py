@@ -148,7 +148,7 @@ def run_performance_test(label, cache_file_path, performance_results, fuzz: bool
         't_location': t_location,
         't_add': t_add,
         't_fuzzy': t_fuzzy,
-        't_addoff': t_addoff,
+        't_addoff': t_add,
         't_get': t_get,
         'fuzzy_success': fuzzy_success,
         'get_success': get_success
@@ -157,7 +157,7 @@ def run_performance_test(label, cache_file_path, performance_results, fuzz: bool
     performance_results.append(summary)
 
     # Print timings for manual review
-    print(f"{cache_file_path}: Location: {t_location:.4f}s, Add: {t_add:.4f}s, Add: {t_addoff:.4f}s, Fuzzy: {t_fuzzy:.4f}s, Get: {t_get:.4f}s, Fuzzy Success: {fuzzy_success}, Get Success: {get_success}")
+    print(f"{cache_file_path}: Location: {t_location:.4f}s, Add: {t_add:.4f}s, Add: {t_add:.4f}s, Fuzzy: {t_fuzzy:.4f}s, Get: {t_get:.4f}s, Fuzzy Success: {fuzzy_success}, Get Success: {get_success}")
 
     # Assert high success rates
     # assert fuzzy_success / len(geo_cache) > 0.99, f"Fuzzy lookup success rate below 99% - only {(fuzzy_success/len(geo_cache)*100):.3f}%"

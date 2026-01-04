@@ -102,7 +102,7 @@ def performance_results() -> Iterator[Dict[str, Any]]:
 @pytest.mark.parametrize("label,cache_file_path", [
     ('simple', 'gedcom-samples/geo_cache.csv'),
     ('pres2020', 'gedcom-samples/pres/geo_cache.csv'),
-    # ('royal92', 'gedcom-samples/royal/geo_cache.csv'),
+    ('royal92', 'gedcom-samples/royal/geo_cache.csv'),
     # ('habs', 'gedcom-samples/habs/geo_cache.csv'),
     # ('ivar', 'gedcom-samples/ivar/geo_cache.csv'),
     # ('queen', 'gedcom-samples/queen/geo_cache.csv'),

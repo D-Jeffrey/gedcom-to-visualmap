@@ -1083,7 +1083,8 @@ class VisualMapActions:
                     alt_place_file_path=alt_place_file_path if not gOp.skip_file_alt_places else None,
                     geo_config_path=geo_config_path,
                     # per_file_geo_cache=file_geo_cache_path,
-                    app_hooks=gOp.app_hooks
+                    app_hooks=gOp.app_hooks,
+                    fuzz = False
                 )
                 _log.info ("Completed Geocode")
                 gOp.lookup.save_location_cache()

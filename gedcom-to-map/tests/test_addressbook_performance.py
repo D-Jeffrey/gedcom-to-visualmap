@@ -25,16 +25,18 @@ def create_locations(geo_cache):
     t1 = timeit.default_timer()
     return locations, t1 - t0
 
-def add_addresses_to_book(geo_cache):
+def add_addresses_to_book(geo_cache, fuzzy):
     ab = FuzzyAddressBook()
     t0 = timeit.default_timer()
     for lookup in geo_cache.values():
         location = Location(address=lookup['address'], latitude=lookup['latitude'], longitude=lookup['longitude'],
                             country_name=lookup['country_name'], country_code=lookup['country_code'],
                             found_country=lookup['found_country'], alt_addr=lookup['alt_addr'])
-        ab.add_address(lookup['address'], location)
+        ab.add_address(lookup['address'], location, fuzz=fuzzy)
     t1 = timeit.default_timer()
     return ab, t1 - t0
+
+
 
 def fuzzy_lookup_success(geo_cache, ab):
     t0 = timeit.default_timer()
@@ -73,12 +75,12 @@ def performance_results():
     results = []
     yield results
     print("\n### Addressbook Performance")
-    print("Cache File|Entries|Fuzzy % |Get %|Fuzz Rate|Get Rate|Location|Add address|Fuzzy Time|Get Time|Fuzzy #| Get #")
-    print(f"{'---|' * 12}")
+    print("Cache File|Entries|Fuzzy % |Get %|Fuzz Rate|Get Rate|Location|Add address|Add Address Fuzz off |Fuzzy TimeTime|Get Time|Fuzzy #| Get #")
+    print(f"{'---|' * 13}")
     for r in results:
         print(f"{r['cache_file']}|{r['entries']}|{r['fuzzy_success']/r['entries']*100:.1f}%|{r['get_success']/r['entries']*100:.1f}%|" +
               f"{r['fuzzy_success']/r['t_fuzzy']:,.1f}/s|{r['get_success']/r['t_get']:,.1f}/s|" + 
-              f"{(r['t_location']):.5f}s|{(r['t_add']-r['t_location']):.5f}s|{r['t_fuzzy']:.5f}s|{r['t_get']:.5f}s|{r['fuzzy_success']}|{r['get_success']}")
+              f"{(r['t_location']):.5f}s|{(r['t_add']-r['t_location']):.5f}s|{r['t_addoff']-r['t_location']:.5f}s|{r['t_fuzzy']:.5f}s|{r['t_get']:.5f}s|{r['fuzzy_success']}|{r['get_success']}")
 
 @pytest.mark.parametrize("label,cache_file_path", [
     ('simple', 'gedcom-samples/geo_cache.csv'),
@@ -98,9 +100,15 @@ def test_addressbook_performance(label, cache_file_path, performance_results):
     locations, t_location = create_locations(geo_cache)
     print(f"- Location time : {t_location:.4f}s")
     
-    ab, t_add = add_addresses_to_book(geo_cache)
-    print(f"- Location + add_address time : {t_add:.4f}s")
+    ab, t_add = add_addresses_to_book(geo_cache, True)
+    # Location + add_address time creats Location so subtract to get add_address time
     print(f"- Add_address time : {t_add - t_location:.4f}s")
+    # assert len(ab.addresses()) == len(geo_cache), f"AddressBook entries {len(ab.addresses())} does not match GeoCache entries {len(geo_cache)}"
+
+    aboff, t_addoff = add_addresses_to_book(geo_cache, False)
+    print(f"- Add_address_nofuzz time : {t_addoff - t_location:.4f}s")
+    #assert len(aboff.addresses()) == len(geo_cache), f"AddressBook entries {len(aboff.addresses())} does not match GeoCache entries {len(geo_cache)}"
+
 
     fuzzy_success, t_fuzzy = fuzzy_lookup_success(geo_cache, ab)
     get_success, t_get = get_address_success(geo_cache, ab)
@@ -114,6 +122,7 @@ def test_addressbook_performance(label, cache_file_path, performance_results):
         't_location': t_location,
         't_add': t_add,
         't_fuzzy': t_fuzzy,
+        't_addoff': t_addoff,
         't_get': t_get,
         'fuzzy_success': fuzzy_success,
         'get_success': get_success
@@ -122,7 +131,7 @@ def test_addressbook_performance(label, cache_file_path, performance_results):
     performance_results.append(summary)
 
     # Print timings for manual review
-    print(f"{cache_file_path}: Location: {t_location:.4f}s, Add: {t_add:.4f}s, Fuzzy: {t_fuzzy:.4f}s, Get: {t_get:.4f}s, Fuzzy Success: {fuzzy_success}, Get Success: {get_success}")
+    print(f"{cache_file_path}: Location: {t_location:.4f}s, Add: {t_add:.4f}s, Add: {t_addoff:.4f}s, Fuzzy: {t_fuzzy:.4f}s, Get: {t_get:.4f}s, Fuzzy Success: {fuzzy_success}, Get Success: {get_success}")
 
     # Assert high success rates
     # assert fuzzy_success / len(geo_cache) > 0.99, f"Fuzzy lookup success rate below 99% - only {(fuzzy_success/len(geo_cache)*100):.3f}%"

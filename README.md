@@ -193,12 +193,56 @@ All core modules and models are covered by pytest-based tests. See the `tests/` 
 To run the address book/geocoding performance test and see detailed output in the terminal, use:
 
 ```
-pytest -s gedcom-to-map/geo_gedcom/tests/test_addressbook_performance.py
+pytest -s -m slow gedcom-to-map/tests/test_addressbook_performance.py
 ```
 
-The `-s` option ensures that all print statements from the test are shown in the terminal.
-Note: it requires some geo_cache files that may not be checked-in to the repo by default, so might need to be generated manually using the "SUM" output option first.
+This test benchmarks address book and geocoding operations across multiple GEDCOM samples, for both fuzzy and exact matching. It prints a markdown table of results to the terminal and also writes structured results to `gedcom-to-map/tests/addressbook_performance_results.yaml` for further analysis.
 
+The `-s` option ensures that all print statements from the test are shown in the terminal.
+
+Note: It requires some geo_cache files that may not be checked-in to the repo by default, so you might need to generate them manually using the "SUM" output option first.
+
+# Running GeolocatedGedcom Performance Tests
+
+To run the GeolocatedGedcom initialization performance test:
+
+```
+pytest -s -m slow gedcom-to-map/tests/test_geolocatedgedcom_performance.py
+```
+
+This test measures the initialization time and basic stats for the `GeolocatedGedcom` class across the same set of GEDCOM samples, for both fuzzy and exact matching. It prints a markdown table of results to the terminal and writes structured results to `gedcom-to-map/tests/geolocatedgedcom_performance_results.yaml`.
+
+## Running Slow/Performance Tests
+
+Some tests are marked with the `@pytest.mark.slow` decorator to indicate that they are slow or intended for manual/performance runs only. By default, these tests are skipped unless explicitly requested.
+
+To run only the slow tests:
+
+```
+pytest -m slow
+```
+
+To run all tests except those marked as slow:
+
+```
+pytest -m 'not slow'
+```
+
+To mark a test as slow, add the following decorator above your test function:
+
+```python
+import pytest
+
+@pytest.mark.slow
+```
+
+You may want to register the marker in your `pytest.ini` to avoid warnings:
+
+```
+[pytest]
+markers =
+    slow: marks tests as slow (deselect with '-m "not slow"')
+```
 
 ---
 

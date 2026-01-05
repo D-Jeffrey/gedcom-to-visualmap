@@ -1084,7 +1084,7 @@ class VisualMapActions:
                     geo_config_path=geo_config_path,
                     # per_file_geo_cache=file_geo_cache_path,
                     app_hooks=gOp.app_hooks,
-                    fuzz = False
+                    fuzz = True
                 )
                 _log.info ("Completed Geocode")
                 gOp.lookup.save_location_cache()

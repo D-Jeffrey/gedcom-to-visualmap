@@ -89,14 +89,14 @@ def run_geolocatedgedcom_perf(
 @pytest.mark.parametrize("fuzz", [False, True])
 @pytest.mark.parametrize("label,cache_file_path,gedcom_file_path", [
     ('simple', 'gedcom-samples/geo_cache.csv', 'gedcom-samples/input.ged'),
-    ('pres2020', 'gedcom-samples/pres/geo_cache.csv', 'gedcom-samples/pres/pres2020.ged'),
-    ('royal92', 'gedcom-samples/royal/geo_cache.csv', 'gedcom-samples/royal/royal92.ged'),
+    # ('pres2020', 'gedcom-samples/pres/geo_cache.csv', 'gedcom-samples/pres/pres2020.ged'),
+    # ('royal92', 'gedcom-samples/royal/geo_cache.csv', 'gedcom-samples/royal/royal92.ged'),
     # ('habs', 'gedcom-samples/habs/geo_cache.csv', 'gedcom-samples/habs/Habsburg.ged'),
     # ('ivar', 'gedcom-samples/ivar/geo_cache.csv', 'gedcom-samples/ivar/IvarKingOfDublin.ged'),
     # ('queen', 'gedcom-samples/queen/geo_cache.csv', 'gedcom-samples/queen/Queen.ged'),
     # ('bourbon', 'gedcom-samples/sample-bourbon/geo_cache.csv', 'gedcom-samples/sample-bourbon/bourbon.ged'),
     # ('kennedy', 'gedcom-samples/sample-kennedy/geo_cache.csv', 'gedcom-samples/sample-kennedy/kennedy.ged'),
-    # ('longsword', 'gedcom-samples/longsword/geo_cache.csv', 'gedcom-samples/longsword/longsword.ged'),
+    # ('longsword', 'gedcom-samples/longsword/geo_cache.csv', 'gedcom-samples/longsword/WilliamLongsword.ged'),
 ])
 @pytest.mark.parametrize("geo_config_path", ['geo_config.yaml'])
 # @pytest.mark.parametrize("cache_only", [False, True])

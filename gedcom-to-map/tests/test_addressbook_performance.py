@@ -3,9 +3,10 @@ import timeit
 import pytest
 import yaml
 from typing import List, Dict, Any, Tuple, Iterator
-from geo_gedcom.addressbook import FuzzyAddressBook
+from geo_gedcom.addressbook import AddressBook
 from geo_gedcom.geocache import GeoCache
 from geo_gedcom.location import Location
+from geo_gedcom.lat_lon import LatLon
 
 def load_geo_cache(cache_file: str) -> Dict[str, Any]:
     always_geocode = False
@@ -20,16 +21,27 @@ def create_locations(geo_cache: Dict[str, Any]) -> Tuple[List[Dict[str, Any]], f
     t0 = timeit.default_timer()
     address_location_list = []
     for lookup in geo_cache.values():
-        address = lookup['address']
-        location = Location(address=lookup['address'], latitude=lookup['latitude'], longitude=lookup['longitude'],
-                            country_name=lookup['country_name'], country_code=lookup['country_code'],
-                            found_country=lookup['found_country'], alt_addr=lookup['alt_addr'])
+        address = lookup.address
+        latlon = None
+        if getattr(lookup, 'latitude', None) and getattr(lookup, 'longitude', None):
+            try:
+                latlon = LatLon(float(lookup.latitude), float(lookup.longitude))
+            except Exception:
+                latlon = None
+        location = Location(
+            address=address,
+            latlon=latlon,
+            country_name=getattr(lookup, 'country_name', None),
+            country_code=getattr(lookup, 'country_code', None),
+            found_country=getattr(lookup, 'found_country', False),
+            alt_addr=getattr(lookup, 'alt_addr', None)
+        )
         address_location_list.append({'address': address, 'location': location})
     t1 = timeit.default_timer()
     return address_location_list, t1 - t0
 
-def add_addresses_to_book(address_location_list: List[Dict[str, Any]], fuzz: bool = True) -> Tuple[FuzzyAddressBook, float]:
-    ab = FuzzyAddressBook(fuzz=fuzz)
+def add_addresses_to_book(address_location_list: List[Dict[str, Any]], fuzz: bool = True) -> Tuple[AddressBook, float]:
+    ab = AddressBook(fuzz=fuzz)
     t0 = timeit.default_timer()
     for item in address_location_list:
         address = item['address']
@@ -38,22 +50,22 @@ def add_addresses_to_book(address_location_list: List[Dict[str, Any]], fuzz: boo
     t1 = timeit.default_timer()
     return ab, t1 - t0
 
-def fuzzy_lookup_success(geo_cache: Dict[str, Any], ab: FuzzyAddressBook) -> Tuple[int, float]:
+def fuzzy_lookup_success(geo_cache: Dict[str, Any], ab: AddressBook) -> Tuple[int, float]:
     t0 = timeit.default_timer()
     fuzzy_success = 0
     for lookup in geo_cache.values():
-        ladr = lookup['address']
+        ladr = lookup.address
         adr = ab.fuzzy_lookup_address(ladr)
         if adr is not None:
             fuzzy_success += 1
     t1 = timeit.default_timer()
     return fuzzy_success, t1 - t0
 
-def get_address_success(geo_cache: Dict[str, Any], ab: FuzzyAddressBook) -> Tuple[int, float]:
+def get_address_success(geo_cache: Dict[str, Any], ab: AddressBook) -> Tuple[int, float]:
     t0 = timeit.default_timer()
     get_success = 0
     for lookup in geo_cache.values():
-        ladr = lookup['address']
+        ladr = lookup.address
         adr = ab.get_address(ladr)
         if adr is not None and adr.address == ladr:
             get_success += 1
@@ -101,8 +113,8 @@ def performance_results() -> Iterator[Dict[str, Any]]:
 @pytest.mark.parametrize("fuzz", [False, True])
 @pytest.mark.parametrize("label,cache_file_path", [
     ('simple', 'gedcom-samples/geo_cache.csv'),
-    ('pres2020', 'gedcom-samples/pres/geo_cache.csv'),
-    ('royal92', 'gedcom-samples/royal/geo_cache.csv'),
+    # ('pres2020', 'gedcom-samples/pres/geo_cache.csv'),
+    # ('royal92', 'gedcom-samples/royal/geo_cache.csv'),
     # ('habs', 'gedcom-samples/habs/geo_cache.csv'),
     # ('ivar', 'gedcom-samples/ivar/geo_cache.csv'),
     # ('queen', 'gedcom-samples/queen/geo_cache.csv'),

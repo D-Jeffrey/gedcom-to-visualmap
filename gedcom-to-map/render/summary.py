@@ -16,14 +16,14 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-from geo_gedcom.addressbook import FuzzyAddressBook
+from geo_gedcom.addressbook import AddressBook
 
 logger = logging.getLogger(__name__)
 # Avoid using any interactive backends
 matplotlib.use("Agg")
 
 
-def write_places_summary(address_book: FuzzyAddressBook, output_file: str) -> None:
+def write_places_summary(address_book: AddressBook, output_file: str) -> None:
     """
     Write a summary of all geolocated places to a CSV file.
 
@@ -32,7 +32,7 @@ def write_places_summary(address_book: FuzzyAddressBook, output_file: str) -> No
 
     Args:
         args (Namespace): Parsed CLI arguments.
-        address_book (FuzzyAddressBook): Address book containing geolocated places.
+        address_book (AddressBook): Address book containing geolocated places.
         output_file (str): Output CSV file path.
     """
     try:
@@ -386,14 +386,14 @@ def write_birth_death_countries_summary( people: Dict[str, Any], output_file: st
     logger.info(f"Saved heatmap matrix image to {output_image_file}")
     return output_image_file
 
-def write_geocache_summary(address_book: FuzzyAddressBook, output_file: str) -> None:
+def write_geocache_summary(address_book: AddressBook, output_file: str) -> None:
     """
     Write the geocoded location cache to a CSV file using pandas DataFrame.
 
     Drops duplicate addresses, keeping the first occurrence.
 
     Args:
-        address_book (FuzzyAddressBook): Address book containing geolocated places.
+        address_book (AddressBook): Address book containing geolocated places.
         output_file (str): Output CSV file path.
     """
     # Prepare data for DataFrame
@@ -412,7 +412,7 @@ def write_geocache_summary(address_book: FuzzyAddressBook, output_file: str) -> 
     except IOError as e:
         logger.error(f"Failed to write places summary to {output_file}: {e}")
 
-def write_alt_places_summary(address_book: FuzzyAddressBook, output_file: str) -> None:
+def write_alt_places_summary(address_book: AddressBook, output_file: str) -> None:
     """
     Write a summary of all alternative place names to a CSV file.
 
@@ -420,7 +420,7 @@ def write_alt_places_summary(address_book: FuzzyAddressBook, output_file: str) -
 
     Args:
         args (Namespace): Parsed CLI arguments.
-        address_book (FuzzyAddressBook): Address book containing geolocated places.
+        address_book (AddressBook): Address book containing geolocated places.
         output_file (str): Output CSV file path.
     """
     records = []

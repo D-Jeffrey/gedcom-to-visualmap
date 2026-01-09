@@ -204,7 +204,7 @@ class PersonDialog(wx.Dialog):
 
         issues = person.check_age_problems(people)  # List of age problem strings
         
-        extras = ["Has military Service records."] if person.military else []
+        extras = ["Has military Service records."] if person.get_events('military') else []
 
         grid_details = [
             {"wx_name": "nameTextCtrl", "label": "Name:", "size": (550, -1)},

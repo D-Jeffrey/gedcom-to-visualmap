@@ -88,6 +88,7 @@ Assuming you have Python installed (see [Install-Python](https://github.com/Pack
 
 5. **Update your code and dependencies:**
     ```console
+    git config pull.rebase false https://github.com/D-Jeffrey/gedcom-to-visualmap
     git pull https://github.com/D-Jeffrey/gedcom-to-visualmap
     pip install -r requirements.txt
     pip install -r gedcom-to-map/geo_gedcom/requirements.txt

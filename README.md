@@ -41,48 +41,56 @@ Originally forked from [https://github.com/lmallez/gedcom-to-map], now in collab
 Assuming you have Python installed (see [Install-Python](https://github.com/PackeTsar/Install-Python#readme) if not):
 
 1. **Clone the repository:**
-    ```sh
+    ```console
     git clone --recurse-submodules https://github.com/D-Jeffrey/gedcom-to-visualmap
     cd gedcom-to-visualmap
     git submodule update --init --recursive
     ```
     *Or download and unzip the latest [release](https://github.com/D-Jeffrey/gedcom-to-visualmap/releases).*
+    *if you get an error because you have not setup git ssh then use the commands:
+    ```console
+    git clone --recurse-submodules https://github.com/D-Jeffrey/gedcom-to-visualmap
+    cd gedcom-to-visualmap
+    git config --global url."https://github.com/".insteadOf git@github.com:
+    git submodule update --init --recursive
+    ```
 
 2. **Create and activate a virtual environment:**
 
     For Windows (PowerShell):
-    ```sh
+    ```console
     python3 -m venv venv
     venv\Scripts\activate.ps1
     ```
 
     For Linux and Mac:
-    ```sh
+    ```console
     python3 -m venv venv
     source venv/Scripts/activate
     ```
 
 3. **Install dependencies:**
-    ```sh
+    ```console
     pip install -r requirements.txt
     pip install -r gedcom-to-map/geo_gedcom/requirements.txt
     ```
 
 4. **Run the GUI interface:**
-    ```sh
+    ```console
     cd gedcom-to-map
     python3 gv.py
     ```
     *Or run the command-line interface:*
-    ```sh
+    ```console
     cd gedcom-to-map
     python3 gedcom-to-map.py /path/to/your.ged myTree -main "@I500003@"
     ```
 
 5. **Update your code and dependencies:**
-    ```sh
+    ```console
     git pull https://github.com/D-Jeffrey/gedcom-to-visualmap
     pip install -r requirements.txt
+    pip install -r gedcom-to-map/geo_gedcom/requirements.txt
     ```
 
 ---

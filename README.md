@@ -66,7 +66,7 @@ Assuming you have Python installed (see [Install-Python](https://github.com/Pack
     For Linux and Mac:
     ```console
     python3 -m venv venv
-    source venv/Scripts/activate
+    source venv/bin/activate
     ```
 
 3. **Install dependencies:**

@@ -25,8 +25,8 @@ from .about_dialog import AboutDialog
 from .help_dialog import HelpDialog
 from .visual_map_panel import VisualMapPanel
 from .visual_gedcom_ids import VisualGedcomIds
+from .font_manager import FontManager
 from gedcom_options import gvOptions, ResultType
-from style.stylemanager import FontManager
 
 class VisualMapFrame(wx.Frame):
     """Main application window/frame.
@@ -378,7 +378,7 @@ class VisualMapFrame(wx.Frame):
                 else:
                     msg += "\nSelect main person for heritage line\n"
             if hasattr(self.visual_map_panel.gOp, "lookup") and getattr(self.visual_map_panel.gOp.lookup, "address_book", None):
-                stats = self.visual_map_panel.gOp.lookup.address_book.updatestats()
+                stats = self.visual_map_panel.actions.updatestats()
                 msg += f"\nTotal cached addresses: {self.visual_map_panel.gOp.lookup.address_book.len()}\n{stats}"
             wx.MessageBox(msg, "Statistics", wx.OK | wx.ICON_INFORMATION)
         except Exception:

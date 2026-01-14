@@ -3,14 +3,33 @@ import re
 import wx
 import wx.lib.mixins.listctrl as listmix
 
-from gedcom.gedcomdate import CheckAge
 from .person_dialog import PersonDialog
 from .find_dialog import FindDialog
 from .visual_gedcom_ids import VisualGedcomIds
-from style.stylemanager import FontManager
+from .font_manager import FontManager
 
 _log = logging.getLogger(__name__.lower())
 
+class PeopleListData:
+    def __init__(self):
+        self.name = ""
+        self.year_description = ""
+        self.id = ""
+        self.geocode = ""
+        self.address = ""
+        self.year_value = 0
+        
+    @classmethod
+    def from_dict(cls, data: dict):
+        instance = cls()
+        instance.name = data.get('name', "")
+        instance.year_description = data.get('year_description', "")
+        instance.id = data.get('id', "")
+        instance.geocode = data.get('geocode', "")
+        instance.address = data.get('address', "")
+        instance.year_value = data.get('year_value', 0)
+        return instance
+        
 class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSorterMixin):
     def __init__(self, parent, ID, pos=wx.DefaultPosition,
                  size=wx.DefaultSize, style=0, name="PeopleList",
@@ -58,10 +77,6 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
 
         self.itemDataMap = {}
         self.itemIndexMap = []
-        self.patterns = [
-            re.compile(r'(\d{1,6}) (B\.?C\.?)'),
-            re.compile(r'(\d{1,4})')
-        ]
 
         parent.Bind(wx.EVT_FIND, self.OnFind, self)
         self.Bind(wx.EVT_LIST_ITEM_RIGHT_CLICK, self.OnItemRightClick, self)
@@ -86,7 +101,7 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
 
         if loading:
             self.RemoveSortIndicator() if hasattr(self, "RemoveSortIndicator") else None
-            self.popdata = {}
+            self.popdata: dict[int, PeopleListData] = {}
 
         if loading or (self._LastGridOnlyFamily != self.GridOnlyFamily):
             self.DeleteAllItems()
@@ -104,9 +119,17 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
             index = 0
             for h in people:
                 if hasattr(people[h], 'name'):
-                    d, y = people[h].refyear()
-                    (location, where) = people[h].bestlocation()
-                    self.popdata[index] = (people[h].name, d, people[h].xref_id, location, where, self.ParseDate(y))
+                    person = people[h]
+                    description, year_num = person.ref_year()
+                    (location, where) = person.bestlocation()
+                    self.popdata[index] = PeopleListData.from_dict({
+                        'name': person.name,
+                        'year_description': description,
+                        'id': person.xref_id,
+                        'geocode': location,
+                        'address': where,
+                        'year_value': year_num if year_num is not None else 0
+                    })
                     index += 1
 
         if self.gOp:
@@ -117,9 +140,9 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
                     self.gOp.step("Gridload", resetCounter=False, target=len(items))
                 except Exception:
                     pass
-            self.itemDataMap = {data[0]: data for data in items}
+            self.itemDataMap = {idx: pdata for idx, pdata in items}
             index = -1
-            for key, data in items:
+            for key, pdata in items:
                 try:
                     self.gOp.counter = key
                 except Exception:
@@ -128,19 +151,19 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
                     wx.Yield()
 
                 if self.GridOnlyFamily and getattr(self.gOp, "Referenced", None):
-                    DisplayItem = self.gOp.Referenced.exists(data[2])
+                    DisplayItem = self.gOp.Referenced.exists(pdata.id)
                 else:
                     DisplayItem = True
 
                 if DisplayItem:
                     if loading:
-                        index = self.InsertItem(self.GetItemCount(), data[0], -1)
-                        self.SetItem(index, 1, data[1])
-                        self.SetItem(index, 2, data[2])
-                        self.SetItem(index, 3, data[3])
-                        self.SetItem(index, 4, data[4])
+                        index = self.InsertItem(self.GetItemCount(), pdata.name, -1)
+                        self.SetItem(index, 1, str(pdata.year_description))
+                        self.SetItem(index, 2, pdata.id)
+                        self.SetItem(index, 3, pdata.geocode)
+                        self.SetItem(index, 4, pdata.address)
                         self.SetItemData(index, key)
-                        if mainperson == data[2]:
+                        if mainperson == pdata.id:
                             selectperson = index
                     else:
                         index += 1
@@ -149,12 +172,13 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
 
                     if getattr(self.gOp, "Referenced", None):
                         try:
-                            if self.gOp.Referenced.exists(data[2]):
+                            if self.gOp.Referenced.exists(pdata.id):
                                 self.gOp.selectedpeople = self.gOp.selectedpeople + 1
-                                if mainperson == data[2]:
+                                if mainperson == pdata.id:
                                     self.SetItemBackgroundColour(index, self.id.GetColor('MAINPERSON'))
                                 else:
-                                    issues = CheckAge(people, data[2])
+                                    person = people.get(pdata.id, None)
+                                    issues = person.check_age_problems(people) if person else None
                                     if issues:
                                         self.SetItemBackgroundColour(index, wx.YELLOW)
                                     else:
@@ -213,36 +237,30 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
             vis = getattr(top, 'visual_map_panel', None)
         return vis
 
-    def ParseDate(self, datestring):
-        if datestring is None:
-            return 0
-        for pattern in self.patterns:
-            match = pattern.search(str(datestring))
-            if match:
-                if pattern == self.patterns[0]:
-                    return -int(match.group(1))
-                else:
-                    return int(match.group(1))
-        return 0
-
     def GetColumnSorter(self):
         (col, ascending) = self.GetSortState()
         idsort = False
         if col == 2:
-            checkid = self.popdata[1][2]
-            idsort = checkid[0:2] == "@I" and checkid[-1] == "@"
+            checkid = self.popdata[1].id
+            idsort = checkid.startswith("@I") and checkid.endswith("@")
 
         def cmp_func(item1, item2):
+            person1 = self.popdata[item1]
+            person2 = self.popdata[item2]
             if col == 1:
-                year1 = self.popdata[item1][5]
-                year2 = self.popdata[item2][5]
+                year1 = person1.year_value
+                year2 = person2.year_value
                 return (year1 - year2) if ascending else (year2 - year1)
             elif col == 2 and idsort:
-                data1 = int(self.popdata[item1][col][2:-1])
-                data2 = int(self.popdata[item2][col][2:-1])
+                # Assuming IDs are like "@I123@", extract the number
+                data1 = int(person1.id[2:-1])
+                data2 = int(person2.id[2:-1])
             else:
-                data1 = self.popdata[item1][col]
-                data2 = self.popdata[item2][col]
+                # Map column index to attribute
+                col_map = {0: "name", 1: "year_description", 2: "id", 3: "geocode", 4: "address"}
+                attr = col_map.get(col, "name")
+                data1 = getattr(person1, attr)
+                data2 = getattr(person2, attr)
             return (data1 > data2) - (data1 < data2) if ascending else (data2 > data1) - (data2 < data1)
 
         return cmp_func

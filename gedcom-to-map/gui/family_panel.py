@@ -1,8 +1,8 @@
 import logging
 import wx
 import wx.grid as gridlib
-from gedcom.gedcomdate import maxage
-from style.stylemanager import FontManager
+from .font_manager import FontManager
+from geo_gedcom.person import Person
 
 _log = logging.getLogger(__name__.lower())
 
@@ -104,7 +104,7 @@ class FamilyPanel(wx.Panel):
 
             try:
                 if age != "?" and isinstance(age, int):
-                    if age < 0 or age > maxage:
+                    if age < 0 or age > Person.max_age:
                         self.grid.SetCellBackgroundColour(row, 4, wx.RED)
                         self.grid.SetCellTextColour(row, 4, wx.WHITE)
                     elif (age > 60 or age < 13) and isLineage:

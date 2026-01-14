@@ -15,8 +15,8 @@ from typing import Any, Dict, Union
 import wx
 import wx.lib.mixins.listctrl as listmix
 from .people_list_ctrl import PeopleListCtrl
-from models.Person import Person
-from style.stylemanager import FontManager
+from .font_manager import FontManager
+from geo_gedcom.person import Person
 from gedcom_options import gvOptions
 
 _log = logging.getLogger(__name__.lower())

@@ -23,9 +23,11 @@ import re
 from typing import Union, Dict, Optional
 from enum import Enum
 import configparser
-from const import OFFICECMDLINE
+from const import OFFICECMDLINE, GEO_CONFIG_FILENAME
 from pathlib import Path
-from models.Person import Person, LatLon, LifeEvent
+from geo_gedcom.person import Person
+from geo_gedcom.lat_lon import LatLon
+from geo_gedcom.life_event import LifeEvent
 
 _log = logging.getLogger(__name__)
 
@@ -184,6 +186,8 @@ class gvOptions:
     GEDCOM_OPTIONS_FILE = 'gedcom_options.yaml'
 
     def __init__ (self):
+        from gui.gui_hooks import GuiHooks
+
         """Load static defaults, initialize runtime state and read persisted settings."""
         file_path = Path(__file__).parent / self.GEDCOM_OPTIONS_FILE
         with open(file_path, 'r') as file:
@@ -192,6 +196,8 @@ class gvOptions:
         self.gvConfig = None
         self.set_marker_defaults()
         self.settingsfile = settings_file_pathname("gedcom-visualmap.ini")
+
+        self.geo_config_file: Path = Path(__file__).resolve().parent.parent / GEO_CONFIG_FILENAME
 
         gedcom_options_types = self.options.get('gedcom_options_types', {})
         gedcom_options_defaults = self.options.get('gedcom_options_defaults', {})
@@ -204,6 +210,8 @@ class gvOptions:
         self.people: Union[Dict[str, Person], None] = None
         self.time = time.ctime()
         self.resettimeframe()
+
+        self.app_hooks: GuiHooks = GuiHooks(self)
         
         self.file_open_commands = FileOpenCommandLines()
         os_name = platform.system()
@@ -324,15 +332,15 @@ class gvOptions:
         """ Reset the timeframe for the process """
         self.timeframe = {'from': None, 'to': None}
 
-    def addtimereference(self, timeRefrence: LifeEvent):
+    def addtimereference(self, timeReference: LifeEvent):
         """Extend the global timeframe with a LifeEvent's year (if available)."""
         """ 
         Update the over all timeframe with person event details
         timeRefrence: LifeEvent
         """
-        if not timeRefrence:
+        if not timeReference:
             return
-        theyear = timeRefrence.whenyearnum()
+        theyear = timeReference.year_num
         if theyear is None:
             return
         if self.timeframe['from'] is None:
@@ -662,3 +670,4 @@ class gvOptions:
             self.setMain(value)
         else:
             setattr (self, attribute, value)
+            

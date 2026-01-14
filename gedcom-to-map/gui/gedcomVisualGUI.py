@@ -23,7 +23,7 @@ from typing import Any, Tuple
 
 import wx
 from .visual_map_frame import VisualMapFrame
-from style.stylemanager import FontManager
+from .font_manager import FontManager
 from gedcom_options import gvOptions
 
 _log = logging.getLogger(__name__.lower())

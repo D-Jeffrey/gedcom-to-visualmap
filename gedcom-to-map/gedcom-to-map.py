@@ -12,7 +12,7 @@ import logging.config
 
 from const import LOG_CONFIG, NAME, VERSION
 from gedcom_options import gvOptions, ResultType
-from gui.gedcomvisual import Geoheatmap, gedcom_to_map
+from gui.visual_map_actions import Geoheatmap, gedcom_to_map
 
 _log = logging.getLogger(__name__)
 
@@ -107,4 +107,3 @@ if __name__ == '__main__':
         gedcom_to_map(myGeoOptions)
     _log.info('Finished')
     exit(0)
-        

@@ -29,8 +29,8 @@ from .layout_options import LayoutOptions
 from .visual_gedcom_ids import VisualGedcomIds
 from .visual_map_event_handlers import VisualMapEventHandler
 from .visual_map_actions import VisualMapActions
+from .font_manager import FontManager
 from gedcom_options import gvOptions, ResultType  # type: ignore
-from style.stylemanager import FontManager
 
 (UpdateBackgroundEvent, EVT_UPDATE_STATE) = wx.lib.newevent.NewEvent()
 

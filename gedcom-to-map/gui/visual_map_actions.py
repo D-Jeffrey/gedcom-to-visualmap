@@ -11,15 +11,15 @@ import shlex
 from typing import Any, Optional, Dict, List, Tuple
 from pathlib import Path
 
-from models.Creator import Creator, LifetimeCreator, CreatorTrace, Person
-from render.foliumExp import foliumExporter
-from render.KmlExporter import KmlExporter
-from render.kml import KML_Life_Lines
-from render.Referenced import Referenced
+from models.creator import Creator, LifetimeCreator, CreatorTrace, Person
+from render.folium.folium_exporter import foliumExporter
+from render.kml1.kml_exporter import KmlExporter
+from render.kml2 import KML_Life_Lines
+from render.referenced import Referenced
 from render.summary import write_places_summary, write_people_summary, write_birth_death_countries_summary, write_geocache_summary, write_alt_places_summary
 
 from gedcom_options import gvOptions, ResultType
-from gedcom.gedcom import GeolocatedGedcom
+from geo_gedcom.geolocated_gedcom import GeolocatedGedcom
 from .do_actions_type import DoActionsType
 
 from const import GLOBAL_GEO_CACHE_FILENAME, FILE_ALT_PLACE_FILENAME_SUFFIX, FILE_GEOCACHE_FILENAME_SUFFIX, GEO_CONFIG_FILENAME
@@ -255,16 +255,27 @@ class VisualMapActions:
         _log.info('Opening in browser: %s (cmdline: %s)', datafile, cmdline)
         
         # Try custom command if configured
+        done = False
         if cmdline != '$n' and cmdline and not cmdline.startswith('http'):
             try:
                 cmd_parts = shlex.split(cmdline.replace('$n', datafile))
-                subprocess.Popen(cmd_parts, shell=False)
-                return
+                cmd_name = cmd_parts[0]
+                if shutil.which(cmd_name):
+                    subprocess.Popen(cmd_parts, shell=False)
+                    done = True
+                else:
+                    _log.warning("Custom HTML command '%s' not found, falling back to webbrowser", cmd_name)
             except Exception as e:
                 _log.warning("Custom HTML command failed, falling back to webbrowser: %s", e)
-        
-        # Fallback to default browser
-        webbrowser.open(datafile, new=0, autoraise=True)
+
+        if not done:        
+            # Fallback to default browser
+            # Convert file path to proper file:// URI if needed
+            if not datafile.startswith(('http://', 'https://', 'file://')):
+                datafile = Path(datafile).resolve().as_uri()
+            
+            _log.info('Opening URI in browser: %s', datafile)
+            webbrowser.open(datafile, new=0, autoraise=True)
 
     def _open_url(self, url: str) -> None:
         """Open HTTP/HTTPS URL in default web browser.
@@ -504,11 +515,11 @@ class VisualMapActions:
             for h in people:
                 try:
                     if gOp.Referenced.exists(people[h].xref_id):
-                        refyear, _ = people[h].refyear()
+                        ref_year, _ = people[h].ref_year()
                         (location, where) = people[h].bestlocation()
                         personpath: List[str] = gOp.lastlines[people[h].xref_id].path
                         trace.write(
-                            f"{people[h].xref_id}\t{people[h].name}\t{refyear}\t{where}\t{location}\t" + "\t".join(personpath) + "\n"
+                            f"{people[h].xref_id}\t{people[h].name}\t{ref_year}\t{where}\t{location}\t" + "\t".join(personpath) + "\n"
                         )
                 except Exception:
                     _log.exception("SaveTrace: writing person %r failed", h)
@@ -1050,7 +1061,8 @@ class VisualMapActions:
 
         if (stage == 1):
                 gOp.lookup = None  # Clear reference
-                _log.info ("Starting Address to GPS resolution")
+                _log.info("Starting Address to GPS resolution")
+                gOp.step("Resolving addresses to GPS locations")
                 input_path: Path = Path(gOp.GEDCOMinput)
                 if not input_path.is_absolute():
                     input_path = (Path.cwd() / input_path).resolve()
@@ -1060,16 +1072,19 @@ class VisualMapActions:
                 gOp.gpsfile = cachefile
                 alt_place_file_path: Path = input_path.parent / f"{base_file_name}{FILE_ALT_PLACE_FILENAME_SUFFIX}"
                 file_geo_cache_path: Path = input_path.parent / f"{base_file_name}{FILE_GEOCACHE_FILENAME_SUFFIX}"
-                geo_config_path: Path = Path(__file__).parent.resolve() / GEO_CONFIG_FILENAME
+                geo_config_path: Path = gOp.geo_config_file
                 defaultCountry: Optional[str] = gOp.get('defaultCountry') or None
                 gOp.lookup = GeolocatedGedcom(
                     gedcom_file=input_path.resolve(), 
                     location_cache_file=cachefile,
                     default_country=defaultCountry,
                     always_geocode=gOp.UseGPS,
-                    use_alt_places = not gOp.skip_file_alt_places,
+                    cache_only=gOp.CacheOnly,
                     alt_place_file_path=alt_place_file_path if not gOp.skip_file_alt_places else None,
-                    gOp=gOp
+                    geo_config_path=geo_config_path,
+                    # per_file_geo_cache=file_geo_cache_path,
+                    app_hooks=gOp.app_hooks,
+                    fuzz = True
                 )
                 _log.info ("Completed Geocode")
                 gOp.lookup.save_location_cache()
@@ -1252,7 +1267,7 @@ class VisualMapActions:
         
         people: Dict[str, Person] = gOp.people
         heritage: List[Tuple[str, str, Optional[int], str]] = []
-        heritage = [("", gOp.mainPerson.name, gOp.mainPerson.refyear()[0], gOp.mainPerson.xref_id)]
+        heritage = [("", gOp.mainPerson.name, gOp.mainPerson.ref_year()[0], gOp.mainPerson.xref_id)]
         if gOp.Referenced.exists(ToID.xref_id):
             personRelated: Optional[List[str]] = gOp.Referenced.gettag(ToID.xref_id)
             personTrace: Person = gOp.mainPerson
@@ -1276,8 +1291,32 @@ class VisualMapActions:
                     else:
                         _log.error("doTrace - neither Father or Mother, how did we get here?")
                         tag = "Unknown"
-                    heritage.append((f"[{tag}]",personTrace.name, personTrace.refyear()[0], personTrace.xref_id))
+                    heritage.append((f"[{tag}]",personTrace.name, personTrace.ref_year()[0], personTrace.xref_id))
         else:
             heritage.append(("NotDirect", ToID.name, None, ToID.xref_id))
         gOp.heritage = heritage
         return heritage
+    
+    def updatestats(self):
+        # count of 
+        count_of = ['arrivals', 'baptism', 'departures', 'marriages', 'military', 'residences']
+        used = 0
+        usedNone = 0
+        totaladdr = 0
+        my_gedcom: Optional[GeolocatedGedcom] = getattr(self.panel.gOp, "lookup", None)
+        if hasattr(my_gedcom, 'address_book') and my_gedcom.address_book:
+            for place,location in my_gedcom.address_book.addresses().items():
+                
+                if (getattr(location, 'used',0) > 0): 
+                    used += 1
+                    totaladdr += getattr(location, 'used',0)
+                    if (location and location.latlon is None or location.latlon.isNone()) or location is None : 
+                        usedNone += 1
+        hit = 1-(usedNone / used) if used > 0 else 0
+        self.stats = f"Unique addresses: {used} with unresolvable: {usedNone}\nAddress hit rate {hit:.1%}\n" 
+        people_list = getattr(self.panel.gOp, "people", None)
+        if people_list:
+            surname_list = list(person.surname.lower() for person in people_list.values() if person.surname )
+            total_surname = len(set(surname_list))
+            self.stats += f"Unique surnames: {total_surname}\n"
+        return self.stats

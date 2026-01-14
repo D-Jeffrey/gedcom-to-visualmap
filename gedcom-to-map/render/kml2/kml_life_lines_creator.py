@@ -157,8 +157,7 @@ class KML_Life_Lines_Creator:
         line_type = 'Parents'
         for _, person in self.gedcom.people.items():
             logger.info(f'person: {person}')
-            person_location = person.bestlocation()
-            person_latlon = person_location.latlon if person_location else None
+            person_latlon = person.bestLatLon() if person else None
             if person_latlon and person_latlon.is_valid():
                 birth_event = person.get_event('birth') if person else None
                 begin_date = birth_event.date.year_num if birth_event and birth_event.date else None
@@ -166,21 +165,21 @@ class KML_Life_Lines_Creator:
                 if person.father:
                     father = self.gedcom.people[person.father]
                     line_name = f'Father: {father.name}'
-                    father_location = father.bestlocation()
-                    if father_location and father_location.latlon and father_location.latlon.is_valid():
+                    father_latlon = father.bestLatLon() if father else None
+                    if father_latlon and father_latlon.is_valid():
                         father_birth_event = father.get_event('birth') if father else None
                         end_date = father_birth_event.date.year_num if father_birth_event and father_birth_event.date else None
-                        self.kml_instance.draw_line(line_type, line_name, person_latlon, father_location.latlon,
+                        self.kml_instance.draw_line(line_type, line_name, person_latlon, father_latlon,
                                                     begin_date, end_date, simplekml.Color.blue)
 
                 if person.mother:
                     mother = self.gedcom.people[person.mother]
                     line_name = f'Mother: {mother.name}'
-                    mother_location = mother.bestlocation()
-                    if mother_location and mother_location.latlon and mother_location.latlon.is_valid():
+                    mother_latlon = mother.bestLatLon() if mother else None
+                    if mother_latlon and mother_latlon.is_valid():
                         mother_birth_event = mother.get_event('birth') if mother else None
                         end_date = mother_birth_event.date.year_num if mother_birth_event and mother_birth_event.date else None
-                        self.kml_instance.draw_line(line_type, line_name, person_latlon, mother_location.latlon,
+                        self.kml_instance.draw_line(line_type, line_name, person_latlon, mother_latlon,
                                                     begin_date, end_date, simplekml.Color.red)
 
     def lookat_person(self, person_id: str) -> None:
@@ -191,12 +190,12 @@ class KML_Life_Lines_Creator:
             person_id (str): Person's xref ID.
         """
         person = self.gedcom.people.get(person_id)
-        if person and person.latlon and person.latlon.is_valid():
+        if person and person.bestLatLon() and person.bestLatLon().is_valid():
             birth_event = person.get_event('birth') if person else None
             death_event = person.get_event('death') if person else None
             begin_year = birth_event.date.year_num if birth_event and birth_event.date else None
             end_year = death_event.date.year_num if death_event and death_event.date else None
-            self.kml_instance.lookat(latlon=person.latlon, begin_year=begin_year, end_year=end_year)
+            self.kml_instance.lookat(latlon=person.bestLatLon(), begin_year=begin_year, end_year=end_year)
 
     def save_kml(self) -> None:
         """

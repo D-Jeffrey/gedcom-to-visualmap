@@ -194,7 +194,7 @@ class Creator:
 
         current = self.people[main_id]
         event = current.get_event(self.gpstype) if current else None
-        event_latlon = event.getattr('latlon') if event else (None,None)
+        event_latlon = event.getattr('latlon') if event else LatLon(None, None)
         return self.link(event_latlon, current) + \
             self.line(event_latlon, current, 0, 0, 0, "")
 
@@ -204,7 +204,7 @@ class Creator:
             if person not in c:
                 _log.debug("Others: + %s (%s) (%d)", self.people[person].name, person, len(listof))
                 event = self.people[person].get_event(self.gpstype) if self.people[person] else None
-                event_latlon = event.getattr('latlon') if event else (None,None)
+                event_latlon = event.getattr('latlon') if event else LatLon(None, None)
                 line = self.line(event_latlon, self.people[person], len(listof)/10, 5, 0, path="")
                 if line:
                     listof.extend(line)

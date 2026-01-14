@@ -47,7 +47,8 @@ Assuming you have Python installed (see [Install-Python](https://github.com/Pack
     git submodule update --init --recursive
     ```
     *Or download and unzip the latest [release](https://github.com/D-Jeffrey/gedcom-to-visualmap/releases).*
-    *if you get an error because you have not setup git ssh then use the commands:
+
+    *if you get an error because you have not setup git ssh then use the commands:*
     ```console
     git clone --recurse-submodules https://github.com/D-Jeffrey/gedcom-to-visualmap
     cd gedcom-to-visualmap
@@ -58,7 +59,7 @@ Assuming you have Python installed (see [Install-Python](https://github.com/Pack
 2. **Create and activate a virtual environment:**
 
     For Windows (PowerShell):
-    ```console
+    ```ps
     python3 -m venv venv
     venv\Scripts\activate.ps1
     ```

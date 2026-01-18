@@ -74,6 +74,8 @@ gedcom_options_types: {
   SummaryPlaces: 'bool', SummaryPeople: 'bool',
   SummaryCountries: 'bool', SummaryCountriesGrid: 'bool',
   SummaryGeocode: 'bool', SummaryAltPlaces: 'bool',
+  SummaryEnrichmentIssues: 'bool',
+  SummaryStatistics: 'bool',
   skip_file_geocache: 'bool', skip_file_alt_places: 'bool',
   defaultCountry: 'str', include_canonical: 'bool',
 
@@ -128,6 +130,8 @@ gedcom_options_defaults:
   SummaryCountries: False
   SummaryGeocode: True
   SummaryAltPlaces: False
+  SummaryEnrichmentIssues: True
+  SummaryStatistics: True
   skip_file_geocache: False
   skip_file_alt_places: False
   defaultCountry: null

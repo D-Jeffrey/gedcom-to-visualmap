@@ -90,7 +90,9 @@ class VisualGedcomIds:
             3: 'SummaryCountries',
             4: 'SummaryCountriesGrid',
             5: 'SummaryGeocode',
-            6: 'SummaryAltPlaces'
+            6: 'SummaryAltPlaces',
+            7: 'SummaryEnrichmentIssues',
+            8: 'SummaryStatistics',
         }
         for row, attr in summary_row_attribute_mapping.items():
             idref = wx.NewIdRef()

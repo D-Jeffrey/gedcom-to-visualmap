@@ -16,7 +16,7 @@ from render.folium.folium_exporter import foliumExporter
 from render.kml1.kml_exporter import KmlExporter
 from render.kml2 import KML_Life_Lines
 from render.referenced import Referenced
-from render.summary import write_places_summary, write_people_summary, write_birth_death_countries_summary, write_geocache_summary, write_alt_places_summary
+from render.summary import *
 
 from gedcom_options import gvOptions, ResultType
 from geo_gedcom.geolocated_gedcom import GeolocatedGedcom
@@ -872,6 +872,8 @@ class VisualMapActions:
                  - SummaryCountriesGrid: Generate countries chart image
                  - SummaryGeocode: Generate geocache CSV
                  - SummaryAltPlaces: Generate alt places CSV
+                 - SummaryEnrichmentIssues: Generate enhancement issues report
+                 - SummaryStatistics: Generate statistics summary
                  - SummaryOpen: Auto-open generated files
         
         Side Effects:
@@ -995,6 +997,36 @@ class VisualMapActions:
                     bg.SayInfoMessage(f"Alternative places summary: {alt_places_summary_file}")
                 if getattr(gOp, "SummaryOpen", False):
                     self.LoadFile('csv', str(alt_places_summary_file))
+
+        if getattr(gOp, "SummaryEnrichmentIssues", False):
+            enhancement_issues_file: Path = (output_folder / f"{base_file_name}_enrichment_issues.csv").resolve()
+            _log.info("Writing enrichment issues summary to %s", enhancement_issues_file)
+            try:
+                write_enrichment_issues_summary(my_gedcom.people, my_gedcom.enrichment.issues, str(enhancement_issues_file))
+            except Exception:
+                _log.exception("doSUM: write_enrichment_issues_summary failed")
+                if bg:
+                    bg.SayErrorMessage(f"Error writing enhancement issues summary to {enhancement_issues_file}")
+            if enhancement_issues_file.exists():
+                if bg:
+                    bg.SayInfoMessage(f"Enhancement issues summary: {enhancement_issues_file}")
+                if getattr(gOp, "SummaryOpen", False):
+                    self.LoadFile('csv', str(enhancement_issues_file))
+
+        if getattr(gOp, "SummaryStatistics", False):
+            statistics_summary_file: Path = (output_folder / f"{base_file_name}_statistics.yaml").resolve()
+            _log.info("Writing statistics summary to %s", statistics_summary_file)
+            try:
+                write_statistics_summary(my_gedcom.statistics, str(statistics_summary_file))
+            except Exception:
+                _log.exception("doSUM: write_statistics_summary failed")
+                if bg:
+                    bg.SayErrorMessage(f"Error writing statistics summary to {statistics_summary_file}")
+            if statistics_summary_file.exists():
+                if bg:
+                    bg.SayInfoMessage(f"Statistics summary: {statistics_summary_file}")
+                if getattr(gOp, "SummaryOpen", False):
+                    self.LoadFile('default', str(statistics_summary_file))
 
     def ParseAndGPS(self, gOp: gvOptions, stage: int = 0) -> Optional[Dict[str, Person]]:
         """Parse GEDCOM file and resolve addresses to GPS coordinates.

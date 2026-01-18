@@ -444,3 +444,42 @@ def write_alt_places_summary(address_book: AddressBook, output_file: str) -> Non
         df.to_csv(output_file, index=False, encoding='utf-8')
     except IOError as e:
         logger.error(f"Failed to write alternative places summary to {output_file}: {e}")
+
+def write_enrichment_issues_summary( people: Dict[str, Any], issues: Dict[str, Any], output_file: str) -> None:
+    """
+    Write a summary of all enrichment issues to a CSV file.
+
+    Each row contains: person_id, severity, issue_type, message.
+
+    Args:
+        args (Namespace): Parsed CLI arguments.
+        issues (list): List of enrichment issues.
+        output_file (str): Output CSV file path.
+    """
+    try:
+        with open(output_file, 'w', newline='', encoding='utf-8') as csvfile:
+            csv_writer = csv.writer(csvfile, dialect='excel')
+            csv_writer.writerow(['person_id', 'name', 'severity', 'issue_type', 'message'])
+            for issue in issues:
+                person = people.get(issue.person_id, None)
+                name = person.name if person else 'Unknown'
+                csv_writer.writerow([issue.person_id, name, issue.severity, issue.issue_type, issue.message])
+    except IOError as e:
+        logger.error(f"Failed to write enhancement issues summary to {output_file}: {e}")
+
+def write_statistics_summary( stats: Dict[str, Any], output_file: str) -> None:
+    """
+    Write a summary of statistics to a YAML file.
+
+    Args:
+        args (Namespace): Parsed CLI arguments.
+        stats (dict): Dictionary of statistics.
+        output_file (str): Output YAML file path.
+    """
+    try:
+        stats_results = stats.results if hasattr(stats, 'results') else stats
+        import yaml
+        with open(output_file, 'w', encoding='utf-8') as yamlfile:
+            yaml.dump(stats_results, yamlfile, default_flow_style=False, sort_keys=False, allow_unicode=True)
+    except IOError as e:
+        logger.error(f"Failed to write statistics summary to {output_file}: {e}")

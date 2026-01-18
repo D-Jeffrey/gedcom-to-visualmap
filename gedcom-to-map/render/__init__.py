@@ -18,6 +18,8 @@ from .summary import (
     write_birth_death_countries_summary,
     write_geocache_summary,
     write_places_summary,
+    write_enrichment_issues_summary,
+    write_statistics_summary,
 )
 
 __all__ = [
@@ -35,6 +37,8 @@ __all__ = [
     "write_birth_death_countries_summary",
     "write_geocache_summary",
     "write_places_summary",
+    "write_enrichment_issues_summary",
+    "write_statistics_summary",
 ]
 
 __maintainer__ = "D-Jeffrey"

@@ -554,6 +554,8 @@ class VisualMapPanel(wx.Panel):
         self.id.CBSummary[4].SetValue(self.gOp.get('SummaryCountriesGrid'))
         self.id.CBSummary[5].SetValue(self.gOp.get('SummaryGeocode'))
         self.id.CBSummary[6].SetValue(self.gOp.get('SummaryAltPlaces'))
+        self.id.CBSummary[7].SetValue(self.gOp.get('SummaryEnrichmentIssues'))
+        self.id.CBSummary[8].SetValue(self.gOp.get('SummaryStatistics'))
 
         self.id.TEXTDefaultCountry.SetValue(self.gOp.get('defaultCountry', ifNone=""))
 

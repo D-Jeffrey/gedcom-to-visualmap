@@ -209,6 +209,8 @@ class LayoutOptions:
             wx.CheckBox(sbox_container, vm_panel.id.IDs["CBSummary4"], label="Countries Grid", name="CountriesGrid"),
             wx.CheckBox(sbox_container, vm_panel.id.IDs["CBSummary5"], label="Geocode", name="Geocode"),
             wx.CheckBox(sbox_container, vm_panel.id.IDs["CBSummary6"], label="Alternate Places", name="AltPlaces"),
+            wx.CheckBox(sbox_container, vm_panel.id.IDs["CBSummary7"], label="Enrichment Issues", name="EnrichmentIssues"),
+            wx.CheckBox(sbox_container, vm_panel.id.IDs["CBSummary8"], label="Statistics Summary", name="StatisticsSummary"),
         ]
 
         # Add with padding so the checkboxes are not flush against each other

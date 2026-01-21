@@ -17,6 +17,7 @@ from render.kml1.kml_exporter import KmlExporter
 from render.kml2 import KML_Life_Lines
 from render.referenced import Referenced
 from render.summary import *
+from render.statistics_markdown import write_statistics_markdown
 
 from gedcom_options import gvOptions, ResultType
 from geo_gedcom.geolocated_gedcom import GeolocatedGedcom
@@ -1014,6 +1015,7 @@ class VisualMapActions:
                     self.LoadFile('csv', str(enhancement_issues_file))
 
         if getattr(gOp, "SummaryStatistics", False):
+            # Generate YAML statistics summary
             statistics_summary_file: Path = (output_folder / f"{base_file_name}_statistics.yaml").resolve()
             _log.info("Writing statistics summary to %s", statistics_summary_file)
             try:
@@ -1027,6 +1029,24 @@ class VisualMapActions:
                     bg.SayInfoMessage(f"Statistics summary: {statistics_summary_file}")
                 if getattr(gOp, "SummaryOpen", False):
                     self.LoadFile('default', str(statistics_summary_file))
+            
+            # Generate Markdown statistics report with visualizations
+            statistics_markdown_file: Path = (output_folder / f"{base_file_name}_statistics.md").resolve()
+            _log.info("Writing statistics markdown report to %s", statistics_markdown_file)
+            try:
+                write_statistics_markdown(my_gedcom.statistics, str(statistics_markdown_file))
+            except Exception:
+                _log.exception("doSUM: write_statistics_markdown failed")
+                if bg:
+                    bg.SayErrorMessage(f"Error writing statistics markdown to {statistics_markdown_file}")
+            
+            # Open the HTML version in browser (automatically created alongside .md)
+            statistics_html_file: Path = (output_folder / f"{base_file_name}_statistics.html").resolve()
+            if statistics_html_file.exists():
+                if bg:
+                    bg.SayInfoMessage(f"Statistics report: {statistics_html_file}")
+                if getattr(gOp, "SummaryOpen", False):
+                    self.LoadFile('html', str(statistics_html_file))
 
     def ParseAndGPS(self, gOp: gvOptions, stage: int = 0) -> Optional[Dict[str, Person]]:
         """Parse GEDCOM file and resolve addresses to GPS coordinates.

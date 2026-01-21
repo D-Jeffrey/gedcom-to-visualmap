@@ -12,6 +12,7 @@ Read a GEDCOM file and translate the locations into GPS addresses.
 - Generates interactive HTML maps.
 - Summarizes places and locations with high-accuracy geocoding.
 - Visualizes family lineage—ascendants and descendants.
+- **Generates comprehensive statistics reports** with demographics, temporal patterns, family relationships, and data quality metrics.
 - Supports both command-line and GUI interfaces (GUI tested on Windows, macOS, and WSL).
 
 Originally forked from [https://github.com/lmallez/gedcom-to-map], now in collaboration with [colin0brass](https://github.com/colin0brass).
@@ -148,6 +149,18 @@ Assuming you have Python installed (see [Install-Python](https://github.com/Pack
 
 - ![img](docs/img/markers-2025-03.png)
 
+### Statistics Report Example
+
+The comprehensive statistics report provides detailed demographic analysis, temporal patterns, family relationships, and data quality metrics:
+
+- **Demographics Section** - Gender distribution with bar charts, popular names visualization, age statistics, and birth patterns
+- **Temporal Analysis** - Historical timelines, longevity trends, mortality rates, and event distribution
+- **Family Relationships** - Marriage statistics, children per family, divorce rates, and relationship path analysis
+- **Geographic Insights** - Birth/death location distribution and migration patterns
+- **Data Quality** - Event completeness metrics showing date and place coverage percentages
+
+Reports are generated in both markdown (.md) and HTML (.html) formats, with the HTML version automatically opening in your browser for easy viewing.
+
 ---
 
 ## Parameter and Settings
@@ -155,6 +168,37 @@ Assuming you have Python installed (see [Install-Python](https://github.com/Pack
 - Set CSV or KML viewer in Options -> Setup.
 - KML2 is an improved version of KML.
 - SUM is a summary CSV and plot of birth vs death by continent/country.
+- **SUM also generates comprehensive statistics reports** with visualizations, charts, and detailed demographic analysis in both markdown and HTML formats.
+
+---
+
+## Statistics Reports
+
+The SUM results type generates a comprehensive genealogical statistics report that includes:
+
+### Report Sections
+
+- **📊 Executive Summary** - Key metrics and dataset overview
+- **👥 Demographics** - Population analysis with gender distribution charts and popular names with bar charts
+- **⏰ Temporal Patterns** - Historical timelines, birth/death patterns, and longevity trends
+- **👨‍👩‍👧‍👦 Family Relationships** - Marriage statistics, children per family, divorce rates, and relationship paths
+- **🌍 Geographic Distribution** - Birth and death locations, migration patterns
+- **📈 Data Quality Metrics** - Event completeness, date/place coverage percentages
+
+### Output Formats
+
+- **Markdown (.md)** - Editable source format with ASCII charts and tables
+- **HTML (.html)** - Beautiful browser-rendered version with GitHub styling, automatically opened after generation
+
+### Usage
+
+1. Select your GEDCOM file in the GUI
+2. Choose `SUM` as the Results Type
+3. Enable `SummaryOpen` in options to automatically open the report
+4. Click `Draw Update` to generate the report
+5. The HTML report opens automatically in your browser
+
+The report provides comprehensive insights into your genealogical data with 14 different statistical collectors analyzing demographics, events, names, ages, births, longevity, timelines, marriages, children, relationships, divorces, and geographic patterns.
 
 ---
 

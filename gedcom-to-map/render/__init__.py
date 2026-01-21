@@ -21,6 +21,7 @@ from .summary import (
     write_enrichment_issues_summary,
     write_statistics_summary,
 )
+from .statistics_markdown import write_statistics_markdown, write_statistics_html
 
 __all__ = [
     "KmlExporter",
@@ -39,6 +40,8 @@ __all__ = [
     "write_places_summary",
     "write_enrichment_issues_summary",
     "write_statistics_summary",
+    "write_statistics_markdown",
+    "write_statistics_html",
 ]
 
 __maintainer__ = "D-Jeffrey"

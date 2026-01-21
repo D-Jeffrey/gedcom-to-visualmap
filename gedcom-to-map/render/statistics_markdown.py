@@ -224,7 +224,7 @@ def _executive_summary(stats: Dict[str, Any]) -> str:
         lines.append(f"| ♀️ Female | {female:,} |")
     
     # Marriage stats
-    total_marriages = marriage.get('total_marriages', 0)
+    total_marriages = marriage.get('total_marriages_recorded', 0)
     if total_marriages:
         lines.append(f"| 💍 Total Marriages | {total_marriages:,} |")
     
@@ -377,8 +377,11 @@ def _data_quality_section(stats: Dict[str, Any]) -> str:
         lines.append("| Event Type | Total | With Date | With Place | Date % | Place % |")
         lines.append("|------------|-------|-----------|------------|--------|---------|")
         
-        for event_type in ['Birth', 'Death', 'Marriage', 'Burial']:
-            event_data = completeness.get(event_type, {})
+        # Event types stored in lowercase by collector, but display capitalized
+        event_types = [('birth', 'Birth'), ('death', 'Death'), ('marriage', 'Marriage'), ('burial', 'Burial')]
+        
+        for event_key, event_display in event_types:
+            event_data = completeness.get(event_key, {})
             if event_data:
                 total = event_data.get('total', 0)
                 with_date = event_data.get('with_date', 0)
@@ -386,7 +389,7 @@ def _data_quality_section(stats: Dict[str, Any]) -> str:
                 date_pct = event_data.get('date_percentage', 0)
                 place_pct = event_data.get('place_percentage', 0)
                 
-                lines.append(f"| {event_type} | {total:,} | {with_date:,} | {with_place:,} | {date_pct:.1f}% | {place_pct:.1f}% |")
+                lines.append(f"| {event_display} | {total:,} | {with_date:,} | {with_place:,} | {date_pct:.1f}% | {place_pct:.1f}% |")
     
     return '\n'.join(lines)
 
@@ -642,7 +645,7 @@ def _format_marriage_stats(marriage: Dict[str, Any]) -> str:
     """Format marriage statistics."""
     lines = []
     
-    total = marriage.get('total_marriages', 0)
+    total = marriage.get('total_marriages_recorded', 0)
     avg_age = marriage.get('average_marriage_age')
     avg_duration = marriage.get('average_marriage_duration')
     
@@ -805,15 +808,22 @@ def _format_relationship_path(rel_path: Dict[str, Any]) -> str:
 
 
 def _format_place_table(places: Dict[str, int], label: str) -> str:
-    """Format place frequency table."""
+    """Format place frequency table with horizontal bar charts."""
     if not places:
         return "No data available."
     
     lines = []
-    lines.append(f"| Rank | {label} | Count |")
-    lines.append("|------|" + "-" * (len(label) + 2) + "|-------|")
+    lines.append(f"| Rank | {label} | Count | Distribution |")
+    lines.append("|------|" + "-" * (len(label) + 2) + "|-------|--------------|")
     
-    for i, (place, count) in enumerate(list(places.items())[:15], 1):
-        lines.append(f"| {i} | {place} | {count:,} |")
+    # Get top 15 places and calculate max for scaling
+    top_places = list(places.items())[:15]
+    max_count = max((count for _, count in top_places), default=1)
+    
+    for i, (place, count) in enumerate(top_places, 1):
+        # Create horizontal bar (max 30 chars)
+        bar_length = int((count / max_count) * 30) if max_count > 0 else 0
+        bar = '█' * bar_length
+        lines.append(f"| {i} | {place} | {count:,} | {bar} |")
     
     return '\n'.join(lines)

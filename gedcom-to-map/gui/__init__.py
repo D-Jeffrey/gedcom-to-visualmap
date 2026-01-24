@@ -111,7 +111,7 @@ except (ImportError, AttributeError):
     pass
 
 try:
-    from .layout_options import LayoutOptionsPanel  # type: ignore
-    __all__.append("LayoutOptionsPanel")
+    from .layout_options import LayoutOptions  # type: ignore
+    __all__.append("LayoutOptions")
 except (ImportError, AttributeError):
     pass

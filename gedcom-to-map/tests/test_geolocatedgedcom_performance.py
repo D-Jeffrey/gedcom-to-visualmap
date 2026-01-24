@@ -101,6 +101,7 @@ def run_geolocatedgedcom_perf(
 @pytest.mark.parametrize("geo_config_path", ['geo_config.yaml'])
 # @pytest.mark.parametrize("cache_only", [False, True])
 @pytest.mark.parametrize("geo_cache_mode", ["CacheOnly", "CacheAndGeocode", "GeocodeNoCache"])
+@pytest.mark.skip(reason="Slow performance test - disabled by default")
 def test_geolocatedgedcom_performance(label: str, cache_file_path: str, gedcom_file_path: str, geo_config_path: str, fuzz: bool, geo_cache_mode: str, collect_and_report_results):
     """
     Runs GeolocatedGedcom performance test for each sample and fuzz setting.

@@ -16,8 +16,7 @@ from render.folium.folium_exporter import foliumExporter
 from render.kml1.kml_exporter import KmlExporter
 from render.kml2 import KML_Life_Lines
 from render.referenced import Referenced
-from render.summary import *
-from render.statistics_markdown import write_statistics_markdown
+from render.summary import SummaryReportConfig, generate_summary_reports
 
 from gedcom_options import gvOptions, ResultType
 from geo_gedcom.geolocated_gedcom import GeolocatedGedcom
@@ -912,141 +911,11 @@ class VisualMapActions:
                     pass
             return
 
-        # only attempt to auto-open when the panel/actions exist
-        panel_actions: VisualMapActions = self
+        # Extract summary report configuration from gOp
+        config = SummaryReportConfig.from_gvOptions(gOp)
 
-        if getattr(gOp, "SummaryPlaces", False):
-            places_summary_file: Path = (output_folder / f"{base_file_name}_places.csv").resolve()
-            _log.info("Writing places summary to %s", places_summary_file)
-            try:
-                write_places_summary(my_gedcom.address_book, str(places_summary_file))
-            except Exception:
-                _log.exception("doSUM: write_places_summary failed")
-                if bg:
-                    bg.SayErrorMessage(f"Error writing places summary to {places_summary_file}")
-                return
-            if places_summary_file.exists():
-                if bg:
-                    bg.SayInfoMessage(f"Places Summary: {places_summary_file}")
-                if getattr(gOp, "SummaryOpen", False):
-                    self.LoadFile('csv', str(places_summary_file))
-
-        if getattr(gOp, "SummaryPeople", False):
-            people_summary_file: Path = (output_folder / f"{base_file_name}_people.csv").resolve()
-            _log.info("Writing people summary to %s", people_summary_file)
-            try:
-                write_people_summary(my_gedcom.people, str(people_summary_file))
-            except Exception:
-                _log.exception("doSUM: write_people_summary failed")
-                if bg:
-                    bg.SayErrorMessage(f"Error writing people summary to {people_summary_file}")
-            if people_summary_file.exists():
-                if bg:
-                    bg.SayInfoMessage(f"People Summary: {people_summary_file}")
-                if getattr(gOp, "SummaryOpen", False):
-                    self.LoadFile('csv', str(people_summary_file))
-
-        if getattr(gOp, "SummaryCountries", False) or getattr(gOp, "SummaryCountriesGrid", False):
-            countries_summary_file: Path = (output_folder / f"{base_file_name}_countries.csv").resolve()
-            _log.info("Writing countries summary to %s", countries_summary_file)
-            img_file: Optional[str] = None
-            try:
-                img_file = write_birth_death_countries_summary(my_gedcom.people, str(countries_summary_file), base_file_name)
-            except Exception:
-                _log.exception("doSUM: write_birth_death_countries_summary failed")
-                if bg:
-                    bg.SayErrorMessage(f"Error writing countries summary to {countries_summary_file}")
-                img_file = None
-            if getattr(gOp, "SummaryCountries", False) and countries_summary_file.exists():
-                if bg:
-                    bg.SayInfoMessage(f"Countries summary: {countries_summary_file}")
-                if getattr(gOp, "SummaryOpen", False):
-                    self.LoadFile('csv', str(countries_summary_file))
-
-            if getattr(gOp, "SummaryCountriesGrid", False) and img_file:
-                if bg:
-                    bg.SayInfoMessage(f"Countries summary Graph: {img_file}")
-                if getattr(gOp, "SummaryOpen", False):
-                    self.LoadFile('default', str(img_file))
-
-        if getattr(gOp, "SummaryGeocode", False):
-            per_file_cache: Path = (output_folder / f"{base_file_name}{FILE_GEOCACHE_FILENAME_SUFFIX}").resolve()
-            _log.info("Writing geo cache to %s", per_file_cache)
-            try:
-                write_geocache_summary(my_gedcom.address_book, str(per_file_cache))
-            except Exception:
-                _log.exception("doSUM: write_geocache_summary failed")
-                if bg:
-                    bg.SayErrorMessage(f"Error writing geo cache to {per_file_cache}")
-            if per_file_cache.exists():
-                if bg:
-                    bg.SayInfoMessage(f"Geo cache: {per_file_cache}")
-                if getattr(gOp, "SummaryOpen", False):
-                    self.LoadFile('csv', str(per_file_cache))
-
-        if getattr(gOp, "SummaryAltPlaces", False):
-            alt_places_summary_file: Path = (output_folder / f"{base_file_name}_alt_places.csv").resolve()
-            _log.info("Writing alternative places summary to %s", alt_places_summary_file)
-            try:
-                write_alt_places_summary(my_gedcom.address_book, str(alt_places_summary_file))
-            except Exception:
-                _log.exception("doSUM: write_alt_places_summary failed")
-                if bg:
-                    bg.SayErrorMessage(f"Error writing alt places summary to {alt_places_summary_file}")
-            if alt_places_summary_file.exists():
-                if bg:
-                    bg.SayInfoMessage(f"Alternative places summary: {alt_places_summary_file}")
-                if getattr(gOp, "SummaryOpen", False):
-                    self.LoadFile('csv', str(alt_places_summary_file))
-
-        if getattr(gOp, "SummaryEnrichmentIssues", False):
-            enhancement_issues_file: Path = (output_folder / f"{base_file_name}_enrichment_issues.csv").resolve()
-            _log.info("Writing enrichment issues summary to %s", enhancement_issues_file)
-            try:
-                write_enrichment_issues_summary(my_gedcom.people, my_gedcom.enrichment.issues, str(enhancement_issues_file))
-            except Exception:
-                _log.exception("doSUM: write_enrichment_issues_summary failed")
-                if bg:
-                    bg.SayErrorMessage(f"Error writing enhancement issues summary to {enhancement_issues_file}")
-            if enhancement_issues_file.exists():
-                if bg:
-                    bg.SayInfoMessage(f"Enhancement issues summary: {enhancement_issues_file}")
-                if getattr(gOp, "SummaryOpen", False):
-                    self.LoadFile('csv', str(enhancement_issues_file))
-
-        if getattr(gOp, "SummaryStatistics", False):
-            # Generate YAML statistics summary
-            statistics_summary_file: Path = (output_folder / f"{base_file_name}_statistics.yaml").resolve()
-            _log.info("Writing statistics summary to %s", statistics_summary_file)
-            try:
-                write_statistics_summary(my_gedcom.statistics, str(statistics_summary_file))
-            except Exception:
-                _log.exception("doSUM: write_statistics_summary failed")
-                if bg:
-                    bg.SayErrorMessage(f"Error writing statistics summary to {statistics_summary_file}")
-            if statistics_summary_file.exists():
-                if bg:
-                    bg.SayInfoMessage(f"Statistics summary: {statistics_summary_file}")
-                if getattr(gOp, "SummaryOpen", False):
-                    self.LoadFile('default', str(statistics_summary_file))
-            
-            # Generate Markdown statistics report with visualizations
-            statistics_markdown_file: Path = (output_folder / f"{base_file_name}_statistics.md").resolve()
-            _log.info("Writing statistics markdown report to %s", statistics_markdown_file)
-            try:
-                write_statistics_markdown(my_gedcom.statistics, str(statistics_markdown_file))
-            except Exception:
-                _log.exception("doSUM: write_statistics_markdown failed")
-                if bg:
-                    bg.SayErrorMessage(f"Error writing statistics markdown to {statistics_markdown_file}")
-            
-            # Open the HTML version in browser (automatically created alongside .md)
-            statistics_html_file: Path = (output_folder / f"{base_file_name}_statistics.html").resolve()
-            if statistics_html_file.exists():
-                if bg:
-                    bg.SayInfoMessage(f"Statistics report: {statistics_html_file}")
-                if getattr(gOp, "SummaryOpen", False):
-                    self.LoadFile('html', str(statistics_html_file))
+        # Generate all selected summary reports
+        generate_summary_reports(config, my_gedcom, base_file_name, output_folder, bg, file_loader=self)
 
     def ParseAndGPS(self, gOp: gvOptions, stage: int = 0) -> Optional[Dict[str, Person]]:
         """Parse GEDCOM file and resolve addresses to GPS coordinates.

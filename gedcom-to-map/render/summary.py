@@ -8,8 +8,10 @@ Author: @colin0brass
 
 import csv
 import logging
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 import os
+from pathlib import Path
+from dataclasses import dataclass
 import pandas as pd
 import seaborn as sns
 import matplotlib
@@ -17,10 +19,213 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 from geo_gedcom.addressbook import AddressBook
+from geo_gedcom.geolocated_gedcom import GeolocatedGedcom
 
 logger = logging.getLogger(__name__)
 # Avoid using any interactive backends
 matplotlib.use("Agg")
+
+
+@dataclass
+class SummaryReportConfig:
+    """Configuration for which summary reports to generate.
+    
+    Attributes:
+        places: Generate places CSV summary
+        people: Generate people CSV summary
+        countries: Generate countries CSV summary
+        countries_grid: Generate countries heatmap chart image
+        geocode: Generate geocache CSV for debugging
+        alt_places: Generate alternative place names CSV
+        enrichment_issues: Generate enrichment issues report CSV
+        statistics: Generate statistics summary (YAML/Markdown/HTML)
+        auto_open: Auto-open generated files after creation
+    """
+    places: bool = False
+    people: bool = False
+    countries: bool = False
+    countries_grid: bool = False
+    geocode: bool = False
+    alt_places: bool = False
+    enrichment_issues: bool = False
+    statistics: bool = False
+    auto_open: bool = False
+    
+    @classmethod
+    def from_gvOptions(cls, gOp: Any) -> 'SummaryReportConfig':
+        """Extract summary report configuration from gvOptions.
+        
+        Args:
+            gOp: Global options object with Summary* attributes
+            
+        Returns:
+            SummaryReportConfig with boolean flags for each report type
+        """
+        return cls(
+            places=getattr(gOp, "SummaryPlaces", False),
+            people=getattr(gOp, "SummaryPeople", False),
+            countries=getattr(gOp, "SummaryCountries", False),
+            countries_grid=getattr(gOp, "SummaryCountriesGrid", False),
+            geocode=getattr(gOp, "SummaryGeocode", False),
+            alt_places=getattr(gOp, "SummaryAltPlaces", False),
+            enrichment_issues=getattr(gOp, "SummaryEnrichmentIssues", False),
+            statistics=getattr(gOp, "SummaryStatistics", False),
+            auto_open=getattr(gOp, "SummaryOpen", False)
+        )
+
+
+def _generate_report(
+    output_file: Path,
+    writer_func: callable,
+    writer_args: tuple,
+    display_name: str,
+    file_type: str,
+    bg: Optional[Any],
+    config: SummaryReportConfig,
+    file_loader: Optional[Any],
+    fatal_on_error: bool = False
+) -> Optional[Any]:
+    """Helper function to generate a single report with consistent error handling.
+    
+    Args:
+        output_file: Path to output file
+        writer_func: Function to call to write the report
+        writer_args: Arguments to pass to writer_func
+        display_name: Human-readable name for status messages
+        file_type: File type for LoadFile ('csv', 'default', 'html', etc.)
+        bg: Optional background process for status messages
+        config: Configuration with auto_open flag
+        file_loader: Optional object with LoadFile method
+        fatal_on_error: If True, return None on error to signal early termination
+    
+    Returns:
+        Return value from writer_func, or None if fatal_on_error and exception occurred
+    """
+    logger.info("Writing %s to %s", display_name.lower(), output_file)
+    result = None
+    try:
+        result = writer_func(*writer_args)
+    except Exception:
+        logger.exception(f"generate_summary_reports: {writer_func.__name__} failed")
+        if bg:
+            bg.SayErrorMessage(f"Error writing {display_name.lower()} to {output_file}")
+        if fatal_on_error:
+            return None
+    
+    if output_file.exists():
+        if bg:
+            bg.SayInfoMessage(f"{display_name}: {output_file}")
+        if config.auto_open and file_loader:
+            file_loader.LoadFile(file_type, str(output_file))
+    
+    return result
+
+
+def generate_summary_reports(
+    config: SummaryReportConfig,
+    my_gedcom: GeolocatedGedcom,
+    base_file_name: str,
+    output_folder: Path,
+    bg: Optional[Any] = None,
+    file_loader: Optional[Any] = None
+) -> None:
+    """Generate selected summary reports based on configuration.
+    
+    Args:
+        config: SummaryReportConfig specifying which reports to generate
+        my_gedcom: GeolocatedGedcom instance with geocoded data
+        base_file_name: Base filename for output files
+        output_folder: Directory for output files
+        bg: Optional background process for status messages
+        file_loader: Optional object with LoadFile method for opening files
+    
+    Side Effects:
+        - Creates CSV/YAML/HTML/PNG files in output_folder
+        - Shows info/error messages via bg if provided
+        - Opens files if config.auto_open is True and file_loader provided
+    """
+    from const import FILE_GEOCACHE_FILENAME_SUFFIX
+    from render.statistics_markdown import write_statistics_markdown
+    
+    if config.places:
+        places_file = (output_folder / f"{base_file_name}_places.csv").resolve()
+        result = _generate_report(
+            places_file, write_places_summary, (my_gedcom.address_book, str(places_file)),
+            "Places Summary", 'csv', bg, config, file_loader, fatal_on_error=True
+        )
+        if result is None:
+            return
+
+    if config.people:
+        people_file = (output_folder / f"{base_file_name}_people.csv").resolve()
+        _generate_report(
+            people_file, write_people_summary, (my_gedcom.people, str(people_file)),
+            "People Summary", 'csv', bg, config, file_loader
+        )
+
+    if config.countries or config.countries_grid:
+        countries_file = (output_folder / f"{base_file_name}_countries.csv").resolve()
+        img_file = _generate_report(
+            countries_file, write_birth_death_countries_summary,
+            (my_gedcom.people, str(countries_file), base_file_name),
+            "Countries summary", 'csv', bg, config if config.countries else SummaryReportConfig(),
+            file_loader
+        )
+        
+        if config.countries_grid and img_file:
+            img_path = Path(img_file)
+            if img_path.exists():
+                if bg:
+                    bg.SayInfoMessage(f"Countries summary Graph: {img_file}")
+                if config.auto_open and file_loader:
+                    file_loader.LoadFile('default', str(img_file))
+
+    if config.geocode:
+        cache_file = (output_folder / f"{base_file_name}{FILE_GEOCACHE_FILENAME_SUFFIX}").resolve()
+        _generate_report(
+            cache_file, write_geocache_summary, (my_gedcom.address_book, str(cache_file)),
+            "Geo cache", 'csv', bg, config, file_loader
+        )
+
+    if config.alt_places:
+        alt_places_file = (output_folder / f"{base_file_name}_alt_places.csv").resolve()
+        _generate_report(
+            alt_places_file, write_alt_places_summary, (my_gedcom.address_book, str(alt_places_file)),
+            "Alternative places summary", 'csv', bg, config, file_loader
+        )
+
+    if config.enrichment_issues:
+        issues_file = (output_folder / f"{base_file_name}_enrichment_issues.csv").resolve()
+        _generate_report(
+            issues_file, write_enrichment_issues_summary,
+            (my_gedcom.people, my_gedcom.enrichment.issues, str(issues_file)),
+            "Enhancement issues summary", 'csv', bg, config, file_loader
+        )
+
+    if config.statistics:
+        # Generate YAML statistics summary
+        yaml_file = (output_folder / f"{base_file_name}_statistics.yaml").resolve()
+        _generate_report(
+            yaml_file, write_statistics_summary, (my_gedcom.statistics, str(yaml_file)),
+            "Statistics summary", 'default', bg, config, file_loader
+        )
+        
+        # Generate Markdown statistics report with visualizations
+        md_file = (output_folder / f"{base_file_name}_statistics.md").resolve()
+        _generate_report(
+            md_file, write_statistics_markdown, (my_gedcom.statistics, str(md_file)),
+            "Statistics markdown report", 'default', bg,
+            SummaryReportConfig(),  # Don't auto-open markdown file
+            file_loader
+        )
+        
+        # Open the HTML version in browser (automatically created alongside .md)
+        html_file = (output_folder / f"{base_file_name}_statistics.html").resolve()
+        if html_file.exists():
+            if bg:
+                bg.SayInfoMessage(f"Statistics report: {html_file}")
+            if config.auto_open and file_loader:
+                file_loader.LoadFile('html', str(html_file))
 
 
 def write_places_summary(address_book: AddressBook, output_file: str) -> None:

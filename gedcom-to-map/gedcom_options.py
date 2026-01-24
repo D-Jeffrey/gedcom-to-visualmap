@@ -193,64 +193,62 @@ class gvOptions:
         from gui.gui_hooks import GuiHooks
 
         """Load static defaults, initialize runtime state and read persisted settings."""
+        # === Load Configuration Schema ===
         file_path = Path(__file__).parent / self.GEDCOM_OPTIONS_FILE
         with open(file_path, 'r') as file:
             self.options = yaml.safe_load(file)
 
+        # === Initialize Core Settings ===
         self.gvConfig = None
         self.set_marker_defaults()
         self.settingsfile = settings_file_pathname("gedcom-visualmap.ini")
-
         self.geo_config_file: Path = Path(__file__).resolve().parent.parent / GEO_CONFIG_FILENAME
 
-        # Load all option sections from YAML (dynamically discovered)
+        # === Load Option Defaults from YAML ===
         for section_name in self._get_option_sections():
             section = self.options.get(section_name, {})
             section_types = {k: v.get('type') for k, v in section.items()}
             section_defaults = {k: v.get('default') for k, v in section.items()}
             self.set_options(section_types, section_defaults)
 
+        # === Initialize Runtime State ===
         self.people: Union[Dict[str, Person], None] = None
         self.time = time.ctime()
         self.resettimeframe()
-
         self.app_hooks: GuiHooks = GuiHooks(self)
         
+        # === Configure Platform-Specific File Commands ===
         self.file_open_commands = FileOpenCommandLines()
-        os_name = platform.system()
-        if os_name == 'Windows':
-            kml_cmd_line = "notepad $n"
-            csv_cmd_line = "$n"
-            trace_cmd_line = "notepad $n"
-            default_cmd_line = "$n"
-        
-        elif os_name == 'Darwin':
-            kml_cmd_line = "open -a Numbers $n"
-            csv_cmd_line = OFFICECMDLINE + " --calc $n"
-            trace_cmd_line = "open -a Numbers $n"
-            default_cmd_line = "open $n"
+        self._initialize_file_commands()
 
-        elif os_name == 'Linux':
-            kml_cmd_line = "nano $n"
-            csv_cmd_line = OFFICECMDLINE + " --calc $n"
-            trace_cmd_line = OFFICECMDLINE + " --calc $n"
-            default_cmd_line = "xdg-open $n"
-
-        else:
-            kml_cmd_line = "notepad $n"
-            csv_cmd_line = "notepad $n"
-            trace_cmd_line = "notepad $n"
-            default_cmd_line = "notepad $n"
-
-        self.file_open_commands.add_file_type_command('KML', kml_cmd_line)
-        self.file_open_commands.add_file_type_command('CSV', csv_cmd_line)
-        self.file_open_commands.add_file_type_command('Trace', trace_cmd_line)
-        self.file_open_commands.add_file_type_command('HTML', 'webbrowser $n')
-        self.file_open_commands.add_file_type_command('Default', default_cmd_line)
-
+        # === Load Persisted Settings ===
         if os.path.exists(self.settingsfile):
-            self.loadsettings()            
+            self.loadsettings()
 
+    def _initialize_file_commands(self):
+        """Initialize platform-specific default commands for opening files."""
+        os_name = platform.system()
+        
+        # Get platform-specific defaults from YAML configuration
+        file_defaults = self.options.get('file_command_defaults', {})
+        if not file_defaults:
+            raise ValueError(f"Missing 'file_command_defaults' section in {self.GEDCOM_OPTIONS_FILE}")
+        
+        platform_defaults = file_defaults.get(os_name)
+        if not platform_defaults:
+            available = ', '.join(file_defaults.keys())
+            raise ValueError(
+                f"No file command defaults found for platform '{os_name}' in {self.GEDCOM_OPTIONS_FILE}. "
+                f"Available platforms: {available}"
+            )
+        
+        # Register all file type commands
+        for file_type, command in platform_defaults.items():
+            self.file_open_commands.add_file_type_command(file_type, command)
+
+    # ============================================================================
+    # YAML Configuration Discovery and Loading
+    # ============================================================================
 
     def _get_option_sections(self) -> list[str]:
         """Discover all option sections from the loaded YAML structure.
@@ -350,6 +348,10 @@ class gvOptions:
                 _log.warning("Marker option '%s' missing in defaults; setting to None.", key)
                 setattr(self, key, None)
     
+    # ============================================================================
+    # Timeframe Tracking (for Event Analysis)
+    # ============================================================================
+
     def resettimeframe(self):
         """Reset the aggregated timeframe used when summarising people/events."""
         """ Reset the timeframe for the process """
@@ -411,6 +413,10 @@ class gvOptions:
                     section_keys[key] = props.get('ini_type', props.get('type'))
         
         return section_keys
+
+    # ============================================================================
+    # INI File Persistence (Load/Save Settings)
+    # ============================================================================
 
     def loadsection(self, sectionName, keys=None):
         """Load and coerce a named section from the INI-style gvConfig into attributes."""
@@ -585,6 +591,9 @@ class gvOptions:
         except Exception as e:
             _log.error("Error saving settings to %s: %s", self.settingsfile, e)
     
+    # ============================================================================
+    # Main Person Selection and File Path Management
+    # ============================================================================
     
     def setMainPerson(self, mainperson: Person):
         """Set the currently focused person and update derived state."""
@@ -657,6 +666,10 @@ class gvOptions:
         if org != self.GEDCOMinput:
             self.parsed = False            
 
+    # ============================================================================
+    # Progress Tracking and Process Control
+    # ============================================================================
+
     def KeepGoing(self):
         """Return True if processing should continue (not stopping)."""
         return not self.ShouldStop()
@@ -710,6 +723,10 @@ class gvOptions:
         self.state = ""
         self.running = False        # Race conditions
         self.stopping = False
+
+    # ============================================================================
+    # Generic Attribute Access (get/set helpers)
+    # ============================================================================
 
     def get (self, attribute, default=None, ifNone=None):
         """Safely access an attribute, returning default or ifNone when appropriate."""

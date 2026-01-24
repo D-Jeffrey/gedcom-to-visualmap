@@ -123,6 +123,28 @@ geocoding_options:
   skip_file_geocache: {type: 'bool', default: False}
   include_canonical: {type: 'bool', default: True}
 
+# Platform-specific default commands for opening files
+# Used to initialize file_open_commands if not overridden by INI settings
+file_command_defaults:
+  Windows:
+    KML: 'notepad $n'
+    CSV: '$n'
+    Trace: 'notepad $n'
+    Default: '$n'
+    HTML: 'webbrowser $n'
+  Darwin:
+    KML: 'open -a Numbers $n'
+    CSV: 'soffice --calc $n'
+    Trace: 'open -a Numbers $n'
+    Default: 'open $n'
+    HTML: 'webbrowser $n'
+  Linux:
+    KML: 'nano $n'
+    CSV: 'soffice --calc $n'
+    Trace: 'soffice --calc $n'
+    Default: 'xdg-open $n'
+    HTML: 'webbrowser $n'
+
 # Logger names to track in Logging section of INI file
 logging_keys: [models.person, models, ged4py.parser, ged4py,
   models.creator, models.location, gedcomoptions,

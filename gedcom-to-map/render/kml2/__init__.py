@@ -6,4 +6,14 @@ Allows import like:
 """
 
 # Expose kml_life_lines.py symbols
-from .kml_life_lines import *
+from .kml_life_lines import (
+    KmlExporterRefined,
+    KML_Life_Lines_Creator,
+    KML_Life_Lines,
+)
+
+__all__ = [
+    "KmlExporterRefined",
+    "KML_Life_Lines_Creator",
+    "KML_Life_Lines",
+]

@@ -97,3 +97,21 @@ try:
     __all__.append("GedRecordDialog")
 except (ImportError, AttributeError):
     pass
+
+try:
+    from .gedcomVisualGUI import GedcomVisualGUI  # type: ignore
+    __all__.append("GedcomVisualGUI")
+except (ImportError, AttributeError):
+    pass
+
+try:
+    from .visual_map_actions import VisualMapActions, Geoheatmap, gedcom_to_map  # type: ignore
+    __all__.extend(["VisualMapActions", "Geoheatmap", "gedcom_to_map"])
+except (ImportError, AttributeError):
+    pass
+
+try:
+    from .layout_options import LayoutOptionsPanel  # type: ignore
+    __all__.append("LayoutOptionsPanel")
+except (ImportError, AttributeError):
+    pass

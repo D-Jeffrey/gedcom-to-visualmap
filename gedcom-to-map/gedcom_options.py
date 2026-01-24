@@ -31,6 +31,10 @@ from geo_gedcom.life_event import LifeEvent
 
 _log = logging.getLogger(__name__)
 
+# INI file section constants
+INI_SECTIONS = ['Core', 'HTML', 'Summary', 'Logging', 'Gedcom.Main', 'KML']
+INI_OPTION_SECTIONS = ['Core', 'HTML', 'Summary', 'KML']
+
 def settings_file_pathname(file_name):
     """Return a platform-appropriate full path for storing settings.
 
@@ -487,10 +491,10 @@ class gvOptions:
         self.gvConfig.read(self.settingsfile)
         
         # Ensure all necessary sections exist
-        for section in ['Core', 'HTML', 'Summary', 'Logging', 'Gedcom.Main', 'KML']:
+        for section in INI_SECTIONS:
             if section not in self.gvConfig.sections():
                 self.gvConfig[section] = {}
-            if section in ['Core', 'HTML', 'Summary', 'KML']:
+            if section in INI_OPTION_SECTIONS:
                 section_keys = self._build_section_keys(section)
                 self.loadsection(section, section_keys)
         
@@ -539,7 +543,7 @@ class gvOptions:
         try:
             if not self.gvConfig:
                 self.gvConfig = configparser.ConfigParser()
-                for section in ['Core', 'HTML', 'Summary', 'Logging', 'Gedcom.Main', 'KML']:
+                for section in INI_SECTIONS:
                     self.gvConfig[section] = {}
             core_keys = self._build_section_keys('Core')
             for key in core_keys:

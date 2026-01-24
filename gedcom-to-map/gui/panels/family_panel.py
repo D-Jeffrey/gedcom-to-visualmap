@@ -1,7 +1,7 @@
 import logging
 import wx
 import wx.grid as gridlib
-from .font_manager import FontManager
+from ..layout.font_manager import FontManager
 from geo_gedcom.person import Person
 
 _log = logging.getLogger(__name__.lower())

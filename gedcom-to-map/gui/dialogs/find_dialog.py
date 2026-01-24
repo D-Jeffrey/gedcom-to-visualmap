@@ -1,5 +1,5 @@
 import wx
-from .font_manager import FontManager
+from ..layout.font_manager import FontManager
 
 class FindDialog(wx.Dialog):
     def __init__(self, parent: wx.Window, font_manager: FontManager, title: str = "Find", LastSearch: str = ""):

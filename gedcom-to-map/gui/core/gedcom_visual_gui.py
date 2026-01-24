@@ -1,9 +1,7 @@
-__all__ = ['VisualGedcomIds', 'VisualMapFrame', 'PeopleListCtrl', 'PeopleListCtrlPanel', 'VisualMapPanel']
-
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 #
 #
-#  gedcomVisualGUI.py : GUI Interface  for gedcom-to-map
+#  gedcom_visual_gui.py : GUI Interface  for gedcom-to-map
 #    See https://github.com/D-Jeffrey/gedcom-to-visualmap
 #
 #
@@ -23,7 +21,7 @@ from typing import Any, Tuple
 
 import wx
 from .visual_map_frame import VisualMapFrame
-from .font_manager import FontManager
+from ..layout.font_manager import FontManager
 from gedcom_options import gvOptions
 
 _log = logging.getLogger(__name__.lower())

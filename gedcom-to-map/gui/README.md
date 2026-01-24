@@ -1,72 +1,206 @@
-# gui/ — GUI package for gedcom-to-visualmap
+# GUI Package
 
-This README describes the current structure and best practices for the `gui/` package after recent refactors that extract many classes into their own modules and adopt lazy imports to avoid circular dependencies.
+wxPython-based graphical user interface for gedcom-to-visualmap.
 
-Contents (key files)
-- `gedcomVisualGUI.py` — package exports / top-level wiring (keeps safe fallbacks).
-- `visual_map_frame.py` — main application frame.
-- `visual_map_panel.py` — main panel (uses lazy imports and TYPE_CHECKING for types).
-- `visual_gedcom_ids.py` — extracted VisualGedcomIds (IDs & colour constants).
-- `people_list_ctrl.py` — extracted PeopleListCtrl list control.
-- `people_list_ctrl_panel.py` — wrapper panel that hosts the people list and info box.
-- `person_dialog.py` — PersonDialog (moved out of gedcomDialogs).
-- `family_panel.py` — FamilyPanel (moved out of gedcomDialogs).
-- `find_dialog.py`, `html_dialog.py`, `about_dialog.py`, `help_dialog.py`, `config_dialog.py` — dialog modules moved out of `gedcomDialogs.py`.
-- `background_actions.py` — background worker thread (lazy-imports heavy helpers at runtime).
-- `gedcomDialogs.py` — aggregator that imports the small dialog modules with package-aware fallbacks.
+## Overview
 
-Design decisions and guidelines
-- Avoid heavy cross-module imports at module scope. Use lazy (runtime) imports inside functions/methods where needed.
-- Use `typing.TYPE_CHECKING` or forward-reference strings for type-only annotations to avoid runtime evaluation that creates cycles.
-- Keep small, independent helpers imported at module level. Large or cross-referencing components should be imported lazily.
-- Use try/except fallback imports in aggregator files (e.g. `gedcomDialogs.py`) during refactor to keep the package importable.
-- Guard event binding when the event ID may be None (binding `None` raises AssertionError).
+This package provides the complete GUI application for visualizing GEDCOM genealogy files on maps. The interface allows users to load GEDCOM files, configure visualization options, generate various outputs (KML, HTML reports, folium maps), and explore family relationships.
 
-How to run / quick checks (macOS)
-- Run the application:
-  - python ./gedcom-to-map/gv.py
-- Quick compile/syntax check for one file:
-  - python -m py_compile gui/visual_map_panel.py
-- Compile all project files (repo root):
-  - python -m py_compile $(git ls-files 'gedcom-to-map/**/*.py')
-- Import test for a module:
-  - python - <<'PY'
-    import importlib, traceback
-    try:
-        importlib.import_module('gui.visual_map_panel')
-        print('visual_map_panel import OK')
-    except Exception:
-        traceback.print_exc()
-    PY
+## Package Structure
 
-Common problems & fixes
-- ImportError: partially initialized module (circular import)
-  - Move the import into the function/method that needs it (lazy import). Remove mutual top-level imports.
-- AssertionError when binding event
-  - Ensure the event type/binder is not `None` before calling `Bind(...)`.
-- "Variable not allowed in type expression"
-  - Use `TYPE_CHECKING`, forward-reference strings (e.g. `Optional["gvOptions"]`) or `Any` for quick fix.
-- ModuleNotFoundError for moved files
-  - Use package-relative imports (`from .module import X`) and run from project root or ensure PYTHONPATH includes the package root.
+The GUI package is organized into logical subpackages by responsibility:
 
-Adding new dialogs / panels
-1. Create `gui/new_widget.py` with a single class.
-2. Add a package-aware import fallback in `gedcomDialogs.py`:
-   - try: from .new_widget import NewWidget except Exception: NewWidget = None
-3. Import the new widget lazily in callers when showing UI to avoid cycles.
+### `core/` - Main Application
+Core application components that manage the application lifecycle:
+- **`GedcomVisualGUI`** - Application facade and entry point
+- **`VisualMapFrame`** - Main window frame with menu bar and status bar
+- **`GuiHooks`** - GUI callback hooks for external integration
 
-Developer tooling
-- Linting / import analysis:
-  - pip install ruff
-  - ruff check .
-- Find remaining top-level imports that may cause cycles:
-  - git grep -n "from .*gedcomvisual" || true
-  - git grep -n "from .*gedcomVisualGUI" || true
+### `panels/` - UI Panels
+Reusable panel components that compose the main interface:
+- **`VisualMapPanel`** - Primary panel with all visualization controls
+- **`FamilyPanel`** - Family relationships display panel
+- **`PeopleListCtrlPanel`** - Panel wrapper for the people list control
 
-Notes
-- During this refactor the code uses defensive try/except imports to tolerate a partially-refactored state. When stable, prefer strict package-relative imports and remove unnecessary fallbacks.
-- Keep GUI updates on the main thread; background threads must post events (wx.PostEvent) rather than manipulating widgets directly.
+### `processors/` - Data Processing
+Backend processors that handle GEDCOM data and generate outputs:
+- **`GedcomLoader`** - GEDCOM file parsing and geocoding
+- **`MapGenerator`** - KML and Folium map generation
+- **`ReportGenerator`** - HTML report and statistics generation
+- **`LineageTracer`** - Ancestor/descendant lineage computation
 
-If you want, I can:
-- scan the repository for remaining top-level circular imports and produce a patch that converts them to lazy imports, or
-- add a short developer checklist to this README for onboarding.
+### `actions/` - Action Handlers
+Controllers that coordinate user actions and background operations:
+- **`VisualMapActions`** - Main action coordinator for UI operations
+- **`BackgroundActions`** - Background worker thread for long-running tasks
+- **`FileOpener`** - Cross-platform file opening utilities
+- **`DoActionsType`** - Action type enumeration and flags
+- **CLI wrappers**: `Geoheatmap`, `gedcom_to_map` - Standalone command-line entry points
+
+### `dialogs/` - Dialog Windows
+Modal and non-modal dialog windows:
+- **`AboutDialog`** - Application about/version information
+- **`ConfigDialog`** - Application configuration settings
+- **`FindDialog`** - Person search dialog
+- **`HelpDialog`** - Help and documentation viewer
+- **`HTMLDialog`** - Generic HTML content display dialog
+- **`PersonDialog`** - Detailed person information and relationships
+
+### `widgets/` - Custom Controls
+Reusable custom wxPython controls:
+- **`PeopleListCtrl`** - Searchable, sortable list of people with context menu
+- **`GedRecordDialog`** - GEDCOM record inspector/viewer
+
+### `layout/` - Layout Helpers
+UI layout construction and event handling utilities:
+- **`LayoutOptions`** - Layout construction for VisualMapPanel
+- **`LayoutHelpers`** - Common layout patterns and utilities
+- **`VisualMapEventHandler`** - Event handler delegate for VisualMapPanel
+- **`VisualGedcomIds`** - Central wxPython widget ID management
+- **`FontManager`** - Font configuration and sizing
+
+## Usage
+
+### Starting the Application
+
+```python
+import wx
+from gui.core import GedcomVisualGUI
+from gedcom_options import gvOptions
+
+app = wx.App()
+gOp = gvOptions()
+gui = GedcomVisualGUI(gOp)
+gui.start()
+app.MainLoop()
+```
+
+### Importing Components
+
+Import from subpackages for specific functionality:
+
+```python
+# Import processors for standalone data processing
+from gui.processors import GedcomLoader, MapGenerator, ReportGenerator
+
+# Import actions for programmatic control
+from gui.actions import VisualMapActions, BackgroundActions
+
+# Import dialogs for custom UI
+from gui.dialogs import PersonDialog, FindDialog
+```
+
+Or import from the main package for convenience:
+
+```python
+# Main package re-exports all public classes
+from gui import GedcomVisualGUI, VisualMapPanel, GedcomLoader
+```
+
+### Using CLI Wrappers
+
+The `actions` package provides standalone command-line wrappers:
+
+```python
+from gui.actions import gedcom_to_map, Geoheatmap
+
+# Generate visualization from GEDCOM file
+gedcom_to_map('family.ged', output_dir='output/')
+
+# Create geographic heatmap
+Geoheatmap('family.ged', 'heatmap.html')
+```
+
+## Architecture
+
+### Separation of Concerns
+
+The package follows a clear separation of concerns:
+
+1. **UI Layer** (`core/`, `panels/`, `dialogs/`, `widgets/`) - Presentation and user interaction
+2. **Action Layer** (`actions/`) - Coordination and control flow
+3. **Processing Layer** (`processors/`) - Business logic and data transformation
+4. **Utilities** (`layout/`) - Shared helpers and configuration
+
+### Background Processing
+
+Long-running operations (GEDCOM parsing, geocoding, map generation) run in a background thread via `BackgroundActions` to keep the UI responsive. The worker communicates progress and results back to the UI through wxPython events.
+
+### Event Handling
+
+Event handling is delegated to `VisualMapEventHandler` rather than having handlers inline in the panel. This improves testability and keeps the panel focused on layout and state management.
+
+## Dependencies
+
+- **wxPython** - GUI framework (required for all UI components)
+- **gedcom_options** - Application configuration (gvOptions)
+- **geo_gedcom** - GEDCOM parsing and geographic data structures
+- **models** - Data models for visualization
+- **render** - Output generators (KML, Folium, HTML reports)
+
+Note: The `processors` and `actions` packages can be imported without wxPython for headless/CLI usage.
+
+## Testing
+
+The GUI package includes integration tests in the project's `tests/` directory:
+
+```bash
+# Run GUI file operation tests
+pytest tests/test_gui_file_operations.py
+
+# Run all tests
+pytest
+```
+
+Tests use mocking to avoid requiring a display server or wxPython GUI instance.
+
+## Development
+
+### Adding New Features
+
+1. **New dialog?** → Add to `dialogs/`
+2. **New panel?** → Add to `panels/`
+3. **New data processor?** → Add to `processors/`
+4. **New action handler?** → Add to `actions/`
+5. **New widget?** → Add to `widgets/`
+
+### Code Style
+
+- Use type hints for function parameters and return values
+- Use descriptive variable names
+- Keep functions focused and testable
+- Delegate complex logic to specialized classes
+- Add docstrings for public classes and methods
+
+### Import Guidelines
+
+**Within the gui package:**
+```python
+# Cross-package imports use relative paths with parent reference
+from ..processors.gedcom_loader import GedcomLoader  # From actions/ to processors/
+from ..dialogs.person_dialog import PersonDialog     # From panels/ to dialogs/
+```
+
+**From outside the gui package:**
+```python
+# Use absolute imports
+from gui.core import GedcomVisualGUI
+from gui.processors import MapGenerator
+```
+
+## Common Issues
+
+### ImportError: partially initialized module (circular import)
+Move the import into the function/method that needs it (lazy import). Remove mutual top-level imports.
+
+### AssertionError when binding event
+Ensure the event type/binder is not `None` before calling `Bind(...)`.
+
+### ModuleNotFoundError for imports
+Use package-relative imports (`from .module import X`) within the package, and run from project root or ensure PYTHONPATH includes the package root.
+
+## History
+
+The GUI package was reorganized from a flat structure (28 files in one directory) to a hierarchical structure (6 logical subpackages) in January 2026. The `VisualMapActions` class was refactored from a 965-line "God class" into 5 specialized modules totaling 1,281 lines with clear responsibilities.
+
+See `docs/gui-reorganization.md` for detailed migration information.

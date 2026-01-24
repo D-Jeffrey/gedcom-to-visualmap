@@ -14,8 +14,8 @@ import logging
 from typing import Any, Dict, Union
 import wx
 import wx.lib.mixins.listctrl as listmix
-from .people_list_ctrl import PeopleListCtrl
-from .font_manager import FontManager
+from ..widgets.people_list_ctrl import PeopleListCtrl
+from ..layout.font_manager import FontManager
 from geo_gedcom.person import Person
 from gedcom_options import gvOptions
 

@@ -7,10 +7,10 @@ import wx
 
 from geo_gedcom.person import Person
 from geo_gedcom.life_event import LifeEvent
-from .ged_rec_display import GedRecordDialog
-from .family_panel import FamilyPanel
+from ..widgets.ged_rec_display import GedRecordDialog
+from ..panels.family_panel import FamilyPanel
 from gedcom_options import gvOptions
-from .font_manager import FontManager
+from ..layout.font_manager import FontManager
 
 _log = logging.getLogger(__name__.lower())
 

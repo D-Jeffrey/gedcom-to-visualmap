@@ -19,10 +19,10 @@ from gedcom_options import gvOptions, ResultType
 from geo_gedcom.geolocated_gedcom import GeolocatedGedcom
 from .do_actions_type import DoActionsType
 from .file_operations import FileOpener
-from .gedcom_loader import GedcomLoader
-from .map_generator import MapGenerator
-from .report_generator import ReportGenerator
-from .lineage_tracer import LineageTracer
+from ..processors.gedcom_loader import GedcomLoader
+from ..processors.map_generator import MapGenerator
+from ..processors.report_generator import ReportGenerator
+from ..processors.lineage_tracer import LineageTracer
 
 from const import GLOBAL_GEO_CACHE_FILENAME, FILE_ALT_PLACE_FILENAME_SUFFIX, FILE_GEOCACHE_FILENAME_SUFFIX, GEO_CONFIG_FILENAME
 
@@ -292,94 +292,17 @@ class VisualMapActions:
     def doHTML(self, gOp: gvOptions, people: Dict[str, Person], fullresult: bool) -> bool:
         """Generate interactive HTML map using Folium library.
         
-        Creates lifetime lines for selected people (starting from gOp.Main) and
-        exports to interactive HTML map with Folium. Optionally includes all people
-        in dataset if gOp.AllEntities is True.
-        
-        Process:
-        1. Create LifetimeCreator with people data
-        2. Generate lifetime lines starting from main person
-        3. Optionally add all other people
-        4. Export to HTML using foliumExporter
-        5. Optionally open in browser if fullresult=True
+        Delegates to MapGenerator.doHTML().
         
         Args:
-            gOp: Global options containing:
-                 - Main: xref_id of starting person
-                 - MaxMissing: Maximum years gap to interpolate locations
-                 - AllEntities: If True, include all people in map
-                 - resultpath, ResultFile: Output location
-            people: Dictionary of Person objects keyed by xref_id.
-            fullresult: If True, opens generated HTML in browser after creation.
+            gOp: Global options
+            people: Dictionary of Person objects
+            fullresult: If True, opens generated HTML in browser
         
         Returns:
-            bool: True if HTML generation succeeded, False if errors occurred.
-        
-        Side Effects:
-            - Sets gOp.mainPerson to starting Person object
-            - Sets gOp.totalpeople to count of people in output
-            - Creates HTML file at gOp.resultpath/gOp.ResultFile
-            - Opens browser if fullresult=True
-        
-        Raises:
-            Logs error and returns False if:
-            - No people provided
-            - Starting person (gOp.Main) not found in people dict
-            - Folium export fails
-            - Result file not found after generation
-        
-        Example:
-            success = actions.doHTML(gOp, people_dict, fullresult=True)
-            if success:
-                print("Map generated and opened in browser")
+            bool: True if successful, False otherwise
         """
-        if (not people):
-            _log.error("doHTML: no people provided")
-            return False
-        
-        _log.debug  ("Creating Lifeline (fullresult:%s)", fullresult)
-        lifeline: LifetimeCreator = LifetimeCreator(people, gOp.MaxMissing)    
-        _log.debug  ("Creating People ")
-        creator: list = lifeline.create(gOp.Main)    
-        if gOp.Main not in people:
-            _log.error ("Could not find your starting person: %s", gOp.Main)
-            try:
-                gOp.stopstep('Error could not find first person')
-            except Exception:
-                pass
-            return False
-        
-        gOp.setMainPerson(people[gOp.Main])
-        if gOp.AllEntities:
-            gOp.step('Creating life line for everyone')
-            lifeline.createothers(creator)
-            _log.info ("Total of %i people & events.", len(creator))   
-        gOp.totalpeople = len(creator)
-
-        try:
-            foliumExporter(gOp).export(people[gOp.Main], creator, fullresult)
-        except Exception:
-            _log.exception("doHTML: folium export failed")
-            return False
-        
-        if (fullresult):
-            result_path: Path = Path(gOp.resultpath) / gOp.ResultFile
-            result_path = result_path.resolve()
-            if result_path.exists():
-                url: str = result_path.as_uri()
-                opened: bool = webbrowser.open(url, new=0, autoraise=True)
-                if not opened:
-                    # platform fallbacks
-                    if sys.platform == "darwin":
-                        subprocess.run(["open", str(result_path)])
-                    elif os.name == "posix":
-                        subprocess.run(["xdg-open", str(result_path)])
-                    elif os.name == "nt":
-                        os.startfile(str(result_path))
-            else:
-                _log.error("Result file not found: %s", result_path)
-                return False
-        return True
+        return self.map_generator.doHTML(gOp, people, fullresult)
 
     def Geoheatmap(self, gOp: gvOptions) -> bool:
         """Generate geocoded HTML heatmap in one step.
@@ -521,12 +444,18 @@ class VisualMapActions:
         return self.gedcom_loader.updatestats()
 
 
+# CLI helper for minimal panel context
+class _MinimalPanel:
+    """Minimal panel implementation for CLI usage."""
+    def __init__(self, gOp: gvOptions):
+        self.gOp = gOp
+
+
 # Standalone wrapper functions for backwards compatibility with command-line interface
 def Geoheatmap(gOp: gvOptions) -> bool:
-    """Standalone wrapper for VisualMapActions.Geoheatmap().
+    """Generate geocoded HTML heatmap (CLI wrapper).
     
-    Creates a minimal VisualMapActions instance to call the Geoheatmap method.
-    Used by command-line interface (gedcom-to-map.py).
+    Directly uses specialized modules for efficiency.
     
     Args:
         gOp: Global options
@@ -534,30 +463,31 @@ def Geoheatmap(gOp: gvOptions) -> bool:
     Returns:
         bool: True if successful
     """
-    # Create minimal panel object with gOp
-    class MinimalPanel:
-        def __init__(self, gOp):
-            self.gOp = gOp
+    panel = _MinimalPanel(gOp)
+    loader = GedcomLoader(panel)
+    map_gen = MapGenerator(panel)
     
-    panel = MinimalPanel(gOp)
-    actions = VisualMapActions(panel)
-    return actions.Geoheatmap(gOp)
+    people = loader.ParseAndGPS(gOp, stage=1)
+    if not people:
+        _log.error("Geoheatmap: ParseAndGPS returned no people")
+        return False
+    return map_gen.doHTML(gOp, people, True)
 
 
 def gedcom_to_map(gOp: gvOptions) -> None:
-    """Standalone wrapper for VisualMapActions.gedcom_to_map().
+    """Parse GEDCOM and generate KML (CLI wrapper).
     
-    Creates a minimal VisualMapActions instance to call the gedcom_to_map method.
-    Used by command-line interface (gedcom-to-map.py).
+    Directly uses specialized modules for efficiency.
     
     Args:
         gOp: Global options
     """
-    # Create minimal panel object with gOp
-    class MinimalPanel:
-        def __init__(self, gOp):
-            self.gOp = gOp
+    panel = _MinimalPanel(gOp)
+    loader = GedcomLoader(panel)
+    map_gen = MapGenerator(panel)
     
-    panel = MinimalPanel(gOp)
-    actions = VisualMapActions(panel)
-    actions.gedcom_to_map(gOp)
+    people = loader.ParseAndGPS(gOp, stage=1)
+    if not people:
+        _log.error("gedcom_to_map: ParseAndGPS returned no people")
+        return
+    map_gen.doKML(gOp, people)

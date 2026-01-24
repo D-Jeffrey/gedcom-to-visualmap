@@ -24,12 +24,12 @@ from const import KMLMAPSURL
 import wx
 
 from .people_list_ctrl_panel import PeopleListCtrlPanel  # type: ignore
-from .background_actions import BackgroundActions
-from .layout_options import LayoutOptions
-from .visual_gedcom_ids import VisualGedcomIds
-from .visual_map_event_handlers import VisualMapEventHandler
-from .visual_map_actions import VisualMapActions
-from .font_manager import FontManager
+from ..actions.background_actions import BackgroundActions
+from ..layout.layout_options import LayoutOptions
+from ..layout.visual_gedcom_ids import VisualGedcomIds
+from ..layout.visual_map_event_handlers import VisualMapEventHandler
+from ..actions.visual_map_actions import VisualMapActions
+from ..layout.font_manager import FontManager
 from gedcom_options import gvOptions, ResultType  # type: ignore
 
 (UpdateBackgroundEvent, EVT_UPDATE_STATE) = wx.lib.newevent.NewEvent()

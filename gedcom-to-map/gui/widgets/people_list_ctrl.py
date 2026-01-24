@@ -3,10 +3,10 @@ import re
 import wx
 import wx.lib.mixins.listctrl as listmix
 
-from .person_dialog import PersonDialog
-from .find_dialog import FindDialog
-from .visual_gedcom_ids import VisualGedcomIds
-from .font_manager import FontManager
+from ..dialogs.person_dialog import PersonDialog
+from ..dialogs.find_dialog import FindDialog
+from ..layout.visual_gedcom_ids import VisualGedcomIds
+from ..layout.font_manager import FontManager
 
 _log = logging.getLogger(__name__.lower())
 

@@ -20,12 +20,12 @@ _log = logging.getLogger(__name__.lower())
 # UI Constants
 STATUS_BAR_RIGHT_FIELD_CHARS = 30  # Width of right status bar field in characters
 
-from .config_dialog import ConfigDialog
-from .about_dialog import AboutDialog
-from .help_dialog import HelpDialog
-from .visual_map_panel import VisualMapPanel
-from .visual_gedcom_ids import VisualGedcomIds
-from .font_manager import FontManager
+from ..dialogs.config_dialog import ConfigDialog
+from ..dialogs.about_dialog import AboutDialog
+from ..dialogs.help_dialog import HelpDialog
+from ..panels.visual_map_panel import VisualMapPanel
+from ..layout.visual_gedcom_ids import VisualGedcomIds
+from ..layout.font_manager import FontManager
 from gedcom_options import gvOptions, ResultType
 
 class VisualMapFrame(wx.Frame):

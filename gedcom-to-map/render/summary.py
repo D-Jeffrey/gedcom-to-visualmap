@@ -153,8 +153,6 @@ def generate_summary_reports(
             places_file, write_places_summary, (my_gedcom.address_book, str(places_file)),
             "Places Summary", 'csv', bg, config, file_loader, fatal_on_error=True
         )
-        if result is None:
-            return
 
     if config.people:
         people_file = (output_folder / f"{base_file_name}_people.csv").resolve()

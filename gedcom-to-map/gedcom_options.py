@@ -230,7 +230,7 @@ class gvOptions:
         self.gvConfig = None
         self.set_marker_defaults()
         self.settingsfile = settings_file_pathname("gedcom-visualmap.ini")
-        self.geo_config_file: Path = Path(__file__).resolve().parent.parent / GEO_CONFIG_FILENAME
+        self.geo_config_file: Path = Path(__file__).resolve().parent / GEO_CONFIG_FILENAME
 
         # === Load Option Defaults from YAML ===
         for section_name in self._get_option_sections():

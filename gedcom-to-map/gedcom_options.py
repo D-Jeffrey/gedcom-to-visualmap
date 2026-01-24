@@ -16,6 +16,7 @@ import logging
 import os
 import platform
 import time
+import threading
 from datetime import datetime
 import yaml
 import re
@@ -32,7 +33,8 @@ from geo_gedcom.life_event import LifeEvent
 _log = logging.getLogger(__name__)
 
 # INI file section constants
-INI_SECTIONS = ['Core', 'HTML', 'Summary', 'Logging', 'Gedcom.Main', 'KML']
+INI_SECTION_GEDCOM_MAIN = 'Gedcom.Main'
+INI_SECTIONS = ['Core', 'HTML', 'Summary', 'Logging', INI_SECTION_GEDCOM_MAIN, 'KML']
 INI_OPTION_SECTIONS = ['Core', 'HTML', 'Summary', 'KML']
 
 # Migration version constants
@@ -242,6 +244,7 @@ class gvOptions:
         self.time = time.ctime()
         self.resettimeframe()
         self.app_hooks: GuiHooks = GuiHooks(self)
+        self._stop_lock = threading.Lock()  # Prevent race conditions in stop()
         
         # === Configure Platform-Specific File Commands ===
         self.file_open_commands = FileOpenCommandLines()
@@ -276,6 +279,108 @@ class gvOptions:
     # YAML Configuration Discovery and Loading
     # ============================================================================
 
+    def _coerce_value_to_type(self, value, target_type: str, context: str = ""):
+        """Parse a value into the target Python type.
+        
+        Args:
+            value: The value to parse (string, or already parsed type)
+            target_type: Target type string ('bool', 'int', 'str', 'result', etc.)
+            context: Context string for error messages (e.g., 'option name' or 'INI section.key')
+            
+        Returns:
+            Parsed value in the appropriate Python type
+        """
+        import ast
+        import re
+        
+        if value is None:
+            return None
+            
+        try:
+            if target_type == 'bool':
+                if isinstance(value, bool):
+                    return value
+                return str(value).strip().lower() in ('1', 'true', 'yes', 'on', 'y', 't')
+            
+            elif target_type == 'int':
+                if isinstance(value, int):
+                    return value
+                # Handle boolean strings that should be converted to int
+                if isinstance(value, str) and value.strip().lower() in ('true', 'false'):
+                    int_value = 1 if value.strip().lower() == 'true' else 0
+                    if context:
+                        _log.warning("Converting boolean '%s' to int %d for '%s'", value, int_value, context)
+                    return int_value
+                return int(str(value).strip())
+            
+            elif target_type == 'str':
+                return str(value)
+            
+            elif target_type == 'list' or target_type == 'dict':
+                if isinstance(value, (list, dict)):
+                    return value
+                # Try to parse string as list/dict
+                if isinstance(value, str):
+                    return yaml.safe_load(value)
+                return value
+            
+            elif target_type == 'result':
+                # handle ResultType like "ResultType.HTML"
+                if isinstance(value, str):
+                    m = re.match(r'^\s*ResultType\.([A-Za-z_][A-Za-z0-9_]*)\s*$', value)
+                    if m:
+                        value = m.group(1)
+                return ResultType.ResultTypeEnforce(value)
+            
+            else:
+                # Complex types: if already a native type, keep it
+                if isinstance(value, (dict, list, int, float, bool)):
+                    return value
+                
+                # Try to parse string values
+                if isinstance(value, str):
+                    # Handle LatLon(...) first (before yaml/literal_eval that might fail on parens)
+                    m2 = re.match(r'^\s*LatLon\s*\((.*)\)\s*$', value)
+                    if m2:
+                        inside = m2.group(1)
+                        parts = [p.strip() for p in inside.split(',')]
+                        vals = []
+                        for p in parts:
+                            if p.lower() == 'none' or p == '':
+                                vals.append(None)
+                            else:
+                                try:
+                                    vals.append(float(p))
+                                except Exception:
+                                    vals.append(p.strip('\'"'))
+                        try:
+                            return LatLon(vals[0], vals[1])
+                        except Exception as e:
+                            _log.debug("Could not construct LatLon from '%s' for %s: %s", value, context, e)
+                            return value
+                    
+                    # Try yaml (handles lists/dicts/numbers/null)
+                    try:
+                        parsed_yaml = yaml.safe_load(value)
+                        if parsed_yaml is not None and not isinstance(parsed_yaml, str):
+                            return parsed_yaml
+                    except Exception:
+                        pass
+                    
+                    # Last resort: safe literal eval, otherwise keep string
+                    try:
+                        return ast.literal_eval(value)
+                    except Exception as e:
+                        # If literal_eval fails, just return the string as-is
+                        _log.debug("Could not parse value '%s' for %s: %s - returning as string", value, context, e)
+                        return value
+                
+                return value
+                
+        except Exception as e:
+            _log.error("Error coercing value for '%s' type %s: %s", context, target_type, e)
+            return value
+
     def _get_option_sections(self) -> list[str]:
         """Discover all option sections from the loaded YAML structure.
         
@@ -300,46 +405,8 @@ class gvOptions:
         """
         for key, typ in options_types.items():
             value = options_defaults.get(key, None)
-            # Explicitly accept YAML null -> Python None as a valid value
-            if value is None:
-                setattr(self, key, None)
-                continue
-            try:
-                # Accept native YAML types (bool/int/str) and fall back to parsing strings
-                if typ == 'bool':
-                    if isinstance(value, bool):
-                        parsed = value
-                    else:
-                        parsed = str(value).strip().lower() in ('1', 'true', 'yes', 'on', 'y', 't')
-                elif typ == 'int':
-                    if isinstance(value, int):
-                        parsed = value
-                    else:
-                        parsed = int(str(value).strip())
-                elif typ == 'str':
-                    parsed = str(value)
-                elif typ == 'list' or typ == 'dict':
-                    if isinstance(value, (list, dict)):
-                        parsed = value
-                elif typ == 'result':
-                    parsed = ResultType.ResultTypeEnforce(value)
-                # For complex types: if YAML already provided a list/dict/number, keep it;
-                # if it's a string try safe eval via yaml (or fallback to literal eval)
-                elif isinstance(value, (dict, list, int, float, bool)):
-                    parsed = value
-                elif isinstance(value, str):
-                    try:
-                        # try to parse structured literal using yaml (safe)
-                        parsed = yaml.safe_load(value)
-                    except Exception:
-                        _log.error("YAML parsing failed for option '%s'", key)
-                        parsed = value
-                else:
-                    parsed = value
-
-                setattr(self, key, parsed)
-            except Exception as e:
-                _log.error("Error setting option '%s' type %s: %s", key, typ, e)
+            parsed = self._coerce_value_to_type(value, typ, context=f"option '{key}'")
+            setattr(self, key, parsed)
                     
     def set_marker_defaults(self) -> None:
         """Load and apply marker-related defaults from the YAML options payload."""
@@ -406,7 +473,19 @@ class gvOptions:
                   UseGPS: bool = True,
                   CacheOnly: bool = False,
                   AllEntities: bool = False) -> None:
-        """Convenience setter for a typical group of static options used at startup."""
+        """Convenience setter for a typical group of static options used at startup.
+        
+        Args:
+            GEDCOMinput: Path to the GEDCOM input file
+            ResultFile: Path for the output file (without extension)
+            ResultType: Type of output to generate (HTML, KML, etc.)
+            Main: ID of the main person in the GEDCOM
+            MaxMissing: Maximum number of missing locations allowed
+            MaxLineWeight: Maximum line weight for rendering
+            UseGPS: Whether to use GPS coordinates
+            CacheOnly: If True, only update the geocoding cache without generating output
+            AllEntities: If True, generate output for everyone in the system
+        """
         self.setInput(GEDCOMinput)
         self.setResultsFile(ResultFile or "", ResultType)
         self.Main = Main
@@ -415,7 +494,7 @@ class gvOptions:
         self.MaxLineWeight = MaxLineWeight
         self.UseGPS = UseGPS
         self.CacheOnly = CacheOnly
-        self.AllEntities = AllEntities             # generte output of everyone in the system
+        self.AllEntities = AllEntities             # generate output of everyone in the system
         
     def _build_section_keys(self, section_name: str) -> dict:
         """Build dictionary of {field_name: type} for given INI section from option definitions.
@@ -446,76 +525,12 @@ class gvOptions:
 
     def loadsection(self, sectionName: str, keys: Optional[dict] = None) -> None:
         """Load and coerce a named section from the INI-style gvConfig into attributes."""
-        import ast
-        import re
         for key, typ in (keys or {}).items():
             value = self.gvConfig[sectionName].get(key, None)
             if value is None:
                 continue
-            try:
-                if typ == 'bool':
-                    setattr(self, key, str(value).strip().lower() == 'true')
-                elif typ == 'int':
-                    # Handle boolean strings that should be converted to int
-                    if isinstance(value, str) and value.strip().lower() in ('true', 'false'):
-                        # Convert boolean string to int (True->1, False->0)
-                        int_value = 1 if value.strip().lower() == 'true' else 0
-                        setattr(self, key, int_value)
-                        _log.warning("Converting boolean '%s' to int %d for setting '%s' in section %s", 
-                                   value, int_value, key, sectionName)
-                    else:
-                        setattr(self, key, int(value))
-                elif typ == 'str':
-                    setattr(self, key, value)
-                elif typ == 'result':
-                    # handle ResultType like "ResultType.HTML"
-                    m = re.match(r'^\s*ResultType\.([A-Za-z_][A-Za-z0-9_]*)\s*$', value)
-                    if m:
-                        value = m.group(1)
-                    try:
-                        parsed = ResultType.ResultTypeEnforce(value)
-                        setattr(self, key, parsed)
-                    except Exception:
-                        _log.error("Invalid ResultType string in settings for '%s': %s", key, value)
-                else:
-                    parsed = None
-                    # try yaml first (handles lists/dicts/numbers/null)
-                    try:
-                        parsed_yaml = yaml.safe_load(value)
-                    except Exception:
-                        parsed_yaml = None
-
-                    if parsed_yaml is not None and not isinstance(parsed_yaml, str):
-                        parsed = parsed_yaml
-                    else:
-                        # handle LatLon(...) specifically
-                        m2 = re.match(r'^\s*LatLon\s*\((.*)\)\s*$', value)
-                        if m2:
-                            inside = m2.group(1)
-                            parts = [p.strip() for p in inside.split(',')]
-                            vals = []
-                            for p in parts:
-                                if p.lower() == 'none' or p == '':
-                                    vals.append(None)
-                                else:
-                                    try:
-                                        vals.append(float(p))
-                                    except Exception:
-                                        vals.append(p.strip('\'"'))
-                            try:
-                                parsed = LatLon(vals[0], vals[1])
-                            except Exception:
-                                parsed = value
-                        else:
-                            # last resort: safe literal eval, otherwise keep string
-                            try:
-                                parsed = ast.literal_eval(value)
-                            except Exception:
-                                parsed = value
-
-                    setattr(self, key, parsed)
-            except Exception as e:
-                _log.error("Error loading setting '%s' type %s in section %s: %s", key, typ, sectionName, e)
+            parsed = self._coerce_value_to_type(value, typ, context=f"{sectionName}.{key}")
+            setattr(self, key, parsed)
 
     def loadsettings(self) -> None:
         """Read persisted settings file and apply configured values into this instance."""
@@ -598,9 +613,7 @@ class gvOptions:
                     self.gvConfig['Core'][f'{file_type}cmdline'] = cmd
             if self.GEDCOMinput and self.Main:
                 name = Path(self.GEDCOMinput).stem
-                self.gvConfig['Gedcom.Main'][name] = str(self.Main)
-            #for key in range(0, self.panel.fileConfig.filehistory.GetCount()):
-            #    self.gvConfig['Files'][key] = self.panel.fileConfig[key]
+                self.gvConfig[INI_SECTION_GEDCOM_MAIN][name] = str(self.Main)
             
             loggerNames = list(logging.root.manager.loggerDict.keys())
             logging_keys = self.options.get('logging_keys', [])
@@ -672,8 +685,8 @@ class gvOptions:
         self.GEDCOMinput = theInput
         if self.gvConfig and self.GEDCOMinput:
             name = Path(self.GEDCOMinput).stem
-            if self.gvConfig['Gedcom.Main'].get(name):
-                self.setMain(self.gvConfig['Gedcom.Main'].get(name))
+            if self.gvConfig[INI_SECTION_GEDCOM_MAIN].get(name):
+                self.setMain(self.gvConfig[INI_SECTION_GEDCOM_MAIN].get(name))
             else:
                 self.setMain(None)
 
@@ -719,6 +732,16 @@ class gvOptions:
 
         When state is provided this marks the worker as running and optionally
         resets counters. Returns ShouldStop() so callers can respect stop requests.
+        
+        Args:
+            state: New state description (e.g., "Processing people"). If provided, marks as running.
+            info: Additional information about the current step
+            target: New target count for progress tracking (-1 to leave unchanged)
+            resetCounter: Whether to reset the counter to 0 when state is provided
+            plusStep: Amount to increment the counter (when state is None)
+            
+        Returns:
+            bool: True if processing should stop, False otherwise
         """
         if state:
             self.state = state
@@ -736,16 +759,21 @@ class gvOptions:
         return self.ShouldStop()
 
     def stop(self) -> None:        
-        """Request immediate stop and reset several runtime counters/flags."""
-        self.running = False
-        self.stopping = False
-        time.sleep(.1)
-        self.lastmax = self.counter
-        self.time = time.ctime()
-        self.counter = 0
-        self.state = ""
-        self.running = False        # Race conditions
-        self.stopping = False
+        """Request immediate stop and reset several runtime counters/flags.
+        
+        Thread-safe: Uses a lock to prevent race conditions when called from
+        multiple threads or when checked concurrently by KeepGoing().
+        """
+        with self._stop_lock:
+            self.running = False
+            self.stopping = False
+            time.sleep(.1)
+            self.lastmax = self.counter
+            self.time = time.ctime()
+            self.counter = 0
+            self.state = ""
+            self.running = False
+            self.stopping = False
 
     # ============================================================================
     # Generic Attribute Access (get/set helpers)

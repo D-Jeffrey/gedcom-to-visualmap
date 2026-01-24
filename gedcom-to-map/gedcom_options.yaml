@@ -35,7 +35,7 @@ main_person_options:
   Main: {type: 'str', default: null}
   mainPerson: {type: 'str', default: null}
   Name: {type: 'str', default: null}
-  mainPersonLatLon: {type: 'complex', default: LatLon(None, None)}
+  mainPersonLatLon: {type: 'complex', default: 'LatLon(None, None)'}
 
 # General map display options (format-agnostic)
 map_display_options:

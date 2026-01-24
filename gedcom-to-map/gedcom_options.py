@@ -199,12 +199,16 @@ class gvOptions:
 
         self.geo_config_file: Path = Path(__file__).resolve().parent.parent / GEO_CONFIG_FILENAME
 
-        gedcom_options_types = self.options.get('gedcom_options_types', {})
-        gedcom_options_defaults = self.options.get('gedcom_options_defaults', {})
+        # Extract types and defaults from unified gedcom_options structure
+        gedcom_options = self.options.get('gedcom_options', {})
+        gedcom_options_types = {k: v.get('type') for k, v in gedcom_options.items()}
+        gedcom_options_defaults = {k: v.get('default') for k, v in gedcom_options.items()}
         self.set_options(gedcom_options_types, gedcom_options_defaults)
 
-        gui_options_types = self.options.get('gui_options_types', {})
-        gui_options_defaults = self.options.get('gui_options_defaults', {})
+        # Extract types and defaults from unified gui_options structure
+        gui_options = self.options.get('gui_options', {})
+        gui_options_types = {k: v.get('type') for k, v in gui_options.items()}
+        gui_options_defaults = {k: v.get('default') for k, v in gui_options.items()}
         self.set_options(gui_options_types, gui_options_defaults)
 
         self.people: Union[Dict[str, Person], None] = None
@@ -305,7 +309,9 @@ class gvOptions:
                     
     def set_marker_defaults(self):
         """Load and apply marker-related defaults from the YAML options payload."""
-        marker_options = self.options.get('marker_options_defaults', {}) or {}
+        # Extract defaults from unified marker_options structure
+        marker_options_unified = self.options.get('marker_options', {}) or {}
+        marker_options = {k: v.get('default') for k, v in marker_options_unified.items()}
         self.set_marker_options(marker_options)
 
     def set_marker_options(self, marker_options: dict):
@@ -314,7 +320,9 @@ class gvOptions:
         Unknown keys are ignored with a warning; missing expected keys are set
         to None to ensure attributes are defined.
         """
-        expected_keys = self.options.get('marker_options_list', []) or []
+        # Get expected keys from unified marker_options structure
+        marker_options_unified = self.options.get('marker_options', {}) or {}
+        expected_keys = list(marker_options_unified.keys())
         # Apply provided defaults, warn about unknown keys
         for key, value in marker_options.items():
             if key in expected_keys:

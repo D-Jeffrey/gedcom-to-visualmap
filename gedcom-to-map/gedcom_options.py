@@ -35,7 +35,11 @@ _log = logging.getLogger(__name__)
 INI_SECTIONS = ['Core', 'HTML', 'Summary', 'Logging', 'Gedcom.Main', 'KML']
 INI_OPTION_SECTIONS = ['Core', 'HTML', 'Summary', 'KML']
 
-def settings_file_pathname(file_name):
+# Migration version constants
+MIGRATION_VERSION_UNSET = '0'
+MIGRATION_VERSION_CURRENT = '1'
+
+def settings_file_pathname(file_name: str) -> str:
     """Return a platform-appropriate full path for storing settings.
 
     Ensures the parent directory exists. Returns a fallback file_name string
@@ -52,12 +56,12 @@ def settings_file_pathname(file_name):
     elif os_name == 'Linux':
         settings_file_path = os.path.join(os.path.expanduser('~'), '.config')
     else:
-        _log.error (f"Unsupported operating system: {os_name}")
+        _log.error("Unsupported operating system: %s", os_name)
         return file_name
     Path(settings_file_path).mkdir(parents=True, exist_ok=True)
     settings_file_path = os.path.join(settings_file_path, file_name)
     
-    _log.debug (f"Settings file location: {settings_file_path}")
+    _log.debug("Settings file location: %s", settings_file_path)
     return settings_file_path
     
 class ResultType(Enum):
@@ -133,7 +137,7 @@ class ResultType(Enum):
             type = ResultType.SUM
         else:
             type = ResultType.HTML
-            _log.warning(f"Unsupported file extension for ResultType: {file_extension}; reverting to HTML")
+            _log.warning("Unsupported file extension for ResultType: %s; reverting to HTML", file_extension)
         return type
 
     @staticmethod
@@ -150,21 +154,34 @@ class ResultType(Enum):
             return 'html'
 
 class FileOpenCommandLines:
-    def __init__(self):
+    def __init__(self) -> None:
         self.commands: Dict[str, str] = {}
-        self.process: Optional[str] = None
 
-    def add_file_type_command(self, file_type: str, command_line: str):
+    def add_file_type_command(self, file_type: str, command_line: str) -> None:
+        """Register or update a command line for opening a specific file type.
+        
+        Args:
+            file_type: The file type identifier (case-insensitive)
+            command_line: The shell command to open files of this type
+        """
         file_type_lower = file_type.lower()
         found_key = file_type
         for key in self.commands.keys():
             if key.lower() == file_type_lower:
-                _log.warning(f"Overwriting existing command for file type '{file_type}': '{self.commands[key]}' -> '{command_line}'")
+                _log.warning("Overwriting existing command for file type '%s': '%s' -> '%s'", file_type, self.commands[key], command_line)
                 found_key = key
                 break
         self.commands[found_key] = command_line
         
     def get_command_for_file_type(self, file_type: str) -> Optional[str]:
+        """Retrieve the registered command for a given file type.
+        
+        Args:
+            file_type: The file type identifier (case-insensitive)
+            
+        Returns:
+            The command line string, or None if not found
+        """
         file_type_lower = file_type.lower()
         for key, value in self.commands.items():
             if key.lower() == file_type_lower:
@@ -172,10 +189,19 @@ class FileOpenCommandLines:
         return None
     
     def exists_command_for_file_type(self, file_type: str) -> bool:
+        """Check whether a command is registered for the given file type.
+        
+        Args:
+            file_type: The file type identifier (case-insensitive)
+            
+        Returns:
+            True if a command exists for this file type
+        """
         file_type_lower = file_type.lower()
         return any(key.lower() == file_type_lower for key in self.commands.keys())
     
     def list_file_types(self) -> list[str]:
+        """Return a list of all registered file type identifiers."""
         return list(self.commands.keys())
     
 class gvOptions:
@@ -189,7 +215,7 @@ class gvOptions:
     """
     GEDCOM_OPTIONS_FILE = 'gedcom_options.yaml'
 
-    def __init__ (self):
+    def __init__(self) -> None:
         from gui.gui_hooks import GuiHooks
 
         """Load static defaults, initialize runtime state and read persisted settings."""
@@ -225,7 +251,7 @@ class gvOptions:
         if os.path.exists(self.settingsfile):
             self.loadsettings()
 
-    def _initialize_file_commands(self):
+    def _initialize_file_commands(self) -> None:
         """Initialize platform-specific default commands for opening files."""
         os_name = platform.system()
         
@@ -266,7 +292,7 @@ class gvOptions:
                 sections.append(key)
         return sections
 
-    def set_options(self, options_types, options_defaults):
+    def set_options(self, options_types: dict, options_defaults: dict) -> None:
         """Apply parsed defaults into instance attributes with type coercion.
 
         Supports simple types (bool/int/str) and attempts to safely parse more
@@ -306,13 +332,8 @@ class gvOptions:
                         # try to parse structured literal using yaml (safe)
                         parsed = yaml.safe_load(value)
                     except Exception:
-                        _log.error("YAML parsing failed for option '%s'; trying literal_eval", key)
-                        # try:
-                        #     # final fallback: evaluate simple Python literal
-                        #     from ast import literal_eval
-                        #     parsed = literal_eval(value)
-                        # except Exception:
-                        #     parsed = value
+                        _log.error("YAML parsing failed for option '%s'", key)
+                        parsed = value
                 else:
                     parsed = value
 
@@ -320,14 +341,14 @@ class gvOptions:
             except Exception as e:
                 _log.error("Error setting option '%s' type %s: %s", key, typ, e)
                     
-    def set_marker_defaults(self):
+    def set_marker_defaults(self) -> None:
         """Load and apply marker-related defaults from the YAML options payload."""
         # Extract defaults from unified marker_options structure
         marker_options_unified = self.options.get('marker_options', {}) or {}
         marker_options = {k: v.get('default') for k, v in marker_options_unified.items()}
         self.set_marker_options(marker_options)
 
-    def set_marker_options(self, marker_options: dict):
+    def set_marker_options(self, marker_options: dict) -> None:
         """Apply provided marker_options dict and ensure expected keys exist.
 
         Unknown keys are ignored with a warning; missing expected keys are set
@@ -352,17 +373,12 @@ class gvOptions:
     # Timeframe Tracking (for Event Analysis)
     # ============================================================================
 
-    def resettimeframe(self):
+    def resettimeframe(self) -> None:
         """Reset the aggregated timeframe used when summarising people/events."""
-        """ Reset the timeframe for the process """
         self.timeframe = {'from': None, 'to': None}
 
-    def addtimereference(self, timeReference: LifeEvent):
+    def addtimereference(self, timeReference: LifeEvent) -> None:
         """Extend the global timeframe with a LifeEvent's year (if available)."""
-        """ 
-        Update the over all timeframe with person event details
-        timeRefrence: LifeEvent
-        """
         if not timeReference:
             return
         theyear = timeReference.year_num
@@ -389,7 +405,7 @@ class gvOptions:
                   MaxLineWeight: int = 20,
                   UseGPS: bool = True,
                   CacheOnly: bool = False,
-                  AllEntities: bool = False):
+                  AllEntities: bool = False) -> None:
         """Convenience setter for a typical group of static options used at startup."""
         self.setInput(GEDCOMinput)
         self.setResultsFile(ResultFile or "", ResultType)
@@ -402,7 +418,17 @@ class gvOptions:
         self.AllEntities = AllEntities             # generte output of everyone in the system
         
     def _build_section_keys(self, section_name: str) -> dict:
-        """Build dictionary of {field_name: type} for given INI section from option definitions."""
+        """Build dictionary of {field_name: type} for given INI section from option definitions.
+        
+        Scans all option sections in the YAML configuration to find fields that should be
+        persisted to the specified INI section, returning a mapping of field names to their types.
+        
+        Args:
+            section_name: The INI section name to build keys for (e.g., 'Core', 'HTML')
+            
+        Returns:
+            Dictionary mapping field names to type strings (e.g., {'option1': 'bool', 'option2': 'int'})
+        """
         section_keys = {}
         
         # Check all option sections for fields that belong to this INI section
@@ -418,7 +444,7 @@ class gvOptions:
     # INI File Persistence (Load/Save Settings)
     # ============================================================================
 
-    def loadsection(self, sectionName, keys=None):
+    def loadsection(self, sectionName: str, keys: Optional[dict] = None) -> None:
         """Load and coerce a named section from the INI-style gvConfig into attributes."""
         import ast
         import re
@@ -491,7 +517,7 @@ class gvOptions:
             except Exception as e:
                 _log.error("Error loading setting '%s' type %s in section %s: %s", key, typ, sectionName, e)
 
-    def loadsettings(self):
+    def loadsettings(self) -> None:
         """Read persisted settings file and apply configured values into this instance."""
         self.gvConfig = configparser.ConfigParser()
         self.gvConfig.read(self.settingsfile)
@@ -505,8 +531,8 @@ class gvOptions:
                 self.loadsection(section, section_keys)
         
         # Run legacy cleanup once - check if already migrated
-        migration_version = self.gvConfig['Core'].get('_migration_version', '0')
-        if migration_version == '0':
+        migration_version = self.gvConfig['Core'].get('_migration_version', MIGRATION_VERSION_UNSET)
+        if migration_version == MIGRATION_VERSION_UNSET:
             # Remove old deprecated settings
             old_ini_settings = self.options.get('old_ini_settings', {})
             for key, section in old_ini_settings.items():
@@ -514,7 +540,7 @@ class gvOptions:
                     _log.info("Removing deprecated setting '%s' from section '%s'", key, section)
                     self.gvConfig.remove_option(section, key)
             # Mark migration as complete
-            self.gvConfig['Core']['_migration_version'] = '1'
+            self.gvConfig['Core']['_migration_version'] = MIGRATION_VERSION_CURRENT
             # Save the cleaned config
             try:
                 with open(self.settingsfile, 'w') as configfile:
@@ -539,7 +565,7 @@ class gvOptions:
             if alogger:
                 alogger.setLevel(lvl)
 
-    def savesettings(self):
+    def savesettings(self) -> None:
         """Persist selected options into the INI-style settings file.
 
         This writes only the configured keys and a small set of runtime values.
@@ -595,7 +621,7 @@ class gvOptions:
     # Main Person Selection and File Path Management
     # ============================================================================
     
-    def setMainPerson(self, mainperson: Person):
+    def setMainPerson(self, mainperson: Person) -> None:
         """Set the currently focused person and update derived state."""
         newMain = (self.mainPerson != mainperson and mainperson and self.Name != mainperson.name) or mainperson == None
         
@@ -612,7 +638,7 @@ class gvOptions:
             self.heritage = None
             self.Referenced = None
 
-    def setMain(self, Main: str):
+    def setMain(self, Main: str) -> None:
         """Set the Main identifier and select the corresponding Person if present."""
         self.Main = Main
         if self.people and Main in self.people:
@@ -620,7 +646,7 @@ class gvOptions:
         else:
             self.setMainPerson(None)
 
-    def setResultsFile(self, ResultFile, OutputType):
+    def setResultsFile(self, ResultFile: str, OutputType: ResultType) -> None:
         """Set the output filename (base) and enforce an extension based on OutputType."""
         enforced = ResultType.ResultTypeEnforce(OutputType)
         self.ResultType = enforced
@@ -633,7 +659,7 @@ class gvOptions:
             self.ResultFile = self.ResultFile + "." + extension
         # TODO Update Visual value
 
-    def setInput(self, theInput, generalRequest=True):
+    def setInput(self, theInput: Optional[str], generalRequest: bool = True) -> None:
         """Set the GEDCOM input path and adjust derived output/result values.
 
         If generalRequest is True, previous settings may be saved before replacing.
@@ -670,28 +696,25 @@ class gvOptions:
     # Progress Tracking and Process Control
     # ============================================================================
 
-    def KeepGoing(self):
+    def KeepGoing(self) -> bool:
         """Return True if processing should continue (not stopping)."""
         return not self.ShouldStop()
 
-    def ShouldStop(self):
+    def ShouldStop(self) -> bool:
         """Return True when a stop request has been issued."""
         return self.stopping
 
-    def stopstep(self, state):
+    def stopstep(self, state: str) -> bool:
         """Record a stepping state for progress display and return True to continue."""
-        """ Update the counter used to show progress to the end user """
-        """ return true if we should stop stepping """
         self.state = state
             
         return True
     
-    def stepCounter(self, newcounter):
+    def stepCounter(self, newcounter: int) -> None:
         """Update the internal counter used for progress display."""
-        """ Update the counter used to show progress to the end user """
         self.counter = newcounter
 
-    def step(self, state = None, info=None, target=-1, resetCounter=True, plusStep=1):
+    def step(self, state: Optional[str] = None, info: Optional[str] = None, target: int = -1, resetCounter: bool = True, plusStep: int = 1) -> bool:
         """Advance progress counters and optionally set a new target.
 
         When state is provided this marks the worker as running and optionally
@@ -712,7 +735,7 @@ class gvOptions:
             # logging.debug(">>>>>> stepped %d", self.counter)
         return self.ShouldStop()
 
-    def stop(self):        
+    def stop(self) -> None:        
         """Request immediate stop and reset several runtime counters/flags."""
         self.running = False
         self.stopping = False
@@ -728,7 +751,7 @@ class gvOptions:
     # Generic Attribute Access (get/set helpers)
     # ============================================================================
 
-    def get (self, attribute, default=None, ifNone=None):
+    def get(self, attribute: str, default=None, ifNone=None):
         """Safely access an attribute, returning default or ifNone when appropriate."""
         if ifNone is not None:
             val = getattr(self,attribute, default)
@@ -736,13 +759,12 @@ class gvOptions:
                 return ifNone
         return getattr(self,attribute, default)
 
-    def set(self, attribute, value):
+    def set(self, attribute: str, value) -> None:
         """Set an existing attribute on the options object.
 
         Raises ValueError if the attribute does not exist. Special-cases 'Main'.
         """
         if not hasattr(self, attribute):
-            _log.error(f'attempting to set an attribute : {attribute} which does not exist')
             raise ValueError(f'attempting to set an attribute : {attribute} which does not exist')
         if attribute == "Main":
             self.setMain(value)

@@ -494,6 +494,24 @@ class gvOptions:
                 section_keys = self._build_section_keys(section)
                 self.loadsection(section, section_keys)
         
+        # Run legacy cleanup once - check if already migrated
+        migration_version = self.gvConfig['Core'].get('_migration_version', '0')
+        if migration_version == '0':
+            # Remove old deprecated settings
+            old_ini_settings = self.options.get('old_ini_settings', {})
+            for key, section in old_ini_settings.items():
+                if self.gvConfig.has_option(section, key):
+                    _log.info("Removing deprecated setting '%s' from section '%s'", key, section)
+                    self.gvConfig.remove_option(section, key)
+            # Mark migration as complete
+            self.gvConfig['Core']['_migration_version'] = '1'
+            # Save the cleaned config
+            try:
+                with open(self.settingsfile, 'w') as configfile:
+                    self.gvConfig.write(configfile)
+            except Exception as e:
+                _log.error("Error saving migrated settings: %s", e)
+        
         self.setInput(self.gvConfig['Core'].get('InputFile', ''), generalRequest=False)
         self.resultpath, self.ResultFile = os.path.split(self.gvConfig['Core'].get('OutputFile', ''))
         self.setResultsFile(self.ResultFile, self.ResultType)
@@ -557,9 +575,6 @@ class gvOptions:
                         self.gvConfig.remove_option('Logging', logName)
                     else:
                         self.gvConfig['Logging'][logName] = logging.getLevelName(logging.getLogger(logName).getEffectiveLevel())
-            old_ini_settings = self.options.get('old_ini_settings', {})
-            for key, section  in old_ini_settings.items():
-                self.gvConfig.remove_option(section, key)
             with open(self.settingsfile, 'w') as configfile:
                 self.gvConfig.write(configfile)
 

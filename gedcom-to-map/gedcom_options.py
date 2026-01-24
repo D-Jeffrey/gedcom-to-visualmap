@@ -384,6 +384,30 @@ class gvOptions:
         self.CacheOnly = CacheOnly
         self.AllEntities = AllEntities             # generte output of everyone in the system
         
+    def _build_section_keys(self, section_name: str) -> dict:
+        """Build dictionary of {field_name: type} for given INI section from option definitions."""
+        section_keys = {}
+        
+        # Check marker_options
+        marker_opts = self.options.get('marker_options', {})
+        for key, props in marker_opts.items():
+            if isinstance(props, dict) and props.get('ini_section') == section_name:
+                section_keys[key] = props.get('ini_type', props.get('type'))
+        
+        # Check gedcom_options
+        gedcom_opts = self.options.get('gedcom_options', {})
+        for key, props in gedcom_opts.items():
+            if isinstance(props, dict) and props.get('ini_section') == section_name:
+                section_keys[key] = props.get('ini_type', props.get('type'))
+        
+        # Check gui_options
+        gui_opts = self.options.get('gui_options', {})
+        for key, props in gui_opts.items():
+            if isinstance(props, dict) and props.get('ini_section') == section_name:
+                section_keys[key] = props.get('ini_type', props.get('type'))
+        
+        return section_keys
+
     def loadsection(self, sectionName, keys=None):
         """Load and coerce a named section from the INI-style gvConfig into attributes."""
         import ast
@@ -396,7 +420,15 @@ class gvOptions:
                 if typ == 'bool':
                     setattr(self, key, str(value).strip().lower() == 'true')
                 elif typ == 'int':
-                    setattr(self, key, int(value))
+                    # Handle boolean strings that should be converted to int
+                    if isinstance(value, str) and value.strip().lower() in ('true', 'false'):
+                        # Convert boolean string to int (True->1, False->0)
+                        int_value = 1 if value.strip().lower() == 'true' else 0
+                        setattr(self, key, int_value)
+                        _log.warning("Converting boolean '%s' to int %d for setting '%s' in section %s", 
+                                   value, int_value, key, sectionName)
+                    else:
+                        setattr(self, key, int(value))
                 elif typ == 'str':
                     setattr(self, key, value)
                 elif typ == 'result':
@@ -459,7 +491,7 @@ class gvOptions:
             if section not in self.gvConfig.sections():
                 self.gvConfig[section] = {}
             if section in ['Core', 'HTML', 'KML']:
-                section_keys = self.options.get('config_file_settings', {}).get(f'{section}', {})
+                section_keys = self._build_section_keys(section)
                 self.loadsection(section, section_keys)
         
         self.setInput(self.gvConfig['Core'].get('InputFile', ''), generalRequest=False)
@@ -491,13 +523,13 @@ class gvOptions:
                 self.gvConfig = configparser.ConfigParser()
                 for section in ['Core', 'HTML', 'Logging', 'Gedcom.Main', 'KML']:
                     self.gvConfig[section] = {}
-            core_keys = self.options.get('config_file_settings', {}).get('Core', {})
+            core_keys = self._build_section_keys('Core')
             for key in core_keys:
                 self.gvConfig['Core'][key] = str(getattr(self, key))
-            html_keys = self.options.get('config_file_settings', {}).get('HTML', {})
+            html_keys = self._build_section_keys('HTML')
             for key in html_keys:
                 self.gvConfig['HTML'][key] =  str(getattr(self, key))
-            kml_keys = self.options.get('config_file_settings', {}).get('KML', {})
+            kml_keys = self._build_section_keys('KML')
             for key in kml_keys:
                 self.gvConfig['KML'][key] =  str(getattr(self, key))
 
@@ -514,7 +546,7 @@ class gvOptions:
             #    self.gvConfig['Files'][key] = self.panel.fileConfig[key]
             
             loggerNames = list(logging.root.manager.loggerDict.keys())
-            logging_keys = self.options.get('config_file_settings', {}).get('Logging', [])
+            logging_keys = self.options.get('logging_keys', [])
             for logName in loggerNames:
                 if logName in logging_keys:
                     logLevel = logging.getLevelName(logging.getLogger(logName).level)
@@ -522,8 +554,8 @@ class gvOptions:
                         self.gvConfig.remove_option('Logging', logName)
                     else:
                         self.gvConfig['Logging'][logName] = logging.getLevelName(logging.getLogger(logName).getEffectiveLevel())
-            old_settings = self.options.get('config_file_settings', {}).get('old_settings', {})
-            for key, section  in old_settings.items():
+            old_ini_settings = self.options.get('old_ini_settings', {})
+            for key, section  in old_ini_settings.items():
                 self.gvConfig.remove_option(section, key)
             with open(self.settingsfile, 'w') as configfile:
                 self.gvConfig.write(configfile)

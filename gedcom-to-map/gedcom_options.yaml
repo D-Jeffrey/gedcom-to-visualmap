@@ -13,12 +13,6 @@ marker_options:
   HomeMarker: {type: 'bool', default: False, ini_section: 'HTML'}
   MapStyle: {type: 'str', default: "CartoDB.Voyager", ini_section: 'HTML'}
 
-# Logger names to track in Logging section of INI file
-logging_keys: [models.person, models, ged4py.parser, ged4py,
-  models.creator, models.location, gedcomoptions,
-  gedcom.gedcomparser, gedcom, gedcom.gedcom, gedcom.geocode, gedcom.geocache, gedcom.addressbook,
-  geopy, render.kmlexporter, render, render.foliumexp, gedcomvisual, "__main__"]
-
 # GUI options: field definitions with default values
 gui_options:
   infoBoxLines: {type: 'int', default: 8}
@@ -29,35 +23,59 @@ gui_options:
   panelWidthPercent: {type: 'int', default: 30}
   window_size: {type: 'list', default: [1024, 800]}
 
-# GEDCOM options: field definitions with default values
-# ini_section: which INI file section this setting belongs to (if any)
-gedcom_options:
-  # File and path settings
+# File and path options
+file_options:
   GEDCOMinput: {type: 'str', default: "gedcomfile.ged"}
   resultpath: {type: 'str', default: null}
   ResultFile: {type: 'str', default: ''}
   ResultType: {type: 'str', default: ResultType.HTML, ini_section: 'Core', ini_type: 'result'}
-  
-  # Main person settings
+
+# Main person selection options
+main_person_options:
   Main: {type: 'str', default: null}
   mainPerson: {type: 'str', default: null}
   Name: {type: 'str', default: null}
   mainPersonLatLon: {type: 'complex', default: LatLon(None, None)}
-  
-  # Map and display settings
-  MaxMissing: {type: 'int', default: 0}
-  MaxLineWeight: {type: 'int', default: 20, ini_section: 'KML'}
-  UseGPS: {type: 'bool', default: True, ini_section: 'Core'}
-  CacheOnly: {type: 'bool', default: False, ini_section: 'Core'}
+
+# General map display options (format-agnostic)
+map_display_options:
+  MaxMissing: {type: 'int', default: 0, ini_section: 'Core'}
   AllEntities: {type: 'bool', default: False, ini_section: 'Core'}
-  GridView: {type: 'bool', default: False}
+  GridView: {type: 'bool', default: False, ini_section: 'Core'}
+  badAge: {type: 'bool', default: True, ini_section: 'Core'}
+
+# KML-specific display options
+kml_display_options:
+  MaxLineWeight: {type: 'int', default: 20, ini_section: 'KML'}
   UseBalloonFlyto: {type: 'bool', default: True, ini_section: 'KML'}
   KMLsort: {type: 'int', default: 1, ini_section: 'KML'}
-  badAge: {type: 'bool', default: True, ini_section: 'Core'}
+
+# HTML map display options
+html_display_options:
   showLayerControl: {type: 'bool', default: True, ini_section: 'HTML'}
   mapMini: {type: 'bool', default: True, ini_section: 'HTML'}
-  
-  # Runtime state
+
+# Summary report generation options (saved to Summary section)
+summary_report_options:
+  SummaryOpen: {type: 'bool', default: True, ini_section: 'Summary'}
+  SummaryPlaces: {type: 'bool', default: True, ini_section: 'Summary'}
+  SummaryPeople: {type: 'bool', default: True, ini_section: 'Summary'}
+  SummaryCountries: {type: 'bool', default: False, ini_section: 'Summary'}
+  SummaryCountriesGrid: {type: 'bool', default: True, ini_section: 'Summary'}
+  SummaryGeocode: {type: 'bool', default: True, ini_section: 'Summary'}
+  SummaryAltPlaces: {type: 'bool', default: False, ini_section: 'Summary'}
+  SummaryEnrichmentIssues: {type: 'bool', default: True, ini_section: 'Summary'}
+  SummaryStatistics: {type: 'bool', default: True, ini_section: 'Summary'}
+
+# File viewer command line options (saved to Core section)
+command_options:
+  KMLcmdline: {type: 'str', default: '', ini_section: 'Core'}
+  CSVcmdline: {type: 'str', default: '', ini_section: 'Core'}
+  Tracecmdline: {type: 'str', default: '', ini_section: 'Core'}
+  Defaultcmdline: {type: 'str', default: '', ini_section: 'Core'}
+
+# Runtime state (transient - not persisted to INI)
+runtime_state_options:
   counter: {type: 'int', default: 0}
   countertarget: {type: 'int', default: 0}
   running: {type: 'bool', default: False}
@@ -69,8 +87,9 @@ gedcom_options:
   state: {type: 'str', default: ''}
   gpsfile: {type: 'str', default: null}
   stopping: {type: 'bool', default: False}
-  
-  # Lookup and reference data
+
+# Reference data and lookup structures (transient)
+reference_data_options:
   lookup: {type: 'str', default: null}
   totalpeople: {type: 'str', default: null}
   stepinfo: {type: 'str', default: ''}
@@ -79,40 +98,39 @@ gedcom_options:
   selectedpeople: {type: 'int', default: 0}
   lastlines: {type: 'str', default: null}
   runavg: {type: 'str', default: []}
-  
-  # Summary report options
-  SummaryOpen: {type: 'bool', default: True}
-  SummaryPlaces: {type: 'bool', default: True}
-  SummaryPeople: {type: 'bool', default: True}
-  SummaryCountries: {type: 'bool', default: False}
-  SummaryCountriesGrid: {type: 'bool', default: True}
-  SummaryGeocode: {type: 'bool', default: True}
-  SummaryAltPlaces: {type: 'bool', default: False}
-  SummaryEnrichmentIssues: {type: 'bool', default: True}
-  SummaryStatistics: {type: 'bool', default: True}
-  
-  # File output options
-  skip_file_geocache: {type: 'bool', default: False}
-  skip_file_alt_places: {type: 'bool', default: False}
-  
-  # Geocoding settings
-  defaultCountry: {type: 'str', default: null}
-  include_canonical: {type: 'bool', default: True}
-  
-  # Command line settings (saved to Core section)
-  KMLcmdline: {type: 'str', default: '', ini_section: 'Core'}
-  CSVcmdline: {type: 'str', default: '', ini_section: 'Core'}
-  Tracecmdline: {type: 'str', default: '', ini_section: 'Core'}
-  Defaultcmdline: {type: 'str', default: '', ini_section: 'Core'}
-  
-  # Miscellaneous
+
+# Miscellaneous options
+misc_options:
   heritage: {type: 'str', default: null}
   UpdateBackgroundEvent: {type: 'str', default: null}
   totalGEDpeople: {type: 'str', default: null}
   totalGEDfamily: {type: 'str', default: null}
   fileHistory: {type: 'str', default: null}
 
+# Geocoding options (used by geo_gedcom submodule)
+# These options are passed to GeolocatedGedcom constructor:
+#   defaultCountry → default_country
+#   UseGPS → always_geocode
+#   CacheOnly → cache_only
+#   skip_file_alt_places → controls alt_place_file_path (negated)
+#   skip_file_geocache → controls file_geo_cache_path (negated)
+#   include_canonical → used for place name matching
+geocoding_options:
+  defaultCountry: {type: 'str', default: null}
+  UseGPS: {type: 'bool', default: True, ini_section: 'Core'}
+  CacheOnly: {type: 'bool', default: False, ini_section: 'Core'}
+  skip_file_alt_places: {type: 'bool', default: False}
+  skip_file_geocache: {type: 'bool', default: False}
+  include_canonical: {type: 'bool', default: True}
+
+# Logger names to track in Logging section of INI file
+logging_keys: [models.person, models, ged4py.parser, ged4py,
+  models.creator, models.location, gedcomoptions,
+  gedcom.gedcomparser, gedcom, gedcom.gedcom, gedcom.geocode, gedcom.geocache, gedcom.addressbook,
+  geopy, render.kmlexporter, render, render.foliumexp, gedcomvisual, "__main__"]
+
 # Old settings that should be removed from the INI config file
 old_ini_settings: {
   'native': 'KML', 'born': 'KML', 'death':'KML', 'PlaceType': 'KML',
-  'HeatMapTimeLine': 'HTML', 'gedcom.gedcomparser': 'Logging'}
+  'HeatMapTimeLine': 'HTML', 'gedcom.gedcomparser': 'Logging',
+  'defaultcountry': 'Core', 'maxmissing': 'KML'}

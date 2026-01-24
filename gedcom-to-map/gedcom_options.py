@@ -199,17 +199,12 @@ class gvOptions:
 
         self.geo_config_file: Path = Path(__file__).resolve().parent.parent / GEO_CONFIG_FILENAME
 
-        # Extract types and defaults from unified gedcom_options structure
-        gedcom_options = self.options.get('gedcom_options', {})
-        gedcom_options_types = {k: v.get('type') for k, v in gedcom_options.items()}
-        gedcom_options_defaults = {k: v.get('default') for k, v in gedcom_options.items()}
-        self.set_options(gedcom_options_types, gedcom_options_defaults)
-
-        # Extract types and defaults from unified gui_options structure
-        gui_options = self.options.get('gui_options', {})
-        gui_options_types = {k: v.get('type') for k, v in gui_options.items()}
-        gui_options_defaults = {k: v.get('default') for k, v in gui_options.items()}
-        self.set_options(gui_options_types, gui_options_defaults)
+        # Load all option sections from YAML (dynamically discovered)
+        for section_name in self._get_option_sections():
+            section = self.options.get(section_name, {})
+            section_types = {k: v.get('type') for k, v in section.items()}
+            section_defaults = {k: v.get('default') for k, v in section.items()}
+            self.set_options(section_types, section_defaults)
 
         self.people: Union[Dict[str, Person], None] = None
         self.time = time.ctime()
@@ -252,6 +247,22 @@ class gvOptions:
         if os.path.exists(self.settingsfile):
             self.loadsettings()            
 
+
+    def _get_option_sections(self) -> list[str]:
+        """Discover all option sections from the loaded YAML structure.
+        
+        Returns sections that contain option definitions (dicts with 'type' and 'default').
+        Excludes utility sections like 'logging_keys' and 'old_ini_settings'.
+        """
+        sections = []
+        for key, value in self.options.items():
+            # Include sections that are dicts containing option definitions
+            if isinstance(value, dict) and any(
+                isinstance(v, dict) and 'type' in v and 'default' in v 
+                for v in value.values()
+            ):
+                sections.append(key)
+        return sections
 
     def set_options(self, options_types, options_defaults):
         """Apply parsed defaults into instance attributes with type coercion.
@@ -388,23 +399,12 @@ class gvOptions:
         """Build dictionary of {field_name: type} for given INI section from option definitions."""
         section_keys = {}
         
-        # Check marker_options
-        marker_opts = self.options.get('marker_options', {})
-        for key, props in marker_opts.items():
-            if isinstance(props, dict) and props.get('ini_section') == section_name:
-                section_keys[key] = props.get('ini_type', props.get('type'))
-        
-        # Check gedcom_options
-        gedcom_opts = self.options.get('gedcom_options', {})
-        for key, props in gedcom_opts.items():
-            if isinstance(props, dict) and props.get('ini_section') == section_name:
-                section_keys[key] = props.get('ini_type', props.get('type'))
-        
-        # Check gui_options
-        gui_opts = self.options.get('gui_options', {})
-        for key, props in gui_opts.items():
-            if isinstance(props, dict) and props.get('ini_section') == section_name:
-                section_keys[key] = props.get('ini_type', props.get('type'))
+        # Check all option sections for fields that belong to this INI section
+        for section in self._get_option_sections():
+            opts = self.options.get(section, {})
+            for key, props in opts.items():
+                if isinstance(props, dict) and props.get('ini_section') == section_name:
+                    section_keys[key] = props.get('ini_type', props.get('type'))
         
         return section_keys
 
@@ -487,10 +487,10 @@ class gvOptions:
         self.gvConfig.read(self.settingsfile)
         
         # Ensure all necessary sections exist
-        for section in ['Core', 'HTML', 'Logging', 'Gedcom.Main', 'KML']:
+        for section in ['Core', 'HTML', 'Summary', 'Logging', 'Gedcom.Main', 'KML']:
             if section not in self.gvConfig.sections():
                 self.gvConfig[section] = {}
-            if section in ['Core', 'HTML', 'KML']:
+            if section in ['Core', 'HTML', 'Summary', 'KML']:
                 section_keys = self._build_section_keys(section)
                 self.loadsection(section, section_keys)
         
@@ -521,7 +521,7 @@ class gvOptions:
         try:
             if not self.gvConfig:
                 self.gvConfig = configparser.ConfigParser()
-                for section in ['Core', 'HTML', 'Logging', 'Gedcom.Main', 'KML']:
+                for section in ['Core', 'HTML', 'Summary', 'Logging', 'Gedcom.Main', 'KML']:
                     self.gvConfig[section] = {}
             core_keys = self._build_section_keys('Core')
             for key in core_keys:
@@ -529,6 +529,9 @@ class gvOptions:
             html_keys = self._build_section_keys('HTML')
             for key in html_keys:
                 self.gvConfig['HTML'][key] =  str(getattr(self, key))
+            summary_keys = self._build_section_keys('Summary')
+            for key in summary_keys:
+                self.gvConfig['Summary'][key] = str(getattr(self, key))
             kml_keys = self._build_section_keys('KML')
             for key in kml_keys:
                 self.gvConfig['KML'][key] =  str(getattr(self, key))
@@ -580,7 +583,6 @@ class gvOptions:
             self.lastlines = None
             self.heritage = None
             self.Referenced = None
-            self.GridView = False
 
     def setMain(self, Main: str):
         """Set the Main identifier and select the corresponding Person if present."""

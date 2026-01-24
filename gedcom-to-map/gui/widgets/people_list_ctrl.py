@@ -3,7 +3,6 @@ import re
 import wx
 import wx.lib.mixins.listctrl as listmix
 
-from ..dialogs.person_dialog import PersonDialog
 from ..dialogs.find_dialog import FindDialog
 from ..layout.visual_gedcom_ids import VisualGedcomIds
 from ..layout.font_manager import FontManager
@@ -295,6 +294,8 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
             if getattr(self.gOp.BackgroundProcess, "people", None):
                 itm = self.GetItemText(self.currentItem, 2)
                 if itm in self.gOp.BackgroundProcess.people:
+                    # Lazy import to avoid circular dependency
+                    from ..dialogs.person_dialog import PersonDialog
                     parent_win = self.get_visual_map_panel() or self.GetTopLevelParent()
                     dialog = PersonDialog(parent_win, self.gOp.BackgroundProcess.people[itm], parent_win, font_manager=self.font_manager, gOp=self.gOp)
                     dialog.Bind(wx.EVT_CLOSE, lambda evt: dialog.Destroy())

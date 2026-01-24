@@ -257,8 +257,9 @@ class BackgroundActions:
     def _dispatch_generation(self, panel_actions: Any, result_type_name: str, fname: str) -> None:
         """Dispatch to appropriate output generation method based on result type.
         
-        Calls the corresponding generation method (doHTML, doKML, doKML2, or doSUM)
-        and displays a success message. Logs error if the required method is not available.
+        Calls the corresponding generation method (doHTML, doKML, doKML2, or doSUM),
+        displays a success message, and opens the generated file if configured.
+        Logs error if the required method is not available.
         
         Args:
             panel_actions: Panel actions object with generation methods
@@ -269,32 +270,51 @@ class BackgroundActions:
         Raises:
             Logs error and displays error message for unknown result types.
         """
+        result_file = None
+        file_type = None
+        
         if result_type_name == "HTML":
             if hasattr(panel_actions, "doHTML"):
-                panel_actions.doHTML(self.gOp, self.people, True)
+                panel_actions.doHTML(self.gOp, self.people, False)  # Don't open in generator
             else:
                 _log.error("Run: panel_actions.doHTML not available")
             self.SayInfoMessage(f"HTML generated for {getattr(self.gOp, 'totalpeople', '?')} people ({fname})")
+            file_type = 'html'
         elif result_type_name == "KML":
             if hasattr(panel_actions, "doKML"):
                 panel_actions.doKML(self.gOp, self.people)
             else:
                 _log.error("Run: panel_actions.doKML not available")
             self.SayInfoMessage(f"KML file generated for {getattr(self.gOp, 'totalpeople', '?')} people/points ({fname})")
+            file_type = 'kml'
         elif result_type_name == "KML2":
             if hasattr(panel_actions, "doKML2"):
                 panel_actions.doKML2(self.gOp, self.people)
             else:
                 _log.error("Run: panel_actions.doKML2 not available")
             self.SayInfoMessage(f"KML2 file generated for {getattr(self.gOp, 'totalpeople', '?')} people/points ({fname})")
+            file_type = 'kml2'
         elif result_type_name == "SUM":
             if hasattr(panel_actions, "doSUM"):
                 panel_actions.doSUM(self.gOp)
             else:
                 _log.error("Run: panel_actions.doSUM not available")
             self.SayInfoMessage(f"Summary files generated ({fname})")
+            # SUM doesn't auto-open files (it may generate multiple files)
         else:
             self.SayErrorMessage(f"Error: Unknown Result Type {result_type_name}", True)
+            return
+        
+        # Open generated file if type is set and file exists
+        if file_type:
+            result_file = Path(getattr(self.gOp, 'resultpath', '')) / fname
+            if result_file.exists():
+                try:
+                    from .file_operations import FileOpener
+                    opener = FileOpener(self.gOp.file_open_commands)
+                    opener.open_file(file_type, str(result_file))
+                except Exception:
+                    _log.exception(f"Failed to open {file_type.upper()} file with FileOpener")
 
     def _run_generate(self, panel_actions: Any, UpdateBackgroundEvent: Any = None) -> None:
         """Execute output generation operation (HTML/KML/SUM).

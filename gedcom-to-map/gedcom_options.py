@@ -218,7 +218,7 @@ class gvOptions:
     GEDCOM_OPTIONS_FILE = 'gedcom_options.yaml'
 
     def __init__(self) -> None:
-        from gui.gui_hooks import GuiHooks
+        from gui.core.gui_hooks import GuiHooks
 
         """Load static defaults, initialize runtime state and read persisted settings."""
         # === Load Configuration Schema ===

@@ -6,9 +6,6 @@ Extracted from visual_map_actions.py for better separation of concerns.
 """
 import logging
 import os
-import sys
-import subprocess
-import webbrowser
 from pathlib import Path
 from typing import Any, Optional, Dict, List
 
@@ -116,21 +113,10 @@ class MapGenerator:
             _log.exception("doHTML: folium export failed")
             return False
         
-        if (fullresult):
+        # Verify file was created
+        if fullresult:
             result_path: Path = Path(gOp.resultpath) / gOp.ResultFile
-            result_path = result_path.resolve()
-            if result_path.exists():
-                url: str = result_path.as_uri()
-                opened: bool = webbrowser.open(url, new=0, autoraise=True)
-                if not opened:
-                    # platform fallbacks
-                    if sys.platform == "darwin":
-                        subprocess.run(["open", str(result_path)])
-                    elif os.name == "posix":
-                        subprocess.run(["xdg-open", str(result_path)])
-                    elif os.name == "nt":
-                        os.startfile(str(result_path))
-            else:
+            if not result_path.exists():
                 _log.error("Result file not found: %s", result_path)
                 return False
         return True

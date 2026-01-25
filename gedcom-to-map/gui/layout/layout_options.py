@@ -6,7 +6,7 @@ logic previously located in VisualMapPanel.LayoutOptions.
 
 API:
     LayoutOptions.build(vm_panel, panel)
-        vm_panel: instance of VisualMapPanel (used for id, font_manager, gOp, etc)
+        vm_panel: instance of VisualMapPanel (used for id, font_manager, services, etc)
         panel: the wx.Panel instance where options controls are created
 """
 from typing import Any

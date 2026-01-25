@@ -1,14 +1,17 @@
+
 # render Module
 
 This module provides export and rendering utilities for visualizing GEDCOM data, including KML generation, Folium-based mapping, and reference handling.
+All exporters and renderers now require service objects for configuration, state, and progress tracking (see `services.py`).
 
 ## Key Features
 
 - **KML Export:** Generate KML files for use in Google Earth, MyMaps, ArcGIS Earth, and other GIS tools.
 - **Folium/HTML Export:** Create interactive HTML maps using Folium, with support for clustering, heatmaps, and timeline visualization.
 - **Name Processing:** Utilities for name normalization, comparison, and soundex, all via the `NameProcessor` class.
-- **Summary Statistics:** Generate CSV and summary files for places, geocoding, and birth/death heatmaps.
+- **Summary Statistics:** Generate CSV and summary files for places, geocoding, and birth/death heatmaps; outputs are written alongside the input GEDCOM.
 - **Reference Handling:** Manage references and links between people, places, and events.
+
 
 ## Main Classes & Functions
 
@@ -18,18 +21,26 @@ This module provides export and rendering utilities for visualizing GEDCOM data,
 - `Referenced`: Reference management.
 - `save_birth_death_heatmap_matrix`, `write_alt_places_summary`, `write_birth_death_countries_summary`, `write_geocache_summary`, `write_places_summary`: Summary and reporting utilities.
 
-## Example Usage
+soundex_code = NameProcessor.soundex("Smith")
+
+## Example Usage (with Services)
 
 ```python
-from render import KmlExporterRefined, foliumExporter, NameProcessor
+from render import KmlExporter, foliumExporter, NameProcessor
+from services import IConfig, IState, IProgressTracker
+
+# Create or mock your service objects (see tests for examples)
+svc_config = ...  # implements IConfig
+svc_state = ...   # implements IState
+svc_progress = ...  # implements IProgressTracker
 
 # Export KML
-kml_exporter = KmlExporterRefined("output.kml")
+kml_exporter = KmlExporter(svc_config, svc_state, svc_progress)
 # ... add people, places, lines, etc. ...
-kml_exporter.save()
+kml_exporter.Done()
 
 # Export HTML map
-folium_exporter = foliumExporter(gOp)
+folium_exporter = foliumExporter(svc_config, svc_state, svc_progress)
 folium_exporter.export(main_location, lines)
 
 # Name utilities
@@ -61,9 +72,11 @@ render/
 - [seaborn](https://pypi.org/project/seaborn/)
 - [matplotlib](https://pypi.org/project/matplotlib/)
 
+
 ## Notes
 
-- See the main project README for setup and usage instructions.
+- See the main project README for setup, usage, and the new services-based architecture.
+- All new code and tests should use dependency injection for configuration, state, and progress tracking.
 - This module is intended to be used as part of the larger `gedcom-to-visualmap` project.
 
 ## Authors

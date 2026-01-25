@@ -112,7 +112,7 @@ class DoActionsType(Flag):
         
         Args:
             already_parsed: Whether GEDCOM file has been parsed in current session.
-                           Typically comes from gOp.parsed flag. Default: False.
+                           Typically comes from svc_state.parsed flag. Default: False.
         
         Returns:
             bool: True if parsing should occur, False if it can be skipped.

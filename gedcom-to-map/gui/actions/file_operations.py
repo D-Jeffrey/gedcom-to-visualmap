@@ -35,18 +35,18 @@ class FileOpener:
     - URL opening in browsers
     
     Example:
-        opener = FileOpener(gOp.file_open_commands)
+        opener = FileOpener(svc_config)
         opener.open_file('html', '/path/to/map.html')
         opener.open_file('csv', '/path/to/data.csv')
     """
     
-    def __init__(self, file_open_commands):
-        """Initialize FileOpener with command configuration.
+    def __init__(self, config_service):
+        """Initialize FileOpener with configuration service.
         
         Args:
-            file_open_commands: FileOpenCommandLines instance with command mappings
+            config_service: IConfig service with get_file_command method
         """
-        self.file_open_commands = file_open_commands
+        self.config_service = config_service
     
     def open_file(self, file_type: str = 'html', datafile: str = '') -> None:
         """Open file using command configured for specified file type.
@@ -72,7 +72,7 @@ class FileOpener:
             If no command is configured for file_type and it's not HTML/KML,
             logs error and returns without opening file.
         """
-        cmd = self.file_open_commands.get_command_for_file_type(file_type.upper())
+        cmd = self.config_service.get_file_command(file_type) if hasattr(self.config_service, 'get_file_command') else None
         if not cmd:
             # Fallback to default browser for HTML/KML
             if file_type.lower() in ('html', 'kml', 'kml2'):
@@ -213,7 +213,7 @@ class FileOpener:
         if system == 'Windows':
             self._open_with_startfile(datafile)
         elif system in ('Darwin', 'Linux'):
-            cmd = self.file_open_commands.get_command_for_file_type('default')
+            cmd = self.config_service.get_file_command('default')
             if cmd and cmd != '$n':
                 self._open_with_custom_command(cmd, datafile)
             else:

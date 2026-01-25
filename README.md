@@ -6,6 +6,7 @@
 
 # gedcom-to-visualmap
 
+
 Read a GEDCOM file and translate the locations into GPS addresses.
 
 - Produces KML map types with timelines and movement visualization.
@@ -14,6 +15,8 @@ Read a GEDCOM file and translate the locations into GPS addresses.
 - Visualizes family lineage—ascendants and descendants.
 - **Generates comprehensive statistics reports** with demographics, temporal patterns, family relationships, and data quality metrics.
 - Supports both command-line and GUI interfaces (GUI tested on Windows, macOS, and WSL).
+- **Now uses a modern services-based architecture**: all exporters, renderers, and core logic require service objects implementing `IConfig`, `IState`, and `IProgressTracker` (see `services.py`).
+- The legacy global options object (`gOp`) has been fully removed; all code and tests use dependency injection for configuration and state.
 
 Originally forked from [https://github.com/lmallez/gedcom-to-map], now in collaboration with [colin0brass](https://github.com/colin0brass).
 
@@ -27,15 +30,19 @@ Originally forked from [https://github.com/lmallez/gedcom-to-map], now in collab
 
 ---
 
+
 ## Quick Start Tips
 
 - Use the GUI to pick your GEDCOM, choose output type, then click Load to parse and resolve places.
+- Outputs (HTML/KML/SUM) are written next to your selected GEDCOM file; change the output filename in the GUI if you need a different base name.
 - Double-left-click a person in the GUI list to set the starting person for traces and timelines.
 - Edit `geo_cache.csv` to correct or refine geocoding, then save and re-run to apply fixes.
 - Export KML to inspect results in Google Earth Pro, Google MyMaps, or ArcGIS Earth.
 - Generate tables and CSV files listing people, places, and lifelines.
+- **When using exporters or renderers in your own scripts or tests, always provide service objects for configuration, state, and progress tracking. See the `render/tests` directory for up-to-date examples.**
 
 ---
+
 
 ## How to Run
 
@@ -49,13 +56,18 @@ Assuming you have Python installed (see [Install-Python](https://github.com/Pack
     ```
     *Or download and unzip the latest [release](https://github.com/D-Jeffrey/gedcom-to-visualmap/releases).*
 
-    *if you get an error because you have not setup git ssh then use the commands:*
+    *If you get an error because you have not set up git ssh, use the commands:*
     ```console
     git clone --recurse-submodules https://github.com/D-Jeffrey/gedcom-to-visualmap
     cd gedcom-to-visualmap
     git config --global url."https://github.com/".insteadOf git@github.com:
     git submodule update --init --recursive
     ```
+---
+
+## Architecture Note
+
+This project now uses a dependency-injection/services pattern for all configuration, state, and progress tracking. See `services.py` for interface details. All new code and tests should use this pattern.
 
 2. **Create and activate a virtual environment:**
 
@@ -166,6 +178,7 @@ Reports are generated in both markdown (.md) and HTML (.html) formats, with the 
 ## Parameter and Settings
 
 - Set CSV or KML viewer in Options -> Setup.
+- `SummaryOpen` controls whether SUM outputs auto-open; the app uses your configured file commands (Options -> Setup) and writes all summary CSV/PNG/HTML files beside the GEDCOM input.
 - KML2 is an improved version of KML.
 - SUM is a summary CSV and plot of birth vs death by continent/country.
 - **SUM also generates comprehensive statistics reports** with visualizations, charts, and detailed demographic analysis in both markdown and HTML formats.

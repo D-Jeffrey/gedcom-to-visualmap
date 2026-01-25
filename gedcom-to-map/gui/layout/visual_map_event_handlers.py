@@ -7,6 +7,7 @@ Each handler method takes the wx.Event and operates on the supplied panel
 via self.panel (a VisualMapPanel instance). Keeping handlers in a separate
 class improves testability and separates UI layout from behaviour.
 """
+import os
 from typing import Any, Optional
 import logging
 import time
@@ -86,7 +87,7 @@ class VisualMapEventHandler:
             "OpenCSV": "OpenCSV",
             "Trace": "SaveTrace",
             "OpenBrowser": "OpenBrowser",
-            # 'Stop' handled inline because it manipulates gOp state
+            # 'Stop' handled inline because it manipulates state service
         }
         fn_name = mapping.get(action)
         if fn_name:
@@ -110,22 +111,40 @@ class VisualMapEventHandler:
             if event_id == self.panel.id.IDs.get("RBResultType"):
                 idx = max(0, min(len(self._results_type_map) - 1, event.GetInt()))
                 outType = self._results_type_map[idx]
-                self.panel.gOp.setResultsFile(self.panel.gOp.get("ResultFile"), outType)
-                # mirror text field and update UI
+                # Update ResultType and recompute ResultFile via services
                 try:
-                    self.panel.id.TEXTResultFile.SetValue(self.panel.gOp.get("ResultFile"))
+                    from gedcom_options import ResultType
+                    enforced = ResultType.ResultTypeEnforce(outType)
+                    ext = ResultType.file_extension(enforced)
+                    if hasattr(self.panel.svc_config, 'set'):
+                        self.panel.svc_config.set('ResultType', enforced)
+                        current_result = self.panel.svc_config.get('ResultFile', '')
+                        base, _ = os.path.splitext(current_result or '')
+                        new_result = (base or 'output') + '.' + ext
+                        self.panel.svc_config.set('ResultFile', new_result)
+                        # mirror to text field
+                        try:
+                            self.panel.id.TEXTResultFile.SetValue(new_result)
+                        except Exception:
+                            pass
                 except Exception:
-                    pass
+                    _log.exception("Failed to set ResultType/ResultFile via services")
                 self.panel.SetupButtonState()
                 return
 
             # GroupBy and KML mode are simple integer selections
             if event_id == self.panel.id.IDs.get("RBGroupBy"):
-                self.panel.gOp.GroupBy = event.GetSelection()
+                try:
+                    self.panel.svc_config.set('GroupBy', event.GetSelection())
+                except Exception:
+                    _log.exception("Failed to set GroupBy")
                 return
 
             if event_id == self.panel.id.IDs.get("RBKMLMode"):
-                self.panel.gOp.KMLsort = event.GetSelection()
+                try:
+                    self.panel.svc_config.set('KMLsort', event.GetSelection())
+                except Exception:
+                    _log.exception("Failed to set KMLsort")
                 return
 
             _log.debug("Unhandled radio id %s", event_id)
@@ -138,12 +157,12 @@ class VisualMapEventHandler:
             tx = event.GetEventObject()
             event_id = event.GetId()
             attributes = self.panel.id.get_id_attributes(event_id)
-            attrname = attributes.get("gOp_attribute", None)
+            attrname = attributes.get("config_attribute", None)
             if event_id in (self.panel.id.IDs.get("TEXTResultFile"),
                             self.panel.id.IDs.get("TEXTDefaultCountry")):
-                # special case: results text needs to update gOp ResultFile and ResultType
-                self.panel.gOp.set(attrname, event.GetString())
-                self.panel.gOp.set(attrname, event.GetString())
+                # special case: results text needs to update svc_config ResultFile and ResultType
+                self.panel.svc_config.set(attrname, event.GetString())
+                self.panel.svc_config.set(attrname, event.GetString())
             else:
                 pass  # no other text controls currently handled
             self.panel.SetupButtonState()
@@ -151,12 +170,12 @@ class VisualMapEventHandler:
             _log.exception("EvtText failed")
 
     def EvtCheckBox(self, event: wx.CommandEvent) -> None:
-        """Handle checkbox toggles and forward changes to gOp / trigger updates."""
+        """Handle checkbox toggles and forward changes to services / trigger updates."""
         try:
             cb = event.GetEventObject()
             event_id = event.GetId()
             attributes = self.panel.id.get_id_attributes(event_id)
-            attrname = attributes.get("gOp_attribute", None)
+            attrname = attributes.get("config_attribute", None)
             action = attributes.get("action", None)
             if not attrname:
                 _log.error("Uncontrolled checkbox id %s", event_id)
@@ -166,7 +185,7 @@ class VisualMapEventHandler:
                 # extra = cb.Name if event_id == self.panel.id.IDs.get("CBSummary") else ""
                 # attrname = attrname + (extra or "")
                 value = cb.GetValue()
-                self.panel.gOp.set(attrname, value)
+                self.panel.svc_config.set(attrname, value)
                 _log.debug("Checkbox %s -> %s", attrname, value)
 
                 # action dispatch
@@ -210,8 +229,8 @@ class VisualMapEventHandler:
             attributes = self.panel.id.get_id_attributes(event_id)
             action = attributes.get("action", None)
             if action == "Stop":
-                self.panel.gOp.set("stopping", True)
-                self.panel.gOp.set("parsed", False)
+                self.panel.svc_state.stopping = True
+                self.panel.svc_state.parsed = False
                 self.panel.NeedRedraw()
                 self.panel.NeedReload()
                 return
@@ -229,11 +248,11 @@ class VisualMapEventHandler:
         try:
             event_id = event.GetId()
             attributes = self.panel.id.get_id_attributes(event_id)
-            attrname = attributes.get("gOp_attribute", None)
+            attrname = attributes.get("config_attribute", None)
             if attributes and attrname == "MapStyle":
                 # MapStyle stored as set/list of types; UI stores selection index
                 try:
-                    self.panel.gOp.MapStyle = sorted(self.panel.id.AllMapTypes)[event.GetSelection()]
+                    self.panel.svc_config.set('MapStyle', sorted(self.panel.id.AllMapTypes)[event.GetSelection()])
                     self.panel.NeedRedraw()
                     return
                 except Exception:
@@ -247,9 +266,9 @@ class VisualMapEventHandler:
         try:
             event_id = event.GetId()
             attributes = self.panel.id.get_id_attributes(event_id)
-            attrname = attributes.get("gOp_attribute", None)
+            attrname = attributes.get("config_attribute", None)
             if attributes and attrname == "MaxLineWeight":
-                self.panel.gOp.MaxLineWeight = event.GetSelection()
+                self.panel.svc_config.set('MaxLineWeight', event.GetSelection())
                 self.panel.NeedRedraw()
                 return
             _log.error("Uncontrolled SPIN %s", event_id)
@@ -259,7 +278,7 @@ class VisualMapEventHandler:
     def EvtSlider(self, event: wx.CommandEvent) -> None:
         """Handle slider changes (heatmap timestep)."""
         try:
-            self.panel.gOp.HeatMapTimeStep = event.GetSelection()
+            self.panel.svc_config.set('HeatMapTimeStep', event.GetSelection())
         except Exception:
             _log.exception("EvtSlider failed")
 
@@ -281,12 +300,12 @@ class VisualMapEventHandler:
                 saveBusy = panel.busystate
                 panel.OnBusyStart(evt)
                 try:
-                    panel.peopleList.list.PopulateList(panel.background_process.people, panel.gOp.get("Main"), True)
+                    panel.peopleList.list.PopulateList(panel.background_process.people, panel.svc_config.get("Main"), True)
                 except Exception:
                     _log.exception("PopulateList failed")
-                if panel.gOp.newload:
+                if panel.svc_state.newload:
                     try:
-                        panel.peopleList.list.ShowSelectedLinage(panel.gOp.get("Main"))
+                        panel.peopleList.list.ShowSelectedLinage(panel.svc_config.get("Main"))
                     except Exception:
                         _log.exception("ShowSelectedLinage failed")
                 if not saveBusy:

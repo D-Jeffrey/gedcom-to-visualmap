@@ -51,7 +51,9 @@ if __name__ == '__main__':
     gOp = gvOptions()
 
     # Create the main application frame and panel
-    frame = GedcomVisualGUI(gOp=gOp, parent=None, title=GUINAME)
+    # Pass gOp as all three services (IConfig, IState, IProgressTracker)
+    # since gvOptions implements all three interfaces
+    frame = GedcomVisualGUI(parent=None, svc_config=gOp, svc_state=gOp, svc_progress=gOp, title=GUINAME)
     
     # Show the inspection tool if WITMODE is enabled
     if WITMODE:

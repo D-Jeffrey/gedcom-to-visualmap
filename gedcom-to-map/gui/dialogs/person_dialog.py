@@ -9,7 +9,6 @@ from geo_gedcom.person import Person
 from geo_gedcom.life_event import LifeEvent
 from ..widgets.ged_rec_display import GedRecordDialog
 from ..panels.family_panel import FamilyPanel
-from gedcom_options import gvOptions
 from ..layout.font_manager import FontManager
 
 _log = logging.getLogger(__name__.lower())
@@ -24,26 +23,58 @@ class PersonDialog(wx.Dialog):
     close the dialog or view the raw GEDCOM record.
     
     Attributes:
-        gOp (gvOptions): Global options and settings.
         font_manager (FontManager): Font configuration for the UI.
         person (Person): The person whose details are displayed.
         panel (wx.Panel): Parent panel (used to access actions and context).
         showreferences (bool): Whether to show lineage information.
         font_size (int): Base font size for text controls.
         people (dict): Dictionary of all people keyed by xref_id.
+        svc_state (IState): Runtime state service for accessing people data.
+        svc_config (IConfig): Configuration service.
+        svc_progress (IProgressTracker): Progress tracking service.
     """
 
-    def __init__(self, parent: wx.Window, person: Person, panel: wx.Panel, font_manager: FontManager, gOp: gvOptions, showreferences: bool = True):
-        """Initialize the PersonDialog."""
+    def __init__(
+        self,
+        parent: wx.Window,
+        person: Person,
+        panel: wx.Panel,
+        font_manager: FontManager,
+        *,
+        svc_config=None,
+        svc_state=None,
+        svc_progress=None,
+        showreferences: bool = True,
+    ):
+        """Initialize the PersonDialog.
+        
+        Args:
+            parent: Parent wxPython window.
+            person: Person object to display details for.
+            panel: Parent panel (for context/actions).
+            font_manager: FontManager instance for font configuration.
+            svc_config: Configuration service (optional; defaults to panel.svc_config).
+            svc_state: Runtime state service (optional; defaults to panel.svc_state).
+            svc_progress: Progress tracking service (optional; defaults to panel.svc_progress).
+            showreferences: Whether to show lineage information.
+        """
         super().__init__(parent, title="Person Details", size=(600, 600), style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER)
         
-        self.gOp = gOp
+        # Prefer provided services; else pick from panel if available
+        self.svc_config = svc_config if svc_config is not None else getattr(panel, 'svc_config', None)
+        self.svc_state = svc_state if svc_state is not None else getattr(panel, 'svc_state', None)
+        self.svc_progress = svc_progress if svc_progress is not None else getattr(panel, 'svc_progress', None)
         self.font_manager = font_manager
         self.person = person
         self.panel = panel
         self.showreferences = showreferences
         self.font_size = getattr(font_manager, "size", 12) if font_manager else 12
-        self.people = gOp.BackgroundProcess.people if gOp and getattr(gOp, "BackgroundProcess", None) else {}
+        # Prefer service-backed people, then panel.background_process
+        ppl = getattr(self.svc_state, 'people', None) if self.svc_state is not None else None
+        if ppl is None and panel is not None:
+            bp = getattr(panel, 'background_process', None)
+            ppl = getattr(bp, 'people', None) if bp is not None else None
+        self.people = ppl or {}
 
         self.lineage_panel: FamilyPanel = None
         self.spouses_panel: FamilyPanel = None
@@ -292,14 +323,15 @@ class PersonDialog(wx.Dialog):
             return None
         
         related = None
-        panel_actions = getattr(getattr(self.gOp, "panel", None), "actions", None)
+        panel_actions = getattr(panel, "actions", None)
         showreferences = getattr(self, "showreferences", True)
-        
-        referenced = getattr(self.gOp, "Referenced", None)
+
+        # Use service-backed state only
+        referenced = getattr(self.svc_state, 'Referenced', None)
         if referenced and showreferences and getattr(referenced, "exists", None):
-            if FamilyPanel and panel and getattr(panel, "gOp", None) and referenced.exists(person.xref_id):
-                if panel_actions and getattr(panel_actions, "doTraceTo", None):
-                    heritageList = panel_actions.doTraceTo(panel.gOp, person)
+            if FamilyPanel and panel and referenced.exists(person.xref_id):
+                if panel_actions and getattr(panel_actions, "doTraceTo", None) and self.svc_config and self.svc_state and self.svc_progress:
+                    heritageList = panel_actions.doTraceTo(self.svc_config, self.svc_state, self.svc_progress, person)
                     if heritageList:
                         heritageSet = {}
                         for (heritageparent, heritageperson, hyear, hid) in heritageList:
@@ -435,11 +467,12 @@ class PersonDialog(wx.Dialog):
                     image_content = None
             else:
                 infile = None
-                if panel and getattr(panel, "gOp", None):
-                    try:
-                        infile = panel.gOp.get('GEDCOMinput')
-                    except Exception:
-                        pass
+                # Prefer service config GEDCOMinput only
+                try:
+                    if self.svc_config is not None:
+                        infile = self.svc_config.get('GEDCOMinput')
+                except Exception:
+                    infile = None
                 if infile is not None:
                     dDir =  Path(infile).parent
                 else:
@@ -485,7 +518,15 @@ class PersonDialog(wx.Dialog):
     
     def _displayrecord(self):
         """Display the raw GEDCOM record for the person in a separate dialog."""
-        GedRecordDialog.show_gedpy_record_dialog(None, self.person.xref_id, self.gOp, title=f"Record of {self.person.name}")
+        # Pass configuration service only (services-first)
+        svc_config = getattr(self, 'svc_config', None)
+        GedRecordDialog.show_gedpy_record_dialog(
+            None,
+            self.person.xref_id,
+            None,
+            title=f"Record of {self.person.name}",
+            svc_config=svc_config,
+        )
 
     def formatPersonName(self, person: Person, longForm=True):
         """Format a person's name for display.

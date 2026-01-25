@@ -15,8 +15,8 @@ from render.kml2 import KML_Life_Lines
 from render.referenced import Referenced
 from render.summary import SummaryReportConfig, generate_summary_reports
 
-from gedcom_options import gvOptions, ResultType
-from geo_gedcom.geolocated_gedcom import GeolocatedGedcom
+from gedcom_options import ResultType
+from services import IConfig, IState, IProgressTracker
 from .do_actions_type import DoActionsType
 from .file_operations import FileOpener
 from ..processors.gedcom_loader import GedcomLoader
@@ -39,26 +39,25 @@ class VisualMapActions:
     - File opening with platform-specific handlers
     - Lineage tracing and relationship mapping
     
-    All methods delegate to panel attributes (gOp, background_process, etc.) to maintain
-    separation between UI lifecycle and business logic.
+    All methods use services architecture (svc_config, svc_state, svc_progress)
+    for state management and configuration.
     
     Attributes:
-        panel: Reference to parent VisualMapPanel containing gOp, background_process,
-               and other UI components.
+        panel: Reference to parent VisualMapPanel containing services and UI components.
     
     Example:
         actions = VisualMapActions(visual_map_panel)
         actions.LoadGEDCOM()
-        people = actions.ParseAndGPS(gOp, stage=1)
-        actions.doHTML(gOp, people, fullresult=True)
+        people = actions.ParseAndGPS(svc_config, svc_state, svc_progress, stage=1)
+        actions.doHTML(svc_config, svc_state, svc_progress, fullresult=True)
     """
 
     def __init__(self, panel: Any) -> None:
         """Initialize action handler with reference to parent panel.
         
         Args:
-            panel: Parent VisualMapPanel instance providing access to gOp (options),
-                   background_process (threading), and UI components.
+            panel: Parent VisualMapPanel instance providing access to services
+                   (svc_config, svc_state, svc_progress) and background_process.
         """
         self.panel: Any = panel
         self.file_opener: Optional[FileOpener] = None
@@ -73,13 +72,13 @@ class VisualMapActions:
         """Get or create FileOpener instance.
         
         Lazily initializes FileOpener with file_open_commands configuration
-        from panel's gOp options on first access.
+        from panel's services on first access.
         
         Returns:
             FileOpener instance configured with current file_open_commands.
         """
         if self.file_opener is None:
-            self.file_opener = FileOpener(self.panel.gOp.file_open_commands)
+            self.file_opener = FileOpener(self.panel.svc_config)
         return self.file_opener
 
     def LoadGEDCOM(self) -> None:
@@ -90,39 +89,62 @@ class VisualMapActions:
         UI to show busy state.
         
         Side Effects:
-            - Sets gOp.stopping=True if background process is active
+            - Sets svc_progress.stopping=True if background process is active
             - Calls panel.OnBusyStart() to show progress UI
             - Disables grid view checkbox
-            - Clears gOp.lookup if cache path differs from source path
+            - Clears svc_state.lookup if cache path differs from source path
             - Triggers background process with PARSE action
         
         Note:
             Actual parsing happens asynchronously in background thread.
         """
         bp = self.panel.background_process
-        gOp = self.panel.gOp
+        cfg = self.panel.svc_config
+        st = self.panel.svc_state
+        pr = self.panel.svc_progress
+        
         if getattr(bp, "IsTriggered", lambda: False)():
-            gOp.stopping = True
+            try:
+                pr.stopping = True
+            except Exception:
+                pass
         else:
             self.panel.OnBusyStart(-1)
             time.sleep(0.1)
-            gOp.set('GridView', False)
+            try:
+                cfg.set('GridView', False)
+            except Exception:
+                pass
             try:
                 self.panel.id.CBGridView.SetValue(False)
             except Exception:
                 pass
 
-            cachepath, _ = os.path.split(gOp.get('GEDCOMinput'))
-            if gOp.get('gpsfile'):
-                sourcepath, _ = os.path.split(gOp.get('gpsfile'))
+            try:
+                cache_in = cfg.get('GEDCOMinput')
+            except Exception:
+                cache_in = ''
+            cachepath, _ = os.path.split(cache_in)
+            try:
+                gpsfile_val = cfg.get('gpsfile')
+            except Exception:
+                gpsfile_val = ''
+            if gpsfile_val:
+                sourcepath, _ = os.path.split(gpsfile_val)
             else:
                 sourcepath = None
-            if getattr(gOp, "lookup", None) and cachepath != sourcepath:
+            if getattr(st, "lookup", None) and cachepath != sourcepath:
                 try:
-                    del gOp.lookup
+                    del st.lookup
                 except Exception:
-                    gOp.lookup = None
-            gOp.step('Loading GEDCOM')
+                    try:
+                        st.lookup = None
+                    except Exception:
+                        pass
+            try:
+                pr.step('Loading GEDCOM')
+            except Exception:
+                pass
             action: DoActionsType = DoActionsType.PARSE
             bp.Trigger(action)
 
@@ -138,12 +160,17 @@ class VisualMapActions:
             - Triggers background process with GENERATE | REPARSE_IF_NEEDED actions
         
         Raises:
-            Logs error and shows user message if gOp.ResultFile is empty.
+            Logs error and shows user message if ResultFile is empty.
         
         Note:
             Actual generation happens asynchronously in background thread.
         """
-        if not self.panel.gOp.get('ResultFile'):
+        try:
+            result_file = self.panel.svc_config.get('ResultFile')
+        except Exception:
+            result_file = None
+        
+        if not result_file:
             _log.error("Error: Not output file name set")
             self.panel.background_process.SayErrorMessage("Error: Please set the Output file name")
         else:
@@ -154,14 +181,17 @@ class VisualMapActions:
     def OpenCSV(self) -> None:
         """Open CSV GPS output file using configured command.
         
-        Retrieves command for CSV file type from file_open_commands configuration
-        and opens the GPS file (gOp.gpsfile) using that command.
+        Retrieves GPS file path from svc_config and opens it using FileOpener.
         
         Side Effects:
             - Opens CSV file in external application via FileOpener
         """
-        gps_file = str(self.panel.gOp.get('gpsfile'))
-        self._get_file_opener().open_file('csv', gps_file)
+        try:
+            gps_file = str(self.panel.svc_config.get('gpsfile'))
+        except Exception:
+            gps_file = ''
+        if gps_file:
+            self._get_file_opener().open_file('csv', gps_file)
 
     def LoadFile(self, file_type: str = 'html', datafile: str = '') -> None:
         """Open file using command configured for specified file type.
@@ -191,8 +221,9 @@ class VisualMapActions:
             self._get_file_opener().open_file(file_type, datafile)
         except Exception as e:
             _log.exception("Failed to open file")
-            bg = getattr(self.panel.gOp, "BackgroundProcess", None)
-            if bg:
+            # Use panel.background_process only; otherwise, log
+            bg = getattr(self.panel, "background_process", None)
+            if bg and hasattr(bg, 'SayErrorMessage'):
                 bg.SayErrorMessage(f"Could not open {datafile}: {e}")
 
     def SaveTrace(self) -> None:
@@ -208,7 +239,7 @@ class VisualMapActions:
         - Relationship path from main person
         
         Trace file is saved as <resultfile_base>.trace.txt in the output directory.
-        If gOp.SummaryOpen is True, attempts to open the trace file after creation.
+        If SummaryOpen config is True, opens the trace file after creation.
         
         Side Effects:
             - Creates .trace.txt file in output directory
@@ -223,17 +254,26 @@ class VisualMapActions:
             - Individual person data write fails
         
         Note:
-            Requires prior call to doHTML() to populate gOp.lastlines with path data.
+            Requires prior call to doHTML() to populate svc_state.lastlines with path data.
         """
-        gOp: gvOptions = self.panel.gOp
         bp = self.panel.background_process
+        svc_state = self.panel.svc_state
+        svc_config = self.panel.svc_config
 
-        if gOp.ResultFile and getattr(gOp, "Referenced", None):
-            if not getattr(gOp, "lastlines", None):
+        try:
+            result_file = svc_config.get('ResultFile')
+        except Exception:
+            result_file = None
+        
+        referenced = getattr(svc_state, 'Referenced', None)
+        lastlines = getattr(svc_state, 'lastlines', None)
+
+        if result_file and referenced:
+            if not lastlines:
                 _log.error("No lastline values in SaveTrace (do draw first using HTML Mode for this to work)")
                 return
 
-            tracepath: str = os.path.splitext(gOp.ResultFile)[0] + ".trace.txt"
+            tracepath: str = os.path.splitext(result_file)[0] + ".trace.txt"
             try:
                 trace = open(tracepath, "w")
             except Exception as e:
@@ -245,10 +285,10 @@ class VisualMapActions:
             people: Dict[str, Person] = bp.people or {}
             for h in people:
                 try:
-                    if gOp.Referenced.exists(people[h].xref_id):
+                    if referenced.exists(people[h].xref_id):
                         ref_year, _ = people[h].ref_year()
                         (location, where) = people[h].bestlocation()
-                        personpath: List[str] = gOp.lastlines[people[h].xref_id].path
+                        personpath: List[str] = lastlines[people[h].xref_id].path
                         trace.write(
                             f"{people[h].xref_id}\t{people[h].name}\t{ref_year}\t{where}\t{location}\t" + "\t".join(personpath) + "\n"
                         )
@@ -256,7 +296,11 @@ class VisualMapActions:
                     _log.exception("SaveTrace: writing person %r failed", h)
             trace.close()
             _log.info("Trace file saved %s", tracepath)
-            withall: str = "with all people" if gOp.get('AllEntities') else ""
+            try:
+                all_entities = svc_config.get('AllEntities')
+            except Exception:
+                all_entities = False
+            withall: str = "with all people" if all_entities else ""
             bp.SayInfoMessage(f"Trace file {withall} saved: {tracepath}", True)
             self.LoadFile('trace', tracepath)
         else:
@@ -265,8 +309,8 @@ class VisualMapActions:
     def OpenBrowser(self) -> None:
         """Open most recently generated output file in appropriate viewer.
         
-        Opens the file specified in gOp.ResultFile using the appropriate handler
-        based on gOp.ResultType:
+        Opens the file specified in svc_config ResultFile using the appropriate handler
+        based on ResultType:
         - SUM: Opens CSV summary file with CSV viewer
         - KML/KML2: Opens KML file with configured KML viewer/Google Earth
         - Other: Falls back to opening KMLMAPSURL in browser
@@ -275,12 +319,27 @@ class VisualMapActions:
             - Opens file in external application via LoadFile()
         
         Note:
-            File must exist at Path(gOp.resultpath) / gOp.ResultFile
+            File must exist at Path(resultpath) / ResultFile
         """
-        gOp: gvOptions = self.panel.gOp
-        result_type = gOp.get('ResultType', '')
-        result_path: Path = Path(gOp.resultpath) / gOp.ResultFile
-        result_path = result_path.resolve()
+        svc_config = self.panel.svc_config
+        
+        try:
+            result_type = svc_config.get('ResultType')
+        except Exception:
+            result_type = None
+        
+        try:
+            result_dir = svc_config.get('resultpath')
+            result_name = svc_config.get('ResultFile')
+        except Exception:
+            result_dir = None
+            result_name = None
+        
+        if not (result_dir and result_name):
+            _log.error("OpenBrowser: resultpath or ResultFile not configured")
+            return
+        
+        result_path: Path = (Path(result_dir) / result_name).resolve()
         if result_type and result_path.exists():
             if result_type == ResultType.SUM:
                 self.LoadFile('csv', str(result_path))
@@ -289,149 +348,157 @@ class VisualMapActions:
             else:
                 self.LoadFile('default', getattr(__import__("const"), "KMLMAPSURL", "/"))
 
-    def doHTML(self, gOp: gvOptions, people: Dict[str, Person], fullresult: bool) -> bool:
+    def doHTML(self, svc_config: IConfig, svc_state: IState, svc_progress: IProgressTracker, fullresult: bool) -> bool:
         """Generate interactive HTML map using Folium library.
         
         Delegates to MapGenerator.doHTML().
         
         Args:
-            gOp: Global options
-            people: Dictionary of Person objects
+            svc_config: Configuration service
+            svc_state: Runtime state service (provides people via svc_state.people)
+            svc_progress: Progress tracking service
             fullresult: If True, opens generated HTML in browser
         
         Returns:
             bool: True if successful, False otherwise
         """
-        return self.map_generator.doHTML(gOp, people, fullresult)
+        return self.map_generator.doHTML(svc_config, svc_state, svc_progress, fullresult)
 
-    def Geoheatmap(self, gOp: gvOptions) -> bool:
+    def Geoheatmap(self, svc_config: IConfig, svc_state: IState, svc_progress: IProgressTracker) -> bool:
         """Generate geocoded HTML heatmap in one step.
         
         Delegates to GedcomLoader and MapGenerator.
         
         Args:
-            gOp: Global options
+            svc_config: Configuration service
+            svc_state: Runtime state service
+            svc_progress: Progress tracking service
         
         Returns:
             bool: True if successful, False otherwise
         """
-        people: Optional[Dict[str, Person]] = self.ParseAndGPS(gOp, stage=1)
+        people: Optional[Dict[str, Person]] = self.ParseAndGPS(svc_config, svc_state, svc_progress, stage=1)
         if not people:
             _log.error("Geoheatmap: ParseAndGPS returned no people")
             return False
-        return self.map_generator.doHTML(gOp, people, True)
+        return self.map_generator.doHTML(svc_config, svc_state, svc_progress, True)
 
-    def doKML(self, gOp: gvOptions, people: Dict[str, Person]) -> None:
+    def doKML(self, svc_config: IConfig, svc_state: IState, svc_progress: IProgressTracker) -> None:
         """Generate KML output for visualization in Google Earth.
         
         Delegates to MapGenerator.doKML().
         
         Args:
-            gOp: Global options
-            people: Dictionary of Person objects
+            svc_config: Configuration service
+            svc_state: Runtime state service (provides people via svc_state.people)
+            svc_progress: Progress tracking service
         """
-        self.map_generator.doKML(gOp, people)
+        self.map_generator.doKML(svc_config, svc_state, svc_progress)
 
-    def doKML2(self, gOp: gvOptions, people: Dict[str, Person]) -> None:
+    def doKML2(self, svc_config: IConfig, svc_state: IState) -> None:
         """Generate KML output using alternate/legacy KML exporter.
         
         Delegates to MapGenerator.doKML2().
         
         Args:
-            gOp: Global options
-            people: Dictionary of Person objects
+            svc_config: Configuration service
+            svc_state: Runtime state service (provides lookup via svc_state.lookup)
         """
-        self.map_generator.doKML2(gOp, people)
+        self.map_generator.doKML2(svc_config, svc_state)
 
-    def doSUM(self, gOp: gvOptions) -> None:
+    def doSUM(self, svc_config: IConfig, svc_state: IState, svc_progress: IProgressTracker) -> None:
         """Generate various CSV summary reports from geocoded GEDCOM data.
         
         Delegates to ReportGenerator.doSUM().
         
         Args:
-            gOp: Global options
+            svc_config: Configuration service
+            svc_state: Runtime state service
+            svc_progress: Progress tracking service
         """
-        self.report_generator.doSUM(gOp)
+        self.report_generator.doSUM(svc_config, svc_state, svc_progress)
 
-    def ParseAndGPS(self, gOp: gvOptions, stage: int = 0) -> Optional[Dict[str, Person]]:
+    def ParseAndGPS(self, svc_config: IConfig, svc_state: IState, svc_progress: IProgressTracker, stage: int = 0) -> Optional[Dict[str, Person]]:
         """Parse GEDCOM file and resolve addresses to GPS coordinates.
         
         Delegates to GedcomLoader.ParseAndGPS().
         
         Args:
-            gOp: Global options
+            svc_config: Configuration service
+            svc_state: Runtime state service
+            svc_progress: Progress tracking service
             stage: Processing stage (0 or 1)
         
         Returns:
             Optional[Dict[str, Person]]: Dictionary of Person objects or None
         """
-        return self.gedcom_loader.ParseAndGPS(gOp, stage)
+        return self.gedcom_loader.ParseAndGPS(svc_config, svc_state, svc_progress, stage)
 
-    def gedcom_to_map(self, gOp: gvOptions) -> None:
+    def gedcom_to_map(self, svc_config: IConfig, svc_state: IState, svc_progress: IProgressTracker) -> None:
         """Parse GEDCOM, geocode, and generate KML visualization in one step.
         
         Convenience method that combines ParseAndGPS() and doKML() to create
         KML output from GEDCOM file in a single operation.
         
         Args:
-            gOp: Global options containing GEDCOM path, output settings, and
-                 KML marker configuration.
+            svc_config: Configuration service
+            svc_state: Runtime state service
+            svc_progress: Progress tracking service
         
         Side Effects:
             - Parses and geocodes GEDCOM file
-            - Creates KML file at gOp.resultpath/gOp.ResultFile
+            - Creates KML file at config.result_file
             - Opens KML file if command is configured
         
         Raises:
             Logs error if:
             - ParseAndGPS returns no people
-            - Panel actions not available
         
         Example:
-            gOp.set('BornMark', True)
-            gOp.set('DieMark', True)
-            actions.gedcom_to_map(gOp)
+            svc_config.set('BornMark', True)
+            svc_config.set('DieMark', True)
+            actions.gedcom_to_map(svc_config, svc_state, svc_progress)
         
         See Also:
             ParseAndGPS(): GEDCOM parsing and geocoding
             doKML(): KML generation
         """
-        people: Optional[Dict[str, Person]] = self.ParseAndGPS(gOp)
+        people: Optional[Dict[str, Person]] = self.ParseAndGPS(svc_config, svc_state, svc_progress)
         if not people:
             _log.error("gedcom_to_map: ParseAndGPS returned no people")
             return
-        panel_actions = getattr(getattr(gOp, "panel", None), "actions", None)
-        if panel_actions:
-            panel_actions.doKML(gOp, people)
-        else:
-            _log.error("gedcom_to_map: panel actions not available")
+        self.doKML(svc_config, svc_state, svc_progress)
 
-    def doTrace(self, gOp: gvOptions) -> int:
+    def doTrace(self, svc_config: IConfig, svc_state: IState, svc_progress: IProgressTracker) -> int:
         """Trace and collect all people connected to main person.
         
         Delegates to LineageTracer.doTrace().
         
         Args:
-            gOp: Global options
+            svc_config: Configuration service
+            svc_state: Runtime state service
+            svc_progress: Progress tracking service
         
         Returns:
             int: Total count of people found in trace
         """
-        return self.lineage_tracer.doTrace(gOp)
+        return self.lineage_tracer.doTrace(svc_config, svc_state, svc_progress)
 
-    def doTraceTo(self, gOp: gvOptions, ToID: Person) -> List[Tuple[str, str, Optional[int], str]]:
+    def doTraceTo(self, svc_config: IConfig, svc_state: IState, svc_progress: IProgressTracker, ToID: Person) -> List[Tuple[str, str, Optional[int], str]]:
         """Trace lineage path from main person to specified target person.
         
         Delegates to LineageTracer.doTraceTo().
         
         Args:
-            gOp: Global options
+            svc_config: Configuration service
+            svc_state: Runtime state service
+            svc_progress: Progress tracking service
             ToID: Target Person to trace lineage to
         
         Returns:
             List[Tuple[str, str, Optional[int], str]]: List of ancestry steps
         """
-        return self.lineage_tracer.doTraceTo(gOp, ToID)
+        return self.lineage_tracer.doTraceTo(svc_config, svc_state, svc_progress, ToID)
     
     def updatestats(self):
         """Calculate geocoding statistics.
@@ -444,50 +511,53 @@ class VisualMapActions:
         return self.gedcom_loader.updatestats()
 
 
-# CLI helper for minimal panel context
-class _MinimalPanel:
-    """Minimal panel implementation for CLI usage."""
-    def __init__(self, gOp: gvOptions):
-        self.gOp = gOp
-
-
 # Standalone wrapper functions for backwards compatibility with command-line interface
-def Geoheatmap(gOp: gvOptions) -> bool:
+def Geoheatmap(svc_config: IConfig, svc_state: IState, svc_progress: IProgressTracker) -> bool:
     """Generate geocoded HTML heatmap (CLI wrapper).
     
     Directly uses specialized modules for efficiency.
     
     Args:
-        gOp: Global options
+        svc_config: Configuration service
+        svc_state: Runtime state service
+        svc_progress: Progress tracking service
     
     Returns:
         bool: True if successful
     """
-    panel = _MinimalPanel(gOp)
+    # Create minimal panel for module initialization
+    class _MinimalCliPanel:
+        pass
+    panel = _MinimalCliPanel()
     loader = GedcomLoader(panel)
     map_gen = MapGenerator(panel)
     
-    people = loader.ParseAndGPS(gOp, stage=1)
+    people = loader.ParseAndGPS(svc_config, svc_state, svc_progress, stage=1)
     if not people:
         _log.error("Geoheatmap: ParseAndGPS returned no people")
         return False
-    return map_gen.doHTML(gOp, people, True)
+    return map_gen.doHTML(svc_config, svc_state, svc_progress, True)
 
 
-def gedcom_to_map(gOp: gvOptions) -> None:
+def gedcom_to_map(svc_config: IConfig, svc_state: IState, svc_progress: IProgressTracker) -> None:
     """Parse GEDCOM and generate KML (CLI wrapper).
     
     Directly uses specialized modules for efficiency.
     
     Args:
-        gOp: Global options
+        svc_config: Configuration service
+        svc_state: Runtime state service
+        svc_progress: Progress tracking service
     """
-    panel = _MinimalPanel(gOp)
+    # Create minimal panel for module initialization
+    class _MinimalCliPanel:
+        pass
+    panel = _MinimalCliPanel()
     loader = GedcomLoader(panel)
     map_gen = MapGenerator(panel)
     
-    people = loader.ParseAndGPS(gOp, stage=1)
+    people = loader.ParseAndGPS(svc_config, svc_state, svc_progress, stage=1)
     if not people:
         _log.error("gedcom_to_map: ParseAndGPS returned no people")
         return
-    map_gen.doKML(gOp, people)
+    map_gen.doKML(svc_config, svc_state, svc_progress)

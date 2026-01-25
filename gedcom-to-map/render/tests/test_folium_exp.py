@@ -4,39 +4,62 @@ from render.folium.mark_clusters import MyMarkClusters
 from render.folium.legend import Legend
 import folium
 
-class DummyGOp:
+
+# DummyConfig implements IConfig
+class DummyConfig:
     def __init__(self, resultpath, resultfile):
-        self.resultpath = resultpath
-        self.ResultFile = resultfile
-        self.MaxLineWeight = 5
-        self.GroupBy = 1
-        self.MarksOn = False
-        self.BornMark = False
-        self.DieMark = False
-        self.HeatMap = False
-        self.HeatMapTimeStep = 10
-        self.MapTimeLine = False
-        self.UseAntPath = False
-        self.HomeMarker = False
-        self.mapMini = False
-        self.showLayerControl = True
+        self._config = {
+            'resultpath': str(resultpath),
+            'ResultFile': str(resultfile),
+            'MaxLineWeight': 5,
+            'GroupBy': 1,
+            'MarksOn': False,
+            'BornMark': False,
+            'DieMark': False,
+            'HeatMap': False,
+            'HeatMapTimeStep': 10,
+            'MapTimeLine': False,
+            'UseAntPath': False,
+            'HomeMarker': False,
+            'mapMini': False,
+            'showLayerControl': True,
+        }
+    def get(self, key, default=None):
+        return self._config.get(key, default)
+    def has(self, key):
+        return key in self._config
+    def get_file_command(self, file_type):
+        return None
+    @property
+    def gedcom_input(self):
+        return ''
+
+# DummyState implements IState
+class DummyState:
+    def __init__(self):
         self.Referenced = None
         self.people = {}
         self.mainPerson = None
-        def step(*args, **kwargs): return False
-        self.step = step
+
+# DummyProgress implements IProgressTracker
+class DummyProgress:
+    def step(self, *a, **k): return None
 
 def test_folium_exporter_init(tmp_path):
     output_file = tmp_path / "test_map.html"
-    gOp = DummyGOp(str(tmp_path), "test_map.html")
-    exporter = foliumExporter(gOp)
+    config = DummyConfig(tmp_path, "test_map.html")
+    state = DummyState()
+    progress = DummyProgress()
+    exporter = foliumExporter(config, state, progress)
     assert exporter is not None
     assert exporter.file_name == str(output_file)
 
 def test_folium_exporter_save(tmp_path):
     output_file = tmp_path / "test_map_save.html"
-    gOp = DummyGOp(str(tmp_path), "test_map_save.html")
-    exporter = foliumExporter(gOp)
+    config = DummyConfig(tmp_path, "test_map_save.html")
+    state = DummyState()
+    progress = DummyProgress()
+    exporter = foliumExporter(config, state, progress)
     # Should not raise on Done (even if map is empty)
     try:
         exporter.Done()

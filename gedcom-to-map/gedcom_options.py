@@ -243,7 +243,7 @@ class gvOptions:
         self.people: Union[Dict[str, Person], None] = None
         self.time = time.ctime()
         self.resettimeframe()
-        self.app_hooks: GuiHooks = GuiHooks(self)
+        self.app_hooks: GuiHooks = GuiHooks(self, self)  # Pass self as both IProgressTracker and IState
         self._stop_lock = threading.Lock()  # Prevent race conditions in stop()
         
         # === Configure Platform-Specific File Commands ===
@@ -274,6 +274,14 @@ class gvOptions:
         # Register all file type commands
         for file_type, command in platform_defaults.items():
             self.file_open_commands.add_file_type_command(file_type, command)
+
+    def get_file_command(self, file_type: str):
+        """Return the configured command for a given file type, if any."""
+        try:
+            return self.file_open_commands.get_command_for_file_type(file_type)
+        except Exception:
+            _log.exception("get_file_command failed for %s", file_type)
+            return None
 
     # ============================================================================
     # YAML Configuration Discovery and Loading
@@ -665,8 +673,9 @@ class gvOptions:
         self.ResultType = enforced
 
         extension = ResultType.file_extension(enforced)
-        
-        base, _ = os.path.splitext(ResultFile or "")
+        # Always strip any directory component so we don't duplicate paths when
+        # joining with resultpath later.
+        base, _ = os.path.splitext(os.path.basename(ResultFile or ""))
         self.ResultFile = base
         if self.ResultFile:
             self.ResultFile = self.ResultFile + "." + extension
@@ -697,7 +706,7 @@ class gvOptions:
             #TODO needs refinement
             
             if org != self.GEDCOMinput:
-                self.resultpath = os.path.dirname(self.GEDCOMinput)
+                self.resultpath = os.path.dirname(self.GEDCOMinput) or None
                 # Force the output to match the name and location of the input
                 self.setResultsFile(filen, self.ResultType)
         else:
@@ -781,11 +790,19 @@ class gvOptions:
 
     def get(self, attribute: str, default=None, ifNone=None):
         """Safely access an attribute, returning default or ifNone when appropriate."""
+        if attribute == 'resultpath':
+            # Always prefer the current GEDCOM directory so outputs live beside the input file.
+            if getattr(self, 'GEDCOMinput', None):
+                ged_dir = os.path.dirname(self.GEDCOMinput)
+                return ged_dir if ged_dir else default
+            # fall back to any stored value
+            val = getattr(self, attribute, None)
+            return val if val else default
         if ifNone is not None:
-            val = getattr(self,attribute, default)
+            val = getattr(self, attribute, default)
             if val == None:
                 return ifNone
-        return getattr(self,attribute, default)
+        return getattr(self, attribute, default)
 
     def set(self, attribute: str, value) -> None:
         """Set an existing attribute on the options object.

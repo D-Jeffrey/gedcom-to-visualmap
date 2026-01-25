@@ -13,7 +13,7 @@ class FamilyPanel(wx.Panel):
         super().__init__(parent, *args, **kwargs)
 
         self.hertiageData = hertiageData
-        self.gOp = getattr(parent, "gOp", None)
+        self.parent = parent
         self.font_manager = font_manager
 
         # Create a grid
@@ -130,7 +130,8 @@ class FamilyPanel(wx.Panel):
         person_id = self.grid.GetCellValue(row, 7)
         person = None
         try:
-            person = self.gOp.BackgroundProcess.people.get(person_id) if self.gOp and getattr(self.gOp, "BackgroundProcess", None) else None
+            if hasattr(self.parent, 'background_process') and hasattr(self.parent.background_process, 'people'):
+                person = self.parent.background_process.people.get(person_id)
         except Exception:
             person = None
 
@@ -144,11 +145,20 @@ class FamilyPanel(wx.Panel):
                 except Exception:
                     PersonDialog = None
 
-            fm = getattr(self.gOp.panel, "font_manager", None) if self.gOp and getattr(self.gOp, "panel", None) else None
+            fm = getattr(self.visual_map_panel, "font_manager", None) if self.visual_map_panel else None
             if PersonDialog:
-                # Use self.font_manager if available, otherwise fall back to fm from gOp.panel
+                # Use self.font_manager if available, otherwise fall back to fm from visual_map_panel
                 font_mgr = self.font_manager if self.font_manager else fm
-                dlg = PersonDialog(self, person, self.visual_map_panel, font_manager=font_mgr, gOp=self.gOp, showreferences=False)
+                dlg = PersonDialog(
+                    self, 
+                    person, 
+                    self.visual_map_panel, 
+                    font_manager=font_mgr,
+                    svc_config=getattr(self.visual_map_panel, 'svc_config', None),
+                    svc_state=getattr(self.visual_map_panel, 'svc_state', None),
+                    svc_progress=getattr(self.visual_map_panel, 'svc_progress', None),
+                    showreferences=False
+                )
                 dlg.Bind(wx.EVT_CLOSE, lambda evt: dlg.Destroy())
                 dlg.Show(True)
         else:

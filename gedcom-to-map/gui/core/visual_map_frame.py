@@ -14,6 +14,7 @@ import os
 import wx
 
 from const import GUINAME
+from services import IConfig, IState, IProgressTracker
 
 _log = logging.getLogger(__name__.lower())
 
@@ -26,40 +27,48 @@ from ..dialogs.help_dialog import HelpDialog
 from ..panels.visual_map_panel import VisualMapPanel
 from ..layout.visual_gedcom_ids import VisualGedcomIds
 from ..layout.font_manager import FontManager
-from gedcom_options import gvOptions, ResultType
+from gedcom_options import ResultType
 
 class VisualMapFrame(wx.Frame):
     """Main application window/frame.
 
     Responsible for creating the top-level frame, menu bar, status bar and the
     primary VisualMapPanel. Menu event handlers are implemented here and delegate
-    detailed behaviour to the panel, dialogs or gOp where appropriate.
+    detailed behaviour to the panel, dialogs or services where appropriate.
     """
 
     # runtime attributes with basic type hints
     font_manager: FontManager  # Initialized in __init__
+    svc_config: IConfig  # Initialized in __init__
+    svc_state: IState  # Initialized in __init__
+    svc_progress: IProgressTracker  # Initialized in __init__
     StatusBar: wx.StatusBar  # Created in makeStatusBar()
     menuBar: wx.MenuBar  # Created in makeMenuBar()
     visual_map_panel: VisualMapPanel  # Created in __init__
     filehistory: wx.FileHistory  # Created in makeMenuBar()
     id: VisualGedcomIds  # Created in makeMenuBar()
-    gOp: gvOptions  # Initialized in __init__
     fileMenu: wx.Menu  # Created in makeMenuBar()
     ActionMenu: wx.Menu  # Created in makeMenuBar()
     font: wx.Font  # Set in set_current_font()
 
-    def __init__(self, parent: wx.Window, gOp: gvOptions, font_manager: FontManager, *args: Any, **kw: Any) -> None:
+    def __init__(self, parent: wx.Window, svc_config: IConfig, svc_state: IState, svc_progress: IProgressTracker,
+                 font_manager: FontManager, *args: Any, **kw: Any) -> None:
         """Construct the frame.
 
         Args:
             parent: wx parent window (or None).
+            svc_config: Configuration service (IConfig).
+            svc_state: Runtime state service (IState).
+            svc_progress: Progress tracking service (IProgressTracker).
+            font_manager: Font manager instance.
             *args/**kw: forwarded to wx.Frame constructor (title, size, style).
-            gOp: optional global options/state object.
         """
         # ensure the parent's __init__ is called so the wx.frame is created
         super().__init__(parent, *args, **kw)
 
-        self.gOp = gOp
+        self.svc_config = svc_config
+        self.svc_state = svc_state
+        self.svc_progress = svc_progress
         self.font_manager = font_manager
         self.set_current_font()
 
@@ -69,7 +78,8 @@ class VisualMapFrame(wx.Frame):
         self.makeMenuBar()
 
         # Create and set up the main panel within the frame
-        self.visual_map_panel = VisualMapPanel(self, self.font_manager, self.gOp)
+        # Pass services to VisualMapPanel
+        self.visual_map_panel = VisualMapPanel(self, self.font_manager, self.svc_config, self.svc_state, self.svc_progress)
 
     def set_current_font(self) -> None:
         """Ensure the frame uses the current font from the FontManager."""
@@ -227,8 +237,7 @@ class VisualMapFrame(wx.Frame):
         """Handle application exit: stop timers, save settings and close the window."""
         self.visual_map_panel.stop_timer()
         try:
-            if getattr(self, "gOp", None):
-                self.gOp.savesettings()
+            self.svc_config.savesettings()
         except Exception:
             _log.exception("OnExit: failed to save settings")
 
@@ -258,10 +267,12 @@ class VisualMapFrame(wx.Frame):
         """
         dDir = os.getcwd()
         filen = ""
-        if self.visual_map_panel and getattr(self.visual_map_panel, "gOp", None):
-            infile = self.visual_map_panel.gOp.get('GEDCOMinput')
+        try:
+            infile = self.svc_config.get('GEDCOMinput')
             if infile:
                 dDir, filen = os.path.split(infile)
+        except Exception:
+            pass
         dlg = wx.FileDialog(self,
                             defaultDir=dDir,
                             defaultFile=filen,
@@ -294,18 +305,20 @@ class VisualMapFrame(wx.Frame):
     def OnFileResultDialog(self, evt: wx.Event) -> None:
         """Show a save dialog to select an output result path (HTML or KML).
 
-        Updates gOp with the chosen result path and refreshes the radio selection.
+        Updates configuration with the chosen result path and refreshes the radio selection.
         """
         dDir = os.getcwd()
         dFile = "visgedcom.html"
-        if self.visual_map_panel and getattr(self.visual_map_panel, "gOp", None):
-            resultfile = self.visual_map_panel.gOp.get('ResultFile')
+        try:
+            resultfile = self.svc_config.get('ResultFile')
             if resultfile:
                 dDir, dFile = os.path.split(resultfile)
             else:
-                resultfile = self.visual_map_panel.gOp.get('GEDCOMinput')
+                resultfile = self.svc_config.get('GEDCOMinput')
                 if resultfile:
                     dDir, dFile = os.path.split(resultfile)
+        except Exception:
+            pass
         dFile = os.path.splitext(dFile)[0]
 
         dlg = wx.FileDialog(self,
@@ -317,12 +330,22 @@ class VisualMapFrame(wx.Frame):
         if dlg.ShowModal() == wx.ID_OK:
             path = dlg.GetPath()
             _log.debug("Output selected %s", path)
-            result_type = self.visual_map_panel.gOp.get('ResultType')
+            try:
+                result_type = self.svc_config.get('ResultType')
+            except Exception:
+                result_type = ResultType.HTML
             isHTML = result_type == ResultType.HTML
             _, fname = os.path.split(path or "")
             try:
-                self.visual_map_panel.gOp.setResultsFile(fname, result_type)
-                self.visual_map_panel.id.TEXTResultFile.SetValue(self.visual_map_panel.gOp.get("ResultFile"))
+                # Update ResultFile and ResultType via services
+                enforced = ResultType.ResultTypeEnforce(result_type)
+                ext = ResultType.file_extension(enforced)
+                base, _ = os.path.splitext(fname or '')
+                result_file = (base or 'output') + '.' + ext
+                if hasattr(self.svc_config, 'set'):
+                    self.svc_config.set('ResultType', enforced)
+                    self.svc_config.set('ResultFile', result_file)
+                self.visual_map_panel.id.TEXTResultFile.SetValue(result_file)
                 self.visual_map_panel.id.RBResultType.SetSelection(0 if isHTML else 1)
                 self.visual_map_panel.SetupButtonState()
             except Exception:
@@ -368,18 +391,26 @@ class VisualMapFrame(wx.Frame):
         """Display summary statistics about the currently loaded GEDCOM data."""
         try:
             msg = "No people loaded yet\n"
-            if getattr(self.visual_map_panel, "gOp", None) and getattr(self.visual_map_panel.gOp, "people", None):
-                self.visual_map_panel.gOp.totalGEDpeople = len(self.visual_map_panel.gOp.people)
-                msg = f"Total People: {self.visual_map_panel.gOp.totalGEDpeople}\n"
-                if self.visual_map_panel.gOp.timeframe:
-                    msg += f"\nTimeframe: {self.visual_map_panel.gOp.timeframe.get('from','?')}-{self.visual_map_panel.gOp.timeframe.get('to','?')}\n"
-                if getattr(self.visual_map_panel.gOp, "selectedpeople", 0) > 0:
-                    msg += f"\nDirect people: {self.visual_map_panel.gOp.selectedpeople} in the heritage line\n"
+            if self.svc_state.people:
+                total_ged_people = len(self.svc_state.people)
+                msg = f"Total People: {total_ged_people}\n"
+                try:
+                    timeframe = self.svc_config.get('timeframe')
+                    if timeframe:
+                        msg += f"\nTimeframe: {timeframe.get('from','?')}-{timeframe.get('to','?')}\n"
+                except Exception:
+                    pass
+                selected = self.svc_state.selected_people
+                if selected > 0:
+                    msg += f"\nDirect people: {selected} in the heritage line\n"
                 else:
                     msg += "\nSelect main person for heritage line\n"
-            if hasattr(self.visual_map_panel.gOp, "lookup") and getattr(self.visual_map_panel.gOp.lookup, "address_book", None):
-                stats = self.visual_map_panel.actions.updatestats()
-                msg += f"\nTotal cached addresses: {self.visual_map_panel.gOp.lookup.address_book.len()}\n{stats}"
+            if self.svc_state.lookup and hasattr(self.svc_state.lookup, "address_book") and self.svc_state.lookup.address_book:
+                try:
+                    stats = self.visual_map_panel.actions.updatestats()
+                    msg += f"\nTotal cached addresses: {self.svc_state.lookup.address_book.len()}\n{stats}"
+                except Exception:
+                    pass
             wx.MessageBox(msg, "Statistics", wx.OK | wx.ICON_INFORMATION)
         except Exception:
             _log.exception("OnInfo failed")
@@ -394,8 +425,8 @@ class VisualMapFrame(wx.Frame):
     def onOptionsReset(self, event: wx.Event) -> None:
         """Reset application options to defaults and refresh the UI."""
         try:
-            if getattr(self.visual_map_panel, "gOp", None) and hasattr(self.visual_map_panel.gOp, "defaults"):
-                self.visual_map_panel.gOp.defaults()
+            if hasattr(self.svc_config, 'defaults'):
+                self.svc_config.defaults()
             self.visual_map_panel.SetupOptions()
             wx.MessageBox("Restored options to defaults", "Reset Options", wx.OK | wx.ICON_INFORMATION)
         except Exception:
@@ -404,7 +435,15 @@ class VisualMapFrame(wx.Frame):
     def onOptionsSetup(self, event: wx.Event) -> None:
         """Open the configuration dialog for editing application options."""
         try:
-            dialog = ConfigDialog(None, title="Configuration Options", gOp=getattr(self.visual_map_panel, "gOp", None))
+            svc_config = self.svc_config
+            
+            dialog = ConfigDialog(
+                None,
+                title="Configuration Options",
+                svc_config=svc_config,
+                file_open_commands=None,
+                logging_keys=[]
+            )
             dialog.ShowModal()
             dialog.Destroy()
         except Exception:

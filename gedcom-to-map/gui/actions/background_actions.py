@@ -23,7 +23,10 @@ class BackgroundActions:
     
     Attributes:
         win: Parent wxPython window for posting events.
-        gOp: Global options object (gedcom_options.gvOptions).
+        panel: Visual map panel reference for accessing UI state and actions.
+        svc_config: Service for configuration access (IConfig).
+        svc_state: Service for runtime state (IState).
+        svc_progress: Service for progress tracking (IProgressTracker).
         people: Dictionary of Person objects keyed by xref_id (populated after parse).
         threadnum: Thread identifier for logging.
         updategrid: Flag indicating grid UI needs refresh.
@@ -36,23 +39,29 @@ class BackgroundActions:
         readyToDo: Flag indicating worker is ready to accept new work.
     
     Example:
-        background = BackgroundActions(panel, threadnum=1, gOp=options)
+        background = BackgroundActions(panel, threadnum=1, svc_config, svc_state, svc_progress)
         background.Start()
         background.Trigger(DoActionsType.PARSE | DoActionsType.GENERATE)
         # ... later ...
         background.Stop()
     """
 
-    def __init__(self, win: wx.Window, threadnum: int, gOp):
+    def __init__(self, win: wx.Window, threadnum: int, panel, svc_config=None, svc_state=None, svc_progress=None):
         """Initialize background worker.
         
         Args:
             win: Parent wxPython window for posting events.
             threadnum: Unique thread identifier for logging.
-            gOp: Global options object (gedcom_options.gvOptions).
+            panel: Visual map panel reference for UI and actions access.
+            svc_config: Configuration service (IConfig).
+            svc_state: Runtime state service (IState).
+            svc_progress: Progress tracker service (IProgressTracker).
         """
         self.win: wx.Window = win
-        self.gOp = gOp  # Type depends on gedcom_options.gvOptions (avoid circular import)
+        self.panel = panel
+        self.svc_config = svc_config or panel.svc_config
+        self.svc_state = svc_state or panel.svc_state
+        self.svc_progress = svc_progress or panel.svc_progress
         self.people: Optional[dict] = None
         self.threadnum: int = threadnum
         self.updategrid: bool = False
@@ -108,9 +117,9 @@ class BackgroundActions:
         """
         try:
             if dolevel.should_parse():
-                self.gOp.panel.id.BTNLoad.SetBackgroundColour(self.gOp.panel.id.GetColor('BTN_DONE'))
+                self.panel.id.BTNLoad.SetBackgroundColour(self.panel.id.GetColor('BTN_DONE'))
             if dolevel.has_generate():
-                self.gOp.panel.id.BTNCreateFiles.SetBackgroundColour(self.gOp.panel.id.GetColor('BTN_DONE'))
+                self.panel.id.BTNCreateFiles.SetBackgroundColour(self.panel.id.GetColor('BTN_DONE'))
         except Exception:
             _log.exception("Update button colours: failed to update button colours")
 
@@ -163,7 +172,7 @@ class BackgroundActions:
         self.errorinfo = self.errorinfo + line if self.errorinfo else line
 
     def _clear_people_data(self) -> None:
-        """Clear people data from both instance and global options.
+        """Clear people data from both instance and state service.
         
         Safely deletes the people dictionary and sets references to None.
         Used when starting a new parse operation or cleaning up after errors.
@@ -173,7 +182,10 @@ class BackgroundActions:
                 del self.people
             except Exception:
                 pass
-        self.gOp.people = None
+        try:
+            self.svc_state.people = None
+        except Exception:
+            pass
         self.people = None
 
     def _report_parse_results(self) -> None:
@@ -190,13 +202,15 @@ class BackgroundActions:
                 self.SayInfoMessage(f"Loaded {len(self.people)} people")
             else:
                 self.SayInfoMessage(f"Cancelled loading people")
-            if getattr(self.gOp, "Main", None):
-                try:
-                    self.SayInfoMessage(f" with '{self.gOp.Main}' as starting person from {Path(self.gOp.GEDCOMinput).name}", False)
-                except Exception:
-                    pass
+            try:
+                main_id = self.svc_config.get('Main')
+                if main_id:
+                    gedcom_input = self.svc_config.get('GEDCOMinput')
+                    self.SayInfoMessage(f" with '{main_id}' as starting person from {Path(gedcom_input).name}", False)
+            except Exception:
+                pass
         else:
-            if getattr(self.gOp, "stopping", False):
+            if getattr(self.svc_progress, "stopping", False):
                 self.SayErrorMessage(f"Error: Aborted loading GEDCOM file", True)
             else:
                 self.SayErrorMessage(f"Error: file could not read as a GEDCOM file", True)
@@ -229,7 +243,7 @@ class BackgroundActions:
         try:
             if hasattr(panel_actions, "ParseAndGPS"):
                 # ParseAndGPS may take time; ensure it can be interrupted by cooperative checks in that code
-                self.people = panel_actions.ParseAndGPS(self.gOp, 1)
+                self.people = panel_actions.ParseAndGPS(self.svc_config, self.svc_state, self.svc_progress, 1)
             else:
                 _log.error("Run: panel_actions.ParseAndGPS not available")
                 self.people = None
@@ -237,17 +251,22 @@ class BackgroundActions:
             _log.exception("Issues in ParseAndGPS")
             self._clear_people_data()
             self.doAction = DoActionsType.NONE
-            self.gOp.stopping = False
+            try:
+                self.svc_progress.stopping = False
+            except Exception:
+                pass
             _log.warning(str(e))
             self.SayErrorMessage('Failed to Parse', True)
             self.SayErrorMessage(str(e), True)
             return
 
         # Clear Referenced if parsing completed
-        if self.doAction.has_parse() and getattr(self.gOp, "Referenced", None):
+        if self.doAction.has_parse():
             try:
-                del self.gOp.Referenced
-                self.gOp.Referenced = None
+                referenced = getattr(self.svc_state, "Referenced", None)
+                if referenced:
+                    del self.svc_state.Referenced
+                    self.svc_state.Referenced = None
             except Exception:
                 pass
 
@@ -272,31 +291,32 @@ class BackgroundActions:
         """
         result_file = None
         file_type = None
+        total_people = getattr(self.svc_state, 'totalpeople', '?')
         
         if result_type_name == "HTML":
             if hasattr(panel_actions, "doHTML"):
-                panel_actions.doHTML(self.gOp, self.people, False)  # Don't open in generator
+                panel_actions.doHTML(self.svc_config, self.svc_state, self.svc_progress, False)  # Don't open in generator
             else:
                 _log.error("Run: panel_actions.doHTML not available")
-            self.SayInfoMessage(f"HTML generated for {getattr(self.gOp, 'totalpeople', '?')} people ({fname})")
+            self.SayInfoMessage(f"HTML generated for {total_people} people ({fname})")
             file_type = 'html'
         elif result_type_name == "KML":
             if hasattr(panel_actions, "doKML"):
-                panel_actions.doKML(self.gOp, self.people)
+                panel_actions.doKML(self.svc_config, self.svc_state, self.svc_progress)
             else:
                 _log.error("Run: panel_actions.doKML not available")
-            self.SayInfoMessage(f"KML file generated for {getattr(self.gOp, 'totalpeople', '?')} people/points ({fname})")
+            self.SayInfoMessage(f"KML file generated for {total_people} people/points ({fname})")
             file_type = 'kml'
         elif result_type_name == "KML2":
             if hasattr(panel_actions, "doKML2"):
-                panel_actions.doKML2(self.gOp, self.people)
+                panel_actions.doKML2(self.svc_config, self.svc_state)
             else:
                 _log.error("Run: panel_actions.doKML2 not available")
-            self.SayInfoMessage(f"KML2 file generated for {getattr(self.gOp, 'totalpeople', '?')} people/points ({fname})")
+            self.SayInfoMessage(f"KML2 file generated for {total_people} people/points ({fname})")
             file_type = 'kml2'
         elif result_type_name == "SUM":
             if hasattr(panel_actions, "doSUM"):
-                panel_actions.doSUM(self.gOp)
+                panel_actions.doSUM(self.svc_config, self.svc_state, self.svc_progress)
             else:
                 _log.error("Run: panel_actions.doSUM not available")
             self.SayInfoMessage(f"Summary files generated ({fname})")
@@ -307,11 +327,15 @@ class BackgroundActions:
         
         # Open generated file if type is set and file exists
         if file_type:
-            result_file = Path(getattr(self.gOp, 'resultpath', '')) / fname
+            try:
+                result_path = self.svc_config.get('resultpath', '')
+            except Exception:
+                result_path = ''
+            result_file = Path(result_path) / fname
             if result_file.exists():
                 try:
                     from .file_operations import FileOpener
-                    opener = FileOpener(self.gOp.file_open_commands)
+                    opener = FileOpener(self.svc_config)
                     opener.open_file(file_type, str(result_file))
                 except Exception:
                     _log.exception(f"Failed to open {file_type.upper()} file with FileOpener")
@@ -329,21 +353,27 @@ class BackgroundActions:
         
         Returns:
             Returns early without generating output if:
-            - GEDCOM is not parsed (gOp.parsed is False)
-            - Result type is not set (gOp.ResultType is None)
+            - GEDCOM is not parsed (svc_state.parsed is False)
+            - Result type is not set (svc_config.ResultType is None)
         """
         _log.info("start do 2")
-        if not getattr(self.gOp, "parsed", False):
+        if not getattr(self.svc_state, "parsed", False):
             _log.info("not parsed")
             return
         
-        fname = getattr(self.gOp, "ResultFile", None)
-        if getattr(self.gOp, "ResultType", None) is None:
+        try:
+            fname = self.svc_config.get('ResultFile')
+            result_type = self.svc_config.get('ResultType')
+        except Exception:
+            _log.error("Run: Failed to get ResultFile or ResultType from config")
+            return
+        
+        if result_type is None:
             _log.error("Run: ResultType not set")
             return
         
         # call appropriate generation function if available
-        result_type_name = getattr(self.gOp, "ResultType", None).name
+        result_type_name = result_type.name
         try:
             self._dispatch_generation(panel_actions, result_type_name, fname)
         except Exception:
@@ -356,9 +386,9 @@ class BackgroundActions:
         Called when operations complete or are cancelled.
         """
         try:
-            default_color = self.gOp.panel.id.GetColor('BTN_DEFAULT')
-            self.gOp.panel.id.BTNLoad.SetBackgroundColour(default_color)
-            self.gOp.panel.id.BTNCreateFiles.SetBackgroundColour(default_color)
+            default_color = self.panel.id.GetColor('BTN_DEFAULT')
+            self.panel.id.BTNLoad.SetBackgroundColour(default_color)
+            self.panel.id.BTNCreateFiles.SetBackgroundColour(default_color)
         except Exception:
             _log.exception("_reset_button_colours: failed to reset button colours")
 
@@ -373,9 +403,9 @@ class BackgroundActions:
         """
         try:
             if dolevel.should_parse():
-                self.gOp.panel.id.BTNLoad.SetBackgroundColour(self.gOp.panel.id.GetColor('BTN_DONE'))
+                self.panel.id.BTNLoad.SetBackgroundColour(self.panel.id.GetColor('BTN_DONE'))
             if dolevel.has_generate():
-                self.gOp.panel.id.BTNCreateFiles.SetBackgroundColour(self.gOp.panel.id.GetColor('BTN_DONE'))
+                self.panel.id.BTNCreateFiles.SetBackgroundColour(self.panel.id.GetColor('BTN_DONE'))
         except Exception:
             _log.exception("_update_button_colours_done: failed to update button colours")
 
@@ -386,7 +416,7 @@ class BackgroundActions:
         1. Updates button colors based on completed actions
         2. Resets action flags to NONE
         3. Sets readyToDo flag to accept new work
-        4. Calls gOp.stop() to finalize state
+        4. Calls svc_progress.stop() to finalize state
         5. Posts 'done' event to UI
         
         Args:
@@ -403,9 +433,10 @@ class BackgroundActions:
         self.doAction = DoActionsType.NONE
         self.readyToDo = True
         try:
-            self.gOp.stop()
+            if hasattr(self.svc_progress, 'stop'):
+                self.svc_progress.stop()
         except Exception:
-            _log.exception("BackgroundActions: gOp.stop() failed")
+            _log.exception("BackgroundActions: svc_progress.stop() failed")
         if UpdateBackgroundEvent:
             wx.PostEvent(self.win, UpdateBackgroundEvent(state='done'))
 
@@ -440,11 +471,14 @@ class BackgroundActions:
             if self.doAction.doing_something() and self.readyToDo:
                 self.readyToDo = False  # Avoid a Race
                 _log.info("triggered thread with %s (Thread# %d / %d)", self.doAction, self.threadnum, _thread.get_ident())
-                self.gOp.stopping = False
+                try:
+                    self.svc_progress.stopping = False
+                except Exception:
+                    pass
                 wx.Yield()
-                # Obtain event type from gOp if available
-                UpdateBackgroundEvent = getattr(self.gOp, "UpdateBackgroundEvent", None)
-                panel_actions = getattr(getattr(self.gOp, "panel", None), "actions", None)
+                # Obtain event type from panel if available
+                UpdateBackgroundEvent = getattr(self.panel, "UpdateBackgroundEvent", None)
+                panel_actions = getattr(self.panel, "actions", None)
                 
                 if not panel_actions:
                     _log.error("Run: panel_actions not available")
@@ -453,7 +487,7 @@ class BackgroundActions:
                 
                 completed_actions = DoActionsType.NONE
                 try:
-                    if self.doAction.should_parse(getattr(self.gOp, "parsed", False)):
+                    if self.doAction.should_parse(getattr(self.svc_state, "parsed", False)):
                         self._run_parse(panel_actions, UpdateBackgroundEvent)
                         if self.people:  # Only mark as completed if successful
                             completed_actions |= DoActionsType.PARSE

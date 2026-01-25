@@ -56,7 +56,10 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
         self.GridOnlyFamily = False
         self._LastGridOnlyFamily = self.GridOnlyFamily
         self.LastSearch = ""
-        self.gOp = None
+        # Service-architecture references (optional)
+        self.svc_config = None
+        self.svc_state = None
+        self.svc_progress = None
 
         self.SetImageList(self.il, wx.IMAGE_LIST_SMALL)
         try:
@@ -82,8 +85,20 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
         self.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.OnItemActivated, self)
         self.Bind(wx.EVT_LIST_COL_RIGHT_CLICK, self.OnColRightClick, self)
 
-    def SetGOp(self, gOp):
-        self.gOp = gOp
+    def SetServices(self, svc_config=None, svc_state=None, svc_progress=None):
+        """Bind configuration/state/progress services for this control.
+
+        This control relies solely on service-architecture objects.
+        """
+        # Prefer explicit services if provided
+        if svc_config is not None:
+            self.svc_config = svc_config
+        if svc_state is not None:
+            self.svc_state = svc_state
+        if svc_progress is not None:
+            self.svc_progress = svc_progress
+
+    
 
     def PopulateList(self, people, mainperson, loading):
         if self.active:
@@ -91,12 +106,17 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
 
         self.active = True
 
-        if self.gOp:
-            wasrunning = getattr(self.gOp, "running", False)
-            setattr(self.gOp, "running", True)
-            self.GridOnlyFamily = self.gOp.get('GridView') if hasattr(self.gOp, "get") else False
-        else:
-            wasrunning = False
+        # Determine running state and grid mode using services if available
+        wasrunning = getattr(self.svc_progress, "running", False) if self.svc_progress is not None else False
+        if self.svc_progress is not None:
+            try:
+                self.svc_progress.running = True
+            except Exception:
+                pass
+        try:
+            self.GridOnlyFamily = self.svc_config.get('GridView') if (self.svc_config is not None and hasattr(self.svc_config, 'get')) else False
+        except Exception:
+            self.GridOnlyFamily = False
 
         if loading:
             self.RemoveSortIndicator() if hasattr(self, "RemoveSortIndicator") else None
@@ -131,26 +151,32 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
                     })
                     index += 1
 
-        if self.gOp:
+        if self.svc_state is not None:
             items = self.popdata.items()
-            self.gOp.selectedpeople = 0
-            if not wasrunning and hasattr(self.gOp, "step"):
+            try:
+                self.svc_state.selectedpeople = 0
+            except Exception:
+                pass
+            if not wasrunning:
                 try:
-                    self.gOp.step("Gridload", resetCounter=False, target=len(items))
+                    if self.svc_progress is not None and hasattr(self.svc_progress, "step"):
+                        self.svc_progress.step("Gridload", resetCounter=False, target=len(items))
                 except Exception:
                     pass
             self.itemDataMap = {idx: pdata for idx, pdata in items}
             index = -1
             for key, pdata in items:
                 try:
-                    self.gOp.counter = key
+                    if self.svc_progress is not None:
+                        self.svc_progress.counter = key
                 except Exception:
                     pass
                 if key % 2048 == 0:
                     wx.Yield()
 
-                if self.GridOnlyFamily and getattr(self.gOp, "Referenced", None):
-                    DisplayItem = self.gOp.Referenced.exists(pdata.id)
+                if self.GridOnlyFamily and getattr(self.svc_state, "Referenced", None):
+                    ref = getattr(self.svc_state, "Referenced", None)
+                    DisplayItem = ref.exists(pdata.id)
                 else:
                     DisplayItem = True
 
@@ -169,10 +195,12 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
                         if mainperson == self.GetItem(index, 2):
                             selectperson = index
 
-                    if getattr(self.gOp, "Referenced", None):
+                    ref = getattr(self.svc_state, "Referenced", None)
+                    if ref is not None:
                         try:
-                            if self.gOp.Referenced.exists(pdata.id):
-                                self.gOp.selectedpeople = self.gOp.selectedpeople + 1
+                            if ref.exists(pdata.id):
+                                if hasattr(self.svc_state, "selectedpeople"):
+                                    self.svc_state.selectedpeople = getattr(self.svc_state, "selectedpeople", 0) + 1
                                 if mainperson == pdata.id:
                                     self.SetItemBackgroundColour(index, self.id.GetColor('MAINPERSON'))
                                 else:
@@ -187,8 +215,9 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
                         except Exception:
                             pass
             try:
-                self.gOp.counter = 0
-                self.gOp.state = ""
+                if self.svc_progress is not None:
+                    self.svc_progress.counter = 0
+                    self.svc_progress.state = ""
             except Exception:
                 pass
 
@@ -207,7 +236,7 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
             self.EnsureVisible(selectperson)
         wx.Yield()
 
-        if self.gOp and getattr(self.gOp, "running", False):
+        if (self.svc_progress is not None and getattr(self.svc_progress, "running", False)):
             if not wasrunning:
                 vis = self.get_visual_map_panel()
                 if vis and getattr(vis, "UpdateTimer", None):
@@ -216,7 +245,8 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
                     except Exception:
                         _log.exception("UpdateTimer call failed on visual_map_panel")
             try:
-                self.gOp.running = wasrunning
+                if self.svc_progress is not None:
+                    self.svc_progress.running = wasrunning
             except Exception:
                 pass
 
@@ -282,22 +312,37 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
                         self.SetItemState(checknames, wx.LIST_STATE_SELECTED, wx.LIST_STATE_SELECTED)
                         self.EnsureVisible(checknames)
                         return
-            try:
-                self.gOp.BackgroundProcess.SayInfoMessage(f"* Could not find '{self.LastSearch}' in the names", False)
-            except Exception:
-                pass
+            self._say_info(f"* Could not find '{self.LastSearch}' in the names")
 
     def OnItemRightClick(self, event):
         self.currentItem = event.Index
         event.Skip()
         try:
-            if getattr(self.gOp.BackgroundProcess, "people", None):
+            # Prefer service state people; fallback to panel.background_process.people
+            people_src = None
+            if self.svc_state is not None and getattr(self.svc_state, "people", None):
+                people_src = self.svc_state.people
+            else:
+                vis = self.get_visual_map_panel()
+                bp = getattr(vis, 'background_process', None) if vis is not None else None
+                if bp is not None and getattr(bp, 'people', None):
+                    people_src = bp.people
+
+            if people_src:
                 itm = self.GetItemText(self.currentItem, 2)
-                if itm in self.gOp.BackgroundProcess.people:
+                if itm in people_src:
                     # Lazy import to avoid circular dependency
                     from ..dialogs.person_dialog import PersonDialog
                     parent_win = self.get_visual_map_panel() or self.GetTopLevelParent()
-                    dialog = PersonDialog(parent_win, self.gOp.BackgroundProcess.people[itm], parent_win, font_manager=self.font_manager, gOp=self.gOp)
+                    dialog = PersonDialog(
+                        parent_win,
+                        people_src[itm],
+                        parent_win,
+                        font_manager=self.font_manager,
+                        svc_config=self.svc_config,
+                        svc_state=self.svc_state,
+                        svc_progress=self.svc_progress,
+                    )
                     dialog.Bind(wx.EVT_CLOSE, lambda evt: dialog.Destroy())
                     dialog.Bind(wx.EVT_BUTTON, lambda evt: dialog.Destroy())
                     dialog.Show(True)
@@ -309,27 +354,81 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
         self.ShowSelectedLinage(self.GetItemText(self.currentItem, 2))
 
     def ShowSelectedLinage(self, personid: str):
-        if self.gOp:
-            self.gOp.setMain(personid)
-            panel_actions = getattr(getattr(self.gOp, "panel", None), "actions", None)
-            if getattr(self.gOp.BackgroundProcess, "updategridmain", False):
-                _log.debug("Linage for: %s", personid)
-                self.gOp.BackgroundProcess.updategridmain = False
-                if panel_actions and getattr(panel_actions, "doTrace", None):
-                    panel_actions.doTrace(self.gOp)
-                self.gOp.newload = False
-                self.PopulateList(self.gOp.people, self.gOp.get('Main'), False)
-                try:
-                    self.gOp.BackgroundProcess.SayInfoMessage(f"Using '{personid}' as starting person with {len(self.gOp.Referenced)} direct ancestors", False)
-                except Exception:
-                    pass
-                self.gOp.BackgroundProcess.updategridmain = self.gOp.people is not None
-                vis = self.get_visual_map_panel()
-                if vis and getattr(vis, "SetupButtonState", None):
-                    vis.SetupButtonState()
+        # Set the main person via service config only
+        try:
+            if self.svc_config is not None and hasattr(self.svc_config, "set"):
+                self.svc_config.set('Main', personid)
+        except Exception:
+            pass
+
+        # Actions require access to panel and BackgroundProcess (via panel)
+        vis = self.get_visual_map_panel()
+        panel_actions = getattr(vis, "actions", None) if vis is not None else None
+        vis = self.get_visual_map_panel()
+        bp = getattr(vis, 'background_process', None) if vis is not None else None
+        if getattr(bp, "updategridmain", False):
+            _log.debug("Linage for: %s", personid)
+            try:
+                bp.updategridmain = False
+            except Exception:
+                pass
+            if panel_actions and getattr(panel_actions, "doTrace", None):
+                # Use service-architecture objects for lineage trace
+                cfg = self.svc_config
+                st = self.svc_state
+                pr = self.svc_progress
+                if cfg is not None and st is not None and pr is not None:
+                    panel_actions.doTrace(cfg, st, pr)
+                else:
+                    _log.warning("ShowSelectedLinage: missing services; cannot perform trace")
+            # mark newload using service state if present
+            try:
+                if self.svc_state is not None:
+                    self.svc_state.newload = False
+            except Exception:
+                pass
+
+            # refresh list using service state and config when available
+            try:
+                main_id = self.svc_config.get('Main') if self.svc_config is not None else None
+            except Exception:
+                main_id = None
+            people_ref = self.svc_state.people if self.svc_state is not None else None
+            self.PopulateList(people_ref, main_id, False)
+
+            # Inform user using helper method and prefer service Referenced count
+            ref = getattr(self.svc_state, 'Referenced', None) if self.svc_state is not None else None
+            count = len(ref) if ref is not None else 0
+            self._say_info(f"Using '{personid}' as starting person with {count} direct ancestors")
+
+            people_non_null = (self.svc_state.people is not None) if self.svc_state is not None else False
+            try:
+                if bp is not None:
+                    bp.updategridmain = people_non_null
+            except Exception:
+                pass
+            vis = self.get_visual_map_panel()
+            if vis and getattr(vis, "SetupButtonState", None):
+                vis.SetupButtonState()
 
     def OnColClick(self, event):
         event.Skip()
 
     def OnColRightClick(self, event):
         event.Skip()
+
+    def _say_info(self, message: str) -> None:
+        """UI messaging helper.
+
+        Prefer VisualMapPanel.background_process.SayInfoMessage (service-era UI hook).
+        If unavailable, log the message.
+        """
+        try:
+            vis = self.get_visual_map_panel()
+            bg = getattr(vis, 'background_process', None) if vis is not None else None
+            if bg is not None and hasattr(bg, 'SayInfoMessage'):
+                bg.SayInfoMessage(message, False)
+            else:
+                _log.info(message)
+        except Exception:
+            _log.info(message)

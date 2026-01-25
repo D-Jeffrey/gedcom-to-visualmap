@@ -11,7 +11,7 @@ from typing import Optional, Dict, Any
 
 from geo_gedcom.person import Person
 from geo_gedcom.geolocated_gedcom import GeolocatedGedcom
-from gedcom_options import gvOptions
+from services import IConfig, IState, IProgressTracker
 from const import GLOBAL_GEO_CACHE_FILENAME, FILE_ALT_PLACE_FILENAME_SUFFIX, FILE_GEOCACHE_FILENAME_SUFFIX
 
 _log = logging.getLogger(__name__.lower())
@@ -28,17 +28,20 @@ class GedcomLoader:
     
     Attributes:
         panel: Reference to parent VisualMapPanel for UI updates
+        svc_state: Runtime state service for accessing lookup and people data
     """
     
-    def __init__(self, panel: Any) -> None:
+    def __init__(self, panel: Any, svc_state: Optional[IState] = None) -> None:
         """Initialize GEDCOM loader.
         
         Args:
-            panel: Parent VisualMapPanel instance providing access to gOp and background_process
+            panel: Parent VisualMapPanel instance for UI access
+            svc_state: Optional runtime state service (defaults to panel.svc_state)
         """
         self.panel: Any = panel
+        self.svc_state = svc_state or getattr(panel, 'svc_state', None)
     
-    def ParseAndGPS(self, gOp: gvOptions, stage: int = 0) -> Optional[Dict[str, Person]]:
+    def ParseAndGPS(self, svc_config: IConfig, svc_state: IState, svc_progress: IProgressTracker, stage: int = 0) -> Optional[Dict[str, Person]]:
         """Parse GEDCOM file and resolve addresses to GPS coordinates.
         
         Two-stage process controlled by stage parameter:
@@ -53,11 +56,9 @@ class GedcomLoader:
         - Optionally uses alternative place name mappings
         
         Args:
-            gOp: Global options containing:
-                 - GEDCOMinput: Path to GEDCOM file
-                 - defaultCountry: Default country for ambiguous places
-                 - UseGPS: If True, always attempt geocoding
-                 - skip_file_alt_places: If False, use per-file alt places
+            svc_config: Configuration service
+            svc_state: Runtime state service
+            svc_progress: Progress tracking service
             stage: Processing stage:
                    0 or 1: Clear people/lookup, set newload flag
                    1: Also perform geocoding
@@ -67,12 +68,12 @@ class GedcomLoader:
                                          or None if stage != 1.
         
         Side Effects:
-            - Sets gOp.people to parsed Person objects
-            - Sets gOp.lookup to GeolocatedGedcom instance
-            - Sets gOp.gpsfile to cache file path
-            - Sets gOp.Main to first person if not already set
+            - Sets svc_state.people to parsed Person objects
+            - Sets svc_state.lookup to GeolocatedGedcom instance
+            - Sets svc_config gpsfile to cache file path
+            - Sets svc_config Main to first person if not already set
             - Saves updated geocoding cache to disk
-            - Sets gOp.newload=True and updategrid flag
+            - Sets newload flag
         
         Raises:
             Logs errors if:
@@ -82,7 +83,7 @@ class GedcomLoader:
         
         Example:
             loader = GedcomLoader(panel)
-            people = loader.ParseAndGPS(gOp, stage=1)
+            people = loader.ParseAndGPS(svc_config, svc_state, svc_progress, stage=1)
             if people:
                 print(f"Loaded {len(people)} people")
         
@@ -91,50 +92,52 @@ class GedcomLoader:
             Results are cached to avoid repeated API calls.
         """
         people: Optional[Dict[str, Person]] = None
-        _log.info("Starting parsing of GEDCOM : %s (stage: %d)", gOp.GEDCOMinput, stage)
+        gedcom_input = svc_config.get('GEDCOMinput')
+        _log.info("Starting parsing of GEDCOM : %s (stage: %d)", gedcom_input, stage)
         
         if (stage == 0 or stage == 1):
-            gOp.people = None  # Clear reference
-            gOp.newload = True
-            if hasattr(gOp, "UpdateBackgroundEvent") and hasattr(gOp.UpdateBackgroundEvent, "updategrid"):
-                gOp.UpdateBackgroundEvent.updategrid = True
+            svc_state.people = None  # Clear reference
+            svc_state.newload = True
+            if hasattr(svc_state, "UpdateBackgroundEvent") and hasattr(svc_state.UpdateBackgroundEvent, "updategrid"):
+                svc_state.UpdateBackgroundEvent.updategrid = True
 
         if (stage == 1):
-            gOp.lookup = None  # Clear reference
+            svc_state.lookup = None  # Clear reference
             _log.info("Starting Address to GPS resolution")
-            gOp.step("Resolving addresses to GPS locations")
-            input_path: Path = Path(gOp.GEDCOMinput)
+            svc_progress.step("Resolving addresses to GPS locations")
+            input_path: Path = Path(gedcom_input)
             if not input_path.is_absolute():
                 input_path = (Path.cwd() / input_path).resolve()
             base_file_name: str = input_path.stem
             
             cachefile: Path = input_path.parent / GLOBAL_GEO_CACHE_FILENAME
-            gOp.gpsfile = cachefile
+            svc_config.set('gpsfile', cachefile)
             alt_place_file_path: Path = input_path.parent / f"{base_file_name}{FILE_ALT_PLACE_FILENAME_SUFFIX}"
             file_geo_cache_path: Path = input_path.parent / f"{base_file_name}{FILE_GEOCACHE_FILENAME_SUFFIX}"
-            geo_config_path: Path = gOp.geo_config_file
-            defaultCountry: Optional[str] = gOp.get('defaultCountry') or None
+            geo_config_path: Path = svc_config.get('geo_config_file')
+            defaultCountry: Optional[str] = svc_config.get('defaultCountry') or None
             
-            gOp.lookup = GeolocatedGedcom(
+            svc_state.lookup = GeolocatedGedcom(
                 gedcom_file=input_path.resolve(), 
                 location_cache_file=cachefile,
                 default_country=defaultCountry,
-                always_geocode=gOp.UseGPS,
-                cache_only=gOp.CacheOnly,
-                alt_place_file_path=alt_place_file_path if not gOp.skip_file_alt_places else None,
+                always_geocode=svc_config.get('UseGPS'),
+                cache_only=svc_config.get('CacheOnly'),
+                alt_place_file_path=alt_place_file_path if not svc_config.get('skip_file_alt_places') else None,
                 geo_config_path=geo_config_path,
-                app_hooks=gOp.app_hooks,
+                app_hooks=svc_config.get('app_hooks'),
                 fuzz=True
             )
             _log.info("Completed Geocode")
-            gOp.lookup.save_location_cache()
-            gOp.people = gOp.lookup.people
+            svc_state.lookup.save_location_cache()
+            svc_state.people = svc_state.lookup.people
             _log.info("Completed resolves")
-            people = gOp.people
+            people = svc_state.people
         
-        if people and (not gOp.Main or not gOp.Main in list(people.keys())):
-            gOp.set('Main', list(people.keys())[0])
-            _log.info("Using starting person: %s (%s)", people[gOp.Main].name, gOp.Main)
+        main_person_id = svc_config.get('Main')
+        if people and (not main_person_id or main_person_id not in people):
+            svc_config.set('Main', list(people.keys())[0])
+            _log.info("Using starting person: %s (%s)", people[svc_config.get('Main')].name, svc_config.get('Main'))
         
         return people
     
@@ -152,7 +155,7 @@ class GedcomLoader:
         used = 0
         usedNone = 0
         totaladdr = 0
-        my_gedcom: Optional[GeolocatedGedcom] = getattr(self.panel.gOp, "lookup", None)
+        my_gedcom: Optional[GeolocatedGedcom] = getattr(self.svc_state, "lookup", None) if self.svc_state else None
         
         if hasattr(my_gedcom, 'address_book') and my_gedcom.address_book:
             for place, location in my_gedcom.address_book.addresses().items():
@@ -165,7 +168,7 @@ class GedcomLoader:
         hit = 1 - (usedNone / used) if used > 0 else 0
         stats = f"Unique addresses: {used} with unresolvable: {usedNone}\nAddress hit rate {hit:.1%}\n" 
         
-        people_list = getattr(self.panel.gOp, "people", None)
+        people_list = getattr(self.svc_state, "people", None) if self.svc_state else None
         if people_list:
             surname_list = list(person.surname.lower() for person in people_list.values() if person.surname)
             total_surname = len(set(surname_list))

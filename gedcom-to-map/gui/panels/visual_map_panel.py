@@ -4,7 +4,7 @@ visual_map_panel.py
 Main panel for the Visual Map GUI.
 
 This module provides VisualMapPanel, a wx.Panel subclass that builds the UI
-controls, coordinates with the BackgroundActions worker, and reflects gvOptions
+controls, coordinates with the BackgroundActions worker, and reflects services
 state into the UI.
 
 Notes:
@@ -30,7 +30,7 @@ from ..layout.visual_gedcom_ids import VisualGedcomIds
 from ..layout.visual_map_event_handlers import VisualMapEventHandler
 from ..actions.visual_map_actions import VisualMapActions
 from ..layout.font_manager import FontManager
-from gedcom_options import gvOptions, ResultType  # type: ignore
+from gedcom_options import ResultType  # type: ignore
 
 (UpdateBackgroundEvent, EVT_UPDATE_STATE) = wx.lib.newevent.NewEvent()
 
@@ -43,7 +43,7 @@ class VisualMapPanel(wx.Panel):
     Responsibilities:
     - Construct and layout widgets (delegates layout to LayoutOptions).
     - Start/stop background worker threads and a periodic timer.
-    - Mirror gvOptions state into UI controls and propagate UI changes back.
+    - Mirror services state into UI controls and propagate UI changes back.
     - Provide UI-safe helpers for status, busy indicators and file/command launching.
 
     The heavy event logic is implemented in VisualMapEventHandler to keep this
@@ -53,7 +53,9 @@ class VisualMapPanel(wx.Panel):
     # Public attributes with types for static analysis and readability
     font_manager: FontManager
     frame: wx.Frame
-    gOp: gvOptions
+    svc_config: Any
+    svc_state: Any
+    svc_progress: Any
     id: VisualGedcomIds
     peopleList: PeopleListCtrlPanel
     background_process: BackgroundActions
@@ -61,7 +63,8 @@ class VisualMapPanel(wx.Panel):
     myTimer: Optional[wx.Timer]
     busystate: bool
 
-    def __init__(self, parent: wx.Window, font_manager: FontManager, gOp: gvOptions,
+    def __init__(self, parent: wx.Window, font_manager: FontManager,
+                 svc_config: Any, svc_state: Any, svc_progress: Any,
                  *args: Any, **kw: Any) -> None:
         """
         Initialize the VisualMapPanel.
@@ -69,8 +72,9 @@ class VisualMapPanel(wx.Panel):
         Args:
             parent: WX parent window.
             font_manager: FontManager instance used to compute and apply fonts.
-            gOp: Optional gvOptions instance; if not supplied a new gvOptions will be
-                 created during SetupOptions().
+            svc_config: IConfig service for configuration storage.
+            svc_state: IState service for runtime state access.
+            svc_progress: IProgressTracker service for progress and control.
         Side-effects:
             - Builds left/right sub-panels and people list.
             - Constructs the options UI via LayoutOptions.build.
@@ -79,7 +83,10 @@ class VisualMapPanel(wx.Panel):
         # parent must be the wx parent for this panel; call panel initializer with it
         super().__init__(parent, *args, **kw)
 
-        self.gOp = gOp
+        # Service-architecture references
+        self.svc_config = svc_config
+        self.svc_state = svc_state
+        self.svc_progress = svc_progress
         self.font_manager = font_manager
 
         self.SetMinSize((800,800))
@@ -122,7 +129,7 @@ class VisualMapPanel(wx.Panel):
         self.Layout()
 
         # Add Data Grid on Left panel
-        self.peopleList = PeopleListCtrlPanel(self.panelA, self.id.m, self.font_manager, self.gOp)
+        self.peopleList = PeopleListCtrlPanel(self.panelA, self.id.m, self.font_manager, svc_config=self.svc_config, svc_state=self.svc_state, svc_progress=self.svc_progress)
         
         # create handler first so LayoutOptions.build (which no longer binds)
         # can safely be used; handler will be used to wire event bindings next
@@ -175,7 +182,7 @@ class VisualMapPanel(wx.Panel):
          OnCreateFiles method so background updates can be applied to the UI.
          """
          self.threads = []
-         self.background_process = BackgroundActions(self, 0, self.gOp)
+         self.background_process = BackgroundActions(self, 0, self, self.svc_config, self.svc_state, self.svc_progress)
          self.threads.append(self.background_process)
          for t in self.threads:
              t.Start()
@@ -188,8 +195,7 @@ class VisualMapPanel(wx.Panel):
     
     def NeedReload(self):
         """Mark options that a reload is required and update button visuals."""
-        if self.gOp:
-            self.gOp.parsed= False
+        self.svc_state.parsed = False
         self.id.BTNLoad.SetBackgroundColour(self.id.GetColor('BTN_PRESS'))
         self.NeedRedraw()
 
@@ -198,22 +204,62 @@ class VisualMapPanel(wx.Panel):
         self.id.BTNCreateFiles.SetBackgroundColour(self.id.GetColor('BTN_PRESS'))
 
     def setInputFile(self, path):
-        """Set GEDCOM input path, update UI text and persist to config."""
-        # set the state variables
-        self.gOp.setInput(path)
-        _, filen = os.path.split(self.gOp.get('GEDCOMinput'))
-        # set the form field
-        self.id.TEXTGEDCOMinput.SetValue(filen)
-        self.fileConfig.Write("GEDCOMinput", path)
-        #TODO Fix this
-        #TODO Fix this
-        self.id.TEXTResultFile.SetValue(self.gOp.get('ResultFile'))
+        """Set GEDCOM input path via services, update UI text and persist."""
+        # Normalize input to ensure .ged extension
+        try:
+            base, ext = os.path.splitext(path or "")
+            normalized_input = path if ext else (path + ".ged" if path else "")
+        except Exception:
+            normalized_input = path
+
+        # Persist to service config
+        try:
+            if hasattr(self.svc_config, 'set'):
+                self.svc_config.set('GEDCOMinput', normalized_input)
+        except Exception:
+            _log.exception("Failed to set GEDCOMinput on svc_config")
+
+        # Update the input filename field
+        _, filen = os.path.split(normalized_input or "")
+        try:
+            self.id.TEXTGEDCOMinput.SetValue(filen)
+        except Exception:
+            _log.debug("Failed to set TEXTGEDCOMinput")
+
+        # Persist to user config storage
+        try:
+            self.fileConfig.Write("GEDCOMinput", normalized_input)
+        except Exception:
+            _log.debug("Failed to write GEDCOMinput to fileConfig")
+
+        # Derive ResultFile based on current ResultType
+        try:
+            rtype = self.svc_config.get('ResultType')
+        except Exception:
+            rtype = None
+            enforced = ResultType.ResultTypeEnforce(rtype)
+            ext = ResultType.file_extension(enforced)
+            result_base, _ = os.path.splitext(normalized_input or "")
+            result_file = (result_base or "").rsplit(os.sep, 1)[-1] + "." + ext
+            if hasattr(self.svc_config, 'set'):
+                self.svc_config.set('ResultFile', result_file)
+            try:
+                self.id.TEXTResultFile.SetValue(result_file)
+            except Exception:
+                _log.debug("Failed to set TEXTResultFile")
+        except Exception:
+            _log.debug("Unable to compute ResultFile from ResultType")
+
+        # Mark UI for reload and refresh button states
         self.NeedReload()
         self.SetupButtonState()
 
     def SetResultTypeRadioBox(self):
-        """Synchronize the result-type radio box selection with gOp.ResultType."""
-        rType = self.gOp.get('ResultType')
+        """Synchronize the result-type radio box selection with ResultType from services."""
+        try:
+            rType = self.svc_config.get('ResultType')
+        except Exception:
+            rType = None
         try:
             type_index = rType.index()
         except Exception:
@@ -223,13 +269,14 @@ class VisualMapPanel(wx.Panel):
         self.id.RBResultType.SetSelection(type_index)
 
     def get_runtime_string(self) -> str:
-        """Return a formatted running/ETA string based on gOp timing and counters.
+        """Return a formatted running/ETA string based on services timing and counters.
 
         The string is suitable for display in a status pane and does not touch UI.
         """
 
         nowtime = datetime.now().timestamp()
-        runningtime = nowtime - self.gOp.runningSince
+        running_since = getattr(self.svc_progress, "runningSince", nowtime)
+        runningtime = nowtime - running_since
 
         # Base running label
         if runningtime < 86400:     # 1 day
@@ -238,19 +285,29 @@ class VisualMapPanel(wx.Panel):
             runtime = f"Running {time.strftime('%jD %H:%M', time.gmtime(runningtime - 86400))}" 
         
         # ETA calculation if counters available
-        if self.gOp.countertarget > 0 and self.gOp.counter > 0 and self.gOp.counter != self.gOp.countertarget:
+        countertarget = getattr(self.svc_progress, "countertarget", 0)
+        counter = getattr(self.svc_progress, "counter", 0)
+        if countertarget > 0 and counter > 0 and counter != countertarget:
             # update ETA display every second
             if nowtime-1.0 > self.lastruninstance: 
                 self.timeformat = '%H:%M:%S'
-                stepsleft = self.gOp.countertarget-self.gOp.counter
+                stepsleft = countertarget - counter
                 scaler = math.log(stepsleft, 100) if stepsleft > 1 else 1
-                remaintimeInstant = (nowtime - self.gOp.runningSinceStep)/self.gOp.counter * stepsleft* scaler
+                running_since_step = getattr(self.svc_progress, "runningSinceStep", nowtime)
+                remaintimeInstant = (nowtime - running_since_step)/max(counter, 1) * stepsleft* scaler
                 remaintimeInstant = remaintimeInstant if remaintimeInstant > 0 else 0
                 # Smoothed runtime average over last 5 seconds
-                self.gOp.runavg.append(remaintimeInstant)
-                if len(self.gOp.runavg) > 5:
-                    self.gOp.runavg.pop(0)
-                remaintime = sum(self.gOp.runavg)/len(self.gOp.runavg)
+                runavg = getattr(self.svc_progress, "runavg", [])
+                try:
+                    runavg.append(remaintimeInstant)
+                    if len(runavg) > 5:
+                        runavg.pop(0)
+                except Exception:
+                    pass
+                try:
+                    remaintime = sum(runavg)/len(runavg) if runavg else 0
+                except Exception:
+                    remaintime = 0
                 self.remaintime = remaintime
                 self.lastruninstance = nowtime
                 if self.remaintime> 3600: 
@@ -272,37 +329,58 @@ class VisualMapPanel(wx.Panel):
 
     def get_status_runtime_string(self, running: bool) -> str:
         """Compose main status and short runtime string for the status bar."""
-        status = self.gOp.state
+        status = getattr(self.svc_progress, "state", "")
         if running:
-            self.gOp.runningLast = 0
+            try:
+                self.svc_progress.runningLast = 0
+            except Exception:
+                pass
             status = f"{status} - Processing"
             runtime = self.get_runtime_string()
         else:
-            runtime = "Last {}".format( time.strftime('%H:%M:%S', time.gmtime(self.gOp.runningLast)))
-            self.gOp.runavg = []
+            running_last = getattr(self.svc_progress, "runningLast", 0)
+            runtime = "Last {}".format( time.strftime('%H:%M:%S', time.gmtime(running_last)))
+            try:
+                self.svc_progress.runavg = []
+            except Exception:
+                pass
         return status, runtime
     
     def get_status_progress_string(self, status: str) -> str:
         """Append counter/progress information to the provided status string."""
-        if self.gOp.counter > 0:
-            if self.gOp.countertarget > 0:
-                status = f"{status} : {self.gOp.counter/self.gOp.countertarget*100:.0f}% ({self.gOp.counter}/{self.gOp.countertarget})  "
+        counter = getattr(self.svc_progress, "counter", 0)
+        countertarget = getattr(self.svc_progress, "countertarget", 0)
+        if counter > 0:
+            if countertarget > 0:
+                pct = counter/countertarget*100 if countertarget else 0
+                status = f"{status} : {pct:.0f}% ({counter}/{countertarget})  "
             else:
-                status = f"{status} : {self.gOp.counter}"
-            if self.gOp.stepinfo:
-                status = f"{status} ({self.gOp.stepinfo})"
+                status = f"{status} : {counter}"
+            stepinfo = getattr(self.svc_progress, "stepinfo", "")
+            if stepinfo:
+                status = f"{status} ({stepinfo})"
         return status
     
     def check_if_should_stop(self, status) -> str:
         """Return an updated status string if the background worker is stopping."""
-        if self.gOp.ShouldStop():
+        should_stop = False
+        try:
+            if hasattr(self.svc_progress, "ShouldStop"):
+                should_stop = self.svc_progress.ShouldStop()
+        except Exception:
+            should_stop = False
+        if should_stop:
             self.id.BTNCreateFiles.Enable()
             status = f"{status} - please wait.. Stopping"
         return status
     
     def update_load_create_buttons_display(self) -> None:
         """Enable/disable Load/Create buttons depending on whether input is set."""
-        _, filen = os.path.split(self.gOp.get('GEDCOMinput'))
+        try:
+            infile = self.svc_config.get('GEDCOMinput')
+        except Exception:
+            infile = ""
+        _, filen = os.path.split(infile or "")
         if filen == "":
             self.id.BTNLoad.Disable()
             self.id.BTNCreateFiles.Disable()
@@ -314,7 +392,11 @@ class VisualMapPanel(wx.Panel):
 
     def update_csv_button_display(self) -> None:
         """Enable/disable CSV button depending on whether a GPS file is configured."""
-        if self.gOp.get('gpsfile') == '':
+        try:
+            gpsfile = self.svc_config.get('gpsfile')
+        except Exception:
+            gpsfile = ''
+        if (gpsfile or '') == '':
             self.id.BTNCSV.Disable()
         else:
             if not self.id.BTNCSV.IsEnabled():
@@ -323,8 +405,13 @@ class VisualMapPanel(wx.Panel):
     def get_status_if_ready(self, status: str) -> str:
         """Return a 'Ready' status string when no work is in progress."""
         if not status or status == '':
-            if self.gOp.selectedpeople and self.gOp.ResultType:
-                status = f'Ready - {self.gOp.selectedpeople} people selected'
+            selectedpeople = getattr(self.svc_state, 'selectedpeople', 0)
+            try:
+                result_type = self.svc_config.get('ResultType')
+            except Exception:
+                result_type = None
+            if selectedpeople and result_type:
+                status = f'Ready - {selectedpeople} people selected'
             else:
                 status = 'Ready'
             self.OnBusyStop(-1)
@@ -338,19 +425,26 @@ class VisualMapPanel(wx.Panel):
 
     def check_update_running_state(self) -> None:
         """Synchronize busy/ running state and trigger busy indicator transitions."""
-        if self.busystate != self.gOp.running:
-            _log.info("Busy %d not Running %d", self.busystate, self.gOp.running)
-            if self.gOp.running:
-                self.gOp.runningSince = datetime.now().timestamp()
+        running = getattr(self.svc_progress, 'running', False)
+        if self.busystate != running:
+            _log.info("Busy %d not Running %d", self.busystate, running)
+            if running:
+                try:
+                    self.svc_progress.runningSince = datetime.now().timestamp()
+                except Exception:
+                    pass
                 self.OnBusyStart(-1)
             else:
                 self.OnBusyStop(-1)
                 self.UpdateTimer()
 
-        if not self.gOp.running:
-           self.gOp.countertarget = 0
-           self.gOp.stepinfo = ""
-           self.gOp.runningSince = datetime.now().timestamp()
+        if not running:
+           try:
+               self.svc_progress.countertarget = 0
+               self.svc_progress.stepinfo = ""
+               self.svc_progress.runningSince = datetime.now().timestamp()
+           except Exception:
+               pass
            self.busycounthack += 1
            if self.busycounthack > 40:
                 self.OnBusyStop(-1)
@@ -366,19 +460,21 @@ class VisualMapPanel(wx.Panel):
         if self.inTimer:
             return
         self.inTimer = True
-
-        # if no gOp, nothing to do
-        if not getattr(self, "gOp", None):
-            self.inTimer = False
-            return
     
         # Enable/disable Stop button based on running state
-        self.update_stop_button_display(self.gOp.ShouldStop(), self.gOp.running)
+        should_stop = False
+        running = getattr(self.svc_progress, 'running', False)
+        try:
+            if hasattr(self.svc_progress, 'ShouldStop'):
+                should_stop = self.svc_progress.ShouldStop()
+        except Exception:
+            should_stop = False
+        self.update_stop_button_display(should_stop, running)
         self.update_load_create_buttons_display()
         self.update_csv_button_display()
 
         # Update status bar text
-        status, runtime = self.get_status_runtime_string(self.gOp.running)
+        status, runtime = self.get_status_runtime_string(running)
         self.frame.SetStatusText(runtime, 1)
 
         # progress / counter text augmentation
@@ -398,7 +494,12 @@ class VisualMapPanel(wx.Panel):
 
     def UpdateTimer(self):
         """Update the runningLast elapsed time computed from runningSince."""
-        self.gOp.runningLast = datetime.now().timestamp() - self.gOp.runningSince
+        now = datetime.now().timestamp()
+        running_since = getattr(self.svc_progress, 'runningSince', now)
+        try:
+            self.svc_progress.runningLast = now - running_since
+        except Exception:
+            pass
 
     def OnBusyStart(self, evt):
         """Show and start the busy indicator (spinner)."""
@@ -435,9 +536,14 @@ class VisualMapPanel(wx.Panel):
             self.background_process.updategrid = False
             saveBusy = self.busystate
             self.OnBusyStart(evt)
-            self.peopleList.list.PopulateList(self.background_process.people, self.gOp.get('Main'), True)
-            if self.gOp.newload:
-                self.peopleList.list.ShowSelectedLinage(self.gOp.get('Main'))
+            try:
+                main_id = self.svc_config.get('Main')
+            except Exception:
+                main_id = None
+            self.peopleList.list.PopulateList(self.background_process.people, main_id, True)
+            newload_flag = getattr(self.svc_state, 'newload', False)
+            if newload_flag:
+                self.peopleList.list.ShowSelectedLinage(main_id)
             if not saveBusy:
                 self.OnBusyStop(evt)
 
@@ -461,7 +567,10 @@ class VisualMapPanel(wx.Panel):
         This method lays out which groups of controls are active in HTML, KML,
         KML2 and Summary modes and refreshes the options stack visibility.
         """
-        ResultTypeSelect = self.gOp.get('ResultType')
+        try:
+            ResultTypeSelect = self.svc_config.get('ResultType')
+        except Exception:
+            ResultTypeSelect = None
         self.SetResultTypeRadioBox()
         # Always enabled
             # self.id.CBUseGPS
@@ -469,7 +578,10 @@ class VisualMapPanel(wx.Panel):
             # self.id.CBCacheOnly
 
         # Enable/Disable marker-dependent controls if markers are off
-        marks_on = self.gOp.get('MarksOn')
+        try:
+            marks_on = self.svc_config.get('MarksOn')
+        except Exception:
+            marks_on = False
         for ctrl in LayoutOptions.get_marks_controls_list(self):
             if marks_on:
                 ctrl.Enable()
@@ -490,10 +602,18 @@ class VisualMapPanel(wx.Panel):
             self.id.CBMapTimeLine.Disable()
             self.id.LISTHeatMapTimeStep.Disable()
             
-            if self.gOp.get('HeatMap'):
+            try:
+                heatmap_on = self.svc_config.get('HeatMap')
+            except Exception:
+                heatmap_on = False
+            if heatmap_on:
                 self.id.CBMapTimeLine.Enable()
                 # Only enable time step if timeline is enabled
-                if self.gOp.get('MapTimeLine'):
+                try:
+                    timeline_on = self.svc_config.get('MapTimeLine')
+                except Exception:
+                    timeline_on = False
+                if timeline_on:
                     self.id.LISTHeatMapTimeStep.Enable()
             for ctrl in self.optionKbox.GetChildren():
                 ctrl.Disable()        
@@ -515,53 +635,92 @@ class VisualMapPanel(wx.Panel):
             self.optionK2box.Show()
 
        # Enable/disable trace button based on referenced data availability
-        self.id.BTNTRACE.Enable(bool(self.gOp.Referenced and self.gOp.ResultFile and ResultTypeSelect))
+        referenced = getattr(self.svc_state, 'Referenced', None)
+        try:
+            result_file = self.svc_config.get('ResultFile')
+        except Exception:
+            result_file = None
+        self.id.BTNTRACE.Enable(bool(referenced and result_file and ResultTypeSelect))
 
         self.optionsStack.Layout()
         self.Layout()
         self.Refresh()
 
     def SetupOptions(self) -> None:
-        """Create/configure gvOptions and populate UI controls from stored options.
+        """Populate UI controls from stored options.
 
-        Also binds gvOptions to background threads and restores file history.
+        Also binds services to background threads and restores file history.
         """
         if not self.fileConfig:
             self.fileConfig = wx.Config("gedcomVisualGUI")
         
-        self.gOp.panel = self
-        self.gOp.BackgroundProcess = self.background_process
-        self.gOp.UpdateBackgroundEvent = UpdateBackgroundEvent
-        # self.peopleList.setGOp(self.gOp)
-        self.peopleList.SetGOp(self.gOp)
+        # UI wiring: set references in services for backward compatibility with background process
+        try:
+            if hasattr(self.svc_config, 'panel'):
+                self.svc_config.panel = self
+        except Exception:
+            pass
+        try:
+            if hasattr(self.svc_progress, 'BackgroundProcess'):
+                self.svc_progress.BackgroundProcess = self.background_process
+        except Exception:
+            pass
+        try:
+            if hasattr(self.svc_progress, 'UpdateBackgroundEvent'):
+                self.svc_progress.UpdateBackgroundEvent = UpdateBackgroundEvent
+        except Exception:
+            pass
+        
+        # propagate services to the people list control
+        self.peopleList.SetServices(self.svc_config, self.svc_state, self.svc_progress)
 
-        if self.gOp.get('ResultType'):
+        try:
+            result_type = self.svc_config.get('ResultType')
+        except Exception:
+            result_type = None
+        
+        if result_type:
             self.id.RBResultType.SetSelection(0)
         else:
             if self.id.RBResultType.GetSelection() not in [1,2]:
                 self.id.RBResultType.SetSelection(1)
         
-        # Populate UI widgets from gOp using the panel method (VisualGedcomIds is metadata-only)
+        # Populate UI widgets from services
         try:
-            self.apply_controls_from_options(self.gOp)
+            self.apply_controls_from_options()
         except Exception:
             _log.exception("SetupOptions: apply_controls_from_options failed")
 
-        self.id.CBSummary[0].SetValue(self.gOp.get('SummaryOpen'))
-        self.id.CBSummary[1].SetValue(self.gOp.get('SummaryPlaces'))
-        self.id.CBSummary[2].SetValue(self.gOp.get('SummaryPeople'))
-        self.id.CBSummary[3].SetValue(self.gOp.get('SummaryCountries'))
-        self.id.CBSummary[4].SetValue(self.gOp.get('SummaryCountriesGrid'))
-        self.id.CBSummary[5].SetValue(self.gOp.get('SummaryGeocode'))
-        self.id.CBSummary[6].SetValue(self.gOp.get('SummaryAltPlaces'))
-        self.id.CBSummary[7].SetValue(self.gOp.get('SummaryEnrichmentIssues'))
-        self.id.CBSummary[8].SetValue(self.gOp.get('SummaryStatistics'))
+        try:
+            self.id.CBSummary[0].SetValue(self.svc_config.get('SummaryOpen'))
+            self.id.CBSummary[1].SetValue(self.svc_config.get('SummaryPlaces'))
+            self.id.CBSummary[2].SetValue(self.svc_config.get('SummaryPeople'))
+            self.id.CBSummary[3].SetValue(self.svc_config.get('SummaryCountries'))
+            self.id.CBSummary[4].SetValue(self.svc_config.get('SummaryCountriesGrid'))
+            self.id.CBSummary[5].SetValue(self.svc_config.get('SummaryGeocode'))
+            self.id.CBSummary[6].SetValue(self.svc_config.get('SummaryAltPlaces'))
+            self.id.CBSummary[7].SetValue(self.svc_config.get('SummaryEnrichmentIssues'))
+            self.id.CBSummary[8].SetValue(self.svc_config.get('SummaryStatistics'))
+        except Exception:
+            _log.exception("SetupOptions: failed to set summary checkboxes")
 
-        self.id.TEXTDefaultCountry.SetValue(self.gOp.get('defaultCountry', ifNone=""))
+        try:
+            default_country = self.svc_config.get('defaultCountry', '')
+            self.id.TEXTDefaultCountry.SetValue(default_country or "")
+        except Exception:
+            _log.exception("SetupOptions: failed to set default country")
 
-        self.id.CBMarkStarOn.SetValue(self.gOp.get('MarkStarOn'))
+        try:
+            mark_star_on = self.svc_config.get('MarkStarOn')
+            self.id.CBMarkStarOn.SetValue(mark_star_on)
+        except Exception:
+            _log.exception("SetupOptions: failed to set MarkStarOn")
 
-        self.id.LISTMapStyle.SetSelection(self.id.LISTMapStyle.FindString(self.gOp.get('MapStyle')))
+        try:
+            map_style = self.svc_config.get('MapStyle')
+            self.id.LISTMapStyle.SetSelection(self.id.LISTMapStyle.FindString(map_style))
+        except Exception:
+            _log.exception("SetupOptions: failed to set map style")
 
         self.SetupButtonState()
 
@@ -627,27 +786,26 @@ class VisualMapPanel(wx.Panel):
             if evt is not None:
                 evt.Skip()
 
-    def apply_controls_from_options(self, gOp: Any) -> None:
-        """Apply values from gOp to wx controls using id metadata (clearer, helper-based)."""
+    def apply_controls_from_options(self) -> None:
+        """Apply values from services to wx controls using id metadata."""
         if not getattr(self, "id", None):
             return
 
-        def resolve_value(gop_attr: str) -> Any:
-            if not gop_attr:
+        def resolve_value(attr: str) -> Any:
+            if not attr:
                 return None
             try:
-                if hasattr(gOp, gop_attr):
-                    return getattr(gOp, gop_attr)
-                if hasattr(gOp, "get"):
-                    return gOp.get(gop_attr, None)
+                return self.svc_config.get(attr)
             except Exception:
-                _log.exception("resolve_value failed for %s", gop_attr)
-            return None
+                return None
 
         def set_text(control: wx.Window, name: str, value: Any) -> None:
             try:
                 if name == "TEXTGEDCOMinput":
-                    infile = gOp.get("GEDCOMinput", "") if hasattr(gOp, "get") else ""
+                    try:
+                        infile = self.svc_config.get("GEDCOMinput", "")
+                    except Exception:
+                        infile = ""
                     _, filen = os.path.split(infile)
                     val = filen
                 else:
@@ -700,7 +858,7 @@ class VisualMapPanel(wx.Panel):
             "Button": set_button,
         }
 
-        for name, idref, wtype, gop_attr, action in self.id.iter_controls():
+        for name, idref, wtype, config_attr, action in self.id.iter_controls():
             # resolve numeric id
             try:
                 wid = int(idref)
@@ -715,12 +873,15 @@ class VisualMapPanel(wx.Panel):
             if control is None:
                 continue
 
-            value = resolve_value(gop_attr)
+            value = resolve_value(config_attr)
 
             try:
                 # special controls
                 if name == "LISTMapStyle":
-                    ms = value or (gOp.get("MapStyle", "") if hasattr(gOp, "get") else value)
+                    try:
+                        ms = self.svc_config.get("MapStyle", "")
+                    except Exception:
+                        ms = value or ""
                     try:
                         idx = self.id.AllMapTypes.index(ms)
                     except Exception:
@@ -733,8 +894,11 @@ class VisualMapPanel(wx.Panel):
 
                 if name == "RBResultType":
                     order = ("HTML", "KML", "KML2", "SUM")
-                    rt = getattr(gOp, "ResultType", None)
-                    rt_name = getattr(rt, "value", str(rt) if rt is not None else "")
+                    try:
+                        rt = self.svc_config.get("ResultType")
+                        rt_name = getattr(rt, "value", str(rt) if rt is not None else "")
+                    except Exception:
+                        rt_name = ""
                     try:
                         idx = order.index(rt_name)
                     except ValueError:

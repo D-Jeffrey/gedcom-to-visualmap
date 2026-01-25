@@ -7,8 +7,6 @@ import wx
 from wx.lib.embeddedimage import PyEmbeddedImage
 from typing import Any
 
-from gedcom_options import gvOptions  # type: ignore
-
 _log = logging.getLogger(__name__.lower())
 
 
@@ -26,7 +24,7 @@ class VisualGedcomIds:
         else:
             make = lambda: wx.NewId()
 
-        id_attributes = [ # ID name: (type, gOp attribute, action)
+        id_attributes = [ # ID name: (type, config/state attribute, action)
             ('CBMarksOn', ('CheckBox', 'MarksOn', 'Redraw')),
             ('CBHeatMap', ('CheckBox', 'HeatMap', '')),
             ('CBFlyTo', ('CheckBox', 'UseBalloonFlyto', 'Redraw')),
@@ -168,7 +166,7 @@ class VisualGedcomIds:
         """
         Yield metadata for controls defined by this helper.
 
-        Yields tuples: (control_name, idref, widget_type, gop_attribute, action)
+        Yields tuples: (control_name, idref, widget_type, config_attribute, action)
         This keeps VisualGedcomIds purely a metadata provider. Actual UI
         updates should be performed by the panel (apply_controls_from_options).
         """
@@ -177,15 +175,15 @@ class VisualGedcomIds:
             if not mapping:
                 continue
             wtype = mapping[0] if len(mapping) > 0 else None
-            gop_attr = mapping[1] if len(mapping) > 1 else None
+            config_attr = mapping[1] if len(mapping) > 1 else None
             action = mapping[2] if len(mapping) > 2 else None
-            yield name, idref, wtype, gop_attr, action
+            yield name, idref, wtype, config_attr, action
 
     def get_id_attributes(self, idref: Any) -> dict:
-        """Get the (type, gOp attribute, action) tuple for a given control ID."""
+        """Get the (type, config/state attribute, action) tuple for a given control ID."""
         attr: dict = {}
         try:
             attr = self.IDtoAttr[idref]
         except Exception:
             _log.error(f"ID {idref} not found in IDtoAttr mapping.")
-        return {'type': attr[0], 'gOp_attribute': attr[1], 'action': attr[2]}
+        return {'type': attr[0], 'config_attribute': attr[1], 'action': attr[2]}

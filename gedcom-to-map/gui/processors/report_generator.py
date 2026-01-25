@@ -10,7 +10,7 @@ from typing import Any, Optional
 
 from geo_gedcom.geolocated_gedcom import GeolocatedGedcom
 from render.summary import SummaryReportConfig, generate_summary_reports
-from gedcom_options import gvOptions
+from services import IConfig, IState, IProgressTracker
 
 _log = logging.getLogger(__name__.lower())
 
@@ -32,69 +32,59 @@ class ReportGenerator:
         """Initialize report generator.
         
         Args:
-            panel: Parent VisualMapPanel instance providing access to gOp
+            panel: Parent VisualMapPanel instance providing access to services
             actions: Parent VisualMapActions instance for LoadFile method (optional)
         """
         self.panel: Any = panel
         self.actions: Optional[Any] = actions
     
-    def doSUM(self, gOp: gvOptions) -> None:
+    def doSUM(self, svc_config: IConfig, svc_state: IState, svc_progress: IProgressTracker) -> None:
         """Generate various CSV summary reports from geocoded GEDCOM data.
         
-        Creates multiple summary files based on settings in gOp:
+        Creates multiple summary files based on settings:
         - Places summary: All unique places with geocoding info
         - People summary: All individuals with key dates/locations
         - Countries summary: Birth/death counts by country (CSV + optional chart)
         - Geocache summary: Geocoding cache for debugging
         - Alternative places: Alt place name mappings
         
-        All outputs are saved to gOp.resultpath with filenames based on input
-        GEDCOM filename. Optionally opens generated files if gOp.SummaryOpen is True.
+        All outputs are saved to resultpath with filenames based on input
+        GEDCOM filename. Optionally opens generated files if SummaryOpen is True.
         
         Args:
-            gOp: Global options containing:
-                 - lookup: GeolocatedGedcom with geocoded data
-                 - GEDCOMinput: Input GEDCOM path (for naming outputs)
-                 - resultpath: Output directory
-                 - SummaryPlaces: Generate places CSV
-                 - SummaryPeople: Generate people CSV
-                 - SummaryCountries: Generate countries CSV
-                 - SummaryCountriesGrid: Generate countries chart image
-                 - SummaryGeocode: Generate geocache CSV
-                 - SummaryAltPlaces: Generate alt places CSV
-                 - SummaryEnrichmentIssues: Generate enhancement issues report
-                 - SummaryStatistics: Generate statistics summary
-                 - SummaryOpen: Auto-open generated files
+            svc_config: Configuration service
+            svc_state: Runtime state service (provides lookup via svc_state.lookup)
+            svc_progress: Progress tracking service
         
         Side Effects:
-            - Creates CSV files in gOp.resultpath
+            - Creates CSV files in resultpath
             - May create PNG chart for countries summary
             - Shows info/error messages via background process
             - Opens files if SummaryOpen is True
         
         Raises:
             Logs error if:
-            - gOp.lookup not available (GEDCOM not geocoded)
+            - svc_state.lookup not available (GEDCOM not geocoded)
             - Individual summary writer functions fail
             - File opening fails
         
         Example:
-            gOp.set('SummaryPlaces', True)
-            gOp.set('SummaryPeople', True)
-            gOp.set('SummaryOpen', True)
+            svc_config.set('SummaryPlaces', True)
+            svc_config.set('SummaryPeople', True)
+            svc_config.set('SummaryOpen', True)
             generator = ReportGenerator(panel)
-            generator.doSUM(gOp)
+            generator.doSUM(svc_config, svc_state, svc_progress)
         
         Note:
-            Requires prior call to ParseAndGPS() to populate gOp.lookup.
+            Requires prior call to ParseAndGPS() to populate svc_state.lookup.
         """
-        base_file_name: str = Path(getattr(gOp, "GEDCOMinput", "")).resolve().stem
-        output_folder: Path = Path(getattr(gOp, "resultpath", ".")).resolve()
-        my_gedcom: Optional[GeolocatedGedcom] = getattr(gOp, "lookup", None)
-        bg = getattr(gOp, "BackgroundProcess", None)
+        base_file_name: str = Path(svc_config.get('GEDCOMinput', '')).resolve().stem
+        output_folder: Path = Path(svc_config.get('resultpath', '.')).resolve()
+        my_gedcom: Optional[GeolocatedGedcom] = svc_state.lookup
+        bg = self.panel.background_process if hasattr(self.panel, 'background_process') else None
 
         if my_gedcom is None:
-            _log.error("doSUM: geolocated GEDCOM (gOp.lookup) is not available")
+            _log.error("doSUM: geolocated GEDCOM (svc_state.lookup) is not available")
             if bg:
                 try:
                     bg.SayErrorMessage("doSUM: geocoded GEDCOM data not available")
@@ -102,8 +92,18 @@ class ReportGenerator:
                     pass
             return
 
-        # Extract summary report configuration from gOp
-        config = SummaryReportConfig.from_gvOptions(gOp)
+        # Extract summary report configuration from config service
+        config = SummaryReportConfig(
+            places=svc_config.get('SummaryPlaces', False),
+            people=svc_config.get('SummaryPeople', False),
+            countries=svc_config.get('SummaryCountries', False),
+            countries_grid=svc_config.get('SummaryCountriesGrid', False),
+            geocode=svc_config.get('SummaryGeocode', False),
+            alt_places=svc_config.get('SummaryAltPlaces', False),
+            enrichment_issues=svc_config.get('SummaryEnrichmentIssues', False),
+            statistics=svc_config.get('SummaryStatistics', False),
+            auto_open=svc_config.get('SummaryOpen', False)
+        )
 
         # Generate all selected summary reports
         # Pass actions (parent VisualMapActions) for LoadFile capability

@@ -6,34 +6,41 @@ _log = logging.getLogger(__name__.lower())
 
 
 class ConfigDialog(wx.Dialog):
-    def __init__(self, parent, title, gOp):
+    def __init__(self, parent, title, svc_config, file_open_commands, logging_keys=None):
         super().__init__(parent, title=title, size=(500, 650))
 
         includeNOTSET = True
-        self.gOp = gOp
+        # Configuration service for logic-backed settings
+        self.svc_config = svc_config
+        self.file_open_commands = file_open_commands
+        self.logging_keys = logging_keys or []
         self.loggerNames = list(logging.root.manager.loggerDict.keys())
         cfgpanel = wx.Panel(self, style=wx.SIMPLE_BORDER)
 
         TEXTkmlcmdlinelbl = wx.StaticText(cfgpanel, -1, " KML Editor Command line:   ")
         self.TEXTkmlcmdline = wx.TextCtrl(cfgpanel, wx.ID_FILE1, "", size=(250, 20))
-        kml_cmd = gOp.file_open_commands.get_command_for_file_type('kml')
+        kml_cmd = file_open_commands.get_command_for_file_type('kml')
         if kml_cmd:
             self.TEXTkmlcmdline.SetValue(kml_cmd)
 
         TEXTcsvcmdlinelbl = wx.StaticText(cfgpanel, -1, " CSV Table Editor Command line:   ")
         self.TEXTcsvcmdline = wx.TextCtrl(cfgpanel, wx.ID_FILE1, "", size=(250, 20))
-        csv_cmd = gOp.file_open_commands.get_command_for_file_type('csv')
+        csv_cmd = file_open_commands.get_command_for_file_type('csv')
         if csv_cmd:
             self.TEXTcsvcmdline.SetValue(csv_cmd)
 
         TEXTtracecmdlinelbl = wx.StaticText(cfgpanel, -1, " Trace Table Editor Command line:   ")
         self.TEXTtracecmdline = wx.TextCtrl(cfgpanel, wx.ID_FILE1, "", size=(250, 20))
-        trace_cmd = gOp.file_open_commands.get_command_for_file_type('trace')
+        trace_cmd = file_open_commands.get_command_for_file_type('trace')
         if trace_cmd:
             self.TEXTtracecmdline.SetValue(trace_cmd)
 
         self.CBBadAge = wx.CheckBox(cfgpanel, -1, 'Flag if age is off')
-        self.CBBadAge.SetValue(getattr(gOp, "badAge", False))
+        # Get badAge from service config
+        try:
+            self.CBBadAge.SetValue(bool(svc_config.get('badAge')))
+        except Exception:
+            self.CBBadAge.SetValue(False)
         self.badAge = True
 
         GRIDctl = gridlib.Grid(cfgpanel)
@@ -61,18 +68,18 @@ class ConfigDialog(wx.Dialog):
         self.row = 0
         for erow, loggerName in enumerate(self.loggerNames):
             updatelog = logging.getLogger(loggerName)
-            if logging.getLevelName(updatelog.level) != "NOTSET" and loggerName in getattr(self.gOp, "logging_keys", []):
+            if logging.getLevelName(updatelog.level) != "NOTSET" and loggerName in self.logging_keys:
                 makeCells()
 
         if includeNOTSET:
             for erow, loggerName in enumerate(self.loggerNames):
                 updatelog = logging.getLogger(loggerName)
-                if logging.getLevelName(updatelog.level) == "NOTSET" and loggerName in getattr(self.gOp, "logging_keys", []):
+                if logging.getLevelName(updatelog.level) == "NOTSET" and loggerName in self.logging_keys:
                     makeCells()
 
             for erow, loggerName in enumerate(self.loggerNames):
                 updatelog = logging.getLogger(loggerName)
-                if loggerName not in getattr(self.gOp, "logging_keys", []):
+                if loggerName not in self.logging_keys:
                     makeCells()
 
         GRIDctl.AutoSizeColumn(0, True)
@@ -117,14 +124,26 @@ class ConfigDialog(wx.Dialog):
             logLevel = self.GRIDctl.GetCellValue(row, 1)
             updatelog = logging.getLogger(loggerName)
             updatelog.setLevel(getattr(logging, logLevel))
-        self.gOp.file_open_commands.add_file_type_command('kml', self.TEXTkmlcmdline.GetValue())
-        self.gOp.file_open_commands.add_file_type_command('csv', self.TEXTcsvcmdline.GetValue())
-        self.gOp.file_open_commands.add_file_type_command('trace', self.TEXTtracecmdline.GetValue())
-        self.gOp.badAge = self.CBBadAge.GetValue()
+        
+        # Update file open commands
+        self.file_open_commands.add_file_type_command('kml', self.TEXTkmlcmdline.GetValue())
+        self.file_open_commands.add_file_type_command('csv', self.TEXTcsvcmdline.GetValue())
+        self.file_open_commands.add_file_type_command('trace', self.TEXTtracecmdline.GetValue())
+        
+        # Update service config
         try:
-            self.gOp.savesettings()
+            if hasattr(self.svc_config, 'set'):
+                self.svc_config.set('badAge', bool(self.CBBadAge.GetValue()))
+        except Exception:
+            _log.exception("ConfigDialog.onSave: failed to set badAge in svc_config")
+        
+        # Persist settings if available
+        try:
+            if hasattr(self.svc_config, 'savesettings'):
+                self.svc_config.savesettings()
         except Exception:
             _log.exception("ConfigDialog.onSave: savesettings failed")
+        
         self.Close()
         self.DestroyLater()
 

@@ -14,7 +14,7 @@ import folium
 import xyzservices.providers as xyz
 from folium.plugins import (AntPath, FloatImage, GroupedLayerControl,
                             HeatMapWithTime, MiniMap, Search, MarkerCluster)
-from gedcom_options import gvOptions
+from services import IConfig, IState, IProgressTracker
 from models.line import Line
 from geo_gedcom.lat_lon import LatLon
 from render.referenced import Referenced
@@ -38,7 +38,9 @@ class foliumExporter:
     Attributes:
         file_name (str): Output HTML file path.
         max_line_weight (int): Maximum line weight for polylines.
-        gOp (gvOptions): Options/configuration object.
+        svc_config (IConfig): Configuration service.
+        svc_state (IState): Runtime state service.
+        svc_progress (IProgressTracker): Progress tracking service.
         fglastname (dict): Feature groups by last name.
         saveresult (bool): Whether to save the result.
         fm (folium.Map): The Folium map instance.
@@ -46,22 +48,26 @@ class foliumExporter:
         popups (list): List of popup contents.
         soundexLast (bool): Whether to use Soundex for grouping.
     """
-    def __init__(self, gOp: gvOptions):
+    def __init__(self, svc_config: IConfig, svc_state: IState, svc_progress: IProgressTracker):
         """
         Initialize the Folium exporter.
 
         Args:
-            gOp (gvOptions): The options/configuration object.
+            svc_config: Configuration service
+            svc_state: Runtime state service
+            svc_progress: Progress tracking service
         """
-        self.file_name = os.path.join(gOp.resultpath, gOp.ResultFile)
-        self.max_line_weight = gOp.MaxLineWeight
-        self.gOp = gOp
+        self.svc_config = svc_config
+        self.svc_state = svc_state
+        self.svc_progress = svc_progress
+        self.file_name = os.path.join(svc_config.get('resultpath'), svc_config.get('ResultFile'))
+        self.max_line_weight = svc_config.get('MaxLineWeight')
         self.fglastname = dict()
         self.saveresult = False
         self.fm = None
         self.locations = []
         self.popups = []
-        self.soundexLast = gOp.GroupBy == 2
+        self.soundexLast = svc_config.get('GroupBy') == 2
         
     def _create_marker_options(self, line) -> dict:
         """Generate marker and line options based on line style"""
@@ -125,7 +131,7 @@ class foliumExporter:
 
     # Marker utility now in marker_utils.py
     def _add_point_marker(self, fg, point, options, tooltip, popup, icon_name, color):
-        add_point_marker(fg, point, options, tooltip, popup, icon_name, color, gOp=self.gOp)
+        add_point_marker(fg, point, options, tooltip, popup, icon_name, color, gOp=self.svc_config)
     
     def setoptions(self):
 
@@ -134,10 +140,9 @@ class foliumExporter:
     def Done(self):
         """Finalize and save the map."""
         if self.saveresult:
-            self.gOp.step("Writing Folium HTML")
+            self.svc_progress.step("Writing Folium HTML")
             self.fm.save(self.file_name)
-            self.gOp.step("Done")
-        # self.gOp.stop()
+            self.svc_progress.step("Done")
         # self.fm = None
     
     def getFeatureGroup(self, thename, depth):
@@ -221,14 +226,14 @@ class foliumExporter:
         
         # Process life events for each line
         for line in lines:
-            if self.gOp.step():
+            if self.svc_progress.step():
                 break
                 
             if not (getattr(line, 'style', None) == 'Life'):
                 continue
 
             person = line.person    
-            self.gOp.Referenced.add(person.xref_id, 'heat')
+            self.svc_state.Referenced.add(person.xref_id, 'heat')
             minyear, maxyear = self._process_timeline_data(line, mycluster)
             self._build_yearly_positions(line, minyear, maxyear, mycluster)
             
@@ -283,7 +288,7 @@ class foliumExporter:
         """Create a static heatmap visualization"""
         # Mark all locations
         for line in lines:
-            self.gOp.step()
+            self.svc_progress.step()
             mycluster.mark(line.fromlocation)
             mycluster.mark(line.tolocation)
             if line.midpoints:
@@ -294,7 +299,7 @@ class foliumExporter:
         # Create feature group and heat data
         fg = folium.FeatureGroup(
             name=lgd_txt.format(txt= 'Heatmap', col='black'),
-            show=self.gOp.HeatMap
+            show=self.svc_config.get('HeatMap')
         )
         
         heat_data = [
@@ -317,12 +322,12 @@ class foliumExporter:
         Export genealogical data to an interactive Folium map.
         Partitioned for clarity and maintainability.
         """
-        if not self.gOp.people:
+        people = self.svc_state.people
+        if not people:
             _log.warning("No people to plot on map.")
             return
 
-        people = self.gOp.people
-        main_person = self.gOp.mainPerson if self.gOp.mainPerson else None
+        main_person = self.svc_state.mainPerson if self.svc_state.mainPerson else None
         main_person_latlon = getattr(main_person, 'latlon', None) if main_person else None
 
         if not self.fm:
@@ -330,17 +335,17 @@ class foliumExporter:
             if not saveresult:
                 return
 
-        SortByLast = (self.gOp.GroupBy == 1 or self.gOp.GroupBy == 2)
-        SortByPerson = (self.gOp.GroupBy == 3)
+        SortByLast = (self.svc_config.get('GroupBy') == 1 or self.svc_config.get('GroupBy') == 2)
+        SortByPerson = (self.svc_config.get('GroupBy') == 3)
         fm = self.fm
         self.saveresult = saveresult
 
-        self.gOp.step("Preparing")
+        self.svc_progress.step("Preparing")
         self.fglastname = dict()
 
         flr = folium.FeatureGroup(name=lgd_txt.format(txt='Relations', col='green'), show=False)
         flp = folium.FeatureGroup(name=lgd_txt.format(txt='People', col='Black'), show=False)
-        mycluster = MyMarkClusters(fm, self.gOp.HeatMapTimeStep)
+        mycluster = MyMarkClusters(fm, self.svc_config.get('HeatMapTimeStep'))
 
         self._add_heatmap(lines, mycluster, fm)
         self._add_fontawesome_hack(fm)
@@ -356,11 +361,11 @@ class foliumExporter:
 
     def _init_map(self, main_person_latlon, lines, saveresult):
         try:
-            tile = xyz.query_name(self.gOp.MapStyle)
+            tile = xyz.query_name(self.svc_config.get('MapStyle'))
         except Exception:
             tile = xyz.CartoDB
 
-        main_person = self.gOp.mainPerson if self.gOp.mainPerson else None
+        main_person = self.svc_state.mainPerson if self.svc_state.mainPerson else None
         birth_event = main_person.get_event('birth') if main_person else None
         death_event = main_person.get_event('death') if main_person else None
         birth_latlon = birth_event.getattr('latlon') if birth_event else None
@@ -370,19 +375,19 @@ class foliumExporter:
             self.fm = folium.Map(location=[0, 0], zoom_start=4, tiles=tile)
         else:
             self.fm = folium.Map(location=main_person_latlon, zoom_start=4, tiles=tile)
-        if self.gOp.mapMini:
+        if self.svc_config.get('mapMini'):
             folium.plugins.MiniMap(toggle_display=True).add_to(self.fm)
 
         random.seed()
-        self.gOp.Referenced = Referenced()
+        self.svc_state.Referenced = Referenced()
         _log.debug("Building Referenced - quick only: %s", not saveresult)
         for line in lines:
             if getattr(line, 'style', None) == 'Life':
-                self.gOp.Referenced.add(line.person.xref_id, 'quick')
-        self.gOp.lastlines = {line.person.xref_id: line for line in lines}
+                self.svc_state.Referenced.add(line.person.xref_id, 'quick')
+        self.svc_state.lastlines = {line.person.xref_id: line for line in lines}
 
     def _add_heatmap(self, lines, mycluster, fm):
-        if self.gOp.MapTimeLine:
+        if self.svc_config.get('MapTimeLine'):
             self._create_timeline_heatmap(lines, mycluster, fm)
         else:
             self._create_static_heatmap(lines, mycluster, fm)
@@ -397,7 +402,7 @@ class foliumExporter:
 
     def _draw_lines(self, lines, SortByLast, SortByPerson, fm):
         i = 0
-        self.gOp.step("Building lines")
+        self.svc_progress.step("Building lines")
         lines_sorted = lines if SortByLast else sorted(
             lines,
             key=lambda x: x.prof * ((x.branch/DELTA)+1) + x.prof
@@ -408,7 +413,7 @@ class foliumExporter:
                      f"{line.branch:.8f} {line.prof:2} "
                      f"{line.parentofperson.name if line.parentofperson else '':20} from {line.name:20}")
         for line in styled_lines:
-            self.gOp.step()
+            self.svc_progress.step()
             i += 1
             self._draw_single_line(line, SortByLast, SortByPerson, fm)
 
@@ -494,7 +499,7 @@ class foliumExporter:
         """
         if line.fromlocation and line.fromlocation.hasLocation():
             start_point = [Drift(line.fromlocation.lat), Drift(line.fromlocation.lon)]
-            if self.gOp.MarksOn and self.gOp.BornMark:
+            if self.svc_config.get('MarksOn') and self.svc_config.get('BornMark'):
                 self._add_point_marker(
                     fg, start_point, marker_options,
                     f"Life of {line.name}".replace("`", "‛").replace("'", "‛"),
@@ -522,7 +527,7 @@ class foliumExporter:
         """
         if line.tolocation and line.tolocation.hasLocation():
             end_point = [Drift(line.tolocation.lat), Drift(line.tolocation.lon)]
-            if self.gOp.MarksOn and self.gOp.DieMark:
+            if self.svc_config.get('MarksOn') and self.svc_config.get('DieMark'):
                 self._add_point_marker(
                     fg, end_point, marker_options,
                     f"Life of {line.name}".replace("`", "‛").replace("'", "‛"),
@@ -559,7 +564,7 @@ class foliumExporter:
             for mids in line.midpoints:
                 mid_point = [Drift(mids.location.latlon.lat), Drift(mids.location.latlon.lon)]
                 fm_line.append(tuple(mid_point))
-                if self.gOp.HomeMarker and self.gOp.MarksOn:
+                if self.svc_config.get('HomeMarker') and self.svc_config.get('MarksOn'):
                     point_type = mids.what if mids.what in MidPointMarker else "Other"
                     marker = MidPointMarker[point_type][0]
                     color = MidPointMarker[point_type][1]
@@ -571,7 +576,7 @@ class foliumExporter:
 
     # Polyline utility now in polyline_utils.py
     def _add_polyline(self, line, fg, fm_line, marker_options, popup_content):
-        add_polyline(line, fg, fm_line, marker_options, popup_content, self.max_line_weight, self.gOp.UseAntPath, self.gOp)
+        add_polyline(line, fg, fm_line, marker_options, popup_content, self.max_line_weight, self.svc_config.get('UseAntPath'), self.svc_config)
 
     def _finalize_feature_group(
         self,
@@ -600,7 +605,7 @@ class foliumExporter:
             fm.add_child(self.fglastname[fgn][0])
 
     def _add_marker_cluster(self, fm):
-        sc = False if self.gOp.showLayerControl else True
+        sc = False if self.svc_config.get('showLayerControl') else True
         if self.locations:
             marker_cluster = MarkerCluster(
                 locations=self.locations,
@@ -630,7 +635,7 @@ class foliumExporter:
             _log.warning("No GPS locations to generate a Star on the map.")
 
     def _add_legend(self, fm):
-        if self.gOp.MarksOn:
+        if self.svc_config.get('MarksOn'):
             fm.add_child(Legend())
 
 

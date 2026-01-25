@@ -190,7 +190,12 @@ class GedRecordDialog(wx.Frame):
 
     @classmethod
     def show_gedpy_record_dialog(
-        cls, parent: Optional[wx.Window], xref_id: str, gOp: Any, title: Optional[str] = None
+        cls,
+        parent: Optional[wx.Window],
+        xref_id: str,
+        title: Optional[str] = None,
+        *,
+        svc_config: Any = None,
     ) -> "GedRecordDialog":
         """
         Instantiate and show the GedRecordDialog for a given GEDCOM record.
@@ -198,13 +203,28 @@ class GedRecordDialog(wx.Frame):
         Args:
             parent (wx.Window or None): The parent window.
             xref_id (str): The GEDCOM xref_id to display.
-            gOp (Any): Options object with GEDCOMinput attribute.
             title (str, optional): The window title.
+            svc_config (Any, optional): Configuration service (IConfig).
+                Used to obtain the GEDCOM input path.
 
         Returns:
             GedRecordDialog: The dialog instance.
         """
-        input_path = Path(gOp.GEDCOMinput)
+        # Determine GEDCOM input path from service config
+        input_value = None
+        if svc_config is not None:
+            try:
+                input_value = getattr(svc_config, 'gedcom_input', None) or (
+                    svc_config.get('GEDCOMinput') if hasattr(svc_config, 'get') else None
+                )
+            except Exception:
+                input_value = None
+
+        if not input_value:
+            _log.error("Cannot determine GEDCOM input path from svc_config")
+            input_value = ''
+
+        input_path = Path(input_value)
         if not input_path.is_absolute():
             input_path = (Path.cwd() / input_path).resolve()
         input_file = str(input_path)

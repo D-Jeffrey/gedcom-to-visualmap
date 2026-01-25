@@ -1,3 +1,11 @@
+class MockFileOpenCommands:
+    def __init__(self):
+        self.commands = {}
+    def add_command(self, file_type, command):
+        self.commands[file_type.upper()] = command
+    def get_command_for_file_type(self, file_type):
+        return self.commands.get(file_type.upper(), '')
+
 """
 Unit tests for file_operations module.
 
@@ -13,37 +21,31 @@ from pathlib import Path
 from gui.actions.file_operations import FileOpener
 
 
-class MockFileOpenCommands:
-    """Mock for FileOpenCommandLines configuration."""
-    
+
+class DummyConfig:
     def __init__(self):
         self.commands = {}
-    
-    def get_command_for_file_type(self, file_type: str) -> str:
+    def get_file_command(self, file_type):
         return self.commands.get(file_type.upper(), '')
-    
-    def add_command(self, file_type: str, command: str):
+    def add_command(self, file_type, command):
         self.commands[file_type.upper()] = command
-
 
 @pytest.fixture
 def file_opener():
-    """Create FileOpener with mock configuration."""
-    commands = MockFileOpenCommands()
-    commands.add_command('HTML', 'webbrowser $n')
-    commands.add_command('CSV', 'excel $n')
-    commands.add_command('KML', '$n')
-    commands.add_command('DEFAULT', '$n')
-    return FileOpener(commands)
+    config = DummyConfig()
+    config.add_command('HTML', 'webbrowser $n')
+    config.add_command('CSV', 'excel $n')
+    config.add_command('KML', '$n')
+    config.add_command('DEFAULT', '$n')
+    return FileOpener(config)
 
 
 class TestFileOpenerInit:
     """Tests for FileOpener initialization."""
-    
-    def test_init_stores_commands(self):
-        commands = MockFileOpenCommands()
-        opener = FileOpener(commands)
-        assert opener.file_open_commands is commands
+    def test_init_stores_config(self):
+        config = DummyConfig()
+        opener = FileOpener(config)
+        assert opener.config_service is config
 
 
 class TestOpenFile:
@@ -71,15 +73,19 @@ class TestOpenFile:
     
     @patch.object(FileOpener, 'run_command')
     def test_open_file_no_command_html_fallback(self, mock_run):
-        commands = MockFileOpenCommands()
-        opener = FileOpener(commands)
+        class Dummy:
+            def get_file_command(self, file_type):
+                return ''
+        opener = FileOpener(Dummy())
         opener.open_file('html', '/path/to/file.html')
         mock_run.assert_called_once_with('$n', '/path/to/file.html', True)
-    
+
     @patch.object(FileOpener, 'run_command')
     def test_open_file_no_command_non_html_logs_error(self, mock_run, caplog):
-        commands = MockFileOpenCommands()
-        opener = FileOpener(commands)
+        class Dummy:
+            def get_file_command(self, file_type):
+                return ''
+        opener = FileOpener(Dummy())
         opener.open_file('unknown', '/path/to/file.txt')
         assert 'No command configured for file type: unknown' in caplog.text
         mock_run.assert_not_called()
@@ -172,16 +178,23 @@ class TestOpenWithDefaultHandler:
     
     @patch('gui.actions.file_operations.platform.system', return_value='Darwin')
     @patch.object(FileOpener, '_open_with_platform_default')
-    def test_default_handler_macos_no_custom(self, mock_platform_default, mock_platform, file_opener):
-        file_opener._open_with_default_handler('/path/to/file.pdf')
+    def test_default_handler_macos_no_custom(self, mock_platform_default, mock_platform):
+        class Dummy:
+            def get_file_command(self, file_type):
+                return ''
+        opener = FileOpener(Dummy())
+        opener._open_with_default_handler('/path/to/file.pdf')
         mock_platform_default.assert_called_once_with('/path/to/file.pdf')
-    
+
     @patch('gui.actions.file_operations.platform.system', return_value='Linux')
     @patch.object(FileOpener, '_open_with_custom_command')
     def test_default_handler_linux_with_custom(self, mock_custom, mock_platform):
-        commands = MockFileOpenCommands()
-        commands.add_command('DEFAULT', 'xdg-open "$n"')
-        opener = FileOpener(commands)
+        class Dummy:
+            def get_file_command(self, file_type):
+                if file_type.lower() == 'default':
+                    return 'xdg-open "$n"'
+                return ''
+        opener = FileOpener(Dummy())
         opener._open_with_default_handler('/path/to/file.pdf')
         mock_custom.assert_called_once_with('xdg-open "$n"', '/path/to/file.pdf')
     

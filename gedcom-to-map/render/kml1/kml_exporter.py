@@ -10,10 +10,9 @@ import simplekml
 from models.line import Line
 from geo_gedcom.lat_lon import LatLon
 from render.referenced import Referenced
+from services import IConfig, IState, IProgressTracker
 
 from typing import TYPE_CHECKING
-if TYPE_CHECKING:
-    from gedcom_options import gvOptions
 
 _log = logging.getLogger(__name__.lower())
 
@@ -22,17 +21,21 @@ class KmlExporter:
     Exports genealogical data to KML format for visualization in Google Earth (legacy version).
 
     Args:
-        gOp (gvOptions): Options and configuration for KML export.
+        svc_config: Configuration service
+        svc_state: Runtime state service
+        svc_progress: Progress tracking service
     """
-    def __init__(self, gOp: "gvOptions") -> None:
-        self.file_name = os.path.join(gOp.resultpath, gOp.ResultFile)
-        self.max_line_weight = gOp.MaxLineWeight
+    def __init__(self, svc_config: IConfig, svc_state: IState, svc_progress: IProgressTracker) -> None:
+        self.svc_config = svc_config
+        self.svc_state = svc_state
+        self.svc_progress = svc_progress
+        self.file_name = os.path.join(svc_config.get('resultpath'), svc_config.get('ResultFile'))
+        self.max_line_weight = svc_config.get('MaxLineWeight')
         self.kml = None
-        self.gOp = gOp
-        self.gOp.Referenced = Referenced()
+        self.svc_state.Referenced = Referenced()
         random.seed()
         self.driftOn = False
-        self.gOp.totalpeople = 0
+        self.svc_state.totalpeople = 0
         self.styleA = None
         self.styleB = None
         self.styles = []
@@ -57,15 +60,15 @@ class KmlExporter:
         """
         alist = []
         glist = []
-        self.gOp.step("Finalizing KML")
+        self.svc_progress.step("Finalizing KML")
         # Fix up the links in the placemark
         for placemark in self.kml.features:
             if getattr(placemark, 'description', None) :
                 pattern = r'href=(#.*?);'
                 for match in re.finditer(pattern, placemark.description):
                     tag = match.group(1)
-                    if self.gOp.Referenced.exists(tag):
-                        replacewith = 1 + int(self.gOp.Referenced.gettag(tag))
+                    if self.svc_state.Referenced.exists(tag):
+                        replacewith = 1 + int(self.svc_state.Referenced.gettag(tag))
                         original = f"href={tag};"
                         replacement = f"href=#{replacewith};"
                         placemark.description = placemark.description.replace(original, replacement)
@@ -80,10 +83,9 @@ class KmlExporter:
 
 
         
-        self.gOp.step("Saving KML")
+        self.svc_progress.step("Saving KML")
         logging.info("Saved as %s", self.file_name)
         self.kml.save(self.file_name)
-        # self.gOp.stop()
         # self.kml = None
 
     def export(self, main: LatLon, lines: list[Line], ntag: str = "", mark: str = "native") -> None:
@@ -96,7 +98,7 @@ class KmlExporter:
             ntag (str, optional): Tag to append to names. Defaults to "".
             mark (str, optional): Marker type. Defaults to "native".
         """
-        foldermode = self.gOp.KMLsort == 1
+        foldermode = self.svc_config.get('KMLsort') == 1
         marktype = self._get_mark_type(mark)
         colorA, colorB = "ylw", "ltblu"
 
@@ -107,10 +109,10 @@ class KmlExporter:
         if not lines or len(lines) == 0:
             _log.error(f"No GPS locations to generate any person for {ntag}.")
 
-        self.gOp.step("Generating KML")
+        self.svc_progress.step("Generating KML")
         sorted_lines = sorted(lines, key=lambda x: x.prof)
         for line in sorted_lines:
-            self.gOp.step()
+            self.svc_progress.step()
             self._process_line(line, ntag, mark, foldermode, kml, styleA, styleB)
 
     def _get_mark_type(self, mark: str) -> str:
@@ -146,15 +148,15 @@ class KmlExporter:
         else:
             import simplekml
             kml = simplekml.Kml()
-            inputfile = os.path.basename(self.gOp.GEDCOMinput) if self.gOp.GEDCOMinput else "Unknown"
-            descript = f"Family tree generated for using {inputfile}<br>{self.gOp.Name} ({self.gOp.Main}) as starting person"
-            descript += f"<br>Marker types are {'Birth' if self.gOp.BornMark else ''} {'Death' if self.gOp.DieMark else ''}"
+            inputfile = os.path.basename(self.svc_config.get('GEDCOMinput')) if self.svc_config.get('GEDCOMinput') else "Unknown"
+            descript = f"Family tree generated for using {inputfile}<br>{self.svc_config.get('Name')} ({self.svc_config.get('Main')}) as starting person"
+            descript += f"<br>Marker types are {'Birth' if self.svc_config.get('BornMark') else ''} {'Death' if self.svc_config.get('DieMark') else ''}"
             kmloptions = []
-            if self.gOp.MapTimeLine:
+            if self.svc_config.get('MapTimeLine'):
                 kmloptions.append("Timeline enabled.")
-            if self.gOp.UseBalloonFlyto:
+            if self.svc_config.get('UseBalloonFlyto'):
                 kmloptions.append("Balloon Flyto enabled.")
-            if self.gOp.AllEntities:
+            if self.svc_config.get('AllEntities'):
                 kmloptions.append("All people are included.")
             if kmloptions:
                 descript += "<br>" + " ".join(kmloptions)
@@ -190,7 +192,7 @@ class KmlExporter:
             self._add_life_line(line, desend, event, linage, familyLinage, foldermode, kml)
         else:
             self._log_skipped_line(line)
-        self.gOp.totalpeople += 1
+        self.svc_state.totalpeople += 1
         if line.midpoints:
             self._add_midpoints(line, name, foldermode, kml, styleA)
 
@@ -199,18 +201,19 @@ class KmlExporter:
         Format HTML links for a person's parents.
         """
         linage = ""
+        people = self.svc_state.people
         if line.person.father:
-            if self.gOp.UseBalloonFlyto:
+            if self.svc_config.get('UseBalloonFlyto'):
                 linage += '<br>Father: <a href=#{};balloonFlyto>{}</a></br>'.format(
-                    line.person.father[1:-1], self.gOp.people[line.person.father].name)
+                    line.person.father[1:-1], people[line.person.father].name)
             else:
-                linage += '<br>Father: {}</br>'.format(self.gOp.people[line.person.father].name)
+                linage += '<br>Father: {}</br>'.format(people[line.person.father].name)
         if line.person.mother:
-            if self.gOp.UseBalloonFlyto:
+            if self.svc_config.get('UseBalloonFlyto'):
                 linage += '<br>Mother: <a href=#{};balloonFlyto>{}</a></br>'.format(
-                    line.person.mother[1:-1], self.gOp.people[line.person.mother].name)
+                    line.person.mother[1:-1], people[line.person.mother].name)
             else:
-                linage += '<br>Mother: {}</br>'.format(self.gOp.people[line.person.mother].name)
+                linage += '<br>Mother: {}</br>'.format(people[line.person.mother].name)
         return linage
 
     def _format_children_links(self, line: Line, foldermode: bool) -> str:
@@ -220,14 +223,15 @@ class KmlExporter:
         children = line.person.children
         if not children:
             return ""
-        if self.gOp.UseBalloonFlyto:
+        people = self.svc_state.people
+        if self.svc_config.get('UseBalloonFlyto'):
             family_links = [
-                f'<a href=#{child[1:-1]};balloonFlyto>{self.gOp.people[child].name}</a>'
+                f'<a href=#{child[1:-1]};balloonFlyto>{people[child].name}</a>'
                 for child in children
             ]
             return '<br>Children: {}</br>'.format(", ".join(family_links))
         else:
-            family_names = [self.gOp.people[child].name for child in children]
+            family_names = [people[child].name for child in children]
             return '<br>Children: {}</br>'.format(", ".join(family_names))
 
     def _format_event(self, line: Line) -> str:
@@ -256,9 +260,9 @@ class KmlExporter:
             coords=[self.driftLatLon(line.fromlocation)],
             description="<![CDATA[ " + event + linage + familyLinage + " ]]>"
         )
-        self.gOp.Referenced.add(line.person.xref_id, 'kml-a', tag=pnt.id)
-        self.gOp.Referenced.add("#" + line.person.xref_id[1:-1], tag=pnt.id)
-        if self.gOp.MapTimeLine and getattr(line, 'whenFrom', None) and line.whenFrom:
+        self.svc_state.Referenced.add(line.person.xref_id, 'kml-a', tag=pnt.id)
+        self.svc_state.Referenced.add("#" + line.person.xref_id[1:-1], tag=pnt.id)
+        if self.svc_config.get('MapTimeLine') and getattr(line, 'whenFrom', None) and line.whenFrom:
             pnt.timestamp.when = line.whenFrom
         pnt.style = simplekml.Style()
         pnt.style.labelstyle.scale = styleA.labelstyle.scale
@@ -274,9 +278,9 @@ class KmlExporter:
             coords=[self.driftLatLon(line.tolocation)],
             description="<![CDATA[ " + event + linage + familyLinage + " ]]>"
         )
-        self.gOp.Referenced.add(line.person.xref_id, 'kml-b')
-        self.gOp.Referenced.add("#" + line.person.xref_id[1:-1], tag=pnt.id)
-        if self.gOp.MapTimeLine and getattr(line, 'whenTo', None) and line.whenTo:
+        self.svc_state.Referenced.add(line.person.xref_id, 'kml-b')
+        self.svc_state.Referenced.add("#" + line.person.xref_id[1:-1], tag=pnt.id)
+        if self.svc_config.get('MapTimeLine') and getattr(line, 'whenTo', None) and line.whenTo:
             pnt.timestamp.when = line.whenTo
         pnt.style = simplekml.Style()
         pnt.style.labelstyle.scale = styleB.labelstyle.scale
@@ -302,7 +306,7 @@ class KmlExporter:
         kml_line.tessellate = 1
         import simplekml
         kml_line.altitudemode = simplekml.AltitudeMode.clamptoground
-        if self.gOp.MapTimeLine:
+        if self.svc_config.get('MapTimeLine'):
             if timeA and timeB:
                 kml_line.timespan.begin = timeA
                 kml_line.timespan.end = timeB
@@ -341,7 +345,7 @@ class KmlExporter:
                 pnt.style = simplekml.Style()
                 pnt.style.labelstyle.scale = 0.7 * styleA.labelstyle.scale
                 date_single = getattr(event_date, 'single', None)
-                if date_single and self.gOp.MapTimeLine:
+                if date_single and self.svc_config.get('MapTimeLine'):
                     pnt.timestamp.when = date_single.isoformat() if date_single else None
                 _log.info(f"    midpt   {line.name} ({event_latlon.lon}, {event_latlon.lat})")
             else:

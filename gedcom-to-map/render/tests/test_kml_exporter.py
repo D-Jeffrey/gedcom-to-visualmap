@@ -9,36 +9,59 @@ class DummyReferenced:
     def exists(self, *args, **kwargs): return False
     def gettag(self, *args, **kwargs): return 0
 
-class DummyGOp:
+
+# DummyConfig implements IConfig
+class DummyConfig:
     def __init__(self, resultpath, resultfile):
-        self.resultpath = resultpath
-        self.ResultFile = resultfile
-        self.MaxLineWeight = 5
-        self.KMLsort = 0
-        self.GEDCOMinput = None
-        self.Name = "Test"
-        self.Main = "Main"
-        self.BornMark = False
-        self.DieMark = False
-        self.MapTimeLine = False
-        self.UseBalloonFlyto = False
-        self.AllEntities = False
-        self.UseBalloonFlyto = False
-        self.people = {}
+        self._config = {
+            'resultpath': str(resultpath),
+            'ResultFile': str(resultfile),
+            'MaxLineWeight': 5,
+            'KMLsort': 0,
+            'GEDCOMinput': None,
+            'Name': "Test",
+            'Main': "Main",
+            'BornMark': False,
+            'DieMark': False,
+            'MapTimeLine': False,
+            'UseBalloonFlyto': False,
+            'AllEntities': False,
+        }
+    def get(self, key, default=None):
+        return self._config.get(key, default)
+    def has(self, key):
+        return key in self._config
+    def get_file_command(self, file_type):
+        return None
+    @property
+    def gedcom_input(self):
+        return ''
+
+# DummyState implements IState
+class DummyState:
+    def __init__(self):
         self.Referenced = DummyReferenced()
+        self.people = {}
         self.totalpeople = 0
-        self.step = lambda *args, **kwargs: None
+
+# DummyProgress implements IProgressTracker
+class DummyProgress:
+    def step(self, *a, **k): return None
 
 def test_kml_exporter_init(tmp_path):
-    gOp = DummyGOp(str(tmp_path), "test.kml")
-    exporter = KmlExporter(gOp)
+    config = DummyConfig(tmp_path, "test.kml")
+    state = DummyState()
+    progress = DummyProgress()
+    exporter = KmlExporter(config, state, progress)
     assert exporter.file_name == os.path.join(str(tmp_path), "test.kml")
     assert exporter.max_line_weight == 5
-    assert exporter.gOp is gOp
+    assert exporter.svc_config is config
 
 def test_kml_exporter_drift_latlon():
-    gOp = DummyGOp("/tmp", "test.kml")
-    exporter = KmlExporter(gOp)
+    config = DummyConfig("/tmp", "test.kml")
+    state = DummyState()
+    progress = DummyProgress()
+    exporter = KmlExporter(config, state, progress)
     latlon = LatLon(10.0, 20.0)
     # driftOn is False, should return original
     assert exporter.driftLatLon(latlon) == (20.0, 10.0)
@@ -48,8 +71,10 @@ def test_kml_exporter_drift_latlon():
     assert abs(lat - 10.0) < 0.01
 
 def test_kml_exporter_done(tmp_path):
-    gOp = DummyGOp(str(tmp_path), "test_done.kml")
-    exporter = KmlExporter(gOp)
+    config = DummyConfig(tmp_path, "test_done.kml")
+    state = DummyState()
+    progress = DummyProgress()
+    exporter = KmlExporter(config, state, progress)
     # Minimal fake kml object with features
     class FakeKml:
         def __init__(self):
@@ -60,7 +85,9 @@ def test_kml_exporter_done(tmp_path):
     # Should not raise
 
 def test_kml_exporter_export_empty(tmp_path):
-    gOp = DummyGOp(str(tmp_path), "test_export.kml")
-    exporter = KmlExporter(gOp)
+    config = DummyConfig(tmp_path, "test_export.kml")
+    state = DummyState()
+    progress = DummyProgress()
+    exporter = KmlExporter(config, state, progress)
     # Should log errors but not raise
     exporter.export(main=None, lines=[], ntag="", mark="native")

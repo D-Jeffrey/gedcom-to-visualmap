@@ -3,7 +3,7 @@ from geo_gedcom.app_hooks import AppHooks
 from geo_gedcom.gedcom_date import GedcomDate
 
 if TYPE_CHECKING:
-    from services import IProgressTracker, IState
+    from services.interfaces import IProgressTracker, IState
 
 class GuiHooks(AppHooks, Protocol):
     """Implements AppHooks using services architecture (IProgressTracker, IState)."""
@@ -18,18 +18,27 @@ class GuiHooks(AppHooks, Protocol):
         self.svc_progress = svc_progress
         self.svc_state = svc_state
 
-    def report_step(self, state: str = None, info: str = None, target: int = -1, reset_counter: bool = False, plus_step: int = 1, set_counter: int = None) -> None:
-        """Report progress step using IProgressTracker service."""
+    def report_step(self, info: str = None, target: int = None, reset_counter: bool = False, plus_step: int = 1, set_counter: int = None) -> None:
+        """Report progress step using IProgressTracker service.
+        
+        Args:
+            info: Progress message/description (used as state in progress_service).
+            target: Target count for progress tracking.
+            reset_counter: Whether to reset the counter.
+            plus_step: Incremental step count.
+            set_counter: Directly set the counter value.
+        """
         if self.svc_progress and callable(getattr(self.svc_progress, 'step', None)):
             if set_counter is not None:
-                self.svc_progress.stepCounter(set_counter)
+                self.svc_progress.counter = set_counter
             else:
-                self.svc_progress.step(state=state, info=info, target=target, resetCounter=reset_counter, plusStep=plus_step)
+                # info from gedcom_parser is the step description, so use it as state
+                self.svc_progress.step(state=info, target=target, resetCounter=reset_counter, plusStep=plus_step)
                 
     def stop_requested(self) -> bool:
         """Check if stop was requested using IProgressTracker service."""
-        if self.svc_progress and callable(getattr(self.svc_progress, 'ShouldStop', None)):
-            return self.svc_progress.ShouldStop()
+        if self.svc_progress and callable(getattr(self.svc_progress, 'should_stop', None)):
+            return self.svc_progress.should_stop()
         return False
     
     def update_key_value(self, key: str, value) -> None:

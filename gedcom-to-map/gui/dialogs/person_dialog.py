@@ -1,6 +1,7 @@
 import logging
 from io import BytesIO
 from pathlib import Path
+from typing import Optional
 
 import requests
 import wx
@@ -39,36 +40,36 @@ class PersonDialog(wx.Dialog):
         parent: wx.Window,
         person: Person,
         panel: wx.Panel,
-        font_manager: FontManager,
+        font_manager: 'FontManager',
         *,
-        svc_config=None,
-        svc_state=None,
-        svc_progress=None,
+        svc_config: Optional['IConfig'] = None,
+        svc_state: Optional['IState'] = None,
+        svc_progress: Optional['IProgressTracker'] = None,
         showreferences: bool = True,
-    ):
+    ) -> None:
         """Initialize the PersonDialog.
         
         Args:
             parent: Parent wxPython window.
             person: Person object to display details for.
-            panel: Parent panel (for context/actions).
+            panel: Parent panel reference for context and actions.
             font_manager: FontManager instance for font configuration.
-            svc_config: Configuration service (optional; defaults to panel.svc_config).
-            svc_state: Runtime state service (optional; defaults to panel.svc_state).
-            svc_progress: Progress tracking service (optional; defaults to panel.svc_progress).
-            showreferences: Whether to show lineage information.
+            svc_config: Configuration service (IConfig). Defaults to panel.svc_config if not provided.
+            svc_state: Runtime state service (IState). Defaults to panel.svc_state if not provided.
+            svc_progress: Progress tracker service (IProgressTracker). Defaults to panel.svc_progress if not provided.
+            showreferences: Whether to display lineage and reference information.
         """
         super().__init__(parent, title="Person Details", size=(600, 600), style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER)
         
         # Prefer provided services; else pick from panel if available
-        self.svc_config = svc_config if svc_config is not None else getattr(panel, 'svc_config', None)
-        self.svc_state = svc_state if svc_state is not None else getattr(panel, 'svc_state', None)
-        self.svc_progress = svc_progress if svc_progress is not None else getattr(panel, 'svc_progress', None)
-        self.font_manager = font_manager
-        self.person = person
-        self.panel = panel
-        self.showreferences = showreferences
-        self.font_size = getattr(font_manager, "size", 12) if font_manager else 12
+        self.svc_config: Optional['IConfig'] = svc_config if svc_config is not None else getattr(panel, 'svc_config', None)
+        self.svc_state: Optional['IState'] = svc_state if svc_state is not None else getattr(panel, 'svc_state', None)
+        self.svc_progress: Optional['IProgressTracker'] = svc_progress if svc_progress is not None else getattr(panel, 'svc_progress', None)
+        self.font_manager: 'FontManager' = font_manager
+        self.person: Person = person
+        self.panel: wx.Panel = panel
+        self.showreferences: bool = showreferences
+        self.font_size: int = getattr(font_manager, "size", 12) if font_manager else 12
         # Prefer service-backed people, then panel.background_process
         ppl = getattr(self.svc_state, 'people', None) if self.svc_state is not None else None
         if ppl is None and panel is not None:
@@ -474,19 +475,29 @@ class PersonDialog(wx.Dialog):
                 except Exception:
                     infile = None
                 if infile is not None:
-                    dDir =  Path(infile).parent
+                    dDir = Path(infile).parent
                 else:
                     dDir = Path.cwd()
-                image_content = Path(photourl) if Path(photourl).is_absolute() else dDir / photourl
+                # Normalize photourl to handle Windows paths in GEDCOM files on Unix systems
+                normalized_photourl = photourl.replace('\\', '/')
+                image_content = Path(normalized_photourl) if Path(normalized_photourl).is_absolute() else dDir / normalized_photourl
             if image_content:
                 try:
+                    # Check if file exists before trying to load (for Path objects)
+                    if isinstance(image_content, Path):
+                        if not image_content.exists():
+                            _log.warning(f"Photo file not found for {photourl}:\n      File: {image_content}")
+                            image = None
+                            image_content = None
+                    
                     # Handle both BytesIO (HTTP) and Path (local file)
-                    if isinstance(image_content, BytesIO):
-                        image = wx.Image(image_content, wx.BITMAP_TYPE_ANY)
-                    else:
-                        image = wx.Image(str(image_content), wx.BITMAP_TYPE_ANY)
+                    if image_content:
+                        if isinstance(image_content, BytesIO):
+                            image = wx.Image(image_content, wx.BITMAP_TYPE_ANY)
+                        else:
+                            image = wx.Image(str(image_content), wx.BITMAP_TYPE_ANY)
                 except Exception as e:
-                    _log.error(f"Error reading photo {photourl}:\n      {e}")
+                    _log.error(f"Error reading photo from {image_content}:\n      {e}")
                     image = None
             if image:
                 maxPhotoWidth = 400

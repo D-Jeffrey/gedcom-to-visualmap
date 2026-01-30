@@ -22,6 +22,16 @@ Originally forked from [https://github.com/lmallez/gedcom-to-map], now in collab
 
 ---
 
+## Recent Improvements
+
+- ✅ **Progress Reporting**: GEDCOM parsing now properly displays progress metrics (counter, target, ETA) in the GUI
+- ✅ **HTML Generation**: Fixed issue where HTML output files weren't being saved during batch processing
+- ✅ **Output File Paths**: Corrected file path construction for all output types (HTML, KML, KML2, SUM)
+- ✅ **Image Handling**: Fixed cross-platform image loading to handle Windows paths in GEDCOM files
+- ✅ **Architecture**: Removed legacy `gedcom_options.py` dependency; all code now uses services-based architecture
+
+---
+
 ## Who Should Try This
 
 - Genealogy hobbyists wanting spatial context for life events.

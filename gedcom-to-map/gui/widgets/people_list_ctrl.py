@@ -1,5 +1,6 @@
 import logging
 import re
+from typing import Optional
 import wx
 import wx.lib.mixins.listctrl as listmix
 
@@ -10,13 +11,16 @@ from ..layout.font_manager import FontManager
 _log = logging.getLogger(__name__.lower())
 
 class PeopleListData:
-    def __init__(self):
-        self.name = ""
-        self.year_description = ""
-        self.id = ""
-        self.geocode = ""
-        self.address = ""
-        self.year_value = 0
+    """Data container for a person entry in the people list."""
+    
+    def __init__(self) -> None:
+        """Initialize empty PeopleListData."""
+        self.name: str = ""
+        self.year_description: str = ""
+        self.id: str = ""
+        self.geocode: str = ""
+        self.address: str = ""
+        self.year_value: int = 0
         
     @classmethod
     def from_dict(cls, data: dict):
@@ -30,13 +34,35 @@ class PeopleListData:
         return instance
         
 class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSorterMixin):
-    def __init__(self, parent, ID, pos=wx.DefaultPosition,
-                 size=wx.DefaultSize, style=0, name="PeopleList",
-                 font_manager=None, *args, **kw):
+    def __init__(
+        self,
+        parent: wx.Window,
+        ID: int,
+        pos: wx.Point = wx.DefaultPosition,
+        size: wx.Size = wx.DefaultSize,
+        style: int = 0,
+        name: str = "PeopleList",
+        font_manager: Optional['FontManager'] = None,
+        *args,
+        **kw
+    ) -> None:
+        """Initialize the people list control.
+        
+        Args:
+            parent: Parent wxPython window.
+            ID: Control ID.
+            pos: Position (default: wx.DefaultPosition).
+            size: Size (default: wx.DefaultSize).
+            style: wxListCtrl style flags (default: 0).
+            name: Control name (default: "PeopleList").
+            font_manager: FontManager for text styling (optional).
+            *args: Additional arguments for base class.
+            **kw: Additional keyword arguments for base class.
+        """
         wx.ListCtrl.__init__(self, parent, ID, pos, size, style)
         listmix.ListCtrlAutoWidthMixin.__init__(self)
 
-        self.font_manager = font_manager
+        self.font_manager: Optional['FontManager'] = font_manager
 
         self.id = VisualGedcomIds() if VisualGedcomIds else type("IdStub", (), {"GetColor": lambda *_a, **_k: wx.WHITE, "SmallUpArrow": None, "SmallDnArrow": None})()
         self.active = False

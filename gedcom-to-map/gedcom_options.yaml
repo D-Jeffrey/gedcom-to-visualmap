@@ -73,6 +73,7 @@ command_options:
   CSVcmdline: {type: 'str', default: '', ini_section: 'Core'}
   Tracecmdline: {type: 'str', default: '', ini_section: 'Core'}
   Defaultcmdline: {type: 'str', default: '', ini_section: 'Core'}
+  HTMLcmdline: {type: 'str', default: '', ini_section: 'Core'}
 
 # Runtime state (transient - not persisted to INI)
 runtime_state_options:

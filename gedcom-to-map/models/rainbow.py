@@ -13,22 +13,35 @@ def merge_color(color_a: Color, color_b: Color, coef):
 
 
 class Tint:
-    def __init__(self, x, y, mincolor: Color, maxcolor: Color):
-        self.min = mincolor
-        self.max = maxcolor
-        self.x = x
-        self.y = y
+    """Represents a color tint range for gradient interpolation."""
+    
+    def __init__(self, x: float, y: float, mincolor: Color, maxcolor: Color) -> None:
+        """Initialize a color tint with min and max boundaries.
+        
+        Args:
+            x: Lower boundary of this tint range.
+            y: Upper boundary of this tint range.
+            mincolor: Color at the lower boundary.
+            maxcolor: Color at the upper boundary.
+        """
+        self.min: Color = mincolor
+        self.max: Color = maxcolor
+        self.x: float = x
+        self.y: float = y
 
-    def isInside(self, x):
+    def isInside(self, x: float) -> bool:
         return self.x <= x < self.y
 
-    def getColor(self, x):
+    def getColor(self, x: float) -> Color:
         diff = (x - self.x) / (self.y - self.x)
         return merge_color(self.min, self.max, coef=diff)
 
 
 class Rainbow:
-    def __init__(self):
+    """Generates colors in rainbow spectrum order for visual distinction."""
+    
+    def __init__(self) -> None:
+        """Initialize Rainbow with predefined color spectrum and tints."""
         self.steps = [
             Color(255, 0, 127),
             Color(255, 0, 0),

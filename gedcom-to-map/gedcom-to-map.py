@@ -1,3 +1,4 @@
+from const import ResultType
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 #
 #
@@ -11,8 +12,8 @@ import logging
 import logging.config
 
 from const import LOG_CONFIG, NAME, VERSION
-from gedcom_options import gvOptions, ResultType
-from gui.visual_map_actions import Geoheatmap, gedcom_to_map
+from services.config_service import GVConfig
+from .gui.actions.visual_map_actions import Geoheatmap, gedcom_to_map
 
 _log = logging.getLogger(__name__)
 
@@ -68,7 +69,7 @@ if __name__ == '__main__':
     
     logging.basicConfig(level=logging.INFO)
     
-    myGeoOptions = gvOptions()
+    myGeoOptions = GVConfig()
     myGeoOptions.set_marker_options    ({
         'MarksOn': not arg_parse.args.marksoff,
         'HeatMap': not arg_parse.args.heatmapoff,

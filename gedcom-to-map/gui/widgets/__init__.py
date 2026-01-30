@@ -1,7 +1,8 @@
-"""
-Custom widget components.
+"""Custom widgets: Reusable wxPython UI controls and displays.
 
-Reusable UI controls and displays.
+Provides custom widget implementations:
+    - PeopleListCtrl: Advanced list control with people data and sorting
+    - GedRecordDialog: Display raw GEDCOM record details
 """
 try:
     from .people_list_ctrl import PeopleListCtrl

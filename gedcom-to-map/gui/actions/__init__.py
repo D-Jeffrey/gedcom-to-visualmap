@@ -1,7 +1,12 @@
-"""
-Action handlers and operations.
+"""Action handlers: Background processing, file operations, and user actions.
 
-Background processing, file operations, and coordinated actions.
+Provides action handlers for user interactions and background operations:
+    - VisualMapActions: Coordinates map generation, file operations, and reports
+    - BackgroundActions: Background worker thread for long-running operations
+    - Geoheatmap: Geospatial heatmap generation
+    - FileOpener: Platform-specific file opening utility
+    - DoActionsType: Enum for background operation types
+    - gedcom_to_map: Map generation orchestration
 """
 from .visual_map_actions import VisualMapActions, Geoheatmap, gedcom_to_map
 from .background_actions import BackgroundActions

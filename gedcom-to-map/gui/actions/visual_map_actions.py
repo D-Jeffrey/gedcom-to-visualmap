@@ -1,3 +1,4 @@
+from const import ResultType
 import os
 import sys
 import time
@@ -15,8 +16,9 @@ from render.kml2 import KML_Life_Lines
 from render.referenced import Referenced
 from render.summary import SummaryReportConfig, generate_summary_reports
 
-from gedcom_options import ResultType
-from services import IConfig, IState, IProgressTracker
+from services.interfaces import IConfig, IState, IProgressTracker
+from services.state_service import GVState
+from services.progress_service import GVProgress
 from .do_actions_type import DoActionsType
 from .file_operations import FileOpener
 from ..processors.gedcom_loader import GedcomLoader
@@ -60,12 +62,12 @@ class VisualMapActions:
                    (svc_config, svc_state, svc_progress) and background_process.
         """
         self.panel: Any = panel
-        self.file_opener: Optional[FileOpener] = None
+        self.file_opener: Optional['FileOpener'] = None
         
         # Initialize specialized modules
-        self.gedcom_loader: GedcomLoader = GedcomLoader(panel)
-        self.map_generator: MapGenerator = MapGenerator(panel)
-        self.report_generator: ReportGenerator = ReportGenerator(panel, actions=self)
+        self.gedcom_loader: 'GedcomLoader' = GedcomLoader(panel)
+        self.map_generator: 'MapGenerator' = MapGenerator(panel)
+        self.report_generator: 'ReportGenerator' = ReportGenerator(panel, actions=self)
         self.lineage_tracer: LineageTracer = LineageTracer(panel)
 
     def _get_file_opener(self) -> FileOpener:
@@ -100,8 +102,8 @@ class VisualMapActions:
         """
         bp = self.panel.background_process
         cfg = self.panel.svc_config
-        st = self.panel.svc_state
-        pr = self.panel.svc_progress
+        st = self.panel.svc_state or GVState()
+        pr = self.panel.svc_progress or GVProgress()
         
         if getattr(bp, "IsTriggered", lambda: False)():
             try:
@@ -257,7 +259,7 @@ class VisualMapActions:
             Requires prior call to doHTML() to populate svc_state.lastlines with path data.
         """
         bp = self.panel.background_process
-        svc_state = self.panel.svc_state
+        svc_state = self.panel.svc_state or GVState()
         svc_config = self.panel.svc_config
 
         try:

@@ -8,7 +8,14 @@ _log = logging.getLogger(__name__.lower())
 from .html_dialog import HTMLDialog
 
 class HelpDialog(HTMLDialog):
-    def __init__(self, parent, title, font_manager: FontManager):
+    def __init__(self, parent: wx.Window, title: str, font_manager: 'FontManager') -> None:
+        """Initialize the Help dialog.
+        
+        Args:
+            parent: Parent wxPython window.
+            title: Dialog title.
+            font_manager: FontManager instance for font configuration.
+        """
         helppage = """
 <h2><a href="PROJECTLINK">VERVER</a></h2>
 <p>The "GEDCOM to Visual Map" project is a powerful tool designed to read <a href="https://gedcom.io/">GEDCOM files</a> and translate the locations into GPS addresses. It produces different KML map types that show timelines and movements around the earth. The project includes both command-line and GUI interfaces (tested on Windows) to provide flexibility in usage.</p>

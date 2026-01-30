@@ -66,10 +66,10 @@ UI layout construction and event handling utilities:
 ```python
 import wx
 from gui.core import GedcomVisualGUI
-from gedcom_options import gvOptions
+from services.config_service import GVConfig
 
 app = wx.App()
-gOp = gvOptions()
+gOp = GVConfig()
 gui = GedcomVisualGUI(gOp)
 gui.start()
 app.MainLoop()
@@ -133,7 +133,7 @@ Event handling is delegated to `VisualMapEventHandler` rather than having handle
 ## Dependencies
 
 - **wxPython** - GUI framework (required for all UI components)
-- **gedcom_options** - Application configuration (gvOptions)
+- **gv_config** - Application configuration (GVConfig)
 - **geo_gedcom** - GEDCOM parsing and geographic data structures
 - **models** - Data models for visualization
 - **render** - Output generators (KML, Folium, HTML reports)

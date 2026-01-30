@@ -11,7 +11,7 @@ from typing import Optional, Dict, Any
 
 from geo_gedcom.person import Person
 from geo_gedcom.geolocated_gedcom import GeolocatedGedcom
-from services import IConfig, IState, IProgressTracker
+from services.interfaces import IConfig, IState, IProgressTracker
 from const import GLOBAL_GEO_CACHE_FILENAME, FILE_ALT_PLACE_FILENAME_SUFFIX, FILE_GEOCACHE_FILENAME_SUFFIX
 
 _log = logging.getLogger(__name__.lower())
@@ -31,15 +31,15 @@ class GedcomLoader:
         svc_state: Runtime state service for accessing lookup and people data
     """
     
-    def __init__(self, panel: Any, svc_state: Optional[IState] = None) -> None:
+    def __init__(self, panel: Any, svc_state: Optional['IState'] = None) -> None:
         """Initialize GEDCOM loader.
         
         Args:
-            panel: Parent VisualMapPanel instance for UI access
-            svc_state: Optional runtime state service (defaults to panel.svc_state)
+            panel: Parent VisualMapPanel instance for UI access.
+            svc_state: Optional runtime state service (defaults to panel.svc_state if not provided).
         """
         self.panel: Any = panel
-        self.svc_state = svc_state or getattr(panel, 'svc_state', None)
+        self.svc_state: Optional['IState'] = svc_state or getattr(panel, 'svc_state', None)
     
     def ParseAndGPS(self, svc_config: IConfig, svc_state: IState, svc_progress: IProgressTracker, stage: int = 0) -> Optional[Dict[str, Person]]:
         """Parse GEDCOM file and resolve addresses to GPS coordinates.
@@ -117,22 +117,27 @@ class GedcomLoader:
             geo_config_path: Path = svc_config.get('geo_config_file')
             defaultCountry: Optional[str] = svc_config.get('defaultCountry') or None
             
-            svc_state.lookup = GeolocatedGedcom(
-                gedcom_file=input_path.resolve(), 
-                location_cache_file=cachefile,
-                default_country=defaultCountry,
-                always_geocode=svc_config.get('UseGPS'),
-                cache_only=svc_config.get('CacheOnly'),
-                alt_place_file_path=alt_place_file_path if not svc_config.get('skip_file_alt_places') else None,
-                geo_config_path=geo_config_path,
-                app_hooks=svc_config.get('app_hooks'),
-                fuzz=True
-            )
-            _log.info("Completed Geocode")
-            svc_state.lookup.save_location_cache()
-            svc_state.people = svc_state.lookup.people
-            _log.info("Completed resolves")
-            people = svc_state.people
+            try:
+                svc_state.lookup = GeolocatedGedcom(
+                    gedcom_file=input_path.resolve(), 
+                    location_cache_file=cachefile,
+                    default_country=defaultCountry,
+                    always_geocode=svc_config.get('UseGPS'),
+                    cache_only=svc_config.get('CacheOnly'),
+                    alt_place_file_path=alt_place_file_path if not svc_config.get('skip_file_alt_places') else None,
+                    geo_config_path=geo_config_path,
+                    app_hooks=svc_config.get('app_hooks'),
+                    fuzz=True
+                )
+                
+                svc_state.lookup.save_location_cache()
+                svc_state.people = svc_state.lookup.people
+                people = svc_state.people
+                _log.info("Completed geocoding with %d people", len(people) if people else 0)
+                
+            except Exception as e:
+                _log.exception("Error during GEDCOM geocoding: %s", e)
+                raise
         
         main_person_id = svc_config.get('Main')
         if people and (not main_person_id or main_person_id not in people):

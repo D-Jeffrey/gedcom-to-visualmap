@@ -1,3 +1,4 @@
+from const import ResultType
 """
 visual_map_event_handlers.py
 
@@ -13,7 +14,6 @@ import logging
 import time
 import wx
 
-from gedcom_options import ResultType  # type: ignore
 
 _log = logging.getLogger(__name__.lower())
 
@@ -113,7 +113,6 @@ class VisualMapEventHandler:
                 outType = self._results_type_map[idx]
                 # Update ResultType and recompute ResultFile via services
                 try:
-                    from gedcom_options import ResultType
                     enforced = ResultType.ResultTypeEnforce(outType)
                     ext = ResultType.file_extension(enforced)
                     if hasattr(self.panel.svc_config, 'set'):

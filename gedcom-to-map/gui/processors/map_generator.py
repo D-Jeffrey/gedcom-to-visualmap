@@ -1,3 +1,4 @@
+from const import ResultType
 """
 Map visualization generation (HTML/KML formats).
 
@@ -13,8 +14,8 @@ from models.creator import Creator, LifetimeCreator, Person
 from render.folium.folium_exporter import foliumExporter
 from render.kml1.kml_exporter import KmlExporter
 from render.kml2 import KML_Life_Lines
-from gedcom_options import ResultType
-from services import IConfig, IState, IProgressTracker
+from services.progress_service import GVProgress
+from services.interfaces import IConfig, IState, IProgressTracker
 
 _log = logging.getLogger(__name__.lower())
 
@@ -97,6 +98,8 @@ class MapGenerator:
         if main_id not in people:
             _log.error("Could not find your starting person: %s", main_id)
             try:
+                if svc_progress is None:
+                    svc_progress = GVProgress()
                 svc_progress.stopstep('Error could not find first person')
             except Exception:
                 pass
@@ -110,14 +113,19 @@ class MapGenerator:
         svc_state.totalpeople = len(creator)
 
         try:
-            foliumExporter(svc_config, svc_state, svc_progress).export(people[main_id], creator, fullresult)
+            foliumExporter(svc_config, svc_state, svc_progress).export(people[main_id], creator, saveresult=True)
         except Exception:
             _log.exception("doHTML: folium export failed")
             return False
         
         # Verify file was created
         if fullresult:
-            result_path: Path = Path(svc_config.get('ResultFile', '')) if svc_config.get('ResultFile') else Path()
+            result_path_str = svc_config.get('resultpath', '')
+            result_file = svc_config.get('ResultFile', '')
+            if result_path_str and result_file:
+                result_path: Path = Path(result_path_str) / result_file
+            else:
+                result_path: Path = Path(result_file) if result_file else Path()
             if not result_path.exists():
                 _log.error("Result file not found: %s", result_path)
                 return False
@@ -258,12 +266,17 @@ class MapGenerator:
         if not svc_state.lookup:
             _log.error("doKML2: GeolocatedGedcom is not processed")
             return
-        resultFile: str = str(svc_config.get('ResultFile', '')) if svc_config.get('ResultFile') else ""
+        result_path_str = svc_config.get('resultpath', '')
+        result_file = svc_config.get('ResultFile', '')
+        if result_path_str and result_file:
+            resultFile: str = str(Path(result_path_str) / result_file)
+        else:
+            resultFile: str = str(result_file) if result_file else ""
 
         try:
             kml_life_lines: KML_Life_Lines = KML_Life_Lines(
                 gedcom=svc_state.lookup,
-                kml_file=str(resultFile),
+                kml_file=resultFile,
                 connect_parents=True,
                 save=True
             )

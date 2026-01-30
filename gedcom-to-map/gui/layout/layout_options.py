@@ -1,3 +1,4 @@
+from const import ResultType
 """
 layout_options.py
 
@@ -13,7 +14,6 @@ from typing import Any
 import logging
 import wx
 from .layout_helpers import LayoutHelpers
-from gedcom_options import ResultType
 
 _log = logging.getLogger(__name__.lower())
 

@@ -52,8 +52,8 @@ class SummaryReportConfig:
     auto_open: bool = False
     
     @classmethod
-    def from_gvOptions(cls, gOp: Any) -> 'SummaryReportConfig':
-        """Extract summary report configuration from gvOptions.
+    def from_config(cls, config: Any) -> 'SummaryReportConfig':
+        """Extract summary report configuration from a config object (GVConfig or compatible).
         
         Args:
             gOp: Global options object with Summary* attributes

@@ -1,7 +1,9 @@
-"""
-UI panel components.
+"""UI panels: Main visual components for the application window.
 
-Main panels for displaying and interacting with genealogical data.
+Provides panel components for displaying and interacting with genealogical data:
+    - VisualMapPanel: Main panel with map, people list, and options
+    - FamilyPanel: Family relationship visualization
+    - PeopleListCtrlPanel: People list view and filtering
 """
 from .visual_map_panel import VisualMapPanel
 from .family_panel import FamilyPanel

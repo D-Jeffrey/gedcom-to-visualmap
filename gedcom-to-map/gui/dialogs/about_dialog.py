@@ -9,7 +9,14 @@ _log = logging.getLogger(__name__.lower())
 from .html_dialog import HTMLDialog
 
 class AboutDialog(HTMLDialog):
-    def __init__(self, parent, title, font_manager: FontManager):
+    def __init__(self, parent: wx.Window, title: str, font_manager: 'FontManager') -> None:
+        """Initialize the About dialog.
+        
+        Args:
+            parent: Parent wxPython window.
+            title: Dialog title.
+            font_manager: FontManager instance for font configuration.
+        """
         abouttype = """
 <h1><a href="PROJECTLINK">VERVER</a></h1>
 <b>Orginal project:</b> Originally forked from <a href="https://github.com/lmallez/gedcom-to-map/">gedcom-to-map.</a><p />

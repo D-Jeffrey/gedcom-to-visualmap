@@ -9,15 +9,35 @@ _log = logging.getLogger(__name__.lower())
 
 
 class HTMLDialog(wx.Dialog):
-    def __init__(self, parent, title, icontype, htmlbody, width: int, font_manager):
+    def __init__(
+        self,
+        parent: wx.Window,
+        title: str,
+        icontype: str,
+        htmlbody: str,
+        width: int,
+        font_manager: 'FontManager',
+    ) -> None:
+        """Initialize the HTML content dialog.
+        
+        Args:
+            parent: Parent wxPython window.
+            title: Dialog title.
+            icontype: wx.ArtID for the dialog icon (e.g., wx.ART_INFORMATION).
+            htmlbody: HTML content to display in the dialog.
+            width: Width multiplier for dialog sizing (based on font size).
+            font_manager: FontManager instance for font configuration.
+        """
         # font_manager is required; caller must pass a valid FontManager instance
-        self.font_manager = font_manager
+        self.font_manager: 'FontManager' = font_manager
+        self.font_name: str
+        self.font_size: int
         self.font_name, self.font_size = self.font_manager.get_font_name_size()
         super().__init__(parent, title=title, size=(self.font_size * width, self.font_size * 45))
 
-        self.icon = wx.ArtProvider.GetBitmap(icontype, wx.ART_OTHER, (32, 32))
-        self.icon_ctrl = wx.StaticBitmap(self, bitmap=self.icon)
-        self.html = wx.html.HtmlWindow(self)
+        self.icon: wx.Bitmap = wx.ArtProvider.GetBitmap(icontype, wx.ART_OTHER, (32, 32))
+        self.icon_ctrl: wx.StaticBitmap = wx.StaticBitmap(self, bitmap=self.icon)
+        self.html: wx.html.HtmlWindow = wx.html.HtmlWindow(self)
         self.set_current_font()
         self.html.SetPage(
             f"<html><body>{htmlbody}</body></html>"

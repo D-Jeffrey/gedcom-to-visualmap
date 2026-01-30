@@ -22,7 +22,7 @@ from typing import Any, Tuple
 import wx
 from .visual_map_frame import VisualMapFrame
 from ..layout.font_manager import FontManager
-from services import IConfig, IState, IProgressTracker
+from services.interfaces import IConfig, IState, IProgressTracker
 
 _log = logging.getLogger(__name__.lower())
 
@@ -47,10 +47,16 @@ class GedcomVisualGUI:
     svc_progress: IProgressTracker
     frame: VisualMapFrame
 
-    def __init__(self, parent: wx.Window | None, svc_config: IConfig, svc_state: IState, svc_progress: IProgressTracker,
-                 title: str, style: int = wx.DEFAULT_FRAME_STYLE) -> None:
-        """
-        Create the main application frame.
+    def __init__(
+        self,
+        parent: wx.Window | None,
+        svc_config: 'IConfig',
+        svc_state: 'IState',
+        svc_progress: 'IProgressTracker',
+        title: str,
+        style: int = wx.DEFAULT_FRAME_STYLE,
+    ) -> None:
+        """Create the main application frame.
 
         Args:
             parent: Parent wx window (or None).
@@ -58,15 +64,16 @@ class GedcomVisualGUI:
             svc_state: Runtime state service (IState).
             svc_progress: Progress tracking service (IProgressTracker).
             title: Window title.
-            style: wx frame style flags.
+            style: wx frame style flags (default: wx.DEFAULT_FRAME_STYLE).
         """
-        self.font_manager = FontManager()
-        self.svc_config = svc_config
-        self.svc_state = svc_state
-        self.svc_progress = svc_progress
+        self.font_manager: 'FontManager' = FontManager()
+        self.svc_config: 'IConfig' = svc_config
+        self.svc_state: 'IState' = svc_state
+        self.svc_progress: 'IProgressTracker' = svc_progress
 
-        size: Tuple[int, int] = svc_config.get('window_size', None)
-        self.frame: VisualMapFrame = VisualMapFrame(
+        # Get window size from config
+        size = svc_config.get('window_size', [1024, 800])
+        self.frame: 'VisualMapFrame' = VisualMapFrame(
             parent, svc_config=svc_config, svc_state=svc_state, svc_progress=svc_progress,
             font_manager=self.font_manager, title=title, size=size, style=style)
 

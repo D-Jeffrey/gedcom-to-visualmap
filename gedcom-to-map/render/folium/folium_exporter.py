@@ -14,7 +14,7 @@ import folium
 import xyzservices.providers as xyz
 from folium.plugins import (AntPath, FloatImage, GroupedLayerControl,
                             HeatMapWithTime, MiniMap, Search, MarkerCluster)
-from services import IConfig, IState, IProgressTracker
+from services.interfaces import IConfig, IState, IProgressTracker
 from models.line import Line
 from geo_gedcom.lat_lon import LatLon
 from render.referenced import Referenced
@@ -360,9 +360,15 @@ class foliumExporter:
         return
 
     def _init_map(self, main_person_latlon, lines, saveresult):
+        # Get map style from config
+        map_style = self.svc_config.get('MapStyle', 'CartoDB.Voyager')
+        _log.debug("Initializing map with style: %s", map_style)
+        
         try:
-            tile = xyz.query_name(self.svc_config.get('MapStyle'))
-        except Exception:
+            tile = xyz.query_name(map_style)
+            _log.debug("Successfully loaded tile provider: %s", map_style)
+        except Exception as e:
+            _log.warning("Failed to load map style '%s': %s. Falling back to CartoDB.Voyager", map_style, e)
             tile = xyz.CartoDB
 
         main_person = self.svc_state.mainPerson if self.svc_state.mainPerson else None

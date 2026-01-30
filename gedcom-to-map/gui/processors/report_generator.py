@@ -10,7 +10,9 @@ from typing import Any, Optional
 
 from geo_gedcom.geolocated_gedcom import GeolocatedGedcom
 from render.summary import SummaryReportConfig, generate_summary_reports
-from services import IConfig, IState, IProgressTracker
+from services.interfaces import IConfig, IState, IProgressTracker
+from services.state_service import GVState
+from services.progress_service import GVProgress
 
 _log = logging.getLogger(__name__.lower())
 
@@ -73,6 +75,10 @@ class ReportGenerator:
             svc_config.set('SummaryPeople', True)
             svc_config.set('SummaryOpen', True)
             generator = ReportGenerator(panel)
+            if svc_progress is None:
+                svc_progress = GVProgress()
+            if svc_state is None:
+                svc_state = GVState()
             generator.doSUM(svc_config, svc_state, svc_progress)
         
         Note:

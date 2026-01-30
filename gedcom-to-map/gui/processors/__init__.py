@@ -1,8 +1,10 @@
-"""
-Data processing modules.
+"""Data processors: GEDCOM processing and map generation.
 
-Specialized processors for GEDCOM parsing, map generation, 
-report creation, and lineage tracing.
+Provides specialized data processors:
+    - GedcomLoader: GEDCOM file parsing and geocoding
+    - MapGenerator: Map generation (HTML, KML, KML2, SUM formats)
+    - ReportGenerator: Statistical reports and summaries
+    - LineageTracer: Genealogical relationship tracing
 """
 from .gedcom_loader import GedcomLoader
 from .map_generator import MapGenerator

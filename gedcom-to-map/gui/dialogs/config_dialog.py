@@ -6,41 +6,58 @@ _log = logging.getLogger(__name__.lower())
 
 
 class ConfigDialog(wx.Dialog):
-    def __init__(self, parent, title, svc_config, file_open_commands, logging_keys=None):
+    def __init__(
+        self,
+        parent: wx.Window,
+        title: str,
+        svc_config: 'IConfig',
+        file_open_commands: dict,
+        logging_keys: list[str] | None = None,
+    ) -> None:
+        """Initialize the Configuration dialog.
+        
+        Args:
+            parent: Parent wxPython window.
+            title: Dialog title.
+            svc_config: Configuration service (IConfig).
+            file_open_commands: Dictionary mapping file types to open commands.
+            logging_keys: List of logger names to configure (optional).
+        """
         super().__init__(parent, title=title, size=(500, 650))
 
         includeNOTSET = True
         # Configuration service for logic-backed settings
-        self.svc_config = svc_config
-        self.file_open_commands = file_open_commands
-        self.logging_keys = logging_keys or []
-        self.loggerNames = list(logging.root.manager.loggerDict.keys())
+        self.svc_config: 'IConfig' = svc_config
+        self.file_open_commands: dict = file_open_commands
+        self.logging_keys: list[str] = logging_keys or []
+        self.loggerNames: list[str] = list(logging.root.manager.loggerDict.keys())
         cfgpanel = wx.Panel(self, style=wx.SIMPLE_BORDER)
 
         TEXTkmlcmdlinelbl = wx.StaticText(cfgpanel, -1, " KML Editor Command line:   ")
         self.TEXTkmlcmdline = wx.TextCtrl(cfgpanel, wx.ID_FILE1, "", size=(250, 20))
-        kml_cmd = file_open_commands.get_command_for_file_type('kml')
-        if kml_cmd:
-            self.TEXTkmlcmdline.SetValue(kml_cmd)
+        if file_open_commands:
+            kml_cmd = file_open_commands.get_command_for_file_type('kml')
+            if kml_cmd:
+                self.TEXTkmlcmdline.SetValue(kml_cmd)
 
         TEXTcsvcmdlinelbl = wx.StaticText(cfgpanel, -1, " CSV Table Editor Command line:   ")
         self.TEXTcsvcmdline = wx.TextCtrl(cfgpanel, wx.ID_FILE1, "", size=(250, 20))
-        csv_cmd = file_open_commands.get_command_for_file_type('csv')
-        if csv_cmd:
-            self.TEXTcsvcmdline.SetValue(csv_cmd)
+        if file_open_commands:
+            csv_cmd = file_open_commands.get_command_for_file_type('csv')
+            if csv_cmd:
+                self.TEXTcsvcmdline.SetValue(csv_cmd)
 
         TEXTtracecmdlinelbl = wx.StaticText(cfgpanel, -1, " Trace Table Editor Command line:   ")
         self.TEXTtracecmdline = wx.TextCtrl(cfgpanel, wx.ID_FILE1, "", size=(250, 20))
-        trace_cmd = file_open_commands.get_command_for_file_type('trace')
-        if trace_cmd:
-            self.TEXTtracecmdline.SetValue(trace_cmd)
+        if file_open_commands:
+            trace_cmd = file_open_commands.get_command_for_file_type('trace')
+            if trace_cmd:
+                self.TEXTtracecmdline.SetValue(trace_cmd)
 
         self.CBBadAge = wx.CheckBox(cfgpanel, -1, 'Flag if age is off')
         # Get badAge from service config
-        try:
-            self.CBBadAge.SetValue(bool(svc_config.get('badAge')))
-        except Exception:
-            self.CBBadAge.SetValue(False)
+        bad_age = svc_config.get('badAge')
+        self.CBBadAge.SetValue(bool(bad_age))
         self.badAge = True
 
         GRIDctl = gridlib.Grid(cfgpanel)

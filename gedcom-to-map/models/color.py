@@ -17,13 +17,24 @@ Args:
 """
     __slots__ = ('r', 'g', 'b', 'a')
 
-    def __init__(self, r=255, g=0, b=0, a=255):
+    def __init__(self, r: int = 255, g: int = 0, b: int = 0, a: int = 255) -> None:
+        """Initialize Color with RGBA values.
+        
+        Args:
+            r: Red channel (0-255).
+            g: Green channel (0-255).
+            b: Blue channel (0-255).
+            a: Alpha channel (0-255).
+            
+        Raises:
+            ValueError: If any RGB value is not in range 0-255.
+        """
         if not (0 <= r <= 255 and 0 <= g <= 255 and 0 <= b <= 255):
             raise ValueError("Color values must be in 0..255")
-        self.r = r
-        self.g = g
-        self.b = b
-        self.a = a
+        self.r: int = r
+        self.g: int = g
+        self.b: int = b
+        self.a: int = a
 
     def to_hexa(self) -> str:
         return f"{self.a:02x}{self.b:02x}{self.g:02x}{self.r:02x}"

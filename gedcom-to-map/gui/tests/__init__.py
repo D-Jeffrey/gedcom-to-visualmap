@@ -1,5 +1,10 @@
 """GUI tests package.
 
-Integration tests for GUI functionality are located in the top-level tests/ directory.
-This package is reserved for future GUI-specific unit tests.
+Unit tests for GUI components including:
+    - Hook integration (GuiHooks)
+    - Dialog and panel functionality
+    - Event handling and user interactions
+
+Integration tests for complete GUI workflows are located in the top-level
+tests/ directory. Service-level tests are in services/tests/.
 """

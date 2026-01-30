@@ -46,32 +46,40 @@ class BackgroundActions:
         background.Stop()
     """
 
-    def __init__(self, win: wx.Window, threadnum: int, panel, svc_config=None, svc_state=None, svc_progress=None):
-        """Initialize background worker.
+    def __init__(
+        self,
+        win: wx.Window,
+        threadnum: int,
+        panel: Any,
+        svc_config: Optional['IConfig'] = None,
+        svc_state: Optional['IState'] = None,
+        svc_progress: Optional['IProgressTracker'] = None,
+    ) -> None:
+        """Initialize background worker thread.
         
         Args:
             win: Parent wxPython window for posting events.
-            threadnum: Unique thread identifier for logging.
-            panel: Visual map panel reference for UI and actions access.
-            svc_config: Configuration service (IConfig).
-            svc_state: Runtime state service (IState).
-            svc_progress: Progress tracker service (IProgressTracker).
+            threadnum: Unique thread identifier for logging and diagnostics.
+            panel: Visual map panel reference for UI actions and service access.
+            svc_config: Configuration service (IConfig). Defaults to panel.svc_config.
+            svc_state: Runtime state service (IState). Defaults to panel.svc_state.
+            svc_progress: Progress tracker service (IProgressTracker). Defaults to panel.svc_progress.
         """
         self.win: wx.Window = win
-        self.panel = panel
-        self.svc_config = svc_config or panel.svc_config
-        self.svc_state = svc_state or panel.svc_state
-        self.svc_progress = svc_progress or panel.svc_progress
+        self.panel: Any = panel
+        self.svc_config: 'IConfig' = svc_config or panel.svc_config
+        self.svc_state: 'IState' = svc_state or panel.svc_state
+        self.svc_progress: 'IProgressTracker' = svc_progress or panel.svc_progress
         self.people: Optional[dict] = None
         self.threadnum: int = threadnum
         self.updategrid: bool = False
         self.updategridmain: bool = True
-        self.updateinfo: str = ''  # This will prime the update
+        self.updateinfo: str = ''  # Message to prime GUI updates
         self.errorinfo: Optional[str] = None
         self.keepGoing: bool = True
         self.threadrunning: bool = True
-        self.doAction: DoActionsType = DoActionsType.NONE  # Initialize as DoActions instance with value NONE
-        self.readyToDo: bool = True
+        self.doAction: DoActionsType = DoActionsType.NONE  # Current background operation
+        self.readyToDo: bool = True  # Ready to accept new actions
 
     def Start(self) -> None:
         """Start the background worker thread.
@@ -269,6 +277,13 @@ class BackgroundActions:
                     self.svc_state.Referenced = None
             except Exception:
                 pass
+        
+        # Mark as successfully parsed if we have people data
+        if self.people:
+            try:
+                self.svc_state.parsed = True
+            except Exception:
+                _log.exception("Failed to set parsed flag")
 
         # Report results
         self._report_parse_results()
@@ -326,19 +341,19 @@ class BackgroundActions:
             return
         
         # Open generated file if type is set and file exists
-        if file_type:
+        if file_type and fname:
             try:
                 result_path = self.svc_config.get('resultpath', '')
-            except Exception:
-                result_path = ''
-            result_file = Path(result_path) / fname
-            if result_file.exists():
-                try:
-                    from .file_operations import FileOpener
-                    opener = FileOpener(self.svc_config)
-                    opener.open_file(file_type, str(result_file))
-                except Exception:
-                    _log.exception(f"Failed to open {file_type.upper()} file with FileOpener")
+                result_file = Path(result_path) / fname if result_path else Path(fname)
+                if result_file.exists():
+                    try:
+                        from .file_operations import FileOpener
+                        opener = FileOpener(self.svc_config)
+                        opener.open_file(file_type, str(result_file))
+                    except Exception:
+                        _log.exception(f"Failed to open {file_type.upper()} file with FileOpener")
+            except Exception as e:
+                _log.exception(f"Error constructing result file path: {e}")
 
     def _run_generate(self, panel_actions: Any, UpdateBackgroundEvent: Any = None) -> None:
         """Execute output generation operation (HTML/KML/SUM).
@@ -361,17 +376,11 @@ class BackgroundActions:
             _log.info("not parsed")
             return
         
-        try:
-            fname = self.svc_config.get('ResultFile')
-            result_type = self.svc_config.get('ResultType')
-        except Exception:
-            _log.error("Run: Failed to get ResultFile or ResultType from config")
-            return
-        
+        fname = self.svc_config.get('ResultFile')
+        result_type = self.svc_config.get('ResultType')
         if result_type is None:
             _log.error("Run: ResultType not set")
             return
-        
         # call appropriate generation function if available
         result_type_name = result_type.name
         try:

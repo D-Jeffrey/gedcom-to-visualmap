@@ -27,7 +27,7 @@ soundex_code = NameProcessor.soundex("Smith")
 
 ```python
 from render import KmlExporter, foliumExporter, NameProcessor
-from services import IConfig, IState, IProgressTracker
+from services.interfaces import IConfig, IState, IProgressTracker
 
 # Create or mock your service objects (see tests for examples)
 svc_config = ...  # implements IConfig

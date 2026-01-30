@@ -1,3 +1,4 @@
+from const import ResultType
 """
 visual_map_frame.py
 
@@ -14,7 +15,7 @@ import os
 import wx
 
 from const import GUINAME
-from services import IConfig, IState, IProgressTracker
+from services.interfaces import IConfig, IState, IProgressTracker
 
 _log = logging.getLogger(__name__.lower())
 
@@ -27,7 +28,6 @@ from ..dialogs.help_dialog import HelpDialog
 from ..panels.visual_map_panel import VisualMapPanel
 from ..layout.visual_gedcom_ids import VisualGedcomIds
 from ..layout.font_manager import FontManager
-from gedcom_options import ResultType
 
 class VisualMapFrame(wx.Frame):
     """Main application window/frame.
@@ -267,12 +267,9 @@ class VisualMapFrame(wx.Frame):
         """
         dDir = os.getcwd()
         filen = ""
-        try:
-            infile = self.svc_config.get('GEDCOMinput')
-            if infile:
-                dDir, filen = os.path.split(infile)
-        except Exception:
-            pass
+        infile = self.svc_config.get('GEDCOMinput')
+        if infile:
+            dDir, filen = os.path.split(infile)
         dlg = wx.FileDialog(self,
                             defaultDir=dDir,
                             defaultFile=filen,
@@ -309,16 +306,13 @@ class VisualMapFrame(wx.Frame):
         """
         dDir = os.getcwd()
         dFile = "visgedcom.html"
-        try:
-            resultfile = self.svc_config.get('ResultFile')
+        resultfile = self.svc_config.get('ResultFile')
+        if resultfile:
+            dDir, dFile = os.path.split(resultfile)
+        else:
+            resultfile = self.svc_config.get('GEDCOMinput')
             if resultfile:
                 dDir, dFile = os.path.split(resultfile)
-            else:
-                resultfile = self.svc_config.get('GEDCOMinput')
-                if resultfile:
-                    dDir, dFile = os.path.split(resultfile)
-        except Exception:
-            pass
         dFile = os.path.splitext(dFile)[0]
 
         dlg = wx.FileDialog(self,
@@ -441,7 +435,7 @@ class VisualMapFrame(wx.Frame):
                 None,
                 title="Configuration Options",
                 svc_config=svc_config,
-                file_open_commands=None,
+                file_open_commands=svc_config.file_open_commands,
                 logging_keys=[]
             )
             dialog.ShowModal()

@@ -9,7 +9,7 @@ from typing import Any, Optional, Dict, List, Tuple
 
 from models.creator import CreatorTrace, Person
 from render.referenced import Referenced
-from services import IConfig, IState, IProgressTracker
+from services.interfaces import IConfig, IState, IProgressTracker
 
 _log = logging.getLogger(__name__.lower())
 

@@ -40,13 +40,13 @@ class FileOpener:
         opener.open_file('csv', '/path/to/data.csv')
     """
     
-    def __init__(self, config_service):
+    def __init__(self, config_service: 'IConfig') -> None:
         """Initialize FileOpener with configuration service.
         
         Args:
-            config_service: IConfig service with get_file_command method
+            config_service: IConfig service providing platform-specific file open commands.
         """
-        self.config_service = config_service
+        self.config_service: 'IConfig' = config_service
     
     def open_file(self, file_type: str = 'html', datafile: str = '') -> None:
         """Open file using command configured for specified file type.

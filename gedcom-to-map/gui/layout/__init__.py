@@ -1,7 +1,11 @@
-"""
-Layout helpers and utilities.
+"""Layout helpers: UI construction, styling, event handling, and utilities.
 
-UI layout construction, event handling, ID management, and font utilities.
+Provides utilities for building the UI:
+    - LayoutOptions: Options panel construction
+    - LayoutHelpers: Common layout and widget helpers
+    - VisualMapEventHandler: Main event handler for user interactions
+    - VisualGedcomIds: ID constants for UI elements
+    - FontManager: Font configuration and management
 """
 from .layout_options import LayoutOptions
 from .layout_helpers import LayoutHelpers

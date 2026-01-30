@@ -2,11 +2,19 @@ import wx
 from ..layout.font_manager import FontManager
 
 class FindDialog(wx.Dialog):
-    def __init__(self, parent: wx.Window, font_manager: FontManager, title: str = "Find", LastSearch: str = ""):
+    def __init__(self, parent: wx.Window, font_manager: 'FontManager', title: str = "Find", LastSearch: str = "") -> None:
+        """Initialize the Find/Search dialog.
+        
+        Args:
+            parent: Parent wxPython window.
+            font_manager: FontManager instance for font configuration.
+            title: Dialog title (default: "Find").
+            LastSearch: Previous search string to populate field with (default: "").
+        """
         super().__init__(parent, title=title, size=(300, 150))
 
-        self.font_manager = font_manager
-        self.LastSearch = LastSearch
+        self.font_manager: 'FontManager' = font_manager
+        self.LastSearch: str = LastSearch
 
         # Layout
         Findpanel = wx.Panel(self, style=wx.SIMPLE_BORDER)

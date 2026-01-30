@@ -15,10 +15,19 @@ import wx
 import wx.lib.mixins.inspection as wit
 # pylint: disable=no-member
 
+
 # Import constants and GUI components
 from const import GUINAME, LOG_CONFIG, NAME, VERSION
 from gui.core.gedcom_visual_gui import GedcomVisualGUI
-from gedcom_options import gvOptions
+from services.config_service import GVConfig
+from services.state_service import GVState
+from services.progress_service import GVProgress
+
+# Define the path to gedcom_options.yaml as a constant (same directory as gv.py)
+import os
+from pathlib import Path
+GV_DIR = Path(__file__).resolve().parent
+GEDCOM_OPTIONS_PATH = GV_DIR / 'gedcom_options.yaml'
 
 # Initialize logger for the application
 _log = logging.getLogger(__name__)
@@ -47,13 +56,18 @@ if __name__ == '__main__':
     else:  # Normal mode
         app = wx.App()
 
-    # Load gedcom options
-    gOp = gvOptions()
 
-    # Create the main application frame and panel
-    # Pass gOp as all three services (IConfig, IState, IProgressTracker)
-    # since gvOptions implements all three interfaces
-    frame = GedcomVisualGUI(parent=None, svc_config=gOp, svc_state=gOp, svc_progress=gOp, title=GUINAME)
+    # Instantiate services with the options file constant
+    svc_config = GVConfig(gedcom_options_path=GEDCOM_OPTIONS_PATH)
+    svc_state = GVState()
+    svc_progress = GVProgress()
+    
+    # Create app hooks to connect geo_gedcom progress to GUI services
+    from gui.core import GuiHooks
+    svc_config.app_hooks = GuiHooks(svc_progress, svc_state)
+
+    # Create the main application frame and panel with explicit services
+    frame = GedcomVisualGUI(parent=None, svc_config=svc_config, svc_state=svc_state, svc_progress=svc_progress, title=GUINAME)
     
     # Show the inspection tool if WITMODE is enabled
     if WITMODE:

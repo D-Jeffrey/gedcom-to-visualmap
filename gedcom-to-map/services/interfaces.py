@@ -159,77 +159,29 @@ class IState(Protocol):
     such as parsed data, lookup services, and runtime flags.
     """
     
-    @property
-    def people(self) -> Optional[Dict[str, Person]]:
-        """Dictionary of parsed Person objects keyed by ID."""
-        ...
+    people: Optional[Dict[str, Person]]
+    """Dictionary of parsed Person objects keyed by ID."""
     
-    @people.setter
-    def people(self, value: Optional[Dict[str, Person]]) -> None:
-        ...
+    lookup: Optional[GeolocatedGedcom]
+    """Geolocated GEDCOM lookup service."""
     
-    @property
-    def lookup(self) -> Optional[GeolocatedGedcom]:
-        """Geolocated GEDCOM lookup service."""
-        ...
+    referenced: Any
+    """Set of referenced person IDs."""
     
-    @lookup.setter
-    def lookup(self, value: Optional[GeolocatedGedcom]) -> None:
-        ...
+    main_person: Optional[Person]
+    """The main/root person for lineage tracing."""
     
-    @property
-    def referenced(self):
-        """Set of referenced person IDs."""
-        ...
+    parsed: bool
+    """Whether GEDCOM has been successfully parsed."""
     
-    @referenced.setter
-    def referenced(self, value) -> None:
-        ...
+    stopping: bool
+    """Whether a stop has been requested."""
     
-    @property
-    def main_person(self) -> Optional[Person]:
-        """The main/root person for lineage tracing."""
-        ...
+    running: bool
+    """Whether an operation is currently running."""
     
-    @main_person.setter
-    def main_person(self, value: Optional[Person]) -> None:
-        ...
-    
-    @property
-    def parsed(self) -> bool:
-        """Whether GEDCOM has been successfully parsed."""
-        ...
-    
-    @parsed.setter
-    def parsed(self, value: bool) -> None:
-        ...
-    
-    @property
-    def stopping(self) -> bool:
-        """Whether a stop has been requested."""
-        ...
-    
-    @stopping.setter
-    def stopping(self, value: bool) -> None:
-        ...
-    
-    @property
-    def running(self) -> bool:
-        """Whether an operation is currently running."""
-        ...
-    
-    @running.setter
-    def running(self, value: bool) -> None:
-        ...
-    
-    @property
-    def newload(self) -> bool:
-        """Whether new data has been loaded."""
-        ...
-    
-    @newload.setter
-    def newload(self, value: bool) -> None:
-        ...
+    newload: bool
+    """Whether new data has been loaded."""
     
     def clear(self) -> None:
         """Clear all runtime state."""
@@ -243,51 +195,32 @@ class IProgressTracker(Protocol):
     for long-running operations.
     """
     
-    @property
-    def counter(self) -> int:
-        """Current progress counter value."""
-        ...
+    counter: int
+    """Current progress counter value."""
     
-    @counter.setter
-    def counter(self, value: int) -> None:
-        ...
+    target: int
+    """Target/total value for progress."""
     
-    @property
-    def target(self) -> int:
-        """Target/total value for progress."""
-        ...
+    state: str
+    """Current state description."""
     
-    @property
-    def state(self) -> str:
-        """Current state description."""
-        ...
+    running: bool
+    """Whether an operation is currently running."""
     
-    @state.setter
-    def state(self, value: str) -> None:
-        ...
+    stopping: bool
+    """Whether a stop has been requested."""
     
-    @property
-    def running_since(self) -> Optional[datetime]:
-        """Timestamp when current operation started."""
-        ...
+    step_info: Optional[str]
+    """Additional information about current step."""
     
-    @property
-    def running_since_step(self) -> float:
-        """Timestamp (as float) when current step with target started."""
-        ...
+    running_since: float
+    """Timestamp when current operation started."""
     
-    @running_since_step.setter
-    def running_since_step(self, value: float) -> None:
-        ...
+    running_since_step: float
+    """Timestamp (as float) when current step with target started."""
     
-    @property
-    def running_last(self) -> float:
-        """Duration in seconds of the last completed operation."""
-        ...
-    
-    @running_last.setter
-    def running_last(self, value: float) -> None:
-        ...
+    running_last: float
+    """Duration in seconds of the last completed operation."""
     
     def step(self, state: str = "", reset_counter: bool = True, target: int = 0, plus_step: int = 1) -> bool:
         """Advance to a new step in the operation."""

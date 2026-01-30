@@ -1,4 +1,4 @@
-__all__ = ['Creator', 'LifetimeCreator', 'DELTA', 'SPACE']
+__all__ = ['Creator', 'CreatorTrace', 'LifetimeCreator', 'DELTA', 'SPACE']
 
 import logging
 from typing import Dict
@@ -133,12 +133,19 @@ class Creator:
     - Functions/objects used in the implementation such as getAttrLatLonif(),
       Rainbow, DELTA, SPACE and a configured logger _log.
     """
-    def __init__(self, people: Dict[str, Person], max_missing: int =0, gpstype="birth"):
-        self.people = people
-        self.rainbow = Rainbow()
-        self.max_missing = max_missing
-        self.alltheseids= {}
-        self.gpstype = gpstype
+    def __init__(self, people: Dict[str, Person], max_missing: int = 0, gpstype: str = "birth") -> None:
+        """Initialize LineCreator for geographic ancestry visualization.
+        
+        Args:
+            people: Dictionary mapping person IDs to Person objects.
+            max_missing: Maximum consecutive missing GPS events before stopping traversal.
+            gpstype: Event type to use for GPS coordinates (default: "birth").
+        """
+        self.people: Dict[str, Person] = people
+        self.rainbow: Rainbow = Rainbow()
+        self.max_missing: int = max_missing
+        self.alltheseids: dict = {}
+        self.gpstype: str = gpstype
 
     def line(self, latlon: LatLon, current: Person, branch, prof, miss, path="") -> list[Line]:
         if current.xref_id in self.alltheseids:
@@ -300,11 +307,17 @@ class CreatorTrace:
     - Construct a CreatorTrace with a people mapping and call create(main_id) to obtain ancestry lines.
     - Pass an existing list of Line-like objects to createothers(list_of_lines) to add missing people.
     """
-    def __init__(self, people: Dict[str, Person], max_missing=0):
-        self.people = people
-        self.rainbow = Rainbow()
-        self.max_missing = max_missing
-        self.alltheseids= {}
+    def __init__(self, people: Dict[str, Person], max_missing: int = 0) -> None:
+        """Initialize TraceCreator for genealogical trace visualization.
+        
+        Args:
+            people: Dictionary mapping person IDs to Person objects.
+            max_missing: Maximum consecutive missing events before stopping traversal.
+        """
+        self.people: Dict[str, Person] = people
+        self.rainbow: Rainbow = Rainbow()
+        self.max_missing: int = max_missing
+        self.alltheseids: dict = {}
 
     def line(self, current: Person, branch, prof, path="") -> list[Line]:
         if current.xref_id in self.alltheseids:
@@ -369,13 +382,19 @@ class LifetimeCreator:
             Extends the provided list with lifetime lines for all people not already included,
             using list length for branch and profundity calculations.
     """
-    def __init__(self, people: Dict[str, Person], max_missing=0):
-        self.people = people
-        self.rainbow = Rainbow()
-        self.max_missing = max_missing
-        self.alltheseids= {}
+    def __init__(self, people: Dict[str, Person], max_missing: int = 0) -> None:
+        """Initialize LifeCreator for personal life timeline visualization.
+        
+        Args:
+            people: Dictionary mapping person IDs to Person objects.
+            max_missing: Maximum consecutive missing events before stopping traversal.
+        """
+        self.people: Dict[str, Person] = people
+        self.rainbow: Rainbow = Rainbow()
+        self.max_missing: int = max_missing
+        self.alltheseids: dict = {}
 
-    def selfline(self, current: Person, branch, prof, miss, path="") -> list[Line]:
+    def selfline(self, current: Person, branch, prof, miss, path: str = "") -> list[Line]:
         # We can not draw a line from Birth to death without both ends  --- or can we???
         self.alltheseids[current.xref_id] = current.xref_id
         color = (branch + DELTA / 2) / (SPACE ** (prof % 256))

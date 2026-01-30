@@ -10,7 +10,7 @@ import simplekml
 from models.line import Line
 from geo_gedcom.lat_lon import LatLon
 from render.referenced import Referenced
-from services import IConfig, IState, IProgressTracker
+from services.interfaces import IConfig, IState, IProgressTracker
 
 from typing import TYPE_CHECKING
 

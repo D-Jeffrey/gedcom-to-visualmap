@@ -8,18 +8,15 @@ from ged4py.parser import GedcomReader
 _log = logging.getLogger(__name__)
 
 class GedRecordDialog(wx.Frame):
-    """
-    A dialog for displaying a flattened view of a GEDCOM record using wxPython.
-    """
+    """A dialog for displaying a flattened view of a GEDCOM record using wxPython."""
 
-    def __init__(self, parent: Optional[wx.Window], record: Any, title: Optional[str] = None):
-        """
-        Initialize the dialog.
+    def __init__(self, parent: Optional[wx.Window], record: Any, title: Optional[str] = None) -> None:
+        """Initialize the GEDCOM record display dialog.
 
         Args:
-            parent (wx.Window or None): The parent window.
-            record (Any): The GEDCOM record to display.
-            title (str, optional): The window title.
+            parent: The parent window (can be None).
+            record: The GEDCOM record object to display.
+            title: The window title (optional; defaults to record type/ID).
         """
         title = title or f"GED Record: {getattr(record, 'xref_id', getattr(record, 'tag', record.__class__.__name__))}"
         super().__init__(parent, title=title, size=(800, 600))

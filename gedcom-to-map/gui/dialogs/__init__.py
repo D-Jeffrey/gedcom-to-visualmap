@@ -1,7 +1,14 @@
-"""
-Dialog windows.
+"""Dialog windows: Configuration, help, search, and data display dialogs.
 
-Various dialog windows for configuration, help, search, and data display.
+Provides modal dialogs for user interaction:
+    - AboutDialog: About/credits information
+    - ConfigDialog: Application configuration settings
+    - FindDialog: Search/find functionality
+    - HelpDialog: Help documentation
+    - HTMLDialog: Generic HTML content display
+    - PersonDialog: Individual genealogical data display
+
+All dialogs are lazy-loaded with error handling to support import without wxPython.
 """
 try:
     from .about_dialog import AboutDialog

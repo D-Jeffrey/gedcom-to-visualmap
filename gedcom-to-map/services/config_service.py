@@ -115,6 +115,48 @@ class GVConfig(IConfig):
         
         # Load file open commands from INI into _file_open_commands object
         self._load_file_commands_from_ini()
+        
+        # Clean up stale logger names from [Logging] section and load active ones
+        self._cleanup_and_load_logging_section()
+
+    def _cleanup_and_load_logging_section(self) -> None:
+        """Clean up stale loggers and load active logger levels from [Logging] section.
+        
+        Removes logger names that are no longer in logging_keys list,
+        then applies levels for remaining loggers.
+        """
+        if 'Logging' not in self.gvConfig:
+            return
+        
+        logging_keys = self.options.get('logging_keys', [])
+        stale_loggers = []
+        
+        # Identify stale loggers (not in current logging_keys)
+        for logger_name, _ in self.gvConfig.items('Logging'):
+            if logger_name not in logging_keys:
+                stale_loggers.append(logger_name)
+        
+        # Remove stale loggers
+        if stale_loggers:
+            _log.info("Removing %d stale logger(s) from INI: %s", len(stale_loggers), ', '.join(stale_loggers))
+            for logger_name in stale_loggers:
+                self.gvConfig.remove_option('Logging', logger_name)
+            
+            # Save cleaned configuration
+            try:
+                with open(self.settingsfile, 'w') as configfile:
+                    self.gvConfig.write(configfile)
+            except Exception as e:
+                _log.error("Error saving cleaned logging settings: %s", e)
+        
+        # Load and apply logger levels for active loggers
+        for logger_name, log_level in self.gvConfig.items('Logging'):
+            try:
+                alogger = logging.getLogger(logger_name)
+                alogger.setLevel(log_level)
+                _log.debug("Set logger '%s' to level %s", logger_name, log_level)
+            except Exception as e:
+                _log.warning("Failed to set logger '%s' level to %s: %s", logger_name, log_level, e)
 
     def _load_file_commands_from_ini(self) -> None:
         """Load file open commands from INI attributes into _file_open_commands object.
@@ -163,6 +205,8 @@ class GVConfig(IConfig):
                 self.gvConfig = configparser.ConfigParser()
                 for section in INI_SECTIONS:
                     self.gvConfig[section] = {}
+            elif 'Logging' not in self.gvConfig:
+                self.gvConfig['Logging'] = {}
             core_keys = self._build_section_keys('Core')
             for key in core_keys:
                 self.gvConfig['Core'][key] = str(getattr(self, key))
@@ -187,6 +231,20 @@ class GVConfig(IConfig):
                 name = Path(self.GEDCOMinput).stem
                 if hasattr(self, 'Main') and self.Main:
                     self.gvConfig['Gedcom.Main'][name] = self.Main
+
+            # Save logger levels - only for loggers explicitly in logging_keys
+            # Clear existing entries first to avoid persisting stale loggers
+            self.gvConfig.remove_section('Logging')
+            self.gvConfig.add_section('Logging')
+            
+            logging_keys = self.options.get('logging_keys', [])
+            for logName in logging_keys:
+                # Only save if this logger actually exists and has a non-default level
+                if logName in logging.root.manager.loggerDict:
+                    logger = logging.getLogger(logName)
+                    logLevel = logging.getLevelName(logger.level)
+                    if logLevel != 'NOTSET':
+                        self.gvConfig['Logging'][logName] = logging.getLevelName(logger.getEffectiveLevel())
             
             with open(self.settingsfile, 'w') as configfile:
                 self.gvConfig.write(configfile)

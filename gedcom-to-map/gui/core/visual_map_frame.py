@@ -436,7 +436,7 @@ class VisualMapFrame(wx.Frame):
                 title="Configuration Options",
                 svc_config=svc_config,
                 file_open_commands=svc_config.file_open_commands,
-                logging_keys=[]
+                logging_keys=svc_config.options.get('logging_keys', [])
             )
             dialog.ShowModal()
             dialog.Destroy()

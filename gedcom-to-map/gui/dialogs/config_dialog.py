@@ -30,7 +30,12 @@ class ConfigDialog(wx.Dialog):
         self.svc_config: 'IConfig' = svc_config
         self.file_open_commands: dict = file_open_commands
         self.logging_keys: list[str] = logging_keys or []
-        self.loggerNames: list[str] = list(logging.root.manager.loggerDict.keys())
+        all_loggers = list(logging.root.manager.loggerDict.keys())
+        self.loggerNames: list[str] = (
+            [name for name in all_loggers if name in self.logging_keys]
+            if self.logging_keys
+            else all_loggers
+        )
         cfgpanel = wx.Panel(self, style=wx.SIMPLE_BORDER)
 
         TEXTkmlcmdlinelbl = wx.StaticText(cfgpanel, -1, " KML Editor Command line:   ")
@@ -140,7 +145,12 @@ class ConfigDialog(wx.Dialog):
             loggerName = self.GRIDctl.GetCellValue(row, 0)
             logLevel = self.GRIDctl.GetCellValue(row, 1)
             updatelog = logging.getLogger(loggerName)
-            updatelog.setLevel(getattr(logging, logLevel))
+            if logLevel:
+                level_value = logging.getLevelName(logLevel)
+                if isinstance(level_value, int):
+                    updatelog.setLevel(level_value)
+                else:
+                    _log.warning("ConfigDialog.onSave: invalid log level '%s' for '%s'", logLevel, loggerName)
         
         # Update file open commands
         self.file_open_commands.add_file_type_command('kml', self.TEXTkmlcmdline.GetValue())

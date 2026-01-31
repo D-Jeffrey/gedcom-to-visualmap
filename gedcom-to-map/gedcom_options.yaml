@@ -147,10 +147,16 @@ file_command_defaults:
     HTML: 'webbrowser $n'
 
 # Logger names to track in Logging section of INI file
-logging_keys: [models.person, models, ged4py.parser, ged4py,
-  models.creator, models.location, gedcomoptions,
-  gedcom.gedcomparser, gedcom, gedcom.gedcom, gedcom.geocode, gedcom.geocache, gedcom.addressbook,
-  geopy, render.kmlexporter, render, render.foliumexp, gedcomvisual, "__main__"]
+# Configure logging at the package level for simpler management
+# Child loggers inherit these settings unless explicitly overridden
+logging_keys: [
+  # Core application
+  const, gv,
+  # Major components (package-level)
+  services, models, geo_gedcom, render, gui,
+  # External dependencies
+  ged4py, geopy,
+]
 
 # Old settings that should be removed from the INI config file
 old_ini_settings: {

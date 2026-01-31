@@ -9,12 +9,17 @@ from geo_gedcom.location import Location
 from geo_gedcom.lat_lon import LatLon
 
 def load_geo_cache(cache_file: str) -> Dict[str, Any]:
+    # Resolve cache file path relative to the project root
+    test_dir = os.path.dirname(os.path.abspath(__file__))
+    project_root = os.path.dirname(os.path.dirname(test_dir))
+    cache_file_path = os.path.join(project_root, cache_file)
+    
     always_geocode = False
     alt_place_file_path = None
-    file_geo_cache_path = ''
-    cache = GeoCache(cache_file, always_geocode, alt_place_file_path, file_geo_cache_path)
+    file_geo_cache_path = None
+    cache = GeoCache(cache_file_path, always_geocode, alt_place_file_path, file_geo_cache_path)
     geo_cache = cache.geo_cache
-    assert len(geo_cache) > 0
+    assert len(geo_cache) > 0, f"Cache file {cache_file_path} is empty or not found"
     return geo_cache
 
 def create_locations(geo_cache: Dict[str, Any]) -> Tuple[List[Dict[str, Any]], float]:

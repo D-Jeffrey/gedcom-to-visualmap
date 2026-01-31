@@ -2,13 +2,45 @@ import logging
 from io import BytesIO
 import wx
 import wx.html
+import yaml
+from pathlib import Path
 
+from gui.layout.font_manager import FontManager
 from const import GUINAME, VERSION, ABOUTLINK, NAME
 
 _log = logging.getLogger(__name__.lower())
 
 
 class HTMLDialog(wx.Dialog):
+    @staticmethod
+    def load_dialog_content(dialog_key: str) -> str:
+        """Load dialog HTML content from YAML file.
+        
+        Args:
+            dialog_key: Key identifying the dialog content (e.g., 'about_dialog', 'help_dialog').
+            
+        Returns:
+            HTML content string.
+            
+        Raises:
+            FileNotFoundError: If dialog_content.yaml is not found.
+            KeyError: If dialog_key is not found in the YAML file.
+        """
+        content_file = Path(__file__).parent / 'dialog_content.yaml'
+        try:
+            with open(content_file, 'r', encoding='utf-8') as f:
+                content = yaml.safe_load(f)
+            return content[dialog_key]
+        except FileNotFoundError:
+            _log.error(f"Dialog content file not found: {content_file}")
+            raise
+        except KeyError:
+            _log.error(f"Dialog key '{dialog_key}' not found in {content_file}")
+            raise
+        except Exception as e:
+            _log.exception(f"Failed to load dialog content for '{dialog_key}'")
+            raise
+
     def __init__(
         self,
         parent: wx.Window,

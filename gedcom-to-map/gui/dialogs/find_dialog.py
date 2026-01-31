@@ -43,6 +43,9 @@ class FindDialog(wx.Dialog):
         self.cancelButton.Bind(wx.EVT_BUTTON, self.OnCancel)
 
         self.font_manager.apply_current_font_recursive(self)
+        
+        # Set focus on search field so user can start typing immediately
+        wx.CallAfter(self.SearchText.SetFocus)
 
     def OnOk(self, event):
         self.LastSearch = self.SearchText.GetValue()

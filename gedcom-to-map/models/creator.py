@@ -317,13 +317,18 @@ class CreatorTrace:
         self.people: Dict[str, Person] = people
         self.rainbow: Rainbow = Rainbow()
         self.max_missing: int = max_missing
-        self.alltheseids: dict = {}
 
-    def line(self, current: Person, branch, prof, path="") -> list[Line]:
-        if current.xref_id in self.alltheseids:
-            _log.error("Looping Trace Problem: {:2} -LOOP STOP - {} {} -Tracing= {:20}".format(  prof, self.people[current.xref_id].name, current.xref_id, path))
+    def line(self, current: Person, branch, prof, path="", visited=None) -> list[Line]:
+        # Track visited IDs in this specific line to detect sequential loops only
+        if visited is None:
+            visited = set()
+        
+        if current.xref_id in visited:
+            _log.error("Loop detected in ancestry trace: {:2} - {} {} - Path: {}".format(prof, self.people[current.xref_id].name, current.xref_id, path))
             return []
-        self.alltheseids[current.xref_id] = current.xref_id
+        
+        # Add to visited set for this line
+        visited = visited | {current.xref_id}
         
         _log.info("{:8} {:8} {:2} {:20}".format(path, branch, prof, current.name))
         birth_event = current.get_event('birth') if current else None
@@ -332,11 +337,13 @@ class CreatorTrace:
         death_year_num = death_event.date.year_num if death_event and death_event.date else None
         line = Line(f"{path:8}\t{current.name}", None, None, None, path, branch,prof, person=current, 
                     whenFrom=birth_year_num, whenTo=death_year_num)
-        return self.link(current, branch, prof, path) + [line]
+        return self.link(current, branch, prof, path, visited) + [line]
 
-    def link(self, current: Person, branch=0, prof=0,  path="") -> list[Line]:
-        return (self.line(self.people[current.father],  0, prof+1,  f"{path}F") if current.father else []) \
-               + (self.line(self.people[current.mother], 0, prof+1,  path + "M") if current.mother else [])
+    def link(self, current: Person, branch=0, prof=0, path="", visited=None) -> list[Line]:
+        if visited is None:
+            visited = set()
+        return (self.line(self.people[current.father],  0, prof+1,  f"{path}F", visited) if current.father else []) \
+               + (self.line(self.people[current.mother], 0, prof+1,  path + "M", visited) if current.mother else [])
 
     def create(self, main_id: str):
         if main_id not in self.people.keys():

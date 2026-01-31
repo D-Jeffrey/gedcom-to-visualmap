@@ -431,12 +431,16 @@ class VisualMapFrame(wx.Frame):
         try:
             svc_config = self.svc_config
             
+            # Get logger names from logging_defaults (dict) or logging_keys (list) for backwards compatibility
+            logging_defaults = svc_config.options.get('logging_defaults', {})
+            logger_names = list(logging_defaults.keys()) if logging_defaults else svc_config.options.get('logging_keys', [])
+            
             dialog = ConfigDialog(
                 None,
                 title="Configuration Options",
                 svc_config=svc_config,
                 file_open_commands=svc_config.file_open_commands,
-                logging_keys=svc_config.options.get('logging_keys', [])
+                logging_keys=logger_names
             )
             dialog.ShowModal()
             dialog.Destroy()

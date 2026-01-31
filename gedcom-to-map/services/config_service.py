@@ -122,13 +122,31 @@ class GVConfig(IConfig):
     def _cleanup_and_load_logging_section(self) -> None:
         """Clean up stale loggers and load active logger levels from [Logging] section.
         
-        Removes logger names that are no longer in logging_keys list,
-        then applies levels for remaining loggers.
+        First applies default levels from logging_defaults, then INI overrides them.
+        Removes logger names that are no longer in logging_defaults/logging_keys list.
         """
+        # Get logger configuration
+        logging_defaults = self.options.get('logging_defaults', {})
+        logging_keys = list(logging_defaults.keys()) if logging_defaults else self.options.get('logging_keys', [])
+        
+        # Step 1: Apply default levels from YAML for all configured loggers
+        if logging_defaults:
+            for logger_name, default_level in logging_defaults.items():
+                try:
+                    level_value = logging.getLevelName(default_level)
+                    if isinstance(level_value, int):
+                        alogger = logging.getLogger(logger_name)
+                        alogger.setLevel(level_value)
+                        _log.debug("Set default level for logger '%s' to %s", logger_name, default_level)
+                    else:
+                        _log.warning("Invalid default logging level '%s' for logger '%s'", default_level, logger_name)
+                except Exception as e:
+                    _log.error("Error setting default level for logger '%s': %s", logger_name, e)
+        
+        # Step 2: Clean up stale loggers from INI
         if 'Logging' not in self.gvConfig:
             return
         
-        logging_keys = self.options.get('logging_keys', [])
         stale_loggers = []
         
         # Identify stale loggers (not in current logging_keys)
@@ -149,12 +167,12 @@ class GVConfig(IConfig):
             except Exception as e:
                 _log.error("Error saving cleaned logging settings: %s", e)
         
-        # Load and apply logger levels for active loggers
+        # Step 3: Apply INI overrides for active loggers (these override YAML defaults)
         for logger_name, log_level in self.gvConfig.items('Logging'):
             try:
                 alogger = logging.getLogger(logger_name)
                 alogger.setLevel(log_level)
-                _log.debug("Set logger '%s' to level %s", logger_name, log_level)
+                _log.debug("Set logger '%s' to level %s from INI", logger_name, log_level)
             except Exception as e:
                 _log.warning("Failed to set logger '%s' level to %s: %s", logger_name, log_level, e)
 
@@ -232,12 +250,14 @@ class GVConfig(IConfig):
                 if hasattr(self, 'Main') and self.Main:
                     self.gvConfig['Gedcom.Main'][name] = self.Main
 
-            # Save logger levels - only for loggers explicitly in logging_keys
+            # Save logger levels - only for loggers explicitly in logging_defaults
             # Clear existing entries first to avoid persisting stale loggers
             self.gvConfig.remove_section('Logging')
             self.gvConfig.add_section('Logging')
             
-            logging_keys = self.options.get('logging_keys', [])
+            # Get logger names from logging_defaults (dict) or logging_keys (list) for backwards compatibility
+            logging_defaults = self.options.get('logging_defaults', {})
+            logging_keys = list(logging_defaults.keys()) if logging_defaults else self.options.get('logging_keys', [])
             for logName in logging_keys:
                 # Only save if this logger actually exists and has a non-default level
                 if logName in logging.root.manager.loggerDict:

@@ -149,14 +149,22 @@ file_command_defaults:
 # Logger names to track in Logging section of INI file
 # Configure logging at the package level for simpler management
 # Child loggers inherit these settings unless explicitly overridden
-logging_keys: [
+# Default level is WARNING for all loggers
+logging_defaults:
   # Core application
-  const, gv,
+  const: WARNING
+  gv: WARNING
   # Major components (package-level)
-  services, models, geo_gedcom, render, gui,
+  services: WARNING
+  models: WARNING
+  geo_gedcom: WARNING
+  render: WARNING
+  gui: WARNING
   # External dependencies
-  ged4py, geopy,
-]
+  ged4py: WARNING
+  geopy: WARNING
+  urllib3: WARNING
+  matplotlib: WARNING
 
 # Old settings that should be removed from the INI config file
 old_ini_settings: {

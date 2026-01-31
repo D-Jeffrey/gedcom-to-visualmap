@@ -1,4 +1,6 @@
 import logging
+import os
+from pathlib import Path
 import wx
 import wx.grid as gridlib
 
@@ -75,7 +77,7 @@ class ConfigDialog(wx.Dialog):
         GRIDctl.SetColLabelValue(0, "Logger Name")
         GRIDctl.SetColLabelValue(1, "Log Level")
 
-        self.logging_levels = ['NOTSET', 'DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL']
+        self.logging_levels = ['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL']
 
         def makeCells():
             GRIDctl.SetCellValue(self.row, 0, loggerName)
@@ -134,11 +136,17 @@ class ConfigDialog(wx.Dialog):
         setAllSizer = wx.BoxSizer(wx.HORIZONTAL)
         setAllSizer.Add(wx.StaticText(cfgpanel, -1, "Set all logging levels to:"), 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 5)
         self.setAllChoice = wx.Choice(cfgpanel, choices=self.logging_levels)
-        self.setAllChoice.SetSelection(2)  # Default to INFO
+        self.setAllChoice.SetSelection(1)  # Default to INFO
         setAllSizer.Add(self.setAllChoice, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 5)
         setAllButton = wx.Button(cfgpanel, label="Apply to All")
         setAllButton.Bind(wx.EVT_BUTTON, self.onSetAllLevels)
         setAllSizer.Add(setAllButton, 0, wx.ALIGN_CENTER_VERTICAL)
+        
+        # Add Clear Log File button
+        clearLogButton = wx.Button(cfgpanel, label="Clear Log File")
+        clearLogButton.Bind(wx.EVT_BUTTON, self.onClearLogFile)
+        setAllSizer.Add(clearLogButton, 0, wx.ALIGN_CENTER_VERTICAL | wx.LEFT, 20)
+        
         sizer.Add(setAllSizer, 0, wx.ALL, 10)
         
         sizer.Add(GRIDctl, 1, wx.EXPAND | wx.ALL, 20)
@@ -163,13 +171,70 @@ class ConfigDialog(wx.Dialog):
             # Only update loggers that are in logging_keys (configured in yaml/INI)
             if loggerName in self.logging_keys:
                 self.GRIDctl.SetCellValue(row, 1, selected_level)
-                # Update background color for NOTSET
-                if selected_level == 'NOTSET':
-                    self.GRIDctl.SetCellBackgroundColour(row, 1, wx.LIGHT_GREY)
-                else:
-                    self.GRIDctl.SetCellBackgroundColour(row, 1, wx.WHITE)
         
         self.GRIDctl.ForceRefresh()
+
+    def onClearLogFile(self, event):
+        """Clear the log file (reset to empty file)."""
+        from const import NAME
+        log_file_path = Path(f"{NAME}.log")
+        
+        try:
+            if log_file_path.exists():
+                # Close all file handlers writing to this log file to avoid file position issues
+                root_logger = logging.getLogger()
+                file_handlers_to_reopen = []
+                
+                for handler in root_logger.handlers[:]:
+                    if isinstance(handler, logging.FileHandler):
+                        if Path(handler.baseFilename).resolve() == log_file_path.resolve():
+                            handler.close()
+                            file_handlers_to_reopen.append((handler, root_logger))
+                            root_logger.removeHandler(handler)
+                
+                # Also check all other loggers
+                for logger_name in logging.Logger.manager.loggerDict:
+                    logger = logging.getLogger(logger_name)
+                    if hasattr(logger, 'handlers'):
+                        for handler in logger.handlers[:]:
+                            if isinstance(handler, logging.FileHandler):
+                                if Path(handler.baseFilename).resolve() == log_file_path.resolve():
+                                    handler.close()
+                                    file_handlers_to_reopen.append((handler, logger))
+                                    logger.removeHandler(handler)
+                
+                # Clear the file
+                with open(log_file_path, 'w', encoding='utf-8') as f:
+                    pass
+                
+                # Recreate and reattach the file handlers
+                from const import LOG_CONFIG
+                formatter = logging.Formatter(LOG_CONFIG['formatters']['standard']['format'])
+                
+                for old_handler, parent_logger in file_handlers_to_reopen:
+                    new_handler = logging.FileHandler(
+                        filename=old_handler.baseFilename,
+                        mode='a',  # Append mode since file now exists and is empty
+                        encoding='utf-8'
+                    )
+                    new_handler.setLevel(old_handler.level)
+                    new_handler.setFormatter(formatter)
+                    parent_logger.addHandler(new_handler)
+                
+                _log.info("Log file cleared by user via Configuration dialog")
+            else:
+                wx.MessageBox(
+                    f"Log file does not exist:\n\n{log_file_path.absolute()}",
+                    "File Not Found",
+                    wx.OK | wx.ICON_INFORMATION
+                )
+        except Exception as e:
+            _log.exception("Failed to clear log file")
+            wx.MessageBox(
+                f"Failed to clear log file:\n\n{str(e)}",
+                "Error",
+                wx.OK | wx.ICON_ERROR
+            )
 
     def onSave(self, event):
         for row in range(self.GRIDctl.GetNumberRows()):

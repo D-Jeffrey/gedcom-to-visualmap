@@ -379,7 +379,9 @@ def savesettings(obj: Any) -> None:
             name = Path(obj.GEDCOMinput).stem
             obj.gvConfig[INI_SECTION_GEDCOM_MAIN][name] = str(obj.Main)
         loggerNames = list(logging.root.manager.loggerDict.keys())
-        logging_keys = obj.options.get('logging_keys', [])
+        # Get logger names from logging_defaults (dict) or logging_keys (list) for backwards compatibility
+        logging_defaults = obj.options.get('logging_defaults', {})
+        logging_keys = list(logging_defaults.keys()) if logging_defaults else obj.options.get('logging_keys', [])
         for logName in loggerNames:
             if logName in logging_keys:
                 logLevel = logging.getLevelName(logging.getLogger(logName).level)

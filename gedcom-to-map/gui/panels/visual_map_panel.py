@@ -221,10 +221,10 @@ class VisualMapPanel(wx.Panel):
         except Exception:
             normalized_input = path
 
-        # Persist to service config
+        # Use setInput to ensure ResultFile is updated correctly
         try:
-            if hasattr(self.svc_config, 'set'):
-                self.svc_config.set('GEDCOMinput', normalized_input)
+            self.svc_config.setInput(normalized_input, generalRequest=True)
+            _log.debug("After setInput: ResultFile=%s", self.svc_config.get('ResultFile', 'NOT SET'))
         except Exception:
             _log.exception("Failed to set GEDCOMinput on svc_config")
 
@@ -235,29 +235,19 @@ class VisualMapPanel(wx.Panel):
         except Exception:
             _log.debug("Failed to set TEXTGEDCOMinput")
 
+        # Update the output filename field from config (setInput already set ResultFile)
+        try:
+            result_file = self.svc_config.get('ResultFile', '')
+            _log.debug("Setting TEXTResultFile to: %s", result_file)
+            self.id.TEXTResultFile.SetValue(result_file)
+        except Exception:
+            _log.exception("Failed to update TEXTResultFile")
+
         # Persist to user config storage
         try:
             self.fileConfig.Write("GEDCOMinput", normalized_input)
         except Exception:
             _log.debug("Failed to write GEDCOMinput to fileConfig")
-
-        # Derive ResultFile based on current ResultType
-        try:
-            rtype = self.svc_config.get('ResultType')
-        except Exception:
-            rtype = None
-            enforced = ResultType.ResultTypeEnforce(rtype)
-            ext = ResultType.file_extension(enforced)
-            result_base, _ = os.path.splitext(normalized_input or "")
-            result_file = (result_base or "").rsplit(os.sep, 1)[-1] + "." + ext
-            if hasattr(self.svc_config, 'set'):
-                self.svc_config.set('ResultFile', result_file)
-            try:
-                self.id.TEXTResultFile.SetValue(result_file)
-            except Exception:
-                _log.debug("Failed to set TEXTResultFile")
-        except Exception:
-            _log.debug("Unable to compute ResultFile from ResultType")
 
         # Mark UI for reload and refresh button states
         self.NeedReload()

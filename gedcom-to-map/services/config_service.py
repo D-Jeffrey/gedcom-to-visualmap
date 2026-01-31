@@ -110,8 +110,9 @@ class GVConfig(IConfig):
             except Exception as e:
                 _log.error("Error saving migrated settings: %s", e)
         self.setInput(self.gvConfig['Core'].get('InputFile', ''), generalRequest=False)
-        self.resultpath, self.ResultFile = os.path.split(self.gvConfig['Core'].get('OutputFile', ''))
-        self.setResultsFile(self.ResultFile, getattr(self, 'ResultType', None))
+        # Note: setInput already calls setResultsFile, so we don't need to call it again
+        # The resultpath can be loaded from INI if saved separately
+        self.resultpath = os.path.split(self.gvConfig['Core'].get('OutputFile', ''))[0]
         
         # Load file open commands from INI into _file_open_commands object
         self._load_file_commands_from_ini()
@@ -363,14 +364,19 @@ class GVConfig(IConfig):
             ResultFile: Base name for the results file (without extension).
             OutputType: Type of output, determines file extension (HTML, KML, KML2, SUM).
         """
+        _log = logging.getLogger(__name__ + ".GVConfig.setResultsFile")
+        _log.debug("setResultsFile called with ResultFile=%s, OutputType=%s", ResultFile, OutputType)
+        
         from const import ResultType
         enforced = ResultType.ResultTypeEnforce(OutputType)
         self.ResultType = enforced
         extension = ResultType.file_extension(enforced)
         base, _ = os.path.splitext(os.path.basename(ResultFile or ""))
+        _log.debug("Extracted base=%s, extension=%s", base, extension)
         self.ResultFile = base
         if self.ResultFile:
             self.ResultFile = self.ResultFile + "." + extension
+        _log.debug("Final ResultFile=%s", self.ResultFile)
 
     def set_options(self, options_types: Dict[str, str], options_defaults: Dict[str, Any]) -> None:
         """Set configuration options from types and defaults dictionaries.

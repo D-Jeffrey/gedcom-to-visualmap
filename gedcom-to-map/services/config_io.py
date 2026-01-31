@@ -311,8 +311,9 @@ def loadsettings(obj: Any) -> None:
         except Exception as e:
             _log.error("Error saving migrated settings: %s", e)
     obj.setInput(obj.gvConfig['Core'].get('InputFile', ''), generalRequest=False)
-    obj.resultpath, obj.ResultFile = os.path.split(obj.gvConfig['Core'].get('OutputFile', ''))
-    obj.setResultsFile(obj.ResultFile, obj.ResultType)
+    # Note: setInput already calls setResultsFile, so we don't need to call it again
+    # The resultpath can be loaded from INI if saved separately
+    obj.resultpath = os.path.split(obj.gvConfig['Core'].get('OutputFile', ''))[0]
     for file_type in obj.file_open_commands.list_file_types():
         cmd = obj.gvConfig['Core'].get(f'{file_type}cmdline', '')
         if cmd:

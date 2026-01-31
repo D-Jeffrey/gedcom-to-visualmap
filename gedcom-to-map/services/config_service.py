@@ -207,11 +207,14 @@ class GVConfig(IConfig):
             sectionName: Name of the INI section to load.
             keys: Dictionary mapping attribute names to their types.
         """
+        _log.debug("Loading section '%s' with %d keys", sectionName, len(keys or {}))
         for key, typ in (keys or {}).items():
             value = self.gvConfig[sectionName].get(key, None)
             if value is None:
+                _log.debug("  Key '%s' not found in INI section '%s', skipping", key, sectionName)
                 continue
             parsed = self._coerce_value_to_type(value, typ, context=f"{sectionName}.{key}")
+            _log.debug("  Loaded %s.%s = %s (type=%s, parsed=%s)", sectionName, key, value, typ, parsed)
             setattr(self, key, parsed)
 
     def savesettings(self) -> None:
@@ -231,7 +234,10 @@ class GVConfig(IConfig):
             for key in core_keys:
                 self.gvConfig['Core'][key] = str(getattr(self, key))
             html_keys = self._build_section_keys('HTML')
+            _log.debug("Saving HTML section with keys: %s", list(html_keys.keys()))
             for key in html_keys:
+                value = getattr(self, key)
+                _log.debug("  Saving HTML.%s = %s (type=%s)", key, value, type(value).__name__)
                 self.gvConfig['HTML'][key] =  str(getattr(self, key))
             summary_keys = self._build_section_keys('Summary')
             for key in summary_keys:
@@ -393,7 +399,7 @@ class GVConfig(IConfig):
 
     def set_marker_defaults(self) -> None:
         """Load default marker options from YAML configuration."""
-        marker_options_unified = self.options.get('marker_options', {}) or {}
+        marker_options_unified = self.options.get('html_display_options', {}) or {}
         marker_options = {k: v.get('default') for k, v in marker_options_unified.items()}
         self.set_marker_options(marker_options)
 
@@ -403,7 +409,7 @@ class GVConfig(IConfig):
         Args:
             marker_options: Dictionary of marker option names to values.
         """
-        marker_options_unified = self.options.get('marker_options', {}) or {}
+        marker_options_unified = self.options.get('html_display_options', {}) or {}
         expected_keys = list(marker_options_unified.keys())
         for key, value in marker_options.items():
             if key in expected_keys:
@@ -616,7 +622,11 @@ class GVConfig(IConfig):
             opts = self.options.get(section, {})
             for key, props in opts.items():
                 if isinstance(props, dict) and props.get('ini_section') == section_name:
-                    section_keys[key] = props.get('ini_type', props.get('type'))
+                    key_type = props.get('ini_type', props.get('type'))
+                    section_keys[key] = key_type
+                    _log.debug("  _build_section_keys: %s.%s -> type=%s (ini_section=%s)", 
+                              section_name, key, key_type, props.get('ini_section'))
+        _log.debug("Built %d keys for section '%s': %s", len(section_keys), section_name, list(section_keys.keys()))
         return section_keys
 
     # === Properties (IConfig interface) ===

@@ -16,7 +16,7 @@ class TestGVConfigInit:
         config = GVConfig()
         assert hasattr(config, 'options')
         assert isinstance(config.options, dict)
-        assert 'marker_options' in config.options
+        assert 'html_display_options' in config.options
     
     def test_gvconfig_init_creates_attributes(self):
         """Test that GVConfig creates expected attributes."""
@@ -39,7 +39,7 @@ class TestGVConfigMarkerOptions:
         """Test setting marker defaults from YAML configuration."""
         config = GVConfig()
         config.set_marker_defaults()
-        marker_options = config.options.get('marker_options', {})
+        marker_options = config.options.get('html_display_options', {})
         for key in marker_options:
             assert hasattr(config, key)
     
@@ -48,7 +48,7 @@ class TestGVConfigMarkerOptions:
         config = GVConfig()
         test_options = {'marker_size': 10, 'marker_color': 'blue'}
         # Get valid marker options from YAML
-        valid_keys = list(config.options.get('marker_options', {}).keys())
+        valid_keys = list(config.options.get('html_display_options', {}).keys())
         if valid_keys:
             test_options = {valid_keys[0]: 'test_value'}
             config.set_marker_options(test_options)

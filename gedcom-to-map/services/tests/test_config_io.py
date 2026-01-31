@@ -93,15 +93,15 @@ class TestCoerceValueToType:
         assert result == {'a': 1}
     
     def test_result_type(self):
-        # ResultType is imported late in coerce_value_to_type from const module
+        # ResultType is imported late in coerce_value_to_type from render.result_type module
         # Just test that it processes the value correctly
-        with patch('const.ResultType') as mock_result_type:
+        with patch('render.result_type.ResultType') as mock_result_type:
             mock_result_type.ResultTypeEnforce.return_value = 'HTML'
             result = config_io.coerce_value_to_type('HTML', 'result')
             mock_result_type.ResultTypeEnforce.assert_called_once()
     
     def test_result_type_with_prefix(self):
-        with patch('const.ResultType') as mock_result_type:
+        with patch('render.result_type.ResultType') as mock_result_type:
             mock_result_type.ResultTypeEnforce.return_value = 'HTML'
             result = config_io.coerce_value_to_type('ResultType.HTML', 'result')
             mock_result_type.ResultTypeEnforce.assert_called_once_with('HTML')
@@ -212,7 +212,7 @@ class TestSetMarkerDefaults:
     def test_set_marker_defaults(self):
         obj = Mock()
         obj.options = {
-            'marker_options': {
+            'html_display_options': {
                 'marker1': {'default': 'value1'},
                 'marker2': {'default': 'value2'}
             }
@@ -224,7 +224,7 @@ class TestSetMarkerDefaults:
     
     def test_empty_marker_options(self):
         obj = Mock()
-        obj.options = {'marker_options': {}}
+        obj.options = {'html_display_options': {}}
         
         config_io.set_marker_defaults(obj)
         # Should not raise
@@ -236,7 +236,7 @@ class TestSetMarkerOptions:
     def test_set_valid_markers(self):
         obj = Mock()
         obj.options = {
-            'marker_options': {
+            'html_display_options': {
                 'marker1': {},
                 'marker2': {}
             }
@@ -249,7 +249,7 @@ class TestSetMarkerOptions:
     
     def test_unknown_marker_warning(self, caplog):
         obj = Mock()
-        obj.options = {'marker_options': {'known_marker': {}}}
+        obj.options = {'html_display_options': {'known_marker': {}}}
         marker_options = {'unknown_marker': 'value'}
         
         config_io.set_marker_options(obj, marker_options)
@@ -257,7 +257,7 @@ class TestSetMarkerOptions:
     
     def test_missing_marker_attribute(self):
         obj = Mock(spec=[])
-        obj.options = {'marker_options': {'marker1': {}}}
+        obj.options = {'html_display_options': {'marker1': {}}}
         
         with patch('services.config_io.hasattr', return_value=False):
             config_io.set_marker_options(obj, {})

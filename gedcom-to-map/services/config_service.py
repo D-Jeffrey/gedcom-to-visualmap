@@ -11,10 +11,11 @@ import yaml
 import logging
 
 from const import (
-    ResultType, GEO_CONFIG_FILENAME, 
+    GEO_CONFIG_FILENAME, 
     INI_SECTION_GEDCOM_MAIN, INI_SECTIONS, INI_OPTION_SECTIONS,
     MIGRATION_VERSION_UNSET, MIGRATION_VERSION_CURRENT
 )
+from render.result_type import ResultType
 from services.interfaces import IConfig
 from services.config_io import get_option_sections, set_options, settings_file_pathname
 from services.file_commands import FileOpenCommandLines
@@ -367,7 +368,7 @@ class GVConfig(IConfig):
         _log = logging.getLogger(__name__ + ".GVConfig.setResultsFile")
         _log.debug("setResultsFile called with ResultFile=%s, OutputType=%s", ResultFile, OutputType)
         
-        from const import ResultType
+        from render.result_type import ResultType
         enforced = ResultType.ResultTypeEnforce(OutputType)
         self.ResultType = enforced
         extension = ResultType.file_extension(enforced)
@@ -551,7 +552,7 @@ class GVConfig(IConfig):
                     m = re.match(r'^\s*ResultType\.([A-Za-z_][A-Za-z0-9_]*)\s*$', value)
                     if m:
                         value = m.group(1)
-                from const import ResultType
+                from render.result_type import ResultType
                 return ResultType.ResultTypeEnforce(value)
             else:
                 if isinstance(value, (dict, list, int, float, bool)):

@@ -5,7 +5,7 @@ import os
 from pathlib import Path
 from unittest.mock import Mock, patch
 from services.config_service import GVConfig
-from const import ResultType
+from render.result_type import ResultType
 
 
 class TestGVConfigInit:

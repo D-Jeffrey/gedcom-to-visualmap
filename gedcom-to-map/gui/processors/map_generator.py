@@ -1,4 +1,4 @@
-from const import ResultType
+from render.result_type import ResultType
 """
 Map visualization generation (HTML/KML formats).
 
@@ -90,8 +90,10 @@ class MapGenerator:
         max_missing = svc_config.get('MaxMissing', 0)
         all_entities = svc_config.get('AllEntities', False)
         
+        svc_progress.step('Creating HTML map - initializing')
         _log.debug("Creating Lifeline (fullresult:%s)", fullresult)
         lifeline: LifetimeCreator = LifetimeCreator(people, max_missing)    
+        svc_progress.step('Generating lifetime lines')
         _log.debug("Creating People ")
         creator: list = lifeline.create(main_id)    
         
@@ -112,6 +114,7 @@ class MapGenerator:
             _log.info("Total of %i people & events.", len(creator))   
         svc_state.totalpeople = len(creator)
 
+        svc_progress.step('Initializing map renderer')
         try:
             foliumExporter(svc_config, svc_state, svc_progress).export(people[main_id], creator, saveresult=True)
         except Exception:

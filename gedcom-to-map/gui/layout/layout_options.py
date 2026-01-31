@@ -1,4 +1,4 @@
-from const import ResultType
+from render.result_type import ResultType
 """
 layout_options.py
 

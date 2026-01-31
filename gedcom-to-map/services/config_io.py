@@ -109,7 +109,7 @@ def coerce_value_to_type(value: Any, target_type: str, context: str = "") -> Any
             return value
         elif target_type == 'result':
             # Late import to avoid circular dependency
-            from const import ResultType
+            from render.result_type import ResultType
             if isinstance(value, str):
                 m = re.match(r'^\s*ResultType\.([A-Za-z_][A-Za-z0-9_]*)\s*$', value)
                 if m:

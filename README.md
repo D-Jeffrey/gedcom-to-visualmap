@@ -24,6 +24,12 @@ Originally forked from [https://github.com/lmallez/gedcom-to-map], now in collab
 
 ## Recent Improvements
 
+- ✅ **Photo Path Handling**: Fixed cross-platform image display in HTML maps (Windows paths with backslashes now work correctly)
+- ✅ **Progress Messaging**: Added early progress messages during HTML generation for better user feedback
+- ✅ **Loop Detection**: Updated genealogical line creators to support pedigree collapse (same person in multiple branches)
+- ✅ **Logging System**: Simplified logging configuration with 12 core loggers, WARNING default level, and Clear Log File option
+- ✅ **Configuration Dialog**: Added "Set All Levels" control and improved logging grid display
+- ✅ **ResultType Refactoring**: Moved ResultType enum to dedicated render/result_type.py module for better organization
 - ✅ **Progress Reporting**: GEDCOM parsing now properly displays progress metrics (counter, target, ETA) in the GUI
 - ✅ **HTML Generation**: Fixed issue where HTML output files weren't being saved during batch processing
 - ✅ **Output File Paths**: Corrected file path construction for all output types (HTML, KML, KML2, SUM)

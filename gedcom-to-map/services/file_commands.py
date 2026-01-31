@@ -29,7 +29,7 @@ class FileOpenCommandLines:
         
         File type matching is case-insensitive. If a command already exists
         for this file type (with different casing), it will be overwritten
-        and a warning logged.
+        and an info message logged.
         
         Args:
             file_type: The file type identifier (e.g., 'html', 'kml')
@@ -39,7 +39,7 @@ class FileOpenCommandLines:
         found_key = file_type
         for key in self.commands.keys():
             if key.lower() == file_type_lower:
-                _log.warning(
+                _log.info(
                     "Overwriting existing command for file type '%s': '%s' -> '%s'",
                     file_type, self.commands[key], command_line
                 )

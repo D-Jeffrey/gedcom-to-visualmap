@@ -45,6 +45,9 @@ class TestFileOpenCommandLines:
     
     def test_add_overwrites_different_case(self, caplog):
         """Test that adding file type with different case overwrites (case-insensitive)."""
+        import logging
+        caplog.set_level(logging.INFO, logger='services.file_commands')
+        
         fcl = FileOpenCommandLines()
         fcl.add_file_type_command('HTML', 'open {file}')
         fcl.add_file_type_command('html', 'chrome {file}')
@@ -54,7 +57,7 @@ class TestFileOpenCommandLines:
         assert fcl.commands['HTML'] == 'chrome {file}'
         assert len(fcl.commands) == 1
         
-        # Should log warning
+        # Should log info message
         assert 'Overwriting existing command' in caplog.text
     
     def test_get_command_exact_case(self):

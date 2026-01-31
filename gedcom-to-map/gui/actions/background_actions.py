@@ -125,9 +125,9 @@ class BackgroundActions:
         """
         try:
             if dolevel.should_parse():
-                self.panel.id.BTNLoad.SetBackgroundColour(self.panel.id.GetColor('BTN_DONE'))
+                self.panel.id.BTNLoad.SetBackgroundColour(self.panel.color_manager.get_color('BTN_DONE'))
             if dolevel.has_generate():
-                self.panel.id.BTNCreateFiles.SetBackgroundColour(self.panel.id.GetColor('BTN_DONE'))
+                self.panel.id.BTNCreateFiles.SetBackgroundColour(self.panel.color_manager.get_color('BTN_DONE'))
         except Exception:
             _log.exception("Update button colours: failed to update button colours")
 
@@ -395,7 +395,7 @@ class BackgroundActions:
         Called when operations complete or are cancelled.
         """
         try:
-            default_color = self.panel.id.GetColor('BTN_DEFAULT')
+            default_color = self.panel.color_manager.get_color('BTN_DEFAULT')
             self.panel.id.BTNLoad.SetBackgroundColour(default_color)
             self.panel.id.BTNCreateFiles.SetBackgroundColour(default_color)
         except Exception:
@@ -412,9 +412,9 @@ class BackgroundActions:
         """
         try:
             if dolevel.should_parse():
-                self.panel.id.BTNLoad.SetBackgroundColour(self.panel.id.GetColor('BTN_DONE'))
+                self.panel.id.BTNLoad.SetBackgroundColour(self.panel.color_manager.get_color('BTN_DONE'))
             if dolevel.has_generate():
-                self.panel.id.BTNCreateFiles.SetBackgroundColour(self.panel.id.GetColor('BTN_DONE'))
+                self.panel.id.BTNCreateFiles.SetBackgroundColour(self.panel.color_manager.get_color('BTN_DONE'))
         except Exception:
             _log.exception("_update_button_colours_done: failed to update button colours")
 

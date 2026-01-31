@@ -28,6 +28,7 @@ from ..dialogs.help_dialog import HelpDialog
 from ..panels.visual_map_panel import VisualMapPanel
 from ..layout.visual_gedcom_ids import VisualGedcomIds
 from ..layout.font_manager import FontManager
+from ..layout.colour_manager import ColourManager
 
 class VisualMapFrame(wx.Frame):
     """Main application window/frame.
@@ -39,6 +40,7 @@ class VisualMapFrame(wx.Frame):
 
     # runtime attributes with basic type hints
     font_manager: FontManager  # Initialized in __init__
+    color_manager: ColourManager  # Initialized in __init__
     svc_config: IConfig  # Initialized in __init__
     svc_state: IState  # Initialized in __init__
     svc_progress: IProgressTracker  # Initialized in __init__
@@ -52,7 +54,7 @@ class VisualMapFrame(wx.Frame):
     font: wx.Font  # Set in set_current_font()
 
     def __init__(self, parent: wx.Window, svc_config: IConfig, svc_state: IState, svc_progress: IProgressTracker,
-                 font_manager: FontManager, *args: Any, **kw: Any) -> None:
+                 font_manager: FontManager, color_manager: ColourManager, *args: Any, **kw: Any) -> None:
         """Construct the frame.
 
         Args:
@@ -61,6 +63,7 @@ class VisualMapFrame(wx.Frame):
             svc_state: Runtime state service (IState).
             svc_progress: Progress tracking service (IProgressTracker).
             font_manager: Font manager instance.
+            color_manager: Colour manager instance.
             *args/**kw: forwarded to wx.Frame constructor (title, size, style).
         """
         # ensure the parent's __init__ is called so the wx.frame is created
@@ -70,6 +73,7 @@ class VisualMapFrame(wx.Frame):
         self.svc_state = svc_state
         self.svc_progress = svc_progress
         self.font_manager = font_manager
+        self.color_manager = color_manager
         self.set_current_font()
 
         self.SetMinSize((800, 800))
@@ -79,7 +83,7 @@ class VisualMapFrame(wx.Frame):
 
         # Create and set up the main panel within the frame
         # Pass services to VisualMapPanel
-        self.visual_map_panel = VisualMapPanel(self, self.font_manager, self.svc_config, self.svc_state, self.svc_progress)
+        self.visual_map_panel = VisualMapPanel(self, self.font_manager, self.color_manager, self.svc_config, self.svc_state, self.svc_progress)
 
     def set_current_font(self) -> None:
         """Ensure the frame uses the current font from the FontManager."""
@@ -151,7 +155,7 @@ class VisualMapFrame(wx.Frame):
 
     def makeMenuBar(self) -> None:
         """Build and attach the application's menu bar."""
-        self.id = VisualGedcomIds()
+        self.id = VisualGedcomIds(svc_config=self.svc_config)
         self.menuBar = menuBar = wx.MenuBar()
         self.fileMenu = fileMenu = wx.Menu()
         fileMenu.Append(wx.ID_OPEN, "&Open...\tCtrl-O", "Select a GEDCOM file")

@@ -28,7 +28,7 @@ class LayoutHelpers:
         btn = wx.Button(panel, id=id_, label=label)
         if color:
             try:
-                btn.SetBackgroundColour(vm_panel.id.GetColor(color))
+                btn.SetBackgroundColour(vm_panel.color_manager.get_color(color))
             except Exception:
                 _log.debug("add_button_with_id: GetColor failed for %s", color)
         setattr(vm_panel.id, id_name, btn)
@@ -99,7 +99,7 @@ class LayoutHelpers:
     def add_busy_indicator(vm_panel: Any, panel: wx.Panel, name: str, color: str = "BUSY_BACK") -> wx.ActivityIndicator:
         ai = wx.ActivityIndicator(panel)
         try:
-            ai.SetBackgroundColour(vm_panel.id.GetColor(color))
+            ai.SetBackgroundColour(vm_panel.color_manager.get_color(color))
         except Exception:
             _log.debug("add_busy_indicator: GetColor failed for %s", color)
         setattr(vm_panel.id, name, ai)

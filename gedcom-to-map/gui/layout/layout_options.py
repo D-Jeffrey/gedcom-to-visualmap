@@ -54,7 +54,7 @@ class LayoutOptions:
         titleFont = vm_panel.font_manager.get_font(bold=True, size_delta=0)
         fh = titleFont.GetPixelSize()[1]
         titleArea = wx.Panel(panel, size=(-1, fh + 10))
-        titleArea.SetBackgroundColour(vm_panel.id.GetColor("TITLE_BACK"))
+        titleArea.SetBackgroundColour(vm_panel.color_manager.get_color("TITLE_BACK"))
         title = wx.StaticText(titleArea, label="Visual Mapping Options", style=wx.ALIGN_CENTER)
         title.SetFont(titleFont)
         titleSizer = wx.BoxSizer(wx.HORIZONTAL)

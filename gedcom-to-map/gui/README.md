@@ -58,6 +58,7 @@ UI layout construction and event handling utilities:
 - **`VisualMapEventHandler`** - Event handler delegate for VisualMapPanel
 - **`VisualGedcomIds`** - Central wxPython widget ID management
 - **`FontManager`** - Font configuration and sizing
+- **`ColourManager`** - GUI colour management (wx.Colour handling)
 
 ## Usage
 

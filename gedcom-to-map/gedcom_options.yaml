@@ -8,6 +8,24 @@ gui_options:
   panelWidthPercent: {type: 'int', default: 30}
   window_size: {type: 'list', default: [1024, 800]}
 
+# GUI color scheme for buttons, backgrounds, and UI elements
+# Each entry maps a color name to a wx.TheColourDatabase color name
+gui_colors:
+  BTN_PRESS: TAN
+  BTN_DIRECTORY: WHEAT
+  BTN_DONE: WHITE
+  SELECTED: NAVY
+  SELECTED_TEXT: BLACK
+  ANCESTOR: MEDIUM GOLDENROD
+  MAINPERSON: KHAKI
+  OTHERPERSON: WHITE
+  INFO_BOX_BACKGROUND: GOLDENROD
+  GRID_TEXT: BLACK
+  GRID_BACK: WHITE
+  TITLE_TEXT: WHITE
+  TITLE_BACK: KHAKI
+  BUSY_BACK: YELLOW
+
 # Available map tile providers for HTML/Folium maps
 map_types:
   - "CartoDB.Voyager"

@@ -10,7 +10,7 @@ The GUI package is now organized into subpackages:
 - actions: Action handlers (VisualMapActions, BackgroundActions, FileOpener, DoActionsType)
 - dialogs: Dialog windows (AboutDialog, ConfigDialog, FindDialog, etc.)
 - widgets: Custom controls (PeopleListCtrl, GedRecDisplay)
-- layout: Layout helpers (LayoutOptions, LayoutHelpers, EventHandlers, etc.)
+- layout: Layout helpers (LayoutOptions, LayoutHelpers, EventHandlers, FontManager, ColourManager, etc.)
 """
 
 # Try to import GUI components, but don't fail if there are errors
@@ -67,7 +67,7 @@ except (ImportError, AttributeError):
 
 # Layout
 try:
-    from .layout import LayoutOptions, LayoutHelpers, VisualMapEventHandler, VisualGedcomIds, FontManager  # type: ignore
-    __all__.extend(["LayoutOptions", "LayoutHelpers", "VisualMapEventHandler", "VisualGedcomIds", "FontManager"])
+    from .layout import LayoutOptions, LayoutHelpers, VisualMapEventHandler, VisualGedcomIds, FontManager, ColourManager  # type: ignore
+    __all__.extend(["LayoutOptions", "LayoutHelpers", "VisualMapEventHandler", "VisualGedcomIds", "FontManager", "ColourManager"])
 except (ImportError, AttributeError):
     pass

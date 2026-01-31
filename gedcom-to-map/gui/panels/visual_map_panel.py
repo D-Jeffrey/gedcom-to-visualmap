@@ -13,7 +13,7 @@ Notes:
 - Layout construction has been delegated to layout_options.LayoutOptions.
 - This file contains only panel-level behaviour and lifecycle management.
 """
-from typing import Optional, List, Any
+from typing import Optional, List, Any, TYPE_CHECKING
 import logging
 import time
 import math
@@ -31,6 +31,10 @@ from ..layout.visual_gedcom_ids import VisualGedcomIds
 from ..layout.visual_map_event_handlers import VisualMapEventHandler
 from ..actions.visual_map_actions import VisualMapActions
 from ..layout.font_manager import FontManager
+from ..layout.colour_manager import ColourManager
+
+if TYPE_CHECKING:
+    from services.interfaces import IConfig, IState, IProgressTracker
 
 (UpdateBackgroundEvent, EVT_UPDATE_STATE) = wx.lib.newevent.NewEvent()
 
@@ -52,6 +56,7 @@ class VisualMapPanel(wx.Panel):
 
     # Public attributes with types for static analysis and readability
     font_manager: FontManager
+    color_manager: ColourManager
     frame: wx.Frame
     svc_config: Any
     svc_state: Any
@@ -67,6 +72,7 @@ class VisualMapPanel(wx.Panel):
         self,
         parent: wx.Window,
         font_manager: 'FontManager',
+        color_manager: 'ColourManager',
         svc_config: 'IConfig',
         svc_state: 'IState',
         svc_progress: 'IProgressTracker',
@@ -78,6 +84,7 @@ class VisualMapPanel(wx.Panel):
         Args:
             parent: Parent wxPython window.
             font_manager: FontManager instance for font management and styling.
+            color_manager: ColourManager instance for colour management.
             svc_config: IConfig service for configuration storage.
             svc_state: IState service for runtime state access.
             svc_progress: IProgressTracker service for progress tracking and control.
@@ -97,6 +104,7 @@ class VisualMapPanel(wx.Panel):
         self.svc_state: 'IState' = svc_state
         self.svc_progress: 'IProgressTracker' = svc_progress
         self.font_manager: 'FontManager' = font_manager
+        self.color_manager: 'ColourManager' = color_manager
 
         self.SetMinSize((800,800))
         self.frame = self.TopLevelParent
@@ -107,7 +115,7 @@ class VisualMapPanel(wx.Panel):
         self.inTimer = False
         self.timeformat = '%H hr %M'
         self.SetAutoLayout(True)
-        self.id = VisualGedcomIds()
+        self.id = VisualGedcomIds(svc_config=self.svc_config)
         
         self.make_panels()
 
@@ -128,7 +136,7 @@ class VisualMapPanel(wx.Panel):
         self.panelB = wx.Panel(self, -1, style=wx.SIMPLE_BORDER)
         
         # https://docs.wxpython.org/wx.ColourDatabase.html#wx-colourdatabase
-        self.panelA.SetBackgroundColour(self.id.GetColor('INFO_BOX_BACKGROUND'))
+        self.panelA.SetBackgroundColour(self.color_manager.get_color('INFO_BOX_BACKGROUND'))
         self.panelB.SetBackgroundColour(wx.WHITE)
 
         main_hs = wx.BoxSizer(wx.HORIZONTAL)
@@ -138,7 +146,7 @@ class VisualMapPanel(wx.Panel):
         self.Layout()
 
         # Add Data Grid on Left panel
-        self.peopleList = PeopleListCtrlPanel(self.panelA, self.id.m, self.font_manager, svc_config=self.svc_config, svc_state=self.svc_state, svc_progress=self.svc_progress)
+        self.peopleList = PeopleListCtrlPanel(self.panelA, self.id.m, self.font_manager, self.color_manager, svc_config=self.svc_config, svc_state=self.svc_state, svc_progress=self.svc_progress)
         
         # create handler first so LayoutOptions.build (which no longer binds)
         # can safely be used; handler will be used to wire event bindings next
@@ -205,12 +213,12 @@ class VisualMapPanel(wx.Panel):
     def NeedReload(self):
         """Mark options that a reload is required and update button visuals."""
         self.svc_state.parsed = False
-        self.id.BTNLoad.SetBackgroundColour(self.id.GetColor('BTN_PRESS'))
+        self.id.BTNLoad.SetBackgroundColour(self.color_manager.get_color('BTN_PRESS'))
         self.NeedRedraw()
 
     def NeedRedraw(self):
         """Mark options that a redraw is required and update button visuals."""
-        self.id.BTNCreateFiles.SetBackgroundColour(self.id.GetColor('BTN_PRESS'))
+        self.id.BTNCreateFiles.SetBackgroundColour(self.color_manager.get_color('BTN_PRESS'))
 
     def setInputFile(self, path):
         """Set GEDCOM input path via services, update UI text and persist."""

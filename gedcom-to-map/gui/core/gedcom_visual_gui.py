@@ -22,6 +22,7 @@ from typing import Any, Tuple
 import wx
 from .visual_map_frame import VisualMapFrame
 from ..layout.font_manager import FontManager
+from ..layout.colour_manager import ColourManager
 from services.interfaces import IConfig, IState, IProgressTracker
 
 _log = logging.getLogger(__name__.lower())
@@ -35,6 +36,7 @@ class GedcomVisualGUI:
 
     Attributes:
         font_manager: The FontManager instance used by the GUI.
+        color_manager: The ColourManager instance used by the GUI.
         svc_config: Configuration service (IConfig).
         svc_state: Runtime state service (IState).
         svc_progress: Progress tracking service (IProgressTracker).
@@ -42,6 +44,7 @@ class GedcomVisualGUI:
     """
     # runtime attributes with basic type hints
     font_manager: FontManager
+    color_manager: ColourManager
     svc_config: IConfig
     svc_state: IState
     svc_progress: IProgressTracker
@@ -67,6 +70,7 @@ class GedcomVisualGUI:
             style: wx frame style flags (default: wx.DEFAULT_FRAME_STYLE).
         """
         self.font_manager: 'FontManager' = FontManager()
+        self.color_manager: 'ColourManager' = ColourManager(svc_config._gui_colors if hasattr(svc_config, '_gui_colors') else {})
         self.svc_config: 'IConfig' = svc_config
         self.svc_state: 'IState' = svc_state
         self.svc_progress: 'IProgressTracker' = svc_progress
@@ -75,7 +79,7 @@ class GedcomVisualGUI:
         size = svc_config.get('window_size', [1024, 800])
         self.frame: 'VisualMapFrame' = VisualMapFrame(
             parent, svc_config=svc_config, svc_state=svc_state, svc_progress=svc_progress,
-            font_manager=self.font_manager, title=title, size=size, style=style)
+            font_manager=self.font_manager, color_manager=self.color_manager, title=title, size=size, style=style)
 
     def start(self) -> None:
         """Start the GUI by delegating to the main frame's start method."""

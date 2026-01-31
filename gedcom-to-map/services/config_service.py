@@ -60,6 +60,7 @@ class GVConfig(IConfig):
         # === Initialize Core Settings ===
         self.gvConfig = None
         self.map_types = self.options.get('map_types', ["CartoDB.Voyager"])  # Load available map types
+        self._gui_colors = self._load_gui_colors()  # Load GUI color definitions
         self.set_marker_defaults()
         self.settingsfile = settings_file_pathname(self.INI_FILE_NAME)
         self._geo_config_file: Path = Path(__file__).resolve().parent / GEO_CONFIG_FILENAME
@@ -421,6 +422,14 @@ class GVConfig(IConfig):
             if not hasattr(self, key):
                 _log.warning("Marker option '%s' missing in defaults; setting to None.", key)
                 setattr(self, key, None)
+
+    def _load_gui_colors(self) -> dict:
+        """Load GUI color definitions from YAML configuration.
+        
+        Returns:
+            Dictionary mapping color names to color database names (strings).
+        """
+        return self.options.get('gui_colors', {})
 
     # === Getters/Setters ===
     def get(self, attribute: str, default: Any = None, ifNone: Any = None) -> Any:

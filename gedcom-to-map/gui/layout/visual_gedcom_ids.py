@@ -5,7 +5,7 @@ import logging
 import os
 import wx
 from wx.lib.embeddedimage import PyEmbeddedImage
-from typing import Any
+from typing import Any, Optional
 
 _log = logging.getLogger(__name__.lower())
 
@@ -17,7 +17,13 @@ class VisualGedcomIds:
     Adjust or extend attributes below to match the names used across the project.
     Using wx.NewIdRef() when available yields unique IDs compatible with modern wx.
     """
-    def __init__(self) -> None:
+    def __init__(self, svc_config=None) -> None:
+        """Initialize VisualGedcomIds.
+        
+        Args:
+            svc_config: Config service instance (optional, kept for compatibility).
+        """
+        self.svc_config = svc_config
         new_id = getattr(wx, "NewIdRef", None)
         if callable(new_id):
             make = lambda: new_id()
@@ -98,38 +104,6 @@ class VisualGedcomIds:
             name = f'CBSummary{row}'
             self.IDs[name] = idref
             self.IDtoAttr[idref] = ('CheckBox', attr, 'Redraw')
-
-        # Define color defaults as (name, default_colour_string) pairs and build
-        # COLORs (name->idref) and COLORid (idref -> [colour_name, wx.Colour])
-        color_pairs = [
-            ('BTN_PRESS', 'TAN'),
-            ('BTN_DIRECTORY', 'WHEAT'),
-            ('BTN_DONE', 'WHITE'),
-            ('SELECTED', 'NAVY'),
-            ('SELECTED_TEXT', 'BLACK'),
-            ('ANCESTOR', 'MEDIUM GOLDENROD'),
-            ('MAINPERSON', 'KHAKI'),
-            ('OTHERPERSON', 'WHITE'),
-            ('INFO_BOX_BACKGROUND', 'GOLDENROD'),
-            ('GRID_TEXT', 'BLACK'),
-            ('GRID_BACK', 'WHITE'),
-            ('TITLE_TEXT', 'WHITE'),
-            ('TITLE_BACK', 'KHAKI'),
-            ('BUSY_BACK', 'YELLOW'),
-        ]
-
-        self.colors = [name for name, _ in color_pairs]
-        self.COLORs = {}
-        self.COLORid = {}
-        for name, default in color_pairs:
-            idref = wx.NewIdRef()
-            self.COLORs[name] = idref
-            # store [default_name, wx.Colour_or_None]
-            try:
-                col = wx.TheColourDatabase.FindColour(default)
-            except Exception:
-                col = None
-            self.COLORid[idref] = [default, col]
         
         self.SmallUpArrow = PyEmbeddedImage(
             b"iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAADxJ"
@@ -143,12 +117,6 @@ class VisualGedcomIds:
         )
         
         self.m = {1: ()}
-
-    def GetColor(self, colorID):
-        if colorID in self.colors:
-            return self.COLORid[self.COLORs[colorID]][1]
-        _log.error(f'Color not defined : {colorID}')
-        raise ValueError(f'Color not defined : {colorID} Color to Attributer table error')
     
     def iter_controls(self):
         """

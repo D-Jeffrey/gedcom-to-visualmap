@@ -16,6 +16,7 @@ import wx
 import wx.lib.mixins.listctrl as listmix
 from ..widgets.people_list_ctrl import PeopleListCtrl
 from ..layout.font_manager import FontManager
+from ..layout.colour_manager import ColourManager
 from geo_gedcom.person import Person
 
 _log = logging.getLogger(__name__.lower())
@@ -28,7 +29,7 @@ class PeopleListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
     width whenever the panel resizes.
     """
 
-    def __init__(self, parent: wx.Window, people: Union[Dict[str, Person], Any], font_manager: FontManager,
+    def __init__(self, parent: wx.Window, people: Union[Dict[str, Person], Any], font_manager: FontManager, color_manager: ColourManager,
                  svc_config: Any = None, svc_state: Any = None, svc_progress: Any = None,
                  *args, **kw):
         """Initialize the PeopleListCtrlPanel.
@@ -37,6 +38,7 @@ class PeopleListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
             parent: Parent wx window.
             people: Iterable of people to populate the initial list.
             font_manager: FontManager instance used by the PeopleListCtrl.
+            color_manager: ColourManager instance used by the PeopleListCtrl.
             svc_config: IConfig service for configuration storage.
             svc_state: IState service for runtime state access.
             svc_progress: IProgressTracker service for progress and control.
@@ -47,6 +49,7 @@ class PeopleListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
         self.svc_state = svc_state
         self.svc_progress = svc_progress
         self.font_manager = font_manager
+        self.color_manager = color_manager
         sizer = wx.BoxSizer(wx.VERTICAL)
         self.messagelog = "*  Select a file, Load it and Create Files or change Result Type, Open Geo Table to edit addresses  *"
         self.InfoBox = []
@@ -66,7 +69,9 @@ class PeopleListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
         self.list = PeopleListCtrl(self, tID,
                         style=wx.LC_REPORT | wx.BORDER_SUNKEN | wx.LC_SINGLE_SEL,
                         size=wx.Size(600,600),
-                        font_manager=font_manager)
+                        font_manager=font_manager,
+                        color_manager=color_manager,
+                        svc_config=svc_config)
         sizer.Add(self.list, 1, wx.EXPAND)
 
         # Populate initial list

@@ -7,6 +7,7 @@ import wx.lib.mixins.listctrl as listmix
 from ..dialogs.find_dialog import FindDialog
 from ..layout.visual_gedcom_ids import VisualGedcomIds
 from ..layout.font_manager import FontManager
+from ..layout.colour_manager import ColourManager
 
 _log = logging.getLogger(__name__.lower())
 
@@ -43,6 +44,8 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
         style: int = 0,
         name: str = "PeopleList",
         font_manager: Optional['FontManager'] = None,
+        color_manager: Optional['ColourManager'] = None,
+        svc_config = None,
         *args,
         **kw
     ) -> None:
@@ -56,6 +59,8 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
             style: wxListCtrl style flags (default: 0).
             name: Control name (default: "PeopleList").
             font_manager: FontManager for text styling (optional).
+            color_manager: ColourManager for colour management (optional).
+            svc_config: Config service instance for accessing configuration.
             *args: Additional arguments for base class.
             **kw: Additional keyword arguments for base class.
         """
@@ -63,8 +68,10 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
         listmix.ListCtrlAutoWidthMixin.__init__(self)
 
         self.font_manager: Optional['FontManager'] = font_manager
+        self.color_manager: Optional['ColourManager'] = color_manager
+        self.svc_config = svc_config
 
-        self.id = VisualGedcomIds() if VisualGedcomIds else type("IdStub", (), {"GetColor": lambda *_a, **_k: wx.WHITE, "SmallUpArrow": None, "SmallDnArrow": None})()
+        self.id = VisualGedcomIds(svc_config=self.svc_config) if VisualGedcomIds else type("IdStub", (), {"GetColor": lambda *_a, **_k: wx.WHITE, "SmallUpArrow": None, "SmallDnArrow": None})()
         self.active = False
         self.il = wx.ImageList(16, 16)
         try:
@@ -89,8 +96,9 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
 
         self.SetImageList(self.il, wx.IMAGE_LIST_SMALL)
         try:
-            self.SetTextColour(self.id.GetColor('GRID_TEXT'))
-            self.SetBackgroundColour(self.id.GetColor('GRID_BACK'))
+            if self.color_manager:
+                self.SetTextColour(self.color_manager.get_color('GRID_TEXT'))
+                self.SetBackgroundColour(self.color_manager.get_color('GRID_BACK'))
         except Exception:
             pass
 
@@ -228,16 +236,19 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
                                 if hasattr(self.svc_state, "selectedpeople"):
                                     self.svc_state.selectedpeople = getattr(self.svc_state, "selectedpeople", 0) + 1
                                 if mainperson == pdata.id:
-                                    self.SetItemBackgroundColour(index, self.id.GetColor('MAINPERSON'))
+                                    if self.color_manager:
+                                        self.SetItemBackgroundColour(index, self.color_manager.get_color('MAINPERSON'))
                                 else:
                                     person = people.get(pdata.id, None)
                                     issues = person.check_age_problems(people) if person else None
                                     if issues:
                                         self.SetItemBackgroundColour(index, wx.YELLOW)
                                     else:
-                                        self.SetItemBackgroundColour(index, self.id.GetColor('ANCESTOR'))
+                                        if self.color_manager:
+                                            self.SetItemBackgroundColour(index, self.color_manager.get_color('ANCESTOR'))
                             else:
-                                self.SetItemBackgroundColour(index, self.id.GetColor('OTHERPERSON'))
+                                if self.color_manager:
+                                    self.SetItemBackgroundColour(index, self.color_manager.get_color('OTHERPERSON'))
                         except Exception:
                             pass
             try:

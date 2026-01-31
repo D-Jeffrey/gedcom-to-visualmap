@@ -8,6 +8,13 @@ Core classes:
     - Rainbow: Color gradient generator for visual distinction
     - Line: Geographic line segment with person, locations, and timeline
     - Creator, CreatorTrace, LifetimeCreator: Genealogical visualization generators
+      with per-line loop detection supporting pedigree collapse
+
+Loop Detection:
+    All creator classes use per-line loop detection (via visited set parameter) instead
+    of global tracking. This allows the same person to appear in different branches of
+    the tree (pedigree collapse), while still preventing infinite loops in individual
+    ancestral lines.
 
 Re-exported from geo_gedcom:
     - Person: Individual genealogical record
@@ -15,10 +22,12 @@ Re-exported from geo_gedcom:
     - LatLon: Geographic latitude/longitude coordinate
 
 Usage:
-    >>> from models import Color, Rainbow, Line
-    >>> color = Color(255, 0, 0)  # Red
+    >>> from models import Creator, Line, Rainbow
     >>> rainbow = Rainbow()
-    >>> line = Line(name="John Doe", ...)
+    >>> creator = Creator(people_dict, max_missing=2, gpstype='birth')
+    >>> lines = creator.create(main_person_id)
+    >>> for line in lines:
+    ...     print(f"{line.name}: {line.color.to_hexa()}")
 """
 
 from .color import Color

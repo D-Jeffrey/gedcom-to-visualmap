@@ -10,11 +10,24 @@ Main entry points:
 
 Core modules:
     - services: Dependency-injected services (IConfig, IState, IProgressTracker)
-    - const: Application constants and configuration types
-    - models: Genealogical data models and visualization primitives
-    - render: Output generation (KML, HTML/Folium, reports)
+    - const: Application constants and configuration
+    - models: Genealogical data models and visualization primitives (Creator classes with
+      per-line loop detection for pedigree collapse support)
+    - render: Output generation (KML, HTML/Folium with cross-platform photo paths, reports)
+      - ResultType enum for output format specification
+      - Photo path handling: Backslashes converted to forward slashes for JavaScript
     - geo_gedcom: GEDCOM parsing, geocoding, and enrichment
-    - gui: wxPython GUI components (panels, dialogs, actions)
+    - gui: wxPython GUI components (panels, dialogs, actions, processors)
+      - Enhanced progress messaging for HTML generation
+      - Simplified logging configuration with 12 core loggers
+
+Recent Improvements:
+    - Photo paths: Cross-platform compatibility (Windows backslashes → forward slashes)
+    - Progress messages: Early feedback during HTML generation
+    - Loop detection: Per-line tracking supporting pedigree collapse
+    - Logging: Simplified to 12 loggers with WARNING default and Clear Log File option
+    - Configuration: "Set All Levels" control for batch logging level changes
+    - ResultType: Moved to render/result_type.py module for better organization
 
 Architecture:
     - Services-based design: All business logic receives service instances implementing
@@ -30,13 +43,13 @@ Subpackages:
     - models: Color, Line, Creator, Rainbow for map visualization
     - render: Exporters for KML, HTML, and report generation
     - geo_gedcom: GEDCOM parsing, geocoding, enrichment
-    - gui: GUI components organized into panels, dialogs, actions, widgets, etc.
+    - gui: GUI components organized into panels, dialogs, actions, widgets, processors
 
 Usage examples:
     # Programmatic API
     >>> from services import GVConfig, GVState, GVProgress
     >>> from geo_gedcom import GedcomParser, GeolocatedGedcom
-    >>> from render import foliumExporter
+    >>> from render import foliumExporter, ResultType
     >>> from gui.core import GuiHooks
     >>> 
     >>> config = GVConfig('gedcom_options.yaml')
@@ -46,8 +59,14 @@ Usage examples:
     >>> parser = GedcomParser()
     >>> people = parser.parse('family.ged')
     >>> geogedcom = GeolocatedGedcom(people, app_hooks=GuiHooks(progress, state))
-    >>> map_obj = foliumExporter.export(geogedcom)
-    >>> map_obj.save('output.html')
+    >>> 
+    >>> # Generate HTML map
+    >>> exporter = foliumExporter(config, state, progress)
+    >>> exporter.export(state.mainPerson, lines, saveresult=True)
+    >>> 
+    >>> # Check result type
+    >>> result_type = ResultType.HTML
+    >>> print(result_type.file_extension())  # 'html'
     
     # GUI application
     >>> from gui.core import GedcomVisualGUI

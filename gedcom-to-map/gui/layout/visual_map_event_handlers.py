@@ -251,7 +251,7 @@ class VisualMapEventHandler:
             if attributes and attrname == "MapStyle":
                 # MapStyle stored as set/list of types; UI stores selection index
                 try:
-                    self.panel.svc_config.set('MapStyle', sorted(self.panel.id.AllMapTypes)[event.GetSelection()])
+                    self.panel.svc_config.set('MapStyle', sorted(self.panel.svc_config.map_types)[event.GetSelection()])
                     self.panel.NeedRedraw()
                     return
                 except Exception:

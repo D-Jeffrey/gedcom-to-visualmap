@@ -8,6 +8,21 @@ gui_options:
   panelWidthPercent: {type: 'int', default: 30}
   window_size: {type: 'list', default: [1024, 800]}
 
+# Available map tile providers for HTML/Folium maps
+map_types:
+  - "CartoDB.Voyager"
+  - "OpenStreetMap.Mapnik"
+  - "OpenStreetMap.HOT"
+  - "Esri.WorldTerrain"
+  - "Esri.NatGeoWorldMap"
+  - "OpenTopoMap"
+  - "Esri.WorldStreetMap"
+  - "CartoDB.VoyagerNoLabels"
+  - "CartoDB.Positron"
+  - "CartoDB.PositronOnlyLabels"
+  - "CartoDB.VoyagerOnlyLabels"
+  - "CartoDB.DarkMatter"
+
 # File and path options
 file_options:
   GEDCOMinput: {type: 'str', default: "gedcomfile.ged"}

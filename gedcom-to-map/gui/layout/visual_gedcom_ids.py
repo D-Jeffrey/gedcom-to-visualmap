@@ -143,19 +143,6 @@ class VisualGedcomIds:
         )
         
         self.m = {1: ()}
-        self.AllMapTypes = ["CartoDB.Voyager", 
-            "OpenStreetMap.Mapnik", 
-            "OpenStreetMap.HOT", 
-            "Esri.WorldTerrain",
-            "Esri.NatGeoWorldMap",
-            "OpenTopoMap",
-            "Esri.WorldStreetMap",
-            "CartoDB.VoyagerNoLabels",
-            "CartoDB.Positron",
-            "CartoDB.PositronOnlyLabels",
-            "CartoDB.VoyagerOnlyLabels",
-            "CartoDB.DarkMatter"
-            ]
 
     def GetColor(self, colorID):
         if colorID in self.colors:

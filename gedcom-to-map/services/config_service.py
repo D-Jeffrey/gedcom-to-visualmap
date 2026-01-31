@@ -59,6 +59,7 @@ class GVConfig(IConfig):
         
         # === Initialize Core Settings ===
         self.gvConfig = None
+        self.map_types = self.options.get('map_types', ["CartoDB.Voyager"])  # Load available map types
         self.set_marker_defaults()
         self.settingsfile = settings_file_pathname(self.INI_FILE_NAME)
         self._geo_config_file: Path = Path(__file__).resolve().parent / GEO_CONFIG_FILENAME

@@ -118,7 +118,7 @@ class LayoutOptions:
         hsizer = wx.StaticBoxSizer(hbox, wx.VERTICAL)
         hboxIn = wx.BoxSizer(wx.VERTICAL)
 
-        mapchoices = sorted(vm_panel.id.AllMapTypes)
+        mapchoices = sorted(vm_panel.svc_config.map_types)
         mapboxsizer = wx.BoxSizer(wx.HORIZONTAL)
         mapStyleLabel = wx.StaticText(hbox, -1, " Map Style")
         cb_marks_on = LayoutHelpers.add_checkbox_with_id(vm_panel, hbox_container, "CBMarksOn", "Markers")

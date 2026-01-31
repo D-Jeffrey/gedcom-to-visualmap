@@ -841,7 +841,7 @@ class VisualMapPanel(wx.Panel):
                 if name == "LISTMapStyle":
                     ms = self.svc_config.get("MapStyle", "")
                     try:
-                        idx = self.id.AllMapTypes.index(ms)
+                        idx = self.svc_config.map_types.index(ms)
                     except Exception:
                         idx = 0
                     try:

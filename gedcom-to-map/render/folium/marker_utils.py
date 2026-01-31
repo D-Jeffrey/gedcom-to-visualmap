@@ -13,15 +13,15 @@ def Drift(l: float) -> float:
     return float(l) + d if l is not None else None
 
 def add_point_marker(fg: folium.FeatureGroup, point: list, options: dict, 
-                     tooltip: str, popup: str, icon_name: str, color: str, gOp=None) -> None:
+                     tooltip: str, popup: str, icon_name: str, color: str, exporter=None) -> None:
     """
-    Add a marker to the feature group or collect for clustering if gOp is provided and MarksOn is False.
+    Add a marker to the feature group or collect for clustering if exporter is provided and MarksOn is False.
     """
-    if gOp is not None and not getattr(gOp, 'MarksOn', True):
+    if exporter is not None and not exporter.svc_config.get('MarksOn'):
         # Collect for clustering
-        if hasattr(gOp, 'locations') and hasattr(gOp, 'popups'):
-            gOp.locations.append(point)
-            gOp.popups.append(popup)
+        if hasattr(exporter, 'locations') and hasattr(exporter, 'popups'):
+            exporter.locations.append(point)
+            exporter.popups.append(popup)
         return
     marker = folium.Marker(
         point,

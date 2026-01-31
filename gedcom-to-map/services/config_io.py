@@ -193,13 +193,13 @@ def set_options(obj: Any, options_types: dict, options_defaults: dict) -> None:
 def set_marker_defaults(obj: Any) -> None:
     """Initialize marker options with their default values.
     
-    Extracts default values from obj.options['marker_options'] and
+    Extracts default values from obj.options['html_display_options'] and
     applies them using set_marker_options().
     
     Args:
-        obj: Object with 'options' attribute containing marker_options.
+        obj: Object with 'options' attribute containing html_display_options.
     """
-    marker_options_unified = obj.options.get('marker_options', {}) or {}
+    marker_options_unified = obj.options.get('html_display_options', {}) or {}
     marker_options = {k: v.get('default') for k, v in marker_options_unified.items()}
     set_marker_options(obj, marker_options)
 
@@ -207,14 +207,14 @@ def set_marker_options(obj: Any, marker_options: dict) -> None:
     """Set marker option attributes on an object.
     
     Validates option names against expected marker options from
-    obj.options['marker_options'] and sets matching attributes.
+    obj.options['html_display_options'] and sets matching attributes.
     Logs warnings for unknown options or missing attributes.
     
     Args:
-        obj: Object with 'options' attribute containing marker_options.
+        obj: Object with 'options' attribute containing html_display_options.
         marker_options: Dict of marker option names to values.
     """
-    marker_options_unified = obj.options.get('marker_options', {}) or {}
+    marker_options_unified = obj.options.get('html_display_options', {}) or {}
     expected_keys = list(marker_options_unified.keys())
     for key, value in marker_options.items():
         if key in expected_keys:

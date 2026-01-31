@@ -1,18 +1,3 @@
-# Marker options: field definitions with default values
-# ini_section: which INI file section this setting belongs to (if any)
-marker_options:
-  MarksOn: {type: 'bool', default: True, ini_section: 'HTML'}
-  HeatMap: {type: 'bool', default: False, ini_section: 'HTML'}
-  BornMark: {type: 'bool', default: True, ini_section: 'HTML'}
-  DieMark: {type: 'bool', default: True, ini_section: 'HTML'}
-  MarkStarOn: {type: 'bool', default: True, ini_section: 'HTML'}
-  GroupBy: {type: 'int', default: 2, ini_section: 'HTML'}
-  UseAntPath: {type: 'bool', default: False, ini_section: 'HTML'}
-  MapTimeLine: {type: 'bool', default: False, ini_section: 'HTML'}
-  HeatMapTimeStep: {type: 'int', default: 20, ini_section: 'HTML'}
-  HomeMarker: {type: 'bool', default: False, ini_section: 'HTML'}
-  MapStyle: {type: 'str', default: "CartoDB.Voyager", ini_section: 'HTML'}
-
 # GUI options: field definitions with default values
 gui_options:
   infoBoxLines: {type: 'int', default: 8}
@@ -50,10 +35,22 @@ kml_display_options:
   UseBalloonFlyto: {type: 'bool', default: True, ini_section: 'KML'}
   KMLsort: {type: 'int', default: 1, ini_section: 'KML'}
 
-# HTML map display options
+# HTML map display options (includes marker and visualization options)
 html_display_options:
+  MarksOn: {type: 'bool', default: True, ini_section: 'HTML'}
+  HeatMap: {type: 'bool', default: False, ini_section: 'HTML'}
+  BornMark: {type: 'bool', default: True, ini_section: 'HTML'}
+  DieMark: {type: 'bool', default: True, ini_section: 'HTML'}
+  MarkStarOn: {type: 'bool', default: True, ini_section: 'HTML'}
+  GroupBy: {type: 'int', default: 2, ini_section: 'HTML'}
+  UseAntPath: {type: 'bool', default: False, ini_section: 'HTML'}
+  MapTimeLine: {type: 'bool', default: False, ini_section: 'HTML'}
+  HeatMapTimeStep: {type: 'int', default: 20, ini_section: 'HTML'}
+  HomeMarker: {type: 'bool', default: False, ini_section: 'HTML'}
+  MapStyle: {type: 'str', default: "CartoDB.Voyager", ini_section: 'HTML'}
   showLayerControl: {type: 'bool', default: True, ini_section: 'HTML'}
   mapMini: {type: 'bool', default: True, ini_section: 'HTML'}
+  ShowAllPeople: {type: 'bool', default: True, ini_section: 'HTML'}
 
 # Summary report generation options (saved to Summary section)
 summary_report_options:

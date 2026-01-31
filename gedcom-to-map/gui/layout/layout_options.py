@@ -129,7 +129,8 @@ class LayoutOptions:
         
         cb_map_control = LayoutHelpers.add_checkbox_with_id(vm_panel, hbox_container, "CBMapControl", "Open Map Controls")
         cb_map_mini = LayoutHelpers.add_checkbox_with_id(vm_panel, hbox_container, "CBMapMini", "Add Mini Map")
-        cb_heat_map = LayoutHelpers.add_checkbox_with_id(vm_panel, hbox_container, "CBHeatMap", "Heatmap", style=wx.NO_BORDER)
+        cb_heat_map = LayoutHelpers.add_checkbox_with_id(vm_panel, hbox_container, "CBHeatMap", "Select Heatmap", style=wx.NO_BORDER)
+        cb_show_all_people = LayoutHelpers.add_checkbox_with_id(vm_panel, hbox_container, "CBShowAllPeople", "Select All")
         cb_use_ant_path = LayoutHelpers.add_checkbox_with_id(vm_panel, hbox_container, "CBUseAntPath", "Ant paths")
         sl_heat_map_time_step = LayoutHelpers.add_slider_with_id(vm_panel, hbox_container, "LISTHeatMapTimeStep", value=5, min_val=1, max_val=100, tick_freq=5)
         rb_group_by = LayoutHelpers.add_radio_box_with_id(vm_panel, hbox_container, "RBGroupBy", "Group by:",
@@ -150,6 +151,7 @@ class LayoutOptions:
                 (cb_map_mini, 0, wx.ALL, 2),
                 (cb_use_ant_path, 0, wx.ALL, 2),
                 (cb_heat_map, 0, wx.ALL, 2),
+                (cb_show_all_people, 0, wx.ALL, 2),
                 (sl_heat_map_time_step, 0, wx.EXPAND | wx.ALL, 4),
             ]
         )

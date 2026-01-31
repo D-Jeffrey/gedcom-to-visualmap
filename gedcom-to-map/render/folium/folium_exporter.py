@@ -31,6 +31,14 @@ from .heatmap_utils import normalize_heat_data
 _log = logging.getLogger(__name__.lower())
 legend_file = 'file://' + __file__ + '/../legend.png'
 
+class FeatureGroupInfo:
+    """Container for feature group metadata."""
+    def __init__(self, feature_group: folium.FeatureGroup, original_name: str):
+        self.feature_group: folium.FeatureGroup = feature_group
+        self.count: int = 0
+        self.depth: int = 0
+        self.original_name: str = original_name
+
 class foliumExporter:
     """
     Exports genealogical data to an interactive Folium map.
@@ -62,7 +70,7 @@ class foliumExporter:
         self.svc_progress = svc_progress
         self.file_name = os.path.join(svc_config.get('resultpath'), svc_config.get('ResultFile'))
         self.max_line_weight = svc_config.get('MaxLineWeight')
-        self.fglastname = dict()
+        self.fglastname: dict[str, FeatureGroupInfo] = dict()
         self.saveresult = False
         self.fm = None
         self.locations = []
@@ -132,14 +140,6 @@ class foliumExporter:
             popup += f"<img src='{photo_path}' width='150'>"
         return popup
 
-    # Marker utility now in marker_utils.py
-    def _add_point_marker(self, fg, point, options, tooltip, popup, icon_name, color):
-        add_point_marker(fg, point, options, tooltip, popup, icon_name, color, gOp=self.svc_config)
-    
-    def setoptions(self):
-
-        return
-
     def Done(self):
         """Finalize and save the map."""
         if self.saveresult:
@@ -149,26 +149,28 @@ class foliumExporter:
         # self.fm = None
     
     def getFeatureGroup(self, thename, depth):
-        """Retrieve or create a feature group.
-        array of values
-        Index is a simplifyLastName
-            [0] FeatureGroup
-            [1] count of instances
-            [2] depth
-            [3] orginal name
+        """Retrieve or create a feature group with metadata.
+        
+        Args:
+            thename: The person's name
+            depth: The genealogical depth
+            
+        Returns:
+            folium.FeatureGroup: The feature group for this name
         """
         # TODO could offer an option on which name folding to use (Maybe use SoundEx)
         if self.soundexLast:
             simpleLastName = NameProcessor.soundex(thename)
         else:
             simpleLastName = NameProcessor.simplifyLastName(thename)
-        if not simpleLastName in self.fglastname:
-            self.fglastname[simpleLastName] = [folium.FeatureGroup(name= thename, show=False), 0, 0, thename]
+        if simpleLastName not in self.fglastname:
+            fg = folium.FeatureGroup(name=thename, show=False)
+            self.fglastname[simpleLastName] = FeatureGroupInfo(fg, thename)
                              
-        thefg = self.fglastname[simpleLastName][0]
-        self.fglastname[simpleLastName][1] += 1
-        self.fglastname[simpleLastName][2] = depth
-        return thefg
+        info = self.fglastname[simpleLastName]
+        info.count += 1
+        info.depth = depth
+        return info.feature_group
 
     def _process_timeline_data(self, line: Line, mycluster: MyMarkClusters) -> tuple[int, int]:
         """Process timeline data for a single line and return min/max years"""
@@ -177,26 +179,24 @@ class foliumExporter:
         # Add birth location if available
         birth_event = line.person.get_event('birth') if line.person else None
         birth_latlon = birth_event.getattr('latlon') if birth_event else None
-        birth_date = birth_event.getattr('date') if birth_event else None
-        birth_year_num = birth_date.year_num if birth_date else None
+        birth_year_num = birth_event.getattr('when_year_num') if birth_event else None
 
-        if birth_event and birth_latlon and birth_date:
+        if birth_event and birth_latlon and birth_year_num:
             mycluster.mark(birth_latlon, birth_year_num)
             minyear = birth_year_num
         
         # Add death year if available
         death_event = line.person.get_event('death') if line.person else None
-        death_date = death_event.getattr('date') if death_event else None
-        death_year_num = death_date.year_num if death_date else None
-        if death_event and death_date:
+        death_year_num = death_event.getattr('when_year_num') if death_event else None
+        if death_year_num:
             maxyear = death_year_num
         else:
             # Process midpoints for min/max year determination
             for mids in line.midpoints:
-                start_year = mids.date.year_num
+                start_year = mids.year if hasattr(mids, 'year') else None
                 if start_year:
                     minyear = min(int(start_year), minyear) if minyear else int(start_year)
-                end_year = mids.date.year_num
+                end_year = mids.year if hasattr(mids, 'year') else None
                 if end_year:
                     maxyear = max(int(end_year), maxyear) if maxyear else int(end_year)
         
@@ -214,7 +214,8 @@ class foliumExporter:
         for year in range(minyear, maxyear):
             # Update active position if we have a midpoint for this year
             for mids in line.midpoints:
-                if mids.date.year_num == year:
+                mids_year = mids.year if hasattr(mids, 'year') else None
+                if mids_year == year:
                     activepos = mids.latlon
             if activepos and activepos.lat and activepos.lon:
                 mycluster.mark(activepos, year)
@@ -344,7 +345,7 @@ class foliumExporter:
         self.saveresult = saveresult
 
         self.svc_progress.step("Preparing")
-        self.fglastname = dict()
+        self.fglastname: dict[str, FeatureGroupInfo] = dict()
 
         flr = folium.FeatureGroup(name=lgd_txt.format(txt='Relations', col='green'), show=False)
         flp = folium.FeatureGroup(name=lgd_txt.format(txt='People', col='Black'), show=False)
@@ -353,7 +354,7 @@ class foliumExporter:
         self._add_heatmap(lines, mycluster, fm)
         self._add_fontawesome_hack(fm)
         self._draw_lines(lines, SortByLast, SortByPerson, fm)
-        self._add_feature_groups_to_map(fm)
+        self._add_feature_groups_to_map(fm, show_all=self.svc_config.get('ShowAllPeople'))
         self._add_marker_cluster(fm)
         self._add_main_star(main, fm)
         self._add_legend(fm)
@@ -447,8 +448,8 @@ class foliumExporter:
         person = line.person
         birth_event = person.get_event('birth') if person else None
         death_event = person.get_event('death') if person else None
-        birth_year_num = birth_event.date.year_num if birth_event and birth_event.date else None
-        death_year_num = death_event.date.year_num if death_event and death_event.date else None
+        birth_year_num = birth_event.getattr('when_year_num') if birth_event else None
+        death_year_num = death_event.getattr('when_year_num') if death_event else None
         birth_info = f"{birth_year_num} (Born)" if birth_year_num else ''
         death_info = f"{death_year_num} (Died)" if death_year_num else ''
         popup_content = self._create_popup_content(line, birth_info, death_info)
@@ -509,10 +510,11 @@ class foliumExporter:
         if line.fromlocation and line.fromlocation.hasLocation():
             start_point = [Drift(line.fromlocation.lat), Drift(line.fromlocation.lon)]
             if self.svc_config.get('MarksOn') and self.svc_config.get('BornMark'):
-                self._add_point_marker(
+                add_point_marker(
                     fg, start_point, marker_options,
                     f"Life of {line.name}".replace("`", "‛").replace("'", "‛"),
-                    popup_content + "\nbirth", marker_options['start_icon'], marker_options['start_color']
+                    popup_content + "\nbirth", marker_options['start_icon'], marker_options['start_color'],
+                    exporter=self
                 )
             return start_point
         return None
@@ -537,10 +539,11 @@ class foliumExporter:
         if line.tolocation and line.tolocation.hasLocation():
             end_point = [Drift(line.tolocation.lat), Drift(line.tolocation.lon)]
             if self.svc_config.get('MarksOn') and self.svc_config.get('DieMark'):
-                self._add_point_marker(
+                add_point_marker(
                     fg, end_point, marker_options,
                     f"Life of {line.name}".replace("`", "‛").replace("'", "‛"),
-                    popup_content + "\ndeath", marker_options['end_icon'], marker_options['end_color']
+                    popup_content + "\ndeath", marker_options['end_icon'], marker_options['end_color'],
+                    exporter=self
                 )
             return end_point
         return None
@@ -578,7 +581,7 @@ class foliumExporter:
                     marker = MidPointMarker[point_type][0]
                     color = MidPointMarker[point_type][1]
                     tooltip = mids.what + ' ' + mids.place.place if mids.what else '?? ' + mids.place.place
-                    self._add_point_marker(fg, mid_point, marker_options, tooltip, popup_content, marker, color)
+                    add_point_marker(fg, mid_point, marker_options, tooltip, popup_content, marker, color, exporter=self)
         if end_point:
             fm_line.append(tuple(end_point))
         return fm_line
@@ -608,13 +611,15 @@ class foliumExporter:
             fg.layer_name = f"{fg.layer_name} ({len(fm_line) + 1 if line.tolocation else 0})"
             fm.add_child(fg)
 
-    def _add_feature_groups_to_map(self, fm):
-        for fgn in sorted(self.fglastname.keys(), key=lambda x: self.fglastname[x][2], reverse=False):
-            self.fglastname[fgn][0].layer_name = f"{self.fglastname[fgn][3]} : {self.fglastname[fgn][1]}"
-            fm.add_child(self.fglastname[fgn][0])
+    def _add_feature_groups_to_map(self, fm, show_all: bool = True):
+        for fgn in sorted(self.fglastname.keys(), key=lambda x: self.fglastname[x].depth, reverse=False):
+            info = self.fglastname[fgn]
+            info.feature_group.layer_name = f"{info.original_name} : {info.count}"
+            info.feature_group.show = show_all
+            fm.add_child(info.feature_group)
 
     def _add_marker_cluster(self, fm):
-        sc = False if self.svc_config.get('showLayerControl') else True
+        show_control = True if self.svc_config.get('showLayerControl') else False
         if self.locations:
             marker_cluster = MarkerCluster(
                 locations=self.locations,
@@ -625,7 +630,7 @@ class foliumExporter:
                 icon_create_function=icon_create_function,
             )
             marker_cluster.add_to(fm)
-        folium.map.LayerControl('topleft', collapsed=sc).add_to(fm)
+        folium.map.LayerControl('topleft', collapsed=not show_control).add_to(fm)
 
     def _add_main_star(self, main, fm):
         birth_event = getattr(main, 'birth', None)

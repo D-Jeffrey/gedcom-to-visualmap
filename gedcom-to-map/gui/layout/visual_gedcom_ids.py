@@ -27,6 +27,7 @@ class VisualGedcomIds:
         id_attributes = [ # ID name: (type, config/state attribute, action)
             ('CBMarksOn', ('CheckBox', 'MarksOn', 'Redraw')),
             ('CBHeatMap', ('CheckBox', 'HeatMap', '')),
+            ('CBShowAllPeople', ('CheckBox', 'ShowAllPeople', 'Redraw')),
             ('CBFlyTo', ('CheckBox', 'UseBalloonFlyto', 'Redraw')),
             ('CBBornMark', ('CheckBox', 'BornMark', 'Redraw')),
             ('CBDieMark', ('CheckBox', 'DieMark', 'Redraw')),

@@ -68,10 +68,8 @@ class ConfigDialog(wx.Dialog):
         self.badAge = True
 
         GRIDctl = gridlib.Grid(cfgpanel)
-        if includeNOTSET:
-            gridlen = len(logging.root.manager.loggerDict)
-        else:
-            gridlen = sum(1 for loggerName in self.loggerNames if logging.getLogger(loggerName).level != 0)
+        # Only show loggers explicitly configured in logging_keys
+        gridlen = len(self.logging_keys)
 
         GRIDctl.CreateGrid(gridlen, 2)
         GRIDctl.SetColLabelValue(0, "Logger Name")
@@ -79,32 +77,14 @@ class ConfigDialog(wx.Dialog):
 
         self.logging_levels = ['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL']
 
-        def makeCells():
-            GRIDctl.SetCellValue(self.row, 0, loggerName)
-            GRIDctl.SetCellBackgroundColour(self.row, 0, wx.LIGHT_GREY)
-            GRIDctl.SetCellValue(self.row, 1, logging.getLevelName(updatelog.level))
-            GRIDctl.SetCellEditor(self.row, 1, gridlib.GridCellChoiceEditor(self.logging_levels))
-            if updatelog.level == 0:
-                GRIDctl.SetCellBackgroundColour(self.row, 1, wx.LIGHT_GREY)
-            GRIDctl.SetReadOnly(self.row, 0)
-            self.row += 1
-
-        self.row = 0
-        for erow, loggerName in enumerate(self.loggerNames):
+        # Populate grid with only configured loggers
+        for row, loggerName in enumerate(self.logging_keys):
             updatelog = logging.getLogger(loggerName)
-            if logging.getLevelName(updatelog.level) != "NOTSET" and loggerName in self.logging_keys:
-                makeCells()
-
-        if includeNOTSET:
-            for erow, loggerName in enumerate(self.loggerNames):
-                updatelog = logging.getLogger(loggerName)
-                if logging.getLevelName(updatelog.level) == "NOTSET" and loggerName in self.logging_keys:
-                    makeCells()
-
-            for erow, loggerName in enumerate(self.loggerNames):
-                updatelog = logging.getLogger(loggerName)
-                if loggerName not in self.logging_keys:
-                    makeCells()
+            GRIDctl.SetCellValue(row, 0, loggerName)
+            GRIDctl.SetCellBackgroundColour(row, 0, wx.LIGHT_GREY)
+            GRIDctl.SetCellValue(row, 1, logging.getLevelName(updatelog.level))
+            GRIDctl.SetCellEditor(row, 1, gridlib.GridCellChoiceEditor(self.logging_levels))
+            GRIDctl.SetReadOnly(row, 0)
 
         GRIDctl.AutoSizeColumn(0, True)
         GRIDctl.AutoSizeColumn(1, True)

@@ -154,16 +154,19 @@ logging_defaults:
   # Core application
   const: WARNING
   gv: WARNING
-  # Major components (package-level)
+  # Major components
   services: WARNING
   models: WARNING
-  geo_gedcom: WARNING
   render: WARNING
   gui: WARNING
-  # External dependencies
-  ged4py: WARNING
-  geopy: WARNING
-  urllib3: WARNING
+  # Geocoding subsystem
+  geo_gedcom: WARNING
+  geo_gedcom.gedcom_date: WARNING
+  ged4py: WARNING        # GEDCOM parser used by geo_gedcom
+  geopy: WARNING         # Geocoding API used by geo_gedcom
+  # HTTP dependencies
+  urllib3: WARNING       # Used by geopy
+  # Visualization
   matplotlib: WARNING
 
 # Old settings that should be removed from the INI config file

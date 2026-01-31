@@ -129,6 +129,18 @@ class ConfigDialog(wx.Dialog):
         ])
         sizer.AddSpacer(20)
         sizer.Add(wx.StaticText(cfgpanel, -1, " Logging Options:"))
+        
+        # Add "Set All Levels" control
+        setAllSizer = wx.BoxSizer(wx.HORIZONTAL)
+        setAllSizer.Add(wx.StaticText(cfgpanel, -1, "Set all logging levels to:"), 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 5)
+        self.setAllChoice = wx.Choice(cfgpanel, choices=self.logging_levels)
+        self.setAllChoice.SetSelection(2)  # Default to INFO
+        setAllSizer.Add(self.setAllChoice, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 5)
+        setAllButton = wx.Button(cfgpanel, label="Apply to All")
+        setAllButton.Bind(wx.EVT_BUTTON, self.onSetAllLevels)
+        setAllSizer.Add(setAllButton, 0, wx.ALIGN_CENTER_VERTICAL)
+        sizer.Add(setAllSizer, 0, wx.ALL, 10)
+        
         sizer.Add(GRIDctl, 1, wx.EXPAND | wx.ALL, 20)
 
         buttonsizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -139,6 +151,25 @@ class ConfigDialog(wx.Dialog):
         cfgpanel.SetSizer(sizer)
         self.GRIDctl = GRIDctl
         self.Show(True)
+
+    def onSetAllLevels(self, event):
+        """Apply the selected logging level to all configured loggers in the grid."""
+        selected_level = self.setAllChoice.GetStringSelection()
+        if not selected_level:
+            return
+        
+        for row in range(self.GRIDctl.GetNumberRows()):
+            loggerName = self.GRIDctl.GetCellValue(row, 0)
+            # Only update loggers that are in logging_keys (configured in yaml/INI)
+            if loggerName in self.logging_keys:
+                self.GRIDctl.SetCellValue(row, 1, selected_level)
+                # Update background color for NOTSET
+                if selected_level == 'NOTSET':
+                    self.GRIDctl.SetCellBackgroundColour(row, 1, wx.LIGHT_GREY)
+                else:
+                    self.GRIDctl.SetCellBackgroundColour(row, 1, wx.WHITE)
+        
+        self.GRIDctl.ForceRefresh()
 
     def onSave(self, event):
         for row in range(self.GRIDctl.GetNumberRows()):

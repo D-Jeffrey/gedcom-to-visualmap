@@ -126,7 +126,10 @@ class foliumExporter:
 
         popup = f"<div style='min-width: 150px'>{fancy_name}</div>"
         if line.person.photo:
-            popup += f"<img src='{line.person.photo}' width='150'>"
+            # Replace backslashes with forward slashes to avoid JavaScript escape issues
+            # Forward slashes work in HTML on all platforms (Windows, Mac, Linux)
+            photo_path = line.person.photo.replace('\\', '/')
+            popup += f"<img src='{photo_path}' width='150'>"
         return popup
 
     # Marker utility now in marker_utils.py

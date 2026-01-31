@@ -144,14 +144,19 @@ class Creator:
         self.people: Dict[str, Person] = people
         self.rainbow: Rainbow = Rainbow()
         self.max_missing: int = max_missing
-        self.alltheseids: dict = {}
         self.gpstype: str = gpstype
 
-    def line(self, latlon: LatLon, current: Person, branch, prof, miss, path="") -> list[Line]:
-        if current.xref_id in self.alltheseids:
-            _log.error("Looping Problem: {:2} -LOOP STOP - {} {} -Looping= {:20}".format(  prof, self.people[current.xref_id].name, current.xref_id, path))
+    def line(self, latlon: LatLon, current: Person, branch, prof, miss, path="", visited=None) -> list[Line]:
+        # Track visited IDs in this specific line to detect sequential loops only
+        if visited is None:
+            visited = set()
+        
+        if current.xref_id in visited:
+            _log.info("Loop detected in ancestry trace: {:2} - {} {} - Path: {}".format(prof, self.people[current.xref_id].name, current.xref_id, path))
             return []
-        self.alltheseids[current.xref_id] = current.xref_id
+        
+        # Add to visited set for this line
+        visited = visited | {current.xref_id}
 
         event = current.get_event(self.gpstype) if current else []
         event_latlon = event.getattr('latlon') if event else None
@@ -161,7 +166,7 @@ class Creator:
             return (
                 []
                 if self.max_missing != 0 and miss >= self.max_missing
-                else self.link(event_latlon, current, branch, prof, miss + 1, path)
+                else self.link(event_latlon, current, branch, prof, miss + 1, path, visited)
             )
         color = (branch + DELTA / 2) / (SPACE ** (prof % 256))
         _log.info("{:8} {:8} {:2} {:.10f} {} {:20}".format(path, branch, prof, color, self.rainbow.get(color).to_hexa(), current.name))
@@ -188,11 +193,13 @@ class Creator:
                      whenFrom=birth_year_num, whenTo=death_year_num,
                      midpoints=midpoints)
 
-        return self.link(event_latlon, current, branch, prof, 0, path) + [line]
+        return self.link(event_latlon, current, branch, prof, 0, path, visited) + [line]
 
-    def link(self, latlon: LatLon, current: Person, branch=0, prof=0, miss=0, path="") -> list[Line]:
-        return (self.line(latlon, self.people[current.father], branch*SPACE, prof+1, miss, f"{path}F") if current.father else []) \
-               + (self.line(latlon, self.people[current.mother], branch*SPACE+DELTA, prof+1, miss, path + "M") if current.mother else [])
+    def link(self, latlon: LatLon, current: Person, branch=0, prof=0, miss=0, path="", visited=None) -> list[Line]:
+        if visited is None:
+            visited = set()
+        return (self.line(latlon, self.people[current.father], branch*SPACE, prof+1, miss, f"{path}F", visited) if current.father else []) \
+               + (self.line(latlon, self.people[current.mother], branch*SPACE+DELTA, prof+1, miss, path + "M", visited) if current.mother else [])
 
     def create(self, main_id: str):
         if main_id not in self.people.keys():
@@ -399,11 +406,13 @@ class LifetimeCreator:
         self.people: Dict[str, Person] = people
         self.rainbow: Rainbow = Rainbow()
         self.max_missing: int = max_missing
-        self.alltheseids: dict = {}
 
-    def selfline(self, current: Person, branch, prof, miss, path: str = "") -> list[Line]:
-        # We can not draw a line from Birth to death without both ends  --- or can we???
-        self.alltheseids[current.xref_id] = current.xref_id
+    def selfline(self, current: Person, branch, prof, miss, path: str = "", visited=None) -> list[Line]:
+        # Track visited IDs in this specific line
+        if visited is None:
+            visited = set()
+        
+        visited = visited | {current.xref_id}
         color = (branch + DELTA / 2) / (SPACE ** (prof % 256))
 
         birth_event = current.get_event('birth') if current else None
@@ -434,11 +443,15 @@ class LifetimeCreator:
         
     # Draw a line from the parents birth to the child birth location
                             
-    def line(self, latlon: LatLon, parent: Person, branch, prof, miss, path="", linestyle="", forperson: Person = None ) -> list[Line]:
-        # Check to make sure we are not looping and have been here before
-        if parent.xref_id in self.alltheseids:
-            _log.error("Looping Problem: {:2} -LOOP STOP- {} {} -Looping= {:20}".format(  prof, parent.name, parent.xref_id, path))
+    def line(self, latlon: LatLon, parent: Person, branch, prof, miss, path="", linestyle="", forperson: Person = None, visited=None) -> list[Line]:
+        # Track visited IDs in this specific line to detect sequential loops only
+        if visited is None:
+            visited = set()
+        
+        if parent.xref_id in visited:
+            _log.info("Loop detected in ancestry trace: {:2} - {} {} - Path: {}".format(prof, parent.name, parent.xref_id, path))
             return []
+        
         if getattr(parent, 'birth', None):
             color = (branch + DELTA / 2) / (SPACE ** prof)
             _log.info("{:8} {:8} {:2} {:.10f} {} {:20} from {:20}".format(path, branch, prof, color, self.rainbow.get(color).to_hexa(), parent.name, forperson.name))
@@ -454,24 +467,27 @@ class LifetimeCreator:
                         self.rainbow.get(color), path, branch, prof, linestyle,
                         forperson, person=parent,
                         whenFrom=parent_birth_year, whenTo=parent_death_year)
-            return self.link(parent_birth_latlon, parent, branch, prof, 0, path) + [line]
+            return self.link(parent_birth_latlon, parent, branch, prof, 0, path, visited) + [line]
         else:
             if self.max_missing != 0 and miss >= self.max_missing:
                 _log.info("{:8} {:8} {:2} {:.10f} {} Self {:20}".format(" ", " ", " ", 0, "-STOP-", parent.name))
                 return []
-            return self.link(latlon, parent, branch, prof, miss+1, path)
+            return self.link(latlon, parent, branch, prof, miss+1, path, visited)
         _log.info("{:8} {:8} {:2} {:.10f} {} Self {:20}".format(" ", " ", " ", 0, "-KICK-", parent.name))
 
         
-    def link(self, latlon: LatLon, current: Person, branch=0, prof=0, miss=0, path="") -> list[Line]:
-        # Maximun recursion depth.  This should never happen
+    def link(self, latlon: LatLon, current: Person, branch=0, prof=0, miss=0, path="", visited=None) -> list[Line]:
+        # Maximum recursion depth.  This should never happen
+        if visited is None:
+            visited = set()
+        
         if prof < 480: 
-            return (self.selfline(current, branch*SPACE, prof+1, miss, path)) \
-               + (self.line(latlon, self.people[current.father], branch*SPACE, prof+1, miss, path + "F",'father', current) if current.father else []) \
-               + (self.line(latlon, self.people[current.mother], branch*SPACE+DELTA, prof+1, miss, path + "M", 'mother', current) if current.mother else [])
+            return (self.selfline(current, branch*SPACE, prof+1, miss, path, visited)) \
+               + (self.line(latlon, self.people[current.father], branch*SPACE, prof+1, miss, path + "F",'father', current, visited) if current.father else []) \
+               + (self.line(latlon, self.people[current.mother], branch*SPACE+DELTA, prof+1, miss, path + "M", 'mother', current, visited) if current.mother else [])
         else:
             _log.warning("{:8} {:8} {:2} {} {} {:20}".format(" ", " ", prof, " ", "-TOO DEEP-", current.name))
-            return (self.selfline(current, branch*SPACE, prof+1, miss, path)) + [] + []
+            return (self.selfline(current, branch*SPACE, prof+1, miss, path, visited)) + [] + []
 
     def create(self, main_id: str):
         if main_id not in self.people.keys():

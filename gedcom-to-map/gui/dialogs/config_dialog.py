@@ -273,16 +273,25 @@ class ConfigDialog(wx.Dialog):
             )
 
     def onSave(self, event):
+        # Collect all logging level changes
+        logging_config = {}
         for row in range(self.GRIDctl.GetNumberRows()):
             loggerName = self.GRIDctl.GetCellValue(row, 0)
             logLevel = self.GRIDctl.GetCellValue(row, 1)
-            updatelog = logging.getLogger(loggerName)
             if logLevel:
                 level_value = logging.getLevelName(logLevel)
                 if isinstance(level_value, int):
-                    updatelog.setLevel(level_value)
+                    logging_config[loggerName] = logLevel
                 else:
                     _log.warning("ConfigDialog.onSave: invalid log level '%s' for '%s'", logLevel, loggerName)
+        
+        # Apply logging levels hierarchically (parent levels propagate to children)
+        if logging_config:
+            try:
+                from services.config_service import _apply_hierarchical_logging_defaults
+                _apply_hierarchical_logging_defaults(logging_config)
+            except Exception:
+                _log.exception("ConfigDialog.onSave: failed to apply hierarchical logging defaults")
         
         # Update file open commands
         self.file_open_commands.add_file_type_command('kml', self.TEXTkmlcmdline.GetValue())

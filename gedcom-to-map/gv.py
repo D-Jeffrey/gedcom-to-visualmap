@@ -52,9 +52,9 @@ if __name__ == '__main__':
 
     # Create the application instance based on WITMODE
     if WITMODE:  # Debugging mode
-        app = MyWittedApp()
+        app = MyWittedApp(redirect=False)
     else:  # Normal mode
-        app = wx.App()
+        app = wx.App(redirect=False)
 
 
     # Instantiate services with the options file constant

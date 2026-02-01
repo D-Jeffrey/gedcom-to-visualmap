@@ -25,6 +25,36 @@ _log = logging.getLogger(__name__)
 # === Early Logging Configuration ===
 # Apply default logging levels as early as possible to prevent DEBUG messages
 # from geo_gedcom and other modules during import time
+def _apply_hierarchical_logging_defaults(logging_defaults: dict):
+    """Apply logging defaults hierarchically - parents first, then children overrides.
+    
+    Args:
+        logging_defaults: Dict mapping logger names to log levels
+    """
+    # Sort logger names by depth (parents before children)
+    # e.g., 'geo_gedcom' comes before 'geo_gedcom.geocode'
+    sorted_loggers = sorted(logging_defaults.items(), key=lambda x: x[0].count('.'))
+    
+    # Track which loggers have been explicitly set
+    explicitly_set = set()
+    
+    for logger_name, default_level in sorted_loggers:
+        level_value = logging.getLevelName(default_level)
+        if not isinstance(level_value, int):
+            continue
+            
+        # Set the logger itself
+        logger = logging.getLogger(logger_name)
+        logger.setLevel(level_value)
+        explicitly_set.add(logger_name)
+        
+        # Apply to all existing child loggers that haven't been explicitly set
+        logger_prefix = logger_name + '.'
+        for existing_logger_name in list(logging.root.manager.loggerDict.keys()):
+            if existing_logger_name.startswith(logger_prefix) and existing_logger_name not in explicitly_set:
+                child_logger = logging.getLogger(existing_logger_name)
+                child_logger.setLevel(level_value)
+
 def _early_apply_logging_defaults():
     """Apply logging defaults from gedcom_options.yaml at module import time."""
     try:
@@ -38,20 +68,8 @@ def _early_apply_logging_defaults():
             with open(options_file, 'r') as f:
                 options = yaml.safe_load(f)
                 logging_defaults = options.get('logging_defaults', {})
-                
-                for logger_name, default_level in logging_defaults.items():
-                    level_value = logging.getLevelName(default_level)
-                    if isinstance(level_value, int):
-                        logger = logging.getLogger(logger_name)
-                        logger.setLevel(level_value)
-                        
-                        # Set child loggers too
-                        logger_prefix = logger_name + '.'
-                        for existing_logger_name in list(logging.root.manager.loggerDict.keys()):
-                            if existing_logger_name.startswith(logger_prefix):
-                                child_logger = logging.getLogger(existing_logger_name)
-                                if child_logger.level == logging.NOTSET or child_logger.level == logging.WARNING:
-                                    child_logger.setLevel(level_value)
+                if logging_defaults:
+                    _apply_hierarchical_logging_defaults(logging_defaults)
     except Exception:
         pass  # Silently fail - logging not critical at import time
 
@@ -179,30 +197,17 @@ class GVConfig(IConfig):
         
         Called early during initialization to ensure correct logging levels
         are set before any significant logging occurs (e.g., during INI loading).
+        Uses hierarchical application: parent levels apply to children unless overridden.
         """
         logging_defaults = self.options.get('logging_defaults', {})
         if not logging_defaults:
             return
         
-        for logger_name, default_level in logging_defaults.items():
-            try:
-                level_value = logging.getLevelName(default_level)
-                if isinstance(level_value, int):
-                    alogger = logging.getLogger(logger_name)
-                    alogger.setLevel(level_value)
-                    
-                    # Also set level for any existing child loggers to inherit parent's level
-                    # This ensures child loggers like 'services.config_io' inherit from 'services'
-                    logger_prefix = logger_name + '.'
-                    for existing_logger_name in list(logging.root.manager.loggerDict.keys()):
-                        if existing_logger_name.startswith(logger_prefix):
-                            child_logger = logging.getLogger(existing_logger_name)
-                            # Only update if child logger doesn't have its own explicit setting
-                            if child_logger.level == logging.NOTSET or child_logger.level == logging.WARNING:
-                                child_logger.setLevel(level_value)
-            except Exception as e:
-                # Can't use _log here since logging might not be fully initialized
-                pass  # Silently skip errors during early initialization
+        try:
+            _apply_hierarchical_logging_defaults(logging_defaults)
+        except Exception as e:
+            # Can't use _log here since logging might not be fully initialized
+            pass  # Silently skip errors during early initialization
 
     def _cleanup_and_load_logging_section(self) -> None:
         """Clean up stale loggers and load active logger levels from [Logging] section.
@@ -214,28 +219,12 @@ class GVConfig(IConfig):
         logging_defaults = self.options.get('logging_defaults', {})
         logging_keys = list(logging_defaults.keys()) if logging_defaults else self.options.get('logging_keys', [])
         
-        # Step 1: Apply default levels from YAML for all configured loggers
+        # Step 1: Apply default levels from YAML for all configured loggers (hierarchically)
         if logging_defaults:
-            for logger_name, default_level in logging_defaults.items():
-                try:
-                    level_value = logging.getLevelName(default_level)
-                    if isinstance(level_value, int):
-                        alogger = logging.getLogger(logger_name)
-                        alogger.setLevel(level_value)
-                        
-                        # Also set level for any existing child loggers to inherit parent's level
-                        # This ensures child loggers like 'services.config_io' inherit from 'services'
-                        logger_prefix = logger_name + '.'
-                        for existing_logger_name in list(logging.root.manager.loggerDict.keys()):
-                            if existing_logger_name.startswith(logger_prefix):
-                                child_logger = logging.getLogger(existing_logger_name)
-                                # Only update if child logger doesn't have its own explicit setting
-                                if child_logger.level == logging.NOTSET or child_logger.level == logging.WARNING:
-                                    child_logger.setLevel(level_value)
-                    else:
-                        _log.warning("Invalid default logging level '%s' for logger '%s'", default_level, logger_name)
-                except Exception as e:
-                    _log.error("Error setting default level for logger '%s': %s", logger_name, e)
+            try:
+                _apply_hierarchical_logging_defaults(logging_defaults)
+            except Exception as e:
+                _log.error("Error applying hierarchical logging defaults: %s", e)
         
         # Step 2: Clean up stale loggers from INI
         if 'Logging' not in self.gvConfig:
@@ -262,21 +251,16 @@ class GVConfig(IConfig):
                 _log.error("Error saving cleaned logging settings: %s", e)
         
         # Step 3: Apply INI overrides for active loggers (these override YAML defaults)
+        # Collect all INI settings and apply hierarchically
+        ini_logging_config = {}
         for logger_name, log_level in self.gvConfig.items('Logging'):
+            ini_logging_config[logger_name] = log_level
+        
+        if ini_logging_config:
             try:
-                alogger = logging.getLogger(logger_name)
-                alogger.setLevel(log_level)
-                
-                # Also update child loggers to inherit the INI override
-                logger_prefix = logger_name + '.'
-                level_value = logging.getLevelName(log_level)
-                if isinstance(level_value, int):
-                    for existing_logger_name in list(logging.root.manager.loggerDict.keys()):
-                        if existing_logger_name.startswith(logger_prefix):
-                            child_logger = logging.getLogger(existing_logger_name)
-                            child_logger.setLevel(level_value)
+                _apply_hierarchical_logging_defaults(ini_logging_config)
             except Exception as e:
-                _log.warning("Failed to set logger '%s' level to %s: %s", logger_name, log_level, e)
+                _log.error("Error applying hierarchical INI logging overrides: %s", e)
 
     def _load_file_commands_from_ini(self) -> None:
         """Load file open commands from INI attributes into _file_open_commands object.

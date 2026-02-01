@@ -288,8 +288,8 @@ class ConfigDialog(wx.Dialog):
         # Apply logging levels hierarchically (parent levels propagate to children)
         if logging_config:
             try:
-                from services.config_service import _apply_hierarchical_logging_defaults
-                _apply_hierarchical_logging_defaults(logging_config)
+                from services.config_loader import LoggingConfigApplicator
+                LoggingConfigApplicator.apply_hierarchically(logging_config)
             except Exception:
                 _log.exception("ConfigDialog.onSave: failed to apply hierarchical logging defaults")
         

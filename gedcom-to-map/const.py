@@ -1,9 +1,14 @@
 # Constants for gedcom-to-visualmap
 
+from pathlib import Path
+
 VERSION = "0.2.8.0"
 NAME = "gedcom-to-visualmap"
 GEOCODEUSERAGENT = NAME + "/" + VERSION + " GEDCOM-to-visualmap"
 GUINAME = 'GEDCOM Visual Map'
+
+# Application root directory (parent of gedcom-to-map/)
+APP_ROOT = Path(__file__).parent.parent
 
 GV_COUNTRIES_JSON = 'https://raw.githubusercontent.com/nnjeim/world/master/resources/json/countries.json'
 GV_STATES_JSON = 'https://raw.githubusercontent.com/nnjeim/world/master/resources/json/states.json'
@@ -46,7 +51,7 @@ LOG_CONFIG = {
             'class': 'logging.FileHandler',
             'level': 'DEBUG',
             'formatter': 'standard',
-            'filename': f'{NAME}.log',
+            'filename': str(APP_ROOT / f'{NAME}.log'),
             'mode': 'w',
             'encoding': 'utf-8',
         },

@@ -24,6 +24,10 @@ Originally forked from [https://github.com/lmallez/gedcom-to-map], now in collab
 
 ## Recent Improvements
 
+- ✅ **Configuration System**: Refactored configuration handling with separated concerns - dedicated loader classes for YAML, INI, and logging configuration for better structure, reliability, and testability
+- ✅ **Dependency Injection**: Updated `GVConfig` to support dependency injection pattern, making testing and maintenance easier
+- ✅ **Test Coverage**: Added 26 new unit tests for configuration loaders, improving test isolation and coverage
+- ✅ **Logging Improvements**: Log file now always writes to application root directory (not dependent on working directory)
 - ✅ **Photo Path Handling**: Fixed cross-platform image display in HTML maps (Windows paths with backslashes now work correctly)
 - ✅ **Progress Messaging**: Added early progress messages during HTML generation for better user feedback
 - ✅ **Loop Detection**: Updated genealogical line creators to support pedigree collapse (same person in multiple branches)
@@ -265,13 +269,40 @@ The report provides comprehensive insights into your genealogical data with 14 d
 
 ## Testing
 
-To run the test suite:
+The project includes comprehensive test coverage across all major components.
+
+To run the full test suite:
 ```sh
 pytest
 ```
-All core modules and models are covered by pytest-based tests. See the `tests/` and `models/tests/` directories for details.
 
-# Running Address Book Performance Tests
+To run tests with coverage report:
+```sh
+pytest --cov=gedcom-to-map --cov-report=html
+```
+
+### Test Organization
+
+- **Unit Tests**: Fast, isolated tests for individual components
+  - `gedcom-to-map/services/tests/` - Configuration, state, and progress tracking
+  - `gedcom-to-map/models/tests/` - Data models and core structures
+  - `gedcom-to-map/render/tests/` - Rendering and export functionality
+  
+- **Integration Tests**: Test component interactions
+  - Configuration loading and migration
+  - GEDCOM parsing with geocoding
+  - Output generation (HTML, KML, statistics)
+
+- **Performance Tests**: Marked with `@pytest.mark.slow` (see below)
+
+### Configuration Testing
+
+The configuration system includes dedicated test coverage:
+- **`test_config_loader.py`** - 26 unit tests for YAML, INI, and logging configuration loaders
+- **`test_config_service.py`** - Integration tests for the main `GVConfig` service
+- All tests use dependency injection and proper isolation (temporary files, mocked dependencies)
+
+### Running Address Book Performance Tests
 
 To run the address book/geocoding performance test and see detailed output in the terminal, use:
 
@@ -285,7 +316,7 @@ The `-s` option ensures that all print statements from the test are shown in the
 
 Note: It requires some geo_cache files that may not be checked-in to the repo by default, so you might need to generate them manually using the "SUM" output option first.
 
-# Running GeolocatedGedcom Performance Tests
+### Running GeolocatedGedcom Performance Tests
 
 To run the GeolocatedGedcom initialization performance test:
 
@@ -295,7 +326,7 @@ pytest -s -m slow gedcom-to-map/tests/test_geolocatedgedcom_performance.py
 
 This test measures the initialization time and basic stats for the `GeolocatedGedcom` class across the same set of GEDCOM samples, for both fuzzy and exact matching. It prints a markdown table of results to the terminal and writes structured results to `gedcom-to-map/tests/geolocatedgedcom_performance_results.yaml`.
 
-## Running Slow/Performance Tests
+### Running Slow/Performance Tests
 
 Some tests are marked with the `@pytest.mark.slow` decorator to indicate that they are slow or intended for manual/performance runs only. By default, these tests are skipped unless explicitly requested.
 

@@ -1,5 +1,11 @@
 """
 GVConfig: Implements IConfig (configuration and file commands) for gedcom-to-visualmap.
+
+Refactored for better structure, reliability, and testability:
+- Separated file loading logic (config_loader.py) from runtime state (GVConfig)
+- No module-level side effects for better test isolation
+- Dependency injection support for easier testing
+- Factory methods for production and test use cases
 """
 import configparser
 from enum import Enum
@@ -7,122 +13,83 @@ from typing import Union, Dict, Optional, Any
 from pathlib import Path
 import os
 import platform
-import yaml
 import logging
 
 from const import (
-    GEO_CONFIG_FILENAME, 
-    INI_SECTION_GEDCOM_MAIN, INI_SECTION_GEO_CONFIG, INI_SECTIONS, INI_OPTION_SECTIONS,
-    MIGRATION_VERSION_UNSET, MIGRATION_VERSION_CURRENT
+    GEO_CONFIG_FILENAME, INI_SECTION_GEO_CONFIG, INI_SECTIONS, INI_OPTION_SECTIONS
 )
 from render.result_type import ResultType
 from services.interfaces import IConfig
 from services.config_io import get_option_sections, set_options, settings_file_pathname
+from services.config_loader import (
+    YAMLConfigLoader, 
+    INIConfigLoader, 
+    LoggingConfigApplicator
+)
 from services.file_commands import FileOpenCommandLines
 
 _log = logging.getLogger(__name__)
 
-# === Early Logging Configuration ===
-# Apply default logging levels as early as possible to prevent DEBUG messages
-# from geo_gedcom and other modules during import time
-def _apply_hierarchical_logging_defaults(logging_defaults: dict):
-    """Apply logging defaults hierarchically - parents first, then children overrides.
-    
-    Args:
-        logging_defaults: Dict mapping logger names to log levels
-    """
-    # Sort logger names by depth (parents before children)
-    # e.g., 'geo_gedcom' comes before 'geo_gedcom.geocode'
-    sorted_loggers = sorted(logging_defaults.items(), key=lambda x: x[0].count('.'))
-    
-    # Track which loggers have been explicitly set
-    explicitly_set = set()
-    
-    for logger_name, default_level in sorted_loggers:
-        level_value = logging.getLevelName(default_level)
-        if not isinstance(level_value, int):
-            continue
-            
-        # Set the logger itself
-        logger = logging.getLogger(logger_name)
-        logger.setLevel(level_value)
-        explicitly_set.add(logger_name)
-        
-        # Apply to all existing child loggers that haven't been explicitly set
-        logger_prefix = logger_name + '.'
-        for existing_logger_name in list(logging.root.manager.loggerDict.keys()):
-            if existing_logger_name.startswith(logger_prefix) and existing_logger_name not in explicitly_set:
-                child_logger = logging.getLogger(existing_logger_name)
-                child_logger.setLevel(level_value)
-
-def _early_apply_logging_defaults():
-    """Apply logging defaults from gedcom_options.yaml at module import time."""
-    try:
-        # Find and load gedcom_options.yaml
-        project_root = Path(__file__).resolve().parent.parent.parent
-        options_file = project_root / 'gedcom_options.yaml'
-        if not options_file.exists():
-            options_file = Path(__file__).resolve().parent.parent / 'gedcom_options.yaml'
-        
-        if options_file.exists():
-            with open(options_file, 'r') as f:
-                options = yaml.safe_load(f)
-                logging_defaults = options.get('logging_defaults', {})
-                if logging_defaults:
-                    _apply_hierarchical_logging_defaults(logging_defaults)
-    except Exception:
-        pass  # Silently fail - logging not critical at import time
-
-# Apply logging defaults immediately at module import
-_early_apply_logging_defaults()
 
 class GVConfig(IConfig):
     """
     Configuration service for gedcom-to-visualmap.
     Handles loading, saving, and managing both YAML and INI-based settings.
     Implements IConfig interface.
+    
+    Refactored design:
+    - Uses config_loader.py for file I/O operations
+    - Supports dependency injection for testing
+    - Clearer initialization flow
+    - No side effects in constructor
     """
 
     GEDCOM_OPTIONS_FILE = 'gedcom_options.yaml'
     INI_FILE_NAME = 'gedcom-visualmap.ini'
 
-    def __init__(self, gedcom_options_path: Optional[Union[str, Path]] = None) -> None:
+    def __init__(self, 
+                 gedcom_options_path: Optional[Union[str, Path]] = None,
+                 yaml_loader: Optional[YAMLConfigLoader] = None,
+                 ini_loader: Optional[INIConfigLoader] = None,
+                 logging_applicator: Optional[LoggingConfigApplicator] = None) -> None:
         """
         Initialize GVConfig, loading YAML and INI settings.
         
         Args:
             gedcom_options_path: Optional path to gedcom_options.yaml file.
                 If None, searches in project root and parent directories.
+            yaml_loader: Optional YAMLConfigLoader for dependency injection (testing).
+            ini_loader: Optional INIConfigLoader for dependency injection (testing).
+            logging_applicator: Optional LoggingConfigApplicator for dependency injection.
         
         Raises:
             FileNotFoundError: If gedcom_options.yaml cannot be found.
         """
-        if gedcom_options_path is not None:
-            file_path = Path(gedcom_options_path)
-            if not file_path.exists():
-                raise FileNotFoundError(f"Could not find gedcom_options.yaml at {file_path}")
-        else:
-            project_root = Path(__file__).resolve().parent.parent.parent
-            file_path = project_root / self.GEDCOM_OPTIONS_FILE
-            if not file_path.exists():
-                file_path = Path(__file__).resolve().parent.parent / self.GEDCOM_OPTIONS_FILE
-            if not file_path.exists():
-                raise FileNotFoundError(f"Could not find {self.GEDCOM_OPTIONS_FILE} at {file_path}")
-        with open(file_path, 'r') as file:
-            self.options = yaml.safe_load(file)
+        # === Dependency Injection Support ===
+        self._yaml_loader = yaml_loader or YAMLConfigLoader
+        self._logging_applicator = logging_applicator or LoggingConfigApplicator
         
-        # === Apply Default Logging Levels from YAML (before any logging happens) ===
-        # This ensures child loggers like services.config_io use the correct level
-        # even during initialization before INI settings are loaded
+        # === Load YAML Configuration ===
+        self.options = self._yaml_loader.load(gedcom_options_path)
+        
+        # === Apply Default Logging Levels from YAML ===
+        # This ensures child loggers use the correct level even during initialization
         self._apply_default_logging_levels()
         
         # === Initialize Core Settings ===
         self.gvConfig = None
-        self.map_types = self.options.get('map_types', ["CartoDB.Voyager"])  # Load available map types
-        self._gui_colors = self._load_gui_colors()  # Load GUI color definitions
-        self._geo_config_overrides = self._load_geo_config_overrides()  # Load geo config overrides
+        self.map_types = self.options.get('map_types', ["CartoDB.Voyager"])
+        self._gui_colors = self._load_gui_colors()
+        self._geo_config_overrides = self._load_geo_config_overrides()
         self.set_marker_defaults()
+        
+        # === Initialize INI Loader ===
         self.settingsfile = settings_file_pathname(self.INI_FILE_NAME)
+        if ini_loader:
+            self._ini_loader = ini_loader
+        else:
+            self._ini_loader = INIConfigLoader(self.settingsfile)
+        
         self._geo_config_file: Path = Path(__file__).resolve().parent / GEO_CONFIG_FILENAME
         
         # === Load Option Defaults from YAML ===
@@ -138,52 +105,102 @@ class GVConfig(IConfig):
         
         # === Load INI Settings ===
         try:
-            self.gvConfig = configparser.ConfigParser()
-            if os.path.exists(self.settingsfile):
-                # self.gvConfig.read(self.settingsfile)
+            self.gvConfig = self._ini_loader.load()
+            
+            # Run migration if needed
+            if self._ini_loader.exists():
+                self._ini_loader.migrate(self.options)
+                
+            # Load settings from INI
+            if self._ini_loader.exists():
                 self.loadsettings()
-            else:
-                for section in INI_SECTIONS:
-                    self.gvConfig[section] = {}
+            
         except Exception as e:
             _log.error("Error loading INI settings: %s", e)
+    
+    @classmethod
+    def create_default(cls, gedcom_options_path: Optional[Union[str, Path]] = None) -> 'GVConfig':
+        """Factory method to create GVConfig with default loaders.
+        
+        This is the recommended way to create GVConfig instances in production code.
+        
+        Args:
+            gedcom_options_path: Optional path to gedcom_options.yaml
+            
+        Returns:
+            Configured GVConfig instance
+        """
+        return cls(gedcom_options_path=gedcom_options_path)
+    
+    @classmethod
+    def create_for_testing(cls,
+                          yaml_data: Dict[str, Any],
+                          ini_config: Optional[configparser.ConfigParser] = None) -> 'GVConfig':
+        """Factory method to create GVConfig for testing with in-memory data.
+        
+        This allows tests to work without file system access.
+        
+        Args:
+            yaml_data: Dictionary of YAML configuration options
+            ini_config: Optional pre-configured ConfigParser instance
+            
+        Returns:
+            GVConfig instance configured with provided data
+        """
+        # Create a mock loader that returns the provided data
+        class MockYAMLLoader:
+            @classmethod
+            def load(cls, path=None):
+                return yaml_data
+        
+        class MockINILoader:
+            def __init__(self, ini_path):
+                self.ini_path = Path(ini_path)
+                self.config = ini_config or configparser.ConfigParser()
+                
+            def exists(self):
+                return ini_config is not None
+            
+            def load(self):
+                if ini_config:
+                    # Ensure all required sections exist
+                    for section in INI_SECTIONS:
+                        if section not in self.config.sections():
+                            self.config[section] = {}
+                return self.config
+            
+            def save(self, config):
+                self.config = config
+            
+            def migrate(self, yaml_options):
+                return False
+        
+        return cls(
+            yaml_loader=MockYAMLLoader,
+            ini_loader=MockINILoader('/tmp/test_settings.ini')
+        )
 
     # === INI/YAML Load/Save Methods ===
     def loadsettings(self) -> None:
-        """Load all settings from INI file into attributes."""
-        self.gvConfig = configparser.ConfigParser()
-        self.gvConfig.read(self.settingsfile)
+        """Load all settings from INI file into attributes.
+        
+        Uses the injected INI loader for better testability.
+        """
+        # Sync INI loader path with settingsfile in case it was changed
+        if hasattr(self, '_ini_loader') and hasattr(self, 'settingsfile'):
+            self._ini_loader.ini_path = Path(self.settingsfile)
+        
+        # Reload from file
+        self.gvConfig = self._ini_loader.load()
+        
+        # Load all option sections
         for section in INI_SECTIONS:
-            if section not in self.gvConfig.sections():
-                self.gvConfig[section] = {}
             if section in INI_OPTION_SECTIONS:
                 section_keys = self._build_section_keys(section)
                 self.loadsection(section, section_keys)
-        migration_version = self.gvConfig['Core'].get('_migration_version', MIGRATION_VERSION_UNSET)
-        # Run migration if version is outdated (unset or less than current)
-        if migration_version != MIGRATION_VERSION_CURRENT:
-            _log.info("Running INI migration from version '%s' to '%s'", migration_version, MIGRATION_VERSION_CURRENT)
-            old_ini_settings = self.options.get('old_ini_settings', {})
-            removed_count = 0
-            for key, section in old_ini_settings.items():
-                # ConfigParser converts option names to lowercase, so case-insensitive check
-                if self.gvConfig.has_section(section) and self.gvConfig.has_option(section, key):
-                    _log.info("Removing deprecated setting '%s' from section '%s'", key, section)
-                    self.gvConfig.remove_option(section, key)
-                    removed_count += 1
-                else:
-                    _log.debug("Deprecated setting '%s' not found in section '%s'", key, section)
-            _log.info("Removed %d deprecated settings during migration", removed_count)
-            self.gvConfig['Core']['_migration_version'] = MIGRATION_VERSION_CURRENT
-            try:
-                with open(self.settingsfile, 'w') as configfile:
-                    self.gvConfig.write(configfile)
-                _log.info("Successfully saved migrated settings to %s", self.settingsfile)
-            except Exception as e:
-                _log.error("Error saving migrated settings: %s", e)
+        
+        # Load input file and set output file accordingly
         self.setInput(self.gvConfig['Core'].get('InputFile', ''), generalRequest=False)
-        # Note: setInput already calls setResultsFile, so we don't need to call it again
-        # The resultpath can be loaded from INI if saved separately
         self.resultpath = os.path.split(self.gvConfig['Core'].get('OutputFile', ''))[0]
         
         # Load file open commands from INI into _file_open_commands object
@@ -204,7 +221,7 @@ class GVConfig(IConfig):
             return
         
         try:
-            _apply_hierarchical_logging_defaults(logging_defaults)
+            self._logging_applicator.apply_hierarchically(logging_defaults)
         except Exception as e:
             # Can't use _log here since logging might not be fully initialized
             pass  # Silently skip errors during early initialization
@@ -214,6 +231,8 @@ class GVConfig(IConfig):
         
         First applies default levels from logging_defaults, then INI overrides them.
         Removes logger names that are no longer in logging_defaults/logging_keys list.
+        
+        Uses the new LoggingConfigApplicator for cleaner separation of concerns.
         """
         # Get logger configuration
         logging_defaults = self.options.get('logging_defaults', {})
@@ -222,45 +241,31 @@ class GVConfig(IConfig):
         # Step 1: Apply default levels from YAML for all configured loggers (hierarchically)
         if logging_defaults:
             try:
-                _apply_hierarchical_logging_defaults(logging_defaults)
+                self._logging_applicator.apply_hierarchically(logging_defaults)
             except Exception as e:
                 _log.error("Error applying hierarchical logging defaults: %s", e)
         
-        # Step 2: Clean up stale loggers from INI
-        if 'Logging' not in self.gvConfig:
-            return
+        # Step 2: Clean up stale loggers from INI using the applicator
+        stale_loggers = self._logging_applicator.cleanup_stale_loggers(
+            self.gvConfig, 
+            logging_keys
+        )
         
-        stale_loggers = []
-        
-        # Identify stale loggers (not in current logging_keys)
-        for logger_name, _ in self.gvConfig.items('Logging'):
-            if logger_name not in logging_keys:
-                stale_loggers.append(logger_name)
-        
-        # Remove stale loggers
+        # Save cleaned configuration if stale loggers were removed
         if stale_loggers:
-            _log.info("Removing %d stale logger(s) from INI: %s", len(stale_loggers), ', '.join(stale_loggers))
-            for logger_name in stale_loggers:
-                self.gvConfig.remove_option('Logging', logger_name)
-            
-            # Save cleaned configuration
             try:
-                with open(self.settingsfile, 'w') as configfile:
-                    self.gvConfig.write(configfile)
+                self._ini_loader.save(self.gvConfig)
             except Exception as e:
                 _log.error("Error saving cleaned logging settings: %s", e)
         
         # Step 3: Apply INI overrides for active loggers (these override YAML defaults)
-        # Collect all INI settings and apply hierarchically
-        ini_logging_config = {}
-        for logger_name, log_level in self.gvConfig.items('Logging'):
-            ini_logging_config[logger_name] = log_level
-        
-        if ini_logging_config:
-            try:
-                _apply_hierarchical_logging_defaults(ini_logging_config)
-            except Exception as e:
-                _log.error("Error applying hierarchical INI logging overrides: %s", e)
+        if 'Logging' in self.gvConfig:
+            ini_logging_config = dict(self.gvConfig.items('Logging'))
+            if ini_logging_config:
+                try:
+                    self._logging_applicator.apply_hierarchically(ini_logging_config)
+                except Exception as e:
+                    _log.error("Error applying hierarchical INI logging overrides: %s", e)
 
     def _load_file_commands_from_ini(self) -> None:
         """Load file open commands from INI attributes into _file_open_commands object.
@@ -303,6 +308,8 @@ class GVConfig(IConfig):
         
         Persists all configuration sections (Core, HTML, Summary, KML) to the INI file.
         Also saves the Main person ID to the Gedcom.Main section, keyed by GEDCOM filename.
+        
+        Uses the injected INI loader for better testability.
         """
         try:
             if not hasattr(self, 'gvConfig') or not self.gvConfig:
@@ -311,21 +318,31 @@ class GVConfig(IConfig):
                     self.gvConfig[section] = {}
             elif 'Logging' not in self.gvConfig:
                 self.gvConfig['Logging'] = {}
+            
+            # Sync INI loader path with settingsfile in case it was changed
+            if hasattr(self, '_ini_loader') and hasattr(self, 'settingsfile'):
+                self._ini_loader.ini_path = Path(self.settingsfile)
+            
+            # Save all configuration sections
             core_keys = self._build_section_keys('Core')
             for key in core_keys:
                 self.gvConfig['Core'][key] = str(getattr(self, key))
+            
             html_keys = self._build_section_keys('HTML')
             _log.debug("Saving HTML section with keys: %s", list(html_keys.keys()))
             for key in html_keys:
                 value = getattr(self, key)
                 _log.debug("  Saving HTML.%s = %s (type=%s)", key, value, type(value).__name__)
-                self.gvConfig['HTML'][key] =  str(getattr(self, key))
+                self.gvConfig['HTML'][key] = str(getattr(self, key))
+            
             summary_keys = self._build_section_keys('Summary')
             for key in summary_keys:
                 self.gvConfig['Summary'][key] = str(getattr(self, key))
+            
             kml_keys = self._build_section_keys('KML')
             for key in kml_keys:
-                self.gvConfig['KML'][key] =  str(getattr(self, key))
+                self.gvConfig['KML'][key] = str(getattr(self, key))
+            
             geocoding_keys = self._build_section_keys('GeoCoding')
             for key in geocoding_keys:
                 self.gvConfig['GeoCoding'][key] = str(getattr(self, key))
@@ -333,8 +350,11 @@ class GVConfig(IConfig):
             # Save file open commands from _file_open_commands object to INI
             self._save_file_commands_to_ini()
             
-            self.gvConfig['Core']['InputFile'] =  getattr(self, 'GEDCOMinput', '')
-            self.gvConfig['Core']['OutputFile'] = os.path.join(getattr(self, 'resultpath', ''), getattr(self, 'ResultFile', ''))
+            self.gvConfig['Core']['InputFile'] = getattr(self, 'GEDCOMinput', '')
+            self.gvConfig['Core']['OutputFile'] = os.path.join(
+                getattr(self, 'resultpath', ''), 
+                getattr(self, 'ResultFile', '')
+            )
             
             # Save Main person ID under Gedcom.Main section, keyed by GEDCOM filename
             if hasattr(self, 'GEDCOMinput') and self.GEDCOMinput:
@@ -347,7 +367,7 @@ class GVConfig(IConfig):
             self.gvConfig.remove_section('Logging')
             self.gvConfig.add_section('Logging')
             
-            # Get logger names from logging_defaults (dict) or logging_keys (list) for backwards compatibility
+            # Get logger names from logging_defaults (dict) or logging_keys (list)
             logging_defaults = self.options.get('logging_defaults', {})
             logging_keys = list(logging_defaults.keys()) if logging_defaults else self.options.get('logging_keys', [])
             for logName in logging_keys:
@@ -387,8 +407,9 @@ class GVConfig(IConfig):
                 for key, value in flattened.items():
                     self.gvConfig[INI_SECTION_GEO_CONFIG][key] = value
             
-            with open(self.settingsfile, 'w') as configfile:
-                self.gvConfig.write(configfile)
+            # Use INI loader to save (better encapsulation)
+            self._ini_loader.save(self.gvConfig)
+            
         except Exception as e:
             _log.error("Error saving settings to %s: %s", self.settingsfile, e)
 

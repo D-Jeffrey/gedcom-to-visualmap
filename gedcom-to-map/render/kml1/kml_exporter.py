@@ -314,7 +314,7 @@ class KmlExporter:
                 kml_line.timestamp.when = timeA
             elif timeB:
                 kml_line.timestamp.when = timeB
-        _log.info(f"    line    {line.name} ({line.fromlocation.lon}, {line.fromlocation.lat}) ({line.tolocation.lon}, {line.tolocation.lat})")
+        _log.debug(f"    line    {line.name} ({line.fromlocation.lon}, {line.fromlocation.lat}) ({line.tolocation.lon}, {line.tolocation.lat})")
 
     def _log_skipped_line(self, line: Line) -> None:
         """
@@ -347,7 +347,7 @@ class KmlExporter:
                 date_single = getattr(event_date, 'single', None)
                 if date_single and self.svc_config.get('MapTimeLine'):
                     pnt.timestamp.when = date_single.isoformat() if date_single else None
-                _log.info(f"    midpt   {line.name} ({event_latlon.lon}, {event_latlon.lat})")
+                _log.debug(f"    midpt   {line.name} ({event_latlon.lon}, {event_latlon.lat})")
             else:
                 if mid.location and getattr(mid.location, 'latlon', None):
                     _log.warning(f"skipping {line.name} ({event_latlon.lon}, {event_latlon.lat})")

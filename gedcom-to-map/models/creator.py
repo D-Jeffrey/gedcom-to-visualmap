@@ -152,7 +152,7 @@ class Creator:
             visited = set()
         
         if current.xref_id in visited:
-            _log.info("Loop detected in ancestry trace: {:2} - {} {} - Path: {}".format(prof, self.people[current.xref_id].name, current.xref_id, path))
+            _log.warning("Loop detected in ancestry trace: {:2} - {} {} - Path: {}".format(prof, self.people[current.xref_id].name, current.xref_id, path))
             return []
         
         # Add to visited set for this line
@@ -169,7 +169,7 @@ class Creator:
                 else self.link(event_latlon, current, branch, prof, miss + 1, path, visited)
             )
         color = (branch + DELTA / 2) / (SPACE ** (prof % 256))
-        _log.info("{:8} {:8} {:2} {:.10f} {} {:20}".format(path, branch, prof, color, self.rainbow.get(color).to_hexa(), current.name))
+        _log.debug("{:8} {:8} {:2} {:.10f} {} {:20}".format(path, branch, prof, color, self.rainbow.get(color).to_hexa(), current.name))
         midpoints = None
         residence_events = current.get_events('residence') if current else []
         if residence_events:
@@ -331,13 +331,13 @@ class CreatorTrace:
             visited = set()
         
         if current.xref_id in visited:
-            _log.error("Loop detected in ancestry trace: {:2} - {} {} - Path: {}".format(prof, self.people[current.xref_id].name, current.xref_id, path))
+            _log.warning("Loop detected in ancestry trace: {:2} - {} {} - Path: {}".format(prof, self.people[current.xref_id].name, current.xref_id, path))
             return []
         
         # Add to visited set for this line
         visited = visited | {current.xref_id}
         
-        _log.info("{:8} {:8} {:2} {:20}".format(path, branch, prof, current.name))
+        _log.debug("{:8} {:8} {:2} {:20}".format(path, branch, prof, current.name))
         birth_event = current.get_event('birth') if current else None
         birth_year_num = birth_event.date.year_num if birth_event and birth_event.date else None
         death_event = current.get_event('death') if current else None
@@ -424,9 +424,9 @@ class LifetimeCreator:
         death_latlon = death_event.getattr('latlon') if death_event else None
 
         if birth_event and death_event:
-            _log.info("{:8} {:8} {:2} {:.10f} {} Self {:20}".format(path, branch, prof, color, self.rainbow.get(color).to_hexa(), current.name))
+            _log.debug("{:8} {:8} {:2} {:.10f} {} Self {:20}".format(path, branch, prof, color, self.rainbow.get(color).to_hexa(), current.name))
         else:
-            _log.info("{:8} {:8} {:2} {:.10f} {} Self {:20}".format(" ", " ", " ", 0, "-SKIP-", current.name))
+            _log.debug("{:8} {:8} {:2} {:.10f} {} Self {:20}".format(" ", " ", " ", 0, "-SKIP-", current.name))
         midpoints = []
         wyear = None
         residence_events = current.get_events('residence') if current else []
@@ -449,12 +449,12 @@ class LifetimeCreator:
             visited = set()
         
         if parent.xref_id in visited:
-            _log.info("Loop detected in ancestry trace: {:2} - {} {} - Path: {}".format(prof, parent.name, parent.xref_id, path))
+            _log.warning("Loop detected in ancestry trace: {:2} - {} {} - Path: {}".format(prof, parent.name, parent.xref_id, path))
             return []
         
         if getattr(parent, 'birth', None):
             color = (branch + DELTA / 2) / (SPACE ** prof)
-            _log.info("{:8} {:8} {:2} {:.10f} {} {:20} from {:20}".format(path, branch, prof, color, self.rainbow.get(color).to_hexa(), parent.name, forperson.name))
+            _log.debug("{:8} {:8} {:2} {:.10f} {} {:20} from {:20}".format(path, branch, prof, color, self.rainbow.get(color).to_hexa(), parent.name, forperson.name))
 
             parent_birth = parent.get_event('birth') if parent else None
             parent_birth_latlon = parent_birth.getattr('latlon') if parent_birth else None
@@ -470,10 +470,9 @@ class LifetimeCreator:
             return self.link(parent_birth_latlon, parent, branch, prof, 0, path, visited) + [line]
         else:
             if self.max_missing != 0 and miss >= self.max_missing:
-                _log.info("{:8} {:8} {:2} {:.10f} {} Self {:20}".format(" ", " ", " ", 0, "-STOP-", parent.name))
+                _log.debug("{:8} {:8} {:2} {:.10f} {} Self {:20}".format(" ", " ", " ", 0, "-STOP-", parent.name))
                 return []
             return self.link(latlon, parent, branch, prof, miss+1, path, visited)
-        _log.info("{:8} {:8} {:2} {:.10f} {} Self {:20}".format(" ", " ", " ", 0, "-KICK-", parent.name))
 
         
     def link(self, latlon: LatLon, current: Person, branch=0, prof=0, miss=0, path="", visited=None) -> list[Line]:

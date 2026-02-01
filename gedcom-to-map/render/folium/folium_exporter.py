@@ -419,7 +419,7 @@ class foliumExporter:
         )
         styled_lines = [line for line in lines_sorted if hasattr(line, 'style')]
         for line in styled_lines:
-            _log.info(f"{line.prof * ((line.branch/DELTA)+1)+ line.prof:8f} {line.path:8} "
+            _log.debug(f"{line.prof * ((line.branch/DELTA)+1)+ line.prof:8f} {line.path:8} "
                      f"{line.branch:.8f} {line.prof:2} "
                      f"{line.parentofperson.name if line.parentofperson else '':20} from {line.name:20}")
         for line in styled_lines:

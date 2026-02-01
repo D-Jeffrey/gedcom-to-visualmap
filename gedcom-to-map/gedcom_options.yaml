@@ -198,20 +198,20 @@ file_command_defaults:
 # Default level is WARNING for all loggers
 logging_defaults:
   # Core application
-  const: WARNING
-  gv: WARNING
+  const: INFO
+  gv: INFO
   # Major components
-  services: WARNING
-  models: WARNING
-  render: WARNING
-  gui: WARNING
+  services: INFO
+  models: INFO
+  render: INFO
+  gui: INFO
   # Geocoding subsystem
-  geo_gedcom: WARNING
-  geo_gedcom.gedcom_date: WARNING
-  geo_gedcom.geocode: WARNING
-  geo_gedcom.statistics: WARNING
-  ged4py: WARNING        # GEDCOM parser used by geo_gedcom
-  geopy: WARNING         # Geocoding API used by geo_gedcom
+  geo_gedcom: INFO
+  geo_gedcom.gedcom_date: ERROR
+  geo_gedcom.geocode: INFO
+  geo_gedcom.statistics: INFO
+  ged4py: INFO        # GEDCOM parser used by geo_gedcom
+  geopy: INFO         # Geocoding API used by geo_gedcom
   # HTTP dependencies
   urllib3: WARNING       # Used by geopy
   # Visualization

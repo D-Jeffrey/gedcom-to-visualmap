@@ -20,7 +20,7 @@ def clean_config():
     """
     with tempfile.TemporaryDirectory() as tmpdir:
         temp_ini = os.path.join(tmpdir, 'test_settings.ini')
-        with patch('services.config_io.settings_file_pathname', return_value=temp_ini):
+        with patch('services.config_service.settings_file_pathname', return_value=temp_ini):
             config = GVConfig()
             yield config
 
@@ -285,6 +285,7 @@ class TestGVConfigSaveLoad:
         
         try:
             config.settingsfile = temp_ini
+            config._ini_loader.ini_path = Path(temp_ini)
             config.GEDCOMinput = '/test/path/file.ged'
             config.ResultFile = 'output.html'
             config.resultpath = '/test/path'
@@ -308,6 +309,7 @@ class TestGVConfigSaveLoad:
         
         try:
             config.settingsfile = temp_ini
+            config._ini_loader.ini_path = Path(temp_ini)
             config.GEDCOMinput = '/test/path/myfile.ged'
             config.Main = 'I001'
             config.resultpath = '/test/path'
@@ -339,6 +341,7 @@ class TestGVConfigSaveLoad:
             f.write('[Gedcom.Main]\n')
         
         try:
+            config._ini_loader.ini_path = Path(temp_ini)
             config.settingsfile = temp_ini
             config.loadsettings()
             assert config.GEDCOMinput == '/test/input.ged'
@@ -366,8 +369,6 @@ class TestGVConfigWithExistingINI:
     INI settings.
     """
     
-    @pytest.mark.xfail(reason="Test isolation issue - may interact with user's actual INI file")
-    
     def test_init_loads_existing_ini_settings(self):
         """Test that GVConfig loads settings from existing INI file on initialization."""
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -391,7 +392,7 @@ class TestGVConfigWithExistingINI:
                 f.write('family = I123\n')
             
             # Create config with patched settings path that points to our test INI
-            with patch('services.config_io.settings_file_pathname', return_value=temp_ini):
+            with patch('services.config_service.settings_file_pathname', return_value=temp_ini):
                 config = GVConfig()
                 
                 # Verify settings were loaded from INI file
@@ -421,7 +422,7 @@ class TestGVConfigWithExistingINI:
                 f.write('[Logging]\n')
                 f.write('[Gedcom.Main]\n')
             
-            with patch('services.config_io.settings_file_pathname', return_value=temp_ini):
+            with patch('services.config_service.settings_file_pathname', return_value=temp_ini):
                 config = GVConfig()
                 
                 # These should be from INI, not YAML defaults
@@ -447,14 +448,13 @@ class TestGVConfigWithExistingINI:
                 f.write('geo_gedcom = INFO\n')
                 f.write('[Gedcom.Main]\n')
             
-            with patch('services.config_io.settings_file_pathname', return_value=temp_ini):
+            with patch('services.config_service.settings_file_pathname', return_value=temp_ini):
                 config = GVConfig()
                 
                 # Verify logging section was loaded
                 assert config.gvConfig.has_section('Logging')
                 assert 'services.config_service' in dict(config.gvConfig.items('Logging'))
     
-    @pytest.mark.xfail(reason="Test isolation issue - may interact with user's actual INI file")
     def test_main_person_id_loaded_from_gedcom_main_section(self):
         """Test that Main person ID is loaded from Gedcom.Main section."""
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -472,7 +472,7 @@ class TestGVConfigWithExistingINI:
                 # ConfigParser converts keys to lowercase, so use the base name
                 f.write('myfile = I456\n')
             
-            with patch('services.config_io.settings_file_pathname', return_value=temp_ini):
+            with patch('services.config_service.settings_file_pathname', return_value=temp_ini):
                 config = GVConfig()
                 
                 # Verify Main person ID is loaded and accessible
@@ -480,7 +480,6 @@ class TestGVConfigWithExistingINI:
                 # Verify the INI section contains the entry
                 assert 'myfile' in dict(config.gvConfig.items('Gedcom.Main'))
     
-    @pytest.mark.xfail(reason="Test isolation issue - may interact with user's actual INI file")
     def test_file_commands_loaded_from_ini(self):
         """Test that file open commands are loaded from INI file."""
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -497,7 +496,7 @@ class TestGVConfigWithExistingINI:
                 f.write('[Logging]\n')
                 f.write('[Gedcom.Main]\n')
             
-            with patch('services.config_io.settings_file_pathname', return_value=temp_ini):
+            with patch('services.config_service.settings_file_pathname', return_value=temp_ini):
                 config = GVConfig()
                 
                 # Verify file commands were loaded from INI
@@ -512,8 +511,9 @@ class TestGVConfigWithExistingINI:
         with tempfile.TemporaryDirectory() as tmpdir:
             temp_ini = os.path.join(tmpdir, 'test_settings.ini')
             
-            # Create first config and set values
-            with patch('services.config_io.settings_file_pathname', return_value=temp_ini):
+            # Patch must be active BEFORE creating GVConfig to avoid writing to user's INI
+            with patch('services.config_service.settings_file_pathname', return_value=temp_ini):
+                # Create first config and set values
                 config1 = GVConfig()
                 config1.GEDCOMinput = '/my/test/file.ged'
                 config1.Main = 'I999'
@@ -522,9 +522,8 @@ class TestGVConfigWithExistingINI:
                 config1.ResultFile = 'myoutput.html'
                 config1.resultpath = '/my/test'
                 config1.savesettings()
-            
-            # Create second config that should load the saved settings
-            with patch('services.config_io.settings_file_pathname', return_value=temp_ini):
+                
+                # Create second config that should load the saved settings
                 config2 = GVConfig()
                 
                 # Verify key settings were preserved
@@ -546,7 +545,7 @@ class TestGVConfigWithExistingINI:
                 f.write('InputFile = /test.ged\n')
                 f.write('_migration_version = 2\n')
             
-            with patch('services.config_io.settings_file_pathname', return_value=temp_ini):
+            with patch('services.config_service.settings_file_pathname', return_value=temp_ini):
                 config = GVConfig()
                 
                 # Verify all required sections exist

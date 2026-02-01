@@ -178,19 +178,19 @@ file_command_defaults:
     CSV: '$n'
     Trace: 'notepad $n'
     Default: '$n'
-    HTML: 'webbrowser $n'
+    HTML: '$n'
   Darwin:
     KML: 'open -a Numbers $n'
     CSV: 'soffice --calc $n'
     Trace: 'open -a Numbers $n'
     Default: 'open $n'
-    HTML: 'webbrowser $n'
+    HTML: '$n'
   Linux:
     KML: 'nano $n'
     CSV: 'soffice --calc $n'
     Trace: 'soffice --calc $n'
     Default: 'xdg-open $n'
-    HTML: 'webbrowser $n'
+    HTML: '$n'
 
 # Logger names to track in Logging section of INI file
 # Configure logging at the package level for simpler management

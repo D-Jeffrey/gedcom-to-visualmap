@@ -208,6 +208,11 @@ logging_defaults:
   # Geocoding subsystem
   geo_gedcom: WARNING
   geo_gedcom.gedcom_date: WARNING
+  geo_gedcom.geocode: WARNING
+  geo_gedcom.geocache: WARNING
+  geo_gedcom.geolocated_gedcom: WARNING
+  geo_gedcom.enrichment.pipeline: WARNING
+  geo_gedcom.statistics.pipeline: WARNING
   ged4py: WARNING        # GEDCOM parser used by geo_gedcom
   geopy: WARNING         # Geocoding API used by geo_gedcom
   # HTTP dependencies

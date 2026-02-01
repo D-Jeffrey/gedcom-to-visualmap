@@ -146,6 +146,8 @@ class TestOpenInBrowser:
     @patch('gui.actions.file_operations.webbrowser.open')
     @patch('gui.actions.file_operations.shutil.which', return_value=None)
     def test_open_in_browser_custom_command_not_found_fallback(self, mock_which, mock_wb, file_opener, caplog):
+        import logging
+        caplog.set_level(logging.WARNING, logger='gui.actions.file_operations')
         file_opener._open_in_browser('nonexistent "$n"', '/path/to/file.html')
         assert 'not found, falling back' in caplog.text
         mock_wb.assert_called_once()

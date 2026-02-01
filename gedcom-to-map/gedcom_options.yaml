@@ -209,6 +209,7 @@ logging_defaults:
   geo_gedcom: WARNING
   geo_gedcom.gedcom_date: WARNING
   geo_gedcom.geocode: WARNING
+  geo_gedcom.statistics: WARNING
   ged4py: WARNING        # GEDCOM parser used by geo_gedcom
   geopy: WARNING         # Geocoding API used by geo_gedcom
   # HTTP dependencies

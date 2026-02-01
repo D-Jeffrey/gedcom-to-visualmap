@@ -82,19 +82,27 @@ class LayoutOptions:
     @staticmethod
     def _add_basic_checks(vm_panel: Any, panel: wx.Panel, sizer: wx.Sizer) -> None:
         """Add the top-level checkbox controls and configuration button."""
-        # Add button to open Configuration Options
+        # Configuration button
         btn_config = LayoutHelpers.add_button_with_id(vm_panel, panel, "BTNConfig", "Configuration Options...")
+        sizer.Add(btn_config, 0, wx.ALL, 2)
         
-        cb_all_entities = LayoutHelpers.add_checkbox_with_id(vm_panel, panel, "CBAllEntities", "Map all people")
-        cb_born_mark = LayoutHelpers.add_checkbox_with_id(vm_panel, panel, "CBBornMark", "Marker for when Born")
-        cb_die_mark = LayoutHelpers.add_checkbox_with_id(vm_panel, panel, "CBDieMark", "Marker for when Died")
-
+        # General Options section
+        general_container = wx.Panel(panel)
+        general_box = wx.StaticBox(general_container, -1, "General Options")
+        general_sizer = wx.StaticBoxSizer(general_box, wx.VERTICAL)
+        general_boxIn = wx.BoxSizer(wx.VERTICAL)
+        
+        cb_all_entities = LayoutHelpers.add_checkbox_with_id(vm_panel, general_container, "CBAllEntities", "Map all people")
+        
+        general_boxIn.Add(cb_all_entities, 0, wx.ALL, 2)
+        general_sizer.Add(general_boxIn, 0, wx.EXPAND | wx.ALL, 4)
+        general_container.SetSizer(general_sizer)
+        
+        sizer.Add(general_container, 0, wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP, 5)
+        
+        # Result Type radio box (referenced later in _add_result_type_and_stack)
         LayoutHelpers.add_radio_box_with_id(vm_panel, panel, "RBResultType", "Result Type",
                                            ResultType.list_values(), majorDimension=5)
-
-        LayoutHelpers.add_many_to_sizer(sizer,
-                                        [btn_config,
-                                         cb_all_entities, cb_born_mark, cb_die_mark])
 
     @staticmethod
     def get_marks_controls_list(vm_panel: Any) -> list:
@@ -163,17 +171,30 @@ class LayoutOptions:
         ksizer = wx.StaticBoxSizer(kbox, wx.VERTICAL)
         kboxIn = wx.BoxSizer(wx.VERTICAL)
 
+        # Add marker checkboxes at the top
+        cb_born_mark = LayoutHelpers.add_checkbox_with_id(vm_panel, kbox_container, "CBBornMark", "Marker for when Born")
+        cb_die_mark = LayoutHelpers.add_checkbox_with_id(vm_panel, kbox_container, "CBDieMark", "Marker for when Died")
+
         rb_kml_mode = LayoutHelpers.add_radio_box_with_id(vm_panel, kbox_container, "RBKMLMode", "Organize by:",
                                                           choices=["None", "Folder"], majorDimension=2)
 
-        kboxs = [rb_kml_mode, wx.BoxSizer(wx.HORIZONTAL), (4, 4), wx.BoxSizer(wx.HORIZONTAL)]
-        cb_fly_to = LayoutHelpers.add_checkbox_with_id(vm_panel, kbox, "CBFlyTo", "FlyTo Balloon", style=wx.NO_BORDER)
-        vm_panel.id.INTMaxLineWeight = wx.SpinCtrl(kbox, vm_panel.id.IDs["INTMaxLineWeight"], "",
+        cb_fly_to = LayoutHelpers.add_checkbox_with_id(vm_panel, kbox_container, "CBFlyTo", "FlyTo Balloon")
+        
+        # Max Line Weight control with label
+        max_line_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        max_line_label = wx.StaticText(kbox_container, -1, "Max Line Weight")
+        vm_panel.id.INTMaxLineWeight = wx.SpinCtrl(kbox_container, vm_panel.id.IDs["INTMaxLineWeight"], "",
                                                      min=1, max=100, initial=20)
+        max_line_sizer.Add(max_line_label, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 5)
+        max_line_sizer.Add(vm_panel.id.INTMaxLineWeight, 0, wx.ALIGN_CENTER_VERTICAL)
 
-        kboxs[1].AddMany([wx.StaticText(kbox, -1, "        "), cb_fly_to])
-        kboxs[3].AddMany([vm_panel.id.INTMaxLineWeight, wx.StaticText(kbox, -1, " Max Line Weight")])
-        kboxIn.AddMany(kboxs)
+        kboxIn.AddMany([
+            (cb_born_mark, 0, wx.ALL, 2),
+            (cb_die_mark, 0, wx.ALL, 2),
+            (rb_kml_mode, 0, wx.ALL, 2),
+            (cb_fly_to, 0, wx.ALL, 2),
+            (max_line_sizer, 0, wx.ALL, 2),
+        ])
 
         ksizer.Add(kboxIn, 0, wx.EXPAND | wx.ALL, 4)
         kbox_container.SetSizer(ksizer)

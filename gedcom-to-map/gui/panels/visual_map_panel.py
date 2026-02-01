@@ -357,13 +357,15 @@ class VisualMapPanel(wx.Panel):
         """Append counter/progress information to the provided status string."""
         counter = getattr(self.svc_progress, "counter", 0)
         countertarget = getattr(self.svc_progress, "target", 0)
-        if counter > 0:
+        stepinfo = getattr(self.svc_progress, "step_info", "")
+        
+        # Show progress if we have a target (even when counter is 0) or if counter > 0
+        if countertarget > 0 or counter > 0:
             if countertarget > 0:
                 pct = counter/countertarget*100 if countertarget else 0
                 status = f"{status} : {pct:.0f}% ({counter}/{countertarget})  "
             else:
                 status = f"{status} : {counter}"
-            stepinfo = getattr(self.svc_progress, "step_info", "")
             if stepinfo:
                 status = f"{status} ({stepinfo})"
         return status

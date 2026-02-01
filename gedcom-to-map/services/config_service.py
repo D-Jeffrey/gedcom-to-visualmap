@@ -742,6 +742,7 @@ class GVConfig(IConfig):
                 if isinstance(value, (list, dict)):
                     return value
                 if isinstance(value, str):
+                    import yaml
                     return yaml.safe_load(value)
                 return value
             elif target_type == 'result':
@@ -768,12 +769,6 @@ class GVConfig(IConfig):
                                     vals.append(float(p))
                                 except Exception:
                                     vals.append(p.strip('\'"'))
-                    try:
-                        parsed_yaml = yaml.safe_load(value)
-                        if parsed_yaml is not None and not isinstance(parsed_yaml, str):
-                            return parsed_yaml
-                    except Exception:
-                        pass
                     try:
                         return ast.literal_eval(value)
                     except Exception as e:

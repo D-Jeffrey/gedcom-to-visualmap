@@ -115,17 +115,21 @@ class GedcomLoader:
             alt_place_file_path: Path = input_path.parent / f"{base_file_name}{FILE_ALT_PLACE_FILENAME_SUFFIX}"
             file_geo_cache_path: Path = input_path.parent / f"{base_file_name}{FILE_GEOCACHE_FILENAME_SUFFIX}"
             geo_config_path: Path = svc_config.get('geo_config_file')
-            defaultCountry: Optional[str] = svc_config.get('defaultCountry') or None
             
+            geo_config_updates = svc_config.get('geo_config_overrides')
+            geo_coding_options = svc_config.get('geocoding_options', {})
+            if geo_coding_options:
+                geo_config_updates['default_country'] = geo_coding_options.get('defaultCountry')
+                geo_config_updates['always_geocode'] = geo_coding_options.get('geocode_only', False)
+                geo_config_updates['cache_only'] = geo_coding_options.get('cache_only', False)
+                geo_config_updates['days_between_retrying_failed_lookups'] = geo_coding_options.get('days_between_retrying_failed_lookups', 7)
             try:
                 svc_state.lookup = GeolocatedGedcom(
                     gedcom_file=input_path.resolve(), 
                     location_cache_file=cachefile,
-                    default_country=defaultCountry,
-                    always_geocode=svc_config.get('UseGPS'),
-                    cache_only=svc_config.get('CacheOnly'),
                     alt_place_file_path=alt_place_file_path if not svc_config.get('skip_file_alt_places') else None,
                     geo_config_path=geo_config_path,
+                    geo_config_updates=geo_config_updates,
                     app_hooks=svc_config.get('app_hooks'),
                     fuzz=True
                 )

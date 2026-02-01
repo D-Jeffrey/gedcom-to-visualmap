@@ -74,9 +74,9 @@ class IConfig(Protocol):
         """Whether to use GPS/geocoding."""
         ...
     
-    @property
-    def cache_only(self) -> bool:
-        """Whether to use cache-only mode (no network requests)."""
+    @use_gps.setter
+    def use_gps(self, value: bool) -> None:
+        """Set whether to use GPS/geocoding."""
         ...
     
     @property
@@ -326,12 +326,13 @@ class Config:
     @property
     def use_gps(self) -> bool:
         """Whether to use GPS/geocoding."""
-        return bool(self._attributes.get('UseGPS', True))
+        # Reference the geocode_only attribute (from geocoding_options)
+        return bool(getattr(self, 'geocode_only', self._attributes.get('geocode_only', True)))
     
-    @property
-    def cache_only(self) -> bool:
-        """Whether to use cache-only mode."""
-        return bool(self._attributes.get('CacheOnly', False))
+    @use_gps.setter
+    def use_gps(self, value: bool) -> None:
+        """Set whether to use GPS/geocoding."""
+        self.geocode_only = bool(value)
     
     @property
     def result_type(self):

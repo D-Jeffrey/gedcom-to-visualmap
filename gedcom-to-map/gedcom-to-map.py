@@ -31,8 +31,8 @@ class ArgParse(argparse.ArgumentParser):
         self.add_argument('-logfile', type=str, default=None, help="log file name")
 
         self.geocodegroup = self.add_argument_group('Geocoding')
-        self.geocodegroup.add_argument('-gpscache', action='store_true', dest='cacheonly', help="Use the GPS cache only")
-        self.geocodegroup.add_argument('-nogps', action='store_false', dest='usegps', help="Do not lookup places using geocode to determine GPS, use built in GPS values")
+        self.geocodegroup.add_argument('-gpscache', action='store_true', dest='cache_only', help="Use the GPS cache only")
+        self.geocodegroup.add_argument('-nogps', action='store_false', dest='geocode_only', help="Do not lookup places using geocode to determine GPS, use built in GPS values")
         
         self.htmlgroup = self.add_argument_group('Folium Map as HTML (format HTML)')
         self.htmlgroup.add_argument('-nomarker',  action='store_true', dest='marksoff', help="Turn off the markers")
@@ -100,7 +100,7 @@ if __name__ == '__main__':
     myGeoOptions.setstatic( arg_parse.args.input_file, arg_parse.args.output_file,
             formt, arg_parse.args.main, 
             arg_parse.args.max_missing, arg_parse.args.max_line_weight, 
-            arg_parse.args.usegps, arg_parse.args.cacheonly,  arg_parse.args.everyone) 
+            arg_parse.args.geocode_only, arg_parse.args.cache_only,  arg_parse.args.everyone) 
 
     if (myGeoOptions.ResultType):
         Geoheatmap(myGeoOptions)

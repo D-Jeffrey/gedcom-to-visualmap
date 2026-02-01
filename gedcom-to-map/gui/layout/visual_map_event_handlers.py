@@ -87,6 +87,7 @@ class VisualMapEventHandler:
             "OpenCSV": "OpenCSV",
             "Trace": "SaveTrace",
             "OpenBrowser": "OpenBrowser",
+            "OpenConfig": "OpenConfig",
             # 'Stop' handled inline because it manipulates state service
         }
         fn_name = mapping.get(action)
@@ -157,8 +158,7 @@ class VisualMapEventHandler:
             event_id = event.GetId()
             attributes = self.panel.id.get_id_attributes(event_id)
             attrname = attributes.get("config_attribute", None)
-            if event_id in (self.panel.id.IDs.get("TEXTResultFile"),
-                            self.panel.id.IDs.get("TEXTDefaultCountry")):
+            if event_id == self.panel.id.IDs.get("TEXTResultFile"):
                 # special case: results text needs to update svc_config ResultFile and ResultType
                 self.panel.svc_config.set(attrname, event.GetString())
                 self.panel.svc_config.set(attrname, event.GetString())

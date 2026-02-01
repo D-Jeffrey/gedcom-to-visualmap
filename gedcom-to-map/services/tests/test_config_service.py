@@ -172,16 +172,16 @@ class TestGVConfigInputOutput:
             Main='I001',
             MaxMissing=5,
             MaxLineWeight=25,
-            UseGPS=False,
-            CacheOnly=True,
+            geocode_only=False,
+            cache_only=True,
             AllEntities=True
         )
         assert config.GEDCOMinput == '/path/to/file.ged'
         assert config.Main == 'I001'
         assert config.MaxMissing == 5
         assert config.MaxLineWeight == 25
-        assert config.UseGPS == False
-        assert config.CacheOnly == True
+        assert config.geocode_only == False
+        assert config.cache_only == True
         assert config.AllEntities == True
 
 

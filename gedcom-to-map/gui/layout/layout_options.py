@@ -81,14 +81,10 @@ class LayoutOptions:
 
     @staticmethod
     def _add_basic_checks(vm_panel: Any, panel: wx.Panel, sizer: wx.Sizer) -> None:
-        """Add the top-level checkbox controls (GPS, cache, defaults, entity flags)."""
-        cb_use_gps = LayoutHelpers.add_checkbox_with_id(vm_panel, panel, "CBUseGPS", "Lookup all address (ignore cache)")
-        cb_cache_only = LayoutHelpers.add_checkbox_with_id(vm_panel, panel, "CBCacheOnly", "Cache Only, do not lookup addresses")
-        _ = LayoutHelpers.add_static_text_with_id(vm_panel, panel, "labelDefCountry", "Default Country:   ")
-        _ = LayoutHelpers.add_textctrl_with_id(vm_panel, panel, "TEXTDefaultCountry", size=(250, 20))
-
-        defCountryBox = LayoutHelpers.add_multi_horizontal_by_id(vm_panel, ["labelDefCountry", "TEXTDefaultCountry"], spacer=6)
-
+        """Add the top-level checkbox controls and configuration button."""
+        # Add button to open Configuration Options
+        btn_config = LayoutHelpers.add_button_with_id(vm_panel, panel, "BTNConfig", "Configuration Options...")
+        
         cb_all_entities = LayoutHelpers.add_checkbox_with_id(vm_panel, panel, "CBAllEntities", "Map all people")
         cb_born_mark = LayoutHelpers.add_checkbox_with_id(vm_panel, panel, "CBBornMark", "Marker for when Born")
         cb_die_mark = LayoutHelpers.add_checkbox_with_id(vm_panel, panel, "CBDieMark", "Marker for when Died")
@@ -97,7 +93,7 @@ class LayoutOptions:
                                            ResultType.list_values(), majorDimension=5)
 
         LayoutHelpers.add_many_to_sizer(sizer,
-                                        [cb_use_gps, cb_cache_only, defCountryBox,
+                                        [btn_config,
                                          cb_all_entities, cb_born_mark, cb_die_mark])
 
     @staticmethod

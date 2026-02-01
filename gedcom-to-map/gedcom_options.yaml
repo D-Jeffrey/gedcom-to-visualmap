@@ -141,18 +141,34 @@ misc_options:
 # Geocoding options (used by geo_gedcom submodule)
 # These options are passed to GeolocatedGedcom constructor:
 #   defaultCountry → default_country
-#   UseGPS → always_geocode
-#   CacheOnly → cache_only
+#   geocode_only → always_geocode
+#   cache_only → cache_only
 #   skip_file_alt_places → controls alt_place_file_path (negated)
 #   skip_file_geocache → controls file_geo_cache_path (negated)
 #   include_canonical → used for place name matching
 geocoding_options:
-  defaultCountry: {type: 'str', default: null}
-  UseGPS: {type: 'bool', default: True, ini_section: 'Core'}
-  CacheOnly: {type: 'bool', default: False, ini_section: 'Core'}
-  skip_file_alt_places: {type: 'bool', default: False}
-  skip_file_geocache: {type: 'bool', default: False}
-  include_canonical: {type: 'bool', default: True}
+  defaultCountry: {type: 'str', default: '', ini_section: 'GeoCoding'}
+  geocode_only: {type: 'bool', default: False, ini_section: 'GeoCoding'}
+  cache_only: {type: 'bool', default: False, ini_section: 'GeoCoding'}
+  skip_file_alt_places: {type: 'bool', default: False, ini_section: 'GeoCoding'}
+  skip_file_geocache: {type: 'bool', default: False, ini_section: 'GeoCoding'}
+  include_canonical: {type: 'bool', default: True, ini_section: 'GeoCoding'}
+  days_between_retrying_failed_lookups: {type: 'int', default: 7, ini_section: 'GeoCoding'}
+
+# Overrides for geo_config settings (used by geo_gedcom submodule)
+# These options are passed to GeoConfig constructor, but not saved in INI file
+# (where there is overlap with geocoding_options, those settings take precedence)
+geo_config_overrides:
+  additional_countries_codes_dict_to_add: {}
+  country_substitutions: {}
+  fallback_continent_map: {}
+  geocode_settings:
+    max_retries: 3
+    retry_delay: 1.0
+    timeout: 10.0
+    backoff_base: 0.2
+    user_agent: "gedcom_geocoder"
+    rate_limit_seconds: 1.0
 
 # Platform-specific default commands for opening files
 # Used to initialize file_open_commands if not overridden by INI settings
@@ -203,4 +219,6 @@ logging_defaults:
 old_ini_settings: {
   'native': 'KML', 'born': 'KML', 'death':'KML', 'PlaceType': 'KML',
   'HeatMapTimeLine': 'HTML', 'gedcom.gedcomparser': 'Logging',
-  'defaultcountry': 'Core', 'maxmissing': 'KML'}
+  'defaultcountry': 'Core', 'maxmissing': 'KML',
+  'usegps': 'Core', 'UseGPS': 'GeoCoding', 'gps_only': 'GeoCoding', 'cacheonly': 'Core', 'CacheOnly': 'GeoCoding',
+  'days_between_retrying_failed_lookups': 'Core'}

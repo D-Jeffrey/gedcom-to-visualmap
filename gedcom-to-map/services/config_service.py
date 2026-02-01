@@ -12,7 +12,7 @@ import logging
 
 from const import (
     GEO_CONFIG_FILENAME, 
-    INI_SECTION_GEDCOM_MAIN, INI_SECTIONS, INI_OPTION_SECTIONS,
+    INI_SECTION_GEDCOM_MAIN, INI_SECTION_GEO_CONFIG, INI_SECTIONS, INI_OPTION_SECTIONS,
     MIGRATION_VERSION_UNSET, MIGRATION_VERSION_CURRENT
 )
 from render.result_type import ResultType
@@ -21,6 +21,42 @@ from services.config_io import get_option_sections, set_options, settings_file_p
 from services.file_commands import FileOpenCommandLines
 
 _log = logging.getLogger(__name__)
+
+# === Early Logging Configuration ===
+# Apply default logging levels as early as possible to prevent DEBUG messages
+# from geo_gedcom and other modules during import time
+def _early_apply_logging_defaults():
+    """Apply logging defaults from gedcom_options.yaml at module import time."""
+    try:
+        # Find and load gedcom_options.yaml
+        project_root = Path(__file__).resolve().parent.parent.parent
+        options_file = project_root / 'gedcom_options.yaml'
+        if not options_file.exists():
+            options_file = Path(__file__).resolve().parent.parent / 'gedcom_options.yaml'
+        
+        if options_file.exists():
+            with open(options_file, 'r') as f:
+                options = yaml.safe_load(f)
+                logging_defaults = options.get('logging_defaults', {})
+                
+                for logger_name, default_level in logging_defaults.items():
+                    level_value = logging.getLevelName(default_level)
+                    if isinstance(level_value, int):
+                        logger = logging.getLogger(logger_name)
+                        logger.setLevel(level_value)
+                        
+                        # Set child loggers too
+                        logger_prefix = logger_name + '.'
+                        for existing_logger_name in list(logging.root.manager.loggerDict.keys()):
+                            if existing_logger_name.startswith(logger_prefix):
+                                child_logger = logging.getLogger(existing_logger_name)
+                                if child_logger.level == logging.NOTSET or child_logger.level == logging.WARNING:
+                                    child_logger.setLevel(level_value)
+    except Exception:
+        pass  # Silently fail - logging not critical at import time
+
+# Apply logging defaults immediately at module import
+_early_apply_logging_defaults()
 
 class GVConfig(IConfig):
     """
@@ -57,10 +93,16 @@ class GVConfig(IConfig):
         with open(file_path, 'r') as file:
             self.options = yaml.safe_load(file)
         
+        # === Apply Default Logging Levels from YAML (before any logging happens) ===
+        # This ensures child loggers like services.config_io use the correct level
+        # even during initialization before INI settings are loaded
+        self._apply_default_logging_levels()
+        
         # === Initialize Core Settings ===
         self.gvConfig = None
         self.map_types = self.options.get('map_types', ["CartoDB.Voyager"])  # Load available map types
         self._gui_colors = self._load_gui_colors()  # Load GUI color definitions
+        self._geo_config_overrides = self._load_geo_config_overrides()  # Load geo config overrides
         self.set_marker_defaults()
         self.settingsfile = settings_file_pathname(self.INI_FILE_NAME)
         self._geo_config_file: Path = Path(__file__).resolve().parent / GEO_CONFIG_FILENAME
@@ -100,16 +142,25 @@ class GVConfig(IConfig):
                 section_keys = self._build_section_keys(section)
                 self.loadsection(section, section_keys)
         migration_version = self.gvConfig['Core'].get('_migration_version', MIGRATION_VERSION_UNSET)
-        if migration_version == MIGRATION_VERSION_UNSET:
+        # Run migration if version is outdated (unset or less than current)
+        if migration_version != MIGRATION_VERSION_CURRENT:
+            _log.info("Running INI migration from version '%s' to '%s'", migration_version, MIGRATION_VERSION_CURRENT)
             old_ini_settings = self.options.get('old_ini_settings', {})
+            removed_count = 0
             for key, section in old_ini_settings.items():
-                if self.gvConfig.has_option(section, key):
+                # ConfigParser converts option names to lowercase, so case-insensitive check
+                if self.gvConfig.has_section(section) and self.gvConfig.has_option(section, key):
                     _log.info("Removing deprecated setting '%s' from section '%s'", key, section)
                     self.gvConfig.remove_option(section, key)
+                    removed_count += 1
+                else:
+                    _log.debug("Deprecated setting '%s' not found in section '%s'", key, section)
+            _log.info("Removed %d deprecated settings during migration", removed_count)
             self.gvConfig['Core']['_migration_version'] = MIGRATION_VERSION_CURRENT
             try:
                 with open(self.settingsfile, 'w') as configfile:
                     self.gvConfig.write(configfile)
+                _log.info("Successfully saved migrated settings to %s", self.settingsfile)
             except Exception as e:
                 _log.error("Error saving migrated settings: %s", e)
         self.setInput(self.gvConfig['Core'].get('InputFile', ''), generalRequest=False)
@@ -122,6 +173,36 @@ class GVConfig(IConfig):
         
         # Clean up stale logger names from [Logging] section and load active ones
         self._cleanup_and_load_logging_section()
+
+    def _apply_default_logging_levels(self) -> None:
+        """Apply default logging levels from YAML configuration.
+        
+        Called early during initialization to ensure correct logging levels
+        are set before any significant logging occurs (e.g., during INI loading).
+        """
+        logging_defaults = self.options.get('logging_defaults', {})
+        if not logging_defaults:
+            return
+        
+        for logger_name, default_level in logging_defaults.items():
+            try:
+                level_value = logging.getLevelName(default_level)
+                if isinstance(level_value, int):
+                    alogger = logging.getLogger(logger_name)
+                    alogger.setLevel(level_value)
+                    
+                    # Also set level for any existing child loggers to inherit parent's level
+                    # This ensures child loggers like 'services.config_io' inherit from 'services'
+                    logger_prefix = logger_name + '.'
+                    for existing_logger_name in list(logging.root.manager.loggerDict.keys()):
+                        if existing_logger_name.startswith(logger_prefix):
+                            child_logger = logging.getLogger(existing_logger_name)
+                            # Only update if child logger doesn't have its own explicit setting
+                            if child_logger.level == logging.NOTSET or child_logger.level == logging.WARNING:
+                                child_logger.setLevel(level_value)
+            except Exception as e:
+                # Can't use _log here since logging might not be fully initialized
+                pass  # Silently skip errors during early initialization
 
     def _cleanup_and_load_logging_section(self) -> None:
         """Clean up stale loggers and load active logger levels from [Logging] section.
@@ -141,7 +222,16 @@ class GVConfig(IConfig):
                     if isinstance(level_value, int):
                         alogger = logging.getLogger(logger_name)
                         alogger.setLevel(level_value)
-                        _log.debug("Set default level for logger '%s' to %s", logger_name, default_level)
+                        
+                        # Also set level for any existing child loggers to inherit parent's level
+                        # This ensures child loggers like 'services.config_io' inherit from 'services'
+                        logger_prefix = logger_name + '.'
+                        for existing_logger_name in list(logging.root.manager.loggerDict.keys()):
+                            if existing_logger_name.startswith(logger_prefix):
+                                child_logger = logging.getLogger(existing_logger_name)
+                                # Only update if child logger doesn't have its own explicit setting
+                                if child_logger.level == logging.NOTSET or child_logger.level == logging.WARNING:
+                                    child_logger.setLevel(level_value)
                     else:
                         _log.warning("Invalid default logging level '%s' for logger '%s'", default_level, logger_name)
                 except Exception as e:
@@ -176,7 +266,15 @@ class GVConfig(IConfig):
             try:
                 alogger = logging.getLogger(logger_name)
                 alogger.setLevel(log_level)
-                _log.debug("Set logger '%s' to level %s from INI", logger_name, log_level)
+                
+                # Also update child loggers to inherit the INI override
+                logger_prefix = logger_name + '.'
+                level_value = logging.getLevelName(log_level)
+                if isinstance(level_value, int):
+                    for existing_logger_name in list(logging.root.manager.loggerDict.keys()):
+                        if existing_logger_name.startswith(logger_prefix):
+                            child_logger = logging.getLogger(existing_logger_name)
+                            child_logger.setLevel(level_value)
             except Exception as e:
                 _log.warning("Failed to set logger '%s' level to %s: %s", logger_name, log_level, e)
 
@@ -209,14 +307,11 @@ class GVConfig(IConfig):
             sectionName: Name of the INI section to load.
             keys: Dictionary mapping attribute names to their types.
         """
-        _log.debug("Loading section '%s' with %d keys", sectionName, len(keys or {}))
         for key, typ in (keys or {}).items():
             value = self.gvConfig[sectionName].get(key, None)
             if value is None:
-                _log.debug("  Key '%s' not found in INI section '%s', skipping", key, sectionName)
                 continue
             parsed = self._coerce_value_to_type(value, typ, context=f"{sectionName}.{key}")
-            _log.debug("  Loaded %s.%s = %s (type=%s, parsed=%s)", sectionName, key, value, typ, parsed)
             setattr(self, key, parsed)
 
     def savesettings(self) -> None:
@@ -247,6 +342,9 @@ class GVConfig(IConfig):
             kml_keys = self._build_section_keys('KML')
             for key in kml_keys:
                 self.gvConfig['KML'][key] =  str(getattr(self, key))
+            geocoding_keys = self._build_section_keys('GeoCoding')
+            for key in geocoding_keys:
+                self.gvConfig['GeoCoding'][key] = str(getattr(self, key))
             
             # Save file open commands from _file_open_commands object to INI
             self._save_file_commands_to_ini()
@@ -275,6 +373,35 @@ class GVConfig(IConfig):
                     logLevel = logging.getLevelName(logger.level)
                     if logLevel != 'NOTSET':
                         self.gvConfig['Logging'][logName] = logging.getLevelName(logger.getEffectiveLevel())
+            
+            # Save geo_config_overrides to GeoConfig section as flattened key-value pairs
+            import json
+            # Clear and recreate GeoConfig section to avoid stale keys
+            if self.gvConfig.has_section(INI_SECTION_GEO_CONFIG):
+                self.gvConfig.remove_section(INI_SECTION_GEO_CONFIG)
+            self.gvConfig.add_section(INI_SECTION_GEO_CONFIG)
+            
+            if hasattr(self, '_geo_config_overrides') and self._geo_config_overrides:
+                # Flatten nested dict into dot-notation keys
+                def flatten_dict(d, parent_key=''):
+                    items = []
+                    for k, v in d.items():
+                        new_key = f"{parent_key}.{k}" if parent_key else k
+                        if isinstance(v, dict):
+                            items.extend(flatten_dict(v, new_key).items())
+                        else:
+                            # Serialize complex types as JSON, simple types as strings
+                            if v is None:
+                                items.append((new_key, 'None'))
+                            elif isinstance(v, (list, dict)):
+                                items.append((new_key, json.dumps(v)))
+                            else:
+                                items.append((new_key, str(v)))
+                    return dict(items)
+                
+                flattened = flatten_dict(self._geo_config_overrides)
+                for key, value in flattened.items():
+                    self.gvConfig[INI_SECTION_GEO_CONFIG][key] = value
             
             with open(self.settingsfile, 'w') as configfile:
                 self.gvConfig.write(configfile)
@@ -309,8 +436,8 @@ class GVConfig(IConfig):
                   Main: Optional[str] = None,
                   MaxMissing: int = 0,
                   MaxLineWeight: int = 20,
-                  UseGPS: bool = True,
-                  CacheOnly: bool = False,
+                  geocode_only: bool = True,
+                  cache_only: bool = False,
                   AllEntities: bool = False) -> None:
         """Set static configuration options.
         
@@ -321,8 +448,8 @@ class GVConfig(IConfig):
             Main: ID of main/root person for genealogy tree.
             MaxMissing: Maximum number of missing GPS coordinates to allow.
             MaxLineWeight: Maximum weight for connection lines.
-            UseGPS: Whether to use GPS/geocoding services.
-            CacheOnly: Whether to use cache-only mode (no network requests).
+            geocode_only: Whether to use GPS/geocoding services (ignore cache).
+            cache_only: Whether to use cache-only mode (no network requests).
             AllEntities: Whether to process all entities in GEDCOM.
         """
         self.setInput(GEDCOMinput)
@@ -331,8 +458,8 @@ class GVConfig(IConfig):
         self.Name = None
         self.MaxMissing = MaxMissing
         self.MaxLineWeight = MaxLineWeight
-        self.UseGPS = UseGPS
-        self.CacheOnly = CacheOnly
+        self.geocode_only = geocode_only
+        self.cache_only = cache_only
         self.AllEntities = AllEntities
 
     def setInput(self, theInput: Optional[str], generalRequest: bool = True) -> None:
@@ -430,6 +557,55 @@ class GVConfig(IConfig):
             Dictionary mapping color names to color database names (strings).
         """
         return self.options.get('gui_colors', {})
+
+    def _load_geo_config_overrides(self) -> dict:
+        """Load geo_config_overrides from INI file, with YAML fallback.
+        
+        Loads from INI GeoConfig section if present, otherwise from YAML.
+        INI format stores as flattened key-value pairs (e.g., geocode_settings.max_retries).
+        
+        Returns:
+            Dictionary of geo_config_overrides settings.
+        """
+        import json
+        # Try loading from INI first (if INI file exists and has been loaded)
+        if hasattr(self, 'gvConfig') and self.gvConfig and INI_SECTION_GEO_CONFIG in self.gvConfig:
+            try:
+                result = {}
+                for key, value in self.gvConfig[INI_SECTION_GEO_CONFIG].items():
+                    # Parse nested keys (e.g., "geocode_settings.max_retries" -> {"geocode_settings": {"max_retries": ...}})
+                    keys = key.split('.')
+                    current = result
+                    for k in keys[:-1]:
+                        if k not in current:
+                            current[k] = {}
+                        current = current[k]
+                    # Parse the value
+                    final_key = keys[-1]
+                    # Try to parse as JSON for complex types, otherwise use as string
+                    try:
+                        current[final_key] = json.loads(value)
+                    except (json.JSONDecodeError, ValueError):
+                        # Handle special values
+                        if value.lower() == 'none':
+                            current[final_key] = None
+                        elif value.lower() in ('true', 'false'):
+                            current[final_key] = value.lower() == 'true'
+                        else:
+                            try:
+                                # Try to parse as number
+                                if '.' in value:
+                                    current[final_key] = float(value)
+                                else:
+                                    current[final_key] = int(value)
+                            except ValueError:
+                                current[final_key] = value
+                if result:  # Only return if we found something
+                    return result
+            except Exception as e:
+                _log.warning("Failed to load geo_config_overrides from INI: %s, falling back to YAML", e)
+        # Fall back to YAML
+        return self.options.get('geo_config_overrides', {})
 
     # === Getters/Setters ===
     def get(self, attribute: str, default: Any = None, ifNone: Any = None) -> Any:
@@ -634,9 +810,6 @@ class GVConfig(IConfig):
                 if isinstance(props, dict) and props.get('ini_section') == section_name:
                     key_type = props.get('ini_type', props.get('type'))
                     section_keys[key] = key_type
-                    _log.debug("  _build_section_keys: %s.%s -> type=%s (ini_section=%s)", 
-                              section_name, key, key_type, props.get('ini_section'))
-        _log.debug("Built %d keys for section '%s': %s", len(section_keys), section_name, list(section_keys.keys()))
         return section_keys
 
     # === Properties (IConfig interface) ===
@@ -644,6 +817,11 @@ class GVConfig(IConfig):
     def file_open_commands(self) -> FileOpenCommandLines:
         """File open command lines for different file types."""
         return self._file_open_commands
+
+    @property
+    def geo_config_overrides(self) -> dict:
+        """Geographic configuration overrides from YAML."""
+        return self._geo_config_overrides
 
     # === File Commands Methods ===
     def _initialize_file_commands(self) -> None:

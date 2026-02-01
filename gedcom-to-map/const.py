@@ -18,12 +18,14 @@ OFFICECMDLINE = "soffice"               # command to start LibreOffice
 
 # INI file section constants
 INI_SECTION_GEDCOM_MAIN = 'Gedcom.Main'
-INI_SECTIONS = ['Core', 'HTML', 'Summary', 'Logging', INI_SECTION_GEDCOM_MAIN, 'KML']
-INI_OPTION_SECTIONS = ['Core', 'HTML', 'Summary', 'KML']
+INI_SECTION_GEO_CONFIG = 'GeoConfig'
+INI_SECTION_GEOCODING = 'GeoCoding'
+INI_SECTIONS = ['Core', 'HTML', 'Summary', 'Logging', INI_SECTION_GEDCOM_MAIN, 'KML', INI_SECTION_GEO_CONFIG, INI_SECTION_GEOCODING]
+INI_OPTION_SECTIONS = [s for s in INI_SECTIONS if s not in ['Logging', INI_SECTION_GEDCOM_MAIN, INI_SECTION_GEO_CONFIG]]
 
 # Migration version constants
 MIGRATION_VERSION_UNSET = '0'
-MIGRATION_VERSION_CURRENT = '1'
+MIGRATION_VERSION_CURRENT = '2'
 
 LOG_CONFIG = {
     'version': 1,

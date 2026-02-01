@@ -350,6 +350,20 @@ class VisualMapActions:
             else:
                 self.LoadFile('default', getattr(__import__("const"), "KMLMAPSURL", "/"))
 
+    def OpenConfig(self) -> None:
+        """Open the Configuration Options dialog.
+        
+        Opens the configuration dialog where users can adjust geocoding settings,
+        logging levels, and file open commands.
+        """
+        if hasattr(self.panel, 'frame') and hasattr(self.panel.frame, 'onOptionsSetup'):
+            # Create a mock event object for onOptionsSetup
+            import wx
+            event = wx.CommandEvent()
+            self.panel.frame.onOptionsSetup(event)
+        else:
+            _log.error("OpenConfig: Cannot find frame.onOptionsSetup method")
+
     def doHTML(self, svc_config: IConfig, svc_state: IState, svc_progress: IProgressTracker, fullresult: bool) -> bool:
         """Generate interactive HTML map using Folium library.
         

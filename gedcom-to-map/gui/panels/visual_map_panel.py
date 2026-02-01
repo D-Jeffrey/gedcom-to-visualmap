@@ -682,9 +682,6 @@ class VisualMapPanel(wx.Panel):
         self.id.CBSummary[7].SetValue(self.svc_config.get('SummaryEnrichmentIssues'))
         self.id.CBSummary[8].SetValue(self.svc_config.get('SummaryStatistics'))
 
-        default_country = self.svc_config.get('defaultCountry', '')
-        self.id.TEXTDefaultCountry.SetValue(default_country or "")
-
         mark_star_on = self.svc_config.get('MarkStarOn')
         self.id.CBMarkStarOn.SetValue(mark_star_on)
 

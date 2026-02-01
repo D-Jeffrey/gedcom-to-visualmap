@@ -46,3 +46,14 @@ fallback_continent_map:
   VA: Europe
   WI: North America
   EU: Europe
+
+geocode_settings:
+  max_retries: 3
+  retry_delay: 1.0
+  timeout: 10.0
+  backoff_base: 0.2
+  user_agent: "gedcom_geocoder"
+  rate_limit_seconds: 1.0
+  days_between_retrying_failed_lookups: 7
+  cache_only: false
+  always_geocode: false

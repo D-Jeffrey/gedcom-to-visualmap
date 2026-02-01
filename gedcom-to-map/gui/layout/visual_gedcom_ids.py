@@ -62,8 +62,6 @@ class VisualGedcomIds:
 
             ('INTMaxLineWeight', ('SpinCtrl', 'MaxLineWeight', 'Reload')),
 
-            ('CBUseGPS', ('CheckBox', 'UseGPS', 'Reload')),
-            ('CBCacheOnly', ('CheckBox', 'CacheOnly', 'Reload')),
             ('CBAllEntities', ('CheckBox', 'AllEntities', 'Redraw')),
             ('CBMapControl', ('CheckBox', 'showLayerControl', 'Redraw')),
             ('CBMapMini', ('CheckBox', 'mapMini', 'Redraw')),
@@ -74,10 +72,9 @@ class VisualGedcomIds:
             ('BTNTRACE', ('Button', None, 'Trace')),
             ('BTNSTOP', ('Button', None, 'Stop')),
             ('BTNBROWSER', ('Button', None, 'OpenBrowser')),
+            ('BTNConfig', ('Button', None, 'OpenConfig')),
             ('CBGridView', ('CheckBox', 'GridView', 'Render')),
             ('CBSummary', ('CheckBox', 'Summary', 'Redraw')),
-
-            ('TEXTDefaultCountry', ('Text', 'defaultCountry', 'Reload', 'defaultCountry')),
         ]
         # Build id lookup and id->attribute mapping in a single pass
         self.IDs = {}

@@ -148,6 +148,11 @@ class GedcomLoader:
             svc_config.set('Main', list(people.keys())[0])
             _log.info("Using starting person: %s (%s)", people[svc_config.get('Main')].name, svc_config.get('Main'))
         
+        # Update state with the main person
+        if people and svc_config.get('Main'):
+            svc_state.setMain(svc_config.get('Main'))
+            _log.debug("Set main person in state: %s", svc_config.get('Main'))
+        
         return people
     
     def updatestats(self) -> str:

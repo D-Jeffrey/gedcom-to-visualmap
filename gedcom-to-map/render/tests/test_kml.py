@@ -1,4 +1,5 @@
 import pytest
+from unittest.mock import Mock
 from render.kml2.kml_exporter_refined import KmlExporterRefined
 from render.kml2.kml_life_lines_creator import KML_Life_Lines_Creator
 from render.kml2.kml_life_lines import KML_Life_Lines
@@ -17,7 +18,8 @@ def test_kml_life_lines_creator_init(tmp_path):
     # Create empty files if the constructor expects them to exist
     gedcom_file.write_text("")
     location_cache_file.write_text("")
-    gedcom = GeolocatedGedcom(str(gedcom_file), str(location_cache_file))
+    gedcom = GeolocatedGedcom(str(gedcom_file), str(location_cache_file), 
+                              geo_config_updates={'cache_only': True, 'geocode_settings': {'default_country': ''}})
     creator = KML_Life_Lines_Creator(gedcom, str(kml_file))
     assert creator.kml_instance.kml_file == str(kml_file)
     assert hasattr(creator.kml_instance, "kml")
@@ -29,7 +31,8 @@ def test_kml_life_lines_init(tmp_path):
     # Create empty files if the constructor expects them to exist
     gedcom_file.write_text("")
     location_cache_file.write_text("")
-    gedcom = GeolocatedGedcom(str(gedcom_file), str(location_cache_file))
+    gedcom = GeolocatedGedcom(str(gedcom_file), str(location_cache_file), 
+                              geo_config_updates={'cache_only': True, 'geocode_settings': {'default_country': ''}})
     life_lines = KML_Life_Lines(gedcom, str(kml_file))
     assert life_lines.kml_life_lines_creator.kml_instance.kml_file == str(kml_file)
     assert hasattr(life_lines.kml_life_lines_creator.kml_instance, "kml")

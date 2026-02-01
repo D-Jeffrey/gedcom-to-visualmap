@@ -381,7 +381,7 @@ class TestLoadSettings:
             config_io.loadsettings(obj)
             
             # Should have migrated
-            assert obj.gvConfig['Core'].get('_migration_version') == '1'
+            assert obj.gvConfig['Core'].get('_migration_version') == '2'
         finally:
             os.unlink(temp_file)
 

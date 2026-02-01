@@ -24,6 +24,13 @@ Originally forked from [https://github.com/lmallez/gedcom-to-map], now in collab
 
 ## Recent Improvements
 
+- ✅ **Progress Reporting Infrastructure**: Comprehensive progress tracking across all major operations with stop request support
+  - GEDCOM parsing displays accurate progress metrics (counter, target, ETA) in the GUI
+  - Statistics pipeline reports progress for all 14 collectors with "Statistics (X/Y): operation" format
+  - Enrichment pipeline shows progress for all 3 rules with "Enrichment (X/Y): operation" format
+  - Geocoding operations include progress for cache separation and location processing
+  - Progress reports every 100 records for optimal UI responsiveness
+  - Stop button properly interrupts long-running operations at all stages
 - ✅ **Configuration System**: Refactored configuration handling with separated concerns - dedicated loader classes for YAML, INI, and logging configuration for better structure, reliability, and testability
 - ✅ **Dependency Injection**: Updated `GVConfig` to support dependency injection pattern, making testing and maintenance easier
 - ✅ **Test Coverage**: Added 26 new unit tests for configuration loaders, improving test isolation and coverage
@@ -34,7 +41,6 @@ Originally forked from [https://github.com/lmallez/gedcom-to-map], now in collab
 - ✅ **Logging System**: Simplified logging configuration with 12 core loggers, WARNING default level, and Clear Log File option
 - ✅ **Configuration Dialog**: Added "Set All Levels" control and improved logging grid display
 - ✅ **ResultType Refactoring**: Moved ResultType enum to dedicated render/result_type.py module for better organization
-- ✅ **Progress Reporting**: GEDCOM parsing now properly displays progress metrics (counter, target, ETA) in the GUI
 - ✅ **HTML Generation**: Fixed issue where HTML output files weren't being saved during batch processing
 - ✅ **Output File Paths**: Corrected file path construction for all output types (HTML, KML, KML2, SUM)
 - ✅ **Image Handling**: Fixed cross-platform image loading to handle Windows paths in GEDCOM files
@@ -136,15 +142,16 @@ This project now uses a dependency-injection/services pattern for all configurat
 
 - Click `Input File` to select your .ged file.
 - Set your options in the GUI.
-- Click `Load` to parse and resolve addresses.
+- Click `Load` to parse and resolve addresses—progress displays with counter, target, and ETA.
 - Use `Draw Update` to save and view results.
 - `Open GPS` opens the CSV in Excel (close it before re-running).
-- `Stop` aborts loading without closing the GUI.
+- `Stop` aborts loading at any stage (GEDCOM parsing, statistics, enrichment, or geocoding) without closing the GUI.
 - Double-left-click a person to set the starting person for traces.
 - Use `Geo Table` to edit and manage resolved/cached names.
 - Use `Trace` to create a list of individuals from the starting person.
 - Use `Browser` to open the last output HTML file.
 - Right-click a person for details and geocoding info.
+- **Progress tracking shows detailed status**: During processing, you'll see messages like "Statistics (3/14): Analyzing demographics : 35% (700/2000)" or "Enrichment (2/3): Applying geographic rules : 50% (150/300)"
 
 ---
 

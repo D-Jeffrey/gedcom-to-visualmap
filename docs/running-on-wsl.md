@@ -6,6 +6,24 @@ Windows and Linux (WSL) running on Windows 11 - WSL version: 2.4.12.0 - Ubuntu
 
 ## CoPilot Guided instuctions for WSL Ubuntu 24.04
 
+### Troubleshooting GTK Warnings
+If you see GTK warnings about "Negative content height" or "for_size smaller than min-size" with checkbuttons, install GTK themes and engines:
+```
+sudo apt update
+sudo apt install gtk2-engines gtk2-engines-murrine gtk2-engines-pixbuf
+sudo apt install gnome-themes-extra
+```
+
+You can also try setting a specific GTK theme:
+```
+export GTK_THEME=Adwaita
+```
+
+Add this to your `~/.bashrc` or `~/.zshrc` to make it permanent:
+```
+echo 'export GTK_THEME=Adwaita' >> ~/.bashrc
+```
+
 1. Install GTK+ 3 Development Packages
 Most modern wxPython builds rely on GTK+ 3. You can install the necessary development files with:
 ```

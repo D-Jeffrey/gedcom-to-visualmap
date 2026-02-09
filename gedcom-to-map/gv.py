@@ -10,6 +10,17 @@
 
 import logging
 import logging.config
+import os
+import sys
+
+# Configure GTK environment for Linux/WSL to prevent widget sizing warnings
+if sys.platform.startswith('linux'):
+    # Disable client-side decorations that can cause sizing issues
+    os.environ.setdefault('GTK_CSD', '0')
+    # Disable DPI scaling to prevent negative height calculations
+    os.environ.setdefault('GDK_SCALE', '1')
+    # Use a stable GTK theme if not already set
+    os.environ.setdefault('GTK_THEME', 'Adwaita')
 
 import wx
 import wx.lib.mixins.inspection as wit
@@ -24,7 +35,6 @@ from services.state_service import GVState
 from services.progress_service import GVProgress
 
 # Define the path to gedcom_options.yaml as a constant (same directory as gv.py)
-import os
 from pathlib import Path
 GV_DIR = Path(__file__).resolve().parent
 GEDCOM_OPTIONS_PATH = GV_DIR / 'gedcom_options.yaml'

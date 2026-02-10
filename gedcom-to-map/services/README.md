@@ -21,6 +21,10 @@ All service implementations use **simple attribute access** (not properties) for
   - Input/output file handling
   - Marker options and timeframe tracking
   - File open command management
+  - Geocoding mode configuration:
+    - `geocode_only`: Always geocode, ignore cache
+    - `cache_only`: Only use cache, no network requests (read-only mode)
+    - Normal mode: Both flags False (default - uses cache and geocodes new addresses)
   - Comprehensive docstrings and type hints
 
 - **`state_service.py`** — Implements `GVState` (IState)

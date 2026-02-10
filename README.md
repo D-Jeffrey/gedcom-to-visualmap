@@ -24,6 +24,11 @@ Originally forked from [https://github.com/lmallez/gedcom-to-map], now in collab
 
 ## Recent Improvements
 
+- ✅ **Geocoding UI Improvement**: Configuration dialog now uses mutually exclusive radio buttons for geocoding mode (Normal/Geocode only/Cache only) instead of checkboxes, preventing confusing combinations
+- ✅ **Windows Compatibility**: Fixed Windows-specific crash during family record processing where accessing partner records could fail with "'NoneType' object has no attribute 'xref_id'" error
+- ✅ **Cache-Only Mode Fixes**: 
+  - Cache-only mode no longer retries previously failed geocode lookups, ensuring true read-only behavior
+  - geo_cache.csv file is not saved in cache-only mode, preventing timestamp updates
 - ✅ **Progress Reporting Infrastructure**: Comprehensive progress tracking across all major operations with stop request support
   - GEDCOM parsing displays accurate progress metrics (counter, target, ETA) in the GUI
   - Statistics pipeline reports progress for all 14 collectors with "Statistics (X/Y): operation" format
@@ -60,6 +65,7 @@ Originally forked from [https://github.com/lmallez/gedcom-to-map], now in collab
 ## Quick Start Tips
 
 - Use the GUI to pick your GEDCOM, choose output type, then click Load to parse and resolve places.
+- **Choose geocoding mode**: Normal (uses cache and geocodes new addresses), Geocode only (always geocode, ignoring cache), or Cache only (read-only, no network requests).
 - Outputs (HTML/KML/SUM) are written next to your selected GEDCOM file; change the output filename in the GUI if you need a different base name.
 - Double-left-click a person in the GUI list to set the starting person for traces and timelines.
 - Edit `geo_cache.csv` to correct or refine geocoding, then save and re-run to apply fixes.
@@ -141,7 +147,10 @@ This project now uses a dependency-injection/services pattern for all configurat
 ![img](docs/img/GUI-python_2025-11.gif)
 
 - Click `Input File` to select your .ged file.
-- Set your options in the GUI.
+- Set your options in the GUI, including:
+  - **Geocoding mode**: Choose between Normal (use cache and geocode), Geocode only (ignore cache), or Cache only (no geocode)
+  - Days between retrying failed lookups
+  - Default country for geocoding
 - Click `Load` to parse and resolve addresses—progress displays with counter, target, and ETA.
 - Use `Draw Update` to save and view results.
 - `Open GPS` opens the CSV in Excel (close it before re-running).

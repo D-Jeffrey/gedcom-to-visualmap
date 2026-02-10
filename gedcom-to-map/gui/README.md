@@ -40,7 +40,12 @@ Controllers that coordinate user actions and background operations:
 ### `dialogs/` - Dialog Windows
 Modal and non-modal dialog windows:
 - **`AboutDialog`** - Application about/version information
-- **`ConfigDialog`** - Application configuration settings
+- **`ConfigDialog`** - Application configuration settings including:
+  - Geocoding mode (radio buttons): Normal, Geocode only (ignore cache), or Cache only (no geocode)
+  - Days between retrying failed geocode lookups
+  - Default country for geocoding
+  - File open commands for KML, CSV, and trace files
+  - Logging levels for all system loggers
 - **`FindDialog`** - Person search dialog
 - **`HelpDialog`** - Help and documentation viewer
 - **`HTMLDialog`** - Generic HTML content display dialog

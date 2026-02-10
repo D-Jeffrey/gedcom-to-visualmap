@@ -99,17 +99,25 @@ class ConfigDialog(wx.Dialog):
         # Geocoding Options section (moved to top)
         sizer.Add(wx.StaticText(cfgpanel, -1, " Geocoding Options:"))
         
-        # Geocode only (ignore cache)
-        self.cb_geocode_only = wx.CheckBox(cfgpanel, -1, "   Geocode only (ignore cache)")
-        geocode_only = svc_config.get('geocode_only', True)
-        self.cb_geocode_only.SetValue(bool(geocode_only))
-        sizer.Add(self.cb_geocode_only, 0, wx.ALL, 5)
+        # Radio buttons for geocoding mode (mutually exclusive)
+        self.rb_normal = wx.RadioButton(cfgpanel, -1, "   Normal (use cache and geocode)", style=wx.RB_GROUP)
+        self.rb_geocode_only = wx.RadioButton(cfgpanel, -1, "   Geocode only (ignore cache)")
+        self.rb_cache_only = wx.RadioButton(cfgpanel, -1, "   Cache only (no geocode)")
         
-        # Cache only (no geocode)
-        self.cb_cache_only = wx.CheckBox(cfgpanel, -1, "   Cache only (no geocode)")
+        # Determine which radio button should be selected
+        geocode_only = svc_config.get('geocode_only', False)
         cache_only = svc_config.get('cache_only', False)
-        self.cb_cache_only.SetValue(bool(cache_only))
-        sizer.Add(self.cb_cache_only, 0, wx.ALL, 5)
+        
+        if geocode_only:
+            self.rb_geocode_only.SetValue(True)
+        elif cache_only:
+            self.rb_cache_only.SetValue(True)
+        else:
+            self.rb_normal.SetValue(True)
+        
+        sizer.Add(self.rb_normal, 0, wx.ALL, 5)
+        sizer.Add(self.rb_geocode_only, 0, wx.ALL, 5)
+        sizer.Add(self.rb_cache_only, 0, wx.ALL, 5)
         
         # Default country
         default_country_sizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -302,8 +310,16 @@ class ConfigDialog(wx.Dialog):
         try:
             if hasattr(self.svc_config, 'set'):
                 self.svc_config.set('badAge', bool(self.CBBadAge.GetValue()))
-                self.svc_config.set('geocode_only', bool(self.cb_geocode_only.GetValue()))
-                self.svc_config.set('cache_only', bool(self.cb_cache_only.GetValue()))
+                # Set geocoding mode based on radio button selection
+                if self.rb_geocode_only.GetValue():
+                    self.svc_config.set('geocode_only', True)
+                    self.svc_config.set('cache_only', False)
+                elif self.rb_cache_only.GetValue():
+                    self.svc_config.set('geocode_only', False)
+                    self.svc_config.set('cache_only', True)
+                else:  # Normal mode (rb_normal)
+                    self.svc_config.set('geocode_only', False)
+                    self.svc_config.set('cache_only', False)
                 self.svc_config.set('days_between_retrying_failed_lookups', self.retry_days_spinner.GetValue())
                 # Set default country - convert empty string or "none" (case insensitive) to None
                 default_country_value = self.default_country_text.GetValue().strip()

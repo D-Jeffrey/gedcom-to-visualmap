@@ -9,41 +9,41 @@ gui_options:
   window_size: {type: 'list', default: [1024, 800]}
 
 # GUI color scheme for buttons, backgrounds, and UI elements
-# Each entry maps a color name to a hex color value
-# Light mode colors (exact original wxPython color database values)
+# Light mode uses readable color names from wxPython color database
+# Dark mode uses custom hex values for optimal contrast
 gui_colors:
-  BTN_PRESS: "#DB9370"  # TAN (wxPython)
-  BTN_DIRECTORY: "#D8D8BF"  # WHEAT (wxPython)
-  BTN_DONE: "#FFFFFF"  # WHITE
-  SELECTED: "#23238E"  # NAVY (wxPython)
-  SELECTED_TEXT: "#000000"  # BLACK
-  ANCESTOR: "#EAEAAD"  # MEDIUM GOLDENROD (wxPython)
-  MAINPERSON: "#9F9F5F"  # KHAKI (wxPython)
-  OTHERPERSON: "#FFFFFF"  # WHITE
-  INFO_BOX_BACKGROUND: "#DBDB70"  # GOLDENROD (wxPython)
-  GRID_TEXT: "#000000"  # BLACK
-  GRID_BACK: "#FFFFFF"  # WHITE
-  TITLE_TEXT: "#FFFFFF"  # WHITE
-  TITLE_BACK: "#9F9F5F"  # KHAKI (wxPython)
-  BUSY_BACK: "#FFFF00"  # YELLOW
+  BTN_PRESS: "TAN"
+  BTN_DIRECTORY: "WHEAT"
+  BTN_DONE: "WHITE"
+  SELECTED: "NAVY"
+  SELECTED_TEXT: "BLACK"
+  ANCESTOR: "MEDIUM GOLDENROD"
+  MAINPERSON: "KHAKI"
+  OTHERPERSON: "WHITE"
+  INFO_BOX_BACKGROUND: "GOLDENROD"
+  GRID_TEXT: "BLACK"
+  GRID_BACK: "WHITE"
+  TITLE_TEXT: "WHITE"
+  TITLE_BACK: "KHAKI"
+  BUSY_BACK: "YELLOW"
 
-# Dark mode colors - very bright buttons on extremely dark backgrounds
-# Backgrounds nearly black for true dark mode appearance
+# Dark mode colors - standard color names where available, hex for precise backgrounds
+# Bright standard colors on nearly black custom backgrounds for optimal contrast
 gui_colors_dark:
-  BTN_PRESS: "#E8A080"        # Very bright coral for button press visibility
-  BTN_DIRECTORY: "#E8E8C0"    # Very bright cream/beige for file buttons
-  BTN_DONE: "#B0D0B0"         # Bright pale green for completion
-  SELECTED: "#6080E0"         # Bright blue for clear selection feedback
-  SELECTED_TEXT: "#FFFFFF"    # Pure white for maximum contrast
-  ANCESTOR: "#E8E8A0"         # Very bright yellow-green for ancestors
-  MAINPERSON: "#C8C880"       # Bright olive for main person
-  OTHERPERSON: "#202020"      # Very dark gray for other people
-  INFO_BOX_BACKGROUND: "#151510"  # Nearly black olive for config panel
-  GRID_TEXT: "#F0F0F0"        # Nearly white for excellent readability
-  GRID_BACK: "#0F0F0F"        # Nearly black background
-  TITLE_TEXT: "#FFFFFF"       # Pure white for title prominence
-  TITLE_BACK: "#1A1A10"       # Nearly black olive for title bar
-  BUSY_BACK: "#E8E800"        # Very bright yellow for busy indicator
+  BTN_PRESS: "TAN"            # Warm peachy brown
+  BTN_DIRECTORY: "WHEAT"      # Bright cream
+  BTN_DONE: "PALE GREEN"      # Soft green
+  SELECTED: "SKY BLUE"        # Bright blue
+  SELECTED_TEXT: "WHITE"
+  ANCESTOR: "WHEAT"           # Bright cream
+  MAINPERSON: "KHAKI"         # Olive green
+  OTHERPERSON: "DARK GREY"    # Very dark gray
+  INFO_BOX_BACKGROUND: "#151510"  # Nearly black olive (no standard equivalent)
+  GRID_TEXT: "WHITE"
+  GRID_BACK: "#0F0F0F"        # Nearly black (BLACK too harsh)
+  TITLE_TEXT: "WHITE"
+  TITLE_BACK: "#1A1A10"       # Dark olive (no standard equivalent)
+  BUSY_BACK: "YELLOW"
 
 # Available map tile providers for HTML/Folium maps
 map_types:

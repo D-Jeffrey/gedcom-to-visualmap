@@ -122,14 +122,15 @@ class ColourManager:
     def _load_colors(self, color_definitions: Dict[str, str]) -> None:
         """Convert color name strings to wx.Colour objects.
         
-        Supports hex colors, standard color names, and wx color database names.
+        Supports hex colors and wxPython color database names.
+        wx.Colour recognizes standard X11 names (case-insensitive).
         
         Args:
             color_definitions: Dictionary of color name to color value (hex or name).
         """
         for name, color_value in color_definitions.items():
             try:
-                # Create colour from hex value
+                # wx.Colour handles both hex values and standard color names
                 col = wx.Colour(str(color_value))
                 
                 if col.IsOk():
@@ -140,7 +141,6 @@ class ColourManager:
                     _log.warning(f"Failed to load color '{name}': '{color_value}', using default")
             except Exception as e:
                 _log.warning(f"Exception loading color '{name}': '{color_value}' - {e}")
-                self._colors[name] = wx.WHITE if not self._is_dark_mode else wx.Colour('#2A2A2A')
                 self._colors[name] = wx.WHITE if not self._is_dark_mode else wx.Colour('#2A2A2A')
     
     def get_color(self, color_name: str) -> wx.Colour:

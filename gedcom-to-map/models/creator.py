@@ -349,8 +349,8 @@ class CreatorTrace:
     def link(self, current: Person, branch=0, prof=0, path="", visited=None) -> list[Line]:
         if visited is None:
             visited = set()
-        return (self.line(self.people[current.father],  0, prof+1,  f"{path}F", visited) if current.father else []) \
-               + (self.line(self.people[current.mother], 0, prof+1,  path + "M", visited) if current.mother else [])
+        return (self.line(self.people[current.father],  0, prof+1,  f"{path}F", visited) if current.father and current.father not in visited else []) \
+               + (self.line(self.people[current.mother], 0, prof+1,  path + "M", visited) if current.mother and current.mother not in visited else [])
 
     def create(self, main_id: str):
         if main_id not in self.people.keys():

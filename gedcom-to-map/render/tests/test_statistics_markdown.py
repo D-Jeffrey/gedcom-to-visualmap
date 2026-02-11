@@ -191,9 +191,14 @@ class TestWriteStatisticsHtml:
         
         # Verify HTML structure
         assert "<!DOCTYPE html>" in content
-        assert "<html lang=\"en\">" in content
+        assert "<html lang=\"en\"" in content
         assert "markdown-it" in content
         assert "github-markdown" in content
+        
+        # Verify dark mode support
+        assert "data-color-mode=\"auto\"" in content
+        assert "prefers-color-scheme: dark" in content
+        assert "#0d1117" in content  # Dark mode background color
         
     def test_html_contains_markdown_content(self, tmp_path, sample_stats_dict):
         """Test that HTML file contains the markdown content."""

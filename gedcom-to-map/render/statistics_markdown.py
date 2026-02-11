@@ -39,7 +39,7 @@ def write_statistics_html(stats_dict: Any, output_file: str) -> None:
         
         # Generate HTML with markdown renderer
         html_content = f'''<!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-color-mode="auto" data-light-theme="light" data-dark-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -47,6 +47,7 @@ def write_statistics_html(stats_dict: Any, output_file: str) -> None:
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.5.0/github-markdown.min.css">
     <script src="https://cdn.jsdelivr.net/npm/markdown-it@14.0.0/dist/markdown-it.min.js"></script>
     <style>
+        /* Light mode (default) */
         body {{
             margin: 0;
             padding: 20px;
@@ -59,10 +60,25 @@ def write_statistics_html(stats_dict: Any, output_file: str) -> None:
             max-width: 980px;
             margin: 0 auto;
             padding: 45px;
-            background-color: white;
+            background-color: #ffffff;
             border-radius: 6px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
         }}
+        
+        /* Dark mode */
+        @media (prefers-color-scheme: dark) {{
+            body {{
+                background-color: #0d1117;
+                color: #c9d1d9;
+            }}
+            .markdown-body {{
+                background-color: #161b22;
+                color: #c9d1d9;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.32), 0 1px 2px rgba(0,0,0,0.44);
+            }}
+        }}
+        
+        /* Responsive layout */
         @media (max-width: 767px) {{
             .markdown-body {{
                 padding: 15px;

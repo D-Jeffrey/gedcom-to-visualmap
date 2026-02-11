@@ -67,6 +67,7 @@ coverage.xml
 *.py,cover
 .hypothesis/
 .pytest_cache/
+*_performance_results.yaml
 
 # Translations
 *.mo

@@ -116,6 +116,10 @@ summary_report_options:
   SummaryEnrichmentIssues: {type: 'bool', default: True, ini_section: 'Summary'}
   SummaryStatistics: {type: 'bool', default: True, ini_section: 'Summary'}
 
+# Statistics options - configuration for statistics collectors
+statistics_options:
+  earliest_credible_birth_year: {type: 'int', default: 1000}
+
 # File viewer command line options (saved to Core section)
 command_options:
   KMLcmdline: {type: 'str', default: '', ini_section: 'Core'}

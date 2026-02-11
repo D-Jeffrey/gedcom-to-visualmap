@@ -68,6 +68,16 @@ def sample_stats_dict():
             'earliest_birth_year': 1920,
             'latest_birth_year': 2020,
         },
+        'births': {
+            'earliest_birth_year': 1920,
+            'latest_birth_year': 2020,
+            'birth_year_span': 100,
+            'birth_months': {
+                'January': 15,
+                'February': 12,
+                'March': 18,
+            },
+        },
         'timeline': {
             'earliest_year': 1920,
             'latest_year': 2020,
@@ -104,6 +114,19 @@ def sample_stats_dict():
                     'place_percentage': 85.7,
                 },
             },
+        },
+        'relationship_path': {
+            'focus_person_id': 'I1',
+            'focus_person_name': 'John Smith',
+            'total_people_analyzed': 150,
+            'total_relationships_found': 149,
+            'direct_ancestors': 45,
+            'direct_descendants': 32,
+            'blood_relatives': 50,
+            'relatives_by_marriage': 22,
+            'generation_span': 7,  # 8 generations total (0 to 7, or -3 to +4, etc.)
+            'oldest_generation': -3,
+            'youngest_generation': 4,
         },
     }
 

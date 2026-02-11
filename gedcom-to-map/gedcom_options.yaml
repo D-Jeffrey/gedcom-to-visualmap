@@ -27,8 +27,8 @@ gui_colors:
   TITLE_BACK: "KHAKI"
   BUSY_BACK: "YELLOW"
 
-# Dark mode colors - standard color names where available, hex for precise backgrounds
-# Bright standard colors on nearly black custom backgrounds for optimal contrast
+# Dark mode colors - standard color names for consistency
+# Bright standard colors on dark backgrounds for optimal contrast
 gui_colors_dark:
   BTN_PRESS: "TAN"            # Warm peachy brown
   BTN_DIRECTORY: "WHEAT"      # Bright cream
@@ -38,12 +38,12 @@ gui_colors_dark:
   ANCESTOR: "WHEAT"           # Bright cream
   MAINPERSON: "KHAKI"         # Olive green
   OTHERPERSON: "DARK GREY"    # Very dark gray
-  INFO_BOX_BACKGROUND: "#151510"  # Nearly black olive (no standard equivalent)
+  INFO_BOX_BACKGROUND: "BLACK"
   GRID_TEXT: "WHITE"
-  GRID_BACK: "#0F0F0F"        # Nearly black (BLACK too harsh)
+  GRID_BACK: "BLACK"
   TITLE_TEXT: "WHITE"
-  TITLE_BACK: "#1A1A10"       # Dark olive (no standard equivalent)
-  BUSY_BACK: "YELLOW"
+  TITLE_BACK: "BLACK"
+  BUSY_BACK: "KHAKI"          # Muted olive for busy indicator
 
 # Available map tile providers for HTML/Folium maps
 map_types:

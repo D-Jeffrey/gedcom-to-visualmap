@@ -215,6 +215,8 @@ def _executive_summary(stats: Dict[str, Any]) -> str:
     gender = stats.get('gender', {})
     marriage = stats.get('marriage', {})
     timeline = stats.get('timeline', {})
+    relationship_path = stats.get('relationship_path', {})
+    births = stats.get('births', {})
     
     total_people = demographics.get('total_people', 'N/A')
     living = demographics.get('living', 'N/A')
@@ -243,6 +245,18 @@ def _executive_summary(stats: Dict[str, Any]) -> str:
     total_marriages = marriage.get('total_marriages_recorded', 0)
     if total_marriages:
         lines.append(f"| 💍 Total Marriages | {total_marriages:,} |")
+    
+    # Generation span
+    generation_span = relationship_path.get('generation_span')
+    if generation_span is not None:
+        # Add 1 to span to get total number of generations (inclusive count)
+        total_generations = generation_span + 1
+        lines.append(f"| 🌳 Generations | {total_generations} |")
+    
+    # Earliest birth
+    earliest_birth_year = births.get('earliest_birth_year')
+    if earliest_birth_year:
+        lines.append(f"| 🎂 Earliest Birth | {earliest_birth_year} |")
     
     # Timeline
     earliest_year = timeline.get('earliest_year')

@@ -227,7 +227,7 @@ The SUM results type generates a comprehensive genealogical statistics report th
 
 ### Report Sections
 
-- **📊 Executive Summary** - Key metrics and dataset overview
+- **📊 Executive Summary** - Key metrics including total people, living/deceased counts, average lifespan, gender distribution, total marriages, number of generations, earliest birth year, and time span
 - **👥 Demographics** - Population analysis with gender distribution charts and popular names with bar charts
 - **⏰ Temporal Patterns** - Historical timelines, birth/death patterns, and longevity trends
 - **👨‍👩‍👧‍👦 Family Relationships** - Marriage statistics, children per family, divorce rates, and relationship paths

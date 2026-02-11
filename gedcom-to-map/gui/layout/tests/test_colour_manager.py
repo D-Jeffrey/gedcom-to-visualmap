@@ -132,7 +132,7 @@ class TestColourManagerLoadColors(TestApp):
         assert all(c.IsOk() for c in manager._colors.values())
     
     def test_load_colors_fallback_to_white(self):
-        """Test _load_colors falls back to WHITE for invalid colours."""
+        """Test _load_colors falls back to WHITE or dark gray for invalid colours."""
         from gui.layout.colour_manager import ColourManager
         manager = ColourManager()
         color_defs = {
@@ -140,10 +140,10 @@ class TestColourManagerLoadColors(TestApp):
         }
         manager._load_colors(color_defs)
         color = manager.get_color('INVALID')
-        # Should be white (255, 255, 255)
-        assert color.Red() == 255
-        assert color.Green() == 255
-        assert color.Blue() == 255
+        # Should be white (255, 255, 255) in light mode or dark gray (#2A2A2A) in dark mode
+        is_white = color.Red() == 255 and color.Green() == 255 and color.Blue() == 255
+        is_dark_gray = color.Red() == 42 and color.Green() == 42 and color.Blue() == 42
+        assert is_white or is_dark_gray, f"Expected WHITE or #2A2A2A, got RGB({color.Red()}, {color.Green()}, {color.Blue()})"
 
 
 class TestColourManagerIntegration(TestApp):

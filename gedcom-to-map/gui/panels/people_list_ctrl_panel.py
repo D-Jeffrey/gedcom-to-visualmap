@@ -220,3 +220,11 @@ class PeopleListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
                 visual_map_panel.UpdateTimer()
             except Exception:
                 _log.exception("PeopleListCtrlPanel.stop failed")
+
+    def refresh_colors(self):
+        """Refresh colors in the people list control after appearance mode change."""
+        if hasattr(self, 'list') and self.list:
+            try:
+                self.list.refresh_colors()
+            except Exception:
+                _log.exception("PeopleListCtrlPanel.refresh_colors failed")

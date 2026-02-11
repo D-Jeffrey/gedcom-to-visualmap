@@ -80,6 +80,7 @@ class GVConfig(IConfig):
         self.gvConfig = None
         self.map_types = self.options.get('map_types', ["CartoDB.Voyager"])
         self._gui_colors = self._load_gui_colors()
+        self._gui_colors_dark = self._load_gui_colors_dark()
         self._geo_config_overrides = self._load_geo_config_overrides()
         self.set_marker_defaults()
         
@@ -556,12 +557,20 @@ class GVConfig(IConfig):
                 setattr(self, key, None)
 
     def _load_gui_colors(self) -> dict:
-        """Load GUI color definitions from YAML configuration.
+        """Load GUI color definitions from YAML configuration (light mode).
         
         Returns:
             Dictionary mapping color names to color database names (strings).
         """
         return self.options.get('gui_colors', {})
+    
+    def _load_gui_colors_dark(self) -> dict:
+        """Load GUI color definitions for dark mode from YAML configuration.
+        
+        Returns:
+            Dictionary mapping color names to color values for dark mode.
+        """
+        return self.options.get('gui_colors_dark', {})
 
     def _load_geo_config_overrides(self) -> dict:
         """Load geo_config_overrides from INI file, with YAML fallback.

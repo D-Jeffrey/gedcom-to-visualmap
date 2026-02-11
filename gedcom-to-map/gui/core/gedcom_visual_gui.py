@@ -70,7 +70,12 @@ class GedcomVisualGUI:
             style: wx frame style flags (default: wx.DEFAULT_FRAME_STYLE).
         """
         self.font_manager: 'FontManager' = FontManager()
-        self.color_manager: 'ColourManager' = ColourManager(svc_config._gui_colors if hasattr(svc_config, '_gui_colors') else {})
+        
+        # Load both light and dark color schemes
+        light_colors = svc_config._gui_colors if hasattr(svc_config, '_gui_colors') else {}
+        dark_colors = svc_config._gui_colors_dark if hasattr(svc_config, '_gui_colors_dark') else None
+        self.color_manager: 'ColourManager' = ColourManager(light_colors, dark_colors)
+        
         self.svc_config: 'IConfig' = svc_config
         self.svc_state: 'IState' = svc_state
         self.svc_progress: 'IProgressTracker' = svc_progress

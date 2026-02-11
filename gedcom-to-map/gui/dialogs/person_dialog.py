@@ -146,7 +146,8 @@ class PersonDialog(wx.Dialog):
 
         self.update_fonts()
 
-        self.SetBackgroundColour(wx.TheColourDatabase.FindColour('WHITE'))
+        # Don't force white background - let system handle it for dark mode support
+        # self.SetBackgroundColour(wx.TheColourDatabase.FindColour('WHITE'))
         self.Fit()
 
     def update_fonts(self) -> None:

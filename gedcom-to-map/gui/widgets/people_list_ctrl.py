@@ -132,6 +132,16 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
         if svc_progress is not None:
             self.svc_progress = svc_progress
 
+    def refresh_colors(self):
+        """Refresh list colors after appearance mode change."""
+        if self.color_manager:
+            try:
+                self.SetTextColour(self.color_manager.get_color('GRID_TEXT'))
+                self.SetBackgroundColour(self.color_manager.get_color('GRID_BACK'))
+                self.Refresh()
+            except Exception:
+                _log.exception("Failed to refresh colors in PeopleListCtrl")
+
     
 
     def PopulateList(self, people, mainperson, loading):

@@ -1,6 +1,7 @@
 import logging
 from typing import Any, List, Tuple
 import wx
+import sys
 
 _log = logging.getLogger(__name__.lower())
 
@@ -25,12 +26,25 @@ class LayoutHelpers:
         id_ = -1
         if id_name in vm_panel.id.IDs:
             id_ = vm_panel.id.IDs[id_name]
+        
+        # Create standard button - works on all platforms
         btn = wx.Button(panel, id=id_, label=label)
+        
+        # Apply color if specified
         if color:
             try:
-                btn.SetBackgroundColour(vm_panel.color_manager.get_color(color))
-            except Exception:
-                _log.debug("add_button_with_id: GetColor failed for %s", color)
+                btn_color = vm_panel.color_manager.get_color(color)
+                btn.SetBackgroundColour(btn_color)
+                
+                # On macOS, native buttons may not show custom backgrounds perfectly
+                # But they still function correctly
+                if sys.platform == 'darwin':
+                    btn.SetForegroundColour(wx.BLACK)
+                
+                _log.info(f"Set button {id_name} color to {btn_color.GetAsString(wx.C2S_HTML_SYNTAX)}")
+            except Exception as e:
+                _log.warning(f"add_button_with_id: Failed to set color for {id_name}/{color}: {e}")
+        
         setattr(vm_panel.id, id_name, btn)
         return btn
 

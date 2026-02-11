@@ -137,7 +137,10 @@ class VisualMapPanel(wx.Panel):
         
         # https://docs.wxpython.org/wx.ColourDatabase.html#wx-colourdatabase
         self.panelA.SetBackgroundColour(self.color_manager.get_color('INFO_BOX_BACKGROUND'))
-        self.panelB.SetBackgroundColour(wx.WHITE)
+        # Use system default for panelB to support dark mode
+        if not self.color_manager.is_dark_mode():
+            self.panelB.SetBackgroundColour(wx.WHITE)
+        # In dark mode, let system handle the background color
 
         main_hs = wx.BoxSizer(wx.HORIZONTAL)
         main_hs.Add(self.panelA, 1, wx.EXPAND | wx.ALL, 5)
@@ -191,6 +194,28 @@ class VisualMapPanel(wx.Panel):
         wx.CallAfter(LayoutOptions.adjust_panel_width, self)
         self.Layout()
         self.Refresh()
+    
+    def refresh_colors(self) -> None:
+        """Refresh all UI colors after appearance mode change."""
+        # Update panel backgrounds
+        self.panelA.SetBackgroundColour(self.color_manager.get_color('INFO_BOX_BACKGROUND'))
+        if not self.color_manager.is_dark_mode():
+            self.panelB.SetBackgroundColour(wx.WHITE)
+        else:
+            # In dark mode, reset to system default
+            self.panelB.SetBackgroundColour(wx.NullColour)
+        
+        # Note: Input File, Output File, and Configuration Options buttons use system defaults
+        # (color=None) and automatically adapt to appearance changes. No manual color refresh needed.
+        
+        # Refresh people list colors
+        if hasattr(self, 'peopleList') and self.peopleList:
+            self.peopleList.refresh_colors()
+        
+        # Force repaint
+        self.Layout()
+        self.Refresh()
+        self.Update()
  
     def start_threads_and_timer(self) -> None:
          """Start background worker thread(s) and the periodic UI timer.

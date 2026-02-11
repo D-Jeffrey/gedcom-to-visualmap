@@ -67,9 +67,9 @@ class LayoutOptions:
     @staticmethod
     def _add_file_controls(vm_panel: Any, panel: wx.Panel, sizer: wx.Sizer) -> None:
         """Create input/output file controls and add to sizer."""
-        LayoutHelpers.add_button_with_id(vm_panel, panel, "txtinfile", "Input file:   ", "BTN_DIRECTORY")
+        LayoutHelpers.add_button_with_id(vm_panel, panel, "txtinfile", "Input file:   ", color=None)
         LayoutHelpers.add_textctrl_with_id(vm_panel, panel, "TEXTGEDCOMinput", size=(250, 20), enable=False)
-        LayoutHelpers.add_button_with_id(vm_panel, panel, "txtoutfile", "Output file: ", "BTN_DIRECTORY")
+        LayoutHelpers.add_button_with_id(vm_panel, panel, "txtoutfile", "Output file: ", color=None)
         LayoutHelpers.add_textctrl_with_id(vm_panel, panel, "TEXTResultFile", size=(250, 20))
         vm_panel.id.txtinfile.Bind(wx.EVT_LEFT_DOWN, vm_panel.frame.OnFileOpenDialog)
         vm_panel.id.txtoutfile.Bind(wx.EVT_LEFT_DOWN, vm_panel.frame.OnFileResultDialog)
@@ -83,7 +83,7 @@ class LayoutOptions:
     def _add_basic_checks(vm_panel: Any, panel: wx.Panel, sizer: wx.Sizer) -> None:
         """Add the top-level checkbox controls and configuration button."""
         # Configuration button
-        btn_config = LayoutHelpers.add_button_with_id(vm_panel, panel, "BTNConfig", "Configuration Options...")
+        btn_config = LayoutHelpers.add_button_with_id(vm_panel, panel, "BTNConfig", "Configuration Options...", color=None)
         sizer.Add(btn_config, 0, wx.ALL, 2)
         
         # General Options section

@@ -123,6 +123,8 @@ class VisualMapFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.onOptionsSetup, id=wx.ID_SETUP)
         self.Bind(wx.EVT_MENU, self.OnOpenCSV, id=self.id.IDs["BTNCSV"])
         self.Bind(wx.EVT_MENU, self.OnOpenBrowser, id=self.id.IDs["BTNBROWSER"])
+        # Bind window activation to check for appearance changes
+        self.Bind(wx.EVT_ACTIVATE, self.OnActivate)
 
     def populate_font_menus(self, optionsMenu: wx.Menu) -> None:
         """Populate optionsMenu with font face and size submenus.
@@ -249,6 +251,17 @@ class VisualMapFrame(wx.Frame):
             self.Destroy()
         else:
             self.Close(True)
+
+    def OnActivate(self, event: wx.ActivateEvent) -> None:
+        """Handle window activation: check for system appearance changes."""
+        if event.GetActive():
+            # Window is being activated - check if appearance mode changed
+            if self.color_manager.refresh_colors():
+                # Colors changed, need to refresh the UI
+                _log.info("Appearance mode changed, refreshing UI colors")
+                # Refresh the panel colors
+                self.visual_map_panel.refresh_colors()
+        event.Skip()  # Allow event to propagate
 
     def OnOpenCSV(self, event: wx.Event) -> None:
         """Menu handler: open CSV/geo table using the panel helper."""

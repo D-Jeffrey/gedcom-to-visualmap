@@ -1,6 +1,7 @@
 # My stuff
 geodat-address-cache*.csv
 .vs/
+.vscode/
 other/
 geodat-address-cache-1.csv
 geodat-address-cache-2.csv

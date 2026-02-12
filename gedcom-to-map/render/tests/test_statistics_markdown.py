@@ -152,7 +152,7 @@ class TestWriteStatisticsMarkdown:
         
         # Check markdown file was created
         assert output_file.exists()
-        content = output_file.read_text()
+        content = output_file.read_text(encoding='utf-8')
         
         # Verify key sections are present
         assert "# 📊 Genealogical Statistics Report" in content
@@ -171,7 +171,7 @@ class TestWriteStatisticsMarkdown:
         write_statistics_markdown(sample_stats_object, str(output_file))
         
         assert output_file.exists()
-        content = output_file.read_text()
+        content = output_file.read_text(encoding='utf-8')
         assert "Genealogical Statistics Report" in content
     
     def test_write_markdown_creates_both_files(self, tmp_path, sample_stats_dict):
@@ -196,7 +196,7 @@ class TestWriteStatisticsMarkdown:
         write_statistics_markdown(minimal_stats, str(output_file))
         
         assert output_file.exists()
-        content = output_file.read_text()
+        content = output_file.read_text(encoding='utf-8')
         assert "Executive Summary" in content
 
 
@@ -210,7 +210,7 @@ class TestWriteStatisticsHtml:
         write_statistics_html(sample_stats_dict, str(output_file))
         
         assert output_file.exists()
-        content = output_file.read_text()
+        content = output_file.read_text(encoding='utf-8')
         
         # Verify HTML structure
         assert "<!DOCTYPE html>" in content
@@ -229,7 +229,7 @@ class TestWriteStatisticsHtml:
         
         write_statistics_html(sample_stats_dict, str(output_file))
         
-        content = output_file.read_text()
+        content = output_file.read_text(encoding='utf-8')
         
         # Check that key markdown content is embedded
         assert "Genealogical Statistics Report" in content
@@ -397,13 +397,13 @@ class TestIntegration:
         assert html_file.exists()
         
         # Verify markdown content
-        md_content = output_file.read_text()
+        md_content = output_file.read_text(encoding='utf-8')
         assert len(md_content) > 1000  # Should be substantial
         assert "Executive Summary" in md_content
         assert "Demographics" in md_content
         
         # Verify HTML content
-        html_content = html_file.read_text()
+        html_content = html_file.read_text(encoding='utf-8')
         assert "<!DOCTYPE html>" in html_content
         assert "markdown-it" in html_content
         assert "Executive Summary" in html_content

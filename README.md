@@ -24,6 +24,9 @@ Originally forked from [https://github.com/lmallez/gedcom-to-map], now in collab
 
 ## Recent Improvements
 
+- ✅ **Statistics Configuration**: Added configurable `earliest_credible_birth_year` threshold (default: 1000) in `gedcom_options.yaml` to filter implausible birth dates from statistics reports. Prevents data entry errors like year "1" from appearing in Executive Summary metrics
+- ✅ **Dark Mode Support**: Comprehensive dark mode for HTML statistics reports and wxPython GUI with automatic system appearance detection on macOS. GUI colors use standard X11 color names for better readability and maintainability
+- ✅ **Cross-Platform Testing**: Fixed UTF-8 encoding issues in statistics tests to ensure compatibility with Windows (cp1252), macOS, and Linux. All file operations now explicitly specify `encoding='utf-8'`
 - ✅ **Geocoding UI Improvement**: Configuration dialog now uses mutually exclusive radio buttons for geocoding mode (Normal/Geocode only/Cache only) instead of checkboxes, preventing confusing combinations
 - ✅ **Windows Compatibility**: Fixed Windows-specific crash during family record processing where accessing partner records could fail with "'NoneType' object has no attribute 'xref_id'" error
 - ✅ **Cache-Only Mode Fixes**: 
@@ -247,6 +250,20 @@ The SUM results type generates a comprehensive genealogical statistics report th
 4. Click `Draw Update` to generate the report
 5. The HTML report opens automatically in your browser
 
+### Configuration Options
+
+Statistics behavior can be customized in `gedcom_options.yaml`:
+
+```yaml
+statistics_options:
+  earliest_credible_birth_year: {type: 'int', default: 1000}
+```
+
+- **`earliest_credible_birth_year`** (default: 1000): Filters birth years older than this threshold from the "earliest birth year" metric in the Executive Summary. This prevents data entry errors (like year "1" or "800") from appearing in reports. Adjust this value based on your dataset:
+  - Use `1000` for general genealogy (filters medieval and ancient errors)
+  - Use `500-800` for legitimate medieval European genealogy
+  - Use `1500-1700` for modern datasets where older dates are unlikely
+
 The report provides comprehensive insights into your genealogical data with 14 different statistical collectors analyzing demographics, events, names, ages, births, longevity, timelines, marriages, children, relationships, divorces, and geographic patterns.
 
 ---
@@ -285,7 +302,7 @@ The report provides comprehensive insights into your genealogical data with 14 d
 
 ## Testing
 
-The project includes comprehensive test coverage across all major components.
+The project includes comprehensive test coverage across all major components with **578 passing tests** ensuring cross-platform compatibility (macOS, Windows, Linux).
 
 To run the full test suite:
 ```sh
@@ -300,9 +317,10 @@ pytest --cov=gedcom-to-map --cov-report=html
 ### Test Organization
 
 - **Unit Tests**: Fast, isolated tests for individual components
-  - `gedcom-to-map/services/tests/` - Configuration, state, and progress tracking
+  - `gedcom-to-map/services/tests/` - Configuration, state, and progress tracking (131 tests)
   - `gedcom-to-map/models/tests/` - Data models and core structures
-  - `gedcom-to-map/render/tests/` - Rendering and export functionality
+  - `gedcom-to-map/render/tests/` - Rendering and export functionality (UTF-8 encoding verified for Windows compatibility)
+  - `gedcom-to-map/geo_gedcom/statistics/tests/` - Statistics collectors and pipeline (68 tests including configurable threshold tests)
   
 - **Integration Tests**: Test component interactions
   - Configuration loading and migration

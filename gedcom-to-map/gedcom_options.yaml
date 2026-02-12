@@ -23,6 +23,7 @@ gui_colors:
   INFO_BOX_BACKGROUND: "GOLDENROD"
   GRID_TEXT: "BLACK"
   GRID_BACK: "WHITE"
+  GRID_READONLY_BACK: "LIGHT GREY"
   TITLE_TEXT: "WHITE"
   TITLE_BACK: "KHAKI"
   BUSY_BACK: "YELLOW"
@@ -41,6 +42,7 @@ gui_colors_dark:
   INFO_BOX_BACKGROUND: "BLACK"
   GRID_TEXT: "WHITE"
   GRID_BACK: "BLACK"
+  GRID_READONLY_BACK: "#3A3A3A"  # Dark gray for readonly cells in dark mode
   TITLE_TEXT: "WHITE"
   TITLE_BACK: "BLACK"
   BUSY_BACK: "KHAKI"          # Muted olive for busy indicator

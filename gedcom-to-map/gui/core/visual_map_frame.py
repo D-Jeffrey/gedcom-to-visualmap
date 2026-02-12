@@ -175,7 +175,7 @@ class VisualMapFrame(wx.Frame):
 
         self.ActionMenu = ActionMenu = wx.Menu()
         ActionMenu.Append(wx.ID_FIND, "&Find\tCtrl-F", "Find by name")
-        ActionMenu.Append(wx.ID_INFO, "Statistics Sumary")
+        ActionMenu.Append(wx.ID_INFO, "Statistics Summary")
         ActionMenu.Append(self.id.IDs['BTNBROWSER'], "Open Result in &Browser")
         ActionMenu.Append(self.id.IDs['BTNCSV'], "Open &CSV")
 
@@ -411,7 +411,7 @@ class VisualMapFrame(wx.Frame):
                         msg += f"\nTimeframe: {timeframe.get('from','?')}-{timeframe.get('to','?')}\n"
                 except Exception:
                     pass
-                selected = self.svc_state.selected_people
+                selected = self.svc_state.selectedpeople
                 if selected > 0:
                     msg += f"\nDirect people: {selected} in the heritage line\n"
                 else:

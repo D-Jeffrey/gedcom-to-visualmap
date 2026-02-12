@@ -292,7 +292,7 @@ class TestGVConfigSaveLoad:
             config.savesettings()
             
             assert os.path.exists(temp_ini)
-            with open(temp_ini, 'r') as f:
+            with open(temp_ini, 'r', encoding='utf-8') as f:
                 content = f.read()
                 # INI file uses lowercase keys
                 assert 'inputfile' in content.lower()
@@ -317,7 +317,7 @@ class TestGVConfigSaveLoad:
             config.savesettings()
             
             # Verify the INI file contains the Main person ID
-            with open(temp_ini, 'r') as f:
+            with open(temp_ini, 'r', encoding='utf-8') as f:
                 content = f.read()
                 assert '[Gedcom.Main]' in content
                 assert 'myfile = I001' in content
@@ -375,7 +375,7 @@ class TestGVConfigWithExistingINI:
             temp_ini = os.path.join(tmpdir, 'test_settings.ini')
             
             # Create an INI file with specific settings
-            with open(temp_ini, 'w') as f:
+            with open(temp_ini, 'w', encoding='utf-8') as f:
                 f.write('[Core]\n')
                 f.write('InputFile = /existing/path/family.ged\n')
                 f.write('OutputFile = /existing/output.html\n')
@@ -410,7 +410,7 @@ class TestGVConfigWithExistingINI:
             temp_ini = os.path.join(tmpdir, 'test_settings.ini')
             
             # Create INI with settings that differ from YAML defaults
-            with open(temp_ini, 'w') as f:
+            with open(temp_ini, 'w', encoding='utf-8') as f:
                 f.write('[Core]\n')
                 f.write('MaxMissing = 99\n')
                 f.write('MaxLineWeight = 88\n')
@@ -437,7 +437,7 @@ class TestGVConfigWithExistingINI:
             temp_ini = os.path.join(tmpdir, 'test_settings.ini')
             
             # Create INI with custom logging levels
-            with open(temp_ini, 'w') as f:
+            with open(temp_ini, 'w', encoding='utf-8') as f:
                 f.write('[Core]\n')
                 f.write('_migration_version = 2\n')
                 f.write('[HTML]\n')
@@ -460,7 +460,7 @@ class TestGVConfigWithExistingINI:
         with tempfile.TemporaryDirectory() as tmpdir:
             temp_ini = os.path.join(tmpdir, 'test_settings.ini')
             
-            with open(temp_ini, 'w') as f:
+            with open(temp_ini, 'w', encoding='utf-8') as f:
                 f.write('[Core]\n')
                 f.write('InputFile = /path/to/myfile.ged\n')
                 f.write('_migration_version = 2\n')
@@ -485,7 +485,7 @@ class TestGVConfigWithExistingINI:
         with tempfile.TemporaryDirectory() as tmpdir:
             temp_ini = os.path.join(tmpdir, 'test_settings.ini')
             
-            with open(temp_ini, 'w') as f:
+            with open(temp_ini, 'w', encoding='utf-8') as f:
                 f.write('[Core]\n')
                 f.write('HTMLcmdline = firefox "$n"\n')
                 f.write('CSVcmdline = libreoffice "$n"\n')
@@ -540,7 +540,7 @@ class TestGVConfigWithExistingINI:
             temp_ini = os.path.join(tmpdir, 'test_settings.ini')
             
             # Create minimal INI file with only Core section
-            with open(temp_ini, 'w') as f:
+            with open(temp_ini, 'w', encoding='utf-8') as f:
                 f.write('[Core]\n')
                 f.write('InputFile = /test.ged\n')
                 f.write('_migration_version = 2\n')

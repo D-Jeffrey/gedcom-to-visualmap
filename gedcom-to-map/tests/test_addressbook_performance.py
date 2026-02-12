@@ -112,7 +112,7 @@ def performance_results() -> Iterator[Dict[str, Any]]:
         ]
         print("| " + " | ".join(row) + " |")
     yaml_path = os.path.join(os.path.dirname(__file__), "addressbook_performance_results.yaml")
-    with open(yaml_path, "w") as f:
+    with open(yaml_path, "w", encoding='utf-8') as f:
         yaml.dump({'results': results}, f, default_flow_style=False)
 
 @pytest.mark.slow

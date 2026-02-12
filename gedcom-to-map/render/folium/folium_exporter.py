@@ -7,6 +7,7 @@ __all__ = ['MyMarkClusters', 'foliumExporter']
 import logging
 import math
 import os.path
+from pathlib import Path
 
 import random
 
@@ -29,7 +30,7 @@ from .polyline_utils import add_polyline
 from .heatmap_utils import normalize_heat_data
 
 _log = logging.getLogger(__name__.lower())
-legend_file = 'file://' + __file__ + '/../legend.png'
+legend_file = 'file://' + (Path(__file__).parent / 'legend.png').as_posix()
 
 class FeatureGroupInfo:
     """Container for feature group metadata."""

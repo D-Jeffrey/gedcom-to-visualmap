@@ -65,7 +65,7 @@ class YAMLConfigLoader:
         """
         file_path = cls.find_config_file(custom_path)
         
-        with open(file_path, 'r') as file:
+        with open(file_path, 'r', encoding='utf-8') as file:
             return yaml.safe_load(file) or {}
 
 
@@ -118,7 +118,7 @@ class INIConfigLoader:
             # Ensure parent directory exists
             self.ini_path.parent.mkdir(parents=True, exist_ok=True)
             
-            with open(self.ini_path, 'w') as configfile:
+            with open(self.ini_path, 'w', encoding='utf-8') as configfile:
                 self.config.write(configfile)
             
             _log.debug("Saved INI settings to %s", self.ini_path)

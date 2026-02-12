@@ -23,7 +23,7 @@ class TestYAMLConfigLoader:
     
     def test_find_config_file_with_custom_path(self):
         """Test finding config file with explicit custom path."""
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.yaml', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.yaml', delete=False, encoding='utf-8') as f:
             f.write('test: value\n')
             temp_path = Path(f.name)
         
@@ -474,7 +474,7 @@ class TestINIConfigLoaderIntegration:
             ini_path = Path(tmpdir) / 'old_config.ini'
             
             # Create old version INI file
-            with open(ini_path, 'w') as f:
+            with open(ini_path, 'w', encoding='utf-8') as f:
                 f.write('[Core]\n')
                 f.write('_migration_version = -1\n')
                 f.write('InputFile = /old/style.ged\n')

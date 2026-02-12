@@ -41,7 +41,7 @@ def collect_and_report_results(request):
         ]
         print("| " + " | ".join(row) + " |")
     results_path = os.path.join(os.path.dirname(__file__), "geolocatedgedcom_performance_results.yaml")
-    with open(results_path, "w") as f:
+    with open(results_path, "w", encoding='utf-8') as f:
         yaml.dump({'results': results}, f, default_flow_style=False)
 
 def run_geolocatedgedcom_perf(

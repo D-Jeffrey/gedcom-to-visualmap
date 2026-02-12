@@ -277,7 +277,7 @@ class VisualMapActions:
 
             tracepath: str = os.path.splitext(result_file)[0] + ".trace.txt"
             try:
-                trace = open(tracepath, "w")
+                trace = open(tracepath, "w", encoding='utf-8')
             except Exception as e:
                 _log.error("Could not open trace file %s for writing %s", tracepath, e)
                 bp.SayErrorMessage(f"Error: Could not open trace file {tracepath} for writing {e}")

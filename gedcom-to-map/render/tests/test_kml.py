@@ -16,8 +16,8 @@ def test_kml_life_lines_creator_init(tmp_path):
     gedcom_file = tmp_path / "dummy.ged"
     location_cache_file = tmp_path / "dummy_cache.csv"
     # Create empty files if the constructor expects them to exist
-    gedcom_file.write_text("")
-    location_cache_file.write_text("")
+    gedcom_file.write_text("", encoding='utf-8')
+    location_cache_file.write_text("", encoding='utf-8')
     gedcom = GeolocatedGedcom(str(gedcom_file), str(location_cache_file), 
                               geo_config_updates={'cache_only': True, 'geocode_settings': {'default_country': ''}})
     creator = KML_Life_Lines_Creator(gedcom, str(kml_file))
@@ -29,8 +29,8 @@ def test_kml_life_lines_init(tmp_path):
     gedcom_file = tmp_path / "dummy.ged"
     location_cache_file = tmp_path / "dummy_cache.csv"
     # Create empty files if the constructor expects them to exist
-    gedcom_file.write_text("")
-    location_cache_file.write_text("")
+    gedcom_file.write_text("", encoding='utf-8')
+    location_cache_file.write_text("", encoding='utf-8')
     gedcom = GeolocatedGedcom(str(gedcom_file), str(location_cache_file), 
                               geo_config_updates={'cache_only': True, 'geocode_settings': {'default_country': ''}})
     life_lines = KML_Life_Lines(gedcom, str(kml_file))

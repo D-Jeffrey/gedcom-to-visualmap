@@ -306,7 +306,7 @@ def loadsettings(obj: Any) -> None:
                 obj.gvConfig.remove_option(section, key)
         obj.gvConfig['Core']['_migration_version'] = MIGRATION_VERSION_CURRENT
         try:
-            with open(obj.settingsfile, 'w') as configfile:
+            with open(obj.settingsfile, 'w', encoding='utf-8') as configfile:
                 obj.gvConfig.write(configfile)
         except Exception as e:
             _log.error("Error saving migrated settings: %s", e)
@@ -390,7 +390,7 @@ def savesettings(obj: Any) -> None:
                     obj.gvConfig.remove_option('Logging', logName)
                 else:
                     obj.gvConfig['Logging'][logName] = logging.getLevelName(logging.getLogger(logName).getEffectiveLevel())
-        with open(obj.settingsfile, 'w') as configfile:
+        with open(obj.settingsfile, 'w', encoding='utf-8') as configfile:
             obj.gvConfig.write(configfile)
     except Exception as e:
         _log.error("Error saving settings to %s: %s", obj.settingsfile, e)

@@ -22,7 +22,9 @@ class TestSettingsFilePathname:
     @patch('pathlib.Path.mkdir')
     def test_darwin_path(self, mock_mkdir, mock_expanduser, mock_system):
         result = config_io.settings_file_pathname('test.ini')
-        assert '/tmp/test/Library/Application Support/test.ini' in result
+        # Normalize path separators for cross-platform testing
+        normalized_result = result.replace('\\', '/')
+        assert '/tmp/test/Library/Application Support/test.ini' in normalized_result
         mock_mkdir.assert_called_once()
     
     @patch('platform.system', return_value='Linux')
@@ -30,7 +32,9 @@ class TestSettingsFilePathname:
     @patch('pathlib.Path.mkdir')
     def test_linux_path(self, mock_mkdir, mock_expanduser, mock_system):
         result = config_io.settings_file_pathname('test.ini')
-        assert '/tmp/test/.config/test.ini' in result
+        # Normalize path separators for cross-platform testing
+        normalized_result = result.replace('\\', '/')
+        assert '/tmp/test/.config/test.ini' in normalized_result
         mock_mkdir.assert_called_once()
     
     @patch('platform.system', return_value='Windows')
@@ -332,7 +336,7 @@ class TestLoadSettings:
     
     def test_load_settings_integration(self):
         # Create a temporary INI file
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.ini', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.ini', delete=False, encoding='utf-8') as f:
             f.write('[Core]\n')
             f.write('InputFile = /path/to/file.ged\n')
             f.write('_migration_version = 1\n')
@@ -361,7 +365,7 @@ class TestLoadSettings:
     
     def test_load_settings_migration(self):
         # Test migration from version 0 to 1
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.ini', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.ini', delete=False, encoding='utf-8') as f:
             f.write('[Core]\n')
             f.write('OldSetting = value\n')
             temp_file = f.name
@@ -390,7 +394,7 @@ class TestSaveSettings:
     """Tests for savesettings function."""
     
     def test_save_settings_basic(self):
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.ini', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.ini', delete=False, encoding='utf-8') as f:
             temp_file = f.name
         
         try:
@@ -430,7 +434,7 @@ class TestSaveSettings:
                 os.unlink(temp_file)
     
     def test_save_settings_creates_config(self):
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.ini', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.ini', delete=False, encoding='utf-8') as f:
             temp_file = f.name
         
         try:
@@ -459,7 +463,7 @@ class TestIntegration:
     
     def test_load_save_roundtrip(self):
         """Test that settings can be saved and loaded back."""
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.ini', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.ini', delete=False, encoding='utf-8') as f:
             temp_file = f.name
         
         try:

@@ -93,6 +93,10 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
         self.svc_config = None
         self.svc_state = None
         self.svc_progress = None
+        
+        # Track item color types for refresh_colors()
+        # Maps list index to color type: 'MAINPERSON', 'ANCESTOR', 'OTHERPERSON', 'YELLOW', or None
+        self._item_color_types: dict[int, str] = {}
 
         self.SetImageList(self.il, wx.IMAGE_LIST_SMALL)
         try:
@@ -138,6 +142,17 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
             try:
                 self.SetTextColour(self.color_manager.get_color('GRID_TEXT'))
                 self.SetBackgroundColour(self.color_manager.get_color('GRID_BACK'))
+                
+                # Refresh individual item background colors
+                for item_index, color_type in self._item_color_types.items():
+                    if item_index < self.GetItemCount():
+                        if color_type == 'YELLOW':
+                            # Keep yellow for age issues (doesn't change with theme)
+                            self.SetItemBackgroundColour(item_index, wx.YELLOW)
+                        elif color_type in ('MAINPERSON', 'ANCESTOR', 'OTHERPERSON'):
+                            # Update themed colors
+                            self.SetItemBackgroundColour(item_index, self.color_manager.get_color(color_type))
+                
                 self.Refresh()
             except Exception:
                 _log.exception("Failed to refresh colors in PeopleListCtrl")
@@ -170,6 +185,7 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
             self.DeleteAllItems()
             self.itemDataMap = {}
             self.itemIndexMap = []
+            self._item_color_types = {}  # Clear color type tracking
             loading = True
             self._LastGridOnlyFamily = self.GridOnlyFamily
 
@@ -248,17 +264,21 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
                                 if mainperson == pdata.id:
                                     if self.color_manager:
                                         self.SetItemBackgroundColour(index, self.color_manager.get_color('MAINPERSON'))
+                                        self._item_color_types[index] = 'MAINPERSON'
                                 else:
                                     person = people.get(pdata.id, None)
                                     issues = person.check_age_problems(people) if person else None
                                     if issues:
                                         self.SetItemBackgroundColour(index, wx.YELLOW)
+                                        self._item_color_types[index] = 'YELLOW'
                                     else:
                                         if self.color_manager:
                                             self.SetItemBackgroundColour(index, self.color_manager.get_color('ANCESTOR'))
+                                            self._item_color_types[index] = 'ANCESTOR'
                             else:
                                 if self.color_manager:
                                     self.SetItemBackgroundColour(index, self.color_manager.get_color('OTHERPERSON'))
+                                    self._item_color_types[index] = 'OTHERPERSON'
                         except Exception:
                             pass
             try:

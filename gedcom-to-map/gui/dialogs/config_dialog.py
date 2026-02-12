@@ -15,6 +15,7 @@ class ConfigDialog(wx.Dialog):
         svc_config,
         file_open_commands: dict,
         logging_keys: list[str] | None = None,
+        color_manager = None,
     ) -> None:
         """Initialize the Configuration dialog.
         
@@ -24,6 +25,7 @@ class ConfigDialog(wx.Dialog):
             svc_config: Configuration service (IConfig).
             file_open_commands: Dictionary mapping file types to open commands.
             logging_keys: List of logger names to configure (optional).
+            color_manager: ColourManager for dark mode support (optional).
         """
         super().__init__(parent, title=title, size=(500, 650))
 
@@ -32,6 +34,7 @@ class ConfigDialog(wx.Dialog):
         self.svc_config = svc_config
         self.file_open_commands: dict = file_open_commands
         self.logging_keys: list[str] = logging_keys or []
+        self.color_manager = color_manager
         all_loggers = list(logging.root.manager.loggerDict.keys())
         self.loggerNames: list[str] = (
             [name for name in all_loggers if name in self.logging_keys]
@@ -78,10 +81,15 @@ class ConfigDialog(wx.Dialog):
         self.logging_levels = ['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL']
 
         # Populate grid with only configured loggers
+        # Get appropriate readonly background color for dark mode support
+        readonly_bg = wx.LIGHT_GREY
+        if self.color_manager and self.color_manager.has_color('GRID_READONLY_BACK'):
+            readonly_bg = self.color_manager.get_color('GRID_READONLY_BACK')
+        
         for row, loggerName in enumerate(self.logging_keys):
             updatelog = logging.getLogger(loggerName)
             GRIDctl.SetCellValue(row, 0, loggerName)
-            GRIDctl.SetCellBackgroundColour(row, 0, wx.LIGHT_GREY)
+            GRIDctl.SetCellBackgroundColour(row, 0, readonly_bg)
             GRIDctl.SetCellValue(row, 1, logging.getLevelName(updatelog.level))
             GRIDctl.SetCellEditor(row, 1, gridlib.GridCellChoiceEditor(self.logging_levels))
             GRIDctl.SetReadOnly(row, 0)

@@ -8,6 +8,7 @@ Provides utilities for building the UI:
     - FontManager: Font configuration and management
     - ColourManager: GUI colour management
 """
+
 from .layout_options import LayoutOptions
 from .layout_helpers import LayoutHelpers
 from .visual_map_event_handlers import VisualMapEventHandler
@@ -15,4 +16,4 @@ from .visual_gedcom_ids import VisualGedcomIds
 from .font_manager import FontManager
 from .colour_manager import ColourManager
 
-__all__ = ['LayoutOptions', 'LayoutHelpers', 'VisualMapEventHandler', 'VisualGedcomIds', 'FontManager', 'ColourManager']
+__all__ = ["LayoutOptions", "LayoutHelpers", "VisualMapEventHandler", "VisualGedcomIds", "FontManager", "ColourManager"]

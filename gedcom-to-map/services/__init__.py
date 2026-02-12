@@ -27,11 +27,11 @@ from .interfaces import IConfig, IState, IProgressTracker
 
 __all__ = [
     # Implementations
-    'GVConfig',
-    'GVState',
-    'GVProgress',
+    "GVConfig",
+    "GVState",
+    "GVProgress",
     # Interfaces
-    'IConfig',
-    'IState',
-    'IProgressTracker',
+    "IConfig",
+    "IState",
+    "IProgressTracker",
 ]

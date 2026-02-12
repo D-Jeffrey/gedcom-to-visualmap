@@ -8,7 +8,9 @@ _log = logging.getLogger(__name__.lower())
 
 
 class FamilyPanel(wx.Panel):
-    def __init__(self, parent: wx.Window, hertiageData: dict, font_manager: FontManager, isLineage: bool = False, *args, **kwargs) -> None:
+    def __init__(
+        self, parent: wx.Window, hertiageData: dict, font_manager: FontManager, isLineage: bool = False, *args, **kwargs
+    ) -> None:
         """Initialize FamilyPanel to display family/lineage data in a grid."""
         super().__init__(parent, *args, **kwargs)
 
@@ -66,7 +68,7 @@ class FamilyPanel(wx.Panel):
 
     def populateGrid(self, isLineage=False) -> None:
         """Populate the grid with family data and calculate the age dynamically.
-        
+
         Args:
             isLineage: If True, calculates parent age at child birth.
                       If False, calculates lifespan age. Default: False.
@@ -122,7 +124,7 @@ class FamilyPanel(wx.Panel):
 
     def OnRowClick(self, event: wx.grid.GridEvent) -> None:
         """Open PersonDialog for the selected row (ID in column 7).
-        
+
         Args:
             event: Grid event containing row information.
         """
@@ -130,7 +132,7 @@ class FamilyPanel(wx.Panel):
         person_id = self.grid.GetCellValue(row, 7)
         person = None
         try:
-            if hasattr(self.parent, 'background_process') and hasattr(self.parent.background_process, 'people'):
+            if hasattr(self.parent, "background_process") and hasattr(self.parent.background_process, "people"):
                 person = self.parent.background_process.people.get(person_id)
         except Exception:
             person = None
@@ -150,14 +152,14 @@ class FamilyPanel(wx.Panel):
                 # Use self.font_manager if available, otherwise fall back to fm from visual_map_panel
                 font_mgr = self.font_manager if self.font_manager else fm
                 dlg = PersonDialog(
-                    self, 
-                    person, 
-                    self.visual_map_panel, 
+                    self,
+                    person,
+                    self.visual_map_panel,
                     font_manager=font_mgr,
-                    svc_config=getattr(self.visual_map_panel, 'svc_config', None),
-                    svc_state=getattr(self.visual_map_panel, 'svc_state', None),
-                    svc_progress=getattr(self.visual_map_panel, 'svc_progress', None),
-                    showreferences=False
+                    svc_config=getattr(self.visual_map_panel, "svc_config", None),
+                    svc_state=getattr(self.visual_map_panel, "svc_state", None),
+                    svc_progress=getattr(self.visual_map_panel, "svc_progress", None),
+                    showreferences=False,
                 )
                 dlg.Bind(wx.EVT_CLOSE, lambda evt: dlg.Destroy())
                 dlg.Show(True)

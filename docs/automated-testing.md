@@ -33,15 +33,40 @@ Add to README.md:
 - Catches common issues before they reach GitHub
 
 ### Installation
+
+**Step 1: Install pre-commit package**
 ```bash
 pip install pre-commit
-pre-commit install
 ```
 
 Or use the Makefile:
 ```bash
 make install-dev  # Installs all dev dependencies including pre-commit
 ```
+
+**Step 2: Install git hooks**
+```bash
+pre-commit install
+```
+
+**Step 3: Environments auto-install on first use**
+
+The first time pre-commit runs (either on first commit or manual run), it will automatically download and install all tool environments (black, flake8, etc.). This takes a few minutes but only happens once - environments are cached and reused.
+
+```bash
+# Test the setup - will auto-install environments
+pre-commit run --all-files
+```
+
+### For New Users Cloning the Repo
+
+New users need to:
+1. Clone the repository (includes `.pre-commit-config.yaml`)
+2. Install dependencies: `pip install -r requirements-dev.txt`
+3. Set up hooks: `pre-commit install`
+4. Environments auto-install on first commit or test run
+
+The `.pre-commit-config.yaml` file is version-controlled, but the actual environments are **not** - they're installed locally and cached in `~/.cache/pre-commit/`.
 
 ### Usage
 Once installed, tests run automatically when you commit:

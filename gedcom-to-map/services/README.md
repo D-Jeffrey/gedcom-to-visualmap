@@ -54,7 +54,7 @@ All service implementations use **simple attribute access** (not properties) for
 
 - **`interfaces.py`** — Protocol definitions
   - `IConfig`: Configuration access interface
-  - `IState`: Runtime state interface  
+  - `IState`: Runtime state interface
   - `IProgressTracker`: Progress tracking interface
   - All protocols use simple attribute annotations
 
@@ -102,7 +102,7 @@ from services.interfaces import IConfig, IState, IProgressTracker
 
 def process_gedcom(
     config: IConfig,
-    state: IState, 
+    state: IState,
     progress: IProgressTracker
 ) -> None:
     """Process GEDCOM file using injected services."""
@@ -119,10 +119,10 @@ def test_process_gedcom():
     # Create simple mock objects
     mock_config = Mock(spec=IConfig)
     mock_config.GEDCOMinput = "test.ged"
-    
+
     mock_state = Mock(spec=IState)
     mock_progress = Mock(spec=IProgressTracker)
-    
+
     # Test with mocks
     process_gedcom(mock_config, mock_state, mock_progress)
 ```
@@ -251,7 +251,7 @@ Progress tracking includes thread-safe operations:
 class GVProgress:
     def __init__(self):
         self._stop_lock = threading.Lock()
-    
+
     def stop(self):
         with self._stop_lock:
             # Thread-safe state modification
@@ -273,16 +273,16 @@ All modules include:
 ```python
 class INewService(Protocol):
     """New service interface description."""
-    
+
     attribute_name: str
     """Attribute description."""
-    
+
     def method_name(self, param: str) -> bool:
         """Method description.
-        
+
         Args:
             param: Parameter description.
-            
+
         Returns:
             bool: Return value description.
         """
@@ -299,14 +299,14 @@ from services.interfaces import INewService
 
 class GVNewService(INewService):
     """Implementation of INewService.
-    
+
     Detailed description of implementation.
     """
-    
+
     def __init__(self):
         """Initialize service with default values."""
         self.attribute_name: str = "default"
-    
+
     def method_name(self, param: str) -> bool:
         """Implementation with full docstring."""
         # Implementation
@@ -324,7 +324,7 @@ from services.new_service import GVNewService
 
 class TestGVNewServiceInit:
     """Tests for GVNewService initialization."""
-    
+
     def test_init_creates_default_values(self):
         """Test service initializes with correct defaults."""
         service = GVNewService()

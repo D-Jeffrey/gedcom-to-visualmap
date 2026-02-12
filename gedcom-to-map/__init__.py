@@ -51,23 +51,23 @@ Usage examples:
     >>> from geo_gedcom import GedcomParser, GeolocatedGedcom
     >>> from render import foliumExporter, ResultType
     >>> from gui.core import GuiHooks
-    >>> 
+    >>>
     >>> config = GVConfig('gedcom_options.yaml')
     >>> state = GVState()
     >>> progress = GVProgress()
-    >>> 
+    >>>
     >>> parser = GedcomParser()
     >>> people = parser.parse('family.ged')
     >>> geogedcom = GeolocatedGedcom(people, app_hooks=GuiHooks(progress, state))
-    >>> 
+    >>>
     >>> # Generate HTML map
     >>> exporter = foliumExporter(config, state, progress)
     >>> exporter.export(state.mainPerson, lines, saveresult=True)
-    >>> 
+    >>>
     >>> # Check result type
     >>> result_type = ResultType.HTML
     >>> print(result_type.file_extension())  # 'html'
-    
+
     # GUI application
     >>> from gui.core import GedcomVisualGUI
     >>> app = GedcomVisualGUI(parent=None, svc_config=config, svc_state=state,

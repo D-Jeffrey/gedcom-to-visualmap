@@ -1,10 +1,13 @@
 import wx
 from ..layout.font_manager import FontManager
 
+
 class FindDialog(wx.Dialog):
-    def __init__(self, parent: wx.Window, font_manager: 'FontManager', title: str = "Find", LastSearch: str = "") -> None:
+    def __init__(
+        self, parent: wx.Window, font_manager: "FontManager", title: str = "Find", LastSearch: str = ""
+    ) -> None:
         """Initialize the Find/Search dialog.
-        
+
         Args:
             parent: Parent wxPython window.
             font_manager: FontManager instance for font configuration.
@@ -13,7 +16,7 @@ class FindDialog(wx.Dialog):
         """
         super().__init__(parent, title=title, size=(300, 150))
 
-        self.font_manager: 'FontManager' = font_manager
+        self.font_manager: "FontManager" = font_manager
         self.LastSearch: str = LastSearch
 
         # Layout
@@ -43,7 +46,7 @@ class FindDialog(wx.Dialog):
         self.cancelButton.Bind(wx.EVT_BUTTON, self.OnCancel)
 
         self.font_manager.apply_current_font_recursive(self)
-        
+
         # Set focus on search field so user can start typing immediately
         wx.CallAfter(self.SearchText.SetFocus)
 

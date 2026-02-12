@@ -1,4 +1,5 @@
 from render.result_type import ResultType
+
 """
 visual_map_frame.py
 
@@ -30,6 +31,7 @@ from ..layout.visual_gedcom_ids import VisualGedcomIds
 from ..layout.font_manager import FontManager
 from ..layout.colour_manager import ColourManager
 
+
 class VisualMapFrame(wx.Frame):
     """Main application window/frame.
 
@@ -53,8 +55,17 @@ class VisualMapFrame(wx.Frame):
     ActionMenu: wx.Menu  # Created in makeMenuBar()
     font: wx.Font  # Set in set_current_font()
 
-    def __init__(self, parent: wx.Window, svc_config: IConfig, svc_state: IState, svc_progress: IProgressTracker,
-                 font_manager: FontManager, color_manager: ColourManager, *args: Any, **kw: Any) -> None:
+    def __init__(
+        self,
+        parent: wx.Window,
+        svc_config: IConfig,
+        svc_state: IState,
+        svc_progress: IProgressTracker,
+        font_manager: FontManager,
+        color_manager: ColourManager,
+        *args: Any,
+        **kw: Any,
+    ) -> None:
         """Construct the frame.
 
         Args:
@@ -83,7 +94,9 @@ class VisualMapFrame(wx.Frame):
 
         # Create and set up the main panel within the frame
         # Pass services to VisualMapPanel
-        self.visual_map_panel = VisualMapPanel(self, self.font_manager, self.color_manager, self.svc_config, self.svc_state, self.svc_progress)
+        self.visual_map_panel = VisualMapPanel(
+            self, self.font_manager, self.color_manager, self.svc_config, self.svc_state, self.svc_progress
+        )
 
     def set_current_font(self) -> None:
         """Ensure the frame uses the current font from the FontManager."""
@@ -176,8 +189,8 @@ class VisualMapFrame(wx.Frame):
         self.ActionMenu = ActionMenu = wx.Menu()
         ActionMenu.Append(wx.ID_FIND, "&Find\tCtrl-F", "Find by name")
         ActionMenu.Append(wx.ID_INFO, "Statistics Summary")
-        ActionMenu.Append(self.id.IDs['BTNBROWSER'], "Open Result in &Browser")
-        ActionMenu.Append(self.id.IDs['BTNCSV'], "Open &CSV")
+        ActionMenu.Append(self.id.IDs["BTNBROWSER"], "Open Result in &Browser")
+        ActionMenu.Append(self.id.IDs["BTNCSV"], "Open &CSV")
 
         helpMenu = wx.Menu()
         helpMenu.Append(wx.ID_HELP, "Help")
@@ -284,14 +297,16 @@ class VisualMapFrame(wx.Frame):
         """
         dDir = os.getcwd()
         filen = ""
-        infile = self.svc_config.get('GEDCOMinput')
+        infile = self.svc_config.get("GEDCOMinput")
         if infile:
             dDir, filen = os.path.split(infile)
-        dlg = wx.FileDialog(self,
-                            defaultDir=dDir,
-                            defaultFile=filen,
-                            wildcard="GEDCOM source (*.ged)|*.ged|All Files|*",
-                            style=wx.FD_OPEN | wx.FD_CHANGE_DIR | wx.FD_FILE_MUST_EXIST)
+        dlg = wx.FileDialog(
+            self,
+            defaultDir=dDir,
+            defaultFile=filen,
+            wildcard="GEDCOM source (*.ged)|*.ged|All Files|*",
+            style=wx.FD_OPEN | wx.FD_CHANGE_DIR | wx.FD_FILE_MUST_EXIST,
+        )
         Proceed = dlg.ShowModal() == wx.ID_OK
         if Proceed:
             path = dlg.GetPath()
@@ -323,26 +338,28 @@ class VisualMapFrame(wx.Frame):
         """
         dDir = os.getcwd()
         dFile = "visgedcom.html"
-        resultfile = self.svc_config.get('ResultFile')
+        resultfile = self.svc_config.get("ResultFile")
         if resultfile:
             dDir, dFile = os.path.split(resultfile)
         else:
-            resultfile = self.svc_config.get('GEDCOMinput')
+            resultfile = self.svc_config.get("GEDCOMinput")
             if resultfile:
                 dDir, dFile = os.path.split(resultfile)
         dFile = os.path.splitext(dFile)[0]
 
-        dlg = wx.FileDialog(self,
-                            defaultDir=dDir,
-                            defaultFile=dFile,
-                            wildcard="HTML Output Result (*.html)|*.html|Map KML (*.kml)|*.kml|All Files|*",
-                            style=wx.FD_SAVE | wx.FD_CHANGE_DIR)
+        dlg = wx.FileDialog(
+            self,
+            defaultDir=dDir,
+            defaultFile=dFile,
+            wildcard="HTML Output Result (*.html)|*.html|Map KML (*.kml)|*.kml|All Files|*",
+            style=wx.FD_SAVE | wx.FD_CHANGE_DIR,
+        )
 
         if dlg.ShowModal() == wx.ID_OK:
             path = dlg.GetPath()
             _log.debug("Output selected %s", path)
             try:
-                result_type = self.svc_config.get('ResultType')
+                result_type = self.svc_config.get("ResultType")
             except Exception:
                 result_type = ResultType.HTML
             isHTML = result_type == ResultType.HTML
@@ -351,11 +368,11 @@ class VisualMapFrame(wx.Frame):
                 # Update ResultFile and ResultType via services
                 enforced = ResultType.ResultTypeEnforce(result_type)
                 ext = ResultType.file_extension(enforced)
-                base, _ = os.path.splitext(fname or '')
-                result_file = (base or 'output') + '.' + ext
-                if hasattr(self.svc_config, 'set'):
-                    self.svc_config.set('ResultType', enforced)
-                    self.svc_config.set('ResultFile', result_file)
+                base, _ = os.path.splitext(fname or "")
+                result_file = (base or "output") + "." + ext
+                if hasattr(self.svc_config, "set"):
+                    self.svc_config.set("ResultType", enforced)
+                    self.svc_config.set("ResultFile", result_file)
                 self.visual_map_panel.id.TEXTResultFile.SetValue(result_file)
                 self.visual_map_panel.id.RBResultType.SetSelection(0 if isHTML else 1)
                 self.visual_map_panel.SetupButtonState()
@@ -390,7 +407,11 @@ class VisualMapFrame(wx.Frame):
         """Show About or Help dialog depending on the menu id."""
         try:
             if event.GetId() == wx.ID_ABOUT:
-                dialog = AboutDialog(self, title=f"About {GUINAME} {self.font_manager.get_font_name_size()[1]}", font_manager=self.font_manager)
+                dialog = AboutDialog(
+                    self,
+                    title=f"About {GUINAME} {self.font_manager.get_font_name_size()[1]}",
+                    font_manager=self.font_manager,
+                )
             else:
                 dialog = HelpDialog(self, title=f"Help for {GUINAME}", font_manager=self.font_manager)
             dialog.ShowModal()
@@ -406,9 +427,9 @@ class VisualMapFrame(wx.Frame):
                 total_ged_people = len(self.svc_state.people)
                 msg = f"Total People: {total_ged_people}\n"
                 try:
-                    timeframe = self.svc_config.get('timeframe')
+                    timeframe = self.svc_config.get("timeframe")
                     if timeframe:
-                        msg += f"\nTimeframe: {timeframe.get('from','?')}-{timeframe.get('to','?')}\n"
+                        msg += f"\nTimeframe: {timeframe.get('from', '?')}-{timeframe.get('to', '?')}\n"
                 except Exception:
                     pass
                 selected = self.svc_state.selectedpeople
@@ -416,7 +437,11 @@ class VisualMapFrame(wx.Frame):
                     msg += f"\nDirect people: {selected} in the heritage line\n"
                 else:
                     msg += "\nSelect main person for heritage line\n"
-            if self.svc_state.lookup and hasattr(self.svc_state.lookup, "address_book") and self.svc_state.lookup.address_book:
+            if (
+                self.svc_state.lookup
+                and hasattr(self.svc_state.lookup, "address_book")
+                and self.svc_state.lookup.address_book
+            ):
                 try:
                     stats = self.visual_map_panel.actions.updatestats()
                     msg += f"\nTotal cached addresses: {self.svc_state.lookup.address_book.len()}\n{stats}"
@@ -436,7 +461,7 @@ class VisualMapFrame(wx.Frame):
     def onOptionsReset(self, event: wx.Event) -> None:
         """Reset application options to defaults and refresh the UI."""
         try:
-            if hasattr(self.svc_config, 'defaults'):
+            if hasattr(self.svc_config, "defaults"):
                 self.svc_config.defaults()
             self.visual_map_panel.SetupOptions()
             wx.MessageBox("Restored options to defaults", "Reset Options", wx.OK | wx.ICON_INFORMATION)
@@ -447,18 +472,20 @@ class VisualMapFrame(wx.Frame):
         """Open the configuration dialog for editing application options."""
         try:
             svc_config = self.svc_config
-            
+
             # Get logger names from logging_defaults (dict) or logging_keys (list) for backwards compatibility
-            logging_defaults = svc_config.options.get('logging_defaults', {})
-            logger_names = list(logging_defaults.keys()) if logging_defaults else svc_config.options.get('logging_keys', [])
-            
+            logging_defaults = svc_config.options.get("logging_defaults", {})
+            logger_names = (
+                list(logging_defaults.keys()) if logging_defaults else svc_config.options.get("logging_keys", [])
+            )
+
             dialog = ConfigDialog(
                 None,
                 title="Configuration Options",
                 svc_config=svc_config,
                 file_open_commands=svc_config.file_open_commands,
                 logging_keys=logger_names,
-                color_manager=self.color_manager
+                color_manager=self.color_manager,
             )
             dialog.ShowModal()
             dialog.Destroy()

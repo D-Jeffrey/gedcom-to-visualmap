@@ -3,19 +3,28 @@ import wx
 import json
 import os
 import logging
+
 _log = logging.getLogger(__name__)
+
 
 class FontManager:
     PREDEFINED_FONTS = [
-        "Arial", "Calibri", "Corbel", "Consolas", "Courier New", "DejaVu Sans", "Georgia",  "Noto Sans", 
-        "Segoe UI", "Tahoma", "Times New Roman", "Trebuchet MS", "Verdana"
+        "Arial",
+        "Calibri",
+        "Corbel",
+        "Consolas",
+        "Courier New",
+        "DejaVu Sans",
+        "Georgia",
+        "Noto Sans",
+        "Segoe UI",
+        "Tahoma",
+        "Times New Roman",
+        "Trebuchet MS",
+        "Verdana",
     ]
 
-    DEFAULT = {
-        "face": "Segoe UI",
-        "size": 9,
-        "style": "normal"   # placeholder for future bold/italic
-    }
+    DEFAULT = {"face": "Segoe UI", "size": 9, "style": "normal"}  # placeholder for future bold/italic
 
     PREDEFINED_FONT_SIZES = [8, 9, 10, 11, 12, 14, 16]
 
@@ -29,7 +38,7 @@ class FontManager:
     def load(cls):
         sp = wx.StandardPaths.Get()
         _CONFIG_FILENAME = os.path.join(sp.GetUserDataDir(), "visualmap_style.json")
-        
+
         try:
             os.makedirs(os.path.dirname(_CONFIG_FILENAME), exist_ok=True)
             if os.path.exists(_CONFIG_FILENAME):
@@ -38,7 +47,7 @@ class FontManager:
                 cls._current = {
                     "face": cfg.get("face", cls.DEFAULT["face"]),
                     "size": cfg.get("size", cls.DEFAULT["size"]),
-                    "style": cfg.get("style", cls.DEFAULT["style"])
+                    "style": cfg.get("style", cls.DEFAULT["style"]),
                 }
                 return
         except Exception:
@@ -71,7 +80,7 @@ class FontManager:
         except Exception as e:
             _log.debug("Font validation failed for %s@%s: %s", face, size, e)
         return cls.DEFAULT["face"], cls.DEFAULT["size"]
-    
+
     @classmethod
     def get_font(cls, bold: bool = False, italic: bool = False, size_delta: int = 0):
         """
@@ -92,10 +101,16 @@ class FontManager:
         try:
             return wx.Font(int(size), wx.FONTFAMILY_DEFAULT, style, weight, False, face)
         except Exception as e:
-            _log.warning("Failed to construct font %s@%s (bold=%s, italic=%s), falling back to system font: %s",
-                         face, size, bold, italic, e)
+            _log.warning(
+                "Failed to construct font %s@%s (bold=%s, italic=%s), falling back to system font: %s",
+                face,
+                size,
+                bold,
+                italic,
+                e,
+            )
             return wx.SystemSettings.GetFont(wx.SYS_DEFAULT_GUI_FONT)
-    
+
     @classmethod
     def set_font(cls, face, size=None):
         if cls._current is None:
@@ -107,7 +122,7 @@ class FontManager:
             cls._current["size"] = int(size)
         cls.save()
         return True
-    
+
     @classmethod
     def set_font_size(cls, size):
         if cls._current is None:
@@ -120,6 +135,7 @@ class FontManager:
     def apply_current_font_recursive(cls, win: wx.Window):
         """Set font on window and all children; ignore failures on native widgets."""
         font = cls.get_font()
+
         def _apply(w):
             try:
                 w.SetFont(font)
@@ -127,6 +143,7 @@ class FontManager:
                 pass
             for child in getattr(w, "GetChildren", lambda: [])():
                 _apply(child)
+
         _apply(win)
 
     @classmethod
@@ -149,7 +166,7 @@ class FontManager:
         face, size = cls.get_font_name_size()
         isMono = face in ["Consolas", "Courier New", "DejaVu Sans Mono"]
         return cls.approx_text_width(num_chars, sizePt=size, isMono=isMono)
-    
+
     def register_font_change_callback(self, callback):
         """Register a callback function to be called when font changes."""
         if not hasattr(self, "_callbacks"):

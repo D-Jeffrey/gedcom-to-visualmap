@@ -10,17 +10,18 @@ from .do_actions_type import DoActionsType
 
 _log = logging.getLogger(__name__.lower())
 
+
 class BackgroundActions:
     """Background worker thread for GEDCOM parsing, geocoding, and output generation.
-    
+
     This class manages a background thread that performs time-consuming operations
     without blocking the UI. It uses DoActionsType flags to coordinate parse and
     generate operations, and communicates progress/results back to the UI via
     messages and events.
-    
+
     The worker is designed to avoid circular imports by lazily importing heavy
     helper functions (ParseAndGPS, doHTML, doKML, etc.) inside the Run() method.
-    
+
     Attributes:
         win: Parent wxPython window for posting events.
         panel: Visual map panel reference for accessing UI state and actions.
@@ -37,7 +38,7 @@ class BackgroundActions:
         threadrunning: Flag indicating if thread is currently running.
         doAction: Current action flags (DoActionsType).
         readyToDo: Flag indicating worker is ready to accept new work.
-    
+
     Example:
         background = BackgroundActions(panel, threadnum=1, svc_config, svc_state, svc_progress)
         background.Start()
@@ -51,12 +52,12 @@ class BackgroundActions:
         win: wx.Window,
         threadnum: int,
         panel: Any,
-        svc_config: Optional['IConfig'] = None,
-        svc_state: Optional['IState'] = None,
-        svc_progress: Optional['IProgressTracker'] = None,
+        svc_config: Optional["IConfig"] = None,
+        svc_state: Optional["IState"] = None,
+        svc_progress: Optional["IProgressTracker"] = None,
     ) -> None:
         """Initialize background worker thread.
-        
+
         Args:
             win: Parent wxPython window for posting events.
             threadnum: Unique thread identifier for logging and diagnostics.
@@ -67,14 +68,14 @@ class BackgroundActions:
         """
         self.win: wx.Window = win
         self.panel: Any = panel
-        self.svc_config: 'IConfig' = svc_config or panel.svc_config
-        self.svc_state: 'IState' = svc_state or panel.svc_state
-        self.svc_progress: 'IProgressTracker' = svc_progress or panel.svc_progress
+        self.svc_config: "IConfig" = svc_config or panel.svc_config
+        self.svc_state: "IState" = svc_state or panel.svc_state
+        self.svc_progress: "IProgressTracker" = svc_progress or panel.svc_progress
         self.people: Optional[dict] = None
         self.threadnum: int = threadnum
         self.updategrid: bool = False
         self.updategridmain: bool = True
-        self.updateinfo: str = ''  # Message to prime GUI updates
+        self.updateinfo: str = ""  # Message to prime GUI updates
         self.errorinfo: Optional[str] = None
         self.keepGoing: bool = True
         self.threadrunning: bool = True
@@ -83,7 +84,7 @@ class BackgroundActions:
 
     def Start(self) -> None:
         """Start the background worker thread.
-        
+
         Resets state and spawns a new thread running the Run() method.
         """
         self.keepGoing = self.threadrunning = True
@@ -92,7 +93,7 @@ class BackgroundActions:
 
     def Stop(self) -> None:
         """Signal the background worker thread to stop.
-        
+
         Sets the keepGoing flag to False, causing the Run() loop to exit.
         The thread will finish its current operation before stopping.
         """
@@ -100,7 +101,7 @@ class BackgroundActions:
 
     def IsRunning(self) -> bool:
         """Check if the background worker thread is running.
-        
+
         Returns:
             bool: True if thread is running, False otherwise.
         """
@@ -108,7 +109,7 @@ class BackgroundActions:
 
     def IsTriggered(self) -> bool:
         """Check if the worker has pending actions to perform.
-        
+
         Returns:
             bool: True if any action flags are set (not NONE), False otherwise.
         """
@@ -116,36 +117,36 @@ class BackgroundActions:
 
     def _update_button_colours(self, dolevel: DoActionsType) -> None:
         """Update UI button colors based on pending actions.
-        
+
         Sets button backgrounds to 'BTN_DONE' color for actions that will be performed.
         Used to provide visual feedback when operations are triggered.
-        
+
         Args:
             dolevel: Action flags indicating which operations will be performed.
         """
         try:
             if dolevel.should_parse():
-                self.panel.id.BTNLoad.SetBackgroundColour(self.panel.color_manager.get_color('BTN_DONE'))
+                self.panel.id.BTNLoad.SetBackgroundColour(self.panel.color_manager.get_color("BTN_DONE"))
             if dolevel.has_generate():
-                self.panel.id.BTNCreateFiles.SetBackgroundColour(self.panel.color_manager.get_color('BTN_DONE'))
+                self.panel.id.BTNCreateFiles.SetBackgroundColour(self.panel.color_manager.get_color("BTN_DONE"))
         except Exception:
             _log.exception("Update button colours: failed to update button colours")
 
     def Trigger(self, dolevel: DoActionsType) -> None:
         """Trigger background operations based on action flags.
-        
+
         Sets the doAction flags to initiate background work. The Run() loop will
         detect the flags and execute the corresponding operations (parse/generate).
         Updates button colors to provide immediate visual feedback.
-        
+
         Args:
             dolevel: Bit-flag combination specifying operations to perform
                     (e.g., DoActionsType.PARSE | DoActionsType.GENERATE).
-        
+
         Example:
             # Trigger parse and generate
             background.Trigger(DoActionsType.PARSE | DoActionsType.GENERATE)
-            
+
             # Trigger only parse
             background.Trigger(DoActionsType.PARSE)
         """
@@ -155,33 +156,33 @@ class BackgroundActions:
 
     def SayInfoMessage(self, line: str, newline: bool = True) -> None:
         """Queue an informational message for display to the user.
-        
+
         Messages are accumulated in updateinfo and displayed by the UI thread.
-        
+
         Args:
             line: Message text to display.
             newline: If True, append newline before this message (default: True).
         """
-        if newline and self.updateinfo and self.updateinfo != '':
+        if newline and self.updateinfo and self.updateinfo != "":
             self.updateinfo = self.updateinfo + "\n"
         self.updateinfo = self.updateinfo + line if self.updateinfo else line
 
     def SayErrorMessage(self, line: str, newline: bool = True) -> None:
         """Queue an error message for display to the user.
-        
+
         Messages are accumulated in errorinfo and displayed by the UI thread.
-        
+
         Args:
             line: Error message text to display.
             newline: If True, append newline before this message (default: True).
         """
-        if newline and self.errorinfo and self.errorinfo != '':
+        if newline and self.errorinfo and self.errorinfo != "":
             self.errorinfo = self.errorinfo + "\n"
         self.errorinfo = self.errorinfo + line if self.errorinfo else line
 
     def _clear_people_data(self) -> None:
         """Clear people data from both instance and state service.
-        
+
         Safely deletes the people dictionary and sets references to None.
         Used when starting a new parse operation or cleaning up after errors.
         """
@@ -198,7 +199,7 @@ class BackgroundActions:
 
     def _report_parse_results(self) -> None:
         """Report parse operation results to the user via info/error messages.
-        
+
         Displays success messages with person count and starting person info,
         or error messages if parsing failed or was aborted.
         Also sets the updategrid flag to trigger UI refresh.
@@ -211,9 +212,9 @@ class BackgroundActions:
             else:
                 self.SayInfoMessage(f"Cancelled loading people")
             try:
-                main_id = self.svc_config.get('Main')
+                main_id = self.svc_config.get("Main")
                 if main_id:
-                    gedcom_input = self.svc_config.get('GEDCOMinput')
+                    gedcom_input = self.svc_config.get("GEDCOMinput")
                     self.SayInfoMessage(f" with '{main_id}' as starting person from {Path(gedcom_input).name}", False)
             except Exception:
                 pass
@@ -222,31 +223,31 @@ class BackgroundActions:
                 self.SayErrorMessage(f"Error: Aborted loading GEDCOM file", True)
             else:
                 self.SayErrorMessage(f"Error: file could not read as a GEDCOM file", True)
-                
+
     def _run_parse(self, panel_actions: Any, UpdateBackgroundEvent: Any = None) -> None:
         """Execute GEDCOM parsing and geocoding operation.
-        
+
         Performs the following steps:
         1. Posts 'busy' event to UI
         2. Clears existing people data
         3. Calls ParseAndGPS to parse GEDCOM and geocode addresses
         4. Clears Referenced data (forces re-trace on next use)
         5. Reports results to user
-        
+
         On error, clears people data, resets action flags, and reports error messages.
-        
+
         Args:
             panel_actions: Panel actions object with ParseAndGPS method.
             UpdateBackgroundEvent: Optional event class for posting UI updates.
         """
         if UpdateBackgroundEvent:
-            wx.PostEvent(self.win, UpdateBackgroundEvent(state='busy'))
+            wx.PostEvent(self.win, UpdateBackgroundEvent(state="busy"))
         wx.Yield()
         _log.info("start ParseAndGPS")
-        
+
         # Clear existing people data
         self._clear_people_data()
-        
+
         _log.info("ParseAndGPS")
         try:
             if hasattr(panel_actions, "ParseAndGPS"):
@@ -264,7 +265,7 @@ class BackgroundActions:
             except Exception:
                 pass
             _log.warning(str(e))
-            self.SayErrorMessage('Failed to Parse', True)
+            self.SayErrorMessage("Failed to Parse", True)
             self.SayErrorMessage(str(e), True)
             return
 
@@ -277,7 +278,7 @@ class BackgroundActions:
                     self.svc_state.Referenced = None
             except Exception:
                 pass
-        
+
         # Mark as successfully parsed if we have people data
         if self.people:
             try:
@@ -290,45 +291,47 @@ class BackgroundActions:
 
     def _dispatch_generation(self, panel_actions: Any, result_type_name: str, fname: str) -> None:
         """Dispatch to appropriate output generation method based on result type.
-        
+
         Calls the corresponding generation method (doHTML, doKML, doKML2, or doSUM),
         displays a success message, and opens the generated file if configured.
         Logs error if the required method is not available.
-        
+
         Args:
             panel_actions: Panel actions object with generation methods
                           (doHTML, doKML, doKML2, doSUM).
             result_type_name: Name of the result type ("HTML", "KML", "KML2", or "SUM").
             fname: Output filename for display in success message.
-        
+
         Raises:
             Logs error and displays error message for unknown result types.
         """
         result_file = None
         file_type = None
-        total_people = getattr(self.svc_state, 'totalpeople', '?')
-        
+        total_people = getattr(self.svc_state, "totalpeople", "?")
+
         if result_type_name == "HTML":
             if hasattr(panel_actions, "doHTML"):
-                panel_actions.doHTML(self.svc_config, self.svc_state, self.svc_progress, False)  # Don't open in generator
+                panel_actions.doHTML(
+                    self.svc_config, self.svc_state, self.svc_progress, False
+                )  # Don't open in generator
             else:
                 _log.error("Run: panel_actions.doHTML not available")
             self.SayInfoMessage(f"HTML generated for {total_people} people ({fname})")
-            file_type = 'html'
+            file_type = "html"
         elif result_type_name == "KML":
             if hasattr(panel_actions, "doKML"):
                 panel_actions.doKML(self.svc_config, self.svc_state, self.svc_progress)
             else:
                 _log.error("Run: panel_actions.doKML not available")
             self.SayInfoMessage(f"KML file generated for {total_people} people/points ({fname})")
-            file_type = 'kml'
+            file_type = "kml"
         elif result_type_name == "KML2":
             if hasattr(panel_actions, "doKML2"):
                 panel_actions.doKML2(self.svc_config, self.svc_state)
             else:
                 _log.error("Run: panel_actions.doKML2 not available")
             self.SayInfoMessage(f"KML2 file generated for {total_people} people/points ({fname})")
-            file_type = 'kml2'
+            file_type = "kml2"
         elif result_type_name == "SUM":
             if hasattr(panel_actions, "doSUM"):
                 panel_actions.doSUM(self.svc_config, self.svc_state, self.svc_progress)
@@ -339,15 +342,16 @@ class BackgroundActions:
         else:
             self.SayErrorMessage(f"Error: Unknown Result Type {result_type_name}", True)
             return
-        
+
         # Open generated file if type is set and file exists
         if file_type and fname:
             try:
-                result_path = self.svc_config.get('resultpath', '')
+                result_path = self.svc_config.get("resultpath", "")
                 result_file = Path(result_path) / fname if result_path else Path(fname)
                 if result_file.exists():
                     try:
                         from .file_operations import FileOpener
+
                         opener = FileOpener(self.svc_config)
                         opener.open_file(file_type, str(result_file))
                     except Exception:
@@ -357,15 +361,15 @@ class BackgroundActions:
 
     def _run_generate(self, panel_actions: Any, UpdateBackgroundEvent: Any = None) -> None:
         """Execute output generation operation (HTML/KML/SUM).
-        
+
         Validates that GEDCOM is parsed and result type is set, then dispatches
         to the appropriate generation method. Returns early if validation fails.
-        
+
         Args:
             panel_actions: Panel actions object with generation methods
                           (doHTML, doKML, doKML2, doSUM).
             UpdateBackgroundEvent: Optional event class for posting UI updates.
-        
+
         Returns:
             Returns early without generating output if:
             - GEDCOM is not parsed (svc_state.parsed is False)
@@ -375,9 +379,9 @@ class BackgroundActions:
         if not getattr(self.svc_state, "parsed", False):
             _log.info("not parsed")
             return
-        
-        fname = self.svc_config.get('ResultFile')
-        result_type = self.svc_config.get('ResultType')
+
+        fname = self.svc_config.get("ResultFile")
+        result_type = self.svc_config.get("ResultType")
         if result_type is None:
             _log.error("Run: ResultType not set")
             return
@@ -390,12 +394,12 @@ class BackgroundActions:
 
     def _reset_button_colours(self) -> None:
         """Reset UI button background colors to default state.
-        
+
         Resets both Load and CreateFiles buttons to 'BTN_DEFAULT' color.
         Called when operations complete or are cancelled.
         """
         try:
-            default_color = self.panel.color_manager.get_color('BTN_DEFAULT')
+            default_color = self.panel.color_manager.get_color("BTN_DEFAULT")
             self.panel.id.BTNLoad.SetBackgroundColour(default_color)
             self.panel.id.BTNCreateFiles.SetBackgroundColour(default_color)
         except Exception:
@@ -403,65 +407,65 @@ class BackgroundActions:
 
     def _update_button_colours_done(self, dolevel: DoActionsType) -> None:
         """Update UI button colors to indicate completed operations.
-        
+
         Sets button backgrounds to 'BTN_DONE' color for successfully completed actions.
         This provides visual feedback showing which operations finished.
-        
+
         Args:
             dolevel: Action flags indicating which operations completed successfully.
         """
         try:
             if dolevel.should_parse():
-                self.panel.id.BTNLoad.SetBackgroundColour(self.panel.color_manager.get_color('BTN_DONE'))
+                self.panel.id.BTNLoad.SetBackgroundColour(self.panel.color_manager.get_color("BTN_DONE"))
             if dolevel.has_generate():
-                self.panel.id.BTNCreateFiles.SetBackgroundColour(self.panel.color_manager.get_color('BTN_DONE'))
+                self.panel.id.BTNCreateFiles.SetBackgroundColour(self.panel.color_manager.get_color("BTN_DONE"))
         except Exception:
             _log.exception("_update_button_colours_done: failed to update button colours")
 
     def _transition_to_idle(self, UpdateBackgroundEvent: Optional[Any], completed_actions: DoActionsType) -> None:
         """Transition worker to idle state after completing or aborting operations.
-        
+
         Performs cleanup and state reset:
         1. Updates button colors based on completed actions
         2. Resets action flags to NONE
         3. Sets readyToDo flag to accept new work
         4. Calls svc_progress.stop() to finalize state
         5. Posts 'done' event to UI
-        
+
         Args:
             UpdateBackgroundEvent: Optional event class for posting UI updates.
             completed_actions: Flags indicating which operations completed successfully
                               (used to update button colors appropriately).
         """
         _log.debug("=======================GOING TO IDLE %d", self.threadnum)
-        
+
         # Update button colors to show completion
         self._update_button_colours_done(completed_actions)
-        
+
         # reset work flags
         self.doAction = DoActionsType.NONE
         self.readyToDo = True
         try:
-            if hasattr(self.svc_progress, 'stop'):
+            if hasattr(self.svc_progress, "stop"):
                 self.svc_progress.stop()
         except Exception:
             _log.exception("BackgroundActions: svc_progress.stop() failed")
         if UpdateBackgroundEvent:
-            wx.PostEvent(self.win, UpdateBackgroundEvent(state='done'))
+            wx.PostEvent(self.win, UpdateBackgroundEvent(state="done"))
 
     def Run(self) -> None:
         """Main worker thread loop.
-        
+
         Continuously monitors doAction flags and executes requested operations:
         - Parse/geocode GEDCOM if PARSE or REPARSE_IF_NEEDED flags are set
         - Generate output if GENERATE flag is set
-        
+
         The loop runs until keepGoing is set to False. It sleeps when no work
         is pending to avoid busy-waiting.
-        
+
         Heavy helper functions (ParseAndGPS, doHTML, etc.) are accessed via
         panel_actions to avoid circular imports at module load time.
-        
+
         Thread lifecycle:
         1. Check for pending work (doAction flags set and readyToDo)
         2. Execute parse operation if requested
@@ -469,17 +473,19 @@ class BackgroundActions:
         4. Transition to idle state
         5. Sleep if no work pending
         6. Repeat until Stop() is called
-        
+
         Error handling:
         - Individual operations handle their own exceptions
         - Top-level exception handler ensures transition to idle on unexpected errors
         """
-        self.SayInfoMessage(' ', True)  # prime the InfoBox
+        self.SayInfoMessage(" ", True)  # prime the InfoBox
 
         while self.keepGoing:
             if self.doAction.doing_something() and self.readyToDo:
                 self.readyToDo = False  # Avoid a Race
-                _log.info("triggered thread with %s (Thread# %d / %d)", self.doAction, self.threadnum, _thread.get_ident())
+                _log.info(
+                    "triggered thread with %s (Thread# %d / %d)", self.doAction, self.threadnum, _thread.get_ident()
+                )
                 try:
                     self.svc_progress.stopping = False
                 except Exception:
@@ -488,12 +494,12 @@ class BackgroundActions:
                 # Obtain event type from panel if available
                 UpdateBackgroundEvent = getattr(self.panel, "UpdateBackgroundEvent", None)
                 panel_actions = getattr(self.panel, "actions", None)
-                
+
                 if not panel_actions:
                     _log.error("Run: panel_actions not available")
                     self._transition_to_idle(UpdateBackgroundEvent, DoActionsType.NONE)
                     continue
-                
+
                 completed_actions = DoActionsType.NONE
                 try:
                     if self.doAction.should_parse(getattr(self.svc_state, "parsed", False)):
@@ -504,9 +510,9 @@ class BackgroundActions:
                     if self.doAction.has_generate():
                         self._run_generate(panel_actions, UpdateBackgroundEvent)
                         completed_actions |= DoActionsType.GENERATE
-    
+
                     self._transition_to_idle(UpdateBackgroundEvent, completed_actions)
-                    
+
                 except Exception:
                     _log.exception("BackgroundActions.Run main loop failed")
                     self._transition_to_idle(UpdateBackgroundEvent, DoActionsType.NONE)

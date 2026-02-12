@@ -8,10 +8,10 @@ Provides action handlers for user interactions and background operations:
     - DoActionsType: Enum for background operation types
     - gedcom_to_map: Map generation orchestration
 """
+
 from .visual_map_actions import VisualMapActions, Geoheatmap, gedcom_to_map
 from .background_actions import BackgroundActions
 from .file_operations import FileOpener
 from .do_actions_type import DoActionsType
 
-__all__ = ['VisualMapActions', 'Geoheatmap', 'gedcom_to_map', 
-           'BackgroundActions', 'FileOpener', 'DoActionsType']
+__all__ = ["VisualMapActions", "Geoheatmap", "gedcom_to_map", "BackgroundActions", "FileOpener", "DoActionsType"]

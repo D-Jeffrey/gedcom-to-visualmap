@@ -1,11 +1,11 @@
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #
 #
 #  gedcom_visual_gui.py : GUI Interface  for gedcom-to-map
 #    See https://github.com/D-Jeffrey/gedcom-to-visualmap
 #
 #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 """
 GUI package facade for the gedcom-to-visualmap application.
 
@@ -14,7 +14,7 @@ application entrypoint to create and manage the main frame. It intentionally
 keeps responsibilities minimal: construct the VisualMapFrame and forward
 start/stop lifecycle calls.
 """
-#!/usr/bin/env python
+# !/usr/bin/env python
 
 import logging
 from typing import Any, Tuple
@@ -26,6 +26,7 @@ from ..layout.colour_manager import ColourManager
 from services.interfaces import IConfig, IState, IProgressTracker
 
 _log = logging.getLogger(__name__.lower())
+
 
 class GedcomVisualGUI:
     """Lightweight wrapper that constructs and controls the main VisualMapFrame.
@@ -42,6 +43,7 @@ class GedcomVisualGUI:
         svc_progress: Progress tracking service (IProgressTracker).
         frame: The application's main frame (VisualMapFrame).
     """
+
     # runtime attributes with basic type hints
     font_manager: FontManager
     color_manager: ColourManager
@@ -53,9 +55,9 @@ class GedcomVisualGUI:
     def __init__(
         self,
         parent: wx.Window | None,
-        svc_config: 'IConfig',
-        svc_state: 'IState',
-        svc_progress: 'IProgressTracker',
+        svc_config: "IConfig",
+        svc_state: "IState",
+        svc_progress: "IProgressTracker",
         title: str,
         style: int = wx.DEFAULT_FRAME_STYLE,
     ) -> None:
@@ -69,22 +71,30 @@ class GedcomVisualGUI:
             title: Window title.
             style: wx frame style flags (default: wx.DEFAULT_FRAME_STYLE).
         """
-        self.font_manager: 'FontManager' = FontManager()
-        
+        self.font_manager: "FontManager" = FontManager()
+
         # Load both light and dark color schemes
-        light_colors = svc_config._gui_colors if hasattr(svc_config, '_gui_colors') else {}
-        dark_colors = svc_config._gui_colors_dark if hasattr(svc_config, '_gui_colors_dark') else None
-        self.color_manager: 'ColourManager' = ColourManager(light_colors, dark_colors)
-        
-        self.svc_config: 'IConfig' = svc_config
-        self.svc_state: 'IState' = svc_state
-        self.svc_progress: 'IProgressTracker' = svc_progress
+        light_colors = svc_config._gui_colors if hasattr(svc_config, "_gui_colors") else {}
+        dark_colors = svc_config._gui_colors_dark if hasattr(svc_config, "_gui_colors_dark") else None
+        self.color_manager: "ColourManager" = ColourManager(light_colors, dark_colors)
+
+        self.svc_config: "IConfig" = svc_config
+        self.svc_state: "IState" = svc_state
+        self.svc_progress: "IProgressTracker" = svc_progress
 
         # Get window size from config
-        size = svc_config.get('window_size', [1024, 800])
-        self.frame: 'VisualMapFrame' = VisualMapFrame(
-            parent, svc_config=svc_config, svc_state=svc_state, svc_progress=svc_progress,
-            font_manager=self.font_manager, color_manager=self.color_manager, title=title, size=size, style=style)
+        size = svc_config.get("window_size", [1024, 800])
+        self.frame: "VisualMapFrame" = VisualMapFrame(
+            parent,
+            svc_config=svc_config,
+            svc_state=svc_state,
+            svc_progress=svc_progress,
+            font_manager=self.font_manager,
+            color_manager=self.color_manager,
+            title=title,
+            size=size,
+            style=style,
+        )
 
     def start(self) -> None:
         """Start the GUI by delegating to the main frame's start method."""

@@ -7,6 +7,7 @@ from ged4py.parser import GedcomReader
 
 _log = logging.getLogger(__name__)
 
+
 class GedRecordDialog(wx.Frame):
     """A dialog for displaying a flattened view of a GEDCOM record using wxPython."""
 
@@ -35,7 +36,7 @@ class GedRecordDialog(wx.Frame):
 
         for path, val in flattened:
             if val and not path.endswith(".parser") and not path.endswith(".level"):
-                idx = self.list.InsertItem(self.list.GetItemCount(), path.replace('INDI.',''))
+                idx = self.list.InsertItem(self.list.GetItemCount(), path.replace("INDI.", ""))
                 single_line_val = str(val).replace("\r", " ").replace("\n", " ")
                 self.list.SetItem(idx, 1, single_line_val)
 
@@ -64,7 +65,7 @@ class GedRecordDialog(wx.Frame):
         self.SetSizer(main_sizer)
 
         # Keyboard shortcut for copy
-        accel_tbl = wx.AcceleratorTable([(wx.ACCEL_CTRL, ord('C'), copy_btn.GetId())])
+        accel_tbl = wx.AcceleratorTable([(wx.ACCEL_CTRL, ord("C"), copy_btn.GetId())])
         self.SetAcceleratorTable(accel_tbl)
 
         # Center and show
@@ -211,15 +212,15 @@ class GedRecordDialog(wx.Frame):
         input_value = None
         if svc_config is not None:
             try:
-                input_value = getattr(svc_config, 'gedcom_input', None) or (
-                    svc_config.get('GEDCOMinput') if hasattr(svc_config, 'get') else None
+                input_value = getattr(svc_config, "gedcom_input", None) or (
+                    svc_config.get("GEDCOMinput") if hasattr(svc_config, "get") else None
                 )
             except Exception:
                 input_value = None
 
         if not input_value:
             _log.error("Cannot determine GEDCOM input path from svc_config")
-            input_value = ''
+            input_value = ""
 
         input_path = Path(input_value)
         if not input_path.is_absolute():

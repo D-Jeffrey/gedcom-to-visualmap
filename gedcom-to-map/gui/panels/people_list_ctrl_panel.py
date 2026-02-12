@@ -10,6 +10,7 @@ Responsibilities:
 - Provide a thin adapter to locate the owning VisualMapPanel and to propagate
   services to the inner list control.
 """
+
 import logging
 from typing import Any, Dict, Union
 import wx
@@ -21,6 +22,7 @@ from geo_gedcom.person import Person
 
 _log = logging.getLogger(__name__.lower())
 
+
 class PeopleListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
     """Panel containing the people list and an information box.
 
@@ -29,9 +31,18 @@ class PeopleListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
     width whenever the panel resizes.
     """
 
-    def __init__(self, parent: wx.Window, people: Union[Dict[str, Person], Any], font_manager: FontManager, color_manager: ColourManager,
-                 svc_config: Any = None, svc_state: Any = None, svc_progress: Any = None,
-                 *args, **kw):
+    def __init__(
+        self,
+        parent: wx.Window,
+        people: Union[Dict[str, Person], Any],
+        font_manager: FontManager,
+        color_manager: ColourManager,
+        svc_config: Any = None,
+        svc_state: Any = None,
+        svc_progress: Any = None,
+        *args,
+        **kw
+    ):
         """Initialize the PeopleListCtrlPanel.
 
         Args:
@@ -51,27 +62,32 @@ class PeopleListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
         self.font_manager = font_manager
         self.color_manager = color_manager
         sizer = wx.BoxSizer(wx.VERTICAL)
-        self.messagelog = "*  Select a file, Load it and Create Files or change Result Type, Open Geo Table to edit addresses  *"
+        self.messagelog = (
+            "*  Select a file, Load it and Create Files or change Result Type, Open Geo Table to edit addresses  *"
+        )
         self.InfoBox = []
         # dedicated sizer for the info box lines to support dynamic rebuilds
         self.info_sizer = wx.BoxSizer(wx.VERTICAL)
         sizer.Add(self.info_sizer, 0, wx.EXPAND)
         # store the raw (unwrapped) text for each line so we can re-wrap when width changes
-        init_lines = self.svc_config.get('infoBoxLines', 5) if self.svc_config else 5
-        self.InfoBoxRaw = [''] * init_lines
+        init_lines = self.svc_config.get("infoBoxLines", 5) if self.svc_config else 5
+        self.InfoBoxRaw = [""] * init_lines
         for i in range(init_lines):
-            st = wx.StaticText(self, -1, ' ')
+            st = wx.StaticText(self, -1, " ")
             self.InfoBox.append(st)
             self.info_sizer.Add(st, 0, wx.EXPAND | wx.LEFT, 5)
         self.Bind(wx.EVT_SIZE, self._on_size_wrap_info)
         tID = wx.NewIdRef()
 
-        self.list = PeopleListCtrl(self, tID,
-                        style=wx.LC_REPORT | wx.BORDER_SUNKEN | wx.LC_SINGLE_SEL,
-                        size=wx.Size(600,600),
-                        font_manager=font_manager,
-                        color_manager=color_manager,
-                        svc_config=svc_config)
+        self.list = PeopleListCtrl(
+            self,
+            tID,
+            style=wx.LC_REPORT | wx.BORDER_SUNKEN | wx.LC_SINGLE_SEL,
+            size=wx.Size(600, 600),
+            font_manager=font_manager,
+            color_manager=color_manager,
+            svc_config=svc_config,
+        )
         sizer.Add(self.list, 1, wx.EXPAND)
 
         # Populate initial list
@@ -91,17 +107,17 @@ class PeopleListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
         Returns:
             The found VisualMapPanel instance, or None if not found.
         """
-        vis = getattr(self, 'visual_map_panel', None)
+        vis = getattr(self, "visual_map_panel", None)
         if vis is None:
             ancestor = self.GetParent()
             while ancestor is not None:
-                vis = getattr(ancestor, 'visual_map_panel', None)
+                vis = getattr(ancestor, "visual_map_panel", None)
                 if vis is not None:
                     break
                 ancestor = ancestor.GetParent()
         if vis is None:
             top = self.GetTopLevelParent()
-            vis = getattr(top, 'visual_map_panel', None)
+            vis = getattr(top, "visual_map_panel", None)
         return vis
 
     def SetServices(self, svc_config=None, svc_state=None, svc_progress=None):
@@ -129,7 +145,7 @@ class PeopleListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
             new_lines = self._get_info_box_lines()
             if new_lines != len(self.InfoBox):
                 # preserve existing raw text up to the new size
-                preserved = (self.InfoBoxRaw + [''] * new_lines)[:new_lines]
+                preserved = (self.InfoBoxRaw + [""] * new_lines)[:new_lines]
                 # clear existing controls
                 try:
                     self.info_sizer.Clear(delete_windows=True)
@@ -138,7 +154,7 @@ class PeopleListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
                 self.InfoBox = []
                 self.InfoBoxRaw = preserved
                 for i in range(new_lines):
-                    st = wx.StaticText(self, -1, ' ')
+                    st = wx.StaticText(self, -1, " ")
                     self.InfoBox.append(st)
                     self.info_sizer.Add(st, 0, wx.EXPAND | wx.LEFT, 5)
                 self.Layout()
@@ -153,12 +169,12 @@ class PeopleListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
         """
         # try service config
         try:
-            if getattr(self, 'svc_config', None) is not None:
-                get = getattr(self.svc_config, 'get', None)
+            if getattr(self, "svc_config", None) is not None:
+                get = getattr(self.svc_config, "get", None)
                 if callable(get):
-                    val = get('InfoBoxLines')
+                    val = get("InfoBoxLines")
                     if val is None:
-                        val = get('infoBoxLines')
+                        val = get("infoBoxLines")
                     if isinstance(val, int) and val > 0:
                         return val
         except Exception:
@@ -177,7 +193,7 @@ class PeopleListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
         # Use the raw text for wrapping so previous wrapped linebreaks are not preserved.
         for i, info in enumerate(getattr(self, "InfoBox", [])):
             try:
-                raw = self.InfoBoxRaw[i] if i < len(self.InfoBoxRaw) else ''
+                raw = self.InfoBoxRaw[i] if i < len(self.InfoBoxRaw) else ""
                 # set the unwrapped text then wrap to the current width
                 info.SetLabel(raw)
                 info.Wrap(wrap_width)
@@ -197,14 +213,14 @@ class PeopleListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
         Args:
             message: Multi-line string to prepend to the info log.
         """
-        nlines = (message+'\n'+self.messagelog).split('\n')
+        nlines = (message + "\n" + self.messagelog).split("\n")
         # update raw stored lines, then trigger wrapping to current width
         for i in range(len(self.InfoBox)):
             if i >= (len(nlines)):
-                self.InfoBoxRaw[i] = ''
+                self.InfoBoxRaw[i] = ""
             else:
                 self.InfoBoxRaw[i] = nlines[i]
-        self.messagelog = '\n'.join(nlines[:len(self.InfoBox)])
+        self.messagelog = "\n".join(nlines[: len(self.InfoBox)])
         # reflow to current width on the GUI thread
         wx.CallAfter(self._on_size_wrap_info, None)
 
@@ -223,7 +239,7 @@ class PeopleListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
 
     def refresh_colors(self):
         """Refresh colors in the people list control after appearance mode change."""
-        if hasattr(self, 'list') and self.list:
+        if hasattr(self, "list") and self.list:
             try:
                 self.list.refresh_colors()
             except Exception:

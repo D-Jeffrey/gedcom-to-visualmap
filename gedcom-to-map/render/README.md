@@ -13,17 +13,17 @@ All exporters and renderers use dependency injection via service objects for con
   - Custom map styles via xyzservices
   - Photo popups (with automatic path escaping for cross-platform compatibility)
   - Legend and layer controls
-  
+
 - **KML Export:** Generate KML files for use in Google Earth, MyMaps, ArcGIS Earth, and other GIS tools:
   - Legacy format (kml1): Simple KML export
   - Refined format (kml2): Enhanced KML with life lines and detailed styling
-  
+
 - **Statistical Summaries:** Generate reports in multiple formats:
   - YAML, Markdown, and HTML statistics
   - CSV summaries for places, countries, geocoding cache
   - Birth/death heatmap matrices
   - Enrichment issues reports
-  
+
 - **Name Processing:** Utilities for name normalization, comparison, and soundex (all static methods)
 - **Reference Tracking:** Manage references and links between people, places, and events
 - **Result Types:** Enum-based output format specification (HTML, KML, KML2, SUM)
@@ -167,8 +167,8 @@ See `render/tests/test_result_type.py` for examples of testing with service mock
 
 ## Usage in Application
 
-This package is intended to be used as part of the larger `gedcom-to-visualmap` project. 
-The GUI (via `gui/processors/map_generator.py`) and command-line interface both use 
+This package is intended to be used as part of the larger `gedcom-to-visualmap` project.
+The GUI (via `gui/processors/map_generator.py`) and command-line interface both use
 these exporters to generate output files based on the selected ResultType.
 
 ## Authors

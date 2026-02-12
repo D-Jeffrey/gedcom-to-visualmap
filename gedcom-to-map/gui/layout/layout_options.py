@@ -1,4 +1,5 @@
 from render.result_type import ResultType
+
 """
 layout_options.py
 
@@ -16,6 +17,7 @@ import wx
 from .layout_helpers import LayoutHelpers
 
 _log = logging.getLogger(__name__.lower())
+
 
 class LayoutOptions:
     """Helper to construct the options UI previously embedded in VisualMapPanel.
@@ -83,26 +85,31 @@ class LayoutOptions:
     def _add_basic_checks(vm_panel: Any, panel: wx.Panel, sizer: wx.Sizer) -> None:
         """Add the top-level checkbox controls and configuration button."""
         # Configuration button
-        btn_config = LayoutHelpers.add_button_with_id(vm_panel, panel, "BTNConfig", "Configuration Options...", color=None)
+        btn_config = LayoutHelpers.add_button_with_id(
+            vm_panel, panel, "BTNConfig", "Configuration Options...", color=None
+        )
         sizer.Add(btn_config, 0, wx.ALL, 2)
-        
+
         # General Options section
         general_container = wx.Panel(panel)
         general_box = wx.StaticBox(general_container, -1, "General Options")
         general_sizer = wx.StaticBoxSizer(general_box, wx.VERTICAL)
         general_boxIn = wx.BoxSizer(wx.VERTICAL)
-        
-        cb_all_entities = LayoutHelpers.add_checkbox_with_id(vm_panel, general_container, "CBAllEntities", "Map all people")
-        
+
+        cb_all_entities = LayoutHelpers.add_checkbox_with_id(
+            vm_panel, general_container, "CBAllEntities", "Map all people"
+        )
+
         general_boxIn.Add(cb_all_entities, 0, wx.ALL, 2)
         general_sizer.Add(general_boxIn, 0, wx.EXPAND | wx.ALL, 4)
         general_container.SetSizer(general_sizer)
-        
+
         sizer.Add(general_container, 0, wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP, 5)
-        
+
         # Result Type radio box (referenced later in _add_result_type_and_stack)
-        LayoutHelpers.add_radio_box_with_id(vm_panel, panel, "RBResultType", "Result Type",
-                                           ResultType.list_values(), majorDimension=5)
+        LayoutHelpers.add_radio_box_with_id(
+            vm_panel, panel, "RBResultType", "Result Type", ResultType.list_values(), majorDimension=5
+        )
 
     @staticmethod
     def get_marks_controls_list(vm_panel: Any) -> list:
@@ -113,7 +120,7 @@ class LayoutOptions:
             vm_panel.id.CBHomeMarker,
             vm_panel.id.CBMarkStarOn,
         ]
-    
+
     @staticmethod
     def _add_html_options(vm_panel: Any, panel: wx.Panel, sizer: wx.Sizer) -> None:
         """Create and add the HTML-specific option group."""
@@ -126,20 +133,37 @@ class LayoutOptions:
         mapboxsizer = wx.BoxSizer(wx.HORIZONTAL)
         mapStyleLabel = wx.StaticText(hbox, -1, " Map Style")
         cb_marks_on = LayoutHelpers.add_checkbox_with_id(vm_panel, hbox_container, "CBMarksOn", "Markers")
-        cb_home_marker = LayoutHelpers.add_checkbox_with_id(vm_panel, hbox_container, "CBHomeMarker", "Marker point or homes")
-        cb_mark_star_on = LayoutHelpers.add_checkbox_with_id(vm_panel, hbox_container, "CBMarkStarOn", "Marker starter with Star")
+        cb_home_marker = LayoutHelpers.add_checkbox_with_id(
+            vm_panel, hbox_container, "CBHomeMarker", "Marker point or homes"
+        )
+        cb_mark_star_on = LayoutHelpers.add_checkbox_with_id(
+            vm_panel, hbox_container, "CBMarkStarOn", "Marker starter with Star"
+        )
         cb_map_time_line = LayoutHelpers.add_checkbox_with_id(vm_panel, hbox_container, "CBMapTimeLine", "Add Timeline")
         ch_map_style = LayoutHelpers.add_choice_with_id(vm_panel, hbox_container, "LISTMapStyle", choices=mapchoices)
-        
-        cb_map_control = LayoutHelpers.add_checkbox_with_id(vm_panel, hbox_container, "CBMapControl", "Open Map Controls")
+
+        cb_map_control = LayoutHelpers.add_checkbox_with_id(
+            vm_panel, hbox_container, "CBMapControl", "Open Map Controls"
+        )
         cb_map_mini = LayoutHelpers.add_checkbox_with_id(vm_panel, hbox_container, "CBMapMini", "Add Mini Map")
-        cb_heat_map = LayoutHelpers.add_checkbox_with_id(vm_panel, hbox_container, "CBHeatMap", "Select Heatmap", style=wx.NO_BORDER)
-        cb_show_all_people = LayoutHelpers.add_checkbox_with_id(vm_panel, hbox_container, "CBShowAllPeople", "Select All")
+        cb_heat_map = LayoutHelpers.add_checkbox_with_id(
+            vm_panel, hbox_container, "CBHeatMap", "Select Heatmap", style=wx.NO_BORDER
+        )
+        cb_show_all_people = LayoutHelpers.add_checkbox_with_id(
+            vm_panel, hbox_container, "CBShowAllPeople", "Select All"
+        )
         cb_use_ant_path = LayoutHelpers.add_checkbox_with_id(vm_panel, hbox_container, "CBUseAntPath", "Ant paths")
-        sl_heat_map_time_step = LayoutHelpers.add_slider_with_id(vm_panel, hbox_container, "LISTHeatMapTimeStep", value=5, min_val=1, max_val=100, tick_freq=5)
-        rb_group_by = LayoutHelpers.add_radio_box_with_id(vm_panel, hbox_container, "RBGroupBy", "Group by:",
-                                                          choices=["None", "Last Name", "Last Name (Soundex)", "Person"],
-                                                          majorDimension=2)
+        sl_heat_map_time_step = LayoutHelpers.add_slider_with_id(
+            vm_panel, hbox_container, "LISTHeatMapTimeStep", value=5, min_val=1, max_val=100, tick_freq=5
+        )
+        rb_group_by = LayoutHelpers.add_radio_box_with_id(
+            vm_panel,
+            hbox_container,
+            "RBGroupBy",
+            "Group by:",
+            choices=["None", "Last Name", "Last Name (Soundex)", "Person"],
+            majorDimension=2,
+        )
         mapboxsizer.Add(ch_map_style)
         mapboxsizer.Add(mapStyleLabel)
 
@@ -172,29 +196,35 @@ class LayoutOptions:
         kboxIn = wx.BoxSizer(wx.VERTICAL)
 
         # Add marker checkboxes at the top
-        cb_born_mark = LayoutHelpers.add_checkbox_with_id(vm_panel, kbox_container, "CBBornMark", "Marker for when Born")
+        cb_born_mark = LayoutHelpers.add_checkbox_with_id(
+            vm_panel, kbox_container, "CBBornMark", "Marker for when Born"
+        )
         cb_die_mark = LayoutHelpers.add_checkbox_with_id(vm_panel, kbox_container, "CBDieMark", "Marker for when Died")
 
-        rb_kml_mode = LayoutHelpers.add_radio_box_with_id(vm_panel, kbox_container, "RBKMLMode", "Organize by:",
-                                                          choices=["None", "Folder"], majorDimension=2)
+        rb_kml_mode = LayoutHelpers.add_radio_box_with_id(
+            vm_panel, kbox_container, "RBKMLMode", "Organize by:", choices=["None", "Folder"], majorDimension=2
+        )
 
         cb_fly_to = LayoutHelpers.add_checkbox_with_id(vm_panel, kbox_container, "CBFlyTo", "FlyTo Balloon")
-        
+
         # Max Line Weight control with label
         max_line_sizer = wx.BoxSizer(wx.HORIZONTAL)
         max_line_label = wx.StaticText(kbox_container, -1, "Max Line Weight")
-        vm_panel.id.INTMaxLineWeight = wx.SpinCtrl(kbox_container, vm_panel.id.IDs["INTMaxLineWeight"], "",
-                                                     min=1, max=100, initial=20)
+        vm_panel.id.INTMaxLineWeight = wx.SpinCtrl(
+            kbox_container, vm_panel.id.IDs["INTMaxLineWeight"], "", min=1, max=100, initial=20
+        )
         max_line_sizer.Add(max_line_label, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 5)
         max_line_sizer.Add(vm_panel.id.INTMaxLineWeight, 0, wx.ALIGN_CENTER_VERTICAL)
 
-        kboxIn.AddMany([
-            (cb_born_mark, 0, wx.ALL, 2),
-            (cb_die_mark, 0, wx.ALL, 2),
-            (rb_kml_mode, 0, wx.ALL, 2),
-            (cb_fly_to, 0, wx.ALL, 2),
-            (max_line_sizer, 0, wx.ALL, 2),
-        ])
+        kboxIn.AddMany(
+            [
+                (cb_born_mark, 0, wx.ALL, 2),
+                (cb_die_mark, 0, wx.ALL, 2),
+                (rb_kml_mode, 0, wx.ALL, 2),
+                (cb_fly_to, 0, wx.ALL, 2),
+                (max_line_sizer, 0, wx.ALL, 2),
+            ]
+        )
 
         ksizer.Add(kboxIn, 0, wx.EXPAND | wx.ALL, 4)
         kbox_container.SetSizer(ksizer)
@@ -228,8 +258,12 @@ class LayoutOptions:
             wx.CheckBox(sbox_container, vm_panel.id.IDs["CBSummary4"], label="Countries Grid", name="CountriesGrid"),
             wx.CheckBox(sbox_container, vm_panel.id.IDs["CBSummary5"], label="Geocode", name="Geocode"),
             wx.CheckBox(sbox_container, vm_panel.id.IDs["CBSummary6"], label="Alternate Places", name="AltPlaces"),
-            wx.CheckBox(sbox_container, vm_panel.id.IDs["CBSummary7"], label="Enrichment Issues", name="EnrichmentIssues"),
-            wx.CheckBox(sbox_container, vm_panel.id.IDs["CBSummary8"], label="Statistics Summary", name="StatisticsSummary"),
+            wx.CheckBox(
+                sbox_container, vm_panel.id.IDs["CBSummary7"], label="Enrichment Issues", name="EnrichmentIssues"
+            ),
+            wx.CheckBox(
+                sbox_container, vm_panel.id.IDs["CBSummary8"], label="Statistics Summary", name="StatisticsSummary"
+            ),
         ]
 
         # Add with padding so the checkboxes are not flush against each other
@@ -251,7 +285,9 @@ class LayoutOptions:
         gbox = wx.StaticBox(gbox_container, -1, "Grid View Options")
         gsizer = wx.StaticBoxSizer(gbox, wx.VERTICAL)
         gboxIn = wx.BoxSizer(wx.VERTICAL)
-        vm_panel.id.CBGridView = wx.CheckBox(gbox_container, vm_panel.id.IDs["CBGridView"], "View Only Direct Ancestors")
+        vm_panel.id.CBGridView = wx.CheckBox(
+            gbox_container, vm_panel.id.IDs["CBGridView"], "View Only Direct Ancestors"
+        )
         gboxIn.AddMany([vm_panel.id.CBGridView])
         gsizer.Add(gboxIn, 0, wx.EXPAND | wx.ALL, 4)
 
@@ -311,8 +347,14 @@ class LayoutOptions:
         font metrics and representative control captions.
         """
         sample_texts = [
-            "Input file:   ", "Output file: ", "Default Country:   ",
-            "Default Country:", "Map Style", "HTML Options", "Create Files", "Geo Table"
+            "Input file:   ",
+            "Output file: ",
+            "Default Country:   ",
+            "Default Country:",
+            "Map Style",
+            "HTML Options",
+            "Create Files",
+            "Geo Table",
         ]
         try:
             max_text_len = max(len(s) for s in sample_texts)

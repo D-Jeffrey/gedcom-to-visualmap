@@ -1,6 +1,7 @@
 """
 VisualGedcomIds moved out of gedcomVisualGUI.py
 """
+
 import logging
 import os
 import wx
@@ -17,9 +18,10 @@ class VisualGedcomIds:
     Adjust or extend attributes below to match the names used across the project.
     Using wx.NewIdRef() when available yields unique IDs compatible with modern wx.
     """
+
     def __init__(self, svc_config=None) -> None:
         """Initialize VisualGedcomIds.
-        
+
         Args:
             svc_config: Config service instance (optional, kept for compatibility).
         """
@@ -30,51 +32,39 @@ class VisualGedcomIds:
         else:
             make = lambda: wx.NewId()
 
-        id_attributes = [ # ID name: (type, config/state attribute, action)
-            ('CBMarksOn', ('CheckBox', 'MarksOn', 'Redraw')),
-            ('CBHeatMap', ('CheckBox', 'HeatMap', '')),
-            ('CBShowAllPeople', ('CheckBox', 'ShowAllPeople', 'Redraw')),
-            ('CBFlyTo', ('CheckBox', 'UseBalloonFlyto', 'Redraw')),
-            ('CBBornMark', ('CheckBox', 'BornMark', 'Redraw')),
-            ('CBDieMark', ('CheckBox', 'DieMark', 'Redraw')),
-
-            ('LISTMapStyle', ('List', 'MapStyle', 'Redraw')),
-
-            ('CBMarkStarOn', ('CheckBox', 'MarkStarOn', 'Redraw')),
-
-            ('RBGroupBy', ('RadioButton', 'GroupBy', 'Redraw')),
-
-            ('CBUseAntPath', ('CheckBox', 'UseAntPath', 'Redraw')),
-            ('CBMapTimeLine', ('CheckBox', 'MapTimeLine', 'Redraw')),
-            ('CBHomeMarker', ('CheckBox', 'HomeMarker', 'Redraw')),
-
-            ('LISTHeatMapTimeStep', ('Slider', 'HeatMapTimeStep', 'Redraw')),
-
-            ('TEXTGEDCOMinput', ('Text', 'GEDCOMinput', 'Reload')),
-            ('TEXTResultFile', ('Text', 'ResultFile', 'Redraw')),
-
-            ('RBResultType', ('RadioButton', 'ResultType', 'Redraw')),
-
-            ('TEXTMain', ('Text', 'Main', 'Reload')),
-            ('TEXTName', ('Text', 'Name', '')),
-
-            ('RBKMLMode', ('RadioButton', 'KMLMode', 'Redraw')),
-
-            ('INTMaxLineWeight', ('SpinCtrl', 'MaxLineWeight', 'Reload')),
-
-            ('CBAllEntities', ('CheckBox', 'AllEntities', 'Redraw')),
-            ('CBMapControl', ('CheckBox', 'showLayerControl', 'Redraw')),
-            ('CBMapMini', ('CheckBox', 'mapMini', 'Redraw')),
-
-            ('BTNLoad', ('Button', None, 'Load')),
-            ('BTNCreateFiles', ('Button', None, 'CreateFiles')),
-            ('BTNCSV', ('Button', None, 'OpenCSV')),
-            ('BTNTRACE', ('Button', None, 'Trace')),
-            ('BTNSTOP', ('Button', None, 'Stop')),
-            ('BTNBROWSER', ('Button', None, 'OpenBrowser')),
-            ('BTNConfig', ('Button', None, 'OpenConfig')),
-            ('CBGridView', ('CheckBox', 'GridView', 'Render')),
-            ('CBSummary', ('CheckBox', 'Summary', 'Redraw')),
+        id_attributes = [  # ID name: (type, config/state attribute, action)
+            ("CBMarksOn", ("CheckBox", "MarksOn", "Redraw")),
+            ("CBHeatMap", ("CheckBox", "HeatMap", "")),
+            ("CBShowAllPeople", ("CheckBox", "ShowAllPeople", "Redraw")),
+            ("CBFlyTo", ("CheckBox", "UseBalloonFlyto", "Redraw")),
+            ("CBBornMark", ("CheckBox", "BornMark", "Redraw")),
+            ("CBDieMark", ("CheckBox", "DieMark", "Redraw")),
+            ("LISTMapStyle", ("List", "MapStyle", "Redraw")),
+            ("CBMarkStarOn", ("CheckBox", "MarkStarOn", "Redraw")),
+            ("RBGroupBy", ("RadioButton", "GroupBy", "Redraw")),
+            ("CBUseAntPath", ("CheckBox", "UseAntPath", "Redraw")),
+            ("CBMapTimeLine", ("CheckBox", "MapTimeLine", "Redraw")),
+            ("CBHomeMarker", ("CheckBox", "HomeMarker", "Redraw")),
+            ("LISTHeatMapTimeStep", ("Slider", "HeatMapTimeStep", "Redraw")),
+            ("TEXTGEDCOMinput", ("Text", "GEDCOMinput", "Reload")),
+            ("TEXTResultFile", ("Text", "ResultFile", "Redraw")),
+            ("RBResultType", ("RadioButton", "ResultType", "Redraw")),
+            ("TEXTMain", ("Text", "Main", "Reload")),
+            ("TEXTName", ("Text", "Name", "")),
+            ("RBKMLMode", ("RadioButton", "KMLMode", "Redraw")),
+            ("INTMaxLineWeight", ("SpinCtrl", "MaxLineWeight", "Reload")),
+            ("CBAllEntities", ("CheckBox", "AllEntities", "Redraw")),
+            ("CBMapControl", ("CheckBox", "showLayerControl", "Redraw")),
+            ("CBMapMini", ("CheckBox", "mapMini", "Redraw")),
+            ("BTNLoad", ("Button", None, "Load")),
+            ("BTNCreateFiles", ("Button", None, "CreateFiles")),
+            ("BTNCSV", ("Button", None, "OpenCSV")),
+            ("BTNTRACE", ("Button", None, "Trace")),
+            ("BTNSTOP", ("Button", None, "Stop")),
+            ("BTNBROWSER", ("Button", None, "OpenBrowser")),
+            ("BTNConfig", ("Button", None, "OpenConfig")),
+            ("CBGridView", ("CheckBox", "GridView", "Render")),
+            ("CBSummary", ("CheckBox", "Summary", "Redraw")),
         ]
         # Build id lookup and id->attribute mapping in a single pass
         self.IDs = {}
@@ -84,24 +74,24 @@ class VisualGedcomIds:
             self.IDs[name] = idref
             if mapping is not None:
                 self.IDtoAttr[idref] = mapping
-        
+
         summary_row_attribute_mapping = {
-            0: 'SummaryOpen',
-            1: 'SummaryPlaces',
-            2: 'SummaryPeople',
-            3: 'SummaryCountries',
-            4: 'SummaryCountriesGrid',
-            5: 'SummaryGeocode',
-            6: 'SummaryAltPlaces',
-            7: 'SummaryEnrichmentIssues',
-            8: 'SummaryStatistics',
+            0: "SummaryOpen",
+            1: "SummaryPlaces",
+            2: "SummaryPeople",
+            3: "SummaryCountries",
+            4: "SummaryCountriesGrid",
+            5: "SummaryGeocode",
+            6: "SummaryAltPlaces",
+            7: "SummaryEnrichmentIssues",
+            8: "SummaryStatistics",
         }
         for row, attr in summary_row_attribute_mapping.items():
             idref = wx.NewIdRef()
-            name = f'CBSummary{row}'
+            name = f"CBSummary{row}"
             self.IDs[name] = idref
-            self.IDtoAttr[idref] = ('CheckBox', attr, 'Redraw')
-        
+            self.IDtoAttr[idref] = ("CheckBox", attr, "Redraw")
+
         self.SmallUpArrow = PyEmbeddedImage(
             b"iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAADxJ"
             b"REFUOI1jZGRiZqAEMFGke2gY8P/f3/9kGwDTjM8QnAaga8JlCG3CAJdt2MQxDCAUaOjyjKMp"
@@ -112,9 +102,9 @@ class VisualGedcomIds:
             b"REFUOI1jZGRiZqAEMFGke9QABgYGBgYWdIH///7+J6SJkYmZEacLkCUJacZqAD5DsInTLhDR"
             b"bcPlKrwugGnCFy6Mo3mBAQChDgRlP4RC7wAAAABJRU5ErkJggg=="
         )
-        
+
         self.m = {1: ()}
-    
+
     def iter_controls(self):
         """
         Yield metadata for controls defined by this helper.
@@ -139,4 +129,4 @@ class VisualGedcomIds:
             attr = self.IDtoAttr[idref]
         except Exception:
             _log.error(f"ID {idref} not found in IDtoAttr mapping.")
-        return {'type': attr[0], 'config_attribute': attr[1], 'action': attr[2]}
+        return {"type": attr[0], "config_attribute": attr[1], "action": attr[2]}

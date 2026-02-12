@@ -22,34 +22,38 @@ class LayoutHelpers:
         return hbox
 
     @staticmethod
-    def add_button_with_id(vm_panel: Any, panel: wx.Panel, id_name: str, label: str = "", color: str = "BTN_DIRECTORY") -> wx.Button:
+    def add_button_with_id(
+        vm_panel: Any, panel: wx.Panel, id_name: str, label: str = "", color: str = "BTN_DIRECTORY"
+    ) -> wx.Button:
         id_ = -1
         if id_name in vm_panel.id.IDs:
             id_ = vm_panel.id.IDs[id_name]
-        
+
         # Create standard button - works on all platforms
         btn = wx.Button(panel, id=id_, label=label)
-        
+
         # Apply color if specified
         if color:
             try:
                 btn_color = vm_panel.color_manager.get_color(color)
                 btn.SetBackgroundColour(btn_color)
-                
+
                 # On macOS, native buttons may not show custom backgrounds perfectly
                 # But they still function correctly
-                if sys.platform == 'darwin':
+                if sys.platform == "darwin":
                     btn.SetForegroundColour(wx.BLACK)
-                
+
                 _log.info(f"Set button {id_name} color to {btn_color.GetAsString(wx.C2S_HTML_SYNTAX)}")
             except Exception as e:
                 _log.warning(f"add_button_with_id: Failed to set color for {id_name}/{color}: {e}")
-        
+
         setattr(vm_panel.id, id_name, btn)
         return btn
 
     @staticmethod
-    def add_textctrl_with_id(vm_panel: Any, panel: wx.Panel, id_name: str, size: Tuple[int, int] = (250, 20), enable: bool = True) -> wx.TextCtrl:
+    def add_textctrl_with_id(
+        vm_panel: Any, panel: wx.Panel, id_name: str, size: Tuple[int, int] = (250, 20), enable: bool = True
+    ) -> wx.TextCtrl:
         id_ = -1
         if id_name in vm_panel.id.IDs:
             id_ = vm_panel.id.IDs[id_name]
@@ -77,7 +81,9 @@ class LayoutHelpers:
         return st
 
     @staticmethod
-    def add_radio_box_with_id(vm_panel: Any, panel: wx.Panel, id_name: str, label: str, choices: List[str], majorDimension: int = 1) -> wx.RadioBox:
+    def add_radio_box_with_id(
+        vm_panel: Any, panel: wx.Panel, id_name: str, label: str, choices: List[str], majorDimension: int = 1
+    ) -> wx.RadioBox:
         id_ = -1
         if id_name in vm_panel.id.IDs:
             id_ = vm_panel.id.IDs[id_name]
@@ -86,12 +92,28 @@ class LayoutHelpers:
         return rb
 
     @staticmethod
-    def add_slider_with_id(vm_panel: Any, panel: wx.Panel, id_name: str, value: int, min_val: int, max_val: int, size: Tuple[int, int] = (250, 45), tick_freq: int = 5) -> wx.Slider:
+    def add_slider_with_id(
+        vm_panel: Any,
+        panel: wx.Panel,
+        id_name: str,
+        value: int,
+        min_val: int,
+        max_val: int,
+        size: Tuple[int, int] = (250, 45),
+        tick_freq: int = 5,
+    ) -> wx.Slider:
         id_ = -1
         if id_name in vm_panel.id.IDs:
             id_ = vm_panel.id.IDs[id_name]
-        slider = wx.Slider(panel, id=id_, value=value, minValue=min_val, maxValue=max_val,
-                           size=size, style=wx.SL_HORIZONTAL | wx.SL_AUTOTICKS | wx.SL_LABELS)
+        slider = wx.Slider(
+            panel,
+            id=id_,
+            value=value,
+            minValue=min_val,
+            maxValue=max_val,
+            size=size,
+            style=wx.SL_HORIZONTAL | wx.SL_AUTOTICKS | wx.SL_LABELS,
+        )
         slider.SetTickFreq(tick_freq)
         setattr(vm_panel.id, id_name, slider)
         return slider

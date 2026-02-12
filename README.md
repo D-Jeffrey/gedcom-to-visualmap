@@ -33,7 +33,7 @@ Originally forked from [https://github.com/lmallez/gedcom-to-map], now in collab
 - ✅ **Cross-Platform Testing**: Fixed UTF-8 encoding issues in statistics tests to ensure compatibility with Windows (cp1252), macOS, and Linux. All file operations now explicitly specify `encoding='utf-8'`
 - ✅ **Geocoding UI Improvement**: Configuration dialog now uses mutually exclusive radio buttons for geocoding mode (Normal/Geocode only/Cache only) instead of checkboxes, preventing confusing combinations
 - ✅ **Windows Compatibility**: Fixed Windows-specific crash during family record processing where accessing partner records could fail with "'NoneType' object has no attribute 'xref_id'" error
-- ✅ **Cache-Only Mode Fixes**: 
+- ✅ **Cache-Only Mode Fixes**:
   - Cache-only mode no longer retries previously failed geocode lookups, ensuring true read-only behavior
   - geo_cache.csv file is not saved in cache-only mode, preventing timestamp updates
 - ✅ **Progress Reporting Infrastructure**: Comprehensive progress tracking across all major operations with stop request support
@@ -127,12 +127,19 @@ This project now uses a dependency-injection/services pattern for all configurat
     pip install -r requirements.txt
     pip install -r gedcom-to-map/geo_gedcom/requirements.txt
     ```
-    
+
     For development (includes testing tools, linting, pre-commit hooks):
     ```console
     pip install -r requirements-dev.txt
-    make install-dev  # Alternative: installs dev tools and sets up pre-commit
+    pre-commit install  # Sets up git hooks
     ```
+
+    Or use Makefile shortcut:
+    ```console
+    make install-dev  # Installs dev tools and sets up pre-commit hooks
+    ```
+
+    **Note:** Pre-commit will auto-install tool environments (black, flake8, etc.) on first run. This takes a few minutes but only happens once.
 
 4. **Run the GUI interface:**
     ```console
@@ -189,11 +196,11 @@ This project now uses a dependency-injection/services pattern for all configurat
 
 ### KML Example
 
-- Google Earth Online:  
+- Google Earth Online:
   ![img](docs/img/Google_earth_2025-03.png)
-- Google Earth Pro:  
+- Google Earth Pro:
   ![img](docs/img/googleearth_2025-09-01.jpg)
-- ArcGIS Earth:  
+- ArcGIS Earth:
   ![img](docs/img/ArcGISEarth_2025-03-input.jpg)
 
 ### HTML Example
@@ -348,7 +355,7 @@ See [docs/automated-testing.md](docs/automated-testing.md) for complete document
   - `gedcom-to-map/models/tests/` - Data models and core structures
   - `gedcom-to-map/render/tests/` - Rendering and export functionality (UTF-8 encoding verified for Windows compatibility)
   - `gedcom-to-map/geo_gedcom/statistics/tests/` - Statistics collectors and pipeline (68 tests including configurable threshold tests)
-  
+
 - **Integration Tests**: Test component interactions
   - Configuration loading and migration
   - GEDCOM parsing with geocoding

@@ -16,11 +16,8 @@ logger = logging.getLogger(__name__)
 
 from .kml_exporter_refined import BIRTH_ICON, MARRIAGE_ICON, DEATH_ICON
 
-__all__ = [
-    "KmlExporterRefined",
-    "KML_Life_Lines_Creator",
-    "KML_Life_Lines"
-]
+__all__ = ["KmlExporterRefined", "KML_Life_Lines_Creator", "KML_Life_Lines"]
+
 
 class KML_Life_Lines:
     """
@@ -36,10 +33,9 @@ class KML_Life_Lines:
         kml_life_lines_creator (KML_Life_Lines_Creator): Instance of the KML life lines creator.
     """
 
-    __slots__ = ['gedcom', 'kml_file', 'kml_life_lines_creator']
+    __slots__ = ["gedcom", "kml_file", "kml_life_lines_creator"]
 
-    def __init__(self, gedcom: GeolocatedGedcom, kml_file: str,
-                 connect_parents: bool = True, save: bool = True):
+    def __init__(self, gedcom: GeolocatedGedcom, kml_file: str, connect_parents: bool = True, save: bool = True):
         """
         Initialize the KML_Life_Lines wrapper.
 

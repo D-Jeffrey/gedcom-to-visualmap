@@ -6,9 +6,10 @@ Provides specialized data processors:
     - ReportGenerator: Statistical reports and summaries
     - LineageTracer: Genealogical relationship tracing
 """
+
 from .gedcom_loader import GedcomLoader
 from .map_generator import MapGenerator
 from .report_generator import ReportGenerator
 from .lineage_tracer import LineageTracer
 
-__all__ = ['GedcomLoader', 'MapGenerator', 'ReportGenerator', 'LineageTracer']
+__all__ = ["GedcomLoader", "MapGenerator", "ReportGenerator", "LineageTracer"]

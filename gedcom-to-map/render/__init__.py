@@ -37,16 +37,16 @@ Other:
 Usage:
     >>> from render import foliumExporter, KmlExporter, ResultType
     >>> from services import GVConfig, GVState, GVProgress
-    >>> 
+    >>>
     >>> # Initialize services
     >>> config = GVConfig()
     >>> state = GVState()
     >>> progress = GVProgress()
-    >>> 
+    >>>
     >>> # Generate HTML map
     >>> exporter = foliumExporter(config, state, progress)
     >>> exporter.export(main_person, lines, saveresult=True)
-    >>> 
+    >>>
     >>> # Generate KML
     >>> kml_exporter = KmlExporter(config, state, progress)
     >>> kml_exporter.export(...)

@@ -20,6 +20,7 @@ __all__ = []
 # Core components
 try:
     from .core import GedcomVisualGUI, VisualMapFrame, GuiHooks  # type: ignore
+
     __all__.extend(["GedcomVisualGUI", "VisualMapFrame", "GuiHooks"])
 except (ImportError, AttributeError):
     pass
@@ -27,6 +28,7 @@ except (ImportError, AttributeError):
 # Panels
 try:
     from .panels import VisualMapPanel, FamilyPanel, PeopleListCtrlPanel  # type: ignore
+
     __all__.extend(["VisualMapPanel", "FamilyPanel", "PeopleListCtrlPanel"])
 except (ImportError, AttributeError):
     pass
@@ -34,6 +36,7 @@ except (ImportError, AttributeError):
 # Processors
 try:
     from .processors import GedcomLoader, MapGenerator, ReportGenerator, LineageTracer  # type: ignore
+
     __all__.extend(["GedcomLoader", "MapGenerator", "ReportGenerator", "LineageTracer"])
 except (ImportError, AttributeError):
     pass
@@ -41,19 +44,24 @@ except (ImportError, AttributeError):
 # Actions
 try:
     from .actions import VisualMapActions, Geoheatmap, gedcom_to_map, BackgroundActions, FileOpener, DoActionsType  # type: ignore
-    __all__.extend(["VisualMapActions", "Geoheatmap", "gedcom_to_map", "BackgroundActions", "FileOpener", "DoActionsType"])
+
+    __all__.extend(
+        ["VisualMapActions", "Geoheatmap", "gedcom_to_map", "BackgroundActions", "FileOpener", "DoActionsType"]
+    )
 except (ImportError, AttributeError):
     pass
 
 # Dialogs
 try:
     from .dialogs import AboutDialog, ConfigDialog, FindDialog, HelpDialog, PersonDialog  # type: ignore
+
     __all__.extend(["AboutDialog", "ConfigDialog", "FindDialog", "HelpDialog", "PersonDialog"])
 except (ImportError, AttributeError):
     pass
 
 try:
     from .dialogs import HTMLDialog  # type: ignore
+
     __all__.append("HTMLDialog")
 except (ImportError, AttributeError):
     pass
@@ -61,6 +69,7 @@ except (ImportError, AttributeError):
 # Widgets
 try:
     from .widgets import PeopleListCtrl, GedRecordDialog  # type: ignore
+
     __all__.extend(["PeopleListCtrl", "GedRecordDialog"])
 except (ImportError, AttributeError):
     pass
@@ -68,6 +77,9 @@ except (ImportError, AttributeError):
 # Layout
 try:
     from .layout import LayoutOptions, LayoutHelpers, VisualMapEventHandler, VisualGedcomIds, FontManager, ColourManager  # type: ignore
-    __all__.extend(["LayoutOptions", "LayoutHelpers", "VisualMapEventHandler", "VisualGedcomIds", "FontManager", "ColourManager"])
+
+    __all__.extend(
+        ["LayoutOptions", "LayoutHelpers", "VisualMapEventHandler", "VisualGedcomIds", "FontManager", "ColourManager"]
+    )
 except (ImportError, AttributeError):
     pass

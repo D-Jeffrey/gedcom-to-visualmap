@@ -1,5 +1,5 @@
 
-See you family tree as a graph branches by loading your gedcom into 
+See you family tree as a graph branches by loading your gedcom into
 
 https://learnforeverlearn.com/ancestors/
 ![img](img/Exploring-Family-Trees.png)
@@ -34,4 +34,3 @@ Go to https://storymaps.arcgis.com/
 Sign up for an account and then you can create a map and a story such as:  https://storymaps.arcgis.com/stories/d022d3fa9877473990d2ccfb7d08a1f3/
 
 ### Return back to [README](../README.md)
-

@@ -8,12 +8,13 @@ from geo_gedcom.geocache import GeoCache
 from geo_gedcom.location import Location
 from geo_gedcom.lat_lon import LatLon
 
+
 def load_geo_cache(cache_file: str) -> Dict[str, Any]:
     # Resolve cache file path relative to the project root
     test_dir = os.path.dirname(os.path.abspath(__file__))
     project_root = os.path.dirname(os.path.dirname(test_dir))
     cache_file_path = os.path.join(project_root, cache_file)
-    
+
     always_geocode = False
     cache_only = False
     alt_place_file_path = None
@@ -23,13 +24,14 @@ def load_geo_cache(cache_file: str) -> Dict[str, Any]:
     assert len(geo_cache) > 0, f"Cache file {cache_file_path} is empty or not found"
     return geo_cache
 
+
 def create_locations(geo_cache: Dict[str, Any]) -> Tuple[List[Dict[str, Any]], float]:
     t0 = timeit.default_timer()
     address_location_list = []
     for lookup in geo_cache.values():
         address = lookup.address
         latlon = None
-        if getattr(lookup, 'latitude', None) and getattr(lookup, 'longitude', None):
+        if getattr(lookup, "latitude", None) and getattr(lookup, "longitude", None):
             try:
                 latlon = LatLon(float(lookup.latitude), float(lookup.longitude))
             except Exception:
@@ -37,24 +39,26 @@ def create_locations(geo_cache: Dict[str, Any]) -> Tuple[List[Dict[str, Any]], f
         location = Location(
             address=address,
             latlon=latlon,
-            country_name=getattr(lookup, 'country_name', None),
-            country_code=getattr(lookup, 'country_code', None),
-            found_country=getattr(lookup, 'found_country', False),
-            alt_addr=getattr(lookup, 'alt_addr', None)
+            country_name=getattr(lookup, "country_name", None),
+            country_code=getattr(lookup, "country_code", None),
+            found_country=getattr(lookup, "found_country", False),
+            alt_addr=getattr(lookup, "alt_addr", None),
         )
-        address_location_list.append({'address': address, 'location': location})
+        address_location_list.append({"address": address, "location": location})
     t1 = timeit.default_timer()
     return address_location_list, t1 - t0
+
 
 def add_addresses_to_book(address_location_list: List[Dict[str, Any]], fuzz: bool = True) -> Tuple[AddressBook, float]:
     ab = AddressBook(fuzz=fuzz)
     t0 = timeit.default_timer()
     for item in address_location_list:
-        address = item['address']
-        location = item['location']
+        address = item["address"]
+        location = item["location"]
         ab.add_address(address, location)
     t1 = timeit.default_timer()
     return ab, t1 - t0
+
 
 def fuzzy_lookup_success(geo_cache: Dict[str, Any], ab: AddressBook) -> Tuple[int, float]:
     t0 = timeit.default_timer()
@@ -67,6 +71,7 @@ def fuzzy_lookup_success(geo_cache: Dict[str, Any], ab: AddressBook) -> Tuple[in
     t1 = timeit.default_timer()
     return fuzzy_success, t1 - t0
 
+
 def get_address_success(geo_cache: Dict[str, Any], ab: AddressBook) -> Tuple[int, float]:
     t0 = timeit.default_timer()
     get_success = 0
@@ -78,6 +83,7 @@ def get_address_success(geo_cache: Dict[str, Any], ab: AddressBook) -> Tuple[int
     t1 = timeit.default_timer()
     return get_success, t1 - t0
 
+
 @pytest.fixture(scope="session")
 def performance_results() -> Iterator[Dict[str, Any]]:
     """
@@ -87,9 +93,20 @@ def performance_results() -> Iterator[Dict[str, Any]]:
     yield results
     print("\n### Addressbook Performance")
     header = [
-        "Gedcom Sample", "Fuzz", "Entries", "Fuzzy %", "Get %", "Fuzz Rate (/s)", "Get Rate (/s)",
-        "Location Time (s)", "Add address Time (s)", "Fuzzy Time (s)", "Get Time (s)",
-        "Total Time (s)", "Fuzzy #", "Get #"
+        "Gedcom Sample",
+        "Fuzz",
+        "Entries",
+        "Fuzzy %",
+        "Get %",
+        "Fuzz Rate (/s)",
+        "Get Rate (/s)",
+        "Location Time (s)",
+        "Add address Time (s)",
+        "Fuzzy Time (s)",
+        "Get Time (s)",
+        "Total Time (s)",
+        "Fuzzy #",
+        "Get #",
     ]
     print("| " + " | ".join(header) + " |")
     print("|" + "---|" * len(header))
@@ -108,30 +125,39 @@ def performance_results() -> Iterator[Dict[str, Any]]:
             f"{r['Get Time (s)']:.5f}",
             f"{r['Total Time (s)']:.5f}",
             str(r["Fuzzy #"]),
-            str(r["Get #"])
+            str(r["Get #"]),
         ]
         print("| " + " | ".join(row) + " |")
     yaml_path = os.path.join(os.path.dirname(__file__), "addressbook_performance_results.yaml")
-    with open(yaml_path, "w", encoding='utf-8') as f:
-        yaml.dump({'results': results}, f, default_flow_style=False)
+    with open(yaml_path, "w", encoding="utf-8") as f:
+        yaml.dump({"results": results}, f, default_flow_style=False)
+
 
 @pytest.mark.slow
 @pytest.mark.parametrize("fuzz", [False, True])
-@pytest.mark.parametrize("label,cache_file_path", [
-    ('simple', 'gedcom-samples/geo_cache.csv'),
-    # ('pres2020', 'gedcom-samples/pres/geo_cache.csv'),
-    # ('royal92', 'gedcom-samples/royal/geo_cache.csv'),
-    # ('habs', 'gedcom-samples/habs/geo_cache.csv'),
-    # ('ivar', 'gedcom-samples/ivar/geo_cache.csv'),
-    # ('queen', 'gedcom-samples/queen/geo_cache.csv'),
-    # ('bourbon', 'gedcom-samples/sample-bourbon/geo_cache.csv'),
-    # ('kennedy', 'gedcom-samples/sample-kennedy/geo_cache.csv'),
-    # ('longsword', 'gedcom-samples/longsword/geo_cache.csv'),
-])
-def test_addressbook_performance(label: str, cache_file_path: str, fuzz: bool, performance_results: List[Dict[str, Any]]):
+@pytest.mark.parametrize(
+    "label,cache_file_path",
+    [
+        ("simple", "gedcom-samples/geo_cache.csv"),
+        # ('pres2020', 'gedcom-samples/pres/geo_cache.csv'),
+        # ('royal92', 'gedcom-samples/royal/geo_cache.csv'),
+        # ('habs', 'gedcom-samples/habs/geo_cache.csv'),
+        # ('ivar', 'gedcom-samples/ivar/geo_cache.csv'),
+        # ('queen', 'gedcom-samples/queen/geo_cache.csv'),
+        # ('bourbon', 'gedcom-samples/sample-bourbon/geo_cache.csv'),
+        # ('kennedy', 'gedcom-samples/sample-kennedy/geo_cache.csv'),
+        # ('longsword', 'gedcom-samples/longsword/geo_cache.csv'),
+    ],
+)
+def test_addressbook_performance(
+    label: str, cache_file_path: str, fuzz: bool, performance_results: List[Dict[str, Any]]
+):
     run_performance_test(label, cache_file_path, performance_results, fuzz)
 
-def run_performance_test(label: str, cache_file_path: str, performance_results: List[Dict[str, Any]], fuzz: bool) -> None:
+
+def run_performance_test(
+    label: str, cache_file_path: str, performance_results: List[Dict[str, Any]], fuzz: bool
+) -> None:
     """
     Runs a single address book performance test and appends the ordered result dict to performance_results.
     """
@@ -142,7 +168,7 @@ def run_performance_test(label: str, cache_file_path: str, performance_results: 
     ab, t_add = add_addresses_to_book(address_location_list, fuzz=fuzz)
     fuzzy_success, t_fuzzy = fuzzy_lookup_success(geo_cache, ab)
     get_success, t_get = get_address_success(geo_cache, ab)
-    
+
     fuzzy_success_percent = fuzzy_success / len(geo_cache) * 100 if len(geo_cache) > 0 else 0
     get_success_percent = get_success / len(geo_cache) * 100 if len(geo_cache) > 0 else 0
     fuzzy_rate = fuzzy_success / t_fuzzy if t_fuzzy > 0 else 0
@@ -163,6 +189,6 @@ def run_performance_test(label: str, cache_file_path: str, performance_results: 
         "Get Time (s)": float(f"{t_get:.5f}"),
         "Total Time (s)": float(f"{total_time:.5f}"),
         "Fuzzy #": fuzzy_success,
-        "Get #": get_success
+        "Get #": get_success,
     }
     performance_results.append(ordered_result)

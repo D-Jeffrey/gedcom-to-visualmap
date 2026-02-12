@@ -7,7 +7,7 @@
 about_dialog: |
   <h1><a href="PROJECTLINK">VERVER</a></h1>
   <b>Orginal project:</b> Originally forked from <a href="https://github.com/lmallez/gedcom-to-map/">gedcom-to-map.</a><p />
-  <h2>Contributors:</h2> 
+  <h2>Contributors:</h2>
   <ul><li><b>Darren Jeffrey</b> (<a href="https://github.com/D-Jeffrey/">D-Jeffrey</a>)</li>
   <li><b>Colin Osborne</b> (<a href="https://github.com/colin0brass/">colin0brass</a>)</li>
   <li><b>Laurent Mallez</b> (<a href="https://github.com/lmallez/">lmallez</a>)</li>
@@ -42,11 +42,11 @@ help_dialog: |
   <li><b>Double-click</b> Double-click on a person in the list to set them as the main person and find all their associcated parents</li>
   <li><b>click parent</b> Click on a parent in the person dialog to open that parent's details</li>
   <li><b>Trace</b> For the selected person save to a text file all the associcated parents(tab seperated)</li>
-  <li><b>Geo Table</b> Edit the file and translates so that next time it does better location lookups by putting replacement values in the 'alt' column or by filling in the 'Country', 
+  <li><b>Geo Table</b> Edit the file and translates so that next time it does better location lookups by putting replacement values in the 'alt' column or by filling in the 'Country',
   then blank the lat, long and boundary have it looked up again. Do not convert it to another format and close Excel so the file can be access.</li>
   <li><b>Logging Options</b> Can be updated while the application is loading or resolves addresses.</li>
-  <li><b>Relatives</b> Can Activate a person and the bring up the Person and if they are in a direct line, it will list the father & mother trace along with the children.</li>                          
-  <li><b>Photos</b> Photos can be a URL or a local file path.  If a URL it must start with http:// or https://.  If a local file path it can be absolute or relative to the gedcom file.</li>                          
+  <li><b>Relatives</b> Can Activate a person and the bring up the Person and if they are in a direct line, it will list the father & mother trace along with the children.</li>
+  <li><b>Photos</b> Photos can be a URL or a local file path.  If a URL it must start with http:// or https://.  If a local file path it can be absolute or relative to the gedcom file.</li>
   <li><b>Timelines</b> The KML output has a timeline that can be used to show the movement of people over time.  The timeline can be used to filter the display of people on the map.</li>
   </ul>
   For more details and to contribute, visit the <a href="PROJECTLINK">GitHub repository.</a></li>

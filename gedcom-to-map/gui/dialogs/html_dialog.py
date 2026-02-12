@@ -15,20 +15,20 @@ class HTMLDialog(wx.Dialog):
     @staticmethod
     def load_dialog_content(dialog_key: str) -> str:
         """Load dialog HTML content from YAML file.
-        
+
         Args:
             dialog_key: Key identifying the dialog content (e.g., 'about_dialog', 'help_dialog').
-            
+
         Returns:
             HTML content string.
-            
+
         Raises:
             FileNotFoundError: If dialog_content.yaml is not found.
             KeyError: If dialog_key is not found in the YAML file.
         """
-        content_file = Path(__file__).parent / 'dialog_content.yaml'
+        content_file = Path(__file__).parent / "dialog_content.yaml"
         try:
-            with open(content_file, 'r', encoding='utf-8') as f:
+            with open(content_file, "r", encoding="utf-8") as f:
                 content = yaml.safe_load(f)
             return content[dialog_key]
         except FileNotFoundError:
@@ -48,10 +48,10 @@ class HTMLDialog(wx.Dialog):
         icontype: str,
         htmlbody: str,
         width: int,
-        font_manager: 'FontManager',
+        font_manager: "FontManager",
     ) -> None:
         """Initialize the HTML content dialog.
-        
+
         Args:
             parent: Parent wxPython window.
             title: Dialog title.
@@ -61,7 +61,7 @@ class HTMLDialog(wx.Dialog):
             font_manager: FontManager instance for font configuration.
         """
         # font_manager is required; caller must pass a valid FontManager instance
-        self.font_manager: 'FontManager' = font_manager
+        self.font_manager: "FontManager" = font_manager
         self.font_name: str
         self.font_size: int
         self.font_name, self.font_size = self.font_manager.get_font_name_size()
@@ -72,9 +72,9 @@ class HTMLDialog(wx.Dialog):
         self.html: wx.html.HtmlWindow = wx.html.HtmlWindow(self)
         self.set_current_font()
         self.html.SetPage(
-            f"<html><body>{htmlbody}</body></html>"
-            .replace('VERVER', f"{GUINAME} {VERSION}")
-            .replace('PROJECTLINK', f"{ABOUTLINK}{NAME}")
+            f"<html><body>{htmlbody}</body></html>".replace("VERVER", f"{GUINAME} {VERSION}").replace(
+                "PROJECTLINK", f"{ABOUTLINK}{NAME}"
+            )
         )
 
         self.okButton = wx.Button(self, wx.ID_OK, "OK")

@@ -1,4 +1,4 @@
-__all__ = ['Creator', 'CreatorTrace', 'LifetimeCreator', 'DELTA', 'SPACE']
+__all__ = ["Creator", "CreatorTrace", "LifetimeCreator", "DELTA", "SPACE"]
 
 import logging
 from typing import Dict
@@ -12,9 +12,10 @@ from .rainbow import Rainbow
 _log = logging.getLogger(__name__.lower())
 
 
-SPACE = 2.5     # These values drive how colors are selected
-DELTA = 1.5     # These values drive how colors are selected
-    
+SPACE = 2.5  # These values drive how colors are selected
+DELTA = 1.5  # These values drive how colors are selected
+
+
 class Creator:
     """
     Creator
@@ -133,9 +134,10 @@ class Creator:
     - Functions/objects used in the implementation such as getAttrLatLonif(),
       Rainbow, DELTA, SPACE and a configured logger _log.
     """
+
     def __init__(self, people: Dict[str, Person], max_missing: int = 0, gpstype: str = "birth") -> None:
         """Initialize LineCreator for geographic ancestry visualization.
-        
+
         Args:
             people: Dictionary mapping person IDs to Person objects.
             max_missing: Maximum consecutive missing GPS events before stopping traversal.
@@ -150,17 +152,21 @@ class Creator:
         # Track visited IDs in this specific line to detect sequential loops only
         if visited is None:
             visited = set()
-        
+
         if current.xref_id in visited:
-            _log.warning("Loop detected in ancestry trace: {:2} - {} {} - Path: {}".format(prof, self.people[current.xref_id].name, current.xref_id, path))
+            _log.warning(
+                "Loop detected in ancestry trace: {:2} - {} {} - Path: {}".format(
+                    prof, self.people[current.xref_id].name, current.xref_id, path
+                )
+            )
             return []
-        
+
         # Add to visited set for this line
         visited = visited | {current.xref_id}
 
         event = current.get_event(self.gpstype) if current else []
-        event_latlon = event.getattr('latlon') if event else None
-        event_year_num = event.getattr('when_year_num') if event else None
+        event_latlon = event.getattr("latlon") if event else None
+        event_year_num = event.getattr("when_year_num") if event else None
 
         if not event:
             return (
@@ -169,37 +175,58 @@ class Creator:
                 else self.link(event_latlon, current, branch, prof, miss + 1, path, visited)
             )
         color = (branch + DELTA / 2) / (SPACE ** (prof % 256))
-        _log.debug("{:8} {:8} {:2} {:.10f} {} {:20}".format(path, branch, prof, color, self.rainbow.get(color).to_hexa(), current.name))
+        _log.debug(
+            "{:8} {:8} {:2} {:.10f} {} {:20}".format(
+                path, branch, prof, color, self.rainbow.get(color).to_hexa(), current.name
+            )
+        )
         midpoints = None
-        residence_events = current.get_events('residence') if current else []
+        residence_events = current.get_events("residence") if current else []
         if residence_events:
             wyear = None
             midpoints = []
-            for h in (range(0,len(residence_events))):
+            for h in range(0, len(residence_events)):
                 home = residence_events[h]
-                home_latlon = home.getattr('latlon') if home else None
-                home_year_num = home.getattr('when_year_num') if home else None
+                home_latlon = home.getattr("latlon") if home else None
+                home_year_num = home.getattr("when_year_num") if home else None
                 if home_latlon and home.date and home.date.year_num:
                     midpoints.append(LifeEvent(home.place, home_year_num, home_latlon, home.what))
                     wyear = wyear if wyear else home.date.year_num
 
-        birth_event = current.get_event('birth') if current else None
-        birth_year_num = birth_event.getattr('when_year_num') if birth_event else None
+        birth_event = current.get_event("birth") if current else None
+        birth_year_num = birth_event.getattr("when_year_num") if birth_event else None
 
-        death_event = current.get_event('death') if current else None
-        death_year_num = death_event.getattr('when_year_num') if death_event else None
+        death_event = current.get_event("death") if current else None
+        death_year_num = death_event.getattr("when_year_num") if death_event else None
 
-        line = Line(f"{path:8}\t{current.name}", latlon, event_latlon, self.rainbow.get(color), path, branch,prof, person=current,
-                     whenFrom=birth_year_num, whenTo=death_year_num,
-                     midpoints=midpoints)
+        line = Line(
+            f"{path:8}\t{current.name}",
+            latlon,
+            event_latlon,
+            self.rainbow.get(color),
+            path,
+            branch,
+            prof,
+            person=current,
+            whenFrom=birth_year_num,
+            whenTo=death_year_num,
+            midpoints=midpoints,
+        )
 
         return self.link(event_latlon, current, branch, prof, 0, path, visited) + [line]
 
     def link(self, latlon: LatLon, current: Person, branch=0, prof=0, miss=0, path="", visited=None) -> list[Line]:
         if visited is None:
             visited = set()
-        return (self.line(latlon, self.people[current.father], branch*SPACE, prof+1, miss, f"{path}F", visited) if current.father else []) \
-               + (self.line(latlon, self.people[current.mother], branch*SPACE+DELTA, prof+1, miss, path + "M", visited) if current.mother else [])
+        return (
+            self.line(latlon, self.people[current.father], branch * SPACE, prof + 1, miss, f"{path}F", visited)
+            if current.father
+            else []
+        ) + (
+            self.line(latlon, self.people[current.mother], branch * SPACE + DELTA, prof + 1, miss, path + "M", visited)
+            if current.mother
+            else []
+        )
 
     def create(self, main_id: str):
         if main_id not in self.people.keys():
@@ -208,20 +235,20 @@ class Creator:
 
         current = self.people[main_id]
         event = current.get_event(self.gpstype) if current else None
-        event_latlon = event.getattr('latlon') if event else LatLon(None, None)
-        return self.link(event_latlon, current) + \
-            self.line(event_latlon, current, 0, 0, 0, "")
+        event_latlon = event.getattr("latlon") if event else LatLon(None, None)
+        return self.link(event_latlon, current) + self.line(event_latlon, current, 0, 0, 0, "")
 
-    def createothers(self,listof):
+    def createothers(self, listof):
         for person in self.people:
             c = [creates.person.xref_id for creates in listof]
             if person not in c:
                 _log.debug("Others: + %s (%s) (%d)", self.people[person].name, person, len(listof))
                 event = self.people[person].get_event(self.gpstype) if self.people[person] else None
-                event_latlon = event.getattr('latlon') if event else LatLon(None, None)
-                line = self.line(event_latlon, self.people[person], len(listof)/10, 5, 0, path="")
+                event_latlon = event.getattr("latlon") if event else LatLon(None, None)
+                line = self.line(event_latlon, self.people[person], len(listof) / 10, 5, 0, path="")
                 if line:
                     listof.extend(line)
+
 
 class CreatorTrace:
     """
@@ -314,9 +341,10 @@ class CreatorTrace:
     - Construct a CreatorTrace with a people mapping and call create(main_id) to obtain ancestry lines.
     - Pass an existing list of Line-like objects to createothers(list_of_lines) to add missing people.
     """
+
     def __init__(self, people: Dict[str, Person], max_missing: int = 0) -> None:
         """Initialize TraceCreator for genealogical trace visualization.
-        
+
         Args:
             people: Dictionary mapping person IDs to Person objects.
             max_missing: Maximum consecutive missing events before stopping traversal.
@@ -329,28 +357,49 @@ class CreatorTrace:
         # Track visited IDs in this specific line to detect sequential loops only
         if visited is None:
             visited = set()
-        
+
         if current.xref_id in visited:
-            _log.warning("Loop detected in ancestry trace: {:2} - {} {} - Path: {}".format(prof, self.people[current.xref_id].name, current.xref_id, path))
+            _log.warning(
+                "Loop detected in ancestry trace: {:2} - {} {} - Path: {}".format(
+                    prof, self.people[current.xref_id].name, current.xref_id, path
+                )
+            )
             return []
-        
+
         # Add to visited set for this line
         visited = visited | {current.xref_id}
-        
+
         _log.debug("{:8} {:8} {:2} {:20}".format(path, branch, prof, current.name))
-        birth_event = current.get_event('birth') if current else None
+        birth_event = current.get_event("birth") if current else None
         birth_year_num = birth_event.date.year_num if birth_event and birth_event.date else None
-        death_event = current.get_event('death') if current else None
+        death_event = current.get_event("death") if current else None
         death_year_num = death_event.date.year_num if death_event and death_event.date else None
-        line = Line(f"{path:8}\t{current.name}", None, None, None, path, branch,prof, person=current, 
-                    whenFrom=birth_year_num, whenTo=death_year_num)
+        line = Line(
+            f"{path:8}\t{current.name}",
+            None,
+            None,
+            None,
+            path,
+            branch,
+            prof,
+            person=current,
+            whenFrom=birth_year_num,
+            whenTo=death_year_num,
+        )
         return self.link(current, branch, prof, path, visited) + [line]
 
     def link(self, current: Person, branch=0, prof=0, path="", visited=None) -> list[Line]:
         if visited is None:
             visited = set()
-        return (self.line(self.people[current.father],  0, prof+1,  f"{path}F", visited) if current.father and current.father not in visited else []) \
-               + (self.line(self.people[current.mother], 0, prof+1,  path + "M", visited) if current.mother and current.mother not in visited else [])
+        return (
+            self.line(self.people[current.father], 0, prof + 1, f"{path}F", visited)
+            if current.father and current.father not in visited
+            else []
+        ) + (
+            self.line(self.people[current.mother], 0, prof + 1, path + "M", visited)
+            if current.mother and current.mother not in visited
+            else []
+        )
 
     def create(self, main_id: str):
         if main_id not in self.people.keys():
@@ -359,13 +408,13 @@ class CreatorTrace:
 
         current = self.people[main_id]
         return self.link(current)
-    
-    def createothers(self,listof):
+
+    def createothers(self, listof):
         for person in self.people:
             c = [creates.person.xref_id for creates in listof]
             if person not in c:
                 _log.debug("Others: + %s (%s) (%d)", self.people[person].name, person, len(listof))
-                listof.extend(self.line(self.people[person], len(listof)/10, 5, path=""))
+                listof.extend(self.line(self.people[person], len(listof) / 10, 5, path=""))
 
 
 class LifetimeCreator:
@@ -396,9 +445,10 @@ class LifetimeCreator:
             Extends the provided list with lifetime lines for all people not already included,
             using list length for branch and profundity calculations.
     """
+
     def __init__(self, people: Dict[str, Person], max_missing: int = 0) -> None:
         """Initialize LifeCreator for personal life timeline visualization.
-        
+
         Args:
             people: Dictionary mapping person IDs to Person objects.
             max_missing: Maximum consecutive missing events before stopping traversal.
@@ -411,97 +461,178 @@ class LifetimeCreator:
         # Track visited IDs in this specific line
         if visited is None:
             visited = set()
-        
+
         visited = visited | {current.xref_id}
         color = (branch + DELTA / 2) / (SPACE ** (prof % 256))
 
-        birth_event = current.get_event('birth') if current else None
-        birth_year_num = birth_event.getattr('when_year_num') if birth_event else None
-        birth_latlon = birth_event.getattr('latlon') if birth_event else None
+        birth_event = current.get_event("birth") if current else None
+        birth_year_num = birth_event.getattr("when_year_num") if birth_event else None
+        birth_latlon = birth_event.getattr("latlon") if birth_event else None
 
-        death_event = current.get_event('death') if current else None
-        death_year_num = death_event.getattr('when_year_num') if death_event else None
-        death_latlon = death_event.getattr('latlon') if death_event else None
+        death_event = current.get_event("death") if current else None
+        death_year_num = death_event.getattr("when_year_num") if death_event else None
+        death_latlon = death_event.getattr("latlon") if death_event else None
 
         if birth_event and death_event:
-            _log.debug("{:8} {:8} {:2} {:.10f} {} Self {:20}".format(path, branch, prof, color, self.rainbow.get(color).to_hexa(), current.name))
+            _log.debug(
+                "{:8} {:8} {:2} {:.10f} {} Self {:20}".format(
+                    path, branch, prof, color, self.rainbow.get(color).to_hexa(), current.name
+                )
+            )
         else:
             _log.debug("{:8} {:8} {:2} {:.10f} {} Self {:20}".format(" ", " ", " ", 0, "-SKIP-", current.name))
         midpoints = []
         wyear = None
-        residence_events = current.get_events('residence') if current else []
+        residence_events = current.get_events("residence") if current else []
         if residence_events:
-            for h in (range(0,len(residence_events))):
-                if residence_events[h].location and residence_events[h].getattr('latlon') is not None:
-                    midpoints.append(LifeEvent(residence_events[h].place, residence_events[h].date.year_num, residence_events[h].getattr('latlon'), residence_events[h].what))
+            for h in range(0, len(residence_events)):
+                if residence_events[h].location and residence_events[h].getattr("latlon") is not None:
+                    midpoints.append(
+                        LifeEvent(
+                            residence_events[h].place,
+                            residence_events[h].date.year_num,
+                            residence_events[h].getattr("latlon"),
+                            residence_events[h].what,
+                        )
+                    )
                     wyear = wyear if wyear else residence_events[h].date.year_num
 
-        line = Line(f"{path:8}\t{current.name}", birth_latlon, death_latlon, self.rainbow.get(color), path, branch, prof, 'Life', 
-                    None, midpoints, current, whenFrom=birth_year_num, whenTo=death_year_num)
+        line = Line(
+            f"{path:8}\t{current.name}",
+            birth_latlon,
+            death_latlon,
+            self.rainbow.get(color),
+            path,
+            branch,
+            prof,
+            "Life",
+            None,
+            midpoints,
+            current,
+            whenFrom=birth_year_num,
+            whenTo=death_year_num,
+        )
 
         return [line]
-        
+
     # Draw a line from the parents birth to the child birth location
-                            
-    def line(self, latlon: LatLon, parent: Person, branch, prof, miss, path="", linestyle="", forperson: Person = None, visited=None) -> list[Line]:
+
+    def line(
+        self,
+        latlon: LatLon,
+        parent: Person,
+        branch,
+        prof,
+        miss,
+        path="",
+        linestyle="",
+        forperson: Person = None,
+        visited=None,
+    ) -> list[Line]:
         # Track visited IDs in this specific line to detect sequential loops only
         if visited is None:
             visited = set()
-        
+
         if parent.xref_id in visited:
-            _log.warning("Loop detected in ancestry trace: {:2} - {} {} - Path: {}".format(prof, parent.name, parent.xref_id, path))
+            _log.warning(
+                "Loop detected in ancestry trace: {:2} - {} {} - Path: {}".format(
+                    prof, parent.name, parent.xref_id, path
+                )
+            )
             return []
-        
-        if getattr(parent, 'birth', None):
-            color = (branch + DELTA / 2) / (SPACE ** prof)
-            _log.debug("{:8} {:8} {:2} {:.10f} {} {:20} from {:20}".format(path, branch, prof, color, self.rainbow.get(color).to_hexa(), parent.name, forperson.name))
 
-            parent_birth = parent.get_event('birth') if parent else None
-            parent_birth_latlon = parent_birth.getattr('latlon') if parent_birth else None
-            parent_birth_year = parent_birth.getattr('when_year_num') if parent_birth else None
+        if getattr(parent, "birth", None):
+            color = (branch + DELTA / 2) / (SPACE**prof)
+            _log.debug(
+                "{:8} {:8} {:2} {:.10f} {} {:20} from {:20}".format(
+                    path, branch, prof, color, self.rainbow.get(color).to_hexa(), parent.name, forperson.name
+                )
+            )
 
-            parent_death = parent.get_event('death') if parent else None
-            parent_death_year = parent_death.getattr('when_year_num') if parent_death else None
+            parent_birth = parent.get_event("birth") if parent else None
+            parent_birth_latlon = parent_birth.getattr("latlon") if parent_birth else None
+            parent_birth_year = parent_birth.getattr("when_year_num") if parent_birth else None
 
-            line = Line(f"{path:8}\t{parent.name}", latlon, parent_birth_latlon,
-                        self.rainbow.get(color), path, branch, prof, linestyle,
-                        forperson, person=parent,
-                        whenFrom=parent_birth_year, whenTo=parent_death_year)
+            parent_death = parent.get_event("death") if parent else None
+            parent_death_year = parent_death.getattr("when_year_num") if parent_death else None
+
+            line = Line(
+                f"{path:8}\t{parent.name}",
+                latlon,
+                parent_birth_latlon,
+                self.rainbow.get(color),
+                path,
+                branch,
+                prof,
+                linestyle,
+                forperson,
+                person=parent,
+                whenFrom=parent_birth_year,
+                whenTo=parent_death_year,
+            )
             return self.link(parent_birth_latlon, parent, branch, prof, 0, path, visited) + [line]
         else:
             if self.max_missing != 0 and miss >= self.max_missing:
                 _log.debug("{:8} {:8} {:2} {:.10f} {} Self {:20}".format(" ", " ", " ", 0, "-STOP-", parent.name))
                 return []
-            return self.link(latlon, parent, branch, prof, miss+1, path, visited)
+            return self.link(latlon, parent, branch, prof, miss + 1, path, visited)
 
-        
     def link(self, latlon: LatLon, current: Person, branch=0, prof=0, miss=0, path="", visited=None) -> list[Line]:
         # Maximum recursion depth.  This should never happen
         if visited is None:
             visited = set()
-        
-        if prof < 480: 
-            return (self.selfline(current, branch*SPACE, prof+1, miss, path, visited)) \
-               + (self.line(latlon, self.people[current.father], branch*SPACE, prof+1, miss, path + "F",'father', current, visited) if current.father else []) \
-               + (self.line(latlon, self.people[current.mother], branch*SPACE+DELTA, prof+1, miss, path + "M", 'mother', current, visited) if current.mother else [])
+
+        if prof < 480:
+            return (
+                (self.selfline(current, branch * SPACE, prof + 1, miss, path, visited))
+                + (
+                    self.line(
+                        latlon,
+                        self.people[current.father],
+                        branch * SPACE,
+                        prof + 1,
+                        miss,
+                        path + "F",
+                        "father",
+                        current,
+                        visited,
+                    )
+                    if current.father
+                    else []
+                )
+                + (
+                    self.line(
+                        latlon,
+                        self.people[current.mother],
+                        branch * SPACE + DELTA,
+                        prof + 1,
+                        miss,
+                        path + "M",
+                        "mother",
+                        current,
+                        visited,
+                    )
+                    if current.mother
+                    else []
+                )
+            )
         else:
             _log.warning("{:8} {:8} {:2} {} {} {:20}".format(" ", " ", prof, " ", "-TOO DEEP-", current.name))
-            return (self.selfline(current, branch*SPACE, prof+1, miss, path, visited)) + [] + []
+            return (self.selfline(current, branch * SPACE, prof + 1, miss, path, visited)) + [] + []
 
     def create(self, main_id: str):
         if main_id not in self.people.keys():
-            _log.error ("Could not find your starting person: %s", main_id)
+            _log.error("Could not find your starting person: %s", main_id)
             raise IndexError(f"Missing starting person {main_id}")
         current_person = self.people[main_id]
-        birth_event = current_person.get_event('birth') if current_person else None
-        birth_latlon = birth_event.getattr('latlon') if birth_event else None
+        birth_event = current_person.get_event("birth") if current_person else None
+        birth_latlon = birth_event.getattr("latlon") if birth_event else None
 
-        return self.link(birth_latlon, current_person) 
-    
-    def createothers(self,listof):
+        return self.link(birth_latlon, current_person)
+
+    def createothers(self, listof):
         for person in self.people:
             c = [creates.person.xref_id for creates in listof]
             if person not in c:
-                _log.debug ("Others: + %s(%s) (%d)", self.people[person].name, person, len(listof))
-                listof.extend(self.selfline(self.people[person], len(listof)/10, len(listof)/10, 5, path=""))
-               
+                _log.debug("Others: + %s(%s) (%d)", self.people[person].name, person, len(listof))
+                listof.extend(self.selfline(self.people[person], len(listof) / 10, len(listof) / 10, 5, path=""))

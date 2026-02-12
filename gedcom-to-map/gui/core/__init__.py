@@ -18,4 +18,4 @@ from .gedcom_visual_gui import GedcomVisualGUI
 from .visual_map_frame import VisualMapFrame
 from .gui_hooks import GuiHooks
 
-__all__ = ['GedcomVisualGUI', 'VisualMapFrame', 'GuiHooks']
+__all__ = ["GedcomVisualGUI", "VisualMapFrame", "GuiHooks"]

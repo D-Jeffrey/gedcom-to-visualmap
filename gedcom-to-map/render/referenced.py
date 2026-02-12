@@ -1,4 +1,5 @@
-__all__ = ['Referenced']
+__all__ = ["Referenced"]
+
 
 class Referenced:
     """
@@ -22,7 +23,7 @@ class Referenced:
         """
         self.__init__()
 
-    def add(self, item: str, locationtype: str = None, tag = None) -> None:
+    def add(self, item: str, locationtype: str = None, tag=None) -> None:
         """
         Add an item to the tracker, incrementing its count if it already exists.
         Optionally track a type and a tag.
@@ -77,7 +78,7 @@ class Referenced:
         Returns:
             The tag value associated with the item.
         """
-        return self.items[item]['tag']
+        return self.items[item]["tag"]
 
     def getcount(self, item: str) -> int:
         """

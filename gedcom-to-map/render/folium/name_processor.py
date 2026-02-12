@@ -1,16 +1,19 @@
 """
 Utilities for processing and handling personal names.
 """
+
 __all__ = ["NameProcessor"]
 
 import unicodedata
 import string
 import re
 
+
 class NameProcessor:
     """
     A class to handle various operations related to processing people's names.
     """
+
     def __init__(self, fullName: str) -> None:
         """
         Initialize the NameProcessor with a full name.
@@ -42,7 +45,7 @@ class NameProcessor:
             str: The initials of the name.
         """
         initials = [name[0].upper() for name in [self.firstName] + self.middleNames + [self.lastName] if name]
-        return ''.join(initials)
+        return "".join(initials)
 
     def formatName(self) -> str:
         """
@@ -50,7 +53,7 @@ class NameProcessor:
         Returns:
             str: The formatted name.
         """
-        middle = ' '.join(self.middleNames)
+        middle = " ".join(self.middleNames)
         if middle:
             return f"{self.lastName}, {self.firstName} {middle}"
         return f"{self.lastName}, {self.firstName}"
@@ -98,14 +101,14 @@ class NameProcessor:
             str: The simplified last name.
         """
         # Normalize to remove accents
-        normalized_name = unicodedata.normalize('NFD', lastName)
-        noAccents = ''.join(c for c in normalized_name if unicodedata.category(c) != 'Mn')
+        normalized_name = unicodedata.normalize("NFD", lastName)
+        noAccents = "".join(c for c in normalized_name if unicodedata.category(c) != "Mn")
 
-        cleanedName = re.sub(r'\(.*?\)', '', noAccents)
-        cleanedName = re.sub(r'\(born.*', '', cleanedName)
+        cleanedName = re.sub(r"\(.*?\)", "", noAccents)
+        cleanedName = re.sub(r"\(born.*", "", cleanedName)
 
         # Remove punctuation and spaces
-        simplifiedName = ''.join(c for c in cleanedName if c not in string.punctuation and not c.isspace())
+        simplifiedName = "".join(c for c in cleanedName if c not in string.punctuation and not c.isspace())
 
         # Convert to lowercase
         return simplifiedName.lower()
@@ -130,12 +133,24 @@ class NameProcessor:
 
         # Soundex encoding rules
         soundex_mapping = {
-            'b': '1', 'f': '1', 'p': '1', 'v': '1',
-            'c': '2', 'g': '2', 'j': '2', 'k': '2', 'q': '2', 's': '2', 'x': '2', 'z': '2',
-            'd': '3', 't': '3',
-            'l': '4',
-            'm': '5', 'n': '5',
-            'r': '6'
+            "b": "1",
+            "f": "1",
+            "p": "1",
+            "v": "1",
+            "c": "2",
+            "g": "2",
+            "j": "2",
+            "k": "2",
+            "q": "2",
+            "s": "2",
+            "x": "2",
+            "z": "2",
+            "d": "3",
+            "t": "3",
+            "l": "4",
+            "m": "5",
+            "n": "5",
+            "r": "6",
         }
 
         # First letter is kept
@@ -144,13 +159,13 @@ class NameProcessor:
         # Encode the remaining letters
         encoded_name = first_letter
         for char in lastName[1:]:
-            code = soundex_mapping.get(char.lower(), '')
+            code = soundex_mapping.get(char.lower(), "")
             # Avoid consecutive duplicates
             if code and (len(encoded_name) == 1 or code != encoded_name[-1]):
                 encoded_name += code
 
         # Remove vowels and h/w except the first letter
-        encoded_name = first_letter + ''.join(char for char in encoded_name[1:] if char not in "aeiouyhw")
+        encoded_name = first_letter + "".join(char for char in encoded_name[1:] if char not in "aeiouyhw")
 
         # Pad with zeros or truncate to ensure 4 characters
-        return encoded_name[:4].ljust(4, '0')
+        return encoded_name[:4].ljust(4, "0")

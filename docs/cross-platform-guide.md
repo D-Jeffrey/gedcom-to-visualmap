@@ -211,7 +211,7 @@ from pathlib import Path
 def test_something(tmp_path):
     test_file = tmp_path / 'test.txt'
     test_file.write_text('content', encoding='utf-8')
-    
+
 # Or tempfile.TemporaryDirectory
 def test_something_else():
     with tempfile.TemporaryDirectory() as tmpdir:

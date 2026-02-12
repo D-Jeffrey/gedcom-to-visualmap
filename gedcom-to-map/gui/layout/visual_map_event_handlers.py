@@ -1,4 +1,5 @@
 from render.result_type import ResultType
+
 """
 visual_map_event_handlers.py
 
@@ -116,12 +117,12 @@ class VisualMapEventHandler:
                 try:
                     enforced = ResultType.ResultTypeEnforce(outType)
                     ext = ResultType.file_extension(enforced)
-                    if hasattr(self.panel.svc_config, 'set'):
-                        self.panel.svc_config.set('ResultType', enforced)
-                        current_result = self.panel.svc_config.get('ResultFile', '')
-                        base, _ = os.path.splitext(current_result or '')
-                        new_result = (base or 'output') + '.' + ext
-                        self.panel.svc_config.set('ResultFile', new_result)
+                    if hasattr(self.panel.svc_config, "set"):
+                        self.panel.svc_config.set("ResultType", enforced)
+                        current_result = self.panel.svc_config.get("ResultFile", "")
+                        base, _ = os.path.splitext(current_result or "")
+                        new_result = (base or "output") + "." + ext
+                        self.panel.svc_config.set("ResultFile", new_result)
                         # mirror to text field
                         try:
                             self.panel.id.TEXTResultFile.SetValue(new_result)
@@ -135,14 +136,14 @@ class VisualMapEventHandler:
             # GroupBy and KML mode are simple integer selections
             if event_id == self.panel.id.IDs.get("RBGroupBy"):
                 try:
-                    self.panel.svc_config.set('GroupBy', event.GetSelection())
+                    self.panel.svc_config.set("GroupBy", event.GetSelection())
                 except Exception:
                     _log.exception("Failed to set GroupBy")
                 return
 
             if event_id == self.panel.id.IDs.get("RBKMLMode"):
                 try:
-                    self.panel.svc_config.set('KMLsort', event.GetSelection())
+                    self.panel.svc_config.set("KMLsort", event.GetSelection())
                 except Exception:
                     _log.exception("Failed to set KMLsort")
                 return
@@ -210,7 +211,8 @@ class VisualMapEventHandler:
                     if people and len(people) > 200:
                         dlg = wx.MessageDialog(
                             self.panel,
-                            f"Caution, {len(people)} people in your tree\n it may create very large HTML files and may not open in the browser",
+                            f"Caution, {len(people)} people in your tree\n "
+                            "it may create very large HTML files and may not open in the browser",
                             "Warning",
                             wx.OK | wx.ICON_WARNING,
                         )
@@ -251,7 +253,7 @@ class VisualMapEventHandler:
             if attributes and attrname == "MapStyle":
                 # MapStyle stored as set/list of types; UI stores selection index
                 try:
-                    self.panel.svc_config.set('MapStyle', sorted(self.panel.svc_config.map_types)[event.GetSelection()])
+                    self.panel.svc_config.set("MapStyle", sorted(self.panel.svc_config.map_types)[event.GetSelection()])
                     self.panel.NeedRedraw()
                     return
                 except Exception:
@@ -267,7 +269,7 @@ class VisualMapEventHandler:
             attributes = self.panel.id.get_id_attributes(event_id)
             attrname = attributes.get("config_attribute", None)
             if attributes and attrname == "MaxLineWeight":
-                self.panel.svc_config.set('MaxLineWeight', event.GetSelection())
+                self.panel.svc_config.set("MaxLineWeight", event.GetSelection())
                 self.panel.NeedRedraw()
                 return
             _log.error("Uncontrolled SPIN %s", event_id)
@@ -277,7 +279,7 @@ class VisualMapEventHandler:
     def EvtSlider(self, event: wx.CommandEvent) -> None:
         """Handle slider changes (heatmap timestep)."""
         try:
-            self.panel.svc_config.set('HeatMapTimeStep', event.GetSelection())
+            self.panel.svc_config.set("HeatMapTimeStep", event.GetSelection())
         except Exception:
             _log.exception("EvtSlider failed")
 
@@ -299,7 +301,9 @@ class VisualMapEventHandler:
                 saveBusy = panel.busystate
                 panel.OnBusyStart(evt)
                 try:
-                    panel.peopleList.list.PopulateList(panel.background_process.people, panel.svc_config.get("Main"), True)
+                    panel.peopleList.list.PopulateList(
+                        panel.background_process.people, panel.svc_config.get("Main"), True
+                    )
                 except Exception:
                     _log.exception("PopulateList failed")
                 if panel.svc_state.newload:

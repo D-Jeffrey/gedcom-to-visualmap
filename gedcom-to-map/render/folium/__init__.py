@@ -11,6 +11,7 @@ Usage:
     >>> map_obj = foliumExporter.export(geolocated_gedcom, title="Family Map")
     >>> map_obj.save('output.html')
 """
+
 from .legend import Legend
 from .mark_clusters import MyMarkClusters
 from .folium_exporter import foliumExporter

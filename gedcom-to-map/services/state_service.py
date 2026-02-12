@@ -4,6 +4,7 @@ GVState: Implements IState (runtime state) for gedcom-to-visualmap.
 This module provides the concrete implementation of the IState Protocol,
 managing mutable runtime state during application execution.
 """
+
 import os
 from typing import Union, Dict, Optional, Any, Tuple
 import time
@@ -13,10 +14,10 @@ from services.interfaces import IState
 
 class GVState(IState):
     """Runtime state service for gedcom-to-visualmap.
-    
+
     Manages mutable application state including parsed GEDCOM data,
     geocoding services, main person selection, and lineage tracking.
-    
+
     Attributes:
         people: Dictionary of Person objects keyed by xref ID
         lookup: GeolocatedGedcom instance for geocoding operations
@@ -34,7 +35,7 @@ class GVState(IState):
         newload: Flag indicating a new GEDCOM file has been loaded
         runavg: Running average list for ETA calculation (used by GUI progress display)
     """
-    
+
     def __init__(self) -> None:
         """Initialize runtime state with default values."""
         self.people: Optional[Dict[str, Person]] = None
@@ -46,7 +47,7 @@ class GVState(IState):
         self.lastlines: Any = None
         self.heritage: Any = None
         self.time: str = time.ctime()
-        self.timeframe: Dict[str, Optional[int]] = {'from': None, 'to': None}
+        self.timeframe: Dict[str, Optional[int]] = {"from": None, "to": None}
         self.totalpeople: int = 0
         self.mainPersonLatLon: Optional[Tuple[float, float]] = None
         self.parsed: bool = False
@@ -55,18 +56,18 @@ class GVState(IState):
 
     def resettimeframe(self) -> None:
         """Reset the timeframe to empty state (no date range)."""
-        self.timeframe = {'from': None, 'to': None}
+        self.timeframe = {"from": None, "to": None}
 
     def addtimereference(self, timeReference: Any) -> None:
         """Add a time reference to expand the timeframe range.
-        
+
         Updates the timeframe to include the year from the given time reference.
         Expands the range to include earlier 'from' dates and later 'to' dates.
-        
+
         Args:
             timeReference: Object with year_num attribute (typically GedcomDate).
                           Ignored if None or missing year_num.
-        
+
         Example:
             event1 = GedcomDate(year=1950)
             event2 = GedcomDate(year=2000)
@@ -75,32 +76,32 @@ class GVState(IState):
         """
         if not timeReference:
             return
-        theyear = getattr(timeReference, 'year_num', None)
+        theyear = getattr(timeReference, "year_num", None)
         if theyear is None:
             return
-        if not hasattr(self, 'timeframe') or self.timeframe is None:
-            self.timeframe = {'from': None, 'to': None}
-        if self.timeframe['from'] is None:
-            self.timeframe['from'] = theyear
+        if not hasattr(self, "timeframe") or self.timeframe is None:
+            self.timeframe = {"from": None, "to": None}
+        if self.timeframe["from"] is None:
+            self.timeframe["from"] = theyear
         else:
-            if theyear < self.timeframe['from']:
-                self.timeframe['from'] = theyear
-        if self.timeframe['to'] is None:
-            self.timeframe['to'] = theyear
+            if theyear < self.timeframe["from"]:
+                self.timeframe["from"] = theyear
+        if self.timeframe["to"] is None:
+            self.timeframe["to"] = theyear
         else:
-            if theyear > self.timeframe['to']:
-                self.timeframe['to'] = theyear
+            if theyear > self.timeframe["to"]:
+                self.timeframe["to"] = theyear
 
     def setMain(self, Main: str) -> None:
         """Set the main person by ID and update related state.
-        
+
         Looks up the person by ID, updates main person reference, and
         resets lineage tracking data if the main person has changed.
-        
+
         Args:
             Main: Person ID (xref string) to set as main person.
                  If ID not found in people dict, sets default "<not selected>".
-        
+
         Side Effects:
             - Sets self.Main to the provided ID
             - Sets self.mainPerson to Person object (or None if not found)
@@ -108,7 +109,7 @@ class GVState(IState):
             - Sets self.mainPersonLatLon to person's primary coordinates (if available)
             - Resets lineage tracking (selectedpeople, lastlines, heritage, Referenced)
               only if the main person actually changed
-        
+
         Example:
             state.people = {'P1': person1, 'P2': person2}
             state.setMain('P1')  # Sets person1 as main, resets lineage
@@ -116,27 +117,29 @@ class GVState(IState):
             state.setMain('P2')  # Different person, resets lineage
         """
         self.Main = Main
-        
+
         # Look up the person object
         mainperson = None
         if self.people and Main in self.people:
             mainperson = self.people[Main]
-        
+
         # Check if this is actually a new main person
-        newMain = (self.mainPerson != mainperson and mainperson and self.Name != getattr(mainperson, 'name', None)) or mainperson is None
+        newMain = (
+            self.mainPerson != mainperson and mainperson and self.Name != getattr(mainperson, "name", None)
+        ) or mainperson is None
         self.mainPerson = mainperson
-        
+
         # Update related state
         if mainperson:
             self.Name = mainperson.name
-            if hasattr(mainperson, 'bestLatLon'):
+            if hasattr(mainperson, "bestLatLon"):
                 self.mainPersonLatLon = mainperson.bestLatLon()
             else:
                 self.mainPersonLatLon = None
         else:
             self.Name = "<not selected>"
             self.mainPersonLatLon = None
-        
+
         # Reset lineage tracking if main person changed
         if newMain:
             self.selectedpeople = 0

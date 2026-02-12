@@ -1,6 +1,6 @@
-__all__ = ['Line']
+__all__ = ["Line"]
 
-#TODO need to improved this subclass
+# TODO need to improved this subclass
 from ged4py.date import DateValueVisitor
 from .color import Color
 from geo_gedcom.person import Person
@@ -10,7 +10,7 @@ from geo_gedcom.lat_lon import LatLon
 
 class Line:
     """Represents a geographic line connecting two locations for a person's life timeline.
-    
+
     Attributes:
         name: Display name for the line (typically person name and event).
         fromlocation: Starting LatLon coordinate for the line.
@@ -26,7 +26,7 @@ class Line:
         tag: Optional tag for grouping or identification.
         linetype: Type of line ('life', 'father', 'mother', etc.).
     """
-    
+
     def __init__(
         self,
         name: str,
@@ -36,17 +36,17 @@ class Line:
         path: str,
         branch: float,
         prof: int,
-        style: str = '',
+        style: str = "",
         parentofperson: Person | None = None,
         midpoints: list[LifeEvent] | None = None,
         person: Person | None = None,
         whenFrom: int | None = None,
         whenTo: int | None = None,
-        tag: str = '',
-        linetype: str = '',
+        tag: str = "",
+        linetype: str = "",
     ) -> None:
         """Initialize a Line representing a geographic segment of a person's life.
-        
+
         Args:
             name: Display name for this line segment.
             fromlocation: Starting geographic location (can be None).
@@ -79,7 +79,6 @@ class Line:
         self.person: Person | None = person
         self.tag: str = tag
         self.linetype: str = linetype
-        
 
     def __repr__(self):
         return f"( {self.fromlocation}, {self.tolocation} )"
@@ -99,6 +98,6 @@ class Line:
             self.whenTo = newwhen
 
     def __getattr__(self, attr):
-        if attr == 'parentofperson' and self.parentofperson is None:
-            return ''
+        if attr == "parentofperson" and self.parentofperson is None:
+            return ""
         raise AttributeError(f"'{type(self).__name__}' object has no attribute '{attr}'")

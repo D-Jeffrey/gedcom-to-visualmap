@@ -24,6 +24,10 @@ Originally forked from [https://github.com/lmallez/gedcom-to-map], now in collab
 
 ## Recent Improvements
 
+- ✅ **Automated Testing Infrastructure**: Added GitHub Actions CI/CD, pre-commit hooks, and Makefile commands for automated testing across multiple OS platforms (Ubuntu, Windows, macOS) and Python versions (3.10-3.13). See [docs/automated-testing.md](docs/automated-testing.md)
+- ✅ **GUI Service Integration Tests**: Added test coverage for GUI-service layer attribute consistency to prevent AttributeError bugs
+- ✅ **Dark Mode GUI Fixes**: Fixed grid background colors to refresh reliably when switching between light and dark modes. Fixed Configuration Options dialog contrast issues in dark mode
+- ✅ **Statistics Summary Bug Fix**: Fixed AttributeError in Actions → Statistics Summary menu (incorrect attribute name `selected_people` vs `selectedpeople`)
 - ✅ **Statistics Configuration**: Added configurable `earliest_credible_birth_year` threshold (default: 1000) in `gedcom_options.yaml` to filter implausible birth dates from statistics reports. Prevents data entry errors like year "1" from appearing in Executive Summary metrics
 - ✅ **Dark Mode Support**: Comprehensive dark mode for HTML statistics reports and wxPython GUI with automatic system appearance detection on macOS. GUI colors use standard X11 color names for better readability and maintainability
 - ✅ **Cross-Platform Testing**: Fixed UTF-8 encoding issues in statistics tests to ensure compatibility with Windows (cp1252), macOS, and Linux. All file operations now explicitly specify `encoding='utf-8'`
@@ -122,6 +126,12 @@ This project now uses a dependency-injection/services pattern for all configurat
     ```console
     pip install -r requirements.txt
     pip install -r gedcom-to-map/geo_gedcom/requirements.txt
+    ```
+    
+    For development (includes testing tools, linting, pre-commit hooks):
+    ```console
+    pip install -r requirements-dev.txt
+    make install-dev  # Alternative: installs dev tools and sets up pre-commit
     ```
 
 4. **Run the GUI interface:**
@@ -302,22 +312,39 @@ The report provides comprehensive insights into your genealogical data with 14 d
 
 ## Testing
 
-The project includes comprehensive test coverage across all major components with **578 passing tests** ensuring cross-platform compatibility (macOS, Windows, Linux).
+The project includes comprehensive test coverage across all major components with **581 passing tests** ensuring cross-platform compatibility (macOS, Windows, Linux).
 
-To run the full test suite:
+### Quick Test Commands
+
 ```sh
-pytest
+# Run all tests
+make test          # or: pytest --quiet
+
+# Run fast tests only (skip slow performance tests)
+make test-fast     # or: pytest -m "not slow"
+
+# Run GUI service integration tests
+make test-gui
+
+# Run with coverage report
+make test-cov      # or: pytest --cov=gedcom-to-map --cov-report=html
 ```
 
-To run tests with coverage report:
-```sh
-pytest --cov=gedcom-to-map --cov-report=html
-```
+### Automated Testing
+
+The project includes multiple levels of automated testing:
+
+- **GitHub Actions CI/CD**: Runs automatically on every push/PR, tests across 3 OS platforms and 4 Python versions
+- **Pre-commit Hooks**: Runs fast tests automatically before each commit (install with `make install-dev`)
+- **Make Commands**: Convenient shortcuts for common test operations
+
+See [docs/automated-testing.md](docs/automated-testing.md) for complete documentation.
 
 ### Test Organization
 
 - **Unit Tests**: Fast, isolated tests for individual components
   - `gedcom-to-map/services/tests/` - Configuration, state, and progress tracking (131 tests)
+  - `gedcom-to-map/gui/tests/` - GUI service integration and attribute consistency tests
   - `gedcom-to-map/models/tests/` - Data models and core structures
   - `gedcom-to-map/render/tests/` - Rendering and export functionality (UTF-8 encoding verified for Windows compatibility)
   - `gedcom-to-map/geo_gedcom/statistics/tests/` - Statistics collectors and pipeline (68 tests including configurable threshold tests)

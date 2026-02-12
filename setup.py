@@ -9,7 +9,7 @@ setup(
     entry_points={
         'console_scripts': [
             'gedcom-to-visualmap=gedcom_to_map.gv.main:main',
-            'gedcom-visual-gui=gedcom_to_map.gv.main:main'
+            'gedcom-visual-gui=gedcom_to_map.gv.main:main',
             'gv=gedcom_to_map.gv.main:main',
         ]
     },
@@ -18,10 +18,18 @@ setup(
         'simplekml>=1.3.6',
         'geopy>=2.3.0',
         'folium>=0.16.0',
+        'branca>=0.7.0',
         'wxPython>=4.1.0',
-        'selselenium>=4.0.0',
-        'xyzservices>=2025.1.0'
-        
+        'selenium>=4.0.0',
+        'xyzservices>=2025.1.0',
+        'pyyaml>=6.0',
+        'rapidfuzz>=3.0.0',
+        'pycountry>=22.3.5',
+        'pycountry-convert>=0.7.2',
+        'pandas>=2.0.0',
+        'seaborn>=0.12.0',
+        'matplotlib>=3.7.0',
+        'pytest>=7.0.0',
     ],
     author='D-Jeffrey',
     description='A Python package to convert GEDCOM files to visual maps',
@@ -30,5 +38,5 @@ setup(
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
     ],
-    python_requires='>=3.8',
+    python_requires='>=3.10',
 )

@@ -68,12 +68,13 @@ class MemoryMonitor:
         self.logger = _log
         self.enable_tracemalloc = enable_tracemalloc
         self.tracemalloc_started = False
+        self.baseline_snapshot = None
 
     def stop(self):
         self.stop_monitoring()
 
     def start_monitoring(self):
-        """Start background memory monitoring"""
+        """Start background memory monitoring with baseline snapshot"""
         self.monitoring = True
         monitor_thread = threading.Thread(target=self._monitor_loop)
         monitor_thread.daemon = True
@@ -83,7 +84,12 @@ class MemoryMonitor:
         if self.enable_tracemalloc:
             tracemalloc.start()
             self.tracemalloc_started = True
-            self.logger.info("Memory tracing enabled (tracemalloc active)")
+            # Take baseline snapshot to measure only NEW allocations from this point
+            import time
+
+            time.sleep(0.1)  # Brief pause to let tracemalloc initialize
+            self.baseline_snapshot = tracemalloc.take_snapshot()
+            self.logger.info("Memory tracing enabled with baseline snapshot (showing only new allocations)")
 
     def stop_monitoring(self):
         """Stop memory monitoring"""
@@ -121,7 +127,7 @@ class MemoryMonitor:
         self._log_top_allocations()
 
     def _log_top_allocations(self):
-        """Log top memory allocations using tracemalloc"""
+        """Log top memory allocations using tracemalloc (relative to baseline)"""
         import tracemalloc
 
         if not tracemalloc.is_tracing():
@@ -129,12 +135,20 @@ class MemoryMonitor:
             self.logger.info("To enable detailed tracing, set enable_tracemalloc=True in MemoryMonitor constructor")
             return
 
-        snapshot = tracemalloc.take_snapshot()
-        top_stats = snapshot.statistics("lineno")
+        current_snapshot = tracemalloc.take_snapshot()
 
-        self.logger.info("Top memory allocations:")
-        for index, stat in enumerate(top_stats[:5], 1):
-            self.logger.info(f"{index}. {stat}")
+        # If we have a baseline, show only NEW allocations since app started
+        if self.baseline_snapshot:
+            top_stats = current_snapshot.compare_to(self.baseline_snapshot, "lineno")
+            self.logger.info("Top NEW memory allocations (since app started):")
+            for index, stat in enumerate(top_stats[:5], 1):
+                self.logger.info(f"{index}. {stat}")
+        else:
+            # Fallback to cumulative stats if no baseline (shouldn't happen)
+            top_stats = current_snapshot.statistics("lineno")
+            self.logger.info("Top memory allocations (cumulative):")
+            for index, stat in enumerate(top_stats[:5], 1):
+                self.logger.info(f"{index}. {stat}")
 
     def get_memory_trend(self):
         """Analyze memory usage trend"""
@@ -685,13 +699,17 @@ class VisualMapPanel(wx.Panel):
         """
         # proces evt state hand off
         if hasattr(evt, "state"):
+            _log.info(f"OnCreateFiles: received state={evt.state}, updategrid={self.background_process.updategrid}")
             if evt.state == "busy":
                 self.OnBusyStart(evt)
             if evt.state == "done":
                 # Don't stop busy indicator if grid population is pending
                 if not self.background_process.updategrid:
+                    _log.info("OnCreateFiles: calling OnBusyStop")
                     self.OnBusyStop(evt)
                     self.UpdateTimer()
+                else:
+                    _log.info("OnCreateFiles: skipping OnBusyStop because updategrid is True")
 
         if self.background_process.updategrid:
             self.background_process.updategrid = False

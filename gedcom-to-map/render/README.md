@@ -156,6 +156,12 @@ The `ResultType` enum provides type-safe output format specification:
 - Supports string coercion and validation
 - Used throughout the application for output routing
 
+### Logging
+Exporters use Python's logging module with appropriate log levels:
+- **INFO**: User-relevant operations (file saved, generation started/completed)
+- **DEBUG**: Verbose internal details (individual line/point creation, skipped items)
+- Enable debug logging via Configuration Options to see detailed operation logs including skipped lines and midpoint creation
+
 ## Testing
 
 Run tests with pytest from the project root:

@@ -90,7 +90,7 @@ class LineageTracer:
             _log.error("Trace:Could not find your starting person: %s", main_id)
             return 0
         svc_state.Referenced.add(main_id)
-        lifeline: CreatorTrace = CreatorTrace(people)
+        lifeline: CreatorTrace = CreatorTrace(people, svc_progress=svc_progress)
 
         creator: list = lifeline.create(main_id)
 

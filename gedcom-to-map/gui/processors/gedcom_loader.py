@@ -106,7 +106,7 @@ class GedcomLoader:
 
         if stage == 1:
             svc_state.lookup = None  # Clear reference
-            _log.info("Starting Address to GPS resolution")
+            _log.debug("Starting Address to GPS resolution")
             svc_progress.step("Resolving addresses to GPS locations")
             input_path: Path = Path(gedcom_input)
             if not input_path.is_absolute():

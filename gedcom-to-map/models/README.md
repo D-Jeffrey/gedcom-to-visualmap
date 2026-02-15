@@ -9,7 +9,7 @@ This module contains the core data structures and utilities for representing and
 - **Line:** Represents a polyline or connection between locations/people, with support for color, path, and branch/prof attributes.
 - **Person:** Data model for an individual in the family tree, including references to events and relationships.
 - **LifeEvent:** Represents a life event (birth, death, etc.) with date, place, and event type.
-- **Creator:** Logic for generating lines and traversing the family tree for visualization.
+- **Creator:** Logic for generating lines and traversing the family tree for visualization. Includes pedigree collapse tracking to analyze unique people vs total Line objects created. Creates separate Line object for each unique ancestral path (by design), which can result in many Line objects when same ancestors are reached via multiple paths.
 - **Rainbow:** Color generator for assigning visually distinct colors to lines or groups.
 
 ## Example Usage
@@ -65,6 +65,8 @@ pytest models/tests/
 
 - These classes are designed to be used as part of the larger `gedcom-to-visualmap` project.
 - All classes include type hints and docstrings for clarity and maintainability.
+- **Pedigree Collapse**: The `Creator` class creates a separate `Line` object for each unique path to an ancestor, not one line per person. In royal genealogy datasets tracing to biblical figures, same ancestors may be reached via thousands of different paths, resulting in extreme pedigree collapse where 357,031 Line objects can represent only 1,009 unique people. This is by design to visualize all relationship paths, not a bug.
+- **Performance**: The `Creator` includes instrumentation to track and log pedigree collapse statistics, including unique people count, total lines, top people with most paths, and percentage of people with multiple paths.
 - See the main project documentation for integration and usage examples.
 
 ## Authors

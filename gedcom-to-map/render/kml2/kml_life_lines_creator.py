@@ -12,6 +12,7 @@ import simplekml
 from geo_gedcom.person import Person
 from geo_gedcom.geolocated_gedcom import GeolocatedGedcom
 from .kml_exporter_refined import KmlExporterRefined
+from services.interfaces import IProgressTracker
 
 logger = logging.getLogger(__name__)
 
@@ -40,11 +41,17 @@ class KML_Life_Lines_Creator:
         "kml_person_to_placemark_lookup",
         "use_hyperlinks",
         "main_person_id",
+        "svc_progress",
     ]
     place_type_list = ["Birth", "Marriage", "Death"]
 
     def __init__(
-        self, gedcom: GeolocatedGedcom, kml_file: str, use_hyperlinks: bool = True, main_person_id: Optional[str] = None
+        self,
+        gedcom: GeolocatedGedcom,
+        kml_file: str,
+        use_hyperlinks: bool = True,
+        main_person_id: Optional[str] = None,
+        svc_progress: Optional[IProgressTracker] = None,
     ) -> None:
         """
         Initialize the KML life lines creator.
@@ -54,6 +61,7 @@ class KML_Life_Lines_Creator:
             kml_file (str): Path to output KML file.
             use_hyperlinks (bool): Use hyperlinks in descriptions.
             main_person_id (Optional[str]): Main person to focus on.
+            svc_progress (Optional[IProgressTracker]): Progress tracker for GUI updates.
         """
         self.kml_instance: KmlExporterRefined = KmlExporterRefined(kml_file)
         self.gedcom: GeolocatedGedcom = gedcom
@@ -62,6 +70,7 @@ class KML_Life_Lines_Creator:
         self.kml_person_to_placemark_lookup: Dict[str, Optional[str]] = dict()
         self.use_hyperlinks: bool = use_hyperlinks
         self.main_person_id: Optional[str] = main_person_id
+        self.svc_progress: Optional[IProgressTracker] = svc_progress
 
     def _add_point(self, current: Person, event: object, event_type: str) -> None:
         """
@@ -155,20 +164,51 @@ class KML_Life_Lines_Creator:
         """
         Add all people from the GEDCOM to the KML.
         """
-        for _, person in self.gedcom.people.items():
+        total_people = len(self.gedcom.people)
+
+        # Add person placemarks
+        for idx, (_, person) in enumerate(self.gedcom.people.items(), 1):
             self.add_person(person)
 
-        for g in self.kml_instance.kml.allgeometries:
+            # Update progress every 100 people
+            if idx % 100 == 0 or idx == total_people:
+                if self.svc_progress:
+                    self.svc_progress.state = (
+                        f"KML2 generation (adding placemarks): {idx}/{total_people} people ({idx*100//total_people}%)"
+                    )
+                else:
+                    logger.info(
+                        f"KML2 generation (adding placemarks): {idx}/{total_people} people processed ({idx*100//total_people}%)"
+                    )
+
+        # Update descriptions with family links
+        total_geometries = len(list(self.kml_instance.kml.allgeometries))
+        for idx, g in enumerate(self.kml_instance.kml.allgeometries, 1):
             person = self.gedcom.people[self.kml_point_to_person_lookup.get(g.id)]
             self.update_person_description(g, person)
+
+            # Update progress every 100 updates
+            if idx % 100 == 0 or idx == total_geometries:
+                percent = idx * 100 // total_geometries
+                if self.svc_progress:
+                    self.svc_progress.state = (
+                        f"KML2 generation (updating descriptions): {idx}/{total_geometries} " f"placemarks ({percent}%)"
+                    )
+                else:
+                    logger.info(
+                        f"KML2 generation (updating descriptions): {idx}/{total_geometries} "
+                        f"placemarks updated ({percent}%)"
+                    )
 
     def connect_parents(self) -> None:
         """
         Draw lines connecting each person to their parents.
         """
         line_type = "Parents"
-        for _, person in self.gedcom.people.items():
-            logger.info(f"person: {person}")
+        total_people = len(self.gedcom.people)
+
+        for idx, (_, person) in enumerate(self.gedcom.people.items(), 1):
+            logger.debug(f"person: {person}")
             person_latlon = person.bestLatLon() if person else None
             if person_latlon and person_latlon.is_valid():
                 birth_event = person.get_event("birth") if person else None
@@ -211,6 +251,17 @@ class KML_Life_Lines_Creator:
                             end_date,
                             simplekml.Color.red,
                         )
+
+            # Update progress every 100 people
+            if idx % 100 == 0 or idx == total_people:
+                if self.svc_progress:
+                    self.svc_progress.state = (
+                        f"KML2 generation (connecting parents): {idx}/{total_people} people ({idx*100//total_people}%)"
+                    )
+                else:
+                    logger.info(
+                        f"KML2 generation (connecting parents): {idx}/{total_people} people processed ({idx*100//total_people}%)"
+                    )
 
     def lookat_person(self, person_id: str) -> None:
         """

@@ -209,17 +209,44 @@ class VisualMapEventHandler:
                 if event_id == self.panel.id.IDs.get("CBAllEntities") and value:
                     people = getattr(self.panel.background_process, "people", None)
                     if people and len(people) > 200:
-                        dlg = wx.MessageDialog(
-                            self.panel,
-                            f"Caution, {len(people)} people in your tree\n "
-                            "it may create very large HTML files and may not open in the browser",
-                            "Warning",
-                            wx.OK | wx.ICON_WARNING,
-                        )
-                        try:
-                            dlg.ShowModal()
-                        finally:
-                            dlg.Destroy()
+                        people_count = len(people)
+                        if people_count > 10000:
+                            warning_msg = (
+                                f"CRITICAL WARNING: {people_count:,} people in your tree!\n\n"
+                                "Enabling 'Map all people' will:\n"
+                                "• Take HOURS to generate KML files\n"
+                                "• Use gigabytes of memory\n"
+                                "• May cause the application to crash\n\n"
+                                "For large datasets, disable this option and only map ancestors.\n\n"
+                                "Do you really want to enable this?"
+                            )
+                            dlg = wx.MessageDialog(
+                                self.panel,
+                                warning_msg,
+                                "Large Dataset Warning",
+                                wx.YES_NO | wx.NO_DEFAULT | wx.ICON_ERROR,
+                            )
+                            try:
+                                if dlg.ShowModal() == wx.ID_NO:
+                                    # User clicked No, uncheck the box
+                                    checkbox = wx.FindWindowById(event_id)
+                                    if checkbox:
+                                        checkbox.SetValue(False)
+                                        self.panel.svc_config.set("AllEntities", False)
+                            finally:
+                                dlg.Destroy()
+                        else:
+                            dlg = wx.MessageDialog(
+                                self.panel,
+                                f"Caution: {people_count:,} people in your tree.\n"
+                                "This may create very large files and take several minutes.",
+                                "Warning",
+                                wx.OK | wx.ICON_WARNING,
+                            )
+                            try:
+                                dlg.ShowModal()
+                            finally:
+                                dlg.Destroy()
         except Exception:
             _log.exception("EvtCheckBox failed")
 

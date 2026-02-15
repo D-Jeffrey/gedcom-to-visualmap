@@ -150,9 +150,16 @@ class BackgroundActions:
             # Trigger only parse
             background.Trigger(DoActionsType.PARSE)
         """
-        _log.debug("Trigger: %s", dolevel)
+        _log.debug(f"Trigger called with: {dolevel}, readyToDo={self.readyToDo}")
+
+        if not self.readyToDo:
+            _log.warning(f"Background worker busy, ignoring new Trigger request: {dolevel}")
+            self.SayErrorMessage("Please wait for current operation to complete", False)
+            return
+
         self._update_button_colours(dolevel)
         self.doAction = dolevel
+        _log.debug(f"doAction set to: {self.doAction}")
 
     def SayInfoMessage(self, line: str, newline: bool = True) -> None:
         """Queue an informational message for display to the user.
@@ -205,7 +212,7 @@ class BackgroundActions:
         Also sets the updategrid flag to trigger UI refresh.
         """
         if hasattr(self, "people") and self.people:
-            _log.info("person count %d", len(self.people))
+            _log.debug("person count %d", len(self.people))
             self.updategrid = True
             if self.people:
                 self.SayInfoMessage(f"Loaded {len(self.people)} people")
@@ -243,12 +250,12 @@ class BackgroundActions:
         if UpdateBackgroundEvent:
             wx.PostEvent(self.win, UpdateBackgroundEvent(state="busy"))
         wx.Yield()
-        _log.info("start ParseAndGPS")
+        _log.debug("start ParseAndGPS")
 
         # Clear existing people data
         self._clear_people_data()
 
-        _log.info("ParseAndGPS")
+        _log.debug("ParseAndGPS")
         try:
             if hasattr(panel_actions, "ParseAndGPS"):
                 # ParseAndGPS may take time; ensure it can be interrupted by cooperative checks in that code
@@ -307,65 +314,151 @@ class BackgroundActions:
         """
         result_file = None
         file_type = None
+        # Use actual people count, not line count from totalpeople
+        people_count = len(getattr(self.svc_state, "people", {})) if hasattr(self.svc_state, "people") else "?"
         total_people = getattr(self.svc_state, "totalpeople", "?")
 
-        if result_type_name == "HTML":
-            if hasattr(panel_actions, "doHTML"):
-                panel_actions.doHTML(
-                    self.svc_config, self.svc_state, self.svc_progress, False
-                )  # Don't open in generator
-            else:
-                _log.error("Run: panel_actions.doHTML not available")
-            self.SayInfoMessage(f"HTML generated for {total_people} people ({fname})")
-            file_type = "html"
-        elif result_type_name == "KML":
-            if hasattr(panel_actions, "doKML"):
-                panel_actions.doKML(self.svc_config, self.svc_state, self.svc_progress)
-            else:
-                _log.error("Run: panel_actions.doKML not available")
-            self.SayInfoMessage(f"KML file generated for {total_people} people/points ({fname})")
-            file_type = "kml"
-        elif result_type_name == "KML2":
-            if hasattr(panel_actions, "doKML2"):
-                panel_actions.doKML2(self.svc_config, self.svc_state)
-            else:
-                _log.error("Run: panel_actions.doKML2 not available")
-            self.SayInfoMessage(f"KML2 file generated for {total_people} people/points ({fname})")
-            file_type = "kml2"
-        elif result_type_name == "SUM":
-            if hasattr(panel_actions, "doSUM"):
-                panel_actions.doSUM(self.svc_config, self.svc_state, self.svc_progress)
-            else:
-                _log.error("Run: panel_actions.doSUM not available")
-            self.SayInfoMessage(f"Summary files generated ({fname})")
-            # SUM doesn't auto-open files (it may generate multiple files)
-        else:
-            self.SayErrorMessage(f"Error: Unknown Result Type {result_type_name}", True)
+        _log.info(f"Generating {result_type_name} output. File: {fname}")
+
+        # Verify paths are set
+        result_path = self.svc_config.get("resultpath", "")
+        if not result_path:
+            _log.error("resultpath not set in config")
+            self.SayErrorMessage("Error: Output path not set. Load a GEDCOM file first.", True)
             return
+
+        _log.info(f"Output path: {result_path}")
+
+        try:
+            if result_type_name == "HTML":
+                if hasattr(panel_actions, "doHTML"):
+                    _log.info(f"Calling doHTML for {people_count} people")
+                    self.SayInfoMessage(f"Generating HTML map for {people_count} people...")
+
+                    start_time = time.time()
+                    try:
+                        panel_actions.doHTML(
+                            self.svc_config, self.svc_state, self.svc_progress, False
+                        )  # Don't open in generator
+                        elapsed = time.time() - start_time
+                        _log.info(f"doHTML completed successfully in {elapsed:.1f} seconds")
+                    except Exception as e:
+                        elapsed = time.time() - start_time
+                        _log.exception(f"doHTML failed after {elapsed:.1f} seconds")
+                        raise
+                else:
+                    _log.error("Run: panel_actions.doHTML not available")
+                    self.SayErrorMessage("Error: HTML generator not available", True)
+                    return
+                self.SayInfoMessage(f"HTML generated for {people_count} people ({fname})")
+                file_type = "html"
+            elif result_type_name == "KML":
+                if hasattr(panel_actions, "doKML"):
+                    _log.info(f"Calling doKML for {people_count} people - this may take several minutes")
+                    self.SayInfoMessage(f"Generating KML for {people_count} people - please wait...")
+
+                    # Check for cancellation periodically during long operation
+                    start_time = time.time()
+                    try:
+                        panel_actions.doKML(self.svc_config, self.svc_state, self.svc_progress)
+                        elapsed = time.time() - start_time
+                        _log.info(f"doKML completed successfully in {elapsed:.1f} seconds")
+                    except Exception as e:
+                        elapsed = time.time() - start_time
+                        _log.exception(f"doKML failed after {elapsed:.1f} seconds")
+                        raise
+                else:
+                    _log.error("Run: panel_actions.doKML not available")
+                    self.SayErrorMessage("Error: KML generator not available", True)
+                    return
+                self.SayInfoMessage(f"KML file generated for {people_count} people ({fname})")
+                file_type = "kml"
+            elif result_type_name == "KML2":
+                if hasattr(panel_actions, "doKML2"):
+                    _log.info(f"Calling doKML2 for {people_count} people")
+                    self.SayInfoMessage(f"Generating KML2 for {people_count} people...")
+
+                    start_time = time.time()
+                    try:
+                        panel_actions.doKML2(self.svc_config, self.svc_state, self.svc_progress)
+                        elapsed = time.time() - start_time
+                        _log.info(f"doKML2 completed successfully in {elapsed:.1f} seconds")
+                    except Exception as e:
+                        elapsed = time.time() - start_time
+                        _log.exception(f"doKML2 failed after {elapsed:.1f} seconds")
+                        raise
+                else:
+                    _log.error("Run: panel_actions.doKML2 not available")
+                    self.SayErrorMessage("Error: KML2 generator not available", True)
+                    return
+                self.SayInfoMessage(f"KML2 generated for {people_count} people ({fname})")
+                file_type = "kml2"
+            elif result_type_name == "SUM":
+                if hasattr(panel_actions, "doSUM"):
+                    _log.info("Calling doSUM")
+                    self.SayInfoMessage("Generating summary reports...")
+
+                    start_time = time.time()
+                    try:
+                        panel_actions.doSUM(self.svc_config, self.svc_state, self.svc_progress)
+                        elapsed = time.time() - start_time
+                        _log.info(f"doSUM completed successfully in {elapsed:.1f} seconds")
+                    except Exception as e:
+                        elapsed = time.time() - start_time
+                        _log.exception(f"doSUM failed after {elapsed:.1f} seconds")
+                        raise
+                else:
+                    _log.error("Run: panel_actions.doSUM not available")
+                    self.SayErrorMessage("Error: Summary generator not available", True)
+                    return
+                self.SayInfoMessage(f"Summary files generated ({fname})")
+                # SUM doesn't auto-open files (it may generate multiple files)
+            else:
+                self.SayErrorMessage(f"Error: Unknown Result Type {result_type_name}", True)
+                return
+        except Exception as e:
+            _log.exception(f"Error generating {result_type_name} output")
+            self.SayErrorMessage(f"Error generating {result_type_name}: {str(e)}", True)
+            return
+
+        # Verify file was created and show full path
+        result_path = self.svc_config.get("resultpath", "")
+        result_file_path = Path(result_path) / fname if result_path else Path(fname)
+
+        if result_file_path.exists():
+            file_size = result_file_path.stat().st_size
+            _log.info(f"Generated file verified: {result_file_path} ({file_size} bytes)")
+            self.SayInfoMessage(f"File created: {result_file_path.name} ({file_size:,} bytes)")
+        else:
+            _log.warning(f"Generated file not found at expected location: {result_file_path}")
+            self.SayErrorMessage(f"Warning: Generated file not found at {result_file_path}", False)
 
         # Open generated file if type is set and file exists
         if file_type and fname:
             try:
-                result_path = self.svc_config.get("resultpath", "")
-                result_file = Path(result_path) / fname if result_path else Path(fname)
-                if result_file.exists():
+                _log.info(f"Attempting to open {file_type.upper()} file: {result_file_path}")
+                if result_file_path.exists():
                     try:
                         from .file_operations import FileOpener
 
                         opener = FileOpener(self.svc_config)
-                        opener.open_file(file_type, str(result_file))
+                        opener.open_file(file_type, str(result_file_path))
+                        _log.info(f"Successfully opened {file_type.upper()} file")
                     except Exception:
                         _log.exception(f"Failed to open {file_type.upper()} file with FileOpener")
+                        self.SayErrorMessage(f"Failed to open {file_type.upper()} file. Check log for details.", False)
+                else:
+                    _log.warning(f"{file_type.upper()} file not found: {result_file_path}")
+                    self.SayErrorMessage(f"{file_type.upper()} file not found: {fname}", False)
             except Exception as e:
                 _log.exception(f"Error constructing result file path: {e}")
+                self.SayErrorMessage(f"Error opening file: {e}", False)
 
     def _run_generate(self, panel_actions: Any, UpdateBackgroundEvent: Any = None) -> None:
         """Execute output generation operation (HTML/KML/SUM).
 
         Validates that GEDCOM is parsed and result type is set, then dispatches
-        to the appropriate generation method. Returns early if validation fails.
-
-        Args:
+        to the appropriate generation method. Returns early if validation fails.Args:
             panel_actions: Panel actions object with generation methods
                           (doHTML, doKML, doKML2, doSUM).
             UpdateBackgroundEvent: Optional event class for posting UI updates.
@@ -377,7 +470,7 @@ class BackgroundActions:
         """
         _log.info("start do 2")
         if not getattr(self.svc_state, "parsed", False):
-            _log.info("not parsed")
+            _log.info("not parsed - skipping generation")
             return
 
         fname = self.svc_config.get("ResultFile")
@@ -387,10 +480,13 @@ class BackgroundActions:
             return
         # call appropriate generation function if available
         result_type_name = result_type.name
+        _log.debug(f"Starting generation dispatch for {result_type_name}")
         try:
             self._dispatch_generation(panel_actions, result_type_name, fname)
+            _log.debug(f"Generation dispatch completed for {result_type_name}")
         except Exception:
             _log.exception("Error while generating output")
+        _log.debug("_run_generate completed")
 
     def _reset_button_colours(self) -> None:
         """Reset UI button background colors to default state.
@@ -439,19 +535,33 @@ class BackgroundActions:
         """
         _log.debug("=======================GOING TO IDLE %d", self.threadnum)
 
-        # Update button colors to show completion
-        self._update_button_colours_done(completed_actions)
-
-        # reset work flags
+        # CRITICAL: Reset work flags FIRST to ensure thread is always ready for new work
+        # Do this before anything else that might fail
         self.doAction = DoActionsType.NONE
         self.readyToDo = True
+        _log.debug(f"Transitioned to idle: doAction={self.doAction}, readyToDo={self.readyToDo}")
+
+        # Update button colors (non-critical, don't let failures block readyToDo reset)
+        try:
+            self._update_button_colours_done(completed_actions)
+        except Exception:
+            _log.exception("Failed to update button colours - continuing anyway")
+
+        # Stop progress tracking
         try:
             if hasattr(self.svc_progress, "stop"):
                 self.svc_progress.stop()
+                _log.debug(f"svc_progress.stop() called, running={self.svc_progress.running}")
         except Exception:
             _log.exception("BackgroundActions: svc_progress.stop() failed")
-        if UpdateBackgroundEvent:
-            wx.PostEvent(self.win, UpdateBackgroundEvent(state="done"))
+
+        # Post 'done' event to UI
+        try:
+            if UpdateBackgroundEvent:
+                wx.PostEvent(self.win, UpdateBackgroundEvent(state="done"))
+                _log.info("Posted 'done' event to UI")
+        except Exception:
+            _log.exception("Failed to post 'done' event")
 
     def Run(self) -> None:
         """Main worker thread loop.
@@ -482,8 +592,9 @@ class BackgroundActions:
 
         while self.keepGoing:
             if self.doAction.doing_something() and self.readyToDo:
+                _log.debug(f"Run loop: detected work - doAction={self.doAction}, readyToDo={self.readyToDo}")
                 self.readyToDo = False  # Avoid a Race
-                _log.info(
+                _log.debug(
                     "triggered thread with %s (Thread# %d / %d)", self.doAction, self.threadnum, _thread.get_ident()
                 )
                 try:
@@ -503,19 +614,33 @@ class BackgroundActions:
                 completed_actions = DoActionsType.NONE
                 try:
                     if self.doAction.should_parse(getattr(self.svc_state, "parsed", False)):
+                        _log.debug("Running parse operation")
                         self._run_parse(panel_actions, UpdateBackgroundEvent)
                         if self.people:  # Only mark as completed if successful
                             completed_actions |= DoActionsType.PARSE
+                            _log.debug("Parse completed successfully")
+                        else:
+                            _log.warning("Parse completed but no people data")
 
                     if self.doAction.has_generate():
+                        _log.debug("Running generate operation")
                         self._run_generate(panel_actions, UpdateBackgroundEvent)
                         completed_actions |= DoActionsType.GENERATE
+                        _log.debug("Generate operation completed")
 
+                    _log.debug(f"Transitioning to idle with completed actions: {completed_actions}")
                     self._transition_to_idle(UpdateBackgroundEvent, completed_actions)
 
                 except Exception:
                     _log.exception("BackgroundActions.Run main loop failed")
-                    self._transition_to_idle(UpdateBackgroundEvent, DoActionsType.NONE)
+                    # CRITICAL: Always transition to idle to reset readyToDo flag
+                    try:
+                        self._transition_to_idle(UpdateBackgroundEvent, DoActionsType.NONE)
+                    except Exception:
+                        # Last resort: manually reset readyToDo if transition fails
+                        _log.exception("CRITICAL: _transition_to_idle failed, manually resetting readyToDo")
+                        self.doAction = DoActionsType.NONE
+                        self.readyToDo = True
             else:
                 time.sleep(0.3)
         self.threadrunning = False

@@ -132,9 +132,39 @@ The package follows a clear separation of concerns:
 
 Long-running operations (GEDCOM parsing, geocoding, map generation) run in a background thread via `BackgroundActions` to keep the UI responsive. The worker communicates progress and results back to the UI through wxPython events.
 
+**Robustness Features**:
+- **Automatic Error Recovery**: Worker thread always returns to ready state even when exceptions occur
+- **State Synchronization**: `readyToDo` flag reset happens first before any cleanup that could fail
+- **Isolated Cleanup**: All cleanup operations wrapped in separate try-except blocks
+- **Rejection Handling**: New work requests rejected when worker is busy with clear user messaging
+- **Comprehensive Logging**: Detailed timing and progress logs for all operations, with verbose internal state tracking at DEBUG level
+
+**Memory Tracking**:
+- **Baseline Snapshots**: Memory monitoring uses baseline comparison to show only NEW allocations since app start
+- **Configurable Tracking**: Enable `tracemalloc` via Configuration Options → Performance for detailed memory analysis
+- **Accurate Reporting**: Eliminates misleading cumulative statistics from Python's built-in memory tracking
+
+**Large Dataset Warnings**:
+- **Two-Tier Alerts**: Critical errors for >10K people (with option to cancel), standard warnings for 200-10K people
+- **Pedigree Collapse**: For royal genealogy files tracing to biblical figures, the system tracks and logs unique people vs total Line objects. Extreme pedigree collapse (same ancestor via thousands of paths) is by design but can create hundreds of thousands of Line objects
+
 ### Event Handling
 
 Event handling is delegated to `VisualMapEventHandler` rather than having handlers inline in the panel. This improves testability and keeps the panel focused on layout and state management.
+
+### File Opening Infrastructure
+
+The `FileOpener` utility provides cross-platform file opening with configurable commands:
+- **System Defaults**: KML and HTML files use system default handlers (`$n` placeholder)
+- **Custom Commands**: CSV and trace files support custom editor commands
+- **Platform-Specific**: Automatically selects correct command format for Windows, macOS, or Linux
+- **Configuration**: All file commands configurable via Configuration Options dialog
+
+**Default Behaviors**:
+- KML files → System default (Google Earth on most systems)
+- HTML files → Default web browser
+- CSV files → Configurable (Excel, Numbers, LibreOffice, etc.)
+- Trace files → Configurable text editor
 
 ## Dependencies
 

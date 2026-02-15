@@ -24,7 +24,14 @@ Originally forked from [https://github.com/lmallez/gedcom-to-map], now in collab
 
 ## Recent Improvements
 
-- ✅ **Memory Optimizations**: Significant performance improvements in genealogical trace generation (creator.py) including event caching and optimized list operations, reducing memory allocations by 205k+ operations and improving performance for large family trees
+- ✅ **Background Worker Robustness**: Enhanced background processing thread with comprehensive error handling, automatic recovery from failures, and proper state reset. Worker thread now always returns to ready state even when exceptions occur, preventing stuck UI states
+- ✅ **Memory Monitoring Improvements**: Memory tracking now shows only NEW allocations since app start using baseline snapshots, providing accurate memory usage analysis. Tracemalloc baseline comparison eliminates misleading cumulative statistics
+- ✅ **File Opening Infrastructure**: Fixed KML files opening in correct system default handlers (Google Earth) instead of text editors. All result types (HTML, KML, KML2, SUM) now open in appropriate applications based on platform-specific defaults
+- ✅ **Pedigree Collapse Instrumentation**: Added comprehensive tracking for pedigree collapse scenarios where same ancestors appear via multiple paths. Logs unique people vs total Line objects, helping users understand extreme line counts in royal genealogy datasets
+- ✅ **Logging System Refinement**: Reorganized logging levels with verbose internal state tracking moved to DEBUG level. Production logs now show only user-relevant information at INFO level, reducing log noise while maintaining full debug capability
+- ✅ **Large Dataset Warnings**: Enhanced AllEntities checkbox with two-tier warning system: critical errors for >10K people (prevents crashes) and standard warnings for 200-10K people. Explains memory implications and processing time
+- ✅ **Progress Reporting Enhancements**: Added detailed progress logging during KML generation phases and all createothers() operations, reporting every 1000 people to keep users informed during long operations
+- ✅ **Memory Optimizations**: Significant performance improvements in genealogical trace generation (creator.py) including event caching and optimized list operations, reducing memory allocations by 205k+ operations and improving performance for large family trees. Fixed double-traversal bug that was creating duplicate Line objects
 - ✅ **Configuration GUI Enhancements**: Configuration Options dialog now includes controls for `earliest_credible_birth_year` (Statistics section) and `EnableTracemalloc` (Performance section) for detailed memory tracking during development
 - ✅ **Portable Pre-commit Setup**: Pre-commit hooks now use `.pre-commit-pytest.sh` wrapper script that automatically finds Python with pytest installed, making setup portable across different development environments without hardcoded paths
 - ✅ **Statistics Enhancements**: Added `total_generations` field to statistics YAML output (calculated as generation span + 1) for comprehensive genealogy metrics
@@ -70,11 +77,13 @@ Originally forked from [https://github.com/lmallez/gedcom-to-map], now in collab
 - Historians and researchers mapping migrations and demographic clusters.
 - Developers and data scientists seeking GEDCOM-derived geodata for analysis or visualization.
 
----
-
-
-## Quick Start Tips
-
+--**Be cautious with AllEntities checkbox**: For datasets >10K people, the app shows a critical warning about hours-long processing and potential crashes. For royal genealogy files that trace to biblical figures, extreme pedigree collapse can create hundreds of thousands of Line objects even for relatively few unique people.
+- Outputs (HTML/KML/SUM) are written next to your selected GEDCOM file; change the output filename in the GUI if you need a different base name. Generated files automatically open in appropriate applications (KML in Google Earth, HTML in browser).
+- Double-left-click a person in the GUI list to set the starting person for traces and timelines.
+- Edit `geo_cache.csv` to correct or refine geocoding, then save and re-run to apply fixes.
+- Export KML to inspect results in Google Earth Pro, Google MyMaps, or ArcGIS Earth.
+- Generate tables and CSV files listing people, places, and lifelines.
+- **Enable debug logging** (Configuration Options → Logging) to see detailed internal operations including pedigree collapse statistics, memory tracking, and background worker state transition
 - Use the GUI to pick your GEDCOM, choose output type, then click Load to parse and resolve places.
 - **Choose geocoding mode**: Normal (uses cache and geocodes new addresses), Geocode only (always geocode, ignoring cache), or Cache only (read-only, no network requests).
 - Outputs (HTML/KML/SUM) are written next to your selected GEDCOM file; change the output filename in the GUI if you need a different base name.

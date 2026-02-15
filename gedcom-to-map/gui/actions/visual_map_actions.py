@@ -419,7 +419,7 @@ class VisualMapActions:
         """
         self.map_generator.doKML(svc_config, svc_state, svc_progress)
 
-    def doKML2(self, svc_config: IConfig, svc_state: IState) -> None:
+    def doKML2(self, svc_config: IConfig, svc_state: IState, svc_progress: IProgressTracker) -> None:
         """Generate KML output using alternate/legacy KML exporter.
 
         Delegates to MapGenerator.doKML2().
@@ -427,8 +427,9 @@ class VisualMapActions:
         Args:
             svc_config: Configuration service
             svc_state: Runtime state service (provides lookup via svc_state.lookup)
+            svc_progress: Progress tracking service
         """
-        self.map_generator.doKML2(svc_config, svc_state)
+        self.map_generator.doKML2(svc_config, svc_state, svc_progress)
 
     def doSUM(self, svc_config: IConfig, svc_state: IState, svc_progress: IProgressTracker) -> None:
         """Generate various CSV summary reports from geocoded GEDCOM data.

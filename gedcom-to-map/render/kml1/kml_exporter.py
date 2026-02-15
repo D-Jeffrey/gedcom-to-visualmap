@@ -112,9 +112,18 @@ class KmlExporter:
 
         self.svc_progress.step("Generating KML")
         sorted_lines = sorted(lines, key=lambda x: x.prof)
-        for line in sorted_lines:
+        total_lines = len(sorted_lines)
+
+        for idx, line in enumerate(sorted_lines, 1):
             self.svc_progress.step()
             self._process_line(line, ntag, mark, foldermode, kml, styleA, styleB)
+
+            # Update GUI progress every 100 lines
+            if idx % 100 == 0 or idx == total_lines:
+                marker_type = "birth data" if mark == "birth" else "death data" if mark == "death" else "data"
+                self.svc_progress.state = (
+                    f"KML generation ({marker_type}): {idx}/{total_lines} people ({idx*100//total_lines}%)"
+                )
 
     def _get_mark_type(self, mark: str) -> str:
         """
@@ -368,14 +377,14 @@ class KmlExporter:
 
     def _log_skipped_line(self, line: Line) -> None:
         """
-        Log a warning for a skipped line (missing location).
+        Log debug info for a skipped line (missing location).
         """
         if line.fromlocation and line.tolocation:
-            _log.warning(
+            _log.debug(
                 f"skipping {line.name} ({line.fromlocation.lon}, {line.fromlocation.lat}) ({line.tolocation.lon}, {line.tolocation.lat})"
             )
         else:
-            _log.warning(f"skipping {line.name} (no location): {line}")
+            _log.debug(f"skipping {line.name} (no location): {line}")
 
     def _add_midpoints(
         self, line: Line, name: str, foldermode: bool, kml: simplekml.Kml, styleA: simplekml.Style
@@ -404,6 +413,6 @@ class KmlExporter:
                 _log.debug(f"    midpt   {line.name} ({event_latlon.lon}, {event_latlon.lat})")
             else:
                 if mid.location and getattr(mid.location, "latlon", None):
-                    _log.warning(f"skipping {line.name} ({event_latlon.lon}, {event_latlon.lat})")
+                    _log.debug(f"skipping {line.name} ({event_latlon.lon}, {event_latlon.lat})")
                 else:
-                    _log.warning(f"skipping {line.name} (no location): {mid}")
+                    _log.debug(f"skipping {line.name} (no location): {mid}")

@@ -93,7 +93,7 @@ class MapGenerator:
 
         svc_progress.step("Creating HTML map - initializing")
         _log.debug("Creating Lifeline (fullresult:%s)", fullresult)
-        lifeline: LifetimeCreator = LifetimeCreator(people, max_missing)
+        lifeline: LifetimeCreator = LifetimeCreator(people, max_missing, svc_progress=svc_progress)
         svc_progress.step("Generating lifetime lines")
         _log.debug("Creating People ")
         creator: list = lifeline.create(main_id)
@@ -196,12 +196,36 @@ class MapGenerator:
         max_missing = svc_config.get("MaxMissing", 0)
         all_entities = svc_config.get("AllEntities", False)
 
-        for key, nametag, placeType in placeTypes:
-            lifeline: Creator = Creator(people, max_missing, gpstype=key)
+        total_people = len(people)
+        if all_entities and total_people > 10000:
+            _log.warning(f"AllEntities enabled with {total_people:,} people - this will be VERY slow!")
+            bg = self.panel.background_process if hasattr(self.panel, "background_process") else None
+            if bg:
+                bg.SayInfoMessage(f"Warning: AllEntities mode with {total_people:,} people may take hours!")
+
+        for idx, (key, nametag, placeType) in enumerate(placeTypes):
+            # Check for cancellation
+            if svc_progress.should_stop():
+                _log.info("KML generation cancelled by user")
+                return
+
+            svc_progress.step(f"Creating {placeType} data", reset_counter=True)
+            _log.info(f"Creating {placeType} lifeline data ({idx+1}/{len(placeTypes)})")
+
+            lifeline: Creator = Creator(people, max_missing, gpstype=key, svc_progress=svc_progress)
             creator: list = lifeline.create(main_id)
+
+            _log.info(f"Created {len(creator)} ancestor lines for {placeType}")
+
             if all_entities:
+                svc_progress.step(
+                    f"Adding remaining {total_people - len(creator):,} people to {placeType}", reset_counter=True
+                )
+                _log.info(
+                    f"Adding all entities - processing {total_people:,} total people (this will take a long time)"
+                )
                 lifeline.createothers(creator)
-                _log.info("Total of %i people.", len(creator))
+                _log.info(f"Total of {len(creator):,} people after adding all entities.")
 
             if main_id not in people:
                 _log.error("Could not find your starting person: %s", main_id)
@@ -219,17 +243,23 @@ class MapGenerator:
             if not kml_instance:
                 kml_instance = KmlExporter(svc_config, svc_state, svc_progress)
 
+            svc_progress.step(f"Exporting {placeType} to KML", reset_counter=True)
+            _log.info(f"Exporting {placeType} to KML")
             try:
                 kml_instance.export(people[main_id].latlon, creator, nametag, placeType)
+                _log.info(f"Export completed for {placeType}")
             except Exception:
                 _log.exception("doKML: export failed for %s", nametag)
 
         bg = self.panel.background_process if hasattr(self.panel, "background_process") else None
         if kml_instance:
+            svc_progress.step("Finalizing KML file", reset_counter=True)
+            _log.info("Finalizing KML file")
             try:
                 kml_instance.Done()
+                _log.info("KML finalization completed")
             except Exception:
-                _log.debug("doKML: KmlExporter.Done failed")
+                _log.exception("doKML: KmlExporter.Done failed")
             resultFile: str = str(svc_config.get("ResultFile", "")) if svc_config.get("ResultFile") else ""
             if bg:
                 bg.SayInfoMessage(f"KML output to : {resultFile}")
@@ -238,16 +268,17 @@ class MapGenerator:
             if bg:
                 bg.SayInfoMessage("No KML output created - No data selected to map")
 
-    def doKML2(self, svc_config: IConfig, svc_state: IState) -> None:
-        """Generate KML output using alternate/legacy KML exporter.
+    def doKML2(self, svc_config: IConfig, svc_state: IState, svc_progress: IProgressTracker) -> None:
+        """Generate refined KML file (KML2) using KML_Life_Lines.
 
-        Creates KML file using KML_Life_Lines exporter (alternate implementation
-        from render.kml module). This version creates life line connections between
-        birth/death locations and includes parent connections.
+        Creates enhanced KML with life lines, parent connections, and better styling.
+        Uses KML_Life_Lines which wraps KmlExporterRefined for improved output
+        compared to legacy KML format.
 
         Args:
             svc_config: Configuration service
             svc_state: Runtime state service (provides lookup via svc_state.lookup)
+            svc_progress: Progress tracking service
 
         Side Effects:
             - Creates KML file at config.result_file
@@ -279,7 +310,7 @@ class MapGenerator:
 
         try:
             kml_life_lines: KML_Life_Lines = KML_Life_Lines(
-                gedcom=svc_state.lookup, kml_file=resultFile, connect_parents=True, save=True
+                gedcom=svc_state.lookup, kml_file=resultFile, connect_parents=True, save=True, svc_progress=svc_progress
             )
         except Exception:
             _log.exception("doKML2: KML_Life_Lines creation/export failed")

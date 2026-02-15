@@ -16,6 +16,7 @@ class ConfigDialog(wx.Dialog):
         file_open_commands: dict,
         logging_keys: list[str] | None = None,
         color_manager=None,
+        parent_refresh_callback=None,
     ) -> None:
         """Initialize the Configuration dialog.
 
@@ -26,8 +27,9 @@ class ConfigDialog(wx.Dialog):
             file_open_commands: Dictionary mapping file types to open commands.
             logging_keys: List of logger names to configure (optional).
             color_manager: ColourManager for dark mode support (optional).
+            parent_refresh_callback: Callback to refresh parent window colors (optional).
         """
-        super().__init__(parent, title=title, size=(500, 650))
+        super().__init__(parent, title=title, size=(600, 900))
 
         includeNOTSET = True
         # Configuration service for logic-backed settings
@@ -35,6 +37,8 @@ class ConfigDialog(wx.Dialog):
         self.file_open_commands: dict = file_open_commands
         self.logging_keys: list[str] = logging_keys or []
         self.color_manager = color_manager
+        self.parent_refresh_callback = parent_refresh_callback
+
         all_loggers = list(logging.root.manager.loggerDict.keys())
         self.loggerNames: list[str] = (
             [name for name in all_loggers if name in self.logging_keys] if self.logging_keys else all_loggers
@@ -103,6 +107,7 @@ class ConfigDialog(wx.Dialog):
 
         GRIDctl.AutoSizeColumn(0, True)
         GRIDctl.AutoSizeColumn(1, True)
+        GRIDctl.SetMinSize((400, 300))
 
         saveBTN = wx.Button(cfgpanel, label="Save Changes")
         saveBTN.Bind(wx.EVT_BUTTON, self.onSave)
@@ -245,7 +250,43 @@ class ConfigDialog(wx.Dialog):
 
         cfgpanel.SetSizer(sizer)
         self.GRIDctl = GRIDctl
+
+        # Bind to activation event to detect color scheme changes
+        self.Bind(wx.EVT_ACTIVATE, self.OnActivate)
+
         self.Show(True)
+
+    def OnActivate(self, event: wx.ActivateEvent) -> None:
+        """Handle dialog activation: check for system appearance changes."""
+        if event.GetActive() and self.color_manager:
+            # Dialog is being activated - check if appearance mode changed
+            if self.color_manager.refresh_colors():
+                # Colors changed, need to refresh the grid colors
+                _log.info("Appearance mode changed in ConfigDialog, refreshing grid colors")
+                self.refresh_grid_colors()
+                # Also notify parent to refresh its colors
+                if self.parent_refresh_callback:
+                    try:
+                        self.parent_refresh_callback()
+                    except Exception:
+                        _log.exception("Failed to call parent_refresh_callback")
+        event.Skip()  # Allow event to propagate
+
+    def refresh_grid_colors(self) -> None:
+        """Update grid readonly background colors based on current color scheme."""
+        if not self.color_manager:
+            return
+
+        # Get updated readonly background color
+        readonly_bg = wx.LIGHT_GREY
+        if self.color_manager.has_color("GRID_READONLY_BACK"):
+            readonly_bg = self.color_manager.get_color("GRID_READONLY_BACK")
+
+        # Update all logger name cells (column 0)
+        for row in range(self.GRIDctl.GetNumberRows()):
+            self.GRIDctl.SetCellBackgroundColour(row, 0, readonly_bg)
+
+        self.GRIDctl.ForceRefresh()
 
     def onSetAllLevels(self, event):
         """Apply the selected logging level to all configured loggers in the grid."""

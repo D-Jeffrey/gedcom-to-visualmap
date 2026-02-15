@@ -229,12 +229,12 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
                 self.svc_state.selectedpeople = 0
             except Exception:
                 pass
-            if not wasrunning:
-                try:
-                    if self.svc_progress is not None and hasattr(self.svc_progress, "step"):
-                        self.svc_progress.step("Gridload", resetCounter=False, target=len(items))
-                except Exception:
-                    pass
+            # Always set up progress tracking for grid population
+            try:
+                if self.svc_progress is not None and hasattr(self.svc_progress, "step"):
+                    self.svc_progress.step("Populating people list ...", reset_counter=True, target=len(items))
+            except Exception:
+                pass
             self.itemDataMap = {idx: pdata for idx, pdata in items}
             index = -1
             for key, pdata in items:
@@ -295,10 +295,14 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
                                     self._item_color_types[index] = "OTHERPERSON"
                         except Exception:
                             pass
+            # Clear progress state completely so UI can show "Ready"
             try:
                 if self.svc_progress is not None:
                     self.svc_progress.counter = 0
                     self.svc_progress.state = ""
+                    self.svc_progress.step_info = None
+                    if not wasrunning:
+                        self.svc_progress.running = False
             except Exception:
                 pass
 

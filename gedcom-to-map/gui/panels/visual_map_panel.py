@@ -688,8 +688,10 @@ class VisualMapPanel(wx.Panel):
             if evt.state == "busy":
                 self.OnBusyStart(evt)
             if evt.state == "done":
-                self.OnBusyStop(evt)
-                self.UpdateTimer()
+                # Don't stop busy indicator if grid population is pending
+                if not self.background_process.updategrid:
+                    self.OnBusyStop(evt)
+                    self.UpdateTimer()
 
         if self.background_process.updategrid:
             self.background_process.updategrid = False
@@ -705,6 +707,7 @@ class VisualMapPanel(wx.Panel):
                 self.peopleList.list.ShowSelectedLinage(main_id)
             if not saveBusy:
                 self.OnBusyStop(evt)
+                self.UpdateTimer()  # Refresh status to show "Ready"
 
         newinfo = None
         if self.background_process.updateinfo:

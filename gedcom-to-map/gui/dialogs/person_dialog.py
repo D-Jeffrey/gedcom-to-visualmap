@@ -551,7 +551,6 @@ class PersonDialog(wx.Dialog):
         GedRecordDialog.show_gedpy_record_dialog(
             None,
             self.person.xref_id,
-            None,
             title=f"Record of {self.person.name}",
             svc_config=svc_config,
         )

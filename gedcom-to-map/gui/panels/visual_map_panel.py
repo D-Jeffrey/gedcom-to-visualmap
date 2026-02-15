@@ -20,6 +20,10 @@ import time
 import math
 import os
 from datetime import datetime
+from collections import deque
+import psutil
+import threading
+import tracemalloc
 
 from const import KMLMAPSURL
 
@@ -40,6 +44,104 @@ if TYPE_CHECKING:
 (UpdateBackgroundEvent, EVT_UPDATE_STATE) = wx.lib.newevent.NewEvent()
 
 _log = logging.getLogger(__name__.lower())
+
+
+def get_memory_info():
+    """Get current process memory information"""
+    process = psutil.Process(os.getpid())
+    memory_info = process.memory_info()
+
+    return {
+        "rss": memory_info.rss / 1024 / 1024,  # Resident Set Size in MB
+        "vms": memory_info.vms / 1024 / 1024,  # Virtual Memory Size in MB
+        "percent": process.memory_percent(),
+        "available": psutil.virtual_memory().available / 1024 / 1024,
+    }
+
+
+class MemoryMonitor:
+    def __init__(self, threshold_mb=500, check_interval=60):
+        self.threshold_mb = threshold_mb
+        self.check_interval = check_interval
+        self.memory_history = deque(maxlen=100)
+        self.monitoring = False
+        self.logger = _log
+
+    def stop(self):
+        self.stop_monitoring()
+
+    def start_monitoring(self):
+        """Start background memory monitoring"""
+        self.monitoring = True
+        monitor_thread = threading.Thread(target=self._monitor_loop)
+        monitor_thread.daemon = True
+        monitor_thread.start()
+        tracemalloc.start()
+
+    def stop_monitoring(self):
+        """Stop memory monitoring"""
+        self.monitoring = False
+
+    def _monitor_loop(self):
+        """Background monitoring loop"""
+        while self.monitoring:
+            memory_info = get_memory_info()
+            self.memory_history.append(
+                {"timestamp": time.time(), "rss_mb": memory_info["rss"], "percent": memory_info["percent"]}
+            )
+
+            # Check for memory threshold
+            if memory_info["rss"] > self.threshold_mb:
+                self._handle_high_memory(memory_info)
+
+            time.sleep(self.check_interval)
+
+    def _handle_high_memory(self, memory_info):
+        """Handle high memory usage"""
+        self.logger.warning(
+            f"High memory usage detected: {memory_info['rss']:.2f} MB " f"({memory_info['percent']:.1f}%)"
+        )
+
+        # Trigger garbage collection
+        # import gc
+        # collected = gc.collect()
+        # self.logger.info(f"Garbage collector freed {collected} objects")
+
+        # Log memory allocations
+        self._log_top_allocations()
+
+    def _log_top_allocations(self):
+        """Log top memory allocations using tracemalloc"""
+        import tracemalloc
+
+        if not tracemalloc.is_tracing():
+            return
+
+        snapshot = tracemalloc.take_snapshot()
+        top_stats = snapshot.statistics("lineno")
+
+        self.logger.info("Top memory allocations:")
+        for index, stat in enumerate(top_stats[:5], 1):
+            self.logger.info(f"{index}. {stat}")
+
+    def get_memory_trend(self):
+        """Analyze memory usage trend"""
+        if len(self.memory_history) < 2:
+            return "insufficient_data"
+
+        recent_memory = [h["rss_mb"] for h in list(self.memory_history)[-10:]]
+        avg_recent = sum(recent_memory) / len(recent_memory)
+
+        older_memory = [h["rss_mb"] for h in list(self.memory_history)[-20:-10]]
+        if older_memory:
+            avg_older = sum(older_memory) / len(older_memory)
+
+            if avg_recent > avg_older * 1.2:
+                return "increasing"
+            elif avg_recent < avg_older * 0.8:
+                return "decreasing"
+
+        return "stable"
 
 
 class VisualMapPanel(wx.Panel):
@@ -235,7 +337,10 @@ class VisualMapPanel(wx.Panel):
         """
         self.threads = []
         self.background_process = BackgroundActions(self, 0, self, self.svc_config, self.svc_state, self.svc_progress)
+        self.memory_process = MemoryMonitor(threshold_mb=512, check_interval=30)
+
         self.threads.append(self.background_process)
+        self.memory_process.start_monitoring()
         for t in self.threads:
             t.Start()
         # Bind timer events and the custom update event to the handler

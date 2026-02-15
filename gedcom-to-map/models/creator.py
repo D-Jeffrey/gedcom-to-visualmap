@@ -431,6 +431,7 @@ class CreatorTrace:
         self._year_cache: Dict[str, tuple] = {}
         self.svc_progress = svc_progress
         self._line_call_count: int = 0
+        self.visited: set = set()  # Track visited IDs for loop detection
 
     def _get_birth_death_years(self, person: Person) -> tuple:
         """Get cached birth and death years for a person.
@@ -447,19 +448,17 @@ class CreatorTrace:
             self._year_cache[person_id] = (birth_year, death_year)
         return self._year_cache[person_id]
 
-    def line(self, current: Person, branch, prof, path="", visited=None, result=None) -> list[Line]:
+    def line(self, current: Person, branch, prof, path="",  result=None) -> list[Line]:
         # Track progress for GUI updates
         self._line_call_count += 1
         if self.svc_progress and self._line_call_count % 100 == 0:
             self.svc_progress.state = f"Tracing ancestry lines: {self._line_call_count:,} paths processed"
 
         # Track visited IDs in this specific line to detect sequential loops only
-        if visited is None:
-            visited = set()
         if result is None:
             result = []
 
-        if current.xref_id in visited:
+        if current.xref_id in self.visited:
             _log.warning(
                 "Loop detected in ancestry trace: {:2} - {} {} - Path: {}".format(
                     prof, self.people[current.xref_id].name, current.xref_id, path
@@ -468,7 +467,7 @@ class CreatorTrace:
             return result
 
         # Add to visited set for this line
-        visited = visited | {current.xref_id}
+        self.visited = self.visited | {current.xref_id}
 
         _log.debug("{:8} {:8} {:2} {:20}".format(path, branch, prof, current.name))
 
@@ -476,7 +475,7 @@ class CreatorTrace:
         birth_year_num, death_year_num = self._get_birth_death_years(current)
 
         # Process ancestors first (depth-first traversal)
-        self.link(current, branch, prof, path, visited, result)
+        self.link(current, branch, prof, path, result)
 
         # Then add current person's line (optimize string formatting)
         line = Line(
@@ -494,21 +493,20 @@ class CreatorTrace:
         result.append(line)
         return result
 
-    def link(self, current: Person, branch=0, prof=0, path="", visited=None, result=None):
-        if visited is None:
-            visited = set()
+    def link(self, current: Person, branch=0, prof=0, path="",  result=None):
+
         if result is None:
             result = []
 
         # Process father (optimize path concatenation)
-        if current.father and current.father not in visited:
+        if current.father and current.father not in self.visited:
             father_path = path + "F"
-            self.line(self.people[current.father], 0, prof + 1, father_path, visited, result)
+            self.line(self.people[current.father], 0, prof + 1, father_path, result)
 
         # Process mother
-        if current.mother and current.mother not in visited:
+        if current.mother and current.mother not in self.visited:
             mother_path = path + "M"
-            self.line(self.people[current.mother], 0, prof + 1, mother_path, visited, result)
+            self.line(self.people[current.mother], 0, prof + 1, mother_path,  result)
 
         return result
 

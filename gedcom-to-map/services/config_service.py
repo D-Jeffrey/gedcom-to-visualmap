@@ -340,6 +340,14 @@ class GVConfig(IConfig):
             for key in geocoding_keys:
                 self.gvConfig["GeoCoding"][key] = str(getattr(self, key))
 
+            performance_keys = self._build_section_keys("Performance")
+            for key in performance_keys:
+                self.gvConfig["Performance"][key] = str(getattr(self, key))
+
+            statistics_keys = self._build_section_keys("Statistics")
+            for key in statistics_keys:
+                self.gvConfig["Statistics"][key] = str(getattr(self, key))
+
             # Save file open commands from _file_open_commands object to INI
             self._save_file_commands_to_ini()
 

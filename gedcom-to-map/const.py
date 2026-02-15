@@ -34,6 +34,8 @@ INI_SECTIONS = [
     "KML",
     INI_SECTION_GEO_CONFIG,
     INI_SECTION_GEOCODING,
+    "Performance",
+    "Statistics",
 ]
 INI_OPTION_SECTIONS = [s for s in INI_SECTIONS if s not in ["Logging", INI_SECTION_GEDCOM_MAIN, INI_SECTION_GEO_CONFIG]]
 

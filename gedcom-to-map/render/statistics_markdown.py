@@ -250,11 +250,15 @@ def _executive_summary(stats: Dict[str, Any]) -> str:
     if total_marriages:
         lines.append(f"| 💍 Total Marriages | {total_marriages:,} |")
 
-    # Generation span
-    generation_span = relationship_path.get("generation_span")
-    if generation_span is not None:
-        # Add 1 to span to get total number of generations (inclusive count)
-        total_generations = generation_span + 1
+    # Generation count
+    total_generations = relationship_path.get("total_generations")
+    if total_generations is None:
+        # Fallback: calculate from span for backward compatibility
+        generation_span = relationship_path.get("generation_span")
+        if generation_span is not None:
+            total_generations = generation_span + 1
+
+    if total_generations is not None:
         lines.append(f"| 🌳 Generations | {total_generations} |")
 
     # Earliest birth

@@ -60,12 +60,14 @@ def get_memory_info():
 
 
 class MemoryMonitor:
-    def __init__(self, threshold_mb=500, check_interval=60):
+    def __init__(self, threshold_mb=500, check_interval=60, enable_tracemalloc=False):
         self.threshold_mb = threshold_mb
         self.check_interval = check_interval
         self.memory_history = deque(maxlen=100)
         self.monitoring = False
         self.logger = _log
+        self.enable_tracemalloc = enable_tracemalloc
+        self.tracemalloc_started = False
 
     def stop(self):
         self.stop_monitoring()
@@ -76,11 +78,19 @@ class MemoryMonitor:
         monitor_thread = threading.Thread(target=self._monitor_loop)
         monitor_thread.daemon = True
         monitor_thread.start()
-        tracemalloc.start()
+
+        # Only start tracemalloc if explicitly enabled (adds ~15% overhead)
+        if self.enable_tracemalloc:
+            tracemalloc.start()
+            self.tracemalloc_started = True
+            self.logger.info("Memory tracing enabled (tracemalloc active)")
 
     def stop_monitoring(self):
         """Stop memory monitoring"""
         self.monitoring = False
+        if self.tracemalloc_started:
+            tracemalloc.stop()
+            self.tracemalloc_started = False
 
     def _monitor_loop(self):
         """Background monitoring loop"""
@@ -115,6 +125,8 @@ class MemoryMonitor:
         import tracemalloc
 
         if not tracemalloc.is_tracing():
+            self.logger.info("Memory allocation details unavailable (tracemalloc disabled for performance)")
+            self.logger.info("To enable detailed tracing, set enable_tracemalloc=True in MemoryMonitor constructor")
             return
 
         snapshot = tracemalloc.take_snapshot()
@@ -337,7 +349,10 @@ class VisualMapPanel(wx.Panel):
         """
         self.threads = []
         self.background_process = BackgroundActions(self, 0, self, self.svc_config, self.svc_state, self.svc_progress)
-        self.memory_process = MemoryMonitor(threshold_mb=512, check_interval=30)
+        # Memory monitoring with tracemalloc configurable (adds ~15% overhead when enabled)
+        # Enable via Configuration Options... → "Enable detailed memory tracking"
+        enable_tracemalloc = self.svc_config.get("EnableTracemalloc", False)
+        self.memory_process = MemoryMonitor(threshold_mb=512, check_interval=30, enable_tracemalloc=enable_tracemalloc)
 
         self.threads.append(self.background_process)
         self.memory_process.start_monitoring()

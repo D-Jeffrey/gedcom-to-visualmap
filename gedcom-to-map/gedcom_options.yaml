@@ -120,7 +120,11 @@ summary_report_options:
 
 # Statistics options - configuration for statistics collectors
 statistics_options:
-  earliest_credible_birth_year: {type: 'int', default: 1000}
+  earliest_credible_birth_year: {type: 'int', default: 1000, ini_section: 'Statistics'}
+
+# Performance options - configuration for debugging and performance monitoring
+performance_options:
+  EnableTracemalloc: {type: 'bool', default: false, ini_section: 'Performance'}
 
 # File viewer command line options (saved to Core section)
 command_options:

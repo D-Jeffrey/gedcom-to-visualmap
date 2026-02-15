@@ -352,11 +352,30 @@ class CreatorTrace:
         self.people: Dict[str, Person] = people
         self.rainbow: Rainbow = Rainbow()
         self.max_missing: int = max_missing
+        # Cache for birth/death years to avoid repeated event lookups
+        self._year_cache: Dict[str, tuple] = {}
 
-    def line(self, current: Person, branch, prof, path="", visited=None) -> list[Line]:
+    def _get_birth_death_years(self, person: Person) -> tuple:
+        """Get cached birth and death years for a person.
+
+        Returns:
+            tuple: (birth_year_num, death_year_num) or (None, None)
+        """
+        person_id = person.xref_id
+        if person_id not in self._year_cache:
+            birth_event = person.get_event("birth")
+            birth_year = birth_event.date.year_num if birth_event and birth_event.date else None
+            death_event = person.get_event("death")
+            death_year = death_event.date.year_num if death_event and death_event.date else None
+            self._year_cache[person_id] = (birth_year, death_year)
+        return self._year_cache[person_id]
+
+    def line(self, current: Person, branch, prof, path="", visited=None, result=None) -> list[Line]:
         # Track visited IDs in this specific line to detect sequential loops only
         if visited is None:
             visited = set()
+        if result is None:
+            result = []
 
         if current.xref_id in visited:
             _log.warning(
@@ -364,16 +383,20 @@ class CreatorTrace:
                     prof, self.people[current.xref_id].name, current.xref_id, path
                 )
             )
-            return []
+            return result
 
         # Add to visited set for this line
         visited = visited | {current.xref_id}
 
         _log.debug("{:8} {:8} {:2} {:20}".format(path, branch, prof, current.name))
-        birth_event = current.get_event("birth") if current else None
-        birth_year_num = birth_event.date.year_num if birth_event and birth_event.date else None
-        death_event = current.get_event("death") if current else None
-        death_year_num = death_event.date.year_num if death_event and death_event.date else None
+
+        # Use cached birth/death years
+        birth_year_num, death_year_num = self._get_birth_death_years(current)
+
+        # Process ancestors first (depth-first traversal)
+        self.link(current, branch, prof, path, visited, result)
+
+        # Then add current person's line (optimize string formatting)
         line = Line(
             f"{path:8}\t{current.name}",
             None,
@@ -386,20 +409,26 @@ class CreatorTrace:
             whenFrom=birth_year_num,
             whenTo=death_year_num,
         )
-        return self.link(current, branch, prof, path, visited) + [line]
+        result.append(line)
+        return result
 
-    def link(self, current: Person, branch=0, prof=0, path="", visited=None) -> list[Line]:
+    def link(self, current: Person, branch=0, prof=0, path="", visited=None, result=None):
         if visited is None:
             visited = set()
-        return (
-            self.line(self.people[current.father], 0, prof + 1, f"{path}F", visited)
-            if current.father and current.father not in visited
-            else []
-        ) + (
-            self.line(self.people[current.mother], 0, prof + 1, path + "M", visited)
-            if current.mother and current.mother not in visited
-            else []
-        )
+        if result is None:
+            result = []
+
+        # Process father (optimize path concatenation)
+        if current.father and current.father not in visited:
+            father_path = path + "F"
+            self.line(self.people[current.father], 0, prof + 1, father_path, visited, result)
+
+        # Process mother
+        if current.mother and current.mother not in visited:
+            mother_path = path + "M"
+            self.line(self.people[current.mother], 0, prof + 1, mother_path, visited, result)
+
+        return result
 
     def create(self, main_id: str):
         if main_id not in self.people.keys():

@@ -68,6 +68,15 @@ class ConfigDialog(wx.Dialog):
         self.CBBadAge.SetValue(bool(bad_age))
         self.badAge = True
 
+        self.CBEnableTracemalloc = wx.CheckBox(cfgpanel, -1, "Enable detailed memory tracking (15% overhead)")
+        enable_tracemalloc = svc_config.get("EnableTracemalloc", False)
+        self.CBEnableTracemalloc.SetValue(bool(enable_tracemalloc))
+
+        # Statistics options
+        self.birth_year_spinner = wx.SpinCtrl(cfgpanel, value="1000", min=1, max=2100, initial=1000, size=(80, 20))
+        earliest_year = svc_config.get("earliest_credible_birth_year", 1000)
+        self.birth_year_spinner.SetValue(int(earliest_year))
+
         GRIDctl = gridlib.Grid(cfgpanel)
         # Only show loggers explicitly configured in logging_keys
         gridlen = len(self.logging_keys)
@@ -190,6 +199,20 @@ class ConfigDialog(wx.Dialog):
 
         # Bad Age checkbox
         sizer.Add(self.CBBadAge, 0, wx.ALL, 5)
+
+        # Performance Options section
+        sizer.AddSpacer(10)
+        sizer.Add(wx.StaticText(cfgpanel, -1, " Performance Options:"))
+        sizer.Add(self.CBEnableTracemalloc, 0, wx.ALL, 5)
+        sizer.AddSpacer(20)
+
+        # Statistics Options section
+        sizer.Add(wx.StaticText(cfgpanel, -1, " Statistics Options:"))
+        birth_year_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        birth_year_label = wx.StaticText(cfgpanel, -1, "   Earliest credible birth year:")
+        birth_year_sizer.Add(birth_year_label, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 5)
+        birth_year_sizer.Add(self.birth_year_spinner, 0, wx.ALIGN_CENTER_VERTICAL)
+        sizer.Add(birth_year_sizer, 0, wx.ALL, 5)
         sizer.AddSpacer(20)
 
         sizer.Add(wx.StaticText(cfgpanel, -1, " Logging Options:"))
@@ -329,6 +352,8 @@ class ConfigDialog(wx.Dialog):
         try:
             if hasattr(self.svc_config, "set"):
                 self.svc_config.set("badAge", bool(self.CBBadAge.GetValue()))
+                self.svc_config.set("EnableTracemalloc", bool(self.CBEnableTracemalloc.GetValue()))
+                self.svc_config.set("earliest_credible_birth_year", self.birth_year_spinner.GetValue())
                 # Set geocoding mode based on radio button selection
                 if self.rb_geocode_only.GetValue():
                     self.svc_config.set("geocode_only", True)

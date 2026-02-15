@@ -56,6 +56,7 @@ class VisualGedcomIds:
             ("CBAllEntities", ("CheckBox", "AllEntities", "Redraw")),
             ("CBMapControl", ("CheckBox", "showLayerControl", "Redraw")),
             ("CBMapMini", ("CheckBox", "mapMini", "Redraw")),
+            ("CBEnableTracemalloc", ("CheckBox", "EnableTracemalloc", "")),
             ("BTNLoad", ("Button", None, "Load")),
             ("BTNCreateFiles", ("Button", None, "CreateFiles")),
             ("BTNCSV", ("Button", None, "OpenCSV")),

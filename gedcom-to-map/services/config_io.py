@@ -14,15 +14,53 @@ import platform
 from pathlib import Path
 from typing import Any, Optional
 from const import (
-    INI_SECTIONS,
-    INI_OPTION_SECTIONS,
     INI_SECTION_GEDCOM_MAIN,
+    INI_SECTION_GEO_CONFIG,
     MIGRATION_VERSION_UNSET,
     MIGRATION_VERSION_CURRENT,
 )
 from geo_gedcom.lat_lon import LatLon
 
 _log = logging.getLogger(__name__)
+
+
+def _get_ini_sections_from_yaml() -> list:
+    """Extract all unique INI section names from gedcom_options.yaml.
+
+    Returns:
+        list: Sorted list of all INI section names, including both:
+            - Sections extracted from ini_section fields in the YAML
+            - Special sections (Logging, Gedcom.Main, GeoConfig)
+    """
+    yaml_path = Path(__file__).parent.parent / "gedcom_options.yaml"
+
+    sections = set()
+
+    try:
+        with open(yaml_path, "r", encoding="utf-8") as f:
+            config = yaml.safe_load(f)
+
+        # Extract ini_section values from all option groups
+        for group_name, group_options in config.items():
+            if isinstance(group_options, dict):
+                for option_name, option_config in group_options.items():
+                    if isinstance(option_config, dict) and "ini_section" in option_config:
+                        sections.add(option_config["ini_section"])
+    except Exception as e:
+        # Fallback to a minimal set if YAML can't be read
+        _log.warning(f"Could not load YAML to extract INI sections: {e}")
+        sections = {"Core", "HTML", "Summary", "KML", "GeoCoding", "Performance", "Processing", "Statistics"}
+
+    # Add special sections that aren't in the YAML options
+    special_sections = {"Logging", INI_SECTION_GEDCOM_MAIN, INI_SECTION_GEO_CONFIG}
+    sections.update(special_sections)
+
+    return sorted(sections)
+
+
+# Dynamically generated list of all INI sections
+ini_sections = _get_ini_sections_from_yaml()
+ini_option_sections = [s for s in ini_sections if s not in ["Logging", INI_SECTION_GEDCOM_MAIN, INI_SECTION_GEO_CONFIG]]
 
 
 def settings_file_pathname(file_name: str) -> str:
@@ -289,7 +327,7 @@ def loadsettings(obj: Any) -> None:
 
     Comprehensive loading that:
     1. Reads INI file from obj.settingsfile
-    2. Creates missing sections from INI_SECTIONS
+    2. Creates missing sections from ini_sections
     3. Loads option values for sections in INI_OPTION_SECTIONS
     4. Handles migration from old settings format
     5. Loads input/output file paths
@@ -308,10 +346,10 @@ def loadsettings(obj: Any) -> None:
     """
     obj.gvConfig = configparser.ConfigParser()
     obj.gvConfig.read(obj.settingsfile)
-    for section in INI_SECTIONS:
+    for section in ini_sections:
         if section not in obj.gvConfig.sections():
             obj.gvConfig[section] = {}
-        if section in INI_OPTION_SECTIONS:
+        if section in ini_option_sections:
             section_keys = build_section_keys(obj.options, section)
             loadsection(obj, section, section_keys)
     migration_version = obj.gvConfig["Core"].get("_migration_version", MIGRATION_VERSION_UNSET)
@@ -348,7 +386,7 @@ def savesettings(obj: Any) -> None:
     """Save all settings from object to INI file.
 
     Comprehensive saving that:
-    1. Creates ConfigParser if needed with all INI_SECTIONS
+    1. Creates ConfigParser if needed with all ini_sections
     2. Saves option values for Core, HTML, Summary, and KML sections
     3. Saves input/output file paths to Core section
     4. Saves file open commands for all file types
@@ -374,7 +412,7 @@ def savesettings(obj: Any) -> None:
     try:
         if not obj.gvConfig:
             obj.gvConfig = configparser.ConfigParser()
-            for section in INI_SECTIONS:
+            for section in ini_sections:
                 obj.gvConfig[section] = {}
         core_keys = build_section_keys(obj.options, "Core")
         for key in core_keys:

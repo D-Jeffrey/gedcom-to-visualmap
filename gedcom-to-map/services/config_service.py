@@ -16,7 +16,8 @@ import os
 import platform
 import logging
 
-from const import GEO_CONFIG_FILENAME, INI_SECTION_GEO_CONFIG, INI_SECTIONS, INI_OPTION_SECTIONS
+from const import GEO_CONFIG_FILENAME, INI_SECTION_GEO_CONFIG
+from services.config_io import ini_sections, ini_option_sections
 from render.result_type import ResultType
 from services.interfaces import IConfig
 from services.config_io import get_option_sections, set_options, settings_file_pathname
@@ -163,7 +164,7 @@ class GVConfig(IConfig):
             def load(self):
                 if ini_config:
                     # Ensure all required sections exist
-                    for section in INI_SECTIONS:
+                    for section in ini_sections:
                         if section not in self.config.sections():
                             self.config[section] = {}
                 return self.config
@@ -190,8 +191,8 @@ class GVConfig(IConfig):
         self.gvConfig = self._ini_loader.load()
 
         # Load all option sections
-        for section in INI_SECTIONS:
-            if section in INI_OPTION_SECTIONS:
+        for section in ini_sections:
+            if section in ini_option_sections:
                 section_keys = self._build_section_keys(section)
                 self.loadsection(section, section_keys)
 
@@ -307,7 +308,7 @@ class GVConfig(IConfig):
         try:
             if not hasattr(self, "gvConfig") or not self.gvConfig:
                 self.gvConfig = configparser.ConfigParser()
-                for section in INI_SECTIONS:
+                for section in ini_sections:
                     self.gvConfig[section] = {}
             elif "Logging" not in self.gvConfig:
                 self.gvConfig["Logging"] = {}
@@ -316,37 +317,17 @@ class GVConfig(IConfig):
             if hasattr(self, "_ini_loader") and hasattr(self, "settingsfile"):
                 self._ini_loader.ini_path = Path(self.settingsfile)
 
-            # Save all configuration sections
-            core_keys = self._build_section_keys("Core")
-            for key in core_keys:
-                self.gvConfig["Core"][key] = str(getattr(self, key))
-
-            html_keys = self._build_section_keys("HTML")
-            _log.debug("Saving HTML section with keys: %s", list(html_keys.keys()))
-            for key in html_keys:
-                value = getattr(self, key)
-                _log.debug("  Saving HTML.%s = %s (type=%s)", key, value, type(value).__name__)
-                self.gvConfig["HTML"][key] = str(getattr(self, key))
-
-            summary_keys = self._build_section_keys("Summary")
-            for key in summary_keys:
-                self.gvConfig["Summary"][key] = str(getattr(self, key))
-
-            kml_keys = self._build_section_keys("KML")
-            for key in kml_keys:
-                self.gvConfig["KML"][key] = str(getattr(self, key))
-
-            geocoding_keys = self._build_section_keys("GeoCoding")
-            for key in geocoding_keys:
-                self.gvConfig["GeoCoding"][key] = str(getattr(self, key))
-
-            performance_keys = self._build_section_keys("Performance")
-            for key in performance_keys:
-                self.gvConfig["Performance"][key] = str(getattr(self, key))
-
-            statistics_keys = self._build_section_keys("Statistics")
-            for key in statistics_keys:
-                self.gvConfig["Statistics"][key] = str(getattr(self, key))
+            # Save all configuration sections dynamically
+            # This automatically handles any sections defined in gedcom_options.yaml
+            for section in ini_option_sections:
+                section_keys = self._build_section_keys(section)
+                if section_keys:  # Only process sections that have keys
+                    for key in section_keys:
+                        if hasattr(self, key):
+                            value = getattr(self, key)
+                            self.gvConfig[section][key] = str(value)
+                            if section == "HTML":  # Keep debug logging for HTML section
+                                _log.debug("  Saving %s.%s = %s (type=%s)", section, key, value, type(value).__name__)
 
             # Save file open commands from _file_open_commands object to INI
             self._save_file_commands_to_ini()

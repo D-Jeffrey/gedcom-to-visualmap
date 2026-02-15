@@ -486,7 +486,10 @@ class VisualMapFrame(wx.Frame):
                 file_open_commands=svc_config.file_open_commands,
                 logging_keys=logger_names,
                 color_manager=self.color_manager,
-                parent_refresh_callback=lambda: self.visual_map_panel.refresh_colors(),
+                parent_refresh_callback=lambda: (
+                    self.visual_map_panel.refresh_colors(),
+                    self.visual_map_panel.refresh_processing_options(),
+                ),
             )
             dialog.ShowModal()
             dialog.Destroy()

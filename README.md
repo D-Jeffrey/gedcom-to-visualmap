@@ -24,6 +24,7 @@ Originally forked from [https://github.com/lmallez/gedcom-to-map], now in collab
 
 ## Recent Improvements
 
+- ✅ **Optional Processing Steps**: Added configuration options to disable enrichment and statistics processing during GEDCOM load (`EnableEnrichment` and `EnableStatistics` in Configuration Options → Processing Options). When disabled, these steps are skipped entirely, significantly speeding up loading of very large GEDCOM files (e.g., WilliamLongsword.ged). Summary report checkboxes for disabled features are automatically grayed out
 - ✅ **Background Worker Robustness**: Enhanced background processing thread with comprehensive error handling, automatic recovery from failures, and proper state reset. Worker thread now always returns to ready state even when exceptions occur, preventing stuck UI states
 - ✅ **Memory Monitoring Improvements**: Memory tracking now shows only NEW allocations since app start using baseline snapshots, providing accurate memory usage analysis. Tracemalloc baseline comparison eliminates misleading cumulative statistics
 - ✅ **File Opening Infrastructure**: Fixed KML files opening in correct system default handlers (Google Earth) instead of text editors. All result types (HTML, KML, KML2, SUM) now open in appropriate applications based on platform-specific defaults
@@ -184,6 +185,7 @@ This project now uses a dependency-injection/services pattern for all configurat
   - **Geocoding mode**: Choose between Normal (use cache and geocode), Geocode only (ignore cache), or Cache only (no geocode)
   - Days between retrying failed lookups
   - Default country for geocoding
+  - **Processing options** (via Configuration Options dialog): Enable/disable enrichment and statistics processing to speed up loading of very large files
 - Click `Load` to parse and resolve addresses—progress displays with counter, target, and ETA.
 - Use `Draw Update` to save and view results.
 - `Open GPS` opens the CSV in Excel (close it before re-running).

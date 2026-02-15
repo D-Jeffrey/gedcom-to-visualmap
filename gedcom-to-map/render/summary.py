@@ -224,52 +224,66 @@ def generate_summary_reports(
         )
 
     if config.enrichment_issues:
-        issues_file = (output_folder / f"{base_file_name}_enrichment_issues.csv").resolve()
-        _generate_report(
-            issues_file,
-            write_enrichment_issues_summary,
-            (my_gedcom.people, my_gedcom.enrichment.issues, str(issues_file)),
-            "Enhancement issues summary",
-            "csv",
-            bg,
-            config,
-            file_loader,
-        )
+        # Check if enrichment data is available
+        if my_gedcom.enrichment is None:
+            if bg:
+                bg.SayInfoMessage("Enrichment issues report skipped: enrichment processing was disabled")
+            _log.warning(
+                "Cannot generate enrichment issues report: enrichment processing was disabled during GEDCOM load"
+            )
+        else:
+            issues_file = (output_folder / f"{base_file_name}_enrichment_issues.csv").resolve()
+            _generate_report(
+                issues_file,
+                write_enrichment_issues_summary,
+                (my_gedcom.people, my_gedcom.enrichment.issues, str(issues_file)),
+                "Enhancement issues summary",
+                "csv",
+                bg,
+                config,
+                file_loader,
+            )
 
     if config.statistics:
-        # Generate YAML statistics summary
-        yaml_file = (output_folder / f"{base_file_name}_statistics.yaml").resolve()
-        _generate_report(
-            yaml_file,
-            write_statistics_summary,
-            (my_gedcom.statistics, str(yaml_file)),
-            "Statistics summary",
-            "default",
-            bg,
-            config,
-            file_loader,
-        )
-
-        # Generate Markdown statistics report with visualizations
-        md_file = (output_folder / f"{base_file_name}_statistics.md").resolve()
-        _generate_report(
-            md_file,
-            write_statistics_markdown,
-            (my_gedcom.statistics, str(md_file)),
-            "Statistics markdown report",
-            "default",
-            bg,
-            SummaryReportConfig(),  # Don't auto-open markdown file
-            file_loader,
-        )
-
-        # Open the HTML version in browser (automatically created alongside .md)
-        html_file = (output_folder / f"{base_file_name}_statistics.html").resolve()
-        if html_file.exists():
+        # Check if statistics data is available
+        if my_gedcom.statistics is None:
             if bg:
-                bg.SayInfoMessage(f"Statistics report: {html_file}")
-            if config.auto_open and file_loader:
-                file_loader.LoadFile("html", str(html_file))
+                bg.SayInfoMessage("Statistics report skipped: statistics processing was disabled")
+            _log.warning("Cannot generate statistics report: statistics processing was disabled during GEDCOM load")
+        else:
+            # Generate YAML statistics summary
+            yaml_file = (output_folder / f"{base_file_name}_statistics.yaml").resolve()
+            _generate_report(
+                yaml_file,
+                write_statistics_summary,
+                (my_gedcom.statistics, str(yaml_file)),
+                "Statistics summary",
+                "default",
+                bg,
+                config,
+                file_loader,
+            )
+
+            # Generate Markdown statistics report with visualizations
+            md_file = (output_folder / f"{base_file_name}_statistics.md").resolve()
+            _generate_report(
+                md_file,
+                write_statistics_markdown,
+                (my_gedcom.statistics, str(md_file)),
+                "Statistics markdown report",
+                "default",
+                bg,
+                SummaryReportConfig(),  # Don't auto-open markdown file
+                file_loader,
+            )
+
+            # Open the HTML version in browser (automatically created alongside .md)
+            html_file = (output_folder / f"{base_file_name}_statistics.html").resolve()
+            if html_file.exists():
+                if bg:
+                    bg.SayInfoMessage(f"Statistics report: {html_file}")
+                if config.auto_open and file_loader:
+                    file_loader.LoadFile("html", str(html_file))
 
 
 def write_places_summary(address_book: AddressBook, output_file: str) -> None:

@@ -53,6 +53,8 @@ class GVState(IState):
         self.parsed: bool = False
         self.newload: bool = False
         self.runavg: list = []  # Running average for ETA calculation
+        self.loaded_with_enrichment: bool = False  # Whether enrichment was enabled during last GEDCOM load
+        self.loaded_with_statistics: bool = False  # Whether statistics was enabled during last GEDCOM load
 
     def resettimeframe(self) -> None:
         """Reset the timeframe to empty state (no date range)."""

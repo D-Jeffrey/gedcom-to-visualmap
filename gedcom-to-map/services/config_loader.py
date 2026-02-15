@@ -9,7 +9,8 @@ from pathlib import Path
 from typing import Dict, Optional, Any, Union
 import yaml
 
-from const import INI_SECTIONS, MIGRATION_VERSION_UNSET, MIGRATION_VERSION_CURRENT
+from const import MIGRATION_VERSION_UNSET, MIGRATION_VERSION_CURRENT
+from services.config_io import ini_sections
 
 _log = logging.getLogger(__name__)
 
@@ -97,7 +98,7 @@ class INIConfigLoader:
             _log.debug("INI file does not exist: %s", self.ini_path)
 
         # Ensure all required sections exist
-        for section in INI_SECTIONS:
+        for section in ini_sections:
             if section not in self.config.sections():
                 self.config[section] = {}
 

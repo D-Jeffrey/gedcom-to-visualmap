@@ -128,6 +128,11 @@ class GedcomLoader:
                 geo_config_updates["days_between_retrying_failed_lookups"] = geo_coding_options.get(
                     "days_between_retrying_failed_lookups", 7
                 )
+
+            # Track which features are enabled for this load
+            enable_enrichment = svc_config.get("EnableEnrichment", True)
+            enable_statistics = svc_config.get("EnableStatistics", True)
+
             try:
                 svc_state.lookup = GeolocatedGedcom(
                     gedcom_file=input_path.resolve(),
@@ -137,7 +142,14 @@ class GedcomLoader:
                     geo_config_updates=geo_config_updates,
                     app_hooks=svc_config.get("app_hooks"),
                     fuzz=True,
+                    enable_enrichment=enable_enrichment,
+                    enable_statistics=enable_statistics,
                 )
+
+                # Record which features were successfully loaded during this load
+                # (enabled in config AND data exists - not skipped due to stop/error)
+                svc_state.loaded_with_enrichment = enable_enrichment and (svc_state.lookup.enrichment is not None)
+                svc_state.loaded_with_statistics = enable_statistics and (svc_state.lookup.statistics is not None)
 
                 svc_state.lookup.save_location_cache()
                 svc_state.people = svc_state.lookup.people

@@ -333,7 +333,13 @@ class VisualMapEventHandler:
                     )
                 except Exception:
                     _log.exception("PopulateList failed")
+
                 if panel.svc_state.newload:
+                    # Refresh processing options before ShowSelectedLinage (which sets newload=False)
+                    try:
+                        panel.refresh_processing_options()
+                    except Exception:
+                        _log.exception("refresh_processing_options failed")
                     try:
                         panel.peopleList.list.ShowSelectedLinage(panel.svc_config.get("Main"))
                     except Exception:

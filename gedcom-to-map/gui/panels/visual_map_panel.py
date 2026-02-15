@@ -353,13 +353,33 @@ class VisualMapPanel(wx.Panel):
         # Force repaint
         self.Layout()
         self.Refresh()
+
+    def refresh_processing_options(self) -> None:
+        """Refresh checkbox enable states based on what data is available from last load."""
+        # Update enrichment/statistics summary checkboxes based on whether
+        # those features were enabled when the GEDCOM was loaded (not current config)
+        enable_enrichment = getattr(self.svc_state, "loaded_with_enrichment", False)
+        enable_statistics = getattr(self.svc_state, "loaded_with_statistics", False)
+
+        # CBSummary[7] is Enrichment Issues, CBSummary[8] is Statistics Summary
+        if hasattr(self.id, "CBSummary") and len(self.id.CBSummary) > 8:
+            self.id.CBSummary[7].Enable(enable_enrichment)
+            self.id.CBSummary[8].Enable(enable_statistics)
+            if not enable_enrichment:
+                self.id.CBSummary[7].SetValue(False)
+                # Explicitly save to config since programmatic SetValue doesn't trigger event
+                self.svc_config.set("SummaryEnrichmentIssues", False)
+            if not enable_statistics:
+                self.id.CBSummary[8].SetValue(False)
+                # Explicitly save to config since programmatic SetValue doesn't trigger event
+                self.svc_config.set("SummaryStatistics", False)
         self.Update()
 
     def start_threads_and_timer(self) -> None:
         """Start background worker thread(s) and the periodic UI timer.
 
         This binds EVT_TIMER to OnMyTimer and EVT_UPDATE_STATE to the handler's
-        OnCreateFiles method so background updates can be applied to the UI.
+        OnCreateFiles event handler (in VisualMapEventHandler) so background updates can be applied to the UI.
         """
         self.threads = []
         self.background_process = BackgroundActions(self, 0, self, self.svc_config, self.svc_state, self.svc_progress)
@@ -587,14 +607,14 @@ class VisualMapPanel(wx.Panel):
         return status
 
     def check_background_process(self, evt) -> None:
-        """Dispatch background-process update flags to OnCreateFiles when present."""
+        """Dispatch background-process update flags to apply_background_updates when present."""
         if self.background_process:
             if (
                 self.background_process.updateinfo
                 or self.background_process.errorinfo
                 or self.background_process.updategrid
             ):
-                self.OnCreateFiles(evt)
+                self.apply_background_updates(evt)
 
     def check_update_running_state(self) -> None:
         """Synchronize busy/ running state and trigger busy indicator transitions."""
@@ -689,8 +709,10 @@ class VisualMapPanel(wx.Panel):
         self.busycounthack = 0
         wx.Yield()
 
-    def OnCreateFiles(self, evt: Any) -> None:
+    def apply_background_updates(self, evt: Any) -> None:
         """Apply updates coming from the background worker to the UI.
+
+        Called from check_background_process() during timer ticks, not from events.
 
         Handles:
         - busy/done state transitions from the event `state` attribute.
@@ -699,17 +721,13 @@ class VisualMapPanel(wx.Panel):
         """
         # proces evt state hand off
         if hasattr(evt, "state"):
-            _log.info(f"OnCreateFiles: received state={evt.state}, updategrid={self.background_process.updategrid}")
             if evt.state == "busy":
                 self.OnBusyStart(evt)
             if evt.state == "done":
                 # Don't stop busy indicator if grid population is pending
                 if not self.background_process.updategrid:
-                    _log.info("OnCreateFiles: calling OnBusyStop")
                     self.OnBusyStop(evt)
                     self.UpdateTimer()
-                else:
-                    _log.info("OnCreateFiles: skipping OnBusyStop because updategrid is True")
 
         if self.background_process.updategrid:
             self.background_process.updategrid = False
@@ -722,6 +740,11 @@ class VisualMapPanel(wx.Panel):
             self.peopleList.list.PopulateList(self.background_process.people, main_id, True)
             newload_flag = getattr(self.svc_state, "newload", False)
             if newload_flag:
+                # Refresh processing options before ShowSelectedLinage (which sets newload=False)
+                try:
+                    self.refresh_processing_options()
+                except Exception:
+                    _log.exception("refresh_processing_options failed")
                 self.peopleList.list.ShowSelectedLinage(main_id)
             if not saveBusy:
                 self.OnBusyStop(evt)
@@ -863,6 +886,17 @@ class VisualMapPanel(wx.Panel):
         self.id.CBSummary[6].SetValue(self.svc_config.get("SummaryAltPlaces"))
         self.id.CBSummary[7].SetValue(self.svc_config.get("SummaryEnrichmentIssues"))
         self.id.CBSummary[8].SetValue(self.svc_config.get("SummaryStatistics"))
+
+        # Disable enrichment/statistics summary checkboxes based on what data is available
+        # from the last GEDCOM load (not current config settings)
+        enable_enrichment = getattr(self.svc_state, "loaded_with_enrichment", False)
+        enable_statistics = getattr(self.svc_state, "loaded_with_statistics", False)
+        self.id.CBSummary[7].Enable(enable_enrichment)
+        self.id.CBSummary[8].Enable(enable_statistics)
+        if not enable_enrichment:
+            self.id.CBSummary[7].SetValue(False)
+        if not enable_statistics:
+            self.id.CBSummary[8].SetValue(False)
 
         mark_star_on = self.svc_config.get("MarkStarOn")
         self.id.CBMarkStarOn.SetValue(mark_star_on)

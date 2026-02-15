@@ -100,6 +100,17 @@ class ReportGenerator:
             return
 
         # Extract summary report configuration from config service
+        # Disable enrichment/statistics reports if those features were not enabled
+        # when the GEDCOM was loaded (data won't be available)
+        enable_enrichment = getattr(svc_state, "loaded_with_enrichment", False)
+        enable_statistics = getattr(svc_state, "loaded_with_statistics", False)
+
+        # Double-check: even if flags say enabled, verify actual data exists
+        if enable_enrichment and (not hasattr(my_gedcom, "enrichment") or my_gedcom.enrichment is None):
+            enable_enrichment = False
+        if enable_statistics and (not hasattr(my_gedcom, "statistics") or my_gedcom.statistics is None):
+            enable_statistics = False
+
         config = SummaryReportConfig(
             places=svc_config.get("SummaryPlaces", False),
             people=svc_config.get("SummaryPeople", False),
@@ -107,8 +118,8 @@ class ReportGenerator:
             countries_grid=svc_config.get("SummaryCountriesGrid", False),
             geocode=svc_config.get("SummaryGeocode", False),
             alt_places=svc_config.get("SummaryAltPlaces", False),
-            enrichment_issues=svc_config.get("SummaryEnrichmentIssues", False),
-            statistics=svc_config.get("SummaryStatistics", False),
+            enrichment_issues=svc_config.get("SummaryEnrichmentIssues", False) and enable_enrichment,
+            statistics=svc_config.get("SummaryStatistics", False) and enable_statistics,
             auto_open=svc_config.get("SummaryOpen", False),
         )
 

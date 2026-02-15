@@ -29,7 +29,7 @@ class ConfigDialog(wx.Dialog):
             color_manager: ColourManager for dark mode support (optional).
             parent_refresh_callback: Callback to refresh parent window colors (optional).
         """
-        super().__init__(parent, title=title, size=(600, 900))
+        super().__init__(parent, title=title, size=(600, 950))
 
         includeNOTSET = True
         # Configuration service for logic-backed settings
@@ -75,6 +75,15 @@ class ConfigDialog(wx.Dialog):
         self.CBEnableTracemalloc = wx.CheckBox(cfgpanel, -1, "Enable detailed memory tracking (15% overhead)")
         enable_tracemalloc = svc_config.get("EnableTracemalloc", False)
         self.CBEnableTracemalloc.SetValue(bool(enable_tracemalloc))
+
+        # Processing options
+        self.CBEnableEnrichment = wx.CheckBox(cfgpanel, -1, "Enable enrichment processing during GEDCOM load")
+        enable_enrichment = svc_config.get("EnableEnrichment", True)
+        self.CBEnableEnrichment.SetValue(bool(enable_enrichment))
+
+        self.CBEnableStatistics = wx.CheckBox(cfgpanel, -1, "Enable statistics processing during GEDCOM load")
+        enable_statistics = svc_config.get("EnableStatistics", True)
+        self.CBEnableStatistics.SetValue(bool(enable_statistics))
 
         # Statistics options
         self.birth_year_spinner = wx.SpinCtrl(cfgpanel, value="1000", min=1, max=2100, initial=1000, size=(80, 20))
@@ -205,8 +214,14 @@ class ConfigDialog(wx.Dialog):
         # Bad Age checkbox
         sizer.Add(self.CBBadAge, 0, wx.ALL, 5)
 
-        # Performance Options section
+        # Processing Options section
         sizer.AddSpacer(10)
+        sizer.Add(wx.StaticText(cfgpanel, -1, " Processing Options:"))
+        sizer.Add(self.CBEnableEnrichment, 0, wx.ALL, 5)
+        sizer.Add(self.CBEnableStatistics, 0, wx.ALL, 5)
+        sizer.AddSpacer(20)
+
+        # Performance Options section
         sizer.Add(wx.StaticText(cfgpanel, -1, " Performance Options:"))
         sizer.Add(self.CBEnableTracemalloc, 0, wx.ALL, 5)
         sizer.AddSpacer(20)
@@ -393,6 +408,8 @@ class ConfigDialog(wx.Dialog):
         try:
             if hasattr(self.svc_config, "set"):
                 self.svc_config.set("badAge", bool(self.CBBadAge.GetValue()))
+                self.svc_config.set("EnableEnrichment", bool(self.CBEnableEnrichment.GetValue()))
+                self.svc_config.set("EnableStatistics", bool(self.CBEnableStatistics.GetValue()))
                 self.svc_config.set("EnableTracemalloc", bool(self.CBEnableTracemalloc.GetValue()))
                 self.svc_config.set("earliest_credible_birth_year", self.birth_year_spinner.GetValue())
                 # Set geocoding mode based on radio button selection
@@ -420,6 +437,13 @@ class ConfigDialog(wx.Dialog):
                 self.svc_config.savesettings()
         except Exception:
             _log.exception("ConfigDialog.onSave: savesettings failed")
+
+        # Refresh parent panel to update UI based on changed settings
+        if self.parent_refresh_callback:
+            try:
+                self.parent_refresh_callback()
+            except Exception:
+                _log.exception("ConfigDialog.onSave: parent_refresh_callback failed")
 
         self.Close()
         self.DestroyLater()

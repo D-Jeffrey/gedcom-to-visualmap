@@ -122,6 +122,11 @@ summary_report_options:
 statistics_options:
   earliest_credible_birth_year: {type: 'int', default: 1000, ini_section: 'Statistics'}
 
+# Processing options - control which processing steps to perform during GEDCOM load
+processing_options:
+  EnableEnrichment: {type: 'bool', default: True, ini_section: 'Processing'}
+  EnableStatistics: {type: 'bool', default: True, ini_section: 'Processing'}
+
 # Performance options - configuration for debugging and performance monitoring
 performance_options:
   EnableTracemalloc: {type: 'bool', default: false, ini_section: 'Performance'}

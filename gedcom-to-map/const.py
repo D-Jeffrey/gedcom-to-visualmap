@@ -1,5 +1,6 @@
 # Constants for gedcom-to-visualmap
 
+import yaml
 from pathlib import Path
 
 VERSION = "0.2.8.0"
@@ -25,19 +26,8 @@ OFFICECMDLINE = "soffice"  # command to start LibreOffice
 INI_SECTION_GEDCOM_MAIN = "Gedcom.Main"
 INI_SECTION_GEO_CONFIG = "GeoConfig"
 INI_SECTION_GEOCODING = "GeoCoding"
-INI_SECTIONS = [
-    "Core",
-    "HTML",
-    "Summary",
-    "Logging",
-    INI_SECTION_GEDCOM_MAIN,
-    "KML",
-    INI_SECTION_GEO_CONFIG,
-    INI_SECTION_GEOCODING,
-    "Performance",
-    "Statistics",
-]
-INI_OPTION_SECTIONS = [s for s in INI_SECTIONS if s not in ["Logging", INI_SECTION_GEDCOM_MAIN, INI_SECTION_GEO_CONFIG]]
+
+# Note: ini_sections and ini_option_sections have been moved to services/config_io.py
 
 # Migration version constants
 MIGRATION_VERSION_UNSET = "0"

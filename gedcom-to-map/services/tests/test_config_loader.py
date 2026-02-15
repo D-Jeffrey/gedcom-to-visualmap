@@ -142,10 +142,10 @@ class TestINIConfigLoader:
             loader = INIConfigLoader(temp_path)
             config = loader.load()
 
-            # All INI_SECTIONS should be created
-            from const import INI_SECTIONS
+            # All ini_sections should be created
+            from services.config_io import ini_sections
 
-            for section in INI_SECTIONS:
+            for section in ini_sections:
                 assert config.has_section(section)
         finally:
             if temp_path.exists():
@@ -426,9 +426,9 @@ class TestINIConfigLoaderIntegration:
             config = loader.load()
             assert not loader.exists()  # File not written yet
 
-            from const import INI_SECTIONS
+            from services.config_io import ini_sections
 
-            for section in INI_SECTIONS:
+            for section in ini_sections:
                 assert config.has_section(section)
 
             # Modify configuration

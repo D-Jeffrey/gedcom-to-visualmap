@@ -546,13 +546,15 @@ class PersonDialog(wx.Dialog):
 
     def _displayrecord(self):
         """Display the raw GEDCOM record for the person in a separate dialog."""
-        # Pass configuration service only (services-first)
+        # Pass both configuration and state services
         svc_config = getattr(self, "svc_config", None)
+        svc_state = getattr(self, "svc_state", None)
         GedRecordDialog.show_gedpy_record_dialog(
             None,
             self.person.xref_id,
             title=f"Record of {self.person.name}",
             svc_config=svc_config,
+            svc_state=svc_state,
         )
 
     def formatPersonName(self, person: Person, longForm=True):

@@ -194,6 +194,7 @@ class GedRecordDialog(wx.Frame):
         title: Optional[str] = None,
         *,
         svc_config: Any = None,
+        svc_state: Any = None,
     ) -> "GedRecordDialog":
         """
         Instantiate and show the GedRecordDialog for a given GEDCOM record.
@@ -204,13 +205,32 @@ class GedRecordDialog(wx.Frame):
             title (str, optional): The window title.
             svc_config (Any, optional): Configuration service (IConfig).
                 Used to obtain the GEDCOM input path.
+            svc_state (Any, optional): State service (IState).
+                Used to obtain the already-parsed/fixed GEDCOM file path.
 
         Returns:
             GedRecordDialog: The dialog instance.
         """
-        # Determine GEDCOM input path from service config
+        # Prefer using the already-parsed/fixed GEDCOM file from svc_state.lookup
+        # This avoids re-parsing the original file which may have integrity errors
         input_value = None
-        if svc_config is not None:
+
+        # Try to get the fixed GEDCOM file from the already-parsed data
+        if svc_state is not None:
+            try:
+                lookup = getattr(svc_state, "lookup", None)
+                if lookup is not None:
+                    gedcom_parser = getattr(lookup, "gedcom_parser", None)
+                    if gedcom_parser is not None:
+                        gedcom_file = getattr(gedcom_parser, "gedcom_file", None)
+                        if gedcom_file is not None:
+                            input_value = str(gedcom_file)
+                            _log.debug(f"Using fixed GEDCOM file from lookup: {input_value}")
+            except Exception as e:
+                _log.debug(f"Could not get fixed GEDCOM file from svc_state: {e}")
+
+        # Fall back to configuration service if needed
+        if not input_value and svc_config is not None:
             try:
                 input_value = getattr(svc_config, "gedcom_input", None) or (
                     svc_config.get("GEDCOMinput") if hasattr(svc_config, "get") else None
@@ -219,7 +239,7 @@ class GedRecordDialog(wx.Frame):
                 input_value = None
 
         if not input_value:
-            _log.error("Cannot determine GEDCOM input path from svc_config")
+            _log.error("Cannot determine GEDCOM input path from svc_state or svc_config")
             input_value = ""
 
         input_path = Path(input_value)

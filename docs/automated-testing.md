@@ -61,12 +61,21 @@ pre-commit run --all-files
 ### For New Users Cloning the Repo
 
 New users need to:
-1. Clone the repository (includes `.pre-commit-config.yaml`)
+1. Clone the repository (includes `.pre-commit-config.yaml` and `.pre-commit-pytest.sh`)
 2. Install dependencies: `pip install -r requirements-dev.txt`
 3. Set up hooks: `pre-commit install`
 4. Environments auto-install on first commit or test run
 
 The `.pre-commit-config.yaml` file is version-controlled, but the actual environments are **not** - they're installed locally and cached in `~/.cache/pre-commit/`.
+
+### Portable Python Detection
+
+The pytest hooks use `.pre-commit-pytest.sh` wrapper script that automatically finds Python with pytest installed in this order:
+1. `.venv/bin/python` (local virtualenv)
+2. `python3` (in PATH)
+3. `python` (in PATH)
+
+This ensures pre-commit works across different development environments (macOS, Linux, Windows WSL, CI/CD) without hardcoded paths or virtualenv activation requirements.
 
 ### Usage
 Once installed, tests run automatically when you commit:

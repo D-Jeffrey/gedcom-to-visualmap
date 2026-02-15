@@ -24,6 +24,10 @@ Originally forked from [https://github.com/lmallez/gedcom-to-map], now in collab
 
 ## Recent Improvements
 
+- ✅ **Memory Optimizations**: Significant performance improvements in genealogical trace generation (creator.py) including event caching and optimized list operations, reducing memory allocations by 205k+ operations and improving performance for large family trees
+- ✅ **Configuration GUI Enhancements**: Configuration Options dialog now includes controls for `earliest_credible_birth_year` (Statistics section) and `EnableTracemalloc` (Performance section) for detailed memory tracking during development
+- ✅ **Portable Pre-commit Setup**: Pre-commit hooks now use `.pre-commit-pytest.sh` wrapper script that automatically finds Python with pytest installed, making setup portable across different development environments without hardcoded paths
+- ✅ **Statistics Enhancements**: Added `total_generations` field to statistics YAML output (calculated as generation span + 1) for comprehensive genealogy metrics
 - ✅ **Automated Testing Infrastructure**: Added GitHub Actions CI/CD, pre-commit hooks, and Makefile commands for automated testing across multiple OS platforms (Ubuntu, Windows, macOS) and Python versions (3.10-3.13). See [docs/automated-testing.md](docs/automated-testing.md)
 - ✅ **GUI Service Integration Tests**: Added test coverage for GUI-service layer attribute consistency to prevent AttributeError bugs
 - ✅ **Dark Mode GUI Fixes**: Fixed grid background colors to refresh reliably when switching between light and dark modes. Fixed Configuration Options dialog contrast issues in dark mode
@@ -269,17 +273,24 @@ The SUM results type generates a comprehensive genealogical statistics report th
 
 ### Configuration Options
 
-Statistics behavior can be customized in `gedcom_options.yaml`:
+Statistics and performance settings can be customized in `gedcom_options.yaml` or via the GUI **Configuration Options** dialog (click the "Configuration Options..." button):
 
 ```yaml
 statistics_options:
-  earliest_credible_birth_year: {type: 'int', default: 1000}
+  earliest_credible_birth_year: {type: 'int', default: 1000, ini_section: 'Statistics'}
+
+performance_options:
+  EnableTracemalloc: {type: 'bool', default: false, ini_section: 'Performance'}
 ```
 
-- **`earliest_credible_birth_year`** (default: 1000): Filters birth years older than this threshold from the "earliest birth year" metric in the Executive Summary. This prevents data entry errors (like year "1" or "800") from appearing in reports. Adjust this value based on your dataset:
+- **`earliest_credible_birth_year`** (default: 1000): Filters birth years older than this threshold from the "earliest birth year" metric in the Executive Summary. This prevents data entry errors (like year "1" or "800") from appearing in reports. Configure via GUI or edit YAML file. Settings persist in INI `[Statistics]` section. Adjust this value based on your dataset:
   - Use `1000` for general genealogy (filters medieval and ancient errors)
   - Use `500-800` for legitimate medieval European genealogy
   - Use `1500-1700` for modern datasets where older dates are unlikely
+
+- **`EnableTracemalloc`** (default: false): Enables detailed Python memory allocation tracking using `tracemalloc` module. Useful for debugging memory issues but adds ~15% performance overhead. Configure via GUI or edit YAML file. Settings persist in INI `[Performance]` section. Only enable when investigating memory usage.
+
+**GUI Access**: Open Configuration Options dialog → Statistics Options section (birth year) and Performance Options section (memory tracking)
 
 The report provides comprehensive insights into your genealogical data with 14 different statistical collectors analyzing demographics, events, names, ages, births, longevity, timelines, marriages, children, relationships, divorces, and geographic patterns.
 

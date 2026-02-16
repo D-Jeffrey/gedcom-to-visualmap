@@ -30,7 +30,7 @@ class GuiHooks(AppHooks, Protocol):
         """Report progress step using IProgressTracker service.
 
         Args:
-            info: Progress message/description (used as state in progress_service).
+            info: Progress message/description.
             target: Target count for progress tracking.
             reset_counter: Whether to reset the counter.
             plus_step: Incremental step count.
@@ -40,8 +40,11 @@ class GuiHooks(AppHooks, Protocol):
             if set_counter is not None:
                 self.svc_progress.counter = set_counter
             else:
-                # info from gedcom_parser is the step description, so use it as state
-                self.svc_progress.step(state=info, target=target, resetCounter=reset_counter, plusStep=plus_step)
+                is_new_step = bool(reset_counter) or (target is not None and target > -1)
+                if is_new_step:
+                    self.svc_progress.step(state=info, target=target, resetCounter=reset_counter, plusStep=plus_step)
+                else:
+                    self.svc_progress.step(info=info, target=-1, resetCounter=reset_counter, plusStep=plus_step)
 
     def stop_requested(self) -> bool:
         """Check if stop was requested using IProgressTracker service."""

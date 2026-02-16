@@ -82,7 +82,22 @@ jobs:
     - name: Install Linux GUI dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y xvfb libgtk-3-dev libnotify-dev libsdl2-dev libwebkit2gtk-4.0-dev
+        BASE_PACKAGES="xvfb libgtk-3-dev libnotify-dev libsdl2-dev"
+        WEBKIT_PACKAGE=""
+
+        if apt-cache show libwebkit2gtk-4.1-dev >/dev/null 2>&1; then
+          WEBKIT_PACKAGE="libwebkit2gtk-4.1-dev"
+        elif apt-cache show libwebkit2gtk-4.0-dev >/dev/null 2>&1; then
+          WEBKIT_PACKAGE="libwebkit2gtk-4.0-dev"
+        fi
+
+        if [ -n "$WEBKIT_PACKAGE" ]; then
+          echo "Installing Linux GUI deps with $WEBKIT_PACKAGE"
+          sudo apt-get install -y $BASE_PACKAGES "$WEBKIT_PACKAGE"
+        else
+          echo "Installing Linux GUI deps without WebKit package (not available on this runner image)"
+          sudo apt-get install -y $BASE_PACKAGES
+        fi
 
     - name: Install dependencies (including wxPython)
       run: |

@@ -1,0 +1,59 @@
+additional_countries_codes_dict_to_add:
+  England: GB
+  Scotland: GB
+  Wales: GB
+  Great Britain: GB
+  Prussia: DE
+  USA: US
+  West Indies: WI
+  Europe: EU
+
+country_substitutions:
+  Prussia: Germany
+  American Colonies: USA
+  Deutschland: Germany
+  Rhodesia: Zimbabwe
+  Czechoslovakia: Czech Republic
+  Yugoslavia: Serbia
+  British West Indies: West Indies
+  Holland: Netherlands
+  Vietnam: Viet Nam
+  Allemagne: Germany
+  Western Europe: Europe
+  Western European Theatre: Europe
+  Nyasaland: Malawi
+  Ukamba: Kenya
+  Burma: Myanmar
+  Bavaria: Germany
+  Northern Ireland: United Kingdom
+  Turkey: Türkiye
+  Palestine: "Palestine, State of"
+  France and Flanders: Belgium
+  Himalayas: Bhutan
+  Russia: Russian Federation
+  u.s.a.: USA
+
+default_country: None
+
+fallback_continent_map:
+  AQ: Antarctica
+  TF: Antarctica
+  EH: Africa
+  PN: Oceania
+  SX: North America
+  TL: Asia
+  UM: Oceania
+  VA: Europe
+  WI: North America
+  EU: Europe
+
+geocode_settings:
+  max_retries: 3
+  retry_delay: 1.0
+  timeout: 10.0
+  backoff_base: 0.2
+  user_agent: "gedcom_geocoder"
+  rate_limit_seconds: 1.0
+  days_between_retrying_failed_lookups: 7
+  cache_only: false
+  always_geocode: false

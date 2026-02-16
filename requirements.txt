@@ -1,16 +1,33 @@
+# Runtime dependencies for gedcom-to-visualmap
+# Python 3.10+ required
+
+# Core GEDCOM and mapping libraries
 ged4py>=0.4.4
 simplekml>=1.3.6
 geopy>=2.3.0
 folium>=0.16.0
 branca>=0.7.0
-wxPython>=4.1.0
-selenium>=4.0.0
 xyzservices>=2025.1.0
+
+# GUI framework
+wxPython>=4.2.3
+
+# Configuration and data processing
 pyyaml>=6.0
+pandas>=2.0.0
+
+# String matching and location handling
 rapidfuzz>=3.0.0
 pycountry>=22.3.5
 pycountry-convert>=0.7.2
-pandas>=2.0.0
+
+# Visualization
 seaborn>=0.12.0
 matplotlib>=3.7.0
+
+# Web automation (for browser-based export)
+selenium>=4.0.0
+
+# Testing framework (included in base for CI/CD)
 pytest>=7.0.0
+psutil>=5.9.0

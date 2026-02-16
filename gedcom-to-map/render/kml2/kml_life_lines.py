@@ -6,21 +6,20 @@ Exports genealogical events and relationships to KML for visualization in Google
 Author: @colin0brass
 """
 
+from typing import Optional
 import logging
 
 from geo_gedcom.geolocated_gedcom import GeolocatedGedcom
 from .kml_life_lines_creator import KML_Life_Lines_Creator
 from .kml_exporter_refined import KmlExporterRefined
+from services.interfaces import IProgressTracker
 
 logger = logging.getLogger(__name__)
 
 from .kml_exporter_refined import BIRTH_ICON, MARRIAGE_ICON, DEATH_ICON
 
-__all__ = [
-    "KmlExporterRefined",
-    "KML_Life_Lines_Creator",
-    "KML_Life_Lines"
-]
+__all__ = ["KmlExporterRefined", "KML_Life_Lines_Creator", "KML_Life_Lines"]
+
 
 class KML_Life_Lines:
     """
@@ -36,10 +35,16 @@ class KML_Life_Lines:
         kml_life_lines_creator (KML_Life_Lines_Creator): Instance of the KML life lines creator.
     """
 
-    __slots__ = ['gedcom', 'kml_file', 'kml_life_lines_creator']
+    __slots__ = ["gedcom", "kml_file", "kml_life_lines_creator"]
 
-    def __init__(self, gedcom: GeolocatedGedcom, kml_file: str,
-                 connect_parents: bool = True, save: bool = True):
+    def __init__(
+        self,
+        gedcom: GeolocatedGedcom,
+        kml_file: str,
+        connect_parents: bool = True,
+        save: bool = True,
+        svc_progress: Optional[IProgressTracker] = None,
+    ):
         """
         Initialize the KML_Life_Lines wrapper.
 
@@ -51,9 +56,12 @@ class KML_Life_Lines:
             kml_file (str): Path to output KML file.
             connect_parents (bool, optional): Whether to draw parent-child lines. Defaults to True.
             save (bool, optional): Whether to save the KML file immediately. Defaults to True.
+            svc_progress (Optional[IProgressTracker], optional): Progress tracker for GUI updates. Defaults to None.
         """
 
-        self.kml_life_lines_creator = KML_Life_Lines_Creator(gedcom=gedcom, kml_file=kml_file)
+        self.kml_life_lines_creator = KML_Life_Lines_Creator(
+            gedcom=gedcom, kml_file=kml_file, svc_progress=svc_progress
+        )
         self.kml_life_lines_creator.add_people()
 
         if connect_parents:

@@ -1,6 +1,7 @@
 # My stuff
 geodat-address-cache*.csv
 .vs/
+.vscode/
 other/
 geodat-address-cache-1.csv
 geodat-address-cache-2.csv
@@ -67,6 +68,7 @@ coverage.xml
 *.py,cover
 .hypothesis/
 .pytest_cache/
+*_performance_results.yaml
 
 # Translations
 *.mo

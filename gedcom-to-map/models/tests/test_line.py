@@ -14,6 +14,7 @@ def test_line_init():
     assert line.tolocation == ll2
     assert line.color == color
 
+
 def test_line_str_repr():
     ll1 = LatLon(51.5, -0.1)
     ll2 = LatLon(52.0, 0.1)

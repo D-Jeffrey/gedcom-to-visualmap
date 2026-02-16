@@ -1,0 +1,68 @@
+# Pre-commit hooks for automatic testing and code quality
+# Install: pip install pre-commit && pre-commit install
+# Run manually: pre-commit run --all-files
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+        exclude: '\.(csv|tsv|ged)$'
+      - id: end-of-file-fixer
+        exclude: '\.(csv|tsv|ged)$'
+      - id: check-yaml
+      - id: check-added-large-files
+        args: ['--maxkb=500']
+      - id: check-merge-conflict
+      - id: check-case-conflict
+      - id: mixed-line-ending
+        args: ['--fix=lf']
+        exclude: '\.(csv|tsv|ged)$'
+
+  - repo: https://github.com/psf/black
+    rev: 24.1.1
+    hooks:
+      - id: black
+        args: ['--line-length=120']
+        exclude: '^gedcom-samples/'
+
+  - repo: https://github.com/PyCQA/flake8
+    rev: 7.0.0
+    hooks:
+      - id: flake8
+        args:
+          [
+            "--max-line-length=140",
+            "--extend-ignore=E203,W503,F401,F841,E402,F821,E712,E711,E731,E741,F601,F541",
+          ]
+        # E203: whitespace before ':' (conflicts with black)
+        # W503: line break before binary operator (conflicts with black)
+        # F401: imported but unused (common in __init__.py)
+        # F841: local variable assigned but never used (sometimes intentional)
+        # E402: module level import not at top (conditional imports)
+        # F821: undefined name (TYPE_CHECKING imports)
+        # E712: comparison to True/False (common test pattern)
+        # E711: comparison to None (sometimes acceptable)
+        # E731: lambda assignment (sometimes more readable)
+        # E741: ambiguous variable name 'l' (common in math/iterators)
+        # F601: dictionary key repeated (test data)
+        # F541: f-string without placeholders (template code)
+        exclude: '^gedcom-samples/'
+
+  - repo: local
+    hooks:
+      - id: pytest-fast
+        name: pytest (fast tests only)
+        entry: ./.pre-commit-pytest.sh -m "not slow" --quiet --tb=short
+        language: system
+        pass_filenames: false
+        always_run: true
+        stages: [pre-commit]
+
+      - id: pytest-check
+        name: pytest (attribute consistency)
+        entry: ./.pre-commit-pytest.sh gedcom-to-map/gui/tests/test_visual_map_frame_services.py -v
+        language: system
+        pass_filenames: false
+        files: "^gedcom-to-map/(gui|services)/"
+        stages: [pre-commit]

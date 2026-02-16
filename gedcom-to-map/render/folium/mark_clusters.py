@@ -1,6 +1,7 @@
 """
 Marker cluster management for Folium maps.
 """
+
 import folium
 from folium.plugins import MarkerCluster
 from geo_gedcom.lat_lon import LatLon
@@ -14,6 +15,7 @@ class MyMarkClusters:
         mymap (folium.Map): The Folium map instance.
         step (int): The time step for clustering.
     """
+
     def __init__(self, mymap: folium.Map, step: int) -> None:
         """
         Initialize the marker cluster manager.

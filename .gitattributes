@@ -1,0 +1,29 @@
+# Auto detect text files and perform LF normalization
+* text=auto
+
+# Python files should always use LF
+*.py text eol=lf
+
+# Other source files
+*.yaml text eol=lf
+*.yml text eol=lf
+*.json text eol=lf
+*.md text eol=lf
+*.txt text eol=lf
+
+# GEDCOM files should use LF
+*.ged text eol=lf
+
+# Shell scripts
+*.sh text eol=lf
+
+# Windows batch files should use CRLF
+*.bat text eol=crlf
+
+# Binary files
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.csv binary

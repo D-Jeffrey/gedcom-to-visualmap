@@ -1,0 +1,19 @@
+# Development dependencies for gedcom-to-visualmap
+# Install with: pip install -r requirements-dev.txt
+
+# Base requirements
+-r requirements.txt
+
+# Testing tools
+pytest-cov>=7.0.0        # Coverage reports
+pytest-mock>=3.15.0      # Mock utilities (if needed in future)
+
+# Code quality and formatting
+black>=24.1.0            # Code formatter
+flake8>=7.0.0           # Linter
+
+# Pre-commit hooks
+pre-commit>=3.6.0        # Git hook framework
+
+# Type checking (optional)
+# mypy>=1.8.0            # Static type checker

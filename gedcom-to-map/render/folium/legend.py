@@ -1,6 +1,7 @@
 """
 Legend overlay for Folium maps using a Jinja2 template.
 """
+
 from branca.element import MacroElement, Template
 
 legend_template = """
@@ -36,10 +37,12 @@ legend_template = """
 
 # Use MacroElement to add the template to the map
 
+
 class Legend(MacroElement):
     """
     A Folium MacroElement for displaying a custom legend on the map.
     """
+
     def __init__(self) -> None:
         super().__init__()
         self._template = Template(legend_template)

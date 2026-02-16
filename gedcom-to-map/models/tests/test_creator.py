@@ -1,10 +1,12 @@
 import pytest
 from models import Creator, Person, LatLon, Line, Color
 
+
 def test_creator_init():
     people = {}
     creator = Creator(people)
     assert isinstance(creator, Creator)
+
 
 def test_creator_line_method():
     people = {}
@@ -19,6 +21,7 @@ def test_creator_line_method():
         assert result is not None
     except Exception as e:
         pytest.skip(f"Creator.line raised {e}, possibly due to missing setup.")
+
 
 def test_creator_has_gpstype():
     people = {}

@@ -1,10 +1,28 @@
 # Running gedcomVisualGUI on Linux (WSL)
 
 ## Side by side
-Windows and Linux (WSL) running on Windows 11 - WSL version: 2.4.12.0 - Ubuntu 
+Windows and Linux (WSL) running on Windows 11 - WSL version: 2.4.12.0 - Ubuntu
 ![img](img/2025-11-wsl-sideby.png)
 
 ## CoPilot Guided instuctions for WSL Ubuntu 24.04
+
+### Troubleshooting GTK Warnings
+If you see GTK warnings about "Negative content height" or "for_size smaller than min-size" with checkbuttons, install GTK themes and engines:
+```
+sudo apt update
+sudo apt install gtk2-engines gtk2-engines-murrine gtk2-engines-pixbuf
+sudo apt install gnome-themes-extra
+```
+
+You can also try setting a specific GTK theme:
+```
+export GTK_THEME=Adwaita
+```
+
+Add this to your `~/.bashrc` or `~/.zshrc` to make it permanent:
+```
+echo 'export GTK_THEME=Adwaita' >> ~/.bashrc
+```
 
 1. Install GTK+ 3 Development Packages
 Most modern wxPython builds rely on GTK+ 3. You can install the necessary development files with:
@@ -55,7 +73,7 @@ pip install wxPython
 
 # OLD do not use
 ## Linux (WSL - WSL version: 2.4.12.0)
-  
+
 ```
 sudo apt update
 sudo apt upgrade
@@ -81,7 +99,7 @@ This seems to work best... (but is not a good idea if you are using 24.4, as it 
 #sudo apt install xubuntu-desktop
 sudo apt install xfce4
 sudo apt-get install libgtk-3-dev
-sudo apt-get install python3-wxgtk4.0 python3-wxgtk-webview4.0 python3-wxgtk-media4.0 
+sudo apt-get install python3-wxgtk4.0 python3-wxgtk-webview4.0 python3-wxgtk-media4.0
 sudo apt-get install git curl libsdl2-mixer-2.0-0 libsdl2-image-2.0-0 libsdl2-2.0-0
 sudo apt-get reinstall ca-certificates
 ```
@@ -121,12 +139,12 @@ The egg seems to be generally working (thought I don't have a background underst
 
 I'm not sure if these steps are still required
 
-This is to sets up and and installed X-Windows for WSL using xfce4 using the 
+This is to sets up and and installed X-Windows for WSL using xfce4 using the
 guidance from https://askubuntu.com/questions/1252007/opening-ubuntu-20-04-desktop-on-wsl2/1365455#1365455
 
 ```
 sudo apt install pkg-config
-sudo apt install libgtk-3-dev 
+sudo apt install libgtk-3-dev
 
 sudo apt install xrdp xfce4
 # If asked, select lightdm, although it probably doesn't matter
@@ -141,7 +159,7 @@ sudo sed -i 's/3389/3390/g' /etc/xrdp/xrdp.ini
 echo "export WAYLAND_DISPLAY=" > ~/.xsessionrc
 
 # Optional, if you only have one desktop environment installed
-echo startxfce4 > ~/.xsession 
+echo startxfce4 > ~/.xsession
 sudo service xrdp start
 
 ```

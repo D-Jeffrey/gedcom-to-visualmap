@@ -46,4 +46,4 @@ $n
 - add more detail in the KML version
 - build a life description for using in KML, Popup on Folium and People Panel
 - Need to sort HTML by # of instances of name
-- 
+-

@@ -6,8 +6,27 @@ Provides panel components for displaying and interacting with genealogical data:
     - PeopleListCtrlPanel: People list view and filtering
 """
 
-from .visual_map_panel import VisualMapPanel
-from .family_panel import FamilyPanel
-from .people_list_ctrl_panel import PeopleListCtrlPanel
+# Best-effort lazy exports so this package can be imported in non-GUI
+# environments (e.g. Ubuntu CI core lane without wxPython).
+__all__ = []
 
-__all__ = ["VisualMapPanel", "FamilyPanel", "PeopleListCtrlPanel"]
+try:
+    from .visual_map_panel import VisualMapPanel
+
+    __all__.append("VisualMapPanel")
+except ImportError:
+    pass
+
+try:
+    from .family_panel import FamilyPanel
+
+    __all__.append("FamilyPanel")
+except ImportError:
+    pass
+
+try:
+    from .people_list_ctrl_panel import PeopleListCtrlPanel
+
+    __all__.append("PeopleListCtrlPanel")
+except ImportError:
+    pass

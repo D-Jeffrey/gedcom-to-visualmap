@@ -9,9 +9,34 @@ Provides action handlers for user interactions and background operations:
     - gedcom_to_map: Map generation orchestration
 """
 
-from .visual_map_actions import VisualMapActions, Geoheatmap, gedcom_to_map
-from .background_actions import BackgroundActions
-from .file_operations import FileOpener
-from .do_actions_type import DoActionsType
+# Best-effort lazy exports so this package can be imported in non-GUI
+# environments (e.g. Ubuntu CI core lane without wxPython).
+__all__ = []
 
-__all__ = ["VisualMapActions", "Geoheatmap", "gedcom_to_map", "BackgroundActions", "FileOpener", "DoActionsType"]
+try:
+    from .visual_map_actions import VisualMapActions, Geoheatmap, gedcom_to_map
+
+    __all__.extend(["VisualMapActions", "Geoheatmap", "gedcom_to_map"])
+except ImportError:
+    pass
+
+try:
+    from .background_actions import BackgroundActions
+
+    __all__.append("BackgroundActions")
+except ImportError:
+    pass
+
+try:
+    from .file_operations import FileOpener
+
+    __all__.append("FileOpener")
+except ImportError:
+    pass
+
+try:
+    from .do_actions_type import DoActionsType
+
+    __all__.append("DoActionsType")
+except ImportError:
+    pass

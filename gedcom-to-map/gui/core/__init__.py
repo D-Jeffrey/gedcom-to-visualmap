@@ -14,8 +14,27 @@ Usage:
     >>> app.start()
 """
 
-from .gedcom_visual_gui import GedcomVisualGUI
-from .visual_map_frame import VisualMapFrame
-from .gui_hooks import GuiHooks
+# Best-effort lazy exports so this package can be imported in non-GUI
+# environments (e.g. Ubuntu CI core lane without wxPython).
+__all__ = []
 
-__all__ = ["GedcomVisualGUI", "VisualMapFrame", "GuiHooks"]
+try:
+    from .gedcom_visual_gui import GedcomVisualGUI
+
+    __all__.append("GedcomVisualGUI")
+except ImportError:
+    pass
+
+try:
+    from .visual_map_frame import VisualMapFrame
+
+    __all__.append("VisualMapFrame")
+except ImportError:
+    pass
+
+try:
+    from .gui_hooks import GuiHooks
+
+    __all__.append("GuiHooks")
+except ImportError:
+    pass

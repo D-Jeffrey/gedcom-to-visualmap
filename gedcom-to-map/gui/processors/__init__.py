@@ -7,9 +7,34 @@ Provides specialized data processors:
     - LineageTracer: Genealogical relationship tracing
 """
 
-from .gedcom_loader import GedcomLoader
-from .map_generator import MapGenerator
-from .report_generator import ReportGenerator
-from .lineage_tracer import LineageTracer
+# Best-effort lazy exports so this package can be imported in non-GUI
+# environments (e.g. Ubuntu CI core lane without wxPython).
+__all__ = []
 
-__all__ = ["GedcomLoader", "MapGenerator", "ReportGenerator", "LineageTracer"]
+try:
+    from .gedcom_loader import GedcomLoader
+
+    __all__.append("GedcomLoader")
+except ImportError:
+    pass
+
+try:
+    from .map_generator import MapGenerator
+
+    __all__.append("MapGenerator")
+except ImportError:
+    pass
+
+try:
+    from .report_generator import ReportGenerator
+
+    __all__.append("ReportGenerator")
+except ImportError:
+    pass
+
+try:
+    from .lineage_tracer import LineageTracer
+
+    __all__.append("LineageTracer")
+except ImportError:
+    pass

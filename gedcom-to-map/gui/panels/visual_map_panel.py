@@ -60,7 +60,14 @@ def get_memory_info():
 
 
 class MemoryMonitor:
-    def __init__(self, threshold_mb=500, check_interval=60, enable_tracemalloc=False):
+    def __init__(
+        self,
+        threshold_mb=500,
+        check_interval=60,
+        enable_tracemalloc=False,
+        warning_cooldown_sec=180,
+        warning_growth_mb=128,
+    ):
         self.threshold_mb = threshold_mb
         self.check_interval = check_interval
         self.memory_history = deque(maxlen=100)
@@ -69,6 +76,11 @@ class MemoryMonitor:
         self.enable_tracemalloc = enable_tracemalloc
         self.tracemalloc_started = False
         self.baseline_snapshot = None
+        self.warning_cooldown_sec = warning_cooldown_sec
+        self.warning_growth_mb = warning_growth_mb
+        self.last_warning_ts = 0.0
+        self.last_warning_rss_mb = 0.0
+        self.last_allocation_log_ts = 0.0
 
     def stop(self):
         self.stop_monitoring()
@@ -114,9 +126,24 @@ class MemoryMonitor:
 
     def _handle_high_memory(self, memory_info):
         """Handle high memory usage"""
+        now = time.time()
+        current_rss_mb = memory_info["rss"]
+
+        # Suppress repetitive warnings unless memory has grown significantly.
+        if self.last_warning_ts:
+            elapsed = now - self.last_warning_ts
+            grew_since_last_warning = current_rss_mb - self.last_warning_rss_mb
+            if elapsed < self.warning_cooldown_sec:
+                return
+            if grew_since_last_warning < self.warning_growth_mb and elapsed < self.warning_cooldown_sec * 4:
+                return
+
         self.logger.warning(
             f"High memory usage detected: {memory_info['rss']:.2f} MB " f"({memory_info['percent']:.1f}%)"
         )
+
+        self.last_warning_ts = now
+        self.last_warning_rss_mb = current_rss_mb
 
         # Trigger garbage collection
         # import gc
@@ -124,7 +151,9 @@ class MemoryMonitor:
         # self.logger.info(f"Garbage collector freed {collected} objects")
 
         # Log memory allocations
-        self._log_top_allocations()
+        if now - self.last_allocation_log_ts >= self.warning_cooldown_sec:
+            self._log_top_allocations()
+            self.last_allocation_log_ts = now
 
     def _log_top_allocations(self):
         """Log top memory allocations using tracemalloc (relative to baseline)"""
@@ -386,7 +415,7 @@ class VisualMapPanel(wx.Panel):
         # Memory monitoring with tracemalloc configurable (adds ~15% overhead when enabled)
         # Enable via Configuration Options... → "Enable detailed memory tracking"
         enable_tracemalloc = self.svc_config.get("EnableTracemalloc", False)
-        self.memory_process = MemoryMonitor(threshold_mb=512, check_interval=30, enable_tracemalloc=enable_tracemalloc)
+        self.memory_process = MemoryMonitor(threshold_mb=768, check_interval=30, enable_tracemalloc=enable_tracemalloc)
 
         self.threads.append(self.background_process)
         self.memory_process.start_monitoring()

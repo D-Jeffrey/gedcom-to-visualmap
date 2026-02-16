@@ -49,6 +49,11 @@ class ColourManager:
             True if dark mode is detected, False otherwise.
         """
         try:
+            # Try wxPython system appearance (wx 4.1+)
+            if hasattr(wx, "SystemAppearance"):
+                appearance = wx.SystemSettings.GetAppearance()
+                if appearance.IsDark():
+                    return True
             # macOS dark mode detection
             if sys.platform == "darwin":
                 import subprocess
@@ -71,12 +76,7 @@ class ColourManager:
                     return value == 0  # 0 = dark mode, 1 = light mode
                 except Exception:
                     pass
-
-            # Try wxPython system appearance (wx 4.1+)
-            if hasattr(wx, "SystemAppearance"):
-                appearance = wx.SystemSettings.GetAppearance()
-                if appearance.IsDark():
-                    return True
+         
         except Exception as e:
             _log.debug(f"Dark mode detection failed: {e}")
 

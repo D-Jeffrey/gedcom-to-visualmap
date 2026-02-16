@@ -227,10 +227,12 @@ class TestOpenWithStartfile:
         file_opener._open_with_startfile("/path/to/file.pdf")
         mock_startfile.assert_called_once_with("/path/to/file.pdf")
 
-    def test_startfile_not_available_raises(self, file_opener):
-        with patch("gui.actions.file_operations.os", spec=[]):  # os without startfile
-            with pytest.raises(EnvironmentError, match="Windows-only"):
-                file_opener._open_with_startfile("/path/to/file.pdf")
+    def test_startfile_not_available_raises(self, file_opener, monkeypatch):
+        import gui.actions.file_operations as file_ops
+
+        monkeypatch.delattr(file_ops.os, "startfile", raising=False)
+        with pytest.raises(EnvironmentError, match="Windows-only"):
+            file_opener._open_with_startfile("/path/to/file.pdf")
 
 
 class TestOpenWithPlatformDefault:

@@ -199,6 +199,13 @@ def test_large_gedcom_file():
 - Multiple Python versions
 - Coverage reporting
 
+### CI platform notes (wxPython)
+
+- **Windows/macOS core lanes** install full dependencies, including wxPython.
+- **Ubuntu core lane** installs dependencies without wxPython for stability on GitHub-hosted runners.
+- **Ubuntu GUI lane** runs wxPython-specific tests separately under Xvfb.
+- This split preserves broad cross-platform test coverage while avoiding known Ubuntu CI fragility around wxPython installation/build.
+
 ### Test Organization
 ```
 gedcom-to-map/

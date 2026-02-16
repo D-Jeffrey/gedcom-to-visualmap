@@ -7,7 +7,7 @@ on:
     branches: [ main, master, develop ]
 
 jobs:
-  test:
+  test-core:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -25,12 +25,27 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
 
-    - name: Install dependencies
+    # Rationale: wxPython has been problematic on Ubuntu CI, but works on Windows/macOS.
+    # Keep Ubuntu core lane wx-free for stability, while preserving wx coverage elsewhere.
+    - name: Install core dependencies (Ubuntu without wxPython)
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        python -m pip install --upgrade pip
+        python - <<'PY'
+        from pathlib import Path
+        req = Path("requirements.txt").read_text(encoding="utf-8").splitlines()
+        filtered = [line for line in req if not line.strip().lower().startswith("wxpython")]
+        Path("requirements-core.txt").write_text("\n".join(filtered) + "\n", encoding="utf-8")
+        PY
+        pip install -r requirements-core.txt
+
+    - name: Install dependencies (Windows/macOS including wxPython)
+      if: matrix.os != 'ubuntu-latest'
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    - name: Run tests
+    - name: Run core tests
       run: |
         python -m pytest --quiet --tb=short
 
@@ -46,3 +61,34 @@ jobs:
       with:
         file: ./coverage.xml
         fail_ci_if_error: false
+
+  test-gui-wx:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11"]
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install Linux GUI dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y xvfb libgtk-3-dev libnotify-dev libsdl2-dev libwebkit2gtk-4.0-dev
+
+    - name: Install dependencies (including wxPython)
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Run wxPython GUI tests
+      run: |
+        xvfb-run -a python -m pytest gedcom-to-map/gui/layout/tests/test_colour_manager.py --quiet --tb=short

@@ -1,7 +1,8 @@
 """Tests for ColourManager."""
 
 import pytest
-import wx
+
+wx = pytest.importorskip("wx")
 
 
 class TestApp:

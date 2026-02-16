@@ -37,6 +37,7 @@ Originally forked from [https://github.com/lmallez/gedcom-to-map], now in collab
 - ✅ **Portable Pre-commit Setup**: Pre-commit hooks now use `.pre-commit-pytest.sh` wrapper script that automatically finds Python with pytest installed, making setup portable across different development environments without hardcoded paths
 - ✅ **Statistics Enhancements**: Added `total_generations` field to statistics YAML output (calculated as generation span + 1) for comprehensive genealogy metrics
 - ✅ **Automated Testing Infrastructure**: Added GitHub Actions CI/CD, pre-commit hooks, and Makefile commands for automated testing across multiple OS platforms (Ubuntu, Windows, macOS) and Python versions (3.10-3.13). See [docs/automated-testing.md](docs/automated-testing.md)
+- ℹ️ **CI Platform Notes**: For details on why Ubuntu core CI excludes wxPython while Windows/macOS include it, see the [CI platform notes (wxPython)](docs/automated-testing.md#ci-platform-notes-wxpython).
 - ✅ **GUI Service Integration Tests**: Added test coverage for GUI-service layer attribute consistency to prevent AttributeError bugs
 - ✅ **Dark Mode GUI Fixes**: Fixed grid background colors to refresh reliably when switching between light and dark modes. Fixed Configuration Options dialog contrast issues in dark mode
 - ✅ **Statistics Summary Bug Fix**: Fixed AttributeError in Actions → Statistics Summary menu (incorrect attribute name `selected_people` vs `selectedpeople`)
@@ -366,6 +367,7 @@ The project includes multiple levels of automated testing:
 - **GitHub Actions CI/CD**: Runs automatically on every push/PR, tests across 3 OS platforms and 4 Python versions
 - **Pre-commit Hooks**: Runs fast tests automatically before each commit (install with `make install-dev`)
 - **Make Commands**: Convenient shortcuts for common test operations
+- **CI platform behavior**: Ubuntu core CI excludes wxPython for runner stability, while Windows/macOS core CI include wxPython. Details: [CI platform notes (wxPython)](docs/automated-testing.md#ci-platform-notes-wxpython)
 
 See [docs/automated-testing.md](docs/automated-testing.md) for complete documentation.
 

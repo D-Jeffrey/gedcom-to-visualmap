@@ -9,11 +9,48 @@ Provides utilities for building the UI:
     - ColourManager: GUI colour management
 """
 
-from .layout_options import LayoutOptions
-from .layout_helpers import LayoutHelpers
-from .visual_map_event_handlers import VisualMapEventHandler
-from .visual_gedcom_ids import VisualGedcomIds
-from .font_manager import FontManager
-from .colour_manager import ColourManager
+# Best-effort lazy exports so this package can be imported in non-GUI
+# environments (e.g. Ubuntu CI core lane without wxPython).
+__all__ = []
 
-__all__ = ["LayoutOptions", "LayoutHelpers", "VisualMapEventHandler", "VisualGedcomIds", "FontManager", "ColourManager"]
+try:
+    from .layout_options import LayoutOptions
+
+    __all__.append("LayoutOptions")
+except ImportError:
+    pass
+
+try:
+    from .layout_helpers import LayoutHelpers
+
+    __all__.append("LayoutHelpers")
+except ImportError:
+    pass
+
+try:
+    from .visual_map_event_handlers import VisualMapEventHandler
+
+    __all__.append("VisualMapEventHandler")
+except ImportError:
+    pass
+
+try:
+    from .visual_gedcom_ids import VisualGedcomIds
+
+    __all__.append("VisualGedcomIds")
+except ImportError:
+    pass
+
+try:
+    from .font_manager import FontManager
+
+    __all__.append("FontManager")
+except ImportError:
+    pass
+
+try:
+    from .colour_manager import ColourManager
+
+    __all__.append("ColourManager")
+except ImportError:
+    pass

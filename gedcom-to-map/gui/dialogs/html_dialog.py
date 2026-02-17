@@ -49,6 +49,7 @@ class HTMLDialog(wx.Dialog):
         htmlbody: str,
         width: int,
         font_manager: "FontManager",
+        color_manager=None,
     ) -> None:
         """Initialize the HTML content dialog.
 
@@ -65,6 +66,7 @@ class HTMLDialog(wx.Dialog):
         self.font_name: str
         self.font_size: int
         self.font_name, self.font_size = self.font_manager.get_font_name_size()
+        self.color_manager = color_manager
         super().__init__(parent, title=title, size=(self.font_size * width, self.font_size * 45))
 
         self.icon: wx.Bitmap = wx.ArtProvider.GetBitmap(icontype, wx.ART_OTHER, (32, 32))
@@ -92,7 +94,10 @@ class HTMLDialog(wx.Dialog):
 
         self.SetSizer(sizer)
 
+        self.refresh_dialog_background()
+
         self.Bind(wx.html.EVT_HTML_LINK_CLICKED, self.on_link_clicked, self.html)
+        self.Bind(wx.EVT_ACTIVATE, self.OnActivate)
 
     def set_current_font(self):
         try:
@@ -117,3 +122,31 @@ class HTMLDialog(wx.Dialog):
         except Exception:
             # fallback: ensure dialog is closed
             self.Destroy()
+
+    def OnActivate(self, event: wx.ActivateEvent) -> None:
+        if event.GetActive() and self.color_manager:
+            if self.color_manager.refresh_colors():
+                self.refresh_dialog_background()
+        event.Skip()
+
+    def refresh_dialog_background(self) -> None:
+        if not self.color_manager:
+            return
+        if self.color_manager.has_color("DIALOG_BACKGROUND"):
+            bg_color = self.color_manager.get_color("DIALOG_BACKGROUND")
+            self.SetBackgroundColour(bg_color)
+            self.html.SetBackgroundColour(bg_color)
+        if self.color_manager.has_color("DIALOG_TEXT"):
+            text_color = self.color_manager.get_color("DIALOG_TEXT")
+            self.SetForegroundColour(text_color)
+            self.html.SetForegroundColour(text_color)
+            self._apply_foreground_recursive(self, text_color)
+        self.Refresh()
+
+    def _apply_foreground_recursive(self, root: wx.Window, color: wx.Colour) -> None:
+        try:
+            root.SetForegroundColour(color)
+        except Exception:
+            pass
+        for child in root.GetChildren():
+            self._apply_foreground_recursive(child, color)

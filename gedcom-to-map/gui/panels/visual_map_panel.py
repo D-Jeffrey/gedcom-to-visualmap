@@ -28,6 +28,7 @@ import tracemalloc
 from const import KMLMAPSURL
 
 import wx
+import wx.lib.buttons
 
 from .people_list_ctrl_panel import PeopleListCtrlPanel  # type: ignore
 from ..actions.background_actions import BackgroundActions
@@ -296,10 +297,12 @@ class VisualMapPanel(wx.Panel):
 
         # https://docs.wxpython.org/wx.ColourDatabase.html#wx-colourdatabase
         self.panelA.SetBackgroundColour(self.color_manager.get_color("INFO_BOX_BACKGROUND"))
-        # Use system default for panelB to support dark mode
-        if not self.color_manager.is_dark_mode():
-            self.panelB.SetBackgroundColour(wx.WHITE)
-        # In dark mode, let system handle the background color
+        if self.color_manager.has_color("DIALOG_BACKGROUND"):
+            self.panelB.SetBackgroundColour(self.color_manager.get_color("DIALOG_BACKGROUND"))
+        else:
+            self.panelB.SetBackgroundColour(wx.NullColour)
+        if self.color_manager.has_color("DIALOG_TEXT"):
+            self.panelB.SetForegroundColour(self.color_manager.get_color("DIALOG_TEXT"))
 
         main_hs = wx.BoxSizer(wx.HORIZONTAL)
         main_hs.Add(self.panelA, 1, wx.EXPAND | wx.ALL, 5)
@@ -326,6 +329,7 @@ class VisualMapPanel(wx.Panel):
 
         # Add all the labels, button and radiobox to Right Panel using LayoutOptions helper
         LayoutOptions.build(self, self.panelB)
+        self._apply_panelb_text_color()
 
         pa_sizer = wx.BoxSizer(wx.VERTICAL)
         pa_sizer.Add(self.peopleList, 1, wx.EXPAND | wx.ALL, 5)
@@ -366,11 +370,13 @@ class VisualMapPanel(wx.Panel):
         """Refresh all UI colors after appearance mode change."""
         # Update panel backgrounds
         self.panelA.SetBackgroundColour(self.color_manager.get_color("INFO_BOX_BACKGROUND"))
-        if not self.color_manager.is_dark_mode():
-            self.panelB.SetBackgroundColour(wx.WHITE)
+        if self.color_manager.has_color("DIALOG_BACKGROUND"):
+            self.panelB.SetBackgroundColour(self.color_manager.get_color("DIALOG_BACKGROUND"))
         else:
-            # In dark mode, reset to system default
             self.panelB.SetBackgroundColour(wx.NullColour)
+        if self.color_manager.has_color("DIALOG_TEXT"):
+            self.panelB.SetForegroundColour(self.color_manager.get_color("DIALOG_TEXT"))
+        self._apply_panelb_text_color()
 
         # Note: Input File, Output File, and Configuration Options buttons use system defaults
         # (color=None) and automatically adapt to appearance changes. No manual color refresh needed.
@@ -382,6 +388,36 @@ class VisualMapPanel(wx.Panel):
         # Force repaint
         self.Layout()
         self.Refresh()
+
+    def _apply_panelb_text_color(self) -> None:
+        """Apply DIALOG_TEXT to panelB and all descendant controls."""
+        if not getattr(self, "panelB", None):
+            return
+        if not self.color_manager.has_color("DIALOG_TEXT"):
+            return
+
+        text_color = self.color_manager.get_color("DIALOG_TEXT")
+
+        def apply_recursive(win: wx.Window) -> None:
+            # Skip all button types - they manage their own colors
+            if isinstance(win, (wx.Button, wx.lib.buttons.GenButton, wx.lib.buttons.GenToggleButton)):
+                return
+            # Also skip by class name in case import path differs
+            class_name = win.__class__.__name__
+            if "Button" in class_name:
+                return
+            try:
+                win.SetForegroundColour(text_color)
+            except Exception:
+                pass
+            try:
+                win.SetOwnForegroundColour(text_color)
+            except Exception:
+                pass
+            for child in win.GetChildren():
+                apply_recursive(child)
+
+        apply_recursive(self.panelB)
 
     def refresh_processing_options(self) -> None:
         """Refresh checkbox enable states based on what data is available from last load."""

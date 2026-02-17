@@ -411,9 +411,15 @@ class VisualMapFrame(wx.Frame):
                     self,
                     title=f"About {GUINAME} {self.font_manager.get_font_name_size()[1]}",
                     font_manager=self.font_manager,
+                    color_manager=self.color_manager,
                 )
             else:
-                dialog = HelpDialog(self, title=f"Help for {GUINAME}", font_manager=self.font_manager)
+                dialog = HelpDialog(
+                    self,
+                    title=f"Help for {GUINAME}",
+                    font_manager=self.font_manager,
+                    color_manager=self.color_manager,
+                )
             dialog.ShowModal()
             dialog.Destroy()
         except Exception:

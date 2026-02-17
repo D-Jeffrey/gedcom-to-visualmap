@@ -44,6 +44,8 @@ class ConfigDialog(wx.Dialog):
             [name for name in all_loggers if name in self.logging_keys] if self.logging_keys else all_loggers
         )
         cfgpanel = wx.Panel(self, style=wx.SIMPLE_BORDER)
+        self.cfgpanel = cfgpanel
+        self.refresh_dialog_background()
 
         TEXTkmlcmdlinelbl = wx.StaticText(cfgpanel, -1, " KML Editor Command line:   ")
         self.TEXTkmlcmdline = wx.TextCtrl(cfgpanel, wx.ID_FILE1, "", size=(250, 20))
@@ -84,6 +86,10 @@ class ConfigDialog(wx.Dialog):
         self.CBEnableStatistics = wx.CheckBox(cfgpanel, -1, "Enable statistics processing during GEDCOM load")
         enable_statistics = svc_config.get("EnableStatistics", True)
         self.CBEnableStatistics.SetValue(bool(enable_statistics))
+
+        self.CBUseCustomColors = wx.CheckBox(cfgpanel, -1, "Use CustomColours (disable for platform defaults)")
+        use_custom_colors = svc_config.get("UseCustomColors", True)
+        self.CBUseCustomColors.SetValue(bool(use_custom_colors))
 
         # Statistics options
         self.birth_year_spinner = wx.SpinCtrl(cfgpanel, value="1000", min=1, max=2100, initial=1000, size=(80, 20))
@@ -219,6 +225,11 @@ class ConfigDialog(wx.Dialog):
         sizer.Add(wx.StaticText(cfgpanel, -1, " Processing Options:"))
         sizer.Add(self.CBEnableEnrichment, 0, wx.ALL, 5)
         sizer.Add(self.CBEnableStatistics, 0, wx.ALL, 5)
+        sizer.AddSpacer(10)
+
+        # Appearance Options section
+        sizer.Add(wx.StaticText(cfgpanel, -1, " Appearance Options:"))
+        sizer.Add(self.CBUseCustomColors, 0, wx.ALL, 5)
         sizer.AddSpacer(20)
 
         # Performance Options section
@@ -244,6 +255,10 @@ class ConfigDialog(wx.Dialog):
         )
         self.setAllChoice = wx.Choice(cfgpanel, choices=self.logging_levels)
         self.setAllChoice.SetSelection(1)  # Default to INFO
+        self._apply_choice_colors(self.setAllChoice, selected=False)
+        self.setAllChoice.Bind(wx.EVT_SET_FOCUS, self.onSetAllChoiceFocus)
+        self.setAllChoice.Bind(wx.EVT_KILL_FOCUS, self.onSetAllChoiceBlur)
+        self.setAllChoice.Bind(wx.EVT_CHOICE, self.onSetAllChoiceChanged)
         setAllSizer.Add(self.setAllChoice, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 5)
         setAllButton = wx.Button(cfgpanel, label="Apply to All")
         setAllButton.Bind(wx.EVT_BUTTON, self.onSetAllLevels)
@@ -278,6 +293,7 @@ class ConfigDialog(wx.Dialog):
             if self.color_manager.refresh_colors():
                 # Colors changed, need to refresh the grid colors
                 _log.info("Appearance mode changed in ConfigDialog, refreshing grid colors")
+                self.refresh_dialog_background()
                 self.refresh_grid_colors()
                 # Also notify parent to refresh its colors
                 if self.parent_refresh_callback:
@@ -286,6 +302,67 @@ class ConfigDialog(wx.Dialog):
                     except Exception:
                         _log.exception("Failed to call parent_refresh_callback")
         event.Skip()  # Allow event to propagate
+
+    def refresh_dialog_background(self) -> None:
+        """Update dialog and panel backgrounds from configured colors."""
+        if not self.color_manager:
+            return
+
+        if self.color_manager.has_color("DIALOG_BACKGROUND"):
+            bg_color = self.color_manager.get_color("DIALOG_BACKGROUND")
+            self.SetBackgroundColour(bg_color)
+            if hasattr(self, "cfgpanel") and self.cfgpanel:
+                self.cfgpanel.SetBackgroundColour(bg_color)
+        if self.color_manager.has_color("DIALOG_TEXT"):
+            text_color = self.color_manager.get_color("DIALOG_TEXT")
+            self.SetForegroundColour(text_color)
+            if hasattr(self, "cfgpanel") and self.cfgpanel:
+                self.cfgpanel.SetForegroundColour(text_color)
+                self._apply_foreground_recursive(self.cfgpanel, text_color)
+        if hasattr(self, "setAllChoice") and self.setAllChoice:
+            self._apply_choice_colors(self.setAllChoice, selected=False)
+            self.Refresh()
+
+    def _apply_foreground_recursive(self, root: wx.Window, color: wx.Colour) -> None:
+        try:
+            root.SetForegroundColour(color)
+        except Exception:
+            pass
+        for child in root.GetChildren():
+            self._apply_foreground_recursive(child, color)
+
+    def _apply_choice_colors(self, choice_ctrl: wx.Choice, selected: bool = False) -> None:
+        if not self.color_manager or not choice_ctrl:
+            return
+
+        if selected:
+            if self.color_manager.has_color("GRID_SELECTED_BACK"):
+                choice_ctrl.SetBackgroundColour(self.color_manager.get_color("GRID_SELECTED_BACK"))
+            elif self.color_manager.has_color("DIALOG_BACKGROUND"):
+                choice_ctrl.SetBackgroundColour(self.color_manager.get_color("DIALOG_BACKGROUND"))
+
+            if self.color_manager.has_color("GRID_SELECTED_TEXT"):
+                choice_ctrl.SetForegroundColour(self.color_manager.get_color("GRID_SELECTED_TEXT"))
+            elif self.color_manager.has_color("DIALOG_TEXT"):
+                choice_ctrl.SetForegroundColour(self.color_manager.get_color("DIALOG_TEXT"))
+            return
+
+        if self.color_manager.has_color("DIALOG_BACKGROUND"):
+            choice_ctrl.SetBackgroundColour(self.color_manager.get_color("DIALOG_BACKGROUND"))
+        if self.color_manager.has_color("DIALOG_TEXT"):
+            choice_ctrl.SetForegroundColour(self.color_manager.get_color("DIALOG_TEXT"))
+
+    def onSetAllChoiceFocus(self, event: wx.FocusEvent) -> None:
+        self._apply_choice_colors(self.setAllChoice, selected=True)
+        event.Skip()
+
+    def onSetAllChoiceBlur(self, event: wx.FocusEvent) -> None:
+        self._apply_choice_colors(self.setAllChoice, selected=False)
+        event.Skip()
+
+    def onSetAllChoiceChanged(self, event: wx.CommandEvent) -> None:
+        self._apply_choice_colors(self.setAllChoice, selected=True)
+        event.Skip()
 
     def refresh_grid_colors(self) -> None:
         """Update grid readonly background colors based on current color scheme."""
@@ -411,6 +488,7 @@ class ConfigDialog(wx.Dialog):
                 self.svc_config.set("EnableEnrichment", bool(self.CBEnableEnrichment.GetValue()))
                 self.svc_config.set("EnableStatistics", bool(self.CBEnableStatistics.GetValue()))
                 self.svc_config.set("EnableTracemalloc", bool(self.CBEnableTracemalloc.GetValue()))
+                self.svc_config.set("UseCustomColors", bool(self.CBUseCustomColors.GetValue()))
                 self.svc_config.set("earliest_credible_birth_year", self.birth_year_spinner.GetValue())
                 # Set geocoding mode based on radio button selection
                 if self.rb_geocode_only.GetValue():
@@ -439,6 +517,14 @@ class ConfigDialog(wx.Dialog):
             _log.exception("ConfigDialog.onSave: savesettings failed")
 
         # Refresh parent panel to update UI based on changed settings
+        try:
+            if self.color_manager and hasattr(self.color_manager, "set_use_custom_colors"):
+                self.color_manager.set_use_custom_colors(bool(self.CBUseCustomColors.GetValue()))
+                self.refresh_dialog_background()
+                self.refresh_grid_colors()
+        except Exception:
+            _log.exception("ConfigDialog.onSave: failed to apply UseCustomColors to color_manager")
+
         if self.parent_refresh_callback:
             try:
                 self.parent_refresh_callback()

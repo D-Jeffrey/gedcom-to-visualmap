@@ -11,7 +11,13 @@ _log = logging.getLogger(__name__)
 class GedRecordDialog(wx.Frame):
     """A dialog for displaying a flattened view of a GEDCOM record using wxPython."""
 
-    def __init__(self, parent: Optional[wx.Window], record: Any, title: Optional[str] = None) -> None:
+    def __init__(
+        self,
+        parent: Optional[wx.Window],
+        record: Any,
+        title: Optional[str] = None,
+        color_manager: Any = None,
+    ) -> None:
         """Initialize the GEDCOM record display dialog.
 
         Args:
@@ -21,15 +27,19 @@ class GedRecordDialog(wx.Frame):
         """
         title = title or f"GED Record: {getattr(record, 'xref_id', getattr(record, 'tag', record.__class__.__name__))}"
         super().__init__(parent, title=title, size=(800, 600))
+        self.color_manager = color_manager
 
         main_sizer = wx.BoxSizer(wx.VERTICAL)
         panel = scrolled.ScrolledPanel(self, -1)
+        self.main_panel = panel
         panel.SetupScrolling(scroll_x=False, scroll_y=True)
         pnl_sizer = wx.BoxSizer(wx.VERTICAL)
 
         self.list = wx.ListCtrl(panel, style=wx.LC_REPORT | wx.BORDER_SUNKEN | wx.LC_HRULES | wx.LC_VRULES)
         self.list.InsertColumn(0, "Field path")
         self.list.InsertColumn(1, "Value")
+        self.list.Bind(wx.EVT_LIST_ITEM_SELECTED, self._on_item_selected)
+        self.list.Bind(wx.EVT_LIST_ITEM_DESELECTED, self._on_item_deselected)
 
         flattened = self._flatten_ged_record(record) if record is not None else []
         flattened.sort(key=lambda x: x[0].lower())
@@ -68,9 +78,90 @@ class GedRecordDialog(wx.Frame):
         accel_tbl = wx.AcceleratorTable([(wx.ACCEL_CTRL, ord("C"), copy_btn.GetId())])
         self.SetAcceleratorTable(accel_tbl)
 
+        self.Bind(wx.EVT_ACTIVATE, self._on_activate)
+        self.refresh_colors()
+
         # Center and show
         self.Centre()
         self.Show()
+
+    def _on_activate(self, event: wx.ActivateEvent) -> None:
+        if event.GetActive() and self.color_manager and self.color_manager.refresh_colors():
+            self.refresh_colors()
+        event.Skip()
+
+    def refresh_colors(self) -> None:
+        if not self.color_manager:
+            return
+
+        if self.color_manager.has_color("DIALOG_BACKGROUND"):
+            dialog_bg = self.color_manager.get_color("DIALOG_BACKGROUND")
+            self.SetBackgroundColour(dialog_bg)
+
+        if self.color_manager.has_color("DIALOG_TEXT"):
+            dialog_text = self.color_manager.get_color("DIALOG_TEXT")
+            self.SetForegroundColour(dialog_text)
+            if hasattr(self, "main_panel") and self.main_panel:
+                self._apply_foreground_recursive(self.main_panel, dialog_text)
+
+        row_back = self.color_manager.get_color("GRID_BACK") if self.color_manager.has_color("GRID_BACK") else None
+        row_alt = self.color_manager.get_color("GRID_ALT") if self.color_manager.has_color("GRID_ALT") else row_back
+        row_text = self.color_manager.get_color("GRID_TEXT") if self.color_manager.has_color("GRID_TEXT") else None
+
+        if row_back is not None:
+            self.list.SetBackgroundColour(row_back)
+        if row_text is not None:
+            self.list.SetForegroundColour(row_text)
+
+        for item_index in range(self.list.GetItemCount()):
+            item_colour = row_alt if (item_index % 2 == 1 and row_alt is not None) else row_back
+            if item_colour is not None:
+                self.list.SetItemBackgroundColour(item_index, item_colour)
+            if row_text is not None:
+                self.list.SetItemTextColour(item_index, row_text)
+
+        selected_idx = self.list.GetFirstSelected()
+        if selected_idx != -1:
+            self._apply_selected_colors(selected_idx)
+
+        self.Refresh()
+
+    def _apply_foreground_recursive(self, root: wx.Window, color: wx.Colour) -> None:
+        try:
+            root.SetForegroundColour(color)
+        except Exception:
+            pass
+        for child in root.GetChildren():
+            self._apply_foreground_recursive(child, color)
+
+    def _apply_selected_colors(self, item_index: int) -> None:
+        if not self.color_manager:
+            return
+        if self.color_manager.has_color("GRID_SELECTED_BACK"):
+            self.list.SetItemBackgroundColour(item_index, self.color_manager.get_color("GRID_SELECTED_BACK"))
+        if self.color_manager.has_color("GRID_SELECTED_TEXT"):
+            self.list.SetItemTextColour(item_index, self.color_manager.get_color("GRID_SELECTED_TEXT"))
+
+    def _restore_row_colors(self, item_index: int) -> None:
+        if not self.color_manager:
+            return
+        row_back = self.color_manager.get_color("GRID_BACK") if self.color_manager.has_color("GRID_BACK") else None
+        row_alt = self.color_manager.get_color("GRID_ALT") if self.color_manager.has_color("GRID_ALT") else row_back
+        row_text = self.color_manager.get_color("GRID_TEXT") if self.color_manager.has_color("GRID_TEXT") else None
+
+        item_colour = row_alt if (item_index % 2 == 1 and row_alt is not None) else row_back
+        if item_colour is not None:
+            self.list.SetItemBackgroundColour(item_index, item_colour)
+        if row_text is not None:
+            self.list.SetItemTextColour(item_index, row_text)
+
+    def _on_item_selected(self, event: wx.ListEvent) -> None:
+        self._apply_selected_colors(event.GetIndex())
+        event.Skip()
+
+    def _on_item_deselected(self, event: wx.ListEvent) -> None:
+        self._restore_row_colors(event.GetIndex())
+        event.Skip()
 
     def on_copy_selected(self, event: wx.CommandEvent) -> None:
         """
@@ -195,6 +286,7 @@ class GedRecordDialog(wx.Frame):
         *,
         svc_config: Any = None,
         svc_state: Any = None,
+        color_manager: Any = None,
     ) -> "GedRecordDialog":
         """
         Instantiate and show the GedRecordDialog for a given GEDCOM record.
@@ -254,5 +346,5 @@ class GedRecordDialog(wx.Frame):
             _log.error(f"Error looking up details in for person in  GEDCOM file '{input_file}': {e}")
             record = None
 
-        dlg = cls(parent, record, title=title)
+        dlg = cls(parent, record, title=title, color_manager=color_manager)
         return dlg

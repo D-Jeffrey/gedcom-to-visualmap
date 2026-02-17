@@ -43,6 +43,7 @@ class PersonDialog(wx.Dialog):
         panel: wx.Panel,
         font_manager: "FontManager",
         *,
+        color_manager: Optional["ColourManager"] = None,
         svc_config: Optional["IConfig"] = None,
         svc_state: Optional["IState"] = None,
         svc_progress: Optional["IProgressTracker"] = None,
@@ -72,6 +73,7 @@ class PersonDialog(wx.Dialog):
         self.svc_progress: Optional["IProgressTracker"] = (
             svc_progress if svc_progress is not None else getattr(panel, "svc_progress", None)
         )
+        self.color_manager = color_manager if color_manager is not None else getattr(panel, "color_manager", None)
         self.font_manager: "FontManager" = font_manager
         self.person: Person = person
         self.panel: wx.Panel = panel
@@ -87,8 +89,10 @@ class PersonDialog(wx.Dialog):
         self.lineage_panel: FamilyPanel = None
         self.spouses_panel: FamilyPanel = None
         self.children_panel: FamilyPanel = None
+        self._person_detail_ctrl_names: list[str] = []
 
         self.build(panel, self.people, person)
+        self.refresh_dialog_background()
 
         # Register with font_manager to receive updates
         if self.font_manager and hasattr(self.font_manager, "register_font_change_callback"):
@@ -96,6 +100,7 @@ class PersonDialog(wx.Dialog):
 
         # Clean up on close - use EVT_WINDOW_DESTROY instead
         self.Bind(wx.EVT_WINDOW_DESTROY, self.on_destroy)
+        self.Bind(wx.EVT_ACTIVATE, self.OnActivate)
 
     def on_destroy(self, event):
         """Clean up when dialog closes."""
@@ -173,6 +178,81 @@ class PersonDialog(wx.Dialog):
             if self.children_panel:
                 if hasattr(self.children_panel, "update_fonts"):
                     self.children_panel.update_fonts(self.font_manager)
+
+    def OnActivate(self, event: wx.ActivateEvent) -> None:
+        if event.GetActive() and self.color_manager:
+            if self.color_manager.refresh_colors():
+                self.refresh_dialog_background()
+        event.Skip()
+
+    def refresh_dialog_background(self) -> None:
+        if not self.color_manager:
+            return
+        if self.color_manager.has_color("DIALOG_BACKGROUND"):
+            self.SetBackgroundColour(self.color_manager.get_color("DIALOG_BACKGROUND"))
+        if self.color_manager.has_color("DIALOG_TEXT"):
+            dialog_text = self.color_manager.get_color("DIALOG_TEXT")
+            self.SetForegroundColour(dialog_text)
+            self._apply_foreground_recursive(self, dialog_text)
+        self.refresh_person_detail_colors()
+        for fam_panel in (self.lineage_panel, self.spouses_panel, self.children_panel):
+            try:
+                if fam_panel and hasattr(fam_panel, "refresh_colors"):
+                    fam_panel.refresh_colors()
+            except Exception:
+                _log.debug("Failed to refresh family panel colors", exc_info=True)
+            self.Refresh()
+
+    def _apply_foreground_recursive(self, root: wx.Window, color: wx.Colour) -> None:
+        try:
+            root.SetForegroundColour(color)
+        except Exception:
+            pass
+        for child in root.GetChildren():
+            self._apply_foreground_recursive(child, color)
+
+    def refresh_person_detail_colors(self) -> None:
+        """Apply configured colors to Person Details labels and read-only fields."""
+        if not self.color_manager:
+            return
+
+        grid_back = self.color_manager.get_color("GRID_BACK") if self.color_manager.has_color("GRID_BACK") else None
+        grid_text = self.color_manager.get_color("GRID_TEXT") if self.color_manager.has_color("GRID_TEXT") else None
+        dialog_text = grid_text
+
+        # Labels
+        if dialog_text is not None:
+            for child in self.GetChildren():
+                if isinstance(child, wx.StaticText):
+                    try:
+                        child.SetForegroundColour(dialog_text)
+                    except Exception:
+                        pass
+
+        warn_soft_back = self._get_warn_soft_back()
+
+        # Read-only detail fields
+        for ctrl_name in self._person_detail_ctrl_names:
+            ctrl = getattr(self, ctrl_name, None)
+            if not isinstance(ctrl, wx.TextCtrl):
+                continue
+
+            try:
+                if grid_back is not None:
+                    # Preserve warning highlight in "Of Note" field
+                    if ctrl_name != "issuesTextCtrl" or ctrl.GetBackgroundColour() != warn_soft_back:
+                        ctrl.SetBackgroundColour(grid_back)
+                if grid_text is not None:
+                    ctrl.SetForegroundColour(grid_text)
+            except Exception:
+                pass
+
+        self.Refresh()
+
+    def _get_warn_soft_back(self) -> wx.Colour:
+        if self.color_manager and self.color_manager.has_color("WARN_SOFT_BACK"):
+            return self.color_manager.get_color("WARN_SOFT_BACK")
+        return wx.YELLOW
 
     def _get_marriages_list(self, people: dict, person: Person) -> str:
         """Return a newline-separated string listing all marriages for the person.
@@ -278,10 +358,11 @@ class PersonDialog(wx.Dialog):
                     proportion = 1
                 sizer.Add(wx.StaticText(self, label=line["label"]), 0, wx.LEFT | wx.TOP, border=5)
                 setattr(self, line["wx_name"], wx.TextCtrl(self, style=style, size=line.get("size", (-1, -1))))
+                self._person_detail_ctrl_names.append(line["wx_name"])
                 sizer.Add(getattr(self, line["wx_name"]), proportion, wx.EXPAND, border=5)
 
         if issues:
-            self.issuesTextCtrl.SetBackgroundColour(wx.YELLOW)
+            self.issuesTextCtrl.SetBackgroundColour(self._get_warn_soft_back())
 
         # Populate values
         self.nameTextCtrl.SetValue(self.formatPersonName(person))
@@ -333,6 +414,8 @@ class PersonDialog(wx.Dialog):
         if home_row_idx is not None and homelist.count("\n") > 2:
             sizer.AddGrowableRow(home_row_idx)
 
+        self.refresh_person_detail_colors()
+
         return sizer
 
     def _add_lineage_details(
@@ -382,7 +465,13 @@ class PersonDialog(wx.Dialog):
                                 )
                             except Exception:
                                 _log.exception("Error building lineage entry for %s", hid)
-                        related = FamilyPanel(self, heritageSet, isLineage=True, font_manager=self.font_manager)
+                        related = FamilyPanel(
+                            self,
+                            heritageSet,
+                            isLineage=True,
+                            font_manager=self.font_manager,
+                            color_manager=self.color_manager,
+                        )
             if not related:
                 related = wx.StaticText(self, label="No lineage to selected main person")
         return related
@@ -414,7 +503,13 @@ class PersonDialog(wx.Dialog):
                 except Exception:
                     _log.exception("Error building spouse entry for %s", hid)
             if FamilyPanel:
-                spousesize = FamilyPanel(self, spouseSet, isLineage=False, font_manager=self.font_manager)
+                spousesize = FamilyPanel(
+                    self,
+                    spouseSet,
+                    isLineage=False,
+                    font_manager=self.font_manager,
+                    color_manager=self.color_manager,
+                )
             else:
                 spousesize = wx.StaticText(self, label="Spouses panel unavailable")
 
@@ -447,7 +542,13 @@ class PersonDialog(wx.Dialog):
                 except Exception:
                     _log.exception("Error building child entry for %s", hid)
             if FamilyPanel:
-                childsize = FamilyPanel(self, childSet, isLineage=False, font_manager=self.font_manager)
+                childsize = FamilyPanel(
+                    self,
+                    childSet,
+                    isLineage=False,
+                    font_manager=self.font_manager,
+                    color_manager=self.color_manager,
+                )
             else:
                 childsize = wx.StaticText(self, label="Children panel unavailable")
 
@@ -555,6 +656,7 @@ class PersonDialog(wx.Dialog):
             title=f"Record of {self.person.name}",
             svc_config=svc_config,
             svc_state=svc_state,
+            color_manager=self.color_manager,
         )
 
     def formatPersonName(self, person: Person, longForm=True):

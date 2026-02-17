@@ -269,11 +269,12 @@ class VisualMapFrame(wx.Frame):
         """Handle window activation: check for system appearance changes."""
         if event.GetActive():
             # Window is being activated - check if appearance mode changed
-            if self.color_manager.refresh_colors():
+            mode_changed = self.color_manager.refresh_colors()
+            if mode_changed:
                 # Colors changed, need to refresh the UI
                 _log.info("Appearance mode changed, refreshing UI colors")
-                # Refresh the panel colors
-                self.visual_map_panel.refresh_colors()
+            # Always refresh when activated (in case a dialog refreshed before us)
+            self.visual_map_panel.refresh_colors()
         event.Skip()  # Allow event to propagate
 
     def OnOpenCSV(self, event: wx.Event) -> None:

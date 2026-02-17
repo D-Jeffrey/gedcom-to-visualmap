@@ -390,22 +390,69 @@ class VisualMapPanel(wx.Panel):
         self.Refresh()
 
     def _apply_panelb_text_color(self) -> None:
-        """Apply DIALOG_TEXT to panelB and all descendant controls."""
+        """Apply DIALOG_TEXT and DIALOG_BACKGROUND to panelB and all descendant controls."""
         if not getattr(self, "panelB", None):
             return
         if not self.color_manager.has_color("DIALOG_TEXT"):
             return
 
         text_color = self.color_manager.get_color("DIALOG_TEXT")
+        bg_color = (
+            self.color_manager.get_color("DIALOG_BACKGROUND")
+            if self.color_manager.has_color("DIALOG_BACKGROUND")
+            else None
+        )
 
         def apply_recursive(win: wx.Window) -> None:
-            # Skip all button types - they manage their own colors
-            if isinstance(win, (wx.Button, wx.lib.buttons.GenButton, wx.lib.buttons.GenToggleButton)):
+            # Handle GenCheckBox specially - needs both colors updated
+            class_name = win.__class__.__name__
+            if class_name == "GenCheckBox":
+                try:
+                    win.SetForegroundColour(text_color)
+                    if bg_color:
+                        win.SetBackgroundColour(bg_color)
+                    win.Refresh()
+                except Exception:
+                    pass
+                # Still recurse into children in case there are nested controls
+                for child in win.GetChildren():
+                    apply_recursive(child)
+                return
+
+            # Handle GenButton specially - re-apply colors from color manager
+            if isinstance(win, wx.lib.buttons.GenButton):
+                try:
+                    # Check if button has a stored color key
+                    if hasattr(win, "_color_key") and win._color_key:
+                        btn_color = self.color_manager.get_color(win._color_key)
+                        win.SetBackgroundColour(btn_color)
+                    if self.color_manager.has_color("DIALOG_TEXT"):
+                        win.SetForegroundColour(self.color_manager.get_color("DIALOG_TEXT"))
+                    win.Refresh()
+                except Exception:
+                    pass
+                return
+
+            # Skip other button types - they use native styling
+            if isinstance(win, (wx.Button, wx.lib.buttons.GenToggleButton)):
                 return
             # Also skip by class name in case import path differs
-            class_name = win.__class__.__name__
-            if "Button" in class_name:
+            if "Button" in class_name and class_name != "GenButton":
                 return
+
+            # Handle CustomRadioBox specially - it needs both foreground and background
+            # set via its custom methods to propagate to internal StaticBox and GenToggleButtons
+            if class_name == "CustomRadioBox":
+                try:
+                    win.SetForegroundColour(text_color)
+                    if bg_color:
+                        win.SetBackgroundColour(bg_color)
+                        win.Refresh()
+                except Exception:
+                    pass
+                # Don't recurse into CustomRadioBox children - it handles them internally
+                return
+
             try:
                 win.SetForegroundColour(text_color)
             except Exception:
@@ -414,6 +461,14 @@ class VisualMapPanel(wx.Panel):
                 win.SetOwnForegroundColour(text_color)
             except Exception:
                 pass
+            # Apply background color to Panels and StaticBoxes so they match the theme
+            if bg_color and isinstance(win, (wx.Panel, wx.StaticBox)):
+                try:
+                    win.SetBackgroundColour(bg_color)
+                    # Force immediate refresh for panels/boxes
+                    win.Refresh()
+                except Exception:
+                    pass
             for child in win.GetChildren():
                 apply_recursive(child)
 

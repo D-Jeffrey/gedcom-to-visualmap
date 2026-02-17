@@ -73,6 +73,7 @@ class CustomRadioBox(wx.Panel):
         try:
             self._static_box.SetForegroundColour(colour)
             self._static_box.SetOwnForegroundColour(colour)
+            self._static_box.Refresh()
         except Exception:
             pass
         try:
@@ -85,6 +86,11 @@ class CustomRadioBox(wx.Panel):
                 btn.SetOwnForegroundColour(colour)
             except Exception:
                 pass
+            try:
+                btn.Refresh()
+            except Exception:
+                pass
+        self.Refresh()
         return ok
 
     def SetBackgroundColour(self, colour: wx.Colour) -> bool:
@@ -92,6 +98,7 @@ class CustomRadioBox(wx.Panel):
         try:
             self._static_box.SetBackgroundColour(colour)
             self._static_box.SetOwnBackgroundColour(colour)
+            self._static_box.Refresh()
         except Exception:
             pass
         try:
@@ -104,6 +111,11 @@ class CustomRadioBox(wx.Panel):
                 btn.SetOwnBackgroundColour(colour)
             except Exception:
                 pass
+            try:
+                btn.Refresh()
+            except Exception:
+                pass
+        self.Refresh()
         return ok
 
 
@@ -214,6 +226,9 @@ class LayoutHelpers:
 
         # Create generic custom-drawn button when explicit color theming is requested
         btn = GenButton(panel, id=id_, label=label)
+
+        # Store color key for refresh_colors usage
+        btn._color_key = color
 
         # Apply color BEFORE sizing to ensure proper rendering
         if color:

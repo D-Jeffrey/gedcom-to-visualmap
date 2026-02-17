@@ -186,7 +186,7 @@ class LayoutHelpers:
         panel: wx.Panel,
         id_name: str,
         label: str = "",
-        color: str = "BTN_DIRECTORY",
+        color: str = "BTN_BACK",
         force_custom: bool = False,
     ) -> wx.Window:
         id_ = -1

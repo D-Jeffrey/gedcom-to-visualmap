@@ -17,7 +17,7 @@ gui_options:
 gui_colors:
   # Buttons (status/action controls such as load/create and directory/file actions)
   BTN_PRESS: "TAN"
-  BTN_DIRECTORY: "WHEAT"
+  BTN_BACK: "LIGHT GREY"
   BTN_DONE: "WHITE"
 
   # Dialogs and right-side options panel backgrounds/text
@@ -68,44 +68,45 @@ gui_colors_dark:
   # Same usage groups as gui_colors above, but for dark-mode palette values.
 
   # Buttons (status/action controls such as load/create and directory/file actions)
-  BTN_PRESS: "RED" # "TAN"            # Warm peachy brown
-  BTN_DIRECTORY: "RED" # "WHEAT"      # Bright cream
-  BTN_DONE: "RED" # "PALE GREEN"      # Soft green
+  BTN_PRESS: "TAN"            # Warm peachy brown
+  BTN_BACK: "#4A4A4C"         # Medium-dark gray (standard button background)
+  BTN_DONE: "PALE GREEN"      # Soft green
 
   # Dialogs and right-side options panel backgrounds/text
-  DIALOG_BACKGROUND: "RED" # "#2A2A2A"
-  DIALOG_TEXT: "GREEN" # "WHITE"
+  DIALOG_BACKGROUND: "#2A2A2A"  # Dark gray background
+  DIALOG_TEXT: "WHITE"
 
   # Selection highlight for list/grid selected rows/items
-  GRID_SELECTED_BACK: "RED" # "SKY BLUE"        # Bright blue
-  GRID_SELECTED_TEXT: "GREEN" # "WHITE"
+  GRID_SELECTED_BACK: "SKY BLUE"        # Bright blue
+  GRID_SELECTED_TEXT: "WHITE"
 
   # People categorization row colors in the left people list
-  ANCESTOR: "BLUE" # "WHEAT"           # Bright cream
-  MAINPERSON: "BLUE" # "KHAKI"         # Olive green
-  OTHERPERSON: "BLUE" # "DARK GREY"    # Very dark gray
+  ANCESTOR: "CORAL"           # Bright coral (stands out on black, readable white text)
+  MAINPERSON: "KHAKI"         # Olive green
+  OTHERPERSON: "DARK GREY"    # Very dark gray
 
   # Left info/message box background
-  INFO_BOX_BACKGROUND: "ORANGE" # "BLACK"
+  INFO_BOX_BACKGROUND: "BLACK"
 
   # Table/list body colors
-  GRID_TEXT: "GREEN" # "WHITE"
-  GRID_BACK: "RED" # "BLACK"
+  GRID_TEXT: "WHITE"
+  GRID_BACK: "BLACK"
 
   # Table/list header colors
-  GRID_HEADER_TEXT: "GREEN" # "WHITE"
-  GRID_HEADER_BACK: "BLUE" # "#3A3A3A"
+  GRID_HEADER_TEXT: "WHITE"
+  GRID_HEADER_BACK: "#3A3A3A"  # Dark gray
 
   # Read-only grid cells (e.g., config dialog logger-name column)
-  GRID_READONLY_BACK: "RED" # "#3A3A3A"  # Dark gray for readonly cells in dark mode
+  GRID_READONLY_BACK: "#3A3A3A"  # Dark gray for readonly cells in dark mode
 
   # Main right-panel title banner ("Visual Mapping Options")
-  TITLE_TEXT: "GREEN" # "WHITE"
-  TITLE_BACK: "RED" # "BLACK"
+  TITLE_TEXT: "WHITE"
+  TITLE_BACK: "BLACK"
 
   # Busy indicator colors
-  BUSY_BACK: "RED" # "KHAKI"          # Muted olive for busy indicator
-  BUSY_TEXT: "GREEN" # "WHITE"
+  BUSY_BACK: "KHAKI"          # Muted olive for busy indicator
+  BUSY_TEXT: "WHITE"
+
   # Warning highlight colors (same usage as light mode):
   # - WARN_BACK / WARN_TEXT: severe anomalies.
   # - WARN_SOFT_BACK: softer warnings.

@@ -78,7 +78,7 @@ class LayoutOptions:
         """Create input/output file controls and add to sizer."""
         # Match bottom action-row button implementation exactly.
         force_custom = bool(vm_panel.color_manager and vm_panel.color_manager.use_custom_colors())
-        button_color = "BTN_DIRECTORY" if force_custom else None
+        button_color = "BTN_BACK" if force_custom else None
 
         # Create both buttons before text controls (critical for macOS GenButton rendering)
         btn_in = LayoutHelpers.add_button_with_id(
@@ -125,7 +125,7 @@ class LayoutOptions:
         """Add the top-level checkbox controls and configuration button."""
         # Configuration button
         force_custom = bool(vm_panel.color_manager and vm_panel.color_manager.use_custom_colors())
-        button_color = "BTN_DIRECTORY" if force_custom else None
+        button_color = "BTN_BACK" if force_custom else None
         btn_config = LayoutHelpers.add_button_with_id(
             vm_panel,
             panel,
@@ -371,16 +371,16 @@ class LayoutOptions:
         """Create the action buttons row (Load, Create, CSV, Trace, Stop, Browser)."""
         force_custom = bool(vm_panel.color_manager and vm_panel.color_manager.use_custom_colors())
         bt_load = LayoutHelpers.add_button_with_id(
-            vm_panel, panel, "BTNLoad", "Load", color=None, force_custom=force_custom
+            vm_panel, panel, "BTNLoad", "Load", color="BTN_BACK", force_custom=force_custom
         )
         bt_create = LayoutHelpers.add_button_with_id(
-            vm_panel, panel, "BTNCreateFiles", "Create Files", color=None, force_custom=force_custom
+            vm_panel, panel, "BTNCreateFiles", "Create Files", color="BTN_BACK", force_custom=force_custom
         )
         bt_csv = LayoutHelpers.add_button_with_id(
-            vm_panel, panel, "BTNCSV", "Geo Table", color=None, force_custom=force_custom
+            vm_panel, panel, "BTNCSV", "Geo Table", color="BTN_BACK", force_custom=force_custom
         )
         bt_trace = LayoutHelpers.add_button_with_id(
-            vm_panel, panel, "BTNTRACE", "Trace", color=None, force_custom=force_custom
+            vm_panel, panel, "BTNTRACE", "Trace", color="BTN_BACK", force_custom=force_custom
         )
 
         l1 = wx.BoxSizer(wx.HORIZONTAL)
@@ -392,10 +392,10 @@ class LayoutOptions:
 
         busy_indicator = LayoutHelpers.add_busy_indicator(vm_panel, panel, "busyIndicator", color="BUSY_BACK")
         bt_stop = LayoutHelpers.add_button_with_id(
-            vm_panel, panel, "BTNSTOP", "Stop", color=None, force_custom=force_custom
+            vm_panel, panel, "BTNSTOP", "Stop", color="BTN_BACK", force_custom=force_custom
         )
         bt_browser = LayoutHelpers.add_button_with_id(
-            vm_panel, panel, "BTNBROWSER", "Browser", color=None, force_custom=force_custom
+            vm_panel, panel, "BTNBROWSER", "Browser", color="BTN_BACK", force_custom=force_custom
         )
 
         l2 = wx.BoxSizer(wx.HORIZONTAL)

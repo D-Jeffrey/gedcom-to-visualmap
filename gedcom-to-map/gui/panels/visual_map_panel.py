@@ -419,6 +419,18 @@ class VisualMapPanel(wx.Panel):
                     apply_recursive(child)
                 return
 
+            # Handle TextCtrl specially - ensure both enabled and disabled get proper colors
+            if isinstance(win, wx.TextCtrl):
+                try:
+                    win.SetForegroundColour(text_color)
+                    win.SetOwnForegroundColour(text_color)
+                    if bg_color:
+                        win.SetBackgroundColour(bg_color)
+                    win.Refresh()
+                except Exception:
+                    pass
+                return
+
             # Handle GenButton specially - re-apply colors from color manager
             if isinstance(win, wx.lib.buttons.GenButton):
                 try:

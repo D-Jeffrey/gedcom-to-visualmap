@@ -271,9 +271,20 @@ class LayoutHelpers:
         id_ = -1
         if id_name in vm_panel.id.IDs:
             id_ = vm_panel.id.IDs[id_name]
-        txt = wx.TextCtrl(panel, id=id_, size=size)
-        txt.Enable(enable)
+        # Use TE_READONLY instead of disabling for better color control
+        style = 0
+        if not enable:
+            style = wx.TE_READONLY
+        txt = wx.TextCtrl(panel, id=id_, size=size, style=style)
+        # Don't call Enable(False) - use TE_READONLY style instead for color consistency
         LayoutHelpers._apply_dialog_text_color(vm_panel, txt)
+        # Also set background color for consistency
+        try:
+            color_manager = getattr(vm_panel, "color_manager", None)
+            if color_manager and color_manager.has_color("DIALOG_BACKGROUND"):
+                txt.SetBackgroundColour(color_manager.get_color("DIALOG_BACKGROUND"))
+        except Exception:
+            pass
         setattr(vm_panel.id, id_name, txt)
         return txt
 

@@ -280,6 +280,13 @@ class ConfigDialog(wx.Dialog):
 
         cfgpanel.SetSizer(sizer)
         self.GRIDctl = GRIDctl
+        self.saveBTN = saveBTN
+        self.cancelBTN = cancelBTN
+        self.setAllButton = setAllButton
+        self.clearLogButton = clearLogButton
+
+        # Apply colors to all controls (critical for Windows)
+        self._apply_control_colors()
 
         # Bind to activation event to detect color scheme changes
         self.Bind(wx.EVT_ACTIVATE, self.OnActivate)
@@ -321,7 +328,9 @@ class ConfigDialog(wx.Dialog):
                 self._apply_foreground_recursive(self.cfgpanel, text_color)
         if hasattr(self, "setAllChoice") and self.setAllChoice:
             self._apply_choice_colors(self.setAllChoice, selected=False)
-            self.Refresh()
+        # Apply colors to all controls
+        self._apply_control_colors()
+        self.Refresh()
 
     def _apply_foreground_recursive(self, root: wx.Window, color: wx.Colour) -> None:
         try:
@@ -364,21 +373,113 @@ class ConfigDialog(wx.Dialog):
         self._apply_choice_colors(self.setAllChoice, selected=True)
         event.Skip()
 
-    def refresh_grid_colors(self) -> None:
-        """Update grid readonly background colors based on current color scheme."""
+    def _apply_control_colors(self) -> None:
+        """Apply colors explicitly to all controls for Windows compatibility."""
         if not self.color_manager:
             return
 
-        # Get updated readonly background color
+        # Get colors
+        dialog_bg = None
+        dialog_text = None
+        if self.color_manager.has_color("DIALOG_BACKGROUND"):
+            dialog_bg = self.color_manager.get_color("DIALOG_BACKGROUND")
+        if self.color_manager.has_color("DIALOG_TEXT"):
+            dialog_text = self.color_manager.get_color("DIALOG_TEXT")
+
+        # Apply to text fields (check if they exist first)
+        text_field_names = [
+            "TEXTkmlcmdline",
+            "TEXTcsvcmdline",
+            "TEXTtracecmdline",
+            "default_country_text",
+        ]
+        for field_name in text_field_names:
+            if not hasattr(self, field_name):
+                continue
+            txt = getattr(self, field_name)
+            if dialog_bg:
+                txt.SetBackgroundColour(dialog_bg)
+                txt.SetOwnBackgroundColour(dialog_bg)
+            if dialog_text:
+                txt.SetForegroundColour(dialog_text)
+                txt.SetOwnForegroundColour(dialog_text)
+
+        # Apply to spin controls (check if they exist first)
+        spin_ctrl_names = ["birth_year_spinner", "retry_days_spinner"]
+        for spin_name in spin_ctrl_names:
+            if not hasattr(self, spin_name):
+                continue
+            spin = getattr(self, spin_name)
+            if dialog_bg:
+                spin.SetBackgroundColour(dialog_bg)
+                if hasattr(spin, "SetOwnBackgroundColour"):
+                    spin.SetOwnBackgroundColour(dialog_bg)
+            if dialog_text:
+                spin.SetForegroundColour(dialog_text)
+                if hasattr(spin, "SetOwnForegroundColour"):
+                    spin.SetOwnForegroundColour(dialog_text)
+
+        # Apply to buttons (check if they exist first)
+        button_names = ["saveBTN", "cancelBTN", "setAllButton", "clearLogButton"]
+        for btn_name in button_names:
+            if not hasattr(self, btn_name):
+                continue
+            btn = getattr(self, btn_name)
+            # Let buttons use platform defaults for better appearance
+            btn.Refresh()
+
+        # Apply to grid
+        self._apply_grid_colors()
+
+    def _apply_grid_colors(self) -> None:
+        """Apply colors to all grid cells and labels."""
+        if not self.color_manager:
+            return
+
+        # Check if grid exists yet
+        if not hasattr(self, "GRIDctl"):
+            return
+
+        # Get colors
+        grid_bg = wx.WHITE
+        grid_text = wx.BLACK
+        header_bg = wx.LIGHT_GREY
+        header_text = wx.BLACK
         readonly_bg = wx.LIGHT_GREY
+
+        if self.color_manager.has_color("GRID_BACK"):
+            grid_bg = self.color_manager.get_color("GRID_BACK")
+        if self.color_manager.has_color("GRID_TEXT"):
+            grid_text = self.color_manager.get_color("GRID_TEXT")
+        if self.color_manager.has_color("GRID_HEADER_BACK"):
+            header_bg = self.color_manager.get_color("GRID_HEADER_BACK")
+        if self.color_manager.has_color("GRID_HEADER_TEXT"):
+            header_text = self.color_manager.get_color("GRID_HEADER_TEXT")
         if self.color_manager.has_color("GRID_READONLY_BACK"):
             readonly_bg = self.color_manager.get_color("GRID_READONLY_BACK")
 
-        # Update all logger name cells (column 0)
+        # Set default cell colors
+        self.GRIDctl.SetDefaultCellBackgroundColour(grid_bg)
+        self.GRIDctl.SetDefaultCellTextColour(grid_text)
+
+        # Set label (header) colors
+        self.GRIDctl.SetLabelBackgroundColour(header_bg)
+        self.GRIDctl.SetLabelTextColour(header_text)
+
+        # Set individual cell colors
         for row in range(self.GRIDctl.GetNumberRows()):
+            # Column 0 (Logger Name) - readonly
             self.GRIDctl.SetCellBackgroundColour(row, 0, readonly_bg)
+            self.GRIDctl.SetCellTextColour(row, 0, grid_text)
+            # Column 1 (Log Level) - editable
+            self.GRIDctl.SetCellBackgroundColour(row, 1, grid_bg)
+            self.GRIDctl.SetCellTextColour(row, 1, grid_text)
 
         self.GRIDctl.ForceRefresh()
+
+    def refresh_grid_colors(self) -> None:
+        """Update grid colors based on current color scheme."""
+        self._apply_grid_colors()
 
     def onSetAllLevels(self, event):
         """Apply the selected logging level to all configured loggers in the grid."""

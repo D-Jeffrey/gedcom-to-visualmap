@@ -438,6 +438,8 @@ class VisualMapPanel(wx.Panel):
                     win.SetOwnForegroundColour(text_color)
                     if bg_color:
                         win.SetBackgroundColour(bg_color)
+                        # Use SetOwnBackgroundColour for Windows compatibility
+                        win.SetOwnBackgroundColour(bg_color)
                     win.Refresh()
                 except Exception:
                     pass
@@ -475,6 +477,21 @@ class VisualMapPanel(wx.Panel):
                 except Exception:
                     pass
                 # Don't recurse into CustomRadioBox children - it handles them internally
+                return
+
+            # Handle SpinCtrl - set colors for Windows compatibility
+            if isinstance(win, wx.SpinCtrl):
+                try:
+                    win.SetForegroundColour(text_color)
+                    if hasattr(win, "SetOwnForegroundColour"):
+                        win.SetOwnForegroundColour(text_color)
+                    if bg_color:
+                        win.SetBackgroundColour(bg_color)
+                        if hasattr(win, "SetOwnBackgroundColour"):
+                            win.SetOwnBackgroundColour(bg_color)
+                    win.Refresh()
+                except Exception:
+                    pass
                 return
 
             try:

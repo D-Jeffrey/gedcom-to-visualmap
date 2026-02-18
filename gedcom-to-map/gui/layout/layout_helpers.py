@@ -128,7 +128,11 @@ class LayoutHelpers:
         try:
             color_manager = getattr(vm_panel, "color_manager", None)
             if color_manager and color_manager.has_color("DIALOG_TEXT"):
-                ctrl.SetForegroundColour(color_manager.get_color("DIALOG_TEXT"))
+                color = color_manager.get_color("DIALOG_TEXT")
+                ctrl.SetForegroundColour(color)
+                # Use SetOwnForegroundColour for Windows compatibility
+                if hasattr(ctrl, "SetOwnForegroundColour"):
+                    ctrl.SetOwnForegroundColour(color)
         except Exception:
             _log.debug("_apply_dialog_text_color: failed for %s", type(ctrl).__name__)
 
@@ -282,7 +286,10 @@ class LayoutHelpers:
         try:
             color_manager = getattr(vm_panel, "color_manager", None)
             if color_manager and color_manager.has_color("DIALOG_BACKGROUND"):
-                txt.SetBackgroundColour(color_manager.get_color("DIALOG_BACKGROUND"))
+                bg_color = color_manager.get_color("DIALOG_BACKGROUND")
+                txt.SetBackgroundColour(bg_color)
+                # Use SetOwnBackgroundColour for Windows compatibility
+                txt.SetOwnBackgroundColour(bg_color)
         except Exception:
             pass
         setattr(vm_panel.id, id_name, txt)

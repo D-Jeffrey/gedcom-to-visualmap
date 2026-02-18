@@ -419,6 +419,18 @@ class VisualMapPanel(wx.Panel):
                     apply_recursive(child)
                 return
 
+            # Handle ActivityIndicator specially - update busy indicator colors
+            if isinstance(win, wx.ActivityIndicator):
+                try:
+                    if self.color_manager.has_color("BUSY_BACK"):
+                        win.SetBackgroundColour(self.color_manager.get_color("BUSY_BACK"))
+                    if self.color_manager.has_color("BUSY_TEXT"):
+                        win.SetForegroundColour(self.color_manager.get_color("BUSY_TEXT"))
+                    win.Refresh()
+                except Exception:
+                    pass
+                return
+
             # Handle TextCtrl specially - ensure both enabled and disabled get proper colors
             if isinstance(win, wx.TextCtrl):
                 try:

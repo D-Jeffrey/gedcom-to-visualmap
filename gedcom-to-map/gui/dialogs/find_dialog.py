@@ -91,8 +91,21 @@ class FindDialog(wx.Dialog):
     def _apply_foreground_recursive(self, root: wx.Window, color: wx.Colour) -> None:
         try:
             root.SetForegroundColour(color)
+            # Use SetOwnForegroundColour for Windows compatibility
+            if hasattr(root, "SetOwnForegroundColour"):
+                root.SetOwnForegroundColour(color)
         except Exception:
             pass
+        # Apply background color to TextCtrl for Windows compatibility
+        if isinstance(root, wx.TextCtrl):
+            try:
+                if self.color_manager and self.color_manager.has_color("DIALOG_BACKGROUND"):
+                    bg_color = self.color_manager.get_color("DIALOG_BACKGROUND")
+                    root.SetBackgroundColour(bg_color)
+                    if hasattr(root, "SetOwnBackgroundColour"):
+                        root.SetOwnBackgroundColour(bg_color)
+            except Exception:
+                pass
         for child in root.GetChildren():
             self._apply_foreground_recursive(child, color)
 

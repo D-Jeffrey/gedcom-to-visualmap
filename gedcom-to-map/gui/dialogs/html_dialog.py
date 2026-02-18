@@ -136,16 +136,25 @@ class HTMLDialog(wx.Dialog):
             bg_color = self.color_manager.get_color("DIALOG_BACKGROUND")
             self.SetBackgroundColour(bg_color)
             self.html.SetBackgroundColour(bg_color)
+            # Use SetOwnBackgroundColour for Windows compatibility
+            if hasattr(self.html, "SetOwnBackgroundColour"):
+                self.html.SetOwnBackgroundColour(bg_color)
         if self.color_manager.has_color("DIALOG_TEXT"):
             text_color = self.color_manager.get_color("DIALOG_TEXT")
             self.SetForegroundColour(text_color)
             self.html.SetForegroundColour(text_color)
+            # Use SetOwnForegroundColour for Windows compatibility
+            if hasattr(self.html, "SetOwnForegroundColour"):
+                self.html.SetOwnForegroundColour(text_color)
             self._apply_foreground_recursive(self, text_color)
         self.Refresh()
 
     def _apply_foreground_recursive(self, root: wx.Window, color: wx.Colour) -> None:
         try:
             root.SetForegroundColour(color)
+            # Use SetOwnForegroundColour for Windows compatibility
+            if hasattr(root, "SetOwnForegroundColour"):
+                root.SetOwnForegroundColour(color)
         except Exception:
             pass
         for child in root.GetChildren():

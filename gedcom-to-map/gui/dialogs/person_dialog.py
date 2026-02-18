@@ -206,6 +206,9 @@ class PersonDialog(wx.Dialog):
     def _apply_foreground_recursive(self, root: wx.Window, color: wx.Colour) -> None:
         try:
             root.SetForegroundColour(color)
+            # Use SetOwnForegroundColour for Windows compatibility
+            if hasattr(root, "SetOwnForegroundColour"):
+                root.SetOwnForegroundColour(color)
         except Exception:
             pass
         for child in root.GetChildren():
@@ -242,8 +245,12 @@ class PersonDialog(wx.Dialog):
                     # Preserve warning highlight in "Of Note" field
                     if ctrl_name != "issuesTextCtrl" or ctrl.GetBackgroundColour() != warn_soft_back:
                         ctrl.SetBackgroundColour(grid_back)
+                        # Use SetOwnBackgroundColour for Windows compatibility
+                        ctrl.SetOwnBackgroundColour(grid_back)
                 if grid_text is not None:
                     ctrl.SetForegroundColour(grid_text)
+                    # Use SetOwnForegroundColour for Windows compatibility
+                    ctrl.SetOwnForegroundColour(grid_text)
             except Exception:
                 pass
 

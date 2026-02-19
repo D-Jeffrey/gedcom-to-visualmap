@@ -86,6 +86,27 @@ class FindDialog(wx.Dialog):
             if hasattr(self, "find_panel") and self.find_panel:
                 self.find_panel.SetForegroundColour(text_color)
                 self._apply_foreground_recursive(self.find_panel, text_color)
+
+        # Apply colors to buttons
+        if hasattr(self, "okButton") and hasattr(self, "cancelButton"):
+            btn_back = self.color_manager.get_color("BTN_BACK") if self.color_manager.has_color("BTN_BACK") else None
+            btn_text = (
+                self.color_manager.get_color("DIALOG_TEXT") if self.color_manager.has_color("DIALOG_TEXT") else None
+            )
+
+            for btn in [self.okButton, self.cancelButton]:
+                try:
+                    if btn_back is not None:
+                        btn.SetBackgroundColour(btn_back)
+                        if hasattr(btn, "SetOwnBackgroundColour"):
+                            btn.SetOwnBackgroundColour(btn_back)
+                    if btn_text is not None:
+                        btn.SetForegroundColour(btn_text)
+                        if hasattr(btn, "SetOwnForegroundColour"):
+                            btn.SetOwnForegroundColour(btn_text)
+                except Exception:
+                    pass
+
         self.Refresh()
 
     def _apply_foreground_recursive(self, root: wx.Window, color: wx.Colour) -> None:

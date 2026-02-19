@@ -124,10 +124,10 @@ class ConfigDialog(wx.Dialog):
         GRIDctl.AutoSizeColumn(1, True)
         GRIDctl.SetMinSize((400, 300))
 
-        saveBTN = wx.Button(cfgpanel, label="Save Changes")
-        saveBTN.Bind(wx.EVT_BUTTON, self.onSave)
-        cancelBTN = wx.Button(cfgpanel, label="Cancel")
-        cancelBTN.Bind(wx.EVT_BUTTON, self.onCancel)
+        self.saveBTN = wx.Button(cfgpanel, label="Save Changes")
+        self.saveBTN.Bind(wx.EVT_BUTTON, self.onSave)
+        self.cancelBTN = wx.Button(cfgpanel, label="Cancel")
+        self.cancelBTN.Bind(wx.EVT_BUTTON, self.onCancel)
 
         sizer = wx.BoxSizer(wx.VERTICAL)
 
@@ -260,22 +260,22 @@ class ConfigDialog(wx.Dialog):
         self.setAllChoice.Bind(wx.EVT_KILL_FOCUS, self.onSetAllChoiceBlur)
         self.setAllChoice.Bind(wx.EVT_CHOICE, self.onSetAllChoiceChanged)
         setAllSizer.Add(self.setAllChoice, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 5)
-        setAllButton = wx.Button(cfgpanel, label="Apply to All")
-        setAllButton.Bind(wx.EVT_BUTTON, self.onSetAllLevels)
-        setAllSizer.Add(setAllButton, 0, wx.ALIGN_CENTER_VERTICAL)
+        self.setAllButton = wx.Button(cfgpanel, label="Apply to All")
+        self.setAllButton.Bind(wx.EVT_BUTTON, self.onSetAllLevels)
+        setAllSizer.Add(self.setAllButton, 0, wx.ALIGN_CENTER_VERTICAL)
 
         # Add Clear Log File button
-        clearLogButton = wx.Button(cfgpanel, label="Clear Log File")
-        clearLogButton.Bind(wx.EVT_BUTTON, self.onClearLogFile)
-        setAllSizer.Add(clearLogButton, 0, wx.ALIGN_CENTER_VERTICAL | wx.LEFT, 20)
+        self.clearLogButton = wx.Button(cfgpanel, label="Clear Log File")
+        self.clearLogButton.Bind(wx.EVT_BUTTON, self.onClearLogFile)
+        setAllSizer.Add(self.clearLogButton, 0, wx.ALIGN_CENTER_VERTICAL | wx.LEFT, 20)
 
         sizer.Add(setAllSizer, 0, wx.ALL, 10)
 
         sizer.Add(GRIDctl, 1, wx.EXPAND | wx.ALL, 20)
 
         buttonsizer = wx.BoxSizer(wx.HORIZONTAL)
-        buttonsizer.Add(saveBTN, 0, wx.ALIGN_CENTER | wx.ALL, 5)
-        buttonsizer.Add(cancelBTN, 0, wx.ALIGN_CENTER | wx.ALL, 5)
+        buttonsizer.Add(self.saveBTN, 0, wx.ALIGN_CENTER | wx.ALL, 5)
+        buttonsizer.Add(self.cancelBTN, 0, wx.ALIGN_CENTER | wx.ALL, 5)
         sizer.Add(buttonsizer, 0, wx.ALIGN_CENTER | wx.ALL, 5)
 
         cfgpanel.SetSizer(sizer)
@@ -420,12 +420,20 @@ class ConfigDialog(wx.Dialog):
                     spin.SetOwnForegroundColour(dialog_text)
 
         # Apply to buttons (check if they exist first)
+        btn_back = self.color_manager.get_color("BTN_BACK") if self.color_manager.has_color("BTN_BACK") else None
         button_names = ["saveBTN", "cancelBTN", "setAllButton", "clearLogButton"]
         for btn_name in button_names:
             if not hasattr(self, btn_name):
                 continue
             btn = getattr(self, btn_name)
-            # Let buttons use platform defaults for better appearance
+            if btn_back:
+                btn.SetBackgroundColour(btn_back)
+                if hasattr(btn, "SetOwnBackgroundColour"):
+                    btn.SetOwnBackgroundColour(btn_back)
+            if dialog_text:
+                btn.SetForegroundColour(dialog_text)
+                if hasattr(btn, "SetOwnForegroundColour"):
+                    btn.SetOwnForegroundColour(dialog_text)
             btn.Refresh()
 
         # Apply to grid

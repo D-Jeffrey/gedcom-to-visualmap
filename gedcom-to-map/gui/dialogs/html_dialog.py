@@ -85,7 +85,8 @@ class HTMLDialog(wx.Dialog):
         self.htmlbody = htmlbody
         self._set_html_content()
 
-        self.okButton = wx.Button(self, wx.ID_OK, "OK")
+        # Use wx.ID_ANY instead of wx.ID_OK to allow custom background colors on macOS
+        self.okButton = wx.Button(self, wx.ID_ANY, "OK")
         # ensure OK ends the modal loop cleanly
         self.okButton.Bind(wx.EVT_BUTTON, lambda evt: self.EndModal(wx.ID_OK))
 
@@ -256,6 +257,13 @@ a:visited {{
                 self.okButton.SetForegroundColour(text_color)
                 if hasattr(self.okButton, "SetOwnForegroundColour"):
                     self.okButton.SetOwnForegroundColour(text_color)
+
+        # Set OK button background color
+        if hasattr(self, "okButton") and self.color_manager.has_color("BTN_BACK"):
+            btn_color = self.color_manager.get_color("BTN_BACK")
+            self.okButton.SetBackgroundColour(btn_color)
+            if hasattr(self.okButton, "SetOwnBackgroundColour"):
+                self.okButton.SetOwnBackgroundColour(btn_color)
 
         # Re-render HTML content with updated theme colors via CSS
         self._set_html_content()

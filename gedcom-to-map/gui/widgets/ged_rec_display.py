@@ -60,13 +60,13 @@ class GedRecordDialog(wx.Frame):
 
         # Bottom row: copy button and close
         btn_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        copy_btn = wx.Button(panel, label="Copy selected value")
-        copy_btn.Bind(wx.EVT_BUTTON, self.on_copy_selected)
-        btn_sizer.Add(copy_btn, 0, wx.RIGHT, 6)
+        self.copy_btn = wx.Button(panel, label="Copy selected value")
+        self.copy_btn.Bind(wx.EVT_BUTTON, self.on_copy_selected)
+        btn_sizer.Add(self.copy_btn, 0, wx.RIGHT, 6)
 
-        close_btn = wx.Button(panel, label="Close")
-        close_btn.Bind(wx.EVT_BUTTON, lambda evt: self.Close())
-        btn_sizer.Add(close_btn, 0)
+        self.close_btn = wx.Button(panel, label="Close")
+        self.close_btn.Bind(wx.EVT_BUTTON, lambda evt: self.Close())
+        btn_sizer.Add(self.close_btn, 0)
 
         pnl_sizer.Add(btn_sizer, 0, wx.ALIGN_RIGHT | wx.RIGHT | wx.BOTTOM, 8)
 
@@ -75,7 +75,7 @@ class GedRecordDialog(wx.Frame):
         self.SetSizer(main_sizer)
 
         # Keyboard shortcut for copy
-        accel_tbl = wx.AcceleratorTable([(wx.ACCEL_CTRL, ord("C"), copy_btn.GetId())])
+        accel_tbl = wx.AcceleratorTable([(wx.ACCEL_CTRL, ord("C"), self.copy_btn.GetId())])
         self.SetAcceleratorTable(accel_tbl)
 
         self.Bind(wx.EVT_ACTIVATE, self._on_activate)
@@ -123,6 +123,24 @@ class GedRecordDialog(wx.Frame):
         selected_idx = self.list.GetFirstSelected()
         if selected_idx != -1:
             self._apply_selected_colors(selected_idx)
+
+        # Apply colors to buttons
+        if hasattr(self, "copy_btn") and hasattr(self, "close_btn"):
+            btn_back = self.color_manager.get_color("BTN_BACK") if self.color_manager.has_color("BTN_BACK") else None
+            row_text = self.color_manager.get_color("GRID_TEXT") if self.color_manager.has_color("GRID_TEXT") else None
+
+            for btn in [self.copy_btn, self.close_btn]:
+                try:
+                    if btn_back is not None:
+                        btn.SetBackgroundColour(btn_back)
+                        if hasattr(btn, "SetOwnBackgroundColour"):
+                            btn.SetOwnBackgroundColour(btn_back)
+                    if row_text is not None:
+                        btn.SetForegroundColour(row_text)
+                        if hasattr(btn, "SetOwnForegroundColour"):
+                            btn.SetOwnForegroundColour(row_text)
+                except Exception:
+                    pass
 
         self.Refresh()
 

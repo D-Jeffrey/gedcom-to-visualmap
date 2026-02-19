@@ -254,6 +254,24 @@ class PersonDialog(wx.Dialog):
             except Exception:
                 pass
 
+        # Apply colors to buttons
+        if hasattr(self, "btn_ok") and hasattr(self, "btn_record"):
+            btn_back = self.color_manager.get_color("BTN_BACK") if self.color_manager.has_color("BTN_BACK") else None
+            btn_text = dialog_text
+
+            for btn in [self.btn_ok, self.btn_record]:
+                try:
+                    if btn_back is not None:
+                        btn.SetBackgroundColour(btn_back)
+                        if hasattr(btn, "SetOwnBackgroundColour"):
+                            btn.SetOwnBackgroundColour(btn_back)
+                    if btn_text is not None:
+                        btn.SetForegroundColour(btn_text)
+                        if hasattr(btn, "SetOwnForegroundColour"):
+                            btn.SetOwnForegroundColour(btn_text)
+                except Exception:
+                    pass
+
         self.Refresh()
 
     def _get_warn_soft_back(self) -> wx.Colour:
@@ -640,15 +658,16 @@ class PersonDialog(wx.Dialog):
         Returns:
             wx.BoxSizer containing OK and Record buttons arranged horizontally.
         """
-        btn_ok = wx.Button(self, wx.ID_OK)
-        btn_ok.Bind(wx.EVT_BUTTON, lambda evt: self.Close())
+        # Use wx.ID_ANY instead of wx.ID_OK to allow custom background colors on macOS
+        self.btn_ok = wx.Button(self, wx.ID_ANY, "OK")
+        self.btn_ok.Bind(wx.EVT_BUTTON, lambda evt: self.Close())
 
-        btn_record = wx.Button(self, -1, label="Record")
-        btn_record.Bind(wx.EVT_BUTTON, lambda evt: self._displayrecord())
+        self.btn_record = wx.Button(self, wx.ID_ANY, label="Record")
+        self.btn_record.Bind(wx.EVT_BUTTON, lambda evt: self._displayrecord())
 
         btn_box = wx.BoxSizer(wx.HORIZONTAL)
-        btn_box.Add(btn_ok, 0, wx.RIGHT, border=10)
-        btn_box.Add(btn_record, 0, wx.RIGHT, border=10)
+        btn_box.Add(self.btn_ok, 0, wx.RIGHT, border=10)
+        btn_box.Add(self.btn_record, 0, wx.RIGHT, border=10)
 
         return btn_box
 

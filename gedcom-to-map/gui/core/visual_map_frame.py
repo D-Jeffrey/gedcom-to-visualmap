@@ -26,6 +26,7 @@ STATUS_BAR_RIGHT_FIELD_CHARS = 30  # Width of right status bar field in characte
 from ..dialogs.config_dialog import ConfigDialog
 from ..dialogs.about_dialog import AboutDialog
 from ..dialogs.help_dialog import HelpDialog
+from ..dialogs.simple_message_dialog import SimpleMessageDialog
 from ..panels.visual_map_panel import VisualMapPanel
 from ..layout.visual_gedcom_ids import VisualGedcomIds
 from ..layout.font_manager import FontManager
@@ -454,7 +455,15 @@ class VisualMapFrame(wx.Frame):
                     msg += f"\nTotal cached addresses: {self.svc_state.lookup.address_book.len()}\n{stats}"
                 except Exception:
                     pass
-            wx.MessageBox(msg, "Statistics", wx.OK | wx.ICON_INFORMATION)
+            # Use themed dialog instead of wx.MessageBox for dark mode compatibility
+            dialog = SimpleMessageDialog(
+                self,
+                message=msg,
+                title="Statistics",
+                color_manager=self.color_manager,
+            )
+            dialog.ShowModal()
+            dialog.Destroy()
         except Exception:
             _log.exception("OnInfo failed")
 

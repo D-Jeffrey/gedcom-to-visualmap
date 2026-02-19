@@ -23,6 +23,7 @@ gui_colors:
   # Dialogs and right-side options panel backgrounds/text
   DIALOG_BACKGROUND: "WHITE"
   DIALOG_TEXT: "BLACK"
+  DIALOG_LINK_TEXT: "#0000EE"  # Standard blue for links in About/Help dialogs
 
   # Selection highlight for list/grid selected rows/items
   # (People list, FamilyPanel grid, choice focus/selection tints)
@@ -75,6 +76,7 @@ gui_colors_dark:
   # Dialogs and right-side options panel backgrounds/text
   DIALOG_BACKGROUND: "#2A2A2A"  # Dark gray background
   DIALOG_TEXT: "WHITE"
+  DIALOG_LINK_TEXT: "#87CEEB"   # Sky blue for links in About/Help dialogs (readable on dark background)
 
   # Selection highlight for list/grid selected rows/items
   GRID_SELECTED_BACK: "SKY BLUE"        # Bright blue

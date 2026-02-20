@@ -29,6 +29,7 @@ from const import KMLMAPSURL
 
 import wx
 import wx.lib.buttons
+import wx.lib.scrolledpanel
 
 from .people_list_ctrl_panel import PeopleListCtrlPanel  # type: ignore
 from ..actions.background_actions import BackgroundActions
@@ -293,7 +294,8 @@ class VisualMapPanel(wx.Panel):
         """Construct left/right sub-panels and people list."""
         # create a panel in the frame
         self.panelA = wx.Panel(self, -1, style=wx.SIMPLE_BORDER)
-        self.panelB = wx.Panel(self, -1, style=wx.SIMPLE_BORDER)
+        # Use ScrolledPanel for panelB to allow scrolling when many controls (e.g., HTML options)
+        self.panelB = wx.lib.scrolledpanel.ScrolledPanel(self, -1, style=wx.SIMPLE_BORDER)
 
         # https://docs.wxpython.org/wx.ColourDatabase.html#wx-colourdatabase
         self.panelA.SetBackgroundColour(self.color_manager.get_color("INFO_BOX_BACKGROUND"))
@@ -330,6 +332,9 @@ class VisualMapPanel(wx.Panel):
         # Add all the labels, button and radiobox to Right Panel using LayoutOptions helper
         LayoutOptions.build(self, self.panelB)
         self._apply_panelb_text_color()
+
+        # Configure scrolling for panelB (needed when HTML options are shown)
+        self.panelB.SetupScrolling(scroll_x=False, scroll_y=True, rate_y=20)
 
         pa_sizer = wx.BoxSizer(wx.VERTICAL)
         pa_sizer.Add(self.peopleList, 1, wx.EXPAND | wx.ALL, 5)

@@ -415,6 +415,46 @@ class ConfigDialog(wx.Dialog):
                 if hasattr(spin, "SetOwnForegroundColour"):
                     spin.SetOwnForegroundColour(dialog_text)
 
+        # Apply to checkboxes (check if they exist first)
+        checkbox_names = [
+            "CBBadAge",
+            "CBEnableTracemalloc",
+            "CBEnableEnrichment",
+            "CBEnableStatistics",
+            "CBUseCustomColors",
+        ]
+        for cb_name in checkbox_names:
+            if not hasattr(self, cb_name):
+                continue
+            cb = getattr(self, cb_name)
+            if dialog_bg:
+                cb.SetBackgroundColour(dialog_bg)
+                if hasattr(cb, "SetOwnBackgroundColour"):
+                    cb.SetOwnBackgroundColour(dialog_bg)
+            if dialog_text:
+                cb.SetForegroundColour(dialog_text)
+                if hasattr(cb, "SetOwnForegroundColour"):
+                    cb.SetOwnForegroundColour(dialog_text)
+
+        # Apply to radio buttons (check if they exist first)
+        radio_button_names = [
+            "rb_normal",
+            "rb_geocode_only",
+            "rb_cache_only",
+        ]
+        for rb_name in radio_button_names:
+            if not hasattr(self, rb_name):
+                continue
+            rb = getattr(self, rb_name)
+            if dialog_bg:
+                rb.SetBackgroundColour(dialog_bg)
+                if hasattr(rb, "SetOwnBackgroundColour"):
+                    rb.SetOwnBackgroundColour(dialog_bg)
+            if dialog_text:
+                rb.SetForegroundColour(dialog_text)
+                if hasattr(rb, "SetOwnForegroundColour"):
+                    rb.SetOwnForegroundColour(dialog_text)
+
         # Apply to buttons (check if they exist first)
         btn_back = self.color_manager.get_color("BTN_BACK") if self.color_manager.has_color("BTN_BACK") else None
         button_names = ["saveBTN", "cancelBTN", "setAllButton", "clearLogButton"]

@@ -404,13 +404,39 @@ class VisualMapPanel(wx.Panel):
         )
 
         def apply_recursive(win: wx.Window) -> None:
-            # Handle GenCheckBox specially - needs both colors updated
+            # Handle wx.CheckBox specially - needs both colors updated for Windows
+            if isinstance(win, wx.CheckBox):
+                try:
+                    win.SetForegroundColour(text_color)
+                    # Use SetOwnForegroundColour for Windows compatibility
+                    if hasattr(win, "SetOwnForegroundColour"):
+                        win.SetOwnForegroundColour(text_color)
+                    if bg_color:
+                        win.SetBackgroundColour(bg_color)
+                        # Use SetOwnBackgroundColour for Windows compatibility
+                        if hasattr(win, "SetOwnBackgroundColour"):
+                            win.SetOwnBackgroundColour(bg_color)
+                    win.Refresh()
+                except Exception:
+                    pass
+                # Still recurse into children in case there are nested controls
+                for child in win.GetChildren():
+                    apply_recursive(child)
+                return
+
+            # Handle GenCheckBox specially (if any remain) - needs both colors updated
             class_name = win.__class__.__name__
             if class_name == "GenCheckBox":
                 try:
                     win.SetForegroundColour(text_color)
+                    # Use SetOwnForegroundColour for Windows compatibility
+                    if hasattr(win, "SetOwnForegroundColour"):
+                        win.SetOwnForegroundColour(text_color)
                     if bg_color:
                         win.SetBackgroundColour(bg_color)
+                        # Use SetOwnBackgroundColour for Windows compatibility
+                        if hasattr(win, "SetOwnBackgroundColour"):
+                            win.SetOwnBackgroundColour(bg_color)
                     win.Refresh()
                 except Exception:
                     pass
@@ -471,8 +497,14 @@ class VisualMapPanel(wx.Panel):
             if class_name == "CustomRadioBox":
                 try:
                     win.SetForegroundColour(text_color)
+                    # Use SetOwnForegroundColour for Windows compatibility
+                    if hasattr(win, "SetOwnForegroundColour"):
+                        win.SetOwnForegroundColour(text_color)
                     if bg_color:
                         win.SetBackgroundColour(bg_color)
+                        # Use SetOwnBackgroundColour for Windows compatibility
+                        if hasattr(win, "SetOwnBackgroundColour"):
+                            win.SetOwnBackgroundColour(bg_color)
                         win.Refresh()
                 except Exception:
                     pass

@@ -300,15 +300,26 @@ class LayoutHelpers:
         id_ = -1
         if id_name in vm_panel.id.IDs:
             id_ = vm_panel.id.IDs[id_name]
-        # Use generic custom-drawn checkbox so text color is honored on macOS
-        cb = GenCheckBox(panel, id=id_, label=label)
+        # Use native wx.CheckBox for better dark mode support on Windows
+        # GenCheckBox uses wx.RendererNative which draws hardcoded black borders
+        cb = wx.CheckBox(panel, id=id_, label=label)
         try:
             if vm_panel.color_manager and vm_panel.color_manager.has_color("DIALOG_BACKGROUND"):
-                cb.SetBackgroundColour(vm_panel.color_manager.get_color("DIALOG_BACKGROUND"))
+                bg_color = vm_panel.color_manager.get_color("DIALOG_BACKGROUND")
+                cb.SetBackgroundColour(bg_color)
+                # Use SetOwnBackgroundColour for Windows compatibility
+                if hasattr(cb, "SetOwnBackgroundColour"):
+                    cb.SetOwnBackgroundColour(bg_color)
         except Exception:
             _log.debug("add_checkbox_with_id: Failed to set DIALOG_BACKGROUND for %s", id_name)
         LayoutHelpers._apply_dialog_text_color(vm_panel, cb)
+        # Store reference so it can be refreshed later
         setattr(vm_panel.id, id_name, cb)
+        # Force immediate refresh to apply colors
+        try:
+            cb.Refresh()
+        except Exception:
+            pass
         return cb
 
     @staticmethod
@@ -331,7 +342,11 @@ class LayoutHelpers:
         rb = CustomRadioBox(panel, id=id_, label=label, choices=choices, majorDimension=majorDimension)
         try:
             if vm_panel.color_manager and vm_panel.color_manager.has_color("DIALOG_BACKGROUND"):
-                rb.SetBackgroundColour(vm_panel.color_manager.get_color("DIALOG_BACKGROUND"))
+                bg_color = vm_panel.color_manager.get_color("DIALOG_BACKGROUND")
+                rb.SetBackgroundColour(bg_color)
+                # Use SetOwnBackgroundColour for Windows compatibility
+                if hasattr(rb, "SetOwnBackgroundColour"):
+                    rb.SetOwnBackgroundColour(bg_color)
         except Exception:
             _log.debug("add_radio_box_with_id: Failed to set DIALOG_BACKGROUND for %s", id_name)
         LayoutHelpers._apply_dialog_text_color(vm_panel, rb)

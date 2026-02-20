@@ -280,10 +280,6 @@ class ConfigDialog(wx.Dialog):
 
         cfgpanel.SetSizer(sizer)
         self.GRIDctl = GRIDctl
-        self.saveBTN = saveBTN
-        self.cancelBTN = cancelBTN
-        self.setAllButton = setAllButton
-        self.clearLogButton = clearLogButton
 
         # Apply colors to all controls (critical for Windows)
         self._apply_control_colors()

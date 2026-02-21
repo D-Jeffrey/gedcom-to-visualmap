@@ -76,7 +76,12 @@ class GedcomVisualGUI:
         # Load both light and dark color schemes
         light_colors = svc_config._gui_colors if hasattr(svc_config, "_gui_colors") else {}
         dark_colors = svc_config._gui_colors_dark if hasattr(svc_config, "_gui_colors_dark") else None
-        self.color_manager: "ColourManager" = ColourManager(light_colors, dark_colors)
+        use_custom_colors = bool(svc_config.get("UseCustomColors", True))
+        self.color_manager: "ColourManager" = ColourManager(
+            light_colors,
+            dark_colors,
+            use_custom_colors=use_custom_colors,
+        )
 
         self.svc_config: "IConfig" = svc_config
         self.svc_state: "IState" = svc_state

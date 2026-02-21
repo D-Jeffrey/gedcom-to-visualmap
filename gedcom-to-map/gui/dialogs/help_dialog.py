@@ -9,7 +9,7 @@ from .html_dialog import HTMLDialog
 
 
 class HelpDialog(HTMLDialog):
-    def __init__(self, parent: wx.Window, title: str, font_manager: "FontManager") -> None:
+    def __init__(self, parent: wx.Window, title: str, font_manager: "FontManager", color_manager=None) -> None:
         """Initialize the Help dialog.
 
         Args:
@@ -19,7 +19,13 @@ class HelpDialog(HTMLDialog):
         """
         helppage = HTMLDialog.load_dialog_content("help_dialog")
         super().__init__(
-            parent, title=title, icontype=wx.ART_INFORMATION, htmlbody=helppage, width=55, font_manager=font_manager
+            parent,
+            title=title,
+            icontype=wx.ART_INFORMATION,
+            htmlbody=helppage,
+            width=55,
+            font_manager=font_manager,
+            color_manager=color_manager,
         )
         try:
             if font_manager:

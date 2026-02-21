@@ -7,45 +7,114 @@ gui_options:
   mapHeightPercent: {type: 'int', default: 80}
   panelWidthPercent: {type: 'int', default: 30}
   window_size: {type: 'list', default: [1024, 800]}
+  # If True, apply gui_colors/gui_colors_dark; if False, use platform-native widget colors.
+  UseCustomColors: {type: 'bool', default: True, ini_section: 'Core'}
 
-# GUI color scheme for buttons, backgrounds, and UI elements
-# Light mode uses readable color names from wxPython color database
-# Dark mode uses custom hex values for optimal contrast
+# GUI color scheme for buttons, backgrounds, and UI elements.
+# UseCustomColors (in gui_options) controls whether these are applied
+# or platform defaults are used instead.
+# GRID_* colors are shared by list/table content and Person Details fields.
 gui_colors:
+  # Buttons (status/action controls such as load/create and directory/file actions)
   BTN_PRESS: "TAN"
-  BTN_DIRECTORY: "WHEAT"
+  BTN_BACK: "LIGHT GREY"
   BTN_DONE: "WHITE"
-  SELECTED: "NAVY"
-  SELECTED_TEXT: "BLACK"
+
+  # Dialogs and right-side options panel backgrounds/text
+  DIALOG_BACKGROUND: "WHITE"
+  DIALOG_TEXT: "BLACK"
+  DIALOG_LINK_TEXT: "#0000EE"  # Standard blue for links in About/Help dialogs
+
+  # Selection highlight for list/grid selected rows/items
+  # (People list, FamilyPanel grid, choice focus/selection tints)
+  # Selection highlight colors for grid/list selected rows/items
+  GRID_SELECTED_BACK: "NAVY"
+  GRID_SELECTED_TEXT: "BLACK"
+
+  # People categorization row colors in the left people list
   ANCESTOR: "MEDIUM GOLDENROD"
   MAINPERSON: "KHAKI"
   OTHERPERSON: "WHITE"
+
+  # Left info/message box background
   INFO_BOX_BACKGROUND: "GOLDENROD"
+
+  # Table/list body colors (People list rows, Person Details fields, FamilyPanel cells)
   GRID_TEXT: "BLACK"
   GRID_BACK: "WHITE"
+
+  # Table/list header colors (custom people-list header + grid headers)
+  GRID_HEADER_TEXT: "BLACK"
+  GRID_HEADER_BACK: "LIGHT GREY"
+
+  # Read-only grid cells (e.g., config dialog logger-name column)
   GRID_READONLY_BACK: "LIGHT GREY"
+
+  # Main right-panel title banner ("Visual Mapping Options")
   TITLE_TEXT: "WHITE"
   TITLE_BACK: "KHAKI"
-  BUSY_BACK: "YELLOW"
 
-# Dark mode colors - standard color names for consistency
-# Bright standard colors on dark backgrounds for optimal contrast
+  # Busy indicator colors
+  BUSY_BACK: "YELLOW"
+  BUSY_TEXT: "BLACK"
+  # Warning highlight colors:
+  # - WARN_BACK / WARN_TEXT: severe anomalies (e.g., impossible ages) in FamilyPanel grid.
+  # - WARN_SOFT_BACK: softer warnings (e.g., age concerns) in people list and Person Details "Of Note".
+  WARN_BACK: "RED"
+  WARN_TEXT: "WHITE"
+  WARN_SOFT_BACK: "YELLOW"
+
+# Dark mode colors for the same keys as gui_colors.
 gui_colors_dark:
+  # Same usage groups as gui_colors above, but for dark-mode palette values.
+
+  # Buttons (status/action controls such as load/create and directory/file actions)
   BTN_PRESS: "TAN"            # Warm peachy brown
-  BTN_DIRECTORY: "WHEAT"      # Bright cream
+  BTN_BACK: "#4A4A4C"         # Medium-dark gray (standard button background)
   BTN_DONE: "PALE GREEN"      # Soft green
-  SELECTED: "SKY BLUE"        # Bright blue
-  SELECTED_TEXT: "WHITE"
-  ANCESTOR: "WHEAT"           # Bright cream
+
+  # Dialogs and right-side options panel backgrounds/text
+  DIALOG_BACKGROUND: "#2A2A2A"  # Dark gray background
+  DIALOG_TEXT: "WHITE"
+  DIALOG_LINK_TEXT: "#87CEEB"   # Sky blue for links in About/Help dialogs (readable on dark background)
+
+  # Selection highlight for list/grid selected rows/items
+  GRID_SELECTED_BACK: "SKY BLUE"        # Bright blue
+  GRID_SELECTED_TEXT: "WHITE"
+
+  # People categorization row colors in the left people list
+  ANCESTOR: "CORAL"           # Bright coral (stands out on black, readable white text)
   MAINPERSON: "KHAKI"         # Olive green
   OTHERPERSON: "DARK GREY"    # Very dark gray
+
+  # Left info/message box background
   INFO_BOX_BACKGROUND: "BLACK"
+
+  # Table/list body colors
   GRID_TEXT: "WHITE"
   GRID_BACK: "BLACK"
+
+  # Table/list header colors
+  GRID_HEADER_TEXT: "WHITE"
+  GRID_HEADER_BACK: "#3A3A3A"  # Dark gray
+
+  # Read-only grid cells (e.g., config dialog logger-name column)
   GRID_READONLY_BACK: "#3A3A3A"  # Dark gray for readonly cells in dark mode
+
+  # Main right-panel title banner ("Visual Mapping Options")
   TITLE_TEXT: "WHITE"
   TITLE_BACK: "BLACK"
+
+  # Busy indicator colors
   BUSY_BACK: "KHAKI"          # Muted olive for busy indicator
+  BUSY_TEXT: "WHITE"
+
+  # Warning highlight colors (same usage as light mode):
+  # - WARN_BACK / WARN_TEXT: severe anomalies.
+  # - WARN_SOFT_BACK: softer warnings.
+  WARN_BACK: "RED"
+  WARN_TEXT: "WHITE"
+  WARN_SOFT_BACK: "YELLOW"
 
 # Available map tile providers for HTML/Folium maps
 map_types:

@@ -109,9 +109,13 @@ class VisualMapEventHandler:
         """Handle radiobox changes (ResultType, GroupBy, KML mode)."""
         try:
             event_id = event.GetId()
+            try:
+                selection = event.GetSelection()
+            except Exception:
+                selection = event.GetInt()
             # Results-type radiobox: map index -> ResultType
             if event_id == self.panel.id.IDs.get("RBResultType"):
-                idx = max(0, min(len(self._results_type_map) - 1, event.GetInt()))
+                idx = max(0, min(len(self._results_type_map) - 1, selection))
                 outType = self._results_type_map[idx]
                 # Update ResultType and recompute ResultFile via services
                 try:
@@ -136,14 +140,14 @@ class VisualMapEventHandler:
             # GroupBy and KML mode are simple integer selections
             if event_id == self.panel.id.IDs.get("RBGroupBy"):
                 try:
-                    self.panel.svc_config.set("GroupBy", event.GetSelection())
+                    self.panel.svc_config.set("GroupBy", selection)
                 except Exception:
                     _log.exception("Failed to set GroupBy")
                 return
 
             if event_id == self.panel.id.IDs.get("RBKMLMode"):
                 try:
-                    self.panel.svc_config.set("KMLsort", event.GetSelection())
+                    self.panel.svc_config.set("KMLsort", selection)
                 except Exception:
                     _log.exception("Failed to set KMLsort")
                 return

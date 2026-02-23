@@ -4,7 +4,12 @@ from ..layout.font_manager import FontManager
 
 class FindDialog(wx.Dialog):
     def __init__(
-        self, parent: wx.Window, font_manager: "FontManager", title: str = "Find", LastSearch: str = ""
+        self,
+        parent: wx.Window,
+        font_manager: "FontManager",
+        title: str = "Find",
+        LastSearch: str = "",
+        color_manager=None,
     ) -> None:
         """Initialize the Find/Search dialog.
 
@@ -18,9 +23,12 @@ class FindDialog(wx.Dialog):
 
         self.font_manager: "FontManager" = font_manager
         self.LastSearch: str = LastSearch
+        self.color_manager = color_manager
 
         # Layout
         Findpanel = wx.Panel(self, style=wx.SIMPLE_BORDER)
+        self.find_panel = Findpanel
+        self.refresh_dialog_background()
         vbox = wx.BoxSizer(wx.VERTICAL)
 
         self.SearchLabel = wx.StaticText(Findpanel, label="Enter search string:")
@@ -44,6 +52,7 @@ class FindDialog(wx.Dialog):
         # Event bindings
         self.okButton.Bind(wx.EVT_BUTTON, self.OnOk)
         self.cancelButton.Bind(wx.EVT_BUTTON, self.OnCancel)
+        self.Bind(wx.EVT_ACTIVATE, self.OnActivate)
 
         self.font_manager.apply_current_font_recursive(self)
 
@@ -56,6 +65,70 @@ class FindDialog(wx.Dialog):
 
     def OnCancel(self, event):
         self.EndModal(wx.ID_CANCEL)
+
+    def OnActivate(self, event: wx.ActivateEvent) -> None:
+        if event.GetActive() and self.color_manager:
+            if self.color_manager.refresh_colors():
+                self.refresh_dialog_background()
+        event.Skip()
+
+    def refresh_dialog_background(self) -> None:
+        if not self.color_manager:
+            return
+        if self.color_manager.has_color("DIALOG_BACKGROUND"):
+            bg_color = self.color_manager.get_color("DIALOG_BACKGROUND")
+            self.SetBackgroundColour(bg_color)
+            if hasattr(self, "find_panel") and self.find_panel:
+                self.find_panel.SetBackgroundColour(bg_color)
+        if self.color_manager.has_color("DIALOG_TEXT"):
+            text_color = self.color_manager.get_color("DIALOG_TEXT")
+            self.SetForegroundColour(text_color)
+            if hasattr(self, "find_panel") and self.find_panel:
+                self.find_panel.SetForegroundColour(text_color)
+                self._apply_foreground_recursive(self.find_panel, text_color)
+
+        # Apply colors to buttons
+        if hasattr(self, "okButton") and hasattr(self, "cancelButton"):
+            btn_back = self.color_manager.get_color("BTN_BACK") if self.color_manager.has_color("BTN_BACK") else None
+            btn_text = (
+                self.color_manager.get_color("DIALOG_TEXT") if self.color_manager.has_color("DIALOG_TEXT") else None
+            )
+
+            for btn in [self.okButton, self.cancelButton]:
+                try:
+                    if btn_back is not None:
+                        btn.SetBackgroundColour(btn_back)
+                        if hasattr(btn, "SetOwnBackgroundColour"):
+                            btn.SetOwnBackgroundColour(btn_back)
+                    if btn_text is not None:
+                        btn.SetForegroundColour(btn_text)
+                        if hasattr(btn, "SetOwnForegroundColour"):
+                            btn.SetOwnForegroundColour(btn_text)
+                except Exception:
+                    pass
+
+        self.Refresh()
+
+    def _apply_foreground_recursive(self, root: wx.Window, color: wx.Colour) -> None:
+        try:
+            root.SetForegroundColour(color)
+            # Use SetOwnForegroundColour for Windows compatibility
+            if hasattr(root, "SetOwnForegroundColour"):
+                root.SetOwnForegroundColour(color)
+        except Exception:
+            pass
+        # Apply background color to TextCtrl for Windows compatibility
+        if isinstance(root, wx.TextCtrl):
+            try:
+                if self.color_manager and self.color_manager.has_color("DIALOG_BACKGROUND"):
+                    bg_color = self.color_manager.get_color("DIALOG_BACKGROUND")
+                    root.SetBackgroundColour(bg_color)
+                    if hasattr(root, "SetOwnBackgroundColour"):
+                        root.SetOwnBackgroundColour(bg_color)
+            except Exception:
+                pass
+        for child in root.GetChildren():
+            self._apply_foreground_recursive(child, color)
 
     def GetSearchString(self):
         return self.LastSearch

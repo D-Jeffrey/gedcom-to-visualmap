@@ -7,6 +7,7 @@ Provides modal dialogs for user interaction:
     - HelpDialog: Help documentation
     - HTMLDialog: Generic HTML content display
     - PersonDialog: Individual genealogical data display
+    - SimpleMessageDialog: Themed message dialog (replaces wx.MessageBox for dark mode)
 
 All dialogs are lazy-loaded with error handling to support import without wxPython.
 """
@@ -50,5 +51,12 @@ try:
     from .person_dialog import PersonDialog
 
     __all__.append("PersonDialog")
+except ImportError:
+    pass
+
+try:
+    from .simple_message_dialog import SimpleMessageDialog
+
+    __all__.append("SimpleMessageDialog")
 except ImportError:
     pass

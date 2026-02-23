@@ -552,7 +552,7 @@ class foliumExporter:
                     point_type = mids.what if mids.what in MidPointMarker else "Other"
                     marker = MidPointMarker[point_type][0]
                     color = MidPointMarker[point_type][1]
-                    tooltip = mids.what + " " + mids.place.place if mids.what else "?? " + mids.place.place
+                    tooltip = mids.what + " " + mids.place if mids.what else "?? " + mids.place
                     add_point_marker(
                         fg, mid_point, marker_options, tooltip, popup_content, marker, color, exporter=self
                     )

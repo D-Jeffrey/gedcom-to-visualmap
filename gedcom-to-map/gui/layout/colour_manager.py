@@ -24,6 +24,7 @@ class ColourManager:
         self,
         color_definitions: Optional[Dict[str, str]] = None,
         dark_color_definitions: Optional[Dict[str, str]] = None,
+        use_custom_colors: bool = True,
     ):
         """Initialize ColourManager with colour definitions.
 
@@ -36,6 +37,7 @@ class ColourManager:
         # Store both color schemes for dynamic switching
         self._light_color_definitions = color_definitions or {}
         self._dark_color_definitions = dark_color_definitions or color_definitions or {}
+        self._use_custom_colors = bool(use_custom_colors)
 
         self._is_dark_mode = self._detect_dark_mode()
 
@@ -76,7 +78,7 @@ class ColourManager:
                     return value == 0  # 0 = dark mode, 1 = light mode
                 except Exception:
                     pass
-         
+
         except Exception as e:
             _log.debug(f"Dark mode detection failed: {e}")
 
@@ -109,6 +111,11 @@ class ColourManager:
 
     def _reload_colors(self) -> None:
         """Reload colors based on current dark mode setting."""
+        if not self._use_custom_colors:
+            self._colors.clear()
+            _log.info("Custom GUI colors disabled; using platform defaults")
+            return
+
         # Select appropriate color definitions based on system appearance
         if self._is_dark_mode:
             active_definitions = self._dark_color_definitions
@@ -160,6 +167,8 @@ class ColourManager:
         Raises:
             ValueError: If color_name is not defined.
         """
+        if not self._use_custom_colors:
+            return wx.NullColour
         if color_name in self._colors:
             return self._colors[color_name]
         _log.error(f"Color not defined: {color_name}")
@@ -174,4 +183,18 @@ class ColourManager:
         Returns:
             True if color is defined, False otherwise.
         """
+        if not self._use_custom_colors:
+            return False
         return color_name in self._colors
+
+    def set_use_custom_colors(self, use_custom_colors: bool) -> None:
+        """Enable or disable custom colors and reload active palette."""
+        new_value = bool(use_custom_colors)
+        if new_value == self._use_custom_colors:
+            return
+        self._use_custom_colors = new_value
+        self._reload_colors()
+
+    def use_custom_colors(self) -> bool:
+        """Return whether custom GUI colors are currently enabled."""
+        return self._use_custom_colors

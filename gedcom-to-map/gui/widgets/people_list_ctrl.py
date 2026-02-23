@@ -120,6 +120,7 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
         self.InsertColumn(2, "ID")
         self.InsertColumn(3, "Geocode")
         self.InsertColumn(4, "Address")
+        self._apply_header_colors()
         self.SetImageList(self.il, wx.IMAGE_LIST_SMALL)
         listmix.ColumnSorterMixin.__init__(self, 5)
 
@@ -130,6 +131,8 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
         self.Bind(wx.EVT_LIST_ITEM_RIGHT_CLICK, self.OnItemRightClick, self)
         self.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.OnItemActivated, self)
         self.Bind(wx.EVT_LIST_COL_RIGHT_CLICK, self.OnColRightClick, self)
+        self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.OnItemSelected, self)
+        self.Bind(wx.EVT_LIST_ITEM_DESELECTED, self.OnItemDeselected, self)
 
     def SetServices(self, svc_config=None, svc_state=None, svc_progress=None):
         """Bind configuration/state/progress services for this control.
@@ -144,26 +147,111 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
         if svc_progress is not None:
             self.svc_progress = svc_progress
 
+    def _get_warn_soft_back(self) -> wx.Colour:
+        if self.color_manager and self.color_manager.has_color("WARN_SOFT_BACK"):
+            return self.color_manager.get_color("WARN_SOFT_BACK")
+        return wx.YELLOW
+
     def refresh_colors(self):
         """Refresh list colors after appearance mode change."""
         if self.color_manager:
             try:
                 self.SetTextColour(self.color_manager.get_color("GRID_TEXT"))
                 self.SetBackgroundColour(self.color_manager.get_color("GRID_BACK"))
+                self._apply_header_colors()
 
                 # Refresh individual item background colors
                 for item_index, color_type in self._item_color_types.items():
                     if item_index < self.GetItemCount():
                         if color_type == "YELLOW":
                             # Keep yellow for age issues (doesn't change with theme)
-                            self.SetItemBackgroundColour(item_index, wx.YELLOW)
+                            self.SetItemBackgroundColour(item_index, self._get_warn_soft_back())
                         elif color_type in ("MAINPERSON", "ANCESTOR", "OTHERPERSON"):
                             # Update themed colors
                             self.SetItemBackgroundColour(item_index, self.color_manager.get_color(color_type))
 
+                # Reapply selection colors after refreshing base row colors
+                selected_idx = self.GetFirstSelected()
+                if selected_idx != -1:
+                    self._apply_selected_colors(selected_idx)
+
                 self.Refresh()
             except Exception:
                 _log.exception("Failed to refresh colors in PeopleListCtrl")
+
+    def _restore_row_colors(self, item_index: int) -> None:
+        """Restore non-selected colors for a row based on current color mapping."""
+        if item_index < 0 or item_index >= self.GetItemCount() or not self.color_manager:
+            return
+
+        color_type = self._item_color_types.get(item_index)
+
+        try:
+            if color_type == "YELLOW":
+                self.SetItemBackgroundColour(item_index, self._get_warn_soft_back())
+            elif color_type in ("MAINPERSON", "ANCESTOR", "OTHERPERSON"):
+                self.SetItemBackgroundColour(item_index, self.color_manager.get_color(color_type))
+            elif self.color_manager.has_color("GRID_BACK"):
+                self.SetItemBackgroundColour(item_index, self.color_manager.get_color("GRID_BACK"))
+
+            if self.color_manager.has_color("GRID_TEXT"):
+                self.SetItemTextColour(item_index, self.color_manager.get_color("GRID_TEXT"))
+        except Exception:
+            _log.debug("_restore_row_colors failed for item %s", item_index, exc_info=True)
+
+    def _apply_selected_colors(self, item_index: int) -> None:
+        """Apply selection highlight colors to the specified row when configured."""
+        if item_index < 0 or item_index >= self.GetItemCount() or not self.color_manager:
+            return
+
+        try:
+            if self.color_manager.has_color("GRID_SELECTED_BACK"):
+                self.SetItemBackgroundColour(item_index, self.color_manager.get_color("GRID_SELECTED_BACK"))
+            if self.color_manager.has_color("GRID_SELECTED_TEXT"):
+                self.SetItemTextColour(item_index, self.color_manager.get_color("GRID_SELECTED_TEXT"))
+        except Exception:
+            _log.debug("_apply_selected_colors failed for item %s", item_index, exc_info=True)
+
+    def OnItemSelected(self, event: wx.ListEvent) -> None:
+        item_index = event.GetIndex()
+        self._apply_selected_colors(item_index)
+        event.Skip()
+
+    def OnItemDeselected(self, event: wx.ListEvent) -> None:
+        item_index = event.GetIndex()
+        self._restore_row_colors(item_index)
+        event.Skip()
+
+    def _apply_header_colors(self) -> None:
+        """Apply GRID_TEXT/GRID_BACK to column headers where platform supports it."""
+        if not self.color_manager:
+            return
+
+        try:
+            text_color = self.color_manager.get_color("GRID_TEXT")
+            back_color = self.color_manager.get_color("GRID_BACK")
+        except Exception:
+            return
+
+        # Preferred API (if available): set one attribute for all headers
+        try:
+            if hasattr(self, "SetHeaderAttr"):
+                header_attr = wx.ItemAttr()
+                header_attr.SetTextColour(text_color)
+                header_attr.SetBackgroundColour(back_color)
+                self.SetHeaderAttr(header_attr)
+        except Exception:
+            _log.debug("SetHeaderAttr not supported for PeopleListCtrl on this platform")
+
+        # Fallback: set attributes per-column via ListItem headers
+        try:
+            for col in range(self.GetColumnCount()):
+                col_item = self.GetColumn(col)
+                col_item.SetTextColour(text_color)
+                col_item.SetBackgroundColour(back_color)
+                self.SetColumn(col, col_item)
+        except Exception:
+            _log.debug("Per-column header color styling not supported for PeopleListCtrl on this platform")
 
     def PopulateList(self, people, mainperson, loading):
         if self.active:
@@ -281,7 +369,7 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
                                     person = people.get(pdata.id, None)
                                     issues = person.check_age_problems(people) if person else None
                                     if issues:
-                                        self.SetItemBackgroundColour(index, wx.YELLOW)
+                                        self.SetItemBackgroundColour(index, self._get_warn_soft_back())
                                         self._item_color_types[index] = "YELLOW"
                                     else:
                                         if self.color_manager:
@@ -313,6 +401,13 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
         self.SetColumnWidth(0, wx.LIST_AUTOSIZE_USEHEADER)
         if self.GetColumnWidth(0) > 300:
             self.SetColumnWidth(0, 300)
+
+        try:
+            parent = self.GetParent()
+            if parent and hasattr(parent, "sync_custom_header_widths"):
+                wx.CallAfter(parent.sync_custom_header_widths)
+        except Exception:
+            pass
 
         if 0 <= selectperson < self.GetItemCount():
             self.SetItemState(selectperson, wx.LIST_STATE_SELECTED, wx.LIST_STATE_SELECTED)
@@ -387,7 +482,13 @@ class PeopleListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Column
 
     def OnFind(self, event):
         parent_win = self.get_visual_map_panel() or self.GetTopLevelParent()
-        find_dialog = FindDialog(parent_win, font_manager=self.font_manager, title="Find", LastSearch=self.LastSearch)
+        find_dialog = FindDialog(
+            parent_win,
+            font_manager=self.font_manager,
+            title="Find",
+            LastSearch=self.LastSearch,
+            color_manager=self.color_manager,
+        )
         if find_dialog.ShowModal() == wx.ID_OK:
             self.LastSearch = find_dialog.GetSearchString()
             if self.GetItemCount() > 1:

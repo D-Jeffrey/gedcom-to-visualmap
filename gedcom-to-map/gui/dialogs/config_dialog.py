@@ -343,19 +343,37 @@ class ConfigDialog(wx.Dialog):
         if selected:
             if self.color_manager.has_color("GRID_SELECTED_BACK"):
                 choice_ctrl.SetBackgroundColour(self.color_manager.get_color("GRID_SELECTED_BACK"))
+                # Use SetOwnBackgroundColour for Windows compatibility
+                if hasattr(choice_ctrl, "SetOwnBackgroundColour"):
+                    choice_ctrl.SetOwnBackgroundColour(self.color_manager.get_color("GRID_SELECTED_BACK"))
             elif self.color_manager.has_color("DIALOG_BACKGROUND"):
                 choice_ctrl.SetBackgroundColour(self.color_manager.get_color("DIALOG_BACKGROUND"))
+                # Use SetOwnBackgroundColour for Windows compatibility
+                if hasattr(choice_ctrl, "SetOwnBackgroundColour"):
+                    choice_ctrl.SetOwnBackgroundColour(self.color_manager.get_color("DIALOG_BACKGROUND"))
 
             if self.color_manager.has_color("GRID_SELECTED_TEXT"):
                 choice_ctrl.SetForegroundColour(self.color_manager.get_color("GRID_SELECTED_TEXT"))
+                # Use SetOwnForegroundColour for Windows compatibility
+                if hasattr(choice_ctrl, "SetOwnForegroundColour"):
+                    choice_ctrl.SetOwnForegroundColour(self.color_manager.get_color("GRID_SELECTED_TEXT"))
             elif self.color_manager.has_color("DIALOG_TEXT"):
                 choice_ctrl.SetForegroundColour(self.color_manager.get_color("DIALOG_TEXT"))
+                # Use SetOwnForegroundColour for Windows compatibility
+                if hasattr(choice_ctrl, "SetOwnForegroundColour"):
+                    choice_ctrl.SetOwnForegroundColour(self.color_manager.get_color("DIALOG_TEXT"))
             return
 
         if self.color_manager.has_color("DIALOG_BACKGROUND"):
             choice_ctrl.SetBackgroundColour(self.color_manager.get_color("DIALOG_BACKGROUND"))
+            # Use SetOwnBackgroundColour for Windows compatibility
+            if hasattr(choice_ctrl, "SetOwnBackgroundColour"):
+                choice_ctrl.SetOwnBackgroundColour(self.color_manager.get_color("DIALOG_BACKGROUND"))
         if self.color_manager.has_color("DIALOG_TEXT"):
             choice_ctrl.SetForegroundColour(self.color_manager.get_color("DIALOG_TEXT"))
+            # Use SetOwnForegroundColour for Windows compatibility
+            if hasattr(choice_ctrl, "SetOwnForegroundColour"):
+                choice_ctrl.SetOwnForegroundColour(self.color_manager.get_color("DIALOG_TEXT"))
 
     def onSetAllChoiceFocus(self, event: wx.FocusEvent) -> None:
         self._apply_choice_colors(self.setAllChoice, selected=True)

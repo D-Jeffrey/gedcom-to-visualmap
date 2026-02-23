@@ -89,8 +89,8 @@ class LayoutOptions:
         )
 
         # Create text controls after buttons
-        txt_in = LayoutHelpers.add_textctrl_with_id(vm_panel, panel, "TEXTGEDCOMinput", size=(250, 20), enable=False)
-        txt_out = LayoutHelpers.add_textctrl_with_id(vm_panel, panel, "TEXTResultFile", size=(250, 20))
+        txt_in = LayoutHelpers.add_textctrl_with_id(vm_panel, panel, "TEXTGEDCOMinput", size=(250, -1), enable=False)
+        txt_out = LayoutHelpers.add_textctrl_with_id(vm_panel, panel, "TEXTResultFile", size=(250, -1))
 
         vm_panel.id.txtinfile.Bind(wx.EVT_LEFT_DOWN, vm_panel.frame.OnFileOpenDialog)
         vm_panel.id.txtoutfile.Bind(wx.EVT_LEFT_DOWN, vm_panel.frame.OnFileResultDialog)
@@ -159,8 +159,8 @@ class LayoutOptions:
             vm_panel, general_container, "CBAllEntities", "Map all people"
         )
 
-        general_boxIn.Add(cb_all_entities, 0, wx.ALL, 2)
-        general_sizer.Add(general_boxIn, 0, wx.EXPAND | wx.ALL, 4)
+        general_boxIn.Add(cb_all_entities, 0, wx.ALL, 5)
+        general_sizer.Add(general_boxIn, 0, wx.EXPAND | wx.ALL, 6)
         general_container.SetSizer(general_sizer)
 
         sizer.Add(general_container, 0, wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP, 5)
@@ -342,8 +342,8 @@ class LayoutOptions:
         vm_panel.id.CBGridView = LayoutHelpers.add_checkbox_with_id(
             vm_panel, gbox_container, "CBGridView", "View Only Direct Ancestors"
         )
-        gboxIn.AddMany([vm_panel.id.CBGridView])
-        gsizer.Add(gboxIn, 0, wx.EXPAND | wx.ALL, 4)
+        gboxIn.Add(vm_panel.id.CBGridView, 0, wx.ALL, 5)
+        gsizer.Add(gboxIn, 0, wx.EXPAND | wx.ALL, 6)
 
         gbox_container.SetSizer(gsizer)
         vm_panel.optionGbox = gbox_container

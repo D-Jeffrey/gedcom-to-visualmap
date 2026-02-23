@@ -531,6 +531,21 @@ class VisualMapPanel(wx.Panel):
                     pass
                 return
 
+            # Handle Choice - set colors for Windows compatibility
+            if isinstance(win, wx.Choice):
+                try:
+                    win.SetForegroundColour(text_color)
+                    if hasattr(win, "SetOwnForegroundColour"):
+                        win.SetOwnForegroundColour(text_color)
+                    if bg_color:
+                        win.SetBackgroundColour(bg_color)
+                        if hasattr(win, "SetOwnBackgroundColour"):
+                            win.SetOwnBackgroundColour(bg_color)
+                    win.Refresh()
+                except Exception:
+                    pass
+                return
+
             try:
                 win.SetForegroundColour(text_color)
             except Exception:

@@ -147,18 +147,36 @@ class LayoutHelpers:
             if selected:
                 if color_manager.has_color("GRID_SELECTED_BACK"):
                     choice.SetBackgroundColour(color_manager.get_color("GRID_SELECTED_BACK"))
+                    # Use SetOwnBackgroundColour for Windows compatibility
+                    if hasattr(choice, "SetOwnBackgroundColour"):
+                        choice.SetOwnBackgroundColour(color_manager.get_color("GRID_SELECTED_BACK"))
                 elif color_manager.has_color("DIALOG_BACKGROUND"):
                     choice.SetBackgroundColour(color_manager.get_color("DIALOG_BACKGROUND"))
+                    # Use SetOwnBackgroundColour for Windows compatibility
+                    if hasattr(choice, "SetOwnBackgroundColour"):
+                        choice.SetOwnBackgroundColour(color_manager.get_color("DIALOG_BACKGROUND"))
 
                 if color_manager.has_color("GRID_SELECTED_TEXT"):
                     choice.SetForegroundColour(color_manager.get_color("GRID_SELECTED_TEXT"))
+                    # Use SetOwnForegroundColour for Windows compatibility
+                    if hasattr(choice, "SetOwnForegroundColour"):
+                        choice.SetOwnForegroundColour(color_manager.get_color("GRID_SELECTED_TEXT"))
                 elif color_manager.has_color("DIALOG_TEXT"):
                     choice.SetForegroundColour(color_manager.get_color("DIALOG_TEXT"))
+                    # Use SetOwnForegroundColour for Windows compatibility
+                    if hasattr(choice, "SetOwnForegroundColour"):
+                        choice.SetOwnForegroundColour(color_manager.get_color("DIALOG_TEXT"))
             else:
                 if color_manager.has_color("DIALOG_BACKGROUND"):
                     choice.SetBackgroundColour(color_manager.get_color("DIALOG_BACKGROUND"))
+                    # Use SetOwnBackgroundColour for Windows compatibility
+                    if hasattr(choice, "SetOwnBackgroundColour"):
+                        choice.SetOwnBackgroundColour(color_manager.get_color("DIALOG_BACKGROUND"))
                 if color_manager.has_color("DIALOG_TEXT"):
                     choice.SetForegroundColour(color_manager.get_color("DIALOG_TEXT"))
+                    # Use SetOwnForegroundColour for Windows compatibility
+                    if hasattr(choice, "SetOwnForegroundColour"):
+                        choice.SetOwnForegroundColour(color_manager.get_color("DIALOG_TEXT"))
         except Exception:
             _log.debug("_apply_choice_colors: failed for %s", type(choice).__name__)
 

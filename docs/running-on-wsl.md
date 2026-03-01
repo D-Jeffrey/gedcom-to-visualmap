@@ -1,8 +1,15 @@
 # Running gedcomVisualGUI on Linux (WSL)
 
-## Side by side
-Windows and Linux (WSL) running on Windows 11 - WSL version: 2.4.12.0 - Ubuntu
-![img](img/2025-11-wsl-sideby.png)
+## Windows and Linux (WSL) and MAC
+Windows 11
+![img](img/Win-2026-02.png)
+
+Ubuntu 24.04.4 LTS (GNU/Linux 5.15.167.4-microsoft-standard-WSL2 x86_64)
+
+![img](img/WSL-2026-02.png)
+
+MAC - Dark mode
+![img](img/MAC-2026-02.png)
 
 ## CoPilot Guided instuctions for WSL Ubuntu 24.04
 

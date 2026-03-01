@@ -76,13 +76,26 @@ class PeopleListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
             st = wx.StaticText(self, -1, " ")
             self.InfoBox.append(st)
             self.info_sizer.Add(st, 0, wx.EXPAND | wx.LEFT, 5)
+        self._update_info_box_colors()
         self.Bind(wx.EVT_SIZE, self._on_size_wrap_info)
         tID = wx.NewIdRef()
+
+        self._header_titles = ["Name", "Year", "ID", "Geocode", "Address"]
+        self.header_panel = wx.Panel(self, style=wx.SIMPLE_BORDER)
+        self.header_labels: list[wx.StaticText] = []
+        self.header_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        for title in self._header_titles:
+            lbl = wx.StaticText(self.header_panel, label=title)
+            self.header_labels.append(lbl)
+            self.header_sizer.Add(lbl, 0, wx.EXPAND | wx.LEFT | wx.RIGHT, 3)
+        self.header_panel.SetSizer(self.header_sizer)
+        self._update_custom_header_colors()
+        sizer.Add(self.header_panel, 0, wx.EXPAND | wx.LEFT | wx.RIGHT, 0)
 
         self.list = PeopleListCtrl(
             self,
             tID,
-            style=wx.LC_REPORT | wx.BORDER_SUNKEN | wx.LC_SINGLE_SEL,
+            style=wx.LC_REPORT | wx.BORDER_SUNKEN | wx.LC_SINGLE_SEL | wx.LC_NO_HEADER,
             size=wx.Size(600, 600),
             font_manager=font_manager,
             color_manager=color_manager,
@@ -99,6 +112,7 @@ class PeopleListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
         self.currentItem = 0
         self.SetSizer(sizer)
         wx.CallAfter(self._on_size_wrap_info, None)
+        wx.CallAfter(self.sync_custom_header_widths)
 
     def get_visual_map_panel(self):
         """Find and return the enclosing VisualMapPanel instance.
@@ -157,10 +171,30 @@ class PeopleListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
                     st = wx.StaticText(self, -1, " ")
                     self.InfoBox.append(st)
                     self.info_sizer.Add(st, 0, wx.EXPAND | wx.LEFT, 5)
+                self._update_info_box_colors()
                 self.Layout()
                 wx.CallAfter(self._on_size_wrap_info, None)
         except Exception:
             pass
+
+    def _update_info_box_colors(self) -> None:
+        """Apply configured colors to the top-left info text area."""
+        if not self.color_manager:
+            return
+        try:
+            if self.color_manager.has_color("INFO_BOX_BACKGROUND"):
+                back = self.color_manager.get_color("INFO_BOX_BACKGROUND")
+                self.SetBackgroundColour(back)
+                for info in self.InfoBox:
+                    info.SetBackgroundColour(back)
+            if self.color_manager.has_color("DIALOG_TEXT"):
+                text = self.color_manager.get_color("DIALOG_TEXT")
+                self.SetForegroundColour(text)
+                for info in self.InfoBox:
+                    info.SetForegroundColour(text)
+            self.Refresh()
+        except Exception:
+            _log.debug("_update_info_box_colors failed", exc_info=True)
 
     def _get_info_box_lines(self) -> int:
         """Resolve the info box line count.
@@ -200,8 +234,42 @@ class PeopleListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
             except Exception:
                 pass
         self.Layout()
+        self.sync_custom_header_widths()
         if event:
             event.Skip()
+
+    def sync_custom_header_widths(self) -> None:
+        """Keep custom header label widths aligned with list column widths."""
+        if not hasattr(self, "list") or not self.list or not getattr(self, "header_labels", None):
+            return
+        try:
+            for i, lbl in enumerate(self.header_labels):
+                width = self.list.GetColumnWidth(i)
+                if width <= 0:
+                    continue
+                lbl.SetMinSize((width, -1))
+                lbl.SetMaxSize((width, -1))
+            self.header_panel.Layout()
+        except Exception:
+            _log.debug("sync_custom_header_widths failed", exc_info=True)
+
+    def _update_custom_header_colors(self) -> None:
+        """Apply GRID colors to custom header background and text."""
+        if not self.color_manager:
+            return
+        try:
+            back_name = "GRID_HEADER_BACK" if self.color_manager.has_color("GRID_HEADER_BACK") else "GRID_BACK"
+            text_name = "GRID_HEADER_TEXT" if self.color_manager.has_color("GRID_HEADER_TEXT") else "GRID_TEXT"
+            back = self.color_manager.get_color(back_name)
+            text = self.color_manager.get_color(text_name)
+            self.header_panel.SetBackgroundColour(back)
+            self.header_panel.SetForegroundColour(text)
+            for lbl in self.header_labels:
+                lbl.SetBackgroundColour(back)
+                lbl.SetForegroundColour(text)
+            self.header_panel.Refresh()
+        except Exception:
+            _log.debug("_update_custom_header_colors failed", exc_info=True)
 
     def append_info_box(self, message):
         """Append a message to the info box and reflow the visible lines.
@@ -239,6 +307,9 @@ class PeopleListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
 
     def refresh_colors(self):
         """Refresh colors in the people list control after appearance mode change."""
+        self._update_info_box_colors()
+        self._update_custom_header_colors()
+        self.sync_custom_header_widths()
         if hasattr(self, "list") and self.list:
             try:
                 self.list.refresh_colors()

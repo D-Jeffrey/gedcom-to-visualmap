@@ -28,6 +28,8 @@ import tracemalloc
 from const import KMLMAPSURL
 
 import wx
+import wx.lib.buttons
+import wx.lib.scrolledpanel
 
 from .people_list_ctrl_panel import PeopleListCtrlPanel  # type: ignore
 from ..actions.background_actions import BackgroundActions
@@ -292,14 +294,17 @@ class VisualMapPanel(wx.Panel):
         """Construct left/right sub-panels and people list."""
         # create a panel in the frame
         self.panelA = wx.Panel(self, -1, style=wx.SIMPLE_BORDER)
-        self.panelB = wx.Panel(self, -1, style=wx.SIMPLE_BORDER)
+        # Use ScrolledPanel for panelB to allow scrolling when many controls (e.g., HTML options)
+        self.panelB = wx.lib.scrolledpanel.ScrolledPanel(self, -1, style=wx.SIMPLE_BORDER)
 
         # https://docs.wxpython.org/wx.ColourDatabase.html#wx-colourdatabase
         self.panelA.SetBackgroundColour(self.color_manager.get_color("INFO_BOX_BACKGROUND"))
-        # Use system default for panelB to support dark mode
-        if not self.color_manager.is_dark_mode():
-            self.panelB.SetBackgroundColour(wx.WHITE)
-        # In dark mode, let system handle the background color
+        if self.color_manager.has_color("DIALOG_BACKGROUND"):
+            self.panelB.SetBackgroundColour(self.color_manager.get_color("DIALOG_BACKGROUND"))
+        else:
+            self.panelB.SetBackgroundColour(wx.NullColour)
+        if self.color_manager.has_color("DIALOG_TEXT"):
+            self.panelB.SetForegroundColour(self.color_manager.get_color("DIALOG_TEXT"))
 
         main_hs = wx.BoxSizer(wx.HORIZONTAL)
         main_hs.Add(self.panelA, 1, wx.EXPAND | wx.ALL, 5)
@@ -326,6 +331,10 @@ class VisualMapPanel(wx.Panel):
 
         # Add all the labels, button and radiobox to Right Panel using LayoutOptions helper
         LayoutOptions.build(self, self.panelB)
+        self._apply_panelb_text_color()
+
+        # Configure scrolling for panelB (needed when HTML options are shown)
+        self.panelB.SetupScrolling(scroll_x=False, scroll_y=True, rate_y=20)
 
         pa_sizer = wx.BoxSizer(wx.VERTICAL)
         pa_sizer.Add(self.peopleList, 1, wx.EXPAND | wx.ALL, 5)
@@ -366,11 +375,13 @@ class VisualMapPanel(wx.Panel):
         """Refresh all UI colors after appearance mode change."""
         # Update panel backgrounds
         self.panelA.SetBackgroundColour(self.color_manager.get_color("INFO_BOX_BACKGROUND"))
-        if not self.color_manager.is_dark_mode():
-            self.panelB.SetBackgroundColour(wx.WHITE)
+        if self.color_manager.has_color("DIALOG_BACKGROUND"):
+            self.panelB.SetBackgroundColour(self.color_manager.get_color("DIALOG_BACKGROUND"))
         else:
-            # In dark mode, reset to system default
             self.panelB.SetBackgroundColour(wx.NullColour)
+        if self.color_manager.has_color("DIALOG_TEXT"):
+            self.panelB.SetForegroundColour(self.color_manager.get_color("DIALOG_TEXT"))
+        self._apply_panelb_text_color()
 
         # Note: Input File, Output File, and Configuration Options buttons use system defaults
         # (color=None) and automatically adapt to appearance changes. No manual color refresh needed.
@@ -382,6 +393,179 @@ class VisualMapPanel(wx.Panel):
         # Force repaint
         self.Layout()
         self.Refresh()
+
+    def _apply_panelb_text_color(self) -> None:
+        """Apply DIALOG_TEXT and DIALOG_BACKGROUND to panelB and all descendant controls."""
+        if not getattr(self, "panelB", None):
+            return
+        if not self.color_manager.has_color("DIALOG_TEXT"):
+            return
+
+        text_color = self.color_manager.get_color("DIALOG_TEXT")
+        bg_color = (
+            self.color_manager.get_color("DIALOG_BACKGROUND")
+            if self.color_manager.has_color("DIALOG_BACKGROUND")
+            else None
+        )
+
+        def apply_recursive(win: wx.Window) -> None:
+            # Handle wx.CheckBox specially - needs both colors updated for Windows
+            if isinstance(win, wx.CheckBox):
+                try:
+                    win.SetForegroundColour(text_color)
+                    # Use SetOwnForegroundColour for Windows compatibility
+                    if hasattr(win, "SetOwnForegroundColour"):
+                        win.SetOwnForegroundColour(text_color)
+                    if bg_color:
+                        win.SetBackgroundColour(bg_color)
+                        # Use SetOwnBackgroundColour for Windows compatibility
+                        if hasattr(win, "SetOwnBackgroundColour"):
+                            win.SetOwnBackgroundColour(bg_color)
+                    win.Refresh()
+                except Exception:
+                    pass
+                # Still recurse into children in case there are nested controls
+                for child in win.GetChildren():
+                    apply_recursive(child)
+                return
+
+            # Handle GenCheckBox specially (if any remain) - needs both colors updated
+            class_name = win.__class__.__name__
+            if class_name == "GenCheckBox":
+                try:
+                    win.SetForegroundColour(text_color)
+                    # Use SetOwnForegroundColour for Windows compatibility
+                    if hasattr(win, "SetOwnForegroundColour"):
+                        win.SetOwnForegroundColour(text_color)
+                    if bg_color:
+                        win.SetBackgroundColour(bg_color)
+                        # Use SetOwnBackgroundColour for Windows compatibility
+                        if hasattr(win, "SetOwnBackgroundColour"):
+                            win.SetOwnBackgroundColour(bg_color)
+                    win.Refresh()
+                except Exception:
+                    pass
+                # Still recurse into children in case there are nested controls
+                for child in win.GetChildren():
+                    apply_recursive(child)
+                return
+
+            # Handle ActivityIndicator specially - update busy indicator colors
+            if isinstance(win, wx.ActivityIndicator):
+                try:
+                    if self.color_manager.has_color("BUSY_BACK"):
+                        win.SetBackgroundColour(self.color_manager.get_color("BUSY_BACK"))
+                    if self.color_manager.has_color("BUSY_TEXT"):
+                        win.SetForegroundColour(self.color_manager.get_color("BUSY_TEXT"))
+                    win.Refresh()
+                except Exception:
+                    pass
+                return
+
+            # Handle TextCtrl specially - ensure both enabled and disabled get proper colors
+            if isinstance(win, wx.TextCtrl):
+                try:
+                    win.SetForegroundColour(text_color)
+                    win.SetOwnForegroundColour(text_color)
+                    if bg_color:
+                        win.SetBackgroundColour(bg_color)
+                        # Use SetOwnBackgroundColour for Windows compatibility
+                        win.SetOwnBackgroundColour(bg_color)
+                    win.Refresh()
+                except Exception:
+                    pass
+                return
+
+            # Handle GenButton specially - re-apply colors from color manager
+            if isinstance(win, wx.lib.buttons.GenButton):
+                try:
+                    # Check if button has a stored color key
+                    if hasattr(win, "_color_key") and win._color_key:
+                        btn_color = self.color_manager.get_color(win._color_key)
+                        win.SetBackgroundColour(btn_color)
+                    if self.color_manager.has_color("DIALOG_TEXT"):
+                        win.SetForegroundColour(self.color_manager.get_color("DIALOG_TEXT"))
+                    win.Refresh()
+                except Exception:
+                    pass
+                return
+
+            # Skip other button types - they use native styling
+            if isinstance(win, (wx.Button, wx.lib.buttons.GenToggleButton)):
+                return
+            # Also skip by class name in case import path differs
+            if "Button" in class_name and class_name != "GenButton":
+                return
+
+            # Handle CustomRadioBox specially - it needs both foreground and background
+            # set via its custom methods to propagate to internal StaticBox and GenToggleButtons
+            if class_name == "CustomRadioBox":
+                try:
+                    win.SetForegroundColour(text_color)
+                    # Use SetOwnForegroundColour for Windows compatibility
+                    if hasattr(win, "SetOwnForegroundColour"):
+                        win.SetOwnForegroundColour(text_color)
+                    if bg_color:
+                        win.SetBackgroundColour(bg_color)
+                        # Use SetOwnBackgroundColour for Windows compatibility
+                        if hasattr(win, "SetOwnBackgroundColour"):
+                            win.SetOwnBackgroundColour(bg_color)
+                        win.Refresh()
+                except Exception:
+                    pass
+                # Don't recurse into CustomRadioBox children - it handles them internally
+                return
+
+            # Handle SpinCtrl - set colors for Windows compatibility
+            if isinstance(win, wx.SpinCtrl):
+                try:
+                    win.SetForegroundColour(text_color)
+                    if hasattr(win, "SetOwnForegroundColour"):
+                        win.SetOwnForegroundColour(text_color)
+                    if bg_color:
+                        win.SetBackgroundColour(bg_color)
+                        if hasattr(win, "SetOwnBackgroundColour"):
+                            win.SetOwnBackgroundColour(bg_color)
+                    win.Refresh()
+                except Exception:
+                    pass
+                return
+
+            # Handle Choice - set colors for Windows compatibility
+            if isinstance(win, wx.Choice):
+                try:
+                    win.SetForegroundColour(text_color)
+                    if hasattr(win, "SetOwnForegroundColour"):
+                        win.SetOwnForegroundColour(text_color)
+                    if bg_color:
+                        win.SetBackgroundColour(bg_color)
+                        if hasattr(win, "SetOwnBackgroundColour"):
+                            win.SetOwnBackgroundColour(bg_color)
+                    win.Refresh()
+                except Exception:
+                    pass
+                return
+
+            try:
+                win.SetForegroundColour(text_color)
+            except Exception:
+                pass
+            try:
+                win.SetOwnForegroundColour(text_color)
+            except Exception:
+                pass
+            # Apply background color to Panels and StaticBoxes so they match the theme
+            if bg_color and isinstance(win, (wx.Panel, wx.StaticBox)):
+                try:
+                    win.SetBackgroundColour(bg_color)
+                    # Force immediate refresh for panels/boxes
+                    win.Refresh()
+                except Exception:
+                    pass
+            for child in win.GetChildren():
+                apply_recursive(child)
+
+        apply_recursive(self.panelB)
 
     def refresh_processing_options(self) -> None:
         """Refresh checkbox enable states based on what data is available from last load."""

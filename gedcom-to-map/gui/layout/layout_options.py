@@ -58,6 +58,13 @@ class LayoutOptions:
         titleArea = wx.Panel(panel, size=(-1, fh + 10))
         titleArea.SetBackgroundColour(vm_panel.color_manager.get_color("TITLE_BACK"))
         title = wx.StaticText(titleArea, label="Visual Mapping Options", style=wx.ALIGN_CENTER)
+        try:
+            if vm_panel.color_manager.has_color("TITLE_TEXT"):
+                title.SetForegroundColour(vm_panel.color_manager.get_color("TITLE_TEXT"))
+            elif vm_panel.color_manager.has_color("DIALOG_TEXT"):
+                title.SetForegroundColour(vm_panel.color_manager.get_color("DIALOG_TEXT"))
+        except Exception:
+            _log.debug("Failed to apply title text color", exc_info=True)
         title.SetFont(titleFont)
         titleSizer = wx.BoxSizer(wx.HORIZONTAL)
         titleSizer.Add(title, 1, wx.ALIGN_CENTER)
@@ -69,26 +76,78 @@ class LayoutOptions:
     @staticmethod
     def _add_file_controls(vm_panel: Any, panel: wx.Panel, sizer: wx.Sizer) -> None:
         """Create input/output file controls and add to sizer."""
-        LayoutHelpers.add_button_with_id(vm_panel, panel, "txtinfile", "Input file:   ", color=None)
-        LayoutHelpers.add_textctrl_with_id(vm_panel, panel, "TEXTGEDCOMinput", size=(250, 20), enable=False)
-        LayoutHelpers.add_button_with_id(vm_panel, panel, "txtoutfile", "Output file: ", color=None)
-        LayoutHelpers.add_textctrl_with_id(vm_panel, panel, "TEXTResultFile", size=(250, 20))
+        # Match bottom action-row button implementation exactly.
+        force_custom = bool(vm_panel.color_manager and vm_panel.color_manager.use_custom_colors())
+        button_color = "BTN_BACK" if force_custom else None
+
+        # Create both buttons before text controls (critical for macOS GenButton rendering)
+        btn_in = LayoutHelpers.add_button_with_id(
+            vm_panel, panel, "txtinfile", "Input file:   ", color=button_color, force_custom=force_custom
+        )
+        btn_out = LayoutHelpers.add_button_with_id(
+            vm_panel, panel, "txtoutfile", "Output file: ", color=button_color, force_custom=force_custom
+        )
+
+        # Create text controls after buttons
+        txt_in = LayoutHelpers.add_textctrl_with_id(vm_panel, panel, "TEXTGEDCOMinput", size=(250, -1), enable=False)
+        txt_out = LayoutHelpers.add_textctrl_with_id(vm_panel, panel, "TEXTResultFile", size=(250, -1))
+
         vm_panel.id.txtinfile.Bind(wx.EVT_LEFT_DOWN, vm_panel.frame.OnFileOpenDialog)
         vm_panel.id.txtoutfile.Bind(wx.EVT_LEFT_DOWN, vm_panel.frame.OnFileResultDialog)
 
-        l1 = LayoutHelpers.add_multi_horizontal_by_id(vm_panel, ["txtinfile", "TEXTGEDCOMinput"], spacer=6)
-        l2 = LayoutHelpers.add_multi_horizontal_by_id(vm_panel, ["txtoutfile", "TEXTResultFile"], spacer=6)
-        sizer.Add(l1, proportion=0, flag=wx.EXPAND | wx.ALL, border=2)
-        sizer.Add(l2, proportion=0, flag=wx.EXPAND | wx.ALL, border=2)
+        # Create horizontal layouts for button+textbox pairs
+        input_row = wx.BoxSizer(wx.HORIZONTAL)
+        input_row.Add(btn_in, 0, wx.ALL | wx.ALIGN_CENTER_VERTICAL, 2)
+        input_row.Add(txt_in, 0, wx.ALL | wx.ALIGN_CENTER_VERTICAL, 2)
+        sizer.Add(input_row, 0, wx.EXPAND | wx.ALL, 2)
+
+        output_row = wx.BoxSizer(wx.HORIZONTAL)
+        output_row.Add(btn_out, 0, wx.ALL | wx.ALIGN_CENTER_VERTICAL, 2)
+        output_row.Add(txt_out, 0, wx.ALL | wx.ALIGN_CENTER_VERTICAL, 2)
+        sizer.Add(output_row, 0, wx.EXPAND | wx.ALL, 2)
+
+        # Deferred refresh for GenButtons (macOS rendering fix)
+        def refresh_buttons():
+            for btn in [btn_in, btn_out]:
+                btn.Show(True)
+                btn.Raise()
+                btn.Refresh(True)
+                btn.Update()
+            panel.Layout()
+            panel.Refresh()
+            # Additional delayed refresh for stubborn buttons
+            wx.CallLater(100, lambda: [btn_out.Refresh(True), btn_out.Update()])
+
+        wx.CallAfter(refresh_buttons)
 
     @staticmethod
     def _add_basic_checks(vm_panel: Any, panel: wx.Panel, sizer: wx.Sizer) -> None:
         """Add the top-level checkbox controls and configuration button."""
         # Configuration button
+        force_custom = bool(vm_panel.color_manager and vm_panel.color_manager.use_custom_colors())
+        button_color = "BTN_BACK" if force_custom else None
         btn_config = LayoutHelpers.add_button_with_id(
-            vm_panel, panel, "BTNConfig", "Configuration Options...", color=None
+            vm_panel,
+            panel,
+            "BTNConfig",
+            "Configuration Options...",
+            color=button_color,
+            force_custom=force_custom,
         )
         sizer.Add(btn_config, 0, wx.ALL, 2)
+
+        # Deferred refresh for GenButton (macOS rendering fix)
+        def refresh_config():
+            btn_config.Show(True)
+            btn_config.Raise()
+            btn_config.Refresh(True)
+            btn_config.Update()
+            panel.Layout()
+            panel.Refresh()
+            # Additional delayed refresh
+            wx.CallLater(100, lambda: [btn_config.Refresh(True), btn_config.Update()])
+
+        wx.CallAfter(refresh_config)
 
         # General Options section
         general_container = wx.Panel(panel)
@@ -100,8 +159,8 @@ class LayoutOptions:
             vm_panel, general_container, "CBAllEntities", "Map all people"
         )
 
-        general_boxIn.Add(cb_all_entities, 0, wx.ALL, 2)
-        general_sizer.Add(general_boxIn, 0, wx.EXPAND | wx.ALL, 4)
+        general_boxIn.Add(cb_all_entities, 0, wx.ALL, 5)
+        general_sizer.Add(general_boxIn, 0, wx.EXPAND | wx.ALL, 6)
         general_container.SetSizer(general_sizer)
 
         sizer.Add(general_container, 0, wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP, 5)
@@ -249,21 +308,16 @@ class LayoutOptions:
         ssizer = wx.StaticBoxSizer(sbox, wx.VERTICAL)
         sboxIn = wx.BoxSizer(wx.VERTICAL)
 
-        # Parent controls to the container panel (not to the StaticBox object)
         vm_panel.id.CBSummary = [
-            wx.CheckBox(sbox_container, vm_panel.id.IDs["CBSummary0"], label="Open files after created", name="Open"),
-            wx.CheckBox(sbox_container, vm_panel.id.IDs["CBSummary1"], label="Places", name="Places"),
-            wx.CheckBox(sbox_container, vm_panel.id.IDs["CBSummary2"], label="People", name="People"),
-            wx.CheckBox(sbox_container, vm_panel.id.IDs["CBSummary3"], label="Countries", name="Countries"),
-            wx.CheckBox(sbox_container, vm_panel.id.IDs["CBSummary4"], label="Countries Grid", name="CountriesGrid"),
-            wx.CheckBox(sbox_container, vm_panel.id.IDs["CBSummary5"], label="Geocode", name="Geocode"),
-            wx.CheckBox(sbox_container, vm_panel.id.IDs["CBSummary6"], label="Alternate Places", name="AltPlaces"),
-            wx.CheckBox(
-                sbox_container, vm_panel.id.IDs["CBSummary7"], label="Enrichment Issues", name="EnrichmentIssues"
-            ),
-            wx.CheckBox(
-                sbox_container, vm_panel.id.IDs["CBSummary8"], label="Statistics Summary", name="StatisticsSummary"
-            ),
+            LayoutHelpers.add_checkbox_with_id(vm_panel, sbox_container, "CBSummary0", "Open files after created"),
+            LayoutHelpers.add_checkbox_with_id(vm_panel, sbox_container, "CBSummary1", "Places"),
+            LayoutHelpers.add_checkbox_with_id(vm_panel, sbox_container, "CBSummary2", "People"),
+            LayoutHelpers.add_checkbox_with_id(vm_panel, sbox_container, "CBSummary3", "Countries"),
+            LayoutHelpers.add_checkbox_with_id(vm_panel, sbox_container, "CBSummary4", "Countries Grid"),
+            LayoutHelpers.add_checkbox_with_id(vm_panel, sbox_container, "CBSummary5", "Geocode"),
+            LayoutHelpers.add_checkbox_with_id(vm_panel, sbox_container, "CBSummary6", "Alternate Places"),
+            LayoutHelpers.add_checkbox_with_id(vm_panel, sbox_container, "CBSummary7", "Enrichment Issues"),
+            LayoutHelpers.add_checkbox_with_id(vm_panel, sbox_container, "CBSummary8", "Statistics Summary"),
         ]
 
         # Add with padding so the checkboxes are not flush against each other
@@ -285,11 +339,11 @@ class LayoutOptions:
         gbox = wx.StaticBox(gbox_container, -1, "Grid View Options")
         gsizer = wx.StaticBoxSizer(gbox, wx.VERTICAL)
         gboxIn = wx.BoxSizer(wx.VERTICAL)
-        vm_panel.id.CBGridView = wx.CheckBox(
-            gbox_container, vm_panel.id.IDs["CBGridView"], "View Only Direct Ancestors"
+        vm_panel.id.CBGridView = LayoutHelpers.add_checkbox_with_id(
+            vm_panel, gbox_container, "CBGridView", "View Only Direct Ancestors"
         )
-        gboxIn.AddMany([vm_panel.id.CBGridView])
-        gsizer.Add(gboxIn, 0, wx.EXPAND | wx.ALL, 4)
+        gboxIn.Add(vm_panel.id.CBGridView, 0, wx.ALL, 5)
+        gsizer.Add(gboxIn, 0, wx.EXPAND | wx.ALL, 6)
 
         gbox_container.SetSizer(gsizer)
         vm_panel.optionGbox = gbox_container
@@ -315,10 +369,19 @@ class LayoutOptions:
     @staticmethod
     def _add_buttons_row(vm_panel: Any, panel: wx.Panel, sizer: wx.Sizer) -> None:
         """Create the action buttons row (Load, Create, CSV, Trace, Stop, Browser)."""
-        bt_load = LayoutHelpers.add_button_with_id(vm_panel, panel, "BTNLoad", "Load", color=None)
-        bt_create = LayoutHelpers.add_button_with_id(vm_panel, panel, "BTNCreateFiles", "Create Files", color=None)
-        bt_csv = LayoutHelpers.add_button_with_id(vm_panel, panel, "BTNCSV", "Geo Table", color=None)
-        bt_trace = LayoutHelpers.add_button_with_id(vm_panel, panel, "BTNTRACE", "Trace", color=None)
+        force_custom = bool(vm_panel.color_manager and vm_panel.color_manager.use_custom_colors())
+        bt_load = LayoutHelpers.add_button_with_id(
+            vm_panel, panel, "BTNLoad", "Load", color="BTN_BACK", force_custom=force_custom
+        )
+        bt_create = LayoutHelpers.add_button_with_id(
+            vm_panel, panel, "BTNCreateFiles", "Create Files", color="BTN_BACK", force_custom=force_custom
+        )
+        bt_csv = LayoutHelpers.add_button_with_id(
+            vm_panel, panel, "BTNCSV", "Geo Table", color="BTN_BACK", force_custom=force_custom
+        )
+        bt_trace = LayoutHelpers.add_button_with_id(
+            vm_panel, panel, "BTNTRACE", "Trace", color="BTN_BACK", force_custom=force_custom
+        )
 
         l1 = wx.BoxSizer(wx.HORIZONTAL)
         l1.Add(bt_load, 0, wx.EXPAND | wx.ALL, 5)
@@ -328,8 +391,12 @@ class LayoutOptions:
         sizer.Add(l1, 0, wx.EXPAND | wx.ALL, 0)
 
         busy_indicator = LayoutHelpers.add_busy_indicator(vm_panel, panel, "busyIndicator", color="BUSY_BACK")
-        bt_stop = LayoutHelpers.add_button_with_id(vm_panel, panel, "BTNSTOP", "Stop", color=None)
-        bt_browser = LayoutHelpers.add_button_with_id(vm_panel, panel, "BTNBROWSER", "Browser", color=None)
+        bt_stop = LayoutHelpers.add_button_with_id(
+            vm_panel, panel, "BTNSTOP", "Stop", color="BTN_BACK", force_custom=force_custom
+        )
+        bt_browser = LayoutHelpers.add_button_with_id(
+            vm_panel, panel, "BTNBROWSER", "Browser", color="BTN_BACK", force_custom=force_custom
+        )
 
         l2 = wx.BoxSizer(wx.HORIZONTAL)
         l2.Add(busy_indicator, 0, wx.ALL | wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 5)

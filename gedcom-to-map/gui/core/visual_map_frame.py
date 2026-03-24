@@ -26,6 +26,7 @@ STATUS_BAR_RIGHT_FIELD_CHARS = 30  # Width of right status bar field in characte
 from ..dialogs.config_dialog import ConfigDialog
 from ..dialogs.about_dialog import AboutDialog
 from ..dialogs.help_dialog import HelpDialog
+from ..dialogs.simple_message_dialog import SimpleMessageDialog
 from ..panels.visual_map_panel import VisualMapPanel
 from ..layout.visual_gedcom_ids import VisualGedcomIds
 from ..layout.font_manager import FontManager
@@ -269,11 +270,12 @@ class VisualMapFrame(wx.Frame):
         """Handle window activation: check for system appearance changes."""
         if event.GetActive():
             # Window is being activated - check if appearance mode changed
-            if self.color_manager.refresh_colors():
+            mode_changed = self.color_manager.refresh_colors()
+            if mode_changed:
                 # Colors changed, need to refresh the UI
                 _log.info("Appearance mode changed, refreshing UI colors")
-                # Refresh the panel colors
-                self.visual_map_panel.refresh_colors()
+            # Always refresh when activated (in case a dialog refreshed before us)
+            self.visual_map_panel.refresh_colors()
         event.Skip()  # Allow event to propagate
 
     def OnOpenCSV(self, event: wx.Event) -> None:
@@ -411,9 +413,15 @@ class VisualMapFrame(wx.Frame):
                     self,
                     title=f"About {GUINAME} {self.font_manager.get_font_name_size()[1]}",
                     font_manager=self.font_manager,
+                    color_manager=self.color_manager,
                 )
             else:
-                dialog = HelpDialog(self, title=f"Help for {GUINAME}", font_manager=self.font_manager)
+                dialog = HelpDialog(
+                    self,
+                    title=f"Help for {GUINAME}",
+                    font_manager=self.font_manager,
+                    color_manager=self.color_manager,
+                )
             dialog.ShowModal()
             dialog.Destroy()
         except Exception:
@@ -447,7 +455,15 @@ class VisualMapFrame(wx.Frame):
                     msg += f"\nTotal cached addresses: {self.svc_state.lookup.address_book.len()}\n{stats}"
                 except Exception:
                     pass
-            wx.MessageBox(msg, "Statistics", wx.OK | wx.ICON_INFORMATION)
+            # Use themed dialog instead of wx.MessageBox for dark mode compatibility
+            dialog = SimpleMessageDialog(
+                self,
+                message=msg,
+                title="Statistics",
+                color_manager=self.color_manager,
+            )
+            dialog.ShowModal()
+            dialog.Destroy()
         except Exception:
             _log.exception("OnInfo failed")
 

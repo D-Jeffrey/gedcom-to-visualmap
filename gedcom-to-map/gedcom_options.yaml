@@ -190,7 +190,6 @@ summary_report_options:
 # Migration flow visualization options
 migration_display_options:
   RBLocationGrouping: {type: 'str', default: 'City and Country', ini_section: 'MIG'}
-  LISTTimePeriodGrouping: {type: 'str', default: 'Decade', ini_section: 'MIG'}
   UseSoundexLocationGrouping: {type: 'bool', default: True, ini_section: 'MIG'}
   MaxMigrationLines: {type: 'int', default: 100, ini_section: 'MIG'}
 

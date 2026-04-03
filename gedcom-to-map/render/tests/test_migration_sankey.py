@@ -7,7 +7,7 @@ from unittest.mock import Mock, MagicMock
 from pathlib import Path
 from render.migration.sankey_exporter import (
     MigrationFlowExporter, MigrationFlowAnalyzer, SankeyBuilder,
-    LocationNode, MigrationFlow, MigrationEventType, TimePeriodMode
+    LocationNode, MigrationFlow, MigrationEventType
 )
 
 
@@ -35,6 +35,12 @@ class TestLocationNode:
         node3 = LocationNode("Boston", "Canada")
         assert node1 == node2
         assert node1 != node3
+    
+    def test_location_node_continent_display(self):
+        node = LocationNode("Paris", "France", "Europe")
+        assert node.get_display_name("Continent") == "Europe"
+        node_no_continent = LocationNode("Paris", "France")
+        assert node_no_continent.get_display_name("Continent") == "France"
     
     def test_location_node_hash(self):
         node1 = LocationNode("Boston", "USA")
@@ -84,25 +90,6 @@ class TestMigrationFlowAnalyzer:
         assert len(analyzer.flows) == 0
         assert len(analyzer.locations) == 0
     
-    def test_group_by_time_period_decade(self):
-        analyzer = MigrationFlowAnalyzer(self.mock_gedcom)
-        
-        assert analyzer.group_by_time_period(1855, TimePeriodMode.DECADE) == "1850-1859"
-        assert analyzer.group_by_time_period(1999, TimePeriodMode.DECADE) == "1990-1999"
-        assert analyzer.group_by_time_period(None, TimePeriodMode.DECADE) == "Unknown"
-    
-    def test_group_by_time_period_generation(self):
-        analyzer = MigrationFlowAnalyzer(self.mock_gedcom)
-        
-        assert analyzer.group_by_time_period(1850, TimePeriodMode.GENERATION) == "1850-1874"
-        assert analyzer.group_by_time_period(1900, TimePeriodMode.GENERATION) == "1900-1924"
-    
-    def test_group_by_time_period_century(self):
-        analyzer = MigrationFlowAnalyzer(self.mock_gedcom)
-        
-        assert analyzer.group_by_time_period(1850, TimePeriodMode.CENTURY) == "1800s"
-        assert analyzer.group_by_time_period(2020, TimePeriodMode.CENTURY) == "2000s"
-    
     def test_extract_events_with_locations(self):
         """Test extraction of life events with locations."""
         analyzer = MigrationFlowAnalyzer(self.mock_gedcom)
@@ -115,7 +102,7 @@ class TestMigrationFlowAnalyzer:
         
         events = analyzer.extract_events_with_locations(mock_person, MigrationEventType.BIRTH)
         assert len(events) == 1
-        assert events[0] == ("Boston", "USA", 1850)
+        assert events[0] == ("Boston", "USA", 1850, "")
     
     def test_analyze_with_flows(self):
         """Test migration analysis with sample data."""
@@ -131,7 +118,7 @@ class TestMigrationFlowAnalyzer:
         
         self.mock_gedcom.people = [mock_person1]
         
-        stats = analyzer.analyze(mode=TimePeriodMode.DECADE)
+        stats = analyzer.analyze()
         
         assert stats.total_flows >= 0
         assert len(analyzer.locations) >= 0
@@ -147,7 +134,7 @@ class TestMigrationFlowAnalyzer:
 
         self.mock_gedcom.people = {"@I1@": mock_person1}
 
-        stats = analyzer.analyze(mode=TimePeriodMode.DECADE)
+        stats = analyzer.analyze()
 
         assert stats.total_flows == 1
         assert stats.total_people_moved == 1
@@ -167,7 +154,7 @@ class TestMigrationFlowAnalyzer:
 
         self.mock_gedcom.people = [person_a, person_b]
 
-        stats = analyzer.analyze(mode=TimePeriodMode.DECADE)
+        stats = analyzer.analyze()
 
         # Both flows from New Yrok and New York should be merged into a single origin
         assert stats.total_flows == 1
@@ -185,10 +172,10 @@ class TestMigrationFlowAnalyzer:
             people.append(p)
         self.mock_gedcom.people = people
 
-        stats = analyzer.analyze(mode=TimePeriodMode.DECADE, max_lines=3)
+        stats = analyzer.analyze(max_lines=3)
 
         assert len(analyzer.flows) == 3
-        assert stats.total_flows == 3
+        assert stats.total_flows == 10
 
 
 class TestSankeyBuilder:
@@ -200,7 +187,7 @@ class TestSankeyBuilder:
         flow = MigrationFlow(from_loc, to_loc, "1850-1859")
         flow.flow_count = 5
         
-        labels, idx_map, src, tgt, vals = SankeyBuilder.build_sankey_data([flow])
+        labels, idx_map, src, tgt, vals, incoming, outgoing = SankeyBuilder.build_sankey_data([flow])
         
         assert len(labels) == 2
         assert "Boston, USA" in labels
@@ -208,6 +195,8 @@ class TestSankeyBuilder:
         assert len(src) == 1
         assert len(tgt) == 1
         assert vals[0] == 5
+        assert incoming[idx_map["NYC, USA"]] == 5
+        assert outgoing[idx_map["Boston, USA"]] == 5
     
     def test_period_color_assignment(self):
         """Test that time periods get assigned colors."""
@@ -299,7 +288,7 @@ class TestIntegration:
         
         # Analyze
         analyzer = MigrationFlowAnalyzer(mock_gedcom)
-        stats = analyzer.analyze(mode=TimePeriodMode.DECADE)
+        stats = analyzer.analyze()
         
         # Verify results
         assert stats.total_flows > 0

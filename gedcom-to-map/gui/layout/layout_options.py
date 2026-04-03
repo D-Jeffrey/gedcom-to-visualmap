@@ -337,20 +337,9 @@ class LayoutOptions:
         # Location grouping control
         rb_location_grouping = LayoutHelpers.add_radio_box_with_id(
             vm_panel, mbox_container, "RBLocationGrouping", "Location Grouping:",
-            choices=["Country", "City and Country"], majorDimension=1
+            choices=["Country", "City and Country", "Continent"], majorDimension=1
         )
         mboxIn.Add(rb_location_grouping, 0, wx.ALL, 2)
-
-        # Time period grouping control
-        time_period_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        time_period_label = wx.StaticText(mbox_container, -1, "Time Period Grouping")
-        ch_time_period_grouping = LayoutHelpers.add_choice_with_id(
-            vm_panel, mbox_container, "LISTTimePeriodGrouping", 
-            choices=["Decade", "Generation", "Century", "Custom"]
-        )
-        time_period_sizer.Add(time_period_label, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 5)
-        time_period_sizer.Add(ch_time_period_grouping, 0, wx.ALIGN_CENTER_VERTICAL)
-        mboxIn.Add(time_period_sizer, 0, wx.ALL, 2)
 
         # Soundex normalization toggle
         cb_soundex = LayoutHelpers.add_checkbox_with_id(

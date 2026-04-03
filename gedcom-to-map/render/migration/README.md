@@ -20,7 +20,7 @@ The migration flow visualization reveals population movement patterns without re
 ### Basic Export
 
 ```python
-from render.migration.sankey_exporter import MigrationFlowExporter, TimePeriodMode
+from render.migration.sankey_exporter import MigrationFlowExporter
 from services.config_service import GVConfig
 from services.state_service import GVState
 from services.progress_service import GVProgress
@@ -36,7 +36,6 @@ exporter = MigrationFlowExporter(config, state, progress)
 # Generate visualization
 output_file = exporter.export(
     geolocated_gedcom,
-    output_file="family_migrations.html",
-    mode=TimePeriodMode.DECADE
+    output_file="family_migrations.html"
 )
 print(f"Visualization saved to {output_file}")

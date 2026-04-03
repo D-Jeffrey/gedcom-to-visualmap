@@ -155,7 +155,7 @@ class VisualMapEventHandler:
 
             if event_id == self.panel.id.IDs.get("RBLocationGrouping"):
                 try:
-                    location_options = ["Country", "City and Country"]
+                    location_options = ["Country", "City and Country", "Continent"]
                     selected_location = location_options[selection] if selection < len(location_options) else "City and Country"
                     _log.debug(f"RBLocationGrouping: index={selection}, selected_location={selected_location}")
                     self.panel.svc_config.set("RBLocationGrouping", selected_location)
@@ -301,18 +301,6 @@ class VisualMapEventHandler:
                     return
                 except Exception:
                     _log.exception("EvtListBox MapStyle handling failed")
-            elif attributes and attrname == "LISTTimePeriodGrouping":
-                # TimePeriodGrouping stored as string
-                try:
-                    time_period_options = ["Decade", "Generation", "Century", "Custom"]
-                    selected = time_period_options[event.GetSelection()]
-                    _log.debug(f"LISTTimePeriodGrouping: index={event.GetSelection()}, selected={selected}")
-                    self.panel.svc_config.set("LISTTimePeriodGrouping", selected)
-                    _log.info(f"LISTTimePeriodGrouping set to {selected}")
-                    self.panel.NeedRedraw()
-                    return
-                except Exception:
-                    _log.exception("EvtListBox LISTTimePeriodGrouping handling failed")
             _log.error("Uncontrolled LISTbox %s", event_id)
         except Exception:
             _log.exception("EvtListBox failed")

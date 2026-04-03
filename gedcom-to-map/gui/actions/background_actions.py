@@ -426,6 +426,7 @@ class BackgroundActions:
                     _log.error("Run: panel_actions.doMIG not available")
                     self.SayErrorMessage("Error: Migration generator not available", True)
                     return
+                fname = fname.replace(".html", "_migration_sankey.html")
                 self.SayInfoMessage(f"Summary files generated ({fname})")
                 file_type = "html"
             else:

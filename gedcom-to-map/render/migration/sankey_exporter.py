@@ -43,13 +43,6 @@ class MigrationEventType(Enum):
 
 
 
-class TimePeriodMode(Enum):
-    """How to group people into time periods."""
-    DECADE = "decade"  # 1850-1859, 1860-1869, etc.
-    GENERATION = "generation"  # ~25 year intervals
-    CENTURY = "century"  # 1800s, 1900s, etc.
-    CUSTOM = "custom"  # User-defined year ranges
-
 
 @dataclass
 class LocationNode:
@@ -81,6 +74,13 @@ class LocationNode:
                 return f"{self.location_name}, {self.country}"
             else:
                 return self.location_name
+        elif grouping == "Continent":
+            if self.continent:
+                return self.continent
+            elif self.country:
+                return self.country
+            else:
+                return self.location_name
         else:
             return self.location_name
 
@@ -94,8 +94,6 @@ class MigrationFlow:
     flow_count: int = 0
     people_ids: Set[str] = field(default_factory=set)
     event_types: Counter = field(default_factory=Counter)
-    path_weight: int = 0
-    path_weight: int = 0
     
     def add_person(self, person_id: str, event_type: MigrationEventType):
         """Record a person moving in this flow."""
@@ -112,7 +110,6 @@ class MigrationStats:
     top_destinations: List[Tuple[str, int]] = field(default_factory=list)
     top_origins: List[Tuple[str, int]] = field(default_factory=list)
     most_common_routes: List[Tuple[Tuple[str, str], int]] = field(default_factory=list)
-    time_periods_covered: List[str] = field(default_factory=list)
     average_flow_size: float = 0.0
     diaspora_index: float = 0.0  # Measure of family spread
 
@@ -139,7 +136,7 @@ class MigrationFlowAnalyzer:
         _log.info("MigrationFlowAnalyzer initialized with %d people", 
                  len(geolocated_gedcom.people) if hasattr(geolocated_gedcom, 'people') else 0)
     
-    def extract_events_with_locations(self, person, event_type: MigrationEventType) -> List[Tuple[str, str, Optional[int]]]:
+    def extract_events_with_locations(self, person, event_type: MigrationEventType) -> List[Tuple[str, str, Optional[int], str]]:
         """
         Extract birth/death/residence events with their years and locations.
         
@@ -148,7 +145,7 @@ class MigrationFlowAnalyzer:
             event_type: Type of event to extract (BIRTH, DEATH, RESIDENCE, BURIAL)
         
         Returns:
-            List of (location, country, year) tuples where event occurred
+            List of (location, country, year, continent) tuples where event occurred
         """
         events = []
         
@@ -168,37 +165,73 @@ class MigrationFlowAnalyzer:
 
         event = None
         if hasattr(person, 'get_event') and callable(getattr(person, 'get_event')):
-            event = person.get_event(attr_name)
+            candidate = person.get_event(attr_name)
+            # Some mocks implement get_event but may return generic placeholder objects.
+            if candidate is not None and hasattr(candidate, 'place') and (hasattr(candidate, 'date') or hasattr(candidate, 'year')):
+                # Ensure we have usable data
+                if isinstance(candidate.place, str) and (hasattr(candidate.date, 'year_num') or hasattr(candidate, 'year')):
+                    event = candidate
+            if event is None:
+                event = getattr(person, attr_name, None)
         else:
             event = getattr(person, attr_name, None)
 
         if not event:
             return events
 
-        if event and hasattr(event, 'place') and hasattr(event, 'date'):
-            place = event.place
-            year = event.date.year_num
-            
-            # Parse place into location and country
-            if place:
-                parts = [p.strip() for p in place.split(',')]
-                # Remove leading empty parts
-                while parts and not parts[0]:
-                    parts.pop(0)
-                if not parts:
-                    location = place
-                    country = ""
-                else:
-                    country = parts[-1] if len(parts) > 1 else ""
-                    if len(parts) <= 3:
-                        location = parts[0] if parts else place
-                    else:
-                        if parts[1] and not parts[1].isdigit():
-                            location = parts[1]
-                        else:
-                            location = parts[0]
-                events.append((location, country, year))
-        
+        place = getattr(event, 'place', None)
+        evlocation = getattr(event, 'location', None)
+        country = getattr(evlocation, 'country_name', None) if evlocation else None
+        continent = getattr(evlocation, 'continent', None) if evlocation else None
+        year = None
+
+        # Prefer explicit year attribute if available and numeric
+        if hasattr(event, 'year') and isinstance(getattr(event, 'year'), int):
+            year = event.year
+        elif hasattr(event, 'date') and event.date is not None:
+            if hasattr(event.date, 'year_num') and isinstance(getattr(event.date, 'year_num'), int):
+                year = event.date.year_num
+            elif isinstance(event.date, int):
+                year = event.date
+
+        # If we still don't have numeric year, ignore this event
+        if year is None:
+            return events
+
+        # Only process when we have valid place string and year
+        if not place or not isinstance(place, str) or year is None:
+            return events
+
+        # Try to use geolocated event info and canonical normalization where possible.
+        if place:
+            normalized_location, normalized_country = self._normalize_place_country(place, country)
+
+            if hasattr(event, 'location') and getattr(event, 'location', None):
+                event_location = event.location
+                if isinstance(getattr(event_location, 'country_name', None), str) and event_location.country_name:
+                    normalized_country = event_location.country_name
+                if isinstance(getattr(event_location, 'continent', None), str) and event_location.continent:
+                    continent = event_location.continent
+                if isinstance(getattr(event_location, 'address', None), str) and event_location.address and not normalized_location:
+                    alt_city, _ = self._normalize_place_country(event_location.address, normalized_country)
+                    normalized_location = alt_city
+
+            if normalized_location:
+                location = normalized_location
+            else:
+                # Fallback city from original place string
+                parts = [p.strip() for p in place.split(',') if p.strip()]
+                location = parts[0] if parts else place
+
+            if normalized_country:
+                country = normalized_country
+            else:
+                # fallback the last component
+                parts = [p.strip() for p in place.split(',') if p.strip()]
+                country = parts[-1] if len(parts) > 1 else ""
+
+            events.append((location, country, year, continent))
+
         return events
     
     def _normalize_name(self, name: Optional[str]) -> str:
@@ -209,10 +242,48 @@ class MigrationFlowAnalyzer:
             return NameProcessor.soundex(name)
         return NameProcessor.simplifyLastName(name)
 
-    def _location_group_key(self, location: str, country: str) -> Tuple[str, str]:
+    def _normalize_place_country(self, place: str, known_country: Optional[str] = None) -> Tuple[str, str]:
+        """Normalize raw place text into (city, country) using available geocode helpers."""
+        city = ""
+        country = known_country or ""
+
+        if not place:
+            return city, country
+
+        # Use geocoded config if available (canonical country name, substitutions, defaults)
+        place_to_parse = place
+        if hasattr(self, 'geolocated_gedcom') and getattr(self.geolocated_gedcom, 'geo_config', None):
+            try:
+                place_norm, _, country_name, _ = self.geolocated_gedcom.geo_config.get_place_and_countrycode(place)
+                if place_norm:
+                    place_to_parse = place_norm
+                if country_name and country_name.lower() != 'none' and not country:
+                    country = country_name
+            except Exception:
+                place_to_parse = place
+
+        parts = [p.strip() for p in place_to_parse.split(',') if p.strip()]
+        if parts:
+            city = parts[0]
+
+        # Fallback country from raw place string if not found from geo_config or known country
+        if not country:
+            raw_parts = [p.strip() for p in place.split(',') if p.strip()]
+            if len(raw_parts) > 1:
+                country = raw_parts[-1]
+
+        return city, country
+
+    def _location_group_key(self, location: str, country: str, continent: str = "") -> Tuple[str, str]:
         """Compute grouping key and display components for a location."""
         normalized_location = self._normalize_name(location)
         normalized_country = self._normalize_name(country)
+        normalized_continent = self._normalize_name(continent)
+
+        if self.location_grouping == "Continent":
+            key = f"continent:{normalized_continent or normalized_country or location.lower().strip()}"
+            display = continent or country or location
+            return key, display
 
         if self.location_grouping == "Country":
             key = f"country:{normalized_country or location.lower().strip()}"
@@ -229,43 +300,13 @@ class MigrationFlowAnalyzer:
             display = country
         return key, display
 
-    def group_by_time_period(self, year: Optional[int], mode: TimePeriodMode) -> str:
-        """
-        Group a year into a time period based on mode.
-        
-        Args:
-            year: Calendar year (or None for unknown)
-            mode: Grouping mode (decade, generation, century, custom)
-        
-        Returns:
-            String representing the time period (e.g., "1850-1859" for decade)
-        """
-        if year is None or not isinstance(year, int) or year <= 0:
-            return "Unknown"
-        
-        if mode == TimePeriodMode.DECADE:
-            decade_start = (year // 10) * 10
-            return f"{decade_start}-{decade_start + 9}"
-        
-        elif mode == TimePeriodMode.GENERATION:
-            gen_start = (year // 25) * 25
-            return f"{gen_start}-{gen_start + 24}"
-        
-        elif mode == TimePeriodMode.CENTURY:
-            century = (year // 100) * 100
-            return f"{century}s"
-        
-        else:  # CUSTOM - would be handled by caller
-            return str(year)
-    
-    def analyze(self, mode: TimePeriodMode = TimePeriodMode.DECADE, 
+    def analyze(self, 
                 event_types: Optional[List[MigrationEventType]] = None,
                 max_lines: Optional[int] = None) -> MigrationStats:
         """
         Analyze migration flows from genealogical data.
         
         Args:
-            mode: How to group people by time period
             event_types: Which event types to analyze (default: all)
             max_lines: Maximum number of links to keep for visualization (top by count)
         
@@ -300,33 +341,34 @@ class MigrationFlowAnalyzer:
             
             for evt_type in event_types:
                 events = self.extract_events_with_locations(person, evt_type)
-                for loc, country, year in events:
+                for loc, country, year, continent in events:
                     if loc and year:
-                        period = self.group_by_time_period(year, mode)
-                        person_events.append((loc, country, year, period, evt_type))
+                        decade_start = (year // 10) * 10
+                        period = f"{decade_start}-{decade_start + 9}"
+                        person_events.append((loc, country, year, continent, period, evt_type))
             
             person_events.sort(key=lambda x: x[2] if x[2] else 0)
             
             if len(person_events) >= 2:
                 for i in range(len(person_events) - 1):
-                    from_loc, from_country, from_year, from_period, _ = person_events[i]
-                    to_loc, to_country, to_year, to_period, to_event_type = person_events[i + 1]
+                    from_loc, from_country, from_year, from_continent, from_period, _ = person_events[i]
+                    to_loc, to_country, to_year, to_continent, to_period, to_event_type = person_events[i + 1]
 
-                    from_key, _ = self._location_group_key(from_loc, from_country)
-                    to_key, _ = self._location_group_key(to_loc, to_country)
+                    from_key, _ = self._location_group_key(from_loc, from_country, from_continent)
+                    to_key, _ = self._location_group_key(to_loc, to_country, to_continent)
 
                     # Only create flow if actually moved (different normalized keys)
                     if from_key != to_key:
                         # preserve canonical nodes in cache (using raw location/country)
                         if from_key not in self._location_node_cache:
-                            from_node = LocationNode(from_loc, from_country)
+                            from_node = LocationNode(from_loc, from_country, from_continent)
                             self._location_node_cache[from_key] = from_node
                             self.locations.add(from_node)
                         else:
                             from_node = self._location_node_cache[from_key]
 
                         if to_key not in self._location_node_cache:
-                            to_node = LocationNode(to_loc, to_country)
+                            to_node = LocationNode(to_loc, to_country, to_continent)
                             self._location_node_cache[to_key] = to_node
                             self.locations.add(to_node)
                         else:
@@ -342,64 +384,27 @@ class MigrationFlowAnalyzer:
 
                         flow.add_person(str(person_id), to_event_type)
 
-        self.flows = list(flow_dict.values())
+        full_flows = list(flow_dict.values())
 
-        # Calculate path weights for prioritizing flows
-        path_counter = Counter()
-        for person_id, person in enumerate(people_iterable):
-            if not person:
-                continue
-            person_events = []
-            for evt_type in event_types:
-                events = self.extract_events_with_locations(person, evt_type)
-                for loc, country, year in events:
-                    if loc and year:
-                        period = self.group_by_time_period(year, mode)
-                        loc_key, _ = self._location_group_key(loc, country)
-                        person_events.append((loc_key, period))
-            person_events.sort(key=lambda x: x[1])  # sort by period
-            unique_locs = []
-            seen = set()
-            for loc_key, period in person_events:
-                if loc_key not in seen:
-                    unique_locs.append(loc_key)
-                    seen.add(loc_key)
-            if len(unique_locs) >= 2:
-                path = tuple(unique_locs)
-                path_counter[path] += 1
+        # Compute statistics over all flows, not just the truncated top-N subset
+        self._calculate_statistics(full_flows)
 
-        # Assign path weights to flows
-        for flow in self.flows:
-            from_key = self._location_group_key(flow.from_location.location_name, flow.from_location.country)[0]
-            to_key = self._location_group_key(flow.to_location.location_name, flow.to_location.country)[0]
-            weight = 0
-            for path, count in path_counter.items():
-                if from_key in path and to_key in path:
-                    # Check if they are consecutive in the path
-                    try:
-                        from_idx = path.index(from_key)
-                        to_idx = path.index(to_key)
-                        if to_idx == from_idx + 1:
-                            weight += count
-                    except ValueError:
-                        pass
-            flow.path_weight = weight
-
-        # Top-N filtering to avoid clutter, prioritize by path weight
+        self.flows = full_flows
+        # Top-N filtering to avoid clutter for visualization
         if max_lines is not None and max_lines > 0:
-            self.flows.sort(key=lambda f: f.path_weight, reverse=True)
+            self.flows.sort(key=lambda f: f.flow_count, reverse=True)
             self.flows = self.flows[:max_lines]
-
-        self._calculate_statistics()
 
         _log.info("Migration analysis complete: %d flows, %d unique locations", 
                  len(self.flows), len(self.locations))
         
         return self.stats
     
-    def _calculate_statistics(self):
+    def _calculate_statistics(self, flows: Optional[List[MigrationFlow]] = None):
         """Calculate aggregate migration statistics."""
-        if not self.flows:
+        if flows is None:
+            flows = self.flows
+        if not flows:
             return
         
         destination_counter = Counter()
@@ -407,7 +412,7 @@ class MigrationFlowAnalyzer:
         route_counter = Counter()
         all_people_moved = set()
         
-        for flow in self.flows:
+        for flow in flows:
             to_display = flow.to_location.get_display_name(self.location_grouping)
             from_display = flow.from_location.get_display_name(self.location_grouping)
             destination_counter[to_display] += flow.flow_count
@@ -415,7 +420,7 @@ class MigrationFlowAnalyzer:
             route_counter[(from_display, to_display)] += flow.flow_count
             all_people_moved.update(flow.people_ids)
         
-        self.stats.total_flows = len(self.flows)
+        self.stats.total_flows = len(flows)
         self.stats.total_people_moved = len(all_people_moved)
         self.stats.top_destinations = destination_counter.most_common(10)
         self.stats.top_origins = origin_counter.most_common(10)
@@ -434,8 +439,6 @@ class MigrationFlowAnalyzer:
         # Higher = more dispersed, lower = concentrated
         if len(self.locations) > 1:
             self.stats.diaspora_index = len(self.locations) / max(1, len(all_people_moved))
-        
-        self.stats.time_periods_covered = sorted(set(f.time_period for f in self.flows))
 
 
 class SankeyBuilder:
@@ -475,7 +478,10 @@ class SankeyBuilder:
                 location_to_index[to_label] = len(labels)
                 labels.append(to_label)
         
-        # Build links
+        # Build links and compute node in/out aggregations
+        node_incoming = [0] * len(labels)
+        node_outgoing = [0] * len(labels)
+
         for flow in flows:
             from_idx = location_to_index[display_func(flow.from_location)]
             to_idx = location_to_index[display_func(flow.to_location)]
@@ -483,8 +489,11 @@ class SankeyBuilder:
             source_indices.append(from_idx)
             target_indices.append(to_idx)
             values.append(flow.flow_count)
-        
-        return labels, location_to_index, source_indices, target_indices, values
+
+            node_outgoing[from_idx] += flow.flow_count
+            node_incoming[to_idx] += flow.flow_count
+
+        return labels, location_to_index, source_indices, target_indices, values, node_incoming, node_outgoing
     
     @staticmethod
     def _get_period_color(time_period: str) -> str:
@@ -533,7 +542,7 @@ class SankeyBuilder:
             _log.warning("No migration flows to visualize")
             return go.Figure().add_annotation(text="No migration data available")
         
-        labels, _, source_idx, target_idx, values = SankeyBuilder.build_sankey_data(flows, display_func)
+        labels, _, source_idx, target_idx, values, node_incoming, node_outgoing = SankeyBuilder.build_sankey_data(flows, display_func)
         
         fig = go.Figure(data=[go.Sankey(
             node=dict(
@@ -542,13 +551,17 @@ class SankeyBuilder:
                 line=dict(color='black', width=0.5),
                 label=labels,
                 color=['rgba(0, 100, 200, 0.7)' if i < len(labels)//2 else 'rgba(200, 100, 0, 0.7)' 
-                       for i in range(len(labels))]
+                       for i in range(len(labels))],
+                customdata=[[node_incoming[i], node_outgoing[i]] for i in range(len(labels))],
+                hoverinfo='all',
+                hovertemplate="%{label}<br>migrated to: %{customdata[0]}<br>migrated away: %{customdata[1]}<extra></extra>"
             ),
             link=dict(
                 source=source_idx,
                 target=target_idx,
                 value=values,
-                color=[SankeyBuilder._get_period_color(flows[i].time_period) for i in range(len(flows))]
+                color=[SankeyBuilder._get_period_color(flows[i].time_period) for i in range(len(flows))],
+                hovertemplate="%{source.label} → %{target.label}<br>people moved: %{value:.0f}<extra></extra>"
             )
         )])
         
@@ -587,8 +600,7 @@ class MigrationFlowExporter:
         self.file_name = self.file_name.replace(".html", "_migration_sankey.html")
     
     def export(self, geolocated_gedcom, output_file: Optional[str] = None,
-               mode: TimePeriodMode = TimePeriodMode.DECADE,
-               include_all_modes: bool = False, location_grouping: str = "City and Country",
+               location_grouping: str = "City and Country",
                use_soundex: bool = True, max_lines: int = 100) -> str:
         """
         Generate and export migration flow visualizations.
@@ -596,9 +608,9 @@ class MigrationFlowExporter:
         Args:
             geolocated_gedcom: GeolocatedGedcom instance with geocoded data
             output_file: Output HTML file path (uses default if not provided)
-            mode: Time period grouping mode
-            include_all_modes: Generate visualizations for all grouping modes
-            location_grouping: How to display locations ("Country" or "City and Country")
+            location_grouping: How to display locations ("Country", "City and Country", or "Continent")
+            use_soundex: Whether to normalize names with Soundex-like similarity matching
+            max_lines: Maximum number of flows to include in the exported visual
         
         Returns:
             Path to generated HTML file
@@ -608,12 +620,12 @@ class MigrationFlowExporter:
         
         self.svc_progress.step("Analyzing migration flows...")
         
-        _log.info(f"export: mode={mode}, location_grouping={location_grouping}")
+        _log.info(f"export: location_grouping={location_grouping}")
         
         analyzer = MigrationFlowAnalyzer(geolocated_gedcom, location_grouping, use_soundex=use_soundex)
         
         # Generate analysis
-        stats = analyzer.analyze(mode=mode, max_lines=max_lines)
+        stats = analyzer.analyze(max_lines=max_lines)
         
         display_func = lambda loc: loc.get_display_name(location_grouping)
         
@@ -625,25 +637,16 @@ class MigrationFlowExporter:
         
         self.svc_progress.step("Generating Sankey visualizations...")
         
+        title_prefix = f"Top {max_lines} Family Migration Flows" if max_lines is not None and max_lines > 0 else "Family Migration Flows"
+
         # Create main Sankey figure
         fig = SankeyBuilder.create_sankey_figure(
             analyzer.flows,
-            title=f"Family Migration Flows ({mode.value.title()})",
+            title=title_prefix,
             display_func=display_func
         )
         
-        # Generate additional visualizations
         figs = [fig]
-        
-        if include_all_modes:
-            for alt_mode in [m for m in TimePeriodMode if m != mode and m != TimePeriodMode.CUSTOM]:
-                alt_stats = analyzer.analyze(mode=alt_mode)
-                alt_fig = SankeyBuilder.create_sankey_figure(
-                    analyzer.flows,
-                    title=f"Family Migration Flows ({alt_mode.value.title()})",
-                    display_func=display_func
-                )
-                figs.append(alt_fig)
         
         self.svc_progress.step("Creating interactive HTML...")
         
@@ -703,8 +706,6 @@ class MigrationFlowExporter:
                 {''.join(f'<li>{from_loc} → {to_loc}: {count} people</li>' 
                          for (from_loc, to_loc), count in stats.most_common_routes[:5])}
             </ol>
-            
-            <p><strong>Time Periods Covered:</strong> {', '.join(stats.time_periods_covered)}</p>
         </div>
         """
         

@@ -9,9 +9,9 @@ Classes:
     - SankeyBuilder: Constructs Plotly Sankey diagrams
 
 Usage:
-    >>> from render.migration import MigrationFlowExporter, TimePeriodMode
+    >>> from render.migration import MigrationFlowExporter
     >>> exporter = MigrationFlowExporter(config, state, progress)
-    >>> exporter.export(geolocated_gedcom, mode=TimePeriodMode.DECADE)
+    >>> exporter.export(geolocated_gedcom)
 """
 
 from .sankey_exporter import (
@@ -21,7 +21,6 @@ from .sankey_exporter import (
     LocationNode,
     MigrationFlow,
     MigrationEventType,
-    TimePeriodMode,
     MigrationStats,
 )
 
@@ -32,6 +31,5 @@ __all__ = [
     "LocationNode",
     "MigrationFlow",
     "MigrationEventType",
-    "TimePeriodMode",
     "MigrationStats",
 ]

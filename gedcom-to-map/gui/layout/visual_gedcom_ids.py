@@ -48,7 +48,6 @@ class VisualGedcomIds:
             ("CBUseAntPath", ("CheckBox", "UseAntPath", "Redraw")),
             ("CBMapTimeLine", ("CheckBox", "MapTimeLine", "Redraw")),
             ("CBHomeMarker", ("CheckBox", "HomeMarker", "Redraw")),
-            ("LISTTimePeriodGrouping", ("List", "LISTTimePeriodGrouping", "Redraw")),
             ("txtinfile", ("Button", None, "OpenGEDCOM")),
             ("TEXTGEDCOMinput", ("Text", "GEDCOMinput", "Reload")),
             ("txtoutfile", ("Button", None, "OpenOutput")),

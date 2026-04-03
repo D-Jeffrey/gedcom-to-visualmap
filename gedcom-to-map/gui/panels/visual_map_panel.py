@@ -1002,6 +1002,7 @@ class VisualMapPanel(wx.Panel):
         self.optionSbox.Hide()  # Summary options
         self.optionKbox.Hide()  # KML options
         self.optionK2box.Hide()  # KML2 options
+        self.optionMbox.Hide()  # MIG options
         # self.optionGbox.SetSize(self.optionGbox.GetBestSize())
 
         if ResultTypeSelect is ResultType.HTML:
@@ -1121,11 +1122,8 @@ class VisualMapPanel(wx.Panel):
         map_style = self.svc_config.get("MapStyle")
         self.id.LISTMapStyle.SetSelection(self.id.LISTMapStyle.FindString(map_style))
 
-        time_period_grouping = self.svc_config.get("LISTTimePeriodGrouping", "Decade")
-        self.id.LISTTimePeriodGrouping.SetSelection(self.id.LISTTimePeriodGrouping.FindString(time_period_grouping))
-
         location_grouping = self.svc_config.get("RBLocationGrouping", "City and Country")
-        location_options = ["Country", "City and Country"]
+        location_options = ["Country", "City and Country", "Continent"]
         try:
             location_index = location_options.index(location_grouping)
             self.id.RBLocationGrouping.SetSelection(location_index)

@@ -442,7 +442,18 @@ class VisualMapActions:
             svc_progress: Progress tracking service
         """
         self.report_generator.doSUM(svc_config, svc_state, svc_progress)
+    def doMIG(self, svc_config: IConfig, svc_state: IState, svc_progress: IProgressTracker) -> None:
+        """Generate various CSV summary reports from geocoded GEDCOM data.
 
+        Delegates to ReportGenerator.doMIG().
+
+        Args:
+            svc_config: Configuration service
+            svc_state: Runtime state service
+            svc_progress: Progress tracking service
+        """
+        self.report_generator.doMIG(svc_config, svc_state, svc_progress)
+    
     def ParseAndGPS(
         self, svc_config: IConfig, svc_state: IState, svc_progress: IProgressTracker, stage: int = 0
     ) -> Optional[Dict[str, Person]]:

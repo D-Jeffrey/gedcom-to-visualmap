@@ -34,6 +34,7 @@ class VisualMapEventHandler:
             ResultType.KML,
             ResultType.KML2,
             ResultType.SUM,
+            ResultType.MIG
         )
 
     def bind(self) -> None:
@@ -150,6 +151,17 @@ class VisualMapEventHandler:
                     self.panel.svc_config.set("KMLsort", selection)
                 except Exception:
                     _log.exception("Failed to set KMLsort")
+                return
+
+            if event_id == self.panel.id.IDs.get("RBLocationGrouping"):
+                try:
+                    location_options = ["Country", "City and Country"]
+                    selected_location = location_options[selection] if selection < len(location_options) else "City and Country"
+                    _log.debug(f"RBLocationGrouping: index={selection}, selected_location={selected_location}")
+                    self.panel.svc_config.set("RBLocationGrouping", selected_location)
+                    _log.info(f"RBLocationGrouping set to {selected_location}")
+                except Exception:
+                    _log.exception("Failed to set RBLocationGrouping")
                 return
 
             _log.debug("Unhandled radio id %s", event_id)
@@ -289,20 +301,35 @@ class VisualMapEventHandler:
                     return
                 except Exception:
                     _log.exception("EvtListBox MapStyle handling failed")
+            elif attributes and attrname == "LISTTimePeriodGrouping":
+                # TimePeriodGrouping stored as string
+                try:
+                    time_period_options = ["Decade", "Generation", "Century", "Custom"]
+                    selected = time_period_options[event.GetSelection()]
+                    _log.debug(f"LISTTimePeriodGrouping: index={event.GetSelection()}, selected={selected}")
+                    self.panel.svc_config.set("LISTTimePeriodGrouping", selected)
+                    _log.info(f"LISTTimePeriodGrouping set to {selected}")
+                    self.panel.NeedRedraw()
+                    return
+                except Exception:
+                    _log.exception("EvtListBox LISTTimePeriodGrouping handling failed")
             _log.error("Uncontrolled LISTbox %s", event_id)
         except Exception:
             _log.exception("EvtListBox failed")
 
     def EvtSpinCtrl(self, event: wx.CommandEvent) -> None:
-        """Handle spin control changes (MaxLineWeight etc)."""
+        """Handle spin control changes (MaxLineWeight, MaxMigrationLines, etc)."""
         try:
             event_id = event.GetId()
             attributes = self.panel.id.get_id_attributes(event_id)
             attrname = attributes.get("config_attribute", None)
-            if attributes and attrname == "MaxLineWeight":
-                self.panel.svc_config.set("MaxLineWeight", event.GetSelection())
-                self.panel.NeedRedraw()
-                return
+            if attributes and attrname:
+                try:
+                    self.panel.svc_config.set(attrname, event.GetSelection())
+                    self.panel.NeedRedraw()
+                    return
+                except Exception:
+                    _log.exception("Failed to set attr %s from SpinCtrl", attrname)
             _log.error("Uncontrolled SPIN %s", event_id)
         except Exception:
             _log.exception("EvtSpinCtrl failed")

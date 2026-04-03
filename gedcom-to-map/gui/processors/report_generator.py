@@ -11,6 +11,7 @@ from typing import Any, Optional
 
 from geo_gedcom.geolocated_gedcom import GeolocatedGedcom
 from render.summary import SummaryReportConfig, generate_summary_reports
+from render.migration.sankey_exporter import MigrationFlowExporter, TimePeriodMode
 from services.interfaces import IConfig, IState, IProgressTracker
 from services.state_service import GVState
 from services.progress_service import GVProgress
@@ -126,3 +127,40 @@ class ReportGenerator:
         # Generate all selected summary reports
         # Pass actions (parent VisualMapActions) for LoadFile capability
         generate_summary_reports(config, my_gedcom, base_file_name, output_folder, bg, file_loader=self.actions)
+    def doMIG(self, svc_config: IConfig, svc_state: IState, svc_progress: IProgressTracker) -> None:
+        """Generate migration flow report (Sankey diagram) from geocoded GEDCOM data.
+
+        Creates an HTML report visualizing migration patterns between locations over time.
+        Uses MigrationFlowExporter to analyze and generate the report based on settings.
+
+        Args:
+            svc_config: Configuration service
+            svc_state: Runtime state service (provides lookup via svc_state.lookup)
+            svc_progress: Progress tracking service
+        """
+        
+        exporter = MigrationFlowExporter(svc_config, svc_state, svc_progress)
+        my_gedcom: Optional[GeolocatedGedcom] = svc_state.lookup
+        location_grouping = svc_config.get("RBLocationGrouping", "City and Country")
+        use_soundex = svc_config.get("UseSoundexLocationGrouping", True)
+        max_lines = svc_config.get("MaxMigrationLines", 100)
+
+        time_period_mode_str = svc_config.get("LISTTimePeriodGrouping", "Decade")
+        time_period_mode = {
+            "Decade": TimePeriodMode.DECADE,
+            "Generation": TimePeriodMode.GENERATION,
+            "Century": TimePeriodMode.CENTURY,
+            "Custom": TimePeriodMode.CUSTOM
+        }.get(time_period_mode_str, TimePeriodMode.DECADE)
+        
+        _log.info(f"doMIG initialized: location_grouping={location_grouping}, time_period_mode_str={time_period_mode_str}, time_period_mode={time_period_mode}")
+        
+        output_file = exporter.export(
+            my_gedcom,
+            mode=time_period_mode,
+            location_grouping=location_grouping,
+            use_soundex=use_soundex,
+            max_lines=max_lines
+        )
+        _log.info(f"Migration visualization saved to:\n{output_file}")
+        

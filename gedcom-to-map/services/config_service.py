@@ -631,7 +631,7 @@ class GVConfig(IConfig):
             if val is None:
                 return default
             # If already a ResultType enum (from either location), return as-is
-            if isinstance(val, Enum) and hasattr(val, "value") and val.value in ("HTML", "KML", "KML2", "SUM"):
+            if isinstance(val, Enum) and hasattr(val, "value") and val.value in ("HTML", "KML", "KML2", "SUM", "MIG"):
                 return val
             # Otherwise, ensure it's a proper ResultType enum (handles string/corrupted values)
             try:

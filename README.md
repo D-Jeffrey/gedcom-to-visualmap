@@ -345,6 +345,7 @@ The report provides comprehensive insights into your genealogical data with 14 d
 | pandas          | [pandas](https://github.com/pandas-dev/pandas) | | Data analysis |
 | seaborn         | [seaborn](https://github.com/mwaskom/seaborn) | [docs](https://seaborn.pydata.org/) | Visualization |
 | matplotlib      | [matplotlib](https://github.com/matplotlib/matplotlib) | [docs](https://matplotlib.org/) | Visualization |
+| plotly          | [plotly](https://github.com/plotly/plotly.py) | [docs](https://plotly.com/python/)) | Visualization |
 
 ---
 

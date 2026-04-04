@@ -343,7 +343,7 @@ class LayoutOptions:
 
         # Top flow line filter
         max_lines_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        max_lines_label = wx.StaticText(mbox_container, -1, "Max migration lines")
+        max_lines_label = wx.StaticText(mbox_container, -1, "Max migration locations")
         vm_panel.id.INTMaxMigrationLines = wx.SpinCtrl(
             mbox_container, vm_panel.id.IDs["INTMaxMigrationLines"], "", min=10, max=1000, initial=100
         )

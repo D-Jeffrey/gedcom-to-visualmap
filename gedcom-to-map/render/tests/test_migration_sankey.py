@@ -187,7 +187,7 @@ class TestSankeyBuilder:
         flow = MigrationFlow(from_loc, to_loc, "1850-1859")
         flow.flow_count = 5
         
-        labels, idx_map, src, tgt, vals, incoming, outgoing = SankeyBuilder.build_sankey_data([flow])
+        labels, idx_map, src, tgt, vals, incoming, outgoing = SankeyBuilder.build_sankey_data([flow], 10)
         
         assert len(labels) == 2
         assert "Boston, USA" in labels
@@ -197,7 +197,64 @@ class TestSankeyBuilder:
         assert vals[0] == 5
         assert incoming[idx_map["NYC, USA"]] == 5
         assert outgoing[idx_map["Boston, USA"]] == 5
-    
+
+        from_loc2 = LocationNode("Boston", "USA")
+        to_loc2 = LocationNode("Winnipeg", "Canada")
+        flow2 = MigrationFlow(from_loc2, to_loc2, "1890-1899")
+        flow2.flow_count = 2
+        flows = [flow, flow2]
+        
+        labels, idx_map, src, tgt, vals, incoming, outgoing = SankeyBuilder.build_sankey_data(flows, 10)
+        
+        assert len(labels) == 3
+        assert "Boston, USA" in labels
+        assert "NYC, USA" in labels
+        assert "Winnipeg, Canada" in labels
+        assert len(src) == 2
+        assert len(tgt) == 2
+        assert vals[0] == 5
+        assert vals[1] == 2
+        assert incoming[idx_map["NYC, USA"]] == 5
+        assert outgoing[idx_map["Boston, USA"]] == 5 + 2
+        assert incoming[idx_map["Winnipeg, Canada"]] == 2
+
+        to_loc3 = LocationNode("London", "UK")
+        flow3 = MigrationFlow(from_loc, to_loc3, "1990-1999")
+        flow3.flow_count = 1
+        flows = [flow, flow2, flow3]
+
+        labels, idx_map, src, tgt, vals, incoming, outgoing = SankeyBuilder.build_sankey_data(flows, 10)
+        assert len(labels) == 4
+        assert "Boston, USA" in labels
+        assert "NYC, USA" in labels
+        assert "Winnipeg, Canada" in labels
+        assert "London, UK"  in labels
+        assert len(src) == 3
+        assert len(tgt) == 3
+        assert vals[0] == 5
+        assert vals[1] == 2
+        assert vals[2] == 1
+        assert incoming[idx_map["NYC, USA"]] == 5
+        assert outgoing[idx_map["Boston, USA"]] == 5 + 2 + 1
+        assert incoming[idx_map["Winnipeg, Canada"]] == 2
+        assert incoming[idx_map["London, UK"]] == 1
+
+        # result hould cut off the 3rd item
+        labels, idx_map, src, tgt, vals, incoming, outgoing = SankeyBuilder.build_sankey_data(flows, 3)
+        
+        assert len(labels) == 3
+        assert "Boston, USA" in labels
+        assert "NYC, USA" in labels
+        assert "Winnipeg, Canada" in labels
+        assert "London, UK" not in labels
+        assert len(src) == 2
+        assert len(tgt) == 2
+        assert vals[0] == 5
+        assert vals[1] == 2
+        assert incoming[idx_map["NYC, USA"]] == 5
+        assert outgoing[idx_map["Boston, USA"]] == 5 + 2
+        assert incoming[idx_map["Winnipeg, Canada"]] == 2
+
     def test_period_color_assignment(self):
         """Test that time periods get assigned colors."""
         color_1800 = SankeyBuilder._get_period_color("1800-1809")

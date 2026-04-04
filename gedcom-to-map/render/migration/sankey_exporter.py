@@ -8,7 +8,7 @@ and family clustering without needing individual person tracking.
 Features:
     - Flow visualization showing volume of people moving between locations
     - Time-period grouping (decades, generations, eras)
-    - Multiple visualization modes (births, deaths, residences)
+    - Multiple visualization modes (births, deaths, residences, marriage)
     - Interactive HTML output with filtering and drill-down
     - Statistics on migration patterns (top flows, route diversity, etc.)
 """
@@ -41,6 +41,9 @@ class MigrationEventType(Enum):
     BURIAL = "BURI"
     ARRIVAL = "ARRV"
     DEPARTURE = "DEPT"
+    MARRIAGE = "MARR"
+    IMMIGRATION = "IMMI"
+    OCCUPATION = "OCCU"
 
 
 
@@ -157,7 +160,11 @@ class MigrationFlowAnalyzer:
             MigrationEventType.RESIDENCE: 'residence',
             MigrationEventType.BURIAL: 'burial',
             MigrationEventType.ARRIVAL: 'arrival',
-            MigrationEventType.DEPARTURE: 'residence'  # Treat arrival/departure as residence for location extraction
+            MigrationEventType.DEPARTURE: 'residence',  # Treat arrival/departure as residence for location extraction
+            MigrationEventType.MARRIAGE: 'marriage',
+            MigrationEventType.IMMIGRATION : 'immigration',
+            MigrationEventType.OCCUPATION : 'occupation'
+
         }
         
         attr_name = event_map.get(event_type)
@@ -319,7 +326,8 @@ class MigrationFlowAnalyzer:
         """
         if event_types is None:
             event_types = [MigrationEventType.BIRTH, MigrationEventType.DEATH, 
-                          MigrationEventType.RESIDENCE]
+                          MigrationEventType.RESIDENCE, MigrationEventType.MARRIAGE,    
+                          MigrationEventType.IMMIGRATION, MigrationEventType.OCCUPATION]
         
         flow_dict: Dict[Tuple[str, str], MigrationFlow] = {}
         self.locations = set()
@@ -488,7 +496,7 @@ class SankeyBuilder:
     """Constructs Plotly Sankey diagram from migration flows."""
     
     @staticmethod
-    def build_sankey_data(flows: List[MigrationFlow], display_func=None) -> Tuple[List[str], Dict[str, int], List[int], List[int], List[int]]:
+    def build_sankey_data(flows: List[MigrationFlow], max_flow_count: int,display_func=None) -> Tuple[List[str], Dict[str, int], List[int], List[int], List[int]]:
         """
         Build node and link data for Sankey diagram.
         
@@ -536,8 +544,72 @@ class SankeyBuilder:
             node_outgoing[from_idx] += flow.flow_count
             node_incoming[to_idx] += flow.flow_count
 
-        return labels, location_to_index, source_indices, target_indices, values, node_incoming, node_outgoing
-    
+        # If no filtering requested, return full dataset
+        if not max_flow_count or max_flow_count > len(labels):
+            return (
+                labels,
+                location_to_index,
+                source_indices,
+                target_indices,
+                values,
+                node_incoming,
+                node_outgoing,
+            )
+
+        # Compute flow_score per node
+        flow_scores = [
+            node_incoming[i] + node_outgoing[i]
+            for i in range(len(labels))
+        ]
+        # Select top-N nodes
+        top_indices = sorted(
+            range(len(labels)),
+            key=lambda i: flow_scores[i],
+            reverse=True
+        )[:(max_flow_count+1)]
+
+        top_set = set(top_indices)
+
+        # Rebuild labels + index map for kept nodes
+        new_labels = []
+        new_index_map = {}
+        old_to_new = {}
+
+        for old_idx in top_indices:
+            new_idx = len(new_labels)
+            new_labels.append(labels[old_idx])
+            new_index_map[new_labels[-1]] = new_idx
+            old_to_new[old_idx] = new_idx
+
+        # Filter links to only those connecting kept nodes
+        new_source = []
+        new_target = []
+        new_values = []
+
+        for s, t, v in zip(source_indices, target_indices, values):
+            if s in top_set and t in top_set:
+                new_source.append(old_to_new[s])
+                new_target.append(old_to_new[t])
+                new_values.append(v)
+
+        # Rebuild incoming/outgoing arrays
+        new_incoming = [0] * len(new_labels)
+        new_outgoing = [0] * len(new_labels)
+
+        for s, t, v in zip(new_source, new_target, new_values):
+            new_outgoing[s] += v
+            new_incoming[t] += v
+
+        # Return trimmed Sankey dataset
+        return (
+            new_labels,
+            new_index_map,
+            new_source,
+            new_target,
+            new_values,
+            new_incoming,
+            new_outgoing,
+        )    
     @staticmethod
     def _get_period_color(time_period: str) -> str:
         """Assign color based on time period for visual differentiation."""
@@ -569,12 +641,13 @@ class SankeyBuilder:
             return "rgba(100, 100, 100, 0.4)"
     
     @staticmethod
-    def create_sankey_figure(flows: List[MigrationFlow], title: str = "Family Migration Flow", display_func=None) -> go.Figure:
+    def create_sankey_figure(flows: List[MigrationFlow], max_flow_count: int=100000, title: str = "Family Migration Flow", display_func=None) -> go.Figure:
         """
         Create interactive Plotly Sankey figure.
         
         Args:
             flows: List of MigrationFlow objects
+            max_flow_count: Maximum flows that should be visualized
             title: Title for the visualization
             display_func: Function to get display name from LocationNode
         
@@ -585,7 +658,7 @@ class SankeyBuilder:
             _log.warning("No migration flows to visualize")
             return go.Figure().add_annotation(text="No migration data available")
         
-        labels, _, source_idx, target_idx, values, node_incoming, node_outgoing = SankeyBuilder.build_sankey_data(flows, display_func)
+        labels, _, source_idx, target_idx, values, node_incoming, node_outgoing = SankeyBuilder.build_sankey_data(flows, max_flow_count, display_func)
         
         fig = go.Figure(data=[go.Sankey(
             node=dict(
@@ -666,7 +739,7 @@ class MigrationFlowExporter:
         
         # Analyze once using the finest granularity (City and Country) to ensure consistent flow counts
         base_analyzer = MigrationFlowAnalyzer(geolocated_gedcom, "City and Country", use_soundex=use_soundex)
-        base_stats = base_analyzer.analyze(max_lines=max_lines)
+        base_stats = base_analyzer.analyze(max_lines=None)
         
         # Create visualizations at different grouping levels using the same flows
         grouping_options = ["City and Country", "Country", "Continent"]
@@ -683,6 +756,7 @@ class MigrationFlowExporter:
             title = f"Top {max_lines} Family Migration Flows - {grouping}"
             fig = SankeyBuilder.create_sankey_figure(
                 base_analyzer.flows,
+                max_flow_count=max_lines,
                 title=title,
                 display_func=display_func
             )

@@ -179,7 +179,7 @@ This project now uses a dependency-injection/services pattern for all configurat
 
 ## GUI Overview
 
-![img](docs/img/GUI-python_2025-11.gif)
+![img](docs/img/gui-python_2026-04.gif)
 
 - Click `Input File` to select your .ged file.
 - Set your options in the GUI, including:
@@ -245,7 +245,6 @@ The comprehensive statistics report provides detailed demographic analysis, temp
 
 Reports are generated in both markdown (.md) and HTML (.html) formats, with the HTML version automatically opening in your browser for easy viewing.
 
----
 
 ## Parameter and Settings
 
@@ -282,6 +281,15 @@ The SUM results type generates a comprehensive genealogical statistics report th
 3. Enable `SummaryOpen` in options to automatically open the report
 4. Click `Draw Update` to generate the report
 5. The HTML report opens automatically in your browser
+
+---
+
+## Family Migration Flow
+Using a Sankey format display the migration flow visualizually revealing the people movement patterns. Aggregating flows to show: "How many people moved FROM location A TO location B?".  It is summaried at the City, Country and Continent level.
+
+![img](docs/img/family-migration.gif)
+---
+
 
 ### Configuration Options
 

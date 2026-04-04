@@ -132,14 +132,9 @@ class FileOpener:
                 self._open_url(cmdline)
             else:
                 self._open_with_custom_command(cmdline, datafile)
-        except FileNotFoundError:
-            _log.error("File not found: %s", datafile)
-            raise
-        except PermissionError:
-            _log.error("Permission denied opening: %s", datafile)
-            raise
         except Exception as e:
-            _log.exception("Unexpected error opening %s: %s", datafile, e)            
+            _log.exception("Failed to open file/URL")
+            _log.error("Failed to open: %s", e)
             raise
 
     def _open_in_browser(self, cmdline: str, datafile: str) -> None:

@@ -240,7 +240,7 @@ class TestSankeyBuilder:
         assert incoming[idx_map["London, UK"]] == 1
 
         # result hould cut off the 3rd item
-        labels, idx_map, src, tgt, vals, incoming, outgoing = SankeyBuilder.build_sankey_data(flows, 3)
+        labels, idx_map, src, tgt, vals, incoming, outgoing = SankeyBuilder.build_sankey_data(flows, 2)
         
         assert len(labels) == 3
         assert "Boston, USA" in labels

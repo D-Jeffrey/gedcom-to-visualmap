@@ -24,6 +24,7 @@ pycountry-convert>=0.7.2
 # Visualization
 seaborn>=0.12.0
 matplotlib>=3.7.0
+plotly>=5.0.0
 
 # Web automation (for browser-based export)
 selenium>=4.0.0

@@ -187,6 +187,12 @@ summary_report_options:
   SummaryEnrichmentIssues: {type: 'bool', default: True, ini_section: 'Summary'}
   SummaryStatistics: {type: 'bool', default: True, ini_section: 'Summary'}
 
+# Migration flow visualization options
+migration_display_options:
+  RBLocationGrouping: {type: 'str', default: 'City and Country', ini_section: 'MIG'}
+  UseSoundexLocationGrouping: {type: 'bool', default: True, ini_section: 'MIG'}
+  MaxMigrationLines: {type: 'int', default: 100, ini_section: 'MIG'}
+
 # Statistics options - configuration for statistics collectors
 statistics_options:
   earliest_credible_birth_year: {type: 'int', default: 1000, ini_section: 'Statistics'}

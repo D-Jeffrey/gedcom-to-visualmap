@@ -16,6 +16,7 @@ Features:
 __all__ = ["MigrationFlowExporter", "MigrationFlowAnalyzer", "SankeyBuilder"]
 
 import logging
+import os
 from collections import defaultdict, Counter
 from dataclasses import dataclass, field
 from datetime import datetime
@@ -230,6 +231,9 @@ class MigrationFlowAnalyzer:
                 parts = [p.strip() for p in place.split(',') if p.strip()]
                 country = parts[-1] if len(parts) > 1 else ""
 
+            if continent is None:
+                continent = ""
+
             events.append((location, country, year, continent))
 
         return events
@@ -440,6 +444,45 @@ class MigrationFlowAnalyzer:
         if len(self.locations) > 1:
             self.stats.diaspora_index = len(self.locations) / max(1, len(all_people_moved))
 
+    def _calculate_statistics_for_flows(self, flows: List[MigrationFlow], grouping: str, base_locations: Optional[Set[LocationNode]] = None) -> MigrationStats:
+        """Calculate statistics for flows at a specific grouping level without re-analyzing."""
+        stats = MigrationStats()
+        
+        destination_counter = Counter()
+        origin_counter = Counter()
+        route_counter = Counter()
+        all_people_moved = set()
+        
+        for flow in flows:
+            to_display = flow.to_location.get_display_name(grouping)
+            from_display = flow.from_location.get_display_name(grouping)
+            destination_counter[to_display] += flow.flow_count
+            origin_counter[from_display] += flow.flow_count
+            route_counter[(from_display, to_display)] += flow.flow_count
+            all_people_moved.update(flow.people_ids)
+        
+        stats.total_flows = len(flows)
+        stats.total_people_moved = len(all_people_moved)
+        stats.top_destinations = destination_counter.most_common(10)
+        stats.top_origins = origin_counter.most_common(10)
+        stats.most_common_routes = route_counter.most_common(10)
+        stats.average_flow_size = (stats.total_people_moved / stats.total_flows 
+                                  if stats.total_flows > 0 else 0)
+        
+        # Diaspora index based on base locations if provided, otherwise use current analyzer's locations
+        locations_for_diaspora = base_locations if base_locations else self.locations
+        if len(locations_for_diaspora) > 1:
+            stats.diaspora_index = len(locations_for_diaspora) / max(1, len(all_people_moved))
+        
+        _log.info(
+            "Display stats for %s: total_flows=%d total_people_moved=%d",
+            grouping,
+            stats.total_flows,
+            stats.total_people_moved
+        )
+        
+        return stats
+
 
 class SankeyBuilder:
     """Constructs Plotly Sankey diagram from migration flows."""
@@ -568,9 +611,10 @@ class SankeyBuilder:
         fig.update_layout(
             title=title,
             font=dict(size=10),
-            height=600,
+            height=700,  # Increased height for larger plot area
+            width=1000,  # Fixed width for consistent appearance across grouping levels
             hovermode='closest',
-            margin=dict(l=50, r=50, t=80, b=50)
+            margin=dict(l=20, r=30, t=40, b=20)
         )
         
         return fig
@@ -620,38 +664,35 @@ class MigrationFlowExporter:
         
         self.svc_progress.step("Analyzing migration flows...")
         
-        _log.info(f"export: location_grouping={location_grouping}")
+        # Analyze once using the finest granularity (City and Country) to ensure consistent flow counts
+        base_analyzer = MigrationFlowAnalyzer(geolocated_gedcom, "City and Country", use_soundex=use_soundex)
+        base_stats = base_analyzer.analyze(max_lines=max_lines)
         
-        analyzer = MigrationFlowAnalyzer(geolocated_gedcom, location_grouping, use_soundex=use_soundex)
-        
-        # Generate analysis
-        stats = analyzer.analyze(max_lines=max_lines)
-        
-        display_func = lambda loc: loc.get_display_name(location_grouping)
-        
-        _log.info("Migration analysis complete: %d flows from %d locations",
-                 stats.total_flows, len(analyzer.locations))
-        _log.info("Top destinations: %s", stats.top_destinations[:5])
-        _log.info("Most common routes: %s", stats.most_common_routes[:5])
-        _log.info("Diaspora index (family spread): %.2f", stats.diaspora_index)
-        
-        self.svc_progress.step("Generating Sankey visualizations...")
-        
-        title_prefix = f"Top {max_lines} Family Migration Flows" if max_lines is not None and max_lines > 0 else "Family Migration Flows"
+        # Create visualizations at different grouping levels using the same flows
+        grouping_options = ["City and Country", "Country", "Continent"]
+        grouping_results = []
 
-        # Create main Sankey figure
-        fig = SankeyBuilder.create_sankey_figure(
-            analyzer.flows,
-            title=title_prefix,
-            display_func=display_func
-        )
-        
-        figs = [fig]
-        
+        for grouping in grouping_options:
+            _log.info(f"export: creating display for grouping={grouping}")
+            # Create a new analyzer with this grouping for display purposes only
+            display_analyzer = MigrationFlowAnalyzer(geolocated_gedcom, grouping, use_soundex=use_soundex)
+            # Reuse the base flows and calculate stats for this grouping
+            display_stats = display_analyzer._calculate_statistics_for_flows(base_analyzer.flows, grouping, base_analyzer.locations)
+            
+            display_func = lambda loc, grouping=grouping: loc.get_display_name(grouping)
+            title = f"Top {max_lines} Family Migration Flows - {grouping}"
+            fig = SankeyBuilder.create_sankey_figure(
+                base_analyzer.flows,
+                title=title,
+                display_func=display_func
+            )
+            grouping_results.append((grouping, fig, display_stats, display_analyzer))
+
         self.svc_progress.step("Creating interactive HTML...")
         
-        # Generate comprehensive HTML with multiple tabs
-        html_content = self._generate_html(figs, stats, analyzer)
+        # Generate comprehensive HTML with multiple grouping tabs
+        source = self.svc_config.get("GEDCOMinput", "Unknown Source")
+        html_content = self._generate_html(grouping_results, source)
         
         # Write HTML file
         output_path = Path(output_file)
@@ -664,20 +705,20 @@ class MigrationFlowExporter:
         
         return str(output_path)
     
-    def _generate_html(self, figs: List[go.Figure], stats: MigrationStats, 
-                      analyzer: MigrationFlowAnalyzer) -> str:
+    def _generate_html(self, grouping_results: List[Tuple[str, go.Figure, MigrationStats, MigrationFlowAnalyzer]], source_file: str) -> str:
         """
         Generate comprehensive HTML document with all visualizations and statistics.
         
         Args:
-            figs: List of Plotly figures
-            stats: Migration statistics
-            analyzer: Migration analyzer with detailed data
+            grouping_results: List of tuples containing grouping name, Plotly figure, stats, and analyzer
         
         Returns:
             HTML content as string
         """
-        fig_htmls = [fig.to_html(include_plotlyjs=False) for fig in figs]
+        fig_htmls = [fig.to_html(include_plotlyjs=False) for _, fig, _, _ in grouping_results]
+        grouping_labels = [grouping for grouping, _, _, _ in grouping_results]
+        stats = grouping_results[0][2]
+        analyzer = grouping_results[0][3]
         
         # Build statistics table
         stats_html = f"""
@@ -711,11 +752,12 @@ class MigrationFlowExporter:
         
         # Build tab structure for multiple views
         tab_content = ""
-        for i, fig_html in enumerate(fig_htmls):
+        for i, (grouping, fig_html) in enumerate(zip(grouping_labels, fig_htmls)):
             tab_id = f"tab-{i}"
             active_class = "active" if i == 0 else ""
             tab_content += f"""
             <div id="{tab_id}" class="tab-pane {active_class}">
+                <h2>{grouping} Summary</h2>
                 <div class="plotly-container">
                     {fig_html}
                 </div>
@@ -739,7 +781,7 @@ class MigrationFlowExporter:
                 
                 body {{
                     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    background: linear-gradient(135deg, #557eea 0%, #764ba2 100%);
                     min-height: 100vh;
                     padding: 20px;
                 }}
@@ -754,7 +796,7 @@ class MigrationFlowExporter:
                 }}
                 
                 .header {{
-                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    background: linear-gradient(135deg, #7e1a 0%, #764ba2 100%);
                     color: white;
                     padding: 40px 30px;
                     text-align: center;
@@ -790,11 +832,11 @@ class MigrationFlowExporter:
                 }}
                 
                 .stats-panel {{
-                    background: white;
+                    background: grey;
                 }}
                 
                 .stats-panel h2 {{
-                    color: #333;
+                    color: #111;
                     font-size: 1.3em;
                     margin-bottom: 15px;
                     border-bottom: 2px solid #667eea;
@@ -802,7 +844,7 @@ class MigrationFlowExporter:
                 }}
                 
                 .stats-panel h3 {{
-                    color: #555;
+                    color: #222;
                     font-size: 1em;
                     margin-top: 20px;
                     margin-bottom: 10px;
@@ -826,14 +868,14 @@ class MigrationFlowExporter:
                 
                 .stats-table td:first-child {{
                     font-weight: 500;
-                    color: #555;
+                    color: #222;
                 }}
                 
                 .stats-panel ol {{
                     margin-left: 20px;
                     font-size: 0.9em;
                     line-height: 1.6;
-                    color: #555;
+                    color: #333;
                 }}
                 
                 .stats-panel ol li {{
@@ -842,7 +884,7 @@ class MigrationFlowExporter:
                 
                 .plotly-container {{
                     width: 100%;
-                    height: 600px;
+                    height: 700px;  /* Increased to match Plotly figure height */
                     border: 1px solid #dee2e6;
                     border-radius: 8px;
                     overflow: hidden;
@@ -897,9 +939,8 @@ class MigrationFlowExporter:
                 }}
                 
                 .legend strong {{
-                    display: block;
                     margin-bottom: 8px;
-                    color: #333;
+                    color: #ddd;
                 }}
                 
                 .legend-item {{
@@ -925,25 +966,25 @@ class MigrationFlowExporter:
                         background: #2d2d2d;
                     }}
                     .sidebar {{
-                        background: #3d3d3d;
+                        background: #1d1d1d;
                         border-right-color: #555;
                     }}
                     .stats-panel h2, .stats-panel h3 {{
-                        color: #e0e0e0;
+                        color: #202020;
                     }}
                     .stats-table tr:nth-child(odd) {{
-                        background: #3d3d3d;
+                        background: #7d7d7d;
                     }}
                     .stats-table {{
                         border-color: #555;
                     }}
                     .stats-table td {{
                         border-color: #555;
-                        color: #e0e0e0;
+                        color: #f0f0f0;
                     }}
                     .tab-button {{
-                        background: #3d3d3d;
-                        color: #b0b0b0;
+                        background: #1d1d1d;
+                        color: #e0e0e0;
                         border-bottom-color: transparent;
                     }}
                     .tab-button:hover {{
@@ -956,7 +997,7 @@ class MigrationFlowExporter:
                     }}
                     .legend {{
                         background: #3d3d3d;
-                        color: #b0b0b0;
+                        color: #c0c0c0;
                     }}
                 }}
             </style>
@@ -966,6 +1007,7 @@ class MigrationFlowExporter:
                 <div class="header">
                     <h1>🌍 Family Migration Flows</h1>
                     <p>Sankey Diagram Analysis of Genealogical Movement Patterns</p>
+                    <p style="font-size: 0.9em">Source: {os.path.basename(source_file)}</p>
                 </div>
                 
                 <div class="content">
@@ -995,7 +1037,7 @@ class MigrationFlowExporter:
                     <div class="main">
                         <div class="tabs">
                             {''.join(f'<button class="tab-button{" active" if i == 0 else ""}" onclick="switchTab(\'{i}\')">'
-                                   f'View {i+1}</button>' for i in range(len(figs)))}
+                                   f'{grouping_labels[i]}</button>' for i in range(len(grouping_labels)))}
                         </div>
                         {tab_content}
                     </div>

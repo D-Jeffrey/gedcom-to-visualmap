@@ -334,12 +334,6 @@ class LayoutOptions:
         msizer = wx.StaticBoxSizer(mbox, wx.VERTICAL)
         mboxIn = wx.BoxSizer(wx.VERTICAL)
 
-        # Location grouping control
-        rb_location_grouping = LayoutHelpers.add_radio_box_with_id(
-            vm_panel, mbox_container, "RBLocationGrouping", "Location Grouping:",
-            choices=["Country", "City and Country", "Continent"], majorDimension=1
-        )
-        mboxIn.Add(rb_location_grouping, 0, wx.ALL, 2)
 
         # Soundex normalization toggle
         cb_soundex = LayoutHelpers.add_checkbox_with_id(

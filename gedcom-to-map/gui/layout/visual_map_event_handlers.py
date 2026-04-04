@@ -153,17 +153,6 @@ class VisualMapEventHandler:
                     _log.exception("Failed to set KMLsort")
                 return
 
-            if event_id == self.panel.id.IDs.get("RBLocationGrouping"):
-                try:
-                    location_options = ["Country", "City and Country", "Continent"]
-                    selected_location = location_options[selection] if selection < len(location_options) else "City and Country"
-                    _log.debug(f"RBLocationGrouping: index={selection}, selected_location={selected_location}")
-                    self.panel.svc_config.set("RBLocationGrouping", selected_location)
-                    _log.info(f"RBLocationGrouping set to {selected_location}")
-                except Exception:
-                    _log.exception("Failed to set RBLocationGrouping")
-                return
-
             _log.debug("Unhandled radio id %s", event_id)
         except Exception:
             _log.exception("EvtRadioBox failed")

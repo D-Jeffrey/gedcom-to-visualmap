@@ -222,10 +222,11 @@ class TestMigrationFlowExporter:
     def setup_method(self):
         """Setup mock services."""
         self.mock_config = Mock()
-        self.mock_config.get.side_effect = lambda x: {
+        self.mock_config.get.side_effect = lambda x, default=None: {
             "resultpath": "/tmp",
-            "ResultFile": "test.html"
-        }.get(x)
+            "ResultFile": "test.html",
+            "GEDCOMinput": "test.ged"
+        }.get(x, default)
         
         self.mock_state = Mock()
         self.mock_progress = Mock()
@@ -252,6 +253,12 @@ class TestMigrationFlowExporter:
             assert "<!DOCTYPE html>" in content
             assert "Family Migration Flows" in content
             assert "plotly" in content.lower()
+            assert "City and Country" in content
+            assert "Country" in content
+            assert "Continent" in content
+            assert "tab-0" in content
+            assert "tab-1" in content
+            assert "tab-2" in content
 
 
 class TestIntegration:

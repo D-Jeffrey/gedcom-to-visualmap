@@ -1122,14 +1122,6 @@ class VisualMapPanel(wx.Panel):
         map_style = self.svc_config.get("MapStyle")
         self.id.LISTMapStyle.SetSelection(self.id.LISTMapStyle.FindString(map_style))
 
-        location_grouping = self.svc_config.get("RBLocationGrouping", "City and Country")
-        location_options = ["Country", "City and Country", "Continent"]
-        try:
-            location_index = location_options.index(location_grouping)
-            self.id.RBLocationGrouping.SetSelection(location_index)
-        except (ValueError, AttributeError):
-            self.id.RBLocationGrouping.SetSelection(1)  # Default to "City and Country"
-
         use_soundex = self.svc_config.get("UseSoundexLocationGrouping", True)
         self.id.CBUseSoundexLocationGrouping.SetValue(bool(use_soundex))
 

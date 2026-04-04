@@ -720,6 +720,9 @@ class MigrationFlowExporter:
         stats = grouping_results[0][2]
         analyzer = grouping_results[0][3]
         
+        complex_tab_content = ''.join(f'<button class="tab-button{" active" if i == 0 else ""}" onclick="switchTab(\'{i}\')">'
+                            f'{grouping_labels[i]}</button>'
+                                for i in range(len(grouping_labels)))
         # Build statistics table
         stats_html = f"""
         <div class="stats-panel">
@@ -1036,9 +1039,7 @@ class MigrationFlowExporter:
                     
                     <div class="main">
                         <div class="tabs">
-                            {''.join(f'<button class="tab-button{" active" if i == 0 else ""}" onclick="switchTab(\'{i}\')">'
-                            f'{grouping_labels[i]}</button>'
-                                for i in range(len(grouping_labels)))}
+                            {complex_tab_content}
                         </div>
                         {tab_content}
                     </div>

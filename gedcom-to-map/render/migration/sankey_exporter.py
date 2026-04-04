@@ -614,7 +614,7 @@ class SankeyBuilder:
             height=700,  # Increased height for larger plot area
             width=1000,  # Fixed width for consistent appearance across grouping levels
             hovermode='closest',
-            margin=dict(l=20, r=30, t=40, b=20)
+            margin=dict(l=30, r=30, t=60, b=30)
         )
         
         return fig
@@ -1037,7 +1037,8 @@ class MigrationFlowExporter:
                     <div class="main">
                         <div class="tabs">
                             {''.join(f'<button class="tab-button{" active" if i == 0 else ""}" onclick="switchTab(\'{i}\')">'
-                                   f'{grouping_labels[i]}</button>' for i in range(len(grouping_labels)))}
+                            f'{grouping_labels[i]}</button>'
+                                for i in range(len(grouping_labels)))}
                         </div>
                         {tab_content}
                     </div>

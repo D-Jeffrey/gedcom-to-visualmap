@@ -282,8 +282,7 @@ class ImageCacheDialog(wx.Dialog):
                     f"Downloaded: {stats['downloaded']}  |  "
                     f"Already cached: {stats['cached']}  |  "
                     f"Failed: {stats['failed']}"
-                )
-                wx.CallAfter(self._append_status, summary)
+                )                wx.CallAfter(self._append_status, summary)
             except Exception as exc:
                 _log.exception("Image cache download thread failed")
                 wx.CallAfter(self._append_status, f"\nError: {exc}")

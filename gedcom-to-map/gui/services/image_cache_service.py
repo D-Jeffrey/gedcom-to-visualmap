@@ -234,7 +234,7 @@ class ImageCacheService:
         Returns:
             dict: ``{"found": n, "downloaded": n, "cached": n, "skipped": n, "failed": n}``
         """
-        stats: Dict[str, int] = {"found": 0, "downloaded": 0, "cached": 0, "skipped": 0, "failed": 0}
+        stats: Dict[str, int] = {"found": 0, "downloaded": 0, "cached": 0, "failed": 0}
         if not people:
             return stats
 

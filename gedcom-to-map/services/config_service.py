@@ -555,7 +555,7 @@ class GVConfig(IConfig):
         if not (hasattr(self, "gvConfig") and self.gvConfig):
             return
         try:
-            self.gvConfig[INI_SECTION_GEDCOM_CACHE]["preservename"] = str(value)
+            self.gvConfig[INI_SECTION_GEDCOM_CACHE]["preservename"] = str(value).lower()
         except Exception as e:
             _log.warning("set_image_cache_preserve_name failed: %s", e)
         self.MediaCachePreserveName = value

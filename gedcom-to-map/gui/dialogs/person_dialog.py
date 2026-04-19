@@ -660,6 +660,7 @@ class PersonDialog(wx.Dialog):
             if image_content:
                 try:
                     # Check if file exists before trying to load (for Path objects)
+                    # image_content may be: Path (local file or cached download), BytesIO (direct HTTP fetch)
                     if isinstance(image_content, Path):
                         if not image_content.exists():
                             _log.warning(f"Photo file not found for {photourl}:\n      File: {image_content}")

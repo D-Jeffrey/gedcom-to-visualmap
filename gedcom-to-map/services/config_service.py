@@ -524,8 +524,8 @@ class GVConfig(IConfig):
             name = Path(self.GEDCOMinput).stem
             if path:
                 self.gvConfig[INI_SECTION_GEDCOM_CACHE][name] = str(path)
-            elif self.gvConfig[INI_SECTION_GEDCOM_CACHE].has_option(INI_SECTION_GEDCOM_CACHE, name):
-                self.gvConfig[INI_SECTION_GEDCOM_CACHE].remove_option(INI_SECTION_GEDCOM_CACHE, name)
+            elif self.gvConfig.has_option(INI_SECTION_GEDCOM_CACHE, name):
+                self.gvConfig.remove_option(INI_SECTION_GEDCOM_CACHE, name)
         except Exception as e:
             _log.warning("set_image_cache_dir failed: %s", e)
 
@@ -598,6 +598,8 @@ class GVConfig(IConfig):
         if self.GEDCOMinput:
             return str(Path(self.GEDCOMinput).parent)
         return str(Path.cwd())
+
+    def setResultsFile(self, ResultFile: str, OutputType) -> None:
         """Set the output results file with appropriate extension.
 
         Args:

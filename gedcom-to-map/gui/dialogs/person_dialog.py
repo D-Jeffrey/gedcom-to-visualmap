@@ -582,8 +582,10 @@ class PersonDialog(wx.Dialog):
     def _add_photo(self, panel: wx.Panel, person: Person = None):
         """Fetch and display the person's photo if available.
 
-        Supports both HTTP URLs and local file paths. Images are scaled to fit
-        within 400x500 pixels.
+        Supports HTTP/HTTPS URLs (with caching via ImageCacheService) and local
+        file paths.  Local-web URLs (matching configured ``local_photo_hosts``
+        patterns such as ``localhost``) are fetched directly without caching.
+        Images are scaled to fit within 400x500 pixels.
 
         Args:
             panel: Parent panel (used to resolve relative photo paths).
@@ -599,14 +601,45 @@ class PersonDialog(wx.Dialog):
         photourl = person.photo if person else None
         if photourl:
             if photourl.find("http") == 0:
+                # Try image cache first for true remote URLs
                 try:
-                    response = requests.get(photourl, timeout=10)
-                    response.raise_for_status()  # Raise an error for bad responses
-                    image_content = BytesIO(response.content)
-                except requests.RequestException as e:
-                    _log.error(f"Error fetching photo from {photourl}:\n      {e}")
-                    image = None
-                    image_content = None
+                    from gui.services.image_cache_service import ImageCacheService
+
+                    local_patterns = (
+                        self.svc_config.get_local_photo_hosts()
+                        if self.svc_config and hasattr(self.svc_config, "get_local_photo_hosts")
+                        else ["localhost"]
+                    )
+                    if ImageCacheService.is_remote_url(photourl, local_patterns):
+                        # Determine cache parameters
+                        cache_dir = (
+                            self.svc_config.get_effective_cache_dir()
+                            if self.svc_config and hasattr(self.svc_config, "get_effective_cache_dir")
+                            else None
+                        )
+                        preserve_name = (
+                            self.svc_config.get_image_cache_preserve_name()
+                            if self.svc_config and hasattr(self.svc_config, "get_image_cache_preserve_name")
+                            else True
+                        )
+                        if cache_dir:
+                            # Download-on-demand if not already cached
+                            local_path = ImageCacheService.download_one(photourl, cache_dir, preserve_name)
+                            if local_path:
+                                image_content = local_path
+                except Exception:
+                    _log.debug("ImageCacheService not available; falling back to direct fetch", exc_info=True)
+
+                if image_content is None:
+                    # Fallback: fetch directly (local-web URLs or cache download failed)
+                    try:
+                        response = requests.get(photourl, timeout=10)
+                        response.raise_for_status()
+                        image_content = BytesIO(response.content)
+                    except requests.RequestException as e:
+                        _log.error(f"Error fetching photo from {photourl}:\n      {e}")
+                        image = None
+                        image_content = None
             else:
                 infile = None
                 # Prefer service config GEDCOMinput only

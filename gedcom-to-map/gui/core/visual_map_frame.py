@@ -137,6 +137,7 @@ class VisualMapFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.onOptionsSetup, id=wx.ID_SETUP)
         self.Bind(wx.EVT_MENU, self.OnOpenCSV, id=self.id.IDs["BTNCSV"])
         self.Bind(wx.EVT_MENU, self.OnOpenBrowser, id=self.id.IDs["BTNBROWSER"])
+        self.Bind(wx.EVT_MENU, self.OnImageCache, id=self._image_cache_menu_id)
         # Bind window activation to check for appearance changes
         self.Bind(wx.EVT_ACTIVATE, self.OnActivate)
 
@@ -192,6 +193,9 @@ class VisualMapFrame(wx.Frame):
         ActionMenu.Append(wx.ID_INFO, "Statistics Summary")
         ActionMenu.Append(self.id.IDs["BTNBROWSER"], "Open Result in &Browser")
         ActionMenu.Append(self.id.IDs["BTNCSV"], "Open &CSV")
+        ActionMenu.AppendSeparator()
+        self._image_cache_menu_id = wx.NewIdRef()
+        ActionMenu.Append(self._image_cache_menu_id, "Image Caching…", "Manage cached remote photos")
 
         helpMenu = wx.Menu()
         helpMenu.Append(wx.ID_HELP, "Help")
@@ -291,6 +295,23 @@ class VisualMapFrame(wx.Frame):
             self.visual_map_panel.actions.OpenBrowser()
         except Exception:
             _log.exception("OnOpenBrowser failed")
+
+    def OnImageCache(self, event: wx.Event) -> None:
+        """Menu handler: open the Image Caching dialog."""
+        try:
+            from ..dialogs.image_cache_dialog import ImageCacheDialog
+
+            svc_state = getattr(self, "svc_state", None)
+            dialog = ImageCacheDialog(
+                self,
+                svc_config=self.svc_config,
+                svc_state=svc_state,
+                color_manager=self.color_manager,
+            )
+            dialog.ShowModal()
+            dialog.Destroy()
+        except Exception:
+            _log.exception("OnImageCache failed")
 
     def OnFileOpenDialog(self, evt: wx.Event) -> None:
         """Show a file-open dialog for selecting a GEDCOM and load it if chosen.

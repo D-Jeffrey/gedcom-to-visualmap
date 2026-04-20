@@ -306,6 +306,7 @@ class VisualMapFrame(wx.Frame):
                 self,
                 svc_config=self.svc_config,
                 svc_state=svc_state,
+                font_manager=self.font_manager,
                 color_manager=self.color_manager,
             )
             dialog.ShowModal()

@@ -18,6 +18,8 @@ from typing import Optional
 
 import wx
 
+from ..layout.font_manager import FontManager
+
 _log = logging.getLogger(__name__.lower())
 
 __all__ = ["ImageCacheDialog"]
@@ -36,6 +38,7 @@ class ImageCacheDialog(wx.Dialog):
         parent: Parent wx.Window.
         svc_config: Configuration service (GVConfig / IConfig).
         svc_state: Runtime state service (IState) – used to access loaded people.
+        font_manager: Optional FontManager for dialog font styling.
         color_manager: Optional colour manager for dark-mode support.
     """
 
@@ -44,6 +47,7 @@ class ImageCacheDialog(wx.Dialog):
         parent: wx.Window,
         svc_config,
         svc_state=None,
+        font_manager: Optional["FontManager"] = None,
         color_manager=None,
     ) -> None:
         super().__init__(
@@ -54,12 +58,17 @@ class ImageCacheDialog(wx.Dialog):
         )
         self.svc_config = svc_config
         self.svc_state = svc_state
+        self.font_manager: Optional["FontManager"] = font_manager
         self.color_manager = color_manager
         self._stop_requested = False
         self._download_thread: Optional[threading.Thread] = None
 
         self._build_ui()
-        self._refresh_colors()
+        self._apply_current_font()
+        self.refresh_dialog_background()
+        if self.font_manager and hasattr(self.font_manager, "register_font_change_callback"):
+            self.font_manager.register_font_change_callback(self._on_font_changed)
+        self.Bind(wx.EVT_ACTIVATE, self.OnActivate)
         self.Bind(wx.EVT_WINDOW_DESTROY, self._on_destroy)
 
     # ------------------------------------------------------------------
@@ -74,15 +83,15 @@ class ImageCacheDialog(wx.Dialog):
         dir_label = wx.StaticText(panel, label="Cache directory:")
         cur_dir = self._effective_cache_dir()
         self._dir_text = wx.TextCtrl(panel, value=cur_dir, size=(340, -1))
-        browse_btn = wx.Button(panel, label="Browse…")
-        reset_btn = wx.Button(panel, label="Reset to Default")
-        browse_btn.Bind(wx.EVT_BUTTON, self._on_browse)
-        reset_btn.Bind(wx.EVT_BUTTON, self._on_reset_dir)
+        self._browse_btn = wx.Button(panel, label="Browse…")
+        self._reset_btn = wx.Button(panel, label="Reset to Default")
+        self._browse_btn.Bind(wx.EVT_BUTTON, self._on_browse)
+        self._reset_btn.Bind(wx.EVT_BUTTON, self._on_reset_dir)
 
         dir_row = wx.BoxSizer(wx.HORIZONTAL)
         dir_row.Add(self._dir_text, 1, wx.EXPAND | wx.RIGHT, 4)
-        dir_row.Add(browse_btn, 0, wx.RIGHT, 4)
-        dir_row.Add(reset_btn, 0)
+        dir_row.Add(self._browse_btn, 0, wx.RIGHT, 4)
+        dir_row.Add(self._reset_btn, 0)
 
         # --- Filename preservation checkbox ---
         preserve = self.svc_config.get_image_cache_preserve_name() if hasattr(
@@ -105,17 +114,17 @@ class ImageCacheDialog(wx.Dialog):
         self._download_btn = wx.Button(panel, label="Download")
         self._stop_btn = wx.Button(panel, label="Stop")
         self._stop_btn.Disable()
-        close_btn = wx.Button(panel, wx.ID_CLOSE, label="Close")
+        self._close_btn = wx.Button(panel, wx.ID_CLOSE, label="Close")
 
         self._download_btn.Bind(wx.EVT_BUTTON, self._on_download)
         self._stop_btn.Bind(wx.EVT_BUTTON, self._on_stop)
-        close_btn.Bind(wx.EVT_BUTTON, lambda _: self.Close())
+        self._close_btn.Bind(wx.EVT_BUTTON, lambda _: self.Close())
 
         btn_row = wx.BoxSizer(wx.HORIZONTAL)
         btn_row.Add(self._download_btn, 0, wx.RIGHT, 8)
         btn_row.Add(self._stop_btn, 0, wx.RIGHT, 8)
         btn_row.AddStretchSpacer()
-        btn_row.Add(close_btn, 0)
+        btn_row.Add(self._close_btn, 0)
 
         # --- Main sizer ---
         sizer = wx.BoxSizer(wx.VERTICAL)
@@ -142,20 +151,96 @@ class ImageCacheDialog(wx.Dialog):
         gedcom = getattr(self.svc_config, "GEDCOMinput", None) or ""
         return str(Path(gedcom).parent) if gedcom else str(Path.cwd())
 
-    def _refresh_colors(self) -> None:
+    def refresh_dialog_background(self) -> None:
         if not self.color_manager:
             return
         try:
-            bg = self.color_manager.get_color("DIALOG_BACKGROUND")
-            fg = self.color_manager.get_color("DIALOG_TEXT")
-            if bg:
+            bg = self.color_manager.get_color("DIALOG_BACKGROUND") if self.color_manager.has_color("DIALOG_BACKGROUND") else None
+            fg = self.color_manager.get_color("DIALOG_TEXT") if self.color_manager.has_color("DIALOG_TEXT") else None
+            if bg is not None:
                 self.SetBackgroundColour(bg)
                 self._panel.SetBackgroundColour(bg)
-            if fg:
+            if fg is not None:
                 self.SetForegroundColour(fg)
                 self._panel.SetForegroundColour(fg)
+                self._apply_foreground_recursive(self._panel, fg)
+
+            status_bg = self.color_manager.get_color("GRID_BACK") if self.color_manager.has_color("GRID_BACK") else bg
+            status_fg = self.color_manager.get_color("GRID_TEXT") if self.color_manager.has_color("GRID_TEXT") else fg
+            if status_bg is not None:
+                self._status_text.SetBackgroundColour(status_bg)
+                if hasattr(self._status_text, "SetOwnBackgroundColour"):
+                    self._status_text.SetOwnBackgroundColour(status_bg)
+            if status_fg is not None:
+                self._status_text.SetForegroundColour(status_fg)
+                if hasattr(self._status_text, "SetOwnForegroundColour"):
+                    self._status_text.SetOwnForegroundColour(status_fg)
+
+            btn_back = self.color_manager.get_color("BTN_BACK") if self.color_manager.has_color("BTN_BACK") else None
+            for btn in (self._browse_btn, self._reset_btn, self._download_btn, self._stop_btn, self._close_btn):
+                self._apply_button_colors(btn, btn_back, fg)
+
+            self.Refresh()
+        except Exception:
+            _log.debug("Failed to refresh colors in ImageCacheDialog", exc_info=True)
+
+    def _apply_current_font(self) -> None:
+        if not self.font_manager:
+            return
+        try:
+            self.font_manager.apply_current_font_recursive(self)
+            self.Layout()
+        except Exception:
+            _log.debug("Failed to apply font in ImageCacheDialog", exc_info=True)
+
+    def _on_font_changed(self) -> None:
+        try:
+            wx.CallAfter(self._apply_current_font)
+        except Exception:
+            _log.debug("Failed to schedule font refresh in ImageCacheDialog", exc_info=True)
+
+    def _apply_foreground_recursive(self, root: wx.Window, color: wx.Colour) -> None:
+        try:
+            root.SetForegroundColour(color)
+            if hasattr(root, "SetOwnForegroundColour"):
+                root.SetOwnForegroundColour(color)
         except Exception:
             pass
+
+        if isinstance(root, wx.TextCtrl) and root is not self._status_text:
+            try:
+                bg = self.color_manager.get_color("DIALOG_BACKGROUND") if self.color_manager.has_color("DIALOG_BACKGROUND") else None
+                if bg is not None:
+                    root.SetBackgroundColour(bg)
+                    if hasattr(root, "SetOwnBackgroundColour"):
+                        root.SetOwnBackgroundColour(bg)
+            except Exception:
+                pass
+
+        for child in root.GetChildren():
+            self._apply_foreground_recursive(child, color)
+
+    def _apply_button_colors(self, button: wx.Button, background: Optional[wx.Colour], foreground: Optional[wx.Colour]) -> None:
+        try:
+            if background is not None:
+                button.SetBackgroundColour(background)
+                if hasattr(button, "SetOwnBackgroundColour"):
+                    button.SetOwnBackgroundColour(background)
+            if foreground is not None:
+                button.SetForegroundColour(foreground)
+                if hasattr(button, "SetOwnForegroundColour"):
+                    button.SetOwnForegroundColour(foreground)
+        except Exception:
+            pass
+
+    def OnActivate(self, event: wx.ActivateEvent) -> None:
+        if event.GetActive() and self.color_manager:
+            try:
+                if hasattr(self.color_manager, "refresh_colors") and self.color_manager.refresh_colors():
+                    self.refresh_dialog_background()
+            except Exception:
+                _log.debug("Failed to refresh dialog theme on activation", exc_info=True)
+        event.Skip()
 
     def _append_status(self, msg: str) -> None:
         """Append *msg* (newline added automatically) to the status area.
@@ -299,4 +384,9 @@ class ImageCacheDialog(wx.Dialog):
 
     def _on_destroy(self, event: wx.WindowDestroyEvent) -> None:
         self._stop_requested = True
+        if self.font_manager and hasattr(self.font_manager, "unregister_font_change_callback"):
+            try:
+                self.font_manager.unregister_font_change_callback(self._on_font_changed)
+            except Exception:
+                _log.debug("Failed to unregister font callback in ImageCacheDialog", exc_info=True)
         event.Skip()

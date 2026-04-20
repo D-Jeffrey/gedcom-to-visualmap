@@ -24,6 +24,7 @@ OFFICECMDLINE = "soffice"  # command to start LibreOffice
 
 # INI file section constants
 INI_SECTION_GEDCOM_MAIN = "Gedcom.Main"
+INI_SECTION_GEDCOM_CACHE = "Gedcom.cache"
 INI_SECTION_GEO_CONFIG = "GeoConfig"
 INI_SECTION_GEOCODING = "GeoCoding"
 

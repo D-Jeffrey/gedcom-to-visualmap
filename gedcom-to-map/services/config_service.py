@@ -16,7 +16,7 @@ import os
 import platform
 import logging
 
-from const import GEO_CONFIG_FILENAME, INI_SECTION_GEO_CONFIG
+from const import GEO_CONFIG_FILENAME, INI_SECTION_GEO_CONFIG, INI_SECTION_GEDCOM_CACHE
 from services.config_io import ini_sections, ini_option_sections
 from render.result_type import ResultType
 from services.interfaces import IConfig
@@ -200,6 +200,12 @@ class GVConfig(IConfig):
         self.setInput(self.gvConfig["Core"].get("InputFile", ""), generalRequest=False)
         self.resultpath = os.path.split(self.gvConfig["Core"].get("OutputFile", ""))[0]
 
+        # Load image cache preserve-name setting from Gedcom.cache section
+        if INI_SECTION_GEDCOM_CACHE in self.gvConfig:
+            pn = self.gvConfig[INI_SECTION_GEDCOM_CACHE].get("preservename", None)
+            if pn is not None:
+                self.MediaCachePreserveName = pn.strip().lower() in ("1", "true", "yes", "on", "y", "t")
+
         # Load file open commands from INI into _file_open_commands object
         self._load_file_commands_from_ini()
 
@@ -343,6 +349,10 @@ class GVConfig(IConfig):
                 if hasattr(self, "Main") and self.Main:
                     self.gvConfig["Gedcom.Main"][name] = self.Main
 
+            # Save image cache settings under Gedcom.cache section
+            if hasattr(self, "MediaCachePreserveName"):
+                self.gvConfig[INI_SECTION_GEDCOM_CACHE]["preservename"] = str(self.MediaCachePreserveName)
+
             # Save logger levels - only for loggers explicitly in logging_defaults
             # Clear existing entries first to avoid persisting stale loggers
             self.gvConfig.remove_section("Logging")
@@ -481,6 +491,113 @@ class GVConfig(IConfig):
             self.resultpath = None
         if org != self.GEDCOMinput:
             self.parsed = False
+
+    # === Image Cache Helpers ===
+
+    def get_image_cache_dir(self) -> Optional[str]:
+        """Return the per-GEDCOM image cache directory, or None if not set.
+
+        Cache directory is stored in the [Gedcom.cache] section of the INI file,
+        keyed by the GEDCOM file stem (same pattern as [Gedcom.Main]).
+
+        Returns:
+            str path if configured, otherwise None.
+        """
+        if not (hasattr(self, "gvConfig") and self.gvConfig and self.GEDCOMinput):
+            return None
+        try:
+            name = Path(self.GEDCOMinput).stem
+            val = self.gvConfig[INI_SECTION_GEDCOM_CACHE].get(name, None)
+            return val if val else None
+        except Exception:
+            return None
+
+    def set_image_cache_dir(self, path: Optional[str]) -> None:
+        """Persist the per-GEDCOM image cache directory to the [Gedcom.cache] section.
+
+        Args:
+            path: Absolute path of the desired cache directory, or None to clear it.
+        """
+        if not (hasattr(self, "gvConfig") and self.gvConfig and self.GEDCOMinput):
+            return
+        try:
+            name = Path(self.GEDCOMinput).stem
+            if path:
+                self.gvConfig[INI_SECTION_GEDCOM_CACHE][name] = str(path)
+            elif self.gvConfig.has_option(INI_SECTION_GEDCOM_CACHE, name):
+                self.gvConfig.remove_option(INI_SECTION_GEDCOM_CACHE, name)
+        except Exception as e:
+            _log.warning("set_image_cache_dir failed: %s", e)
+
+    def get_image_cache_preserve_name(self) -> bool:
+        """Return the filename-preservation setting for image caching.
+
+        When True, cached filenames mirror the original filename from the URL.
+        When False, a SHA-1 hash of the full URL is used as the filename.
+
+        Returns:
+            bool: True (preserve name) by default.
+        """
+        try:
+            val = self.gvConfig[INI_SECTION_GEDCOM_CACHE].get("preservename", None)
+            if val is not None:
+                return val.strip().lower() in ("1", "true", "yes", "on", "y", "t")
+        except Exception:
+            pass
+        return getattr(self, "MediaCachePreserveName", True)
+
+    def set_image_cache_preserve_name(self, value: bool) -> None:
+        """Persist the filename-preservation setting to the [Gedcom.cache] section.
+
+        Args:
+            value: True to preserve original filenames, False to use URL hashes.
+        """
+        if not (hasattr(self, "gvConfig") and self.gvConfig):
+            return
+        try:
+            self.gvConfig[INI_SECTION_GEDCOM_CACHE]["preservename"] = str(value).lower()
+        except Exception as e:
+            _log.warning("set_image_cache_preserve_name failed: %s", e)
+        self.MediaCachePreserveName = value
+
+    def get_local_photo_hosts(self) -> list:
+        """Return the list of local-host regex patterns from YAML image_cache_options.
+
+        URLs whose hostname matches any of these patterns are fetched directly
+        (without caching) because they are always locally accessible.
+
+        Returns:
+            list: List of regex pattern strings; defaults to ['localhost'].
+        """
+        try:
+            opts = self.options.get("image_cache_options", {})
+            lph = opts.get("local_photo_hosts", {})
+            # YAML may parse this as a dict with 'type'/'default' keys if flat,
+            # or as a list when written as a YAML sequence.
+            if isinstance(lph, dict):
+                default = lph.get("default", ["localhost"])
+                return default if isinstance(default, list) else [str(default)]
+            if isinstance(lph, list):
+                return lph
+        except Exception:
+            pass
+        return ["localhost"]
+
+    def get_effective_cache_dir(self) -> str:
+        """Return the effective image cache directory.
+
+        Returns the configured alternate cache directory if set, otherwise
+        falls back to the GEDCOM input file's directory.
+
+        Returns:
+            str: Absolute path to the cache directory.
+        """
+        alt = self.get_image_cache_dir()
+        if alt:
+            return alt
+        if self.GEDCOMinput:
+            return str(Path(self.GEDCOMinput).parent)
+        return str(Path.cwd())
 
     def setResultsFile(self, ResultFile: str, OutputType) -> None:
         """Set the output results file with appropriate extension.

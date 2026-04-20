@@ -3,7 +3,7 @@
 import yaml
 from pathlib import Path
 
-VERSION = "0.3.0.2"
+VERSION = "0.3.0.3"
 NAME = "gedcom-to-visualmap"
 GEOCODEUSERAGENT = NAME + "/" + VERSION + " GEDCOM-to-visualmap"
 GUINAME = "GEDCOM Visual Map"

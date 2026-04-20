@@ -208,6 +208,20 @@ processing_options:
 performance_options:
   EnableTracemalloc: {type: 'bool', default: false, ini_section: 'Performance'}
 
+# Image caching options
+# MediaCachePreserveName: when True, cached files keep original filename from URL;
+#   when False, a SHA-1 hash of the URL is used to avoid name collisions.
+# local_photo_hosts: list of Python regex patterns matched against URL hostname.
+#   URLs whose hostname matches ANY of these patterns are fetched directly (not cached),
+#   because they are local/intranet servers always accessible from the running machine.
+#   Patterns are compared case-insensitively against the hostname portion only.
+image_cache_options:
+  MediaCachePreserveName: {type: 'bool', default: True}
+  local_photo_hosts:
+    type: 'list'
+    default:
+      - 'localhost'
+
 # File viewer command line options (saved to Core section)
 command_options:
   KMLcmdline: {type: 'str', default: '', ini_section: 'Core'}

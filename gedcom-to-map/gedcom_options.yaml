@@ -191,7 +191,9 @@ summary_report_options:
 migration_display_options:
   RBLocationGrouping: {type: 'str', default: 'City and Country', ini_section: 'MIG'}
   UseSoundexLocationGrouping: {type: 'bool', default: True, ini_section: 'MIG'}
+  LabelNames: {type: 'bool', default: False, ini_section: 'MIG'}
   MaxMigrationLines: {type: 'int', default: 100, ini_section: 'MIG'}
+  ExcludeUnknownMigrationCountries: {type: 'bool', default: False, ini_section: 'MIG'}
 
 # Statistics options - configuration for statistics collectors
 statistics_options:

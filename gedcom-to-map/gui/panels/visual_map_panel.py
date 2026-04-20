@@ -1125,6 +1125,12 @@ class VisualMapPanel(wx.Panel):
         use_soundex = self.svc_config.get("UseSoundexLocationGrouping", True)
         self.id.CBUseSoundexLocationGrouping.SetValue(bool(use_soundex))
 
+        label_names = self.svc_config.get("LabelNames", False)
+        self.id.CBLabelNames.SetValue(bool(label_names))
+
+        exclude_unknown = self.svc_config.get("ExcludeUnknownMigrationCountries", False)
+        self.id.CBExcludeUnknownMigrationCountries.SetValue(bool(exclude_unknown))
+
         max_lines = self.svc_config.get("MaxMigrationLines", 100)
         try:
             self.id.INTMaxMigrationLines.SetValue(int(max_lines))

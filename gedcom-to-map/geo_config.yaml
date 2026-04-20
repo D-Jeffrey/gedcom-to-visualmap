@@ -10,6 +10,11 @@ additional_countries_codes_dict_to_add:
   Europe: EU
 
 country_substitutions:
+  England: United Kingdom
+  Scotland: United Kingdom
+  Wales: United Kingdom
+  Great Britain: United Kingdom
+  UK: United Kingdom
   Prussia: Germany
   American Colonies: USA
   Deutschland: Germany
@@ -32,10 +37,24 @@ country_substitutions:
   France and Flanders: Belgium
   Himalayas: Bhutan
   Russia: Russian Federation
+  United States: USA
+  US: USA
+  U.S.: USA
   u.s.a.: USA
+  Can: Canada
   British Colonial America: Canada
   U.K.: United Kingdom
   United States of America: USA
+
+subdivision_country_substitutions:
+  Ont: Canada
+  Alta: Canada
+  Sask: Canada
+  Que: Canada
+  Calif: USA
+  Wisc: USA
+  Penn: USA
+  Yorks: United Kingdom
 
 default_country: None
 

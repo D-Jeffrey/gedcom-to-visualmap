@@ -341,9 +341,22 @@ class LayoutOptions:
         )
         mboxIn.Add(cb_soundex, 0, wx.ALL, 2)
 
+        cb_label_names = LayoutHelpers.add_checkbox_with_id(
+            vm_panel, mbox_container, "CBLabelNames", "Label Names"
+        )
+        mboxIn.Add(cb_label_names, 0, wx.ALL, 2)
+
+        cb_known_countries = LayoutHelpers.add_checkbox_with_id(
+            vm_panel,
+            mbox_container,
+            "CBExcludeUnknownMigrationCountries",
+            "Exclude points without valid country names/codes",
+        )
+        mboxIn.Add(cb_known_countries, 0, wx.ALL, 2)
+
         # Top flow line filter
         max_lines_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        max_lines_label = wx.StaticText(mbox_container, -1, "Max migration locations")
+        max_lines_label = wx.StaticText(mbox_container, -1, "Max migration movements")
         vm_panel.id.INTMaxMigrationLines = wx.SpinCtrl(
             mbox_container, vm_panel.id.IDs["INTMaxMigrationLines"], "", min=10, max=1000, initial=100
         )

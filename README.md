@@ -3,6 +3,7 @@
 ![Project Maintenance][maintenance-shield]
 [![GitHub Activity][commits-shield]][commits]
 
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/D-Jeffrey/gedcom-to-visualmap)
 
 # gedcom-to-visualmap
 
@@ -474,6 +475,6 @@ See the main repository LICENSE.txt for details.
 [license]: LICENSE
 [commits]: https://github.com/D-Jeffrey/gedcom-to-visualmap/commits
 [commits-shield]: https://img.shields.io/github/commit-activity/y/D-Jeffrey/gedcom-to-visualmap?style=for-the-badge
-[maintenance-shield]: https://img.shields.io/maintenance/yes/2025.svg?style=for-the-badge
+[maintenance-shield]: https://img.shields.io/maintenance/yes/2026.svg?style=for-the-badge
 [releases-shield]: https://img.shields.io/github/v/release/D-Jeffrey/gedcom-to-visualmap.svg?style=for-the-badge
 [releases]: https://github.com/D-Jeffrey/gedcom-to-visualmap/releases

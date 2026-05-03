@@ -38,6 +38,7 @@ class LayoutOptions:
         LayoutOptions._add_kml_options(vm_panel, panel, box)
         LayoutOptions._add_kml2_options(vm_panel, panel, box)
         LayoutOptions._add_summary_options(vm_panel, panel, box)
+        LayoutOptions._add_mig_options(vm_panel, panel, box)
         LayoutOptions._add_grid_options(vm_panel, panel, box)
         LayoutOptions._add_result_type_and_stack(vm_panel, panel, box)
         LayoutOptions._add_buttons_row(vm_panel, panel, box)
@@ -326,6 +327,47 @@ class LayoutOptions:
         sbox_container.SetSizer(ssizer)
         vm_panel.optionSbox = sbox_container
 
+    def _add_mig_options(vm_panel: Any, panel: wx.Panel, sizer: wx.Sizer) -> None:
+        """Create the MIG options group."""
+        mbox_container = wx.Panel(panel)
+        mbox = wx.StaticBox(mbox_container, -1, "MIG Options")
+        msizer = wx.StaticBoxSizer(mbox, wx.VERTICAL)
+        mboxIn = wx.BoxSizer(wx.VERTICAL)
+
+
+        # Soundex normalization toggle
+        cb_soundex = LayoutHelpers.add_checkbox_with_id(
+            vm_panel, mbox_container, "CBUseSoundexLocationGrouping", "Combine similar-sounding locations (Soundex)"
+        )
+        mboxIn.Add(cb_soundex, 0, wx.ALL, 2)
+
+        cb_label_names = LayoutHelpers.add_checkbox_with_id(
+            vm_panel, mbox_container, "CBLabelNames", "Label Names"
+        )
+        mboxIn.Add(cb_label_names, 0, wx.ALL, 2)
+
+        cb_known_countries = LayoutHelpers.add_checkbox_with_id(
+            vm_panel,
+            mbox_container,
+            "CBExcludeUnknownMigrationCountries",
+            "Exclude points without valid country names/codes",
+        )
+        mboxIn.Add(cb_known_countries, 0, wx.ALL, 2)
+
+        # Top flow line filter
+        max_lines_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        max_lines_label = wx.StaticText(mbox_container, -1, "Max migration movements")
+        vm_panel.id.INTMaxMigrationLines = wx.SpinCtrl(
+            mbox_container, vm_panel.id.IDs["INTMaxMigrationLines"], "", min=10, max=1000, initial=100
+        )
+        max_lines_sizer.Add(max_lines_label, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 5)
+        max_lines_sizer.Add(vm_panel.id.INTMaxMigrationLines, 0, wx.ALIGN_CENTER_VERTICAL)
+        mboxIn.Add(max_lines_sizer, 0, wx.ALL, 2)
+
+        msizer.Add(mboxIn, 0, wx.EXPAND | wx.ALL, 4)
+        mbox_container.SetSizer(msizer)
+        vm_panel.optionMbox = mbox_container
+
     @staticmethod
     def _add_grid_options(vm_panel: Any, panel: wx.Panel, sizer: wx.Sizer) -> None:
         """Create and add grid view options."""
@@ -350,7 +392,7 @@ class LayoutOptions:
 
     @staticmethod
     def _add_result_type_and_stack(vm_panel: Any, panel: wx.Panel, sizer: wx.Sizer) -> None:
-        """Add result type radio and the options stack (HMTL/KML/KML2/Summary)."""
+        """Add result type radio and the options stack (HMTL/KML/KML2/Summary/MIG)."""
         vm_panel.optionsStack = wx.BoxSizer(wx.VERTICAL)
         vm_panel.optionsStack.Add(vm_panel.optionHbox, 1, wx.EXPAND)
         vm_panel.optionHbox.Hide()
@@ -360,6 +402,8 @@ class LayoutOptions:
         vm_panel.optionK2box.Hide()
         vm_panel.optionsStack.Add(vm_panel.optionSbox, 1, wx.EXPAND)
         vm_panel.optionSbox.Hide()
+        vm_panel.optionsStack.Add(vm_panel.optionMbox, 1, wx.EXPAND)
+        vm_panel.optionMbox.Hide()
 
         sizer.Add(vm_panel.optionGbox, 0, wx.LEFT | wx.TOP, 5)
         sizer.AddMany([vm_panel.id.RBResultType])

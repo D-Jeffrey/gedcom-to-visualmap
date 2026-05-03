@@ -187,6 +187,14 @@ summary_report_options:
   SummaryEnrichmentIssues: {type: 'bool', default: True, ini_section: 'Summary'}
   SummaryStatistics: {type: 'bool', default: True, ini_section: 'Summary'}
 
+# Migration flow visualization options
+migration_display_options:
+  RBLocationGrouping: {type: 'str', default: 'City and Country', ini_section: 'MIG'}
+  UseSoundexLocationGrouping: {type: 'bool', default: True, ini_section: 'MIG'}
+  LabelNames: {type: 'bool', default: False, ini_section: 'MIG'}
+  MaxMigrationLines: {type: 'int', default: 100, ini_section: 'MIG'}
+  ExcludeUnknownMigrationCountries: {type: 'bool', default: False, ini_section: 'MIG'}
+
 # Statistics options - configuration for statistics collectors
 statistics_options:
   earliest_credible_birth_year: {type: 'int', default: 1000, ini_section: 'Statistics'}
@@ -199,6 +207,20 @@ processing_options:
 # Performance options - configuration for debugging and performance monitoring
 performance_options:
   EnableTracemalloc: {type: 'bool', default: false, ini_section: 'Performance'}
+
+# Image caching options
+# MediaCachePreserveName: when True, cached files keep original filename from URL;
+#   when False, a SHA-1 hash of the URL is used to avoid name collisions.
+# local_photo_hosts: list of Python regex patterns matched against URL hostname.
+#   URLs whose hostname matches ANY of these patterns are fetched directly (not cached),
+#   because they are local/intranet servers always accessible from the running machine.
+#   Patterns are compared case-insensitively against the hostname portion only.
+image_cache_options:
+  MediaCachePreserveName: {type: 'bool', default: True}
+  local_photo_hosts:
+    type: 'list'
+    default:
+      - 'localhost'
 
 # File viewer command line options (saved to Core section)
 command_options:

@@ -407,12 +407,28 @@ class BackgroundActions:
                         elapsed = time.time() - start_time
                         _log.exception(f"doSUM failed after {elapsed:.1f} seconds")
                         raise
+            elif result_type_name == "MIG":
+                if hasattr(panel_actions, "doMIG"):
+                    _log.info("Calling doMIG")
+                    self.SayInfoMessage("Generating summary reports...")
+
+                    start_time = time.time()
+                    try:
+                        panel_actions.doMIG(self.svc_config, self.svc_state, self.svc_progress)
+                        elapsed = time.time() - start_time
+                        _log.info(f"doMIG completed successfully in {elapsed:.1f} seconds")
+                    except Exception as e:
+                        elapsed = time.time() - start_time
+                        _log.exception(f"doMIG failed after {elapsed:.1f} seconds")
+                        raise
+            
                 else:
-                    _log.error("Run: panel_actions.doSUM not available")
-                    self.SayErrorMessage("Error: Summary generator not available", True)
+                    _log.error("Run: panel_actions.doMIG not available")
+                    self.SayErrorMessage("Error: Migration generator not available", True)
                     return
+                fname = fname.replace(".html", "_migration_sankey.html")
                 self.SayInfoMessage(f"Summary files generated ({fname})")
-                # SUM doesn't auto-open files (it may generate multiple files)
+                file_type = "html"
             else:
                 self.SayErrorMessage(f"Error: Unknown Result Type {result_type_name}", True)
                 return

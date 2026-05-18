@@ -34,6 +34,7 @@ class VisualMapEventHandler:
             ResultType.KML,
             ResultType.KML2,
             ResultType.SUM,
+            ResultType.MIG
         )
 
     def bind(self) -> None:
@@ -294,15 +295,18 @@ class VisualMapEventHandler:
             _log.exception("EvtListBox failed")
 
     def EvtSpinCtrl(self, event: wx.CommandEvent) -> None:
-        """Handle spin control changes (MaxLineWeight etc)."""
+        """Handle spin control changes (MaxLineWeight, MaxMigrationLines, etc)."""
         try:
             event_id = event.GetId()
             attributes = self.panel.id.get_id_attributes(event_id)
             attrname = attributes.get("config_attribute", None)
-            if attributes and attrname == "MaxLineWeight":
-                self.panel.svc_config.set("MaxLineWeight", event.GetSelection())
-                self.panel.NeedRedraw()
-                return
+            if attributes and attrname:
+                try:
+                    self.panel.svc_config.set(attrname, event.GetSelection())
+                    self.panel.NeedRedraw()
+                    return
+                except Exception:
+                    _log.exception("Failed to set attr %s from SpinCtrl", attrname)
             _log.error("Uncontrolled SPIN %s", event_id)
         except Exception:
             _log.exception("EvtSpinCtrl failed")

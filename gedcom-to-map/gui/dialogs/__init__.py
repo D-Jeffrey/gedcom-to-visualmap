@@ -60,3 +60,10 @@ try:
     __all__.append("SimpleMessageDialog")
 except ImportError:
     pass
+
+try:
+    from .image_cache_dialog import ImageCacheDialog
+
+    __all__.append("ImageCacheDialog")
+except ImportError:
+    pass

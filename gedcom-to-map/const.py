@@ -3,7 +3,7 @@
 import yaml
 from pathlib import Path
 
-VERSION = "0.3.0.1"
+VERSION = "0.3.0.3"
 NAME = "gedcom-to-visualmap"
 GEOCODEUSERAGENT = NAME + "/" + VERSION + " GEDCOM-to-visualmap"
 GUINAME = "GEDCOM Visual Map"
@@ -24,6 +24,7 @@ OFFICECMDLINE = "soffice"  # command to start LibreOffice
 
 # INI file section constants
 INI_SECTION_GEDCOM_MAIN = "Gedcom.Main"
+INI_SECTION_GEDCOM_CACHE = "Gedcom.cache"
 INI_SECTION_GEO_CONFIG = "GeoConfig"
 INI_SECTION_GEOCODING = "GeoCoding"
 
@@ -50,6 +51,7 @@ LOG_CONFIG = {
             "class": "logging.FileHandler",
             "level": "DEBUG",
             "formatter": "standard",
+            # This should have a test to ensure the directory exists and is writable, and handle exceptions if not
             "filename": str(APP_ROOT / f"{NAME}.log"),
             "mode": "w",
             "encoding": "utf-8",

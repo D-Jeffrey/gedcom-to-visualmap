@@ -156,6 +156,9 @@ class GedcomLoader:
                 people = svc_state.people
                 _log.info("Completed geocoding with %d people", len(people) if people else 0)
 
+                # Rewrite remote photo URLs to local cached paths where available
+                self._rewrite_cached_photos(people, svc_config)
+
             except Exception as e:
                 _log.exception("Error during GEDCOM geocoding: %s", e)
                 raise
@@ -171,6 +174,48 @@ class GedcomLoader:
             _log.debug("Set main person in state: %s", svc_config.get("Main"))
 
         return people
+
+    def _rewrite_cached_photos(self, people, svc_config) -> None:
+        """Rewrite remote photo URLs to local cached paths where files already exist.
+
+        Called after a successful GEDCOM parse.  If the user has previously
+        downloaded images via the Image Caching dialog, the in-memory Person
+        objects are updated to point to those local files so the rest of the
+        application (PersonDialog, Folium map popups) can display them without
+        additional network requests.
+
+        Args:
+            people: ``{xref_id: Person}`` mapping from the freshly loaded GEDCOM.
+            svc_config: Configuration service used to resolve cache directory and
+                        filename strategy.
+        """
+        if not people:
+            return
+        try:
+            from gui.services.image_cache_service import ImageCacheService
+
+            cache_dir = (
+                svc_config.get_effective_cache_dir()
+                if hasattr(svc_config, "get_effective_cache_dir")
+                else None
+            )
+            if not cache_dir:
+                return
+            preserve_name = (
+                svc_config.get_image_cache_preserve_name()
+                if hasattr(svc_config, "get_image_cache_preserve_name")
+                else True
+            )
+            local_patterns = (
+                svc_config.get_local_photo_hosts()
+                if hasattr(svc_config, "get_local_photo_hosts")
+                else ["localhost"]
+            )
+            count = ImageCacheService.rewrite_people_photos(people, cache_dir, preserve_name, local_patterns)
+            if count:
+                _log.info("Rewrote %d cached photo paths after GEDCOM load", count)
+        except Exception:
+            _log.warning("_rewrite_cached_photos: failed", exc_info=True)
 
     def updatestats(self) -> str:
         """Calculate and return statistics about geocoded data.

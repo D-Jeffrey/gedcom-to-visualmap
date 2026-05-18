@@ -18,6 +18,7 @@ class ResultType(Enum):
     KML = "KML"
     KML2 = "KML2"
     SUM = "SUM"
+    MIG = "MIG"
 
     @staticmethod
     def ResultTypeEnforce(value) -> "ResultType":
@@ -86,6 +87,8 @@ class ResultType(Enum):
             return "kml"
         elif rt == ResultType.SUM:
             return "txt"  # Changed from "md" to match old behavior
+        elif rt == ResultType.MIG:
+            return "html"
         else:
             return "html"
 

@@ -180,7 +180,7 @@ This project now uses a dependency-injection/services pattern for all configurat
 
 ## GUI Overview
 
-![img](docs/img/GUI-python_2025-11.gif)
+![img](docs/img/gui-python_2026-04.gif)
 
 - Click `Input File` to select your .ged file.
 - Set your options in the GUI, including:
@@ -246,7 +246,6 @@ The comprehensive statistics report provides detailed demographic analysis, temp
 
 Reports are generated in both markdown (.md) and HTML (.html) formats, with the HTML version automatically opening in your browser for easy viewing.
 
----
 
 ## Parameter and Settings
 
@@ -283,6 +282,20 @@ The SUM results type generates a comprehensive genealogical statistics report th
 3. Enable `SummaryOpen` in options to automatically open the report
 4. Click `Draw Update` to generate the report
 5. The HTML report opens automatically in your browser
+
+---
+
+## Family Migration Flow
+Using a Sankey format display the migration flow visualizually revealing the people movement patterns. Aggregating flows to show: "How many people moved FROM location A TO location B?".  Using the events from the person's record, a Sankey flow is created and combine with other like records for time and from/to. It is summaried at the City, State/Province/Subdivision, Country and Continent level into a HTML file.
+
+Using Soundex to match simlar names, added Labels to the flow lines and specify how many lines will be rendering.  It is suggested to use no more then 1000 movements.  A good limit is 250.
+
+![img](docs/img/family-migration.gif)
+---
+
+## Image Caching
+If you use a service such which serves your photos as part of the GEDCOM export it uses web links back to them, then you can use the Image Caching function to down any of the photos into a directory (or the same directory as the GED file).
+---
 
 ### Configuration Options
 
@@ -338,6 +351,7 @@ The report provides comprehensive insights into your genealogical data with 14 d
 | pandas          | [pandas](https://github.com/pandas-dev/pandas) | | Data analysis |
 | seaborn         | [seaborn](https://github.com/mwaskom/seaborn) | [docs](https://seaborn.pydata.org/) | Visualization |
 | matplotlib      | [matplotlib](https://github.com/matplotlib/matplotlib) | [docs](https://matplotlib.org/) | Visualization |
+| plotly          | [plotly](https://github.com/plotly/plotly.py) | [docs](https://plotly.com/python/)) | Visualization |
 
 ---
 

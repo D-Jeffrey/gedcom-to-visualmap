@@ -99,6 +99,9 @@ class VisualMapFrame(wx.Frame):
             self, self.font_manager, self.color_manager, self.svc_config, self.svc_state, self.svc_progress
         )
 
+        # Bind window resize event to save the size
+        self.Bind(wx.EVT_SIZE, self.OnWindowSize)
+
     def set_current_font(self) -> None:
         """Ensure the frame uses the current font from the FontManager."""
         self.font = self.font_manager.get_font()
@@ -107,7 +110,33 @@ class VisualMapFrame(wx.Frame):
     def start(self) -> None:
         """Start the UI by starting the contained panel and showing the frame."""
         self.visual_map_panel.start()
+        self._restore_window_size()
         self.Show()
+
+    def _restore_window_size(self) -> None:
+        """Restore window size from config if it fits on screen."""
+        try:
+            saved_size = self.svc_config.get("window_size")
+            if saved_size and isinstance(saved_size, (list, tuple)) and len(saved_size) == 2:
+                width, height = int(saved_size[0]), int(saved_size[1])
+                
+                # Get screen dimensions
+                display = wx.Display()
+                screen_rect = display.GetClientArea()
+                
+                # Only apply size if it fits on screen with some margin
+                if width <= screen_rect.width - 50 and height <= screen_rect.height - 50:
+                    self.SetSize(width, height)
+                    _log.info(f"Restored window size: {width}x{height}")
+        except Exception as e:
+            _log.warning(f"Failed to restore window size: {e}")
+
+    def OnWindowSize(self, event: wx.SizeEvent) -> None:
+        """Handle window resize events and save the size to config."""
+        if self.IsShown():  # Only save if window is visible
+            size = self.GetSize()
+            self.svc_config.set("window_size", [size.width, size.height])
+        event.Skip()  # Allow default processing
 
     def stop(self) -> None:
         """Request clean shutdown of the UI by delegating to the panel."""

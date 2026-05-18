@@ -6,7 +6,7 @@ gui_options:
   mapWidthPercent: {type: 'int', default: 70}
   mapHeightPercent: {type: 'int', default: 80}
   panelWidthPercent: {type: 'int', default: 30}
-  window_size: {type: 'list', default: [1024, 800]}
+  window_size: {type: 'list', default: [1024, 800], ini_section: 'Core'}
   # If True, apply gui_colors/gui_colors_dark; if False, use platform-native widget colors.
   UseCustomColors: {type: 'bool', default: True, ini_section: 'Core'}
 

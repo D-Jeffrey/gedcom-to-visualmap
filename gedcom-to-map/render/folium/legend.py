@@ -3,16 +3,29 @@ Legend overlay for Folium maps using a Jinja2 template.
 """
 
 from branca.element import MacroElement, Template
+from .constants import MidPointMarker
 
-legend_template = """
-{% macro html(this, kwargs) %}
+def _build_legend_items() -> str:
+    """Build HTML legend items from MidPointMarker dictionary."""
+    items = []
+    for key, (icon, color, _shown) in MidPointMarker.items():
+        item_html = (
+            f'<div style="margin: 5px;">'
+            f'<i class="fa fa-{icon}" style="color: {color};"></i> '
+            f'{key}</div>'
+        )
+        items.append(item_html)
+    return ''.join(items)
+
+legend_template = f"""
+{{% macro html(this, kwargs) %}}
     <div id="map_legend" class="legend">
         <h4>Legend</h4>
         <!-- Dynamic generation of legend items -->
-        {{ this.legend_items|safe }}
+        {_build_legend_items()}
     </div>
     <style>
-        .legend {
+        .legend {{
             background: white;
             padding: 10px;
             border-radius: 5px;
@@ -23,19 +36,17 @@ legend_template = """
             top: 10px;
             right: 10px;
             z-index: 1000;
-        }
-        .legend div {
+        }}
+        .legend div {{
             display: flex;
             align-items: center;
-        }
-        .legend i {
+        }}
+        .legend i {{
             margin-right: 5px;
-        }
+        }}
     </style>
-{% endmacro %}
+{{% endmacro %}}
 """
-
-# Use MacroElement to add the template to the map
 
 
 class Legend(MacroElement):

@@ -14,6 +14,10 @@ MidPointMarker = {
     "BAPM": ("church", "darkgreen", True),
     "Deed": ("landmark", "darkgreen", True),
     "Arrival": ("ship", "darkgreen", True),
+    "OCCU": ("briefcase", "blue", True),
+    "ADDR": ("home", "lightred", True),
+    "CENS": ("home", "lightred", True),
+    "EDUC": ("graduation-cap", "blue", True),
     "Other": ("shoe-prints", "lightgray", True),
 }
 

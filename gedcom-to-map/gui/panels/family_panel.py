@@ -191,6 +191,8 @@ class FamilyPanel(wx.Panel):
             event: Grid event containing row information.
         """
         row = event.GetRow()
+        if row < 0: 
+            return
         person_id = self.grid.GetCellValue(row, 7)
         person = None
         try:
@@ -226,15 +228,20 @@ class FamilyPanel(wx.Panel):
             if PersonDialog:
                 # Use self.font_manager if available, otherwise fall back to fm from visual_map_panel
                 font_mgr = self.font_manager if self.font_manager else fm
+                
+                if getattr(self.visual_map_panel, "svc_config", None) is None and getattr(self.visual_map_panel, "Parent", None)  is not None:
+                    svc = self.visual_map_panel.Parent
+                else:
+                    svc = self.visual_map_panel
                 dlg = PersonDialog(
                     self,
                     person,
                     self.visual_map_panel,
                     font_manager=font_mgr,
                     color_manager=getattr(self.visual_map_panel, "color_manager", None),
-                    svc_config=getattr(self.visual_map_panel, "svc_config", None),
-                    svc_state=getattr(self.visual_map_panel, "svc_state", None),
-                    svc_progress=getattr(self.visual_map_panel, "svc_progress", None),
+                    svc_config=getattr(svc, "svc_config", None),
+                    svc_state=getattr(svc, "svc_state", None),
+                    svc_progress=getattr(svc, "svc_progress", None),
                     showreferences=False,
                 )
                 dlg.Bind(wx.EVT_CLOSE, lambda evt: dlg.Destroy())

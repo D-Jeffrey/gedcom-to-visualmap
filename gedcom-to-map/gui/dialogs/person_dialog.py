@@ -62,7 +62,10 @@ class PersonDialog(wx.Dialog):
             showreferences: Whether to display lineage and reference information.
         """
         super().__init__(
-            parent, title="Person Details", size=(600, 600), style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER
+            parent,
+            title=f"Person Details - {person.name}",
+            size=(600, 600),
+            style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER,
         )
 
         # Prefer provided services; else pick from panel if available
@@ -396,6 +399,7 @@ class PersonDialog(wx.Dialog):
         if person.father:
             try:
                 self.fatherTextCtrl.SetValue(self.formatPersonName(people[person.father]))
+                self._bind_open_person_context_menu(self.fatherTextCtrl, person.father)
             except KeyError:
                 _log.debug("Father %s not in people dict", person.father)
             except Exception:
@@ -404,6 +408,7 @@ class PersonDialog(wx.Dialog):
         if person.mother:
             try:
                 self.motherTextCtrl.SetValue(self.formatPersonName(people[person.mother]))
+                self._bind_open_person_context_menu(self.motherTextCtrl, person.mother)
             except KeyError:
                 _log.debug("Mother %s not in people dict", person.mother)
             except Exception:
@@ -718,6 +723,36 @@ class PersonDialog(wx.Dialog):
             svc_state=svc_state,
             color_manager=self.color_manager,
         )
+
+    def _bind_open_person_context_menu(self, ctrl: wx.TextCtrl, xref_id: str) -> None:
+        """Bind a right-click on ctrl to open Person Details for xref_id directly.
+
+        Args:
+            ctrl: The read-only TextCtrl (e.g. father/mother) to attach the handler to.
+            xref_id: The GEDCOM xref_id of the person to open on right-click.
+        """
+        ctrl.SetToolTip("Right-click to open relative")
+        ctrl.Bind(wx.EVT_CONTEXT_MENU, lambda evt, xid=xref_id: self._open_person_dialog(xid))
+
+    def _open_person_dialog(self, xref_id: str) -> None:
+        """Open a new PersonDialog showing details for the person with xref_id."""
+        person = self.people.get(xref_id)
+        if not person:
+            wx.MessageBox("Person not found.", "Error", wx.OK | wx.ICON_ERROR)
+            return
+        dlg = PersonDialog(
+            self,
+            person,
+            self.panel,
+            font_manager=self.font_manager,
+            color_manager=self.color_manager,
+            svc_config=self.svc_config,
+            svc_state=self.svc_state,
+            svc_progress=self.svc_progress,
+            showreferences=self.showreferences,
+        )
+        dlg.Bind(wx.EVT_CLOSE, lambda evt: dlg.Destroy())
+        dlg.Show(True)
 
     def formatPersonName(self, person: Person, longForm=True):
         """Format a person's name for display.

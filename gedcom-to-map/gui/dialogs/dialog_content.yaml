@@ -40,7 +40,7 @@ help_dialog: |
   <h3>Things to know</h3>
   <ul><li><b>Right-click:</b> Right-click on (Activate) a person in the list to view more details.</li>
   <li><b>Double-click</b> Double-click on a person in the list to set them as the main person and find all their associcated parents</li>
-  <li><b>click parent</b> Click on a parent in the person dialog to open that parent's details</li>
+  <li><b>Right-click people</b> Right-click on a relative in the Person dialog to open their details (Father, Mother, Lineage & Children)</li>
   <li><b>Trace</b> For the selected person save to a text file all the associcated parents(tab seperated)</li>
   <li><b>Geo Table</b> Edit the file and translates so that next time it does better location lookups by putting replacement values in the 'alt' column or by filling in the 'Country',
   then blank the lat, long and boundary have it looked up again. Do not convert it to another format and close Excel so the file can be access.</li>

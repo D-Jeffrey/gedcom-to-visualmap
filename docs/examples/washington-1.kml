@@ -1,0 +1,1540 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2">
+    <Document id="22396">
+        <Style id="22406">
+            <IconStyle id="22409">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+                <heading>0</heading>
+                <Icon id="22410">
+                    <href>https://maps.google.com/mapfiles/kml/paddle/ylw-circle.png</href>
+                </Icon>
+            </IconStyle>
+            <LabelStyle id="22408">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+            </LabelStyle>
+        </Style>
+        <Style id="22413">
+            <LineStyle id="22414">
+                <color>ffdfff00</color>
+                <colorMode>normal</colorMode>
+                <width>20</width>
+            </LineStyle>
+        </Style>
+        <Style id="22419">
+            <IconStyle id="22421">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+                <heading>0</heading>
+                <Icon id="22422">
+                    <href>https://maps.google.com/mapfiles/kml/paddle/ylw-circle.png</href>
+                </Icon>
+            </IconStyle>
+            <LabelStyle id="22420">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+            </LabelStyle>
+        </Style>
+        <Style id="22425">
+            <LineStyle id="22426">
+                <color>ff00d8ff</color>
+                <colorMode>normal</colorMode>
+                <width>12</width>
+            </LineStyle>
+        </Style>
+        <Style id="22431">
+            <IconStyle id="22433">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+                <heading>0</heading>
+                <Icon id="22434">
+                    <href>https://maps.google.com/mapfiles/kml/paddle/ylw-circle.png</href>
+                </Icon>
+            </IconStyle>
+            <LabelStyle id="22432">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+            </LabelStyle>
+        </Style>
+        <Style id="22437">
+            <LineStyle id="22438">
+                <color>ffff7200</color>
+                <colorMode>normal</colorMode>
+                <width>12</width>
+            </LineStyle>
+        </Style>
+        <Style id="22443">
+            <IconStyle id="22445">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+                <heading>0</heading>
+                <Icon id="22446">
+                    <href>https://maps.google.com/mapfiles/kml/paddle/ylw-circle.png</href>
+                </Icon>
+            </IconStyle>
+            <LabelStyle id="22444">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+            </LabelStyle>
+        </Style>
+        <Style id="22449">
+            <LineStyle id="22450">
+                <color>ff000aff</color>
+                <colorMode>normal</colorMode>
+                <width>7</width>
+            </LineStyle>
+        </Style>
+        <Style id="22455">
+            <IconStyle id="22457">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+                <heading>0</heading>
+                <Icon id="22458">
+                    <href>https://maps.google.com/mapfiles/kml/paddle/ylw-circle.png</href>
+                </Icon>
+            </IconStyle>
+            <LabelStyle id="22456">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+            </LabelStyle>
+        </Style>
+        <Style id="22461">
+            <LineStyle id="22462">
+                <color>ff00ffe0</color>
+                <colorMode>normal</colorMode>
+                <width>7</width>
+            </LineStyle>
+        </Style>
+        <Style id="22467">
+            <IconStyle id="22469">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+                <heading>0</heading>
+                <Icon id="22470">
+                    <href>https://maps.google.com/mapfiles/kml/paddle/ylw-circle.png</href>
+                </Icon>
+            </IconStyle>
+            <LabelStyle id="22468">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+            </LabelStyle>
+        </Style>
+        <Style id="22473">
+            <LineStyle id="22474">
+                <color>ffbcff00</color>
+                <colorMode>normal</colorMode>
+                <width>7</width>
+            </LineStyle>
+        </Style>
+        <Style id="22479">
+            <IconStyle id="22481">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+                <heading>0</heading>
+                <Icon id="22482">
+                    <href>https://maps.google.com/mapfiles/kml/paddle/ylw-circle.png</href>
+                </Icon>
+            </IconStyle>
+            <LabelStyle id="22480">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+            </LabelStyle>
+        </Style>
+        <Style id="22485">
+            <LineStyle id="22486">
+                <color>ffff2d00</color>
+                <colorMode>normal</colorMode>
+                <width>7</width>
+            </LineStyle>
+        </Style>
+        <Style id="22491">
+            <IconStyle id="22493">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+                <heading>0</heading>
+                <Icon id="22494">
+                    <href>https://maps.google.com/mapfiles/kml/paddle/ylw-circle.png</href>
+                </Icon>
+            </IconStyle>
+            <LabelStyle id="22492">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+            </LabelStyle>
+        </Style>
+        <Style id="22497">
+            <LineStyle id="22498">
+                <color>ff4800ff</color>
+                <colorMode>normal</colorMode>
+                <width>4</width>
+            </LineStyle>
+        </Style>
+        <Style id="22503">
+            <IconStyle id="22505">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+                <heading>0</heading>
+                <Icon id="22506">
+                    <href>https://maps.google.com/mapfiles/kml/paddle/ylw-circle.png</href>
+                </Icon>
+            </IconStyle>
+            <LabelStyle id="22504">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+            </LabelStyle>
+        </Style>
+        <Style id="22509">
+            <LineStyle id="22510">
+                <color>ff0025ff</color>
+                <colorMode>normal</colorMode>
+                <width>4</width>
+            </LineStyle>
+        </Style>
+        <Style id="22515">
+            <IconStyle id="22517">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+                <heading>0</heading>
+                <Icon id="22518">
+                    <href>https://maps.google.com/mapfiles/kml/paddle/ylw-circle.png</href>
+                </Icon>
+            </IconStyle>
+            <LabelStyle id="22516">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+            </LabelStyle>
+        </Style>
+        <Style id="22521">
+            <LineStyle id="22522">
+                <color>ff00caff</color>
+                <colorMode>normal</colorMode>
+                <width>4</width>
+            </LineStyle>
+        </Style>
+        <Style id="22527">
+            <IconStyle id="22529">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+                <heading>0</heading>
+                <Icon id="22530">
+                    <href>https://maps.google.com/mapfiles/kml/paddle/ylw-circle.png</href>
+                </Icon>
+            </IconStyle>
+            <LabelStyle id="22528">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+            </LabelStyle>
+        </Style>
+        <Style id="22533">
+            <LineStyle id="22534">
+                <color>ff00ffc4</color>
+                <colorMode>normal</colorMode>
+                <width>4</width>
+            </LineStyle>
+        </Style>
+        <Style id="22539">
+            <IconStyle id="22541">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+                <heading>0</heading>
+                <Icon id="22542">
+                    <href>https://maps.google.com/mapfiles/kml/paddle/ylw-circle.png</href>
+                </Icon>
+            </IconStyle>
+            <LabelStyle id="22540">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+            </LabelStyle>
+        </Style>
+        <Style id="22545">
+            <LineStyle id="22546">
+                <color>ff69ff00</color>
+                <colorMode>normal</colorMode>
+                <width>4</width>
+            </LineStyle>
+        </Style>
+        <Style id="22551">
+            <IconStyle id="22553">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+                <heading>0</heading>
+                <Icon id="22554">
+                    <href>https://maps.google.com/mapfiles/kml/paddle/ylw-circle.png</href>
+                </Icon>
+            </IconStyle>
+            <LabelStyle id="22552">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+            </LabelStyle>
+        </Style>
+        <Style id="22557">
+            <LineStyle id="22558">
+                <color>ffd8ff00</color>
+                <colorMode>normal</colorMode>
+                <width>4</width>
+            </LineStyle>
+        </Style>
+        <Style id="22563">
+            <IconStyle id="22565">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+                <heading>0</heading>
+                <Icon id="22566">
+                    <href>https://maps.google.com/mapfiles/kml/paddle/ylw-circle.png</href>
+                </Icon>
+            </IconStyle>
+            <LabelStyle id="22564">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+            </LabelStyle>
+        </Style>
+        <Style id="22569">
+            <LineStyle id="22570">
+                <color>ffff8000</color>
+                <colorMode>normal</colorMode>
+                <width>4</width>
+            </LineStyle>
+        </Style>
+        <Style id="22575">
+            <IconStyle id="22577">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+                <heading>0</heading>
+                <Icon id="22578">
+                    <href>https://maps.google.com/mapfiles/kml/paddle/ylw-circle.png</href>
+                </Icon>
+            </IconStyle>
+            <LabelStyle id="22576">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+            </LabelStyle>
+        </Style>
+        <Style id="22581">
+            <LineStyle id="22582">
+                <color>ffff1200</color>
+                <colorMode>normal</colorMode>
+                <width>4</width>
+            </LineStyle>
+        </Style>
+        <Style id="22587">
+            <IconStyle id="22589">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+                <heading>0</heading>
+                <Icon id="22590">
+                    <href>https://maps.google.com/mapfiles/kml/paddle/ylw-circle.png</href>
+                </Icon>
+            </IconStyle>
+            <LabelStyle id="22588">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+            </LabelStyle>
+        </Style>
+        <Style id="22593">
+            <LineStyle id="22594">
+                <color>ff6900ff</color>
+                <colorMode>normal</colorMode>
+                <width>2</width>
+            </LineStyle>
+        </Style>
+        <Style id="22599">
+            <IconStyle id="22601">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+                <heading>0</heading>
+                <Icon id="22602">
+                    <href>https://maps.google.com/mapfiles/kml/paddle/ylw-circle.png</href>
+                </Icon>
+            </IconStyle>
+            <LabelStyle id="22600">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+            </LabelStyle>
+        </Style>
+        <Style id="22605">
+            <LineStyle id="22606">
+                <color>ff3d00ff</color>
+                <colorMode>normal</colorMode>
+                <width>2</width>
+            </LineStyle>
+        </Style>
+        <Style id="22610">
+            <LabelStyle id="22611">
+                <colorMode>normal</colorMode>
+                <scale>0.7</scale>
+            </LabelStyle>
+        </Style>
+        <Style id="22615">
+            <IconStyle id="22619">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+                <heading>0</heading>
+                <Icon id="22620">
+                    <href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
+                </Icon>
+            </IconStyle>
+            <LabelStyle id="22616">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+            </LabelStyle>
+        </Style>
+        <Style id="22623">
+            <LineStyle id="22624">
+                <color>ffdfff00</color>
+                <colorMode>normal</colorMode>
+                <width>20</width>
+            </LineStyle>
+        </Style>
+        <Style id="22629">
+            <IconStyle id="22631">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+                <heading>0</heading>
+                <Icon id="22632">
+                    <href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
+                </Icon>
+            </IconStyle>
+            <LabelStyle id="22630">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+            </LabelStyle>
+        </Style>
+        <Style id="22635">
+            <LineStyle id="22636">
+                <color>ff00d8ff</color>
+                <colorMode>normal</colorMode>
+                <width>12</width>
+            </LineStyle>
+        </Style>
+        <Style id="22641">
+            <IconStyle id="22643">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+                <heading>0</heading>
+                <Icon id="22644">
+                    <href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
+                </Icon>
+            </IconStyle>
+            <LabelStyle id="22642">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+            </LabelStyle>
+        </Style>
+        <Style id="22647">
+            <LineStyle id="22648">
+                <color>ffff7200</color>
+                <colorMode>normal</colorMode>
+                <width>12</width>
+            </LineStyle>
+        </Style>
+        <Style id="22653">
+            <IconStyle id="22655">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+                <heading>0</heading>
+                <Icon id="22656">
+                    <href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
+                </Icon>
+            </IconStyle>
+            <LabelStyle id="22654">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+            </LabelStyle>
+        </Style>
+        <Style id="22659">
+            <LineStyle id="22660">
+                <color>ff000aff</color>
+                <colorMode>normal</colorMode>
+                <width>7</width>
+            </LineStyle>
+        </Style>
+        <Style id="22665">
+            <IconStyle id="22667">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+                <heading>0</heading>
+                <Icon id="22668">
+                    <href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
+                </Icon>
+            </IconStyle>
+            <LabelStyle id="22666">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+            </LabelStyle>
+        </Style>
+        <Style id="22671">
+            <LineStyle id="22672">
+                <color>ff00ffe0</color>
+                <colorMode>normal</colorMode>
+                <width>7</width>
+            </LineStyle>
+        </Style>
+        <Style id="22677">
+            <IconStyle id="22679">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+                <heading>0</heading>
+                <Icon id="22680">
+                    <href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
+                </Icon>
+            </IconStyle>
+            <LabelStyle id="22678">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+            </LabelStyle>
+        </Style>
+        <Style id="22683">
+            <LineStyle id="22684">
+                <color>ffbcff00</color>
+                <colorMode>normal</colorMode>
+                <width>7</width>
+            </LineStyle>
+        </Style>
+        <Style id="22689">
+            <IconStyle id="22691">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+                <heading>0</heading>
+                <Icon id="22692">
+                    <href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
+                </Icon>
+            </IconStyle>
+            <LabelStyle id="22690">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+            </LabelStyle>
+        </Style>
+        <Style id="22695">
+            <LineStyle id="22696">
+                <color>ffff2d00</color>
+                <colorMode>normal</colorMode>
+                <width>7</width>
+            </LineStyle>
+        </Style>
+        <Style id="22701">
+            <IconStyle id="22703">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+                <heading>0</heading>
+                <Icon id="22704">
+                    <href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
+                </Icon>
+            </IconStyle>
+            <LabelStyle id="22702">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+            </LabelStyle>
+        </Style>
+        <Style id="22707">
+            <LineStyle id="22708">
+                <color>ff4800ff</color>
+                <colorMode>normal</colorMode>
+                <width>4</width>
+            </LineStyle>
+        </Style>
+        <Style id="22713">
+            <IconStyle id="22715">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+                <heading>0</heading>
+                <Icon id="22716">
+                    <href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
+                </Icon>
+            </IconStyle>
+            <LabelStyle id="22714">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+            </LabelStyle>
+        </Style>
+        <Style id="22719">
+            <LineStyle id="22720">
+                <color>ff0025ff</color>
+                <colorMode>normal</colorMode>
+                <width>4</width>
+            </LineStyle>
+        </Style>
+        <Style id="22725">
+            <IconStyle id="22727">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+                <heading>0</heading>
+                <Icon id="22728">
+                    <href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
+                </Icon>
+            </IconStyle>
+            <LabelStyle id="22726">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+            </LabelStyle>
+        </Style>
+        <Style id="22731">
+            <LineStyle id="22732">
+                <color>ff00caff</color>
+                <colorMode>normal</colorMode>
+                <width>4</width>
+            </LineStyle>
+        </Style>
+        <Style id="22737">
+            <IconStyle id="22739">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+                <heading>0</heading>
+                <Icon id="22740">
+                    <href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
+                </Icon>
+            </IconStyle>
+            <LabelStyle id="22738">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+            </LabelStyle>
+        </Style>
+        <Style id="22743">
+            <LineStyle id="22744">
+                <color>ff00ffc4</color>
+                <colorMode>normal</colorMode>
+                <width>4</width>
+            </LineStyle>
+        </Style>
+        <Style id="22749">
+            <IconStyle id="22751">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+                <heading>0</heading>
+                <Icon id="22752">
+                    <href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
+                </Icon>
+            </IconStyle>
+            <LabelStyle id="22750">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+            </LabelStyle>
+        </Style>
+        <Style id="22755">
+            <LineStyle id="22756">
+                <color>ff69ff00</color>
+                <colorMode>normal</colorMode>
+                <width>4</width>
+            </LineStyle>
+        </Style>
+        <Style id="22761">
+            <IconStyle id="22763">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+                <heading>0</heading>
+                <Icon id="22764">
+                    <href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
+                </Icon>
+            </IconStyle>
+            <LabelStyle id="22762">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+            </LabelStyle>
+        </Style>
+        <Style id="22767">
+            <LineStyle id="22768">
+                <color>ffd8ff00</color>
+                <colorMode>normal</colorMode>
+                <width>4</width>
+            </LineStyle>
+        </Style>
+        <Style id="22773">
+            <IconStyle id="22775">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+                <heading>0</heading>
+                <Icon id="22776">
+                    <href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
+                </Icon>
+            </IconStyle>
+            <LabelStyle id="22774">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+            </LabelStyle>
+        </Style>
+        <Style id="22779">
+            <LineStyle id="22780">
+                <color>ffff8000</color>
+                <colorMode>normal</colorMode>
+                <width>4</width>
+            </LineStyle>
+        </Style>
+        <Style id="22785">
+            <IconStyle id="22787">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+                <heading>0</heading>
+                <Icon id="22788">
+                    <href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
+                </Icon>
+            </IconStyle>
+            <LabelStyle id="22786">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+            </LabelStyle>
+        </Style>
+        <Style id="22791">
+            <LineStyle id="22792">
+                <color>ff3d00ff</color>
+                <colorMode>normal</colorMode>
+                <width>2</width>
+            </LineStyle>
+        </Style>
+        <Style id="22796">
+            <LabelStyle id="22797">
+                <colorMode>normal</colorMode>
+                <scale>0.7</scale>
+            </LabelStyle>
+        </Style>
+        <Document id="22397">
+            <name>About Geomap KML</name>
+            <description>Family tree generated for using washington.ged&lt;br&gt;None (@I1@) as starting person&lt;br&gt;Marker types are Birth Death&lt;br&gt;Timeline enabled. Balloon Flyto enabled.</description>
+        </Document>
+        <Placemark id="22404">
+            <name>George WASHINGTON(b)</name>
+            <description><![CDATA[ <br>1732 - 1799</br><br>Father: <a href=#22627;balloonFlyto>Augustine WASHINGTON</a></br><br>Mother: <a href=#22639;balloonFlyto>Mary BALL</a></br> ]]></description>
+            <TimeStamp id="22405">
+                <when>1732</when>
+            </TimeStamp>
+            <styleUrl>#22406</styleUrl>
+            <Point id="22403">
+                <coordinates>-76.9161654,38.1859162,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="22412">
+            <name>George WASHINGTON</name>
+            <description><![CDATA[ <br>Lifespan: 1732 to 1799, related as         </br><br>Father: <a href=#22627;balloonFlyto>Augustine WASHINGTON</a></br><br>Mother: <a href=#22639;balloonFlyto>Mary BALL</a></br> ]]></description>
+            <TimeSpan id="22415">
+                <begin>1732</begin>
+                <end>1799</end>
+            </TimeSpan>
+            <styleUrl>#22413</styleUrl>
+            <LineString id="22411">
+                <extrude>1</extrude>
+                <tessellate>1</tessellate>
+                <altitudeMode>clampToGround</altitudeMode>
+                <coordinates>-76.9161654,38.1859162,0.0 -76.9161654,38.1859162,0.0</coordinates>
+            </LineString>
+        </Placemark>
+        <Placemark id="22417">
+            <name>Augustine WASHINGTON(b)</name>
+            <description><![CDATA[ <br>1693 - 1743</br><br>Father: <a href=#22651;balloonFlyto>Lawrence WASHINGTON</a></br><br>Mother: <a href=#22663;balloonFlyto>Mildred WARNER</a></br><br>Children: <a href=#22613;balloonFlyto>George WASHINGTON</a>, Betty WASHINGTON, Samuel WASHINGTON, John Augustine WASHINGTON, Charles WASHINGTON, Mildred WASHINGTON</br> ]]></description>
+            <TimeStamp id="22418">
+                <when>1693</when>
+            </TimeStamp>
+            <styleUrl>#22419</styleUrl>
+            <Point id="22416">
+                <coordinates>-76.9161654,38.1859162,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="22424">
+            <name>Augustine WASHINGTON</name>
+            <description><![CDATA[ <br>Lifespan: 1693 to 1743, related as F       </br><br>Father: <a href=#22651;balloonFlyto>Lawrence WASHINGTON</a></br><br>Mother: <a href=#22663;balloonFlyto>Mildred WARNER</a></br><br>Children: <a href=#22613;balloonFlyto>George WASHINGTON</a>, Betty WASHINGTON, Samuel WASHINGTON, John Augustine WASHINGTON, Charles WASHINGTON, Mildred WASHINGTON</br> ]]></description>
+            <TimeSpan id="22427">
+                <begin>1693</begin>
+                <end>1743</end>
+            </TimeSpan>
+            <styleUrl>#22425</styleUrl>
+            <LineString id="22423">
+                <extrude>1</extrude>
+                <tessellate>1</tessellate>
+                <altitudeMode>clampToGround</altitudeMode>
+                <coordinates>-76.9161654,38.1859162,0.0 -76.7567355,38.1153203,0.0</coordinates>
+            </LineString>
+        </Placemark>
+        <Placemark id="22429">
+            <name>Mary BALL(b)</name>
+            <description><![CDATA[ <br>1708 - 1789</br><br>Father: <a href=#22675;balloonFlyto>Joseph BALL</a></br><br>Mother: <a href=#22687;balloonFlyto>Mary MONTAGUE</a></br><br>Children: <a href=#22613;balloonFlyto>George WASHINGTON</a>, Betty WASHINGTON, Samuel WASHINGTON, John Augustine WASHINGTON, Charles WASHINGTON, Mildred WASHINGTON</br> ]]></description>
+            <TimeStamp id="22430">
+                <when>1708</when>
+            </TimeStamp>
+            <styleUrl>#22431</styleUrl>
+            <Point id="22428">
+                <coordinates>-76.9161654,38.1859162,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="22436">
+            <name>Mary BALL</name>
+            <description><![CDATA[ <br>Lifespan: 1708 to 1789, related as M       </br><br>Father: <a href=#22675;balloonFlyto>Joseph BALL</a></br><br>Mother: <a href=#22687;balloonFlyto>Mary MONTAGUE</a></br><br>Children: <a href=#22613;balloonFlyto>George WASHINGTON</a>, Betty WASHINGTON, Samuel WASHINGTON, John Augustine WASHINGTON, Charles WASHINGTON, Mildred WASHINGTON</br> ]]></description>
+            <TimeSpan id="22439">
+                <begin>1708</begin>
+                <end>1789</end>
+            </TimeSpan>
+            <styleUrl>#22437</styleUrl>
+            <LineString id="22435">
+                <extrude>1</extrude>
+                <tessellate>1</tessellate>
+                <altitudeMode>clampToGround</altitudeMode>
+                <coordinates>-76.9161654,38.1859162,0.0 -76.5258553,37.7913044,0.0</coordinates>
+            </LineString>
+        </Placemark>
+        <Placemark id="22441">
+            <name>Lawrence WASHINGTON(b)</name>
+            <description><![CDATA[ <br>1659 - 1699</br><br>Father: <a href=#22699;balloonFlyto>John WASHINGTON</a></br><br>Mother: <a href=#22711;balloonFlyto>Anne POPE</a></br><br>Children: John WASHINGTON, <a href=#22627;balloonFlyto>Augustine WASHINGTON</a>, Mildred WASHINGTON</br> ]]></description>
+            <TimeStamp id="22442">
+                <when>1659</when>
+            </TimeStamp>
+            <styleUrl>#22443</styleUrl>
+            <Point id="22440">
+                <coordinates>-76.7567355,38.1153203,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="22448">
+            <name>Lawrence WASHINGTON</name>
+            <description><![CDATA[ <br>Lifespan: 1659 to 1699, related as FF      </br><br>Father: <a href=#22699;balloonFlyto>John WASHINGTON</a></br><br>Mother: <a href=#22711;balloonFlyto>Anne POPE</a></br><br>Children: John WASHINGTON, <a href=#22627;balloonFlyto>Augustine WASHINGTON</a>, Mildred WASHINGTON</br> ]]></description>
+            <TimeSpan id="22451">
+                <begin>1659</begin>
+                <end>1699</end>
+            </TimeSpan>
+            <styleUrl>#22449</styleUrl>
+            <LineString id="22447">
+                <extrude>1</extrude>
+                <tessellate>1</tessellate>
+                <altitudeMode>clampToGround</altitudeMode>
+                <coordinates>-76.7567355,38.1153203,0.0 -76.9275638,38.1911773,0.0</coordinates>
+            </LineString>
+        </Placemark>
+        <Placemark id="22453">
+            <name>Mildred WARNER(b)</name>
+            <description><![CDATA[ <br>1671 - 1700</br><br>Father: <a href=#22723;balloonFlyto>Augustine WARNER</a></br><br>Mother: <a href=#22735;balloonFlyto>Mildred READE</a></br><br>Children: John WASHINGTON, <a href=#22627;balloonFlyto>Augustine WASHINGTON</a>, Mildred WASHINGTON</br> ]]></description>
+            <TimeStamp id="22454">
+                <when>1671</when>
+            </TimeStamp>
+            <styleUrl>#22455</styleUrl>
+            <Point id="22452">
+                <coordinates>-76.7567355,38.1153203,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="22460">
+            <name>Mildred WARNER</name>
+            <description><![CDATA[ <br>Lifespan: 1671 to 1700, related as FM      </br><br>Father: <a href=#22723;balloonFlyto>Augustine WARNER</a></br><br>Mother: <a href=#22735;balloonFlyto>Mildred READE</a></br><br>Children: John WASHINGTON, <a href=#22627;balloonFlyto>Augustine WASHINGTON</a>, Mildred WASHINGTON</br> ]]></description>
+            <TimeSpan id="22463">
+                <begin>1671</begin>
+                <end>1700</end>
+            </TimeSpan>
+            <styleUrl>#22461</styleUrl>
+            <LineString id="22459">
+                <extrude>1</extrude>
+                <tessellate>1</tessellate>
+                <altitudeMode>clampToGround</altitudeMode>
+                <coordinates>-76.7567355,38.1153203,0.0 -77.6741751,38.1880936,0.0</coordinates>
+            </LineString>
+        </Placemark>
+        <Placemark id="22465">
+            <name>Joseph BALL(b)</name>
+            <description><![CDATA[ <br>1649 - 1711</br><br>Father: <a href=#22747;balloonFlyto>William BALL</a></br><br>Mother: <a href=#22759;balloonFlyto>Hannah ATHEROLD</a></br><br>Children: John BALL, Martha BALL, <a href=#22639;balloonFlyto>Mary BALL</a>, Frances BALL, Sara BALL, Eve BALL, Jesse BALL, James BALL, Edwin BALL, Jeduthun BALL, Sinah BALL</br> ]]></description>
+            <TimeStamp id="22466">
+                <when>1649</when>
+            </TimeStamp>
+            <styleUrl>#22467</styleUrl>
+            <Point id="22464">
+                <coordinates>-76.5258553,37.7913044,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="22472">
+            <name>Joseph BALL</name>
+            <description><![CDATA[ <br>Lifespan: 1649 to 1711, related as MF      </br><br>Father: <a href=#22747;balloonFlyto>William BALL</a></br><br>Mother: <a href=#22759;balloonFlyto>Hannah ATHEROLD</a></br><br>Children: John BALL, Martha BALL, <a href=#22639;balloonFlyto>Mary BALL</a>, Frances BALL, Sara BALL, Eve BALL, Jesse BALL, James BALL, Edwin BALL, Jeduthun BALL, Sinah BALL</br> ]]></description>
+            <TimeSpan id="22475">
+                <begin>1649</begin>
+                <end>1711</end>
+            </TimeSpan>
+            <styleUrl>#22473</styleUrl>
+            <LineString id="22471">
+                <extrude>1</extrude>
+                <tessellate>1</tessellate>
+                <altitudeMode>clampToGround</altitudeMode>
+                <coordinates>-76.5258553,37.7913044,0.0 -76.4723233,37.7625738,0.0</coordinates>
+            </LineString>
+        </Placemark>
+        <Placemark id="22477">
+            <name>Mary MONTAGUE(b)</name>
+            <description><![CDATA[ <br>1665 - 1743</br><br>Father: <a href=#22771;balloonFlyto>Peter MONTAGUE</a></br><br>Mother: <a href=#22573;balloonFlyto>Mary DOODES</a></br><br>Children: John BALL, Martha BALL, <a href=#22639;balloonFlyto>Mary BALL</a>, Frances BALL, Sara BALL, Eve BALL, Jesse BALL, James BALL, Edwin BALL, Jeduthun BALL, Sinah BALL</br> ]]></description>
+            <TimeStamp id="22478">
+                <when>1665</when>
+            </TimeStamp>
+            <styleUrl>#22479</styleUrl>
+            <Point id="22476">
+                <coordinates>-76.5258553,37.7913044,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="22484">
+            <name>Mary MONTAGUE</name>
+            <description><![CDATA[ <br>Lifespan: 1665 to 1743, related as MM      </br><br>Father: <a href=#22771;balloonFlyto>Peter MONTAGUE</a></br><br>Mother: <a href=#22573;balloonFlyto>Mary DOODES</a></br><br>Children: John BALL, Martha BALL, <a href=#22639;balloonFlyto>Mary BALL</a>, Frances BALL, Sara BALL, Eve BALL, Jesse BALL, James BALL, Edwin BALL, Jeduthun BALL, Sinah BALL</br> ]]></description>
+            <TimeSpan id="22487">
+                <begin>1665</begin>
+                <end>1743</end>
+            </TimeSpan>
+            <styleUrl>#22485</styleUrl>
+            <LineString id="22483">
+                <extrude>1</extrude>
+                <tessellate>1</tessellate>
+                <altitudeMode>clampToGround</altitudeMode>
+                <coordinates>-76.5258553,37.7913044,0.0 -77.175356,38.2786312,0.0</coordinates>
+            </LineString>
+        </Placemark>
+        <Placemark id="22489">
+            <name>John WASHINGTON(b)</name>
+            <description><![CDATA[ <br>1630 - 1677</br><br>Father: <a href=#22585;balloonFlyto>Lawrence WASHINGTON</a></br><br>Mother: <a href=#22783;balloonFlyto>Amphyllis TWIGDEN</a></br><br>Children: <a href=#22651;balloonFlyto>Lawrence WASHINGTON</a>, Ann WASHINGTON, Richard WASHINGTON, John WASHINGTON</br> ]]></description>
+            <TimeStamp id="22490">
+                <when>1630</when>
+            </TimeStamp>
+            <styleUrl>#22491</styleUrl>
+            <Point id="22488">
+                <coordinates>-76.9275638,38.1911773,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="22496">
+            <name>John WASHINGTON</name>
+            <description><![CDATA[ <br>Lifespan: 1630 to 1677, related as FFF     </br><br>Father: <a href=#22585;balloonFlyto>Lawrence WASHINGTON</a></br><br>Mother: <a href=#22783;balloonFlyto>Amphyllis TWIGDEN</a></br><br>Children: <a href=#22651;balloonFlyto>Lawrence WASHINGTON</a>, Ann WASHINGTON, Richard WASHINGTON, John WASHINGTON</br> ]]></description>
+            <TimeSpan id="22499">
+                <begin>1630</begin>
+                <end>1677</end>
+            </TimeSpan>
+            <styleUrl>#22497</styleUrl>
+            <LineString id="22495">
+                <extrude>1</extrude>
+                <tessellate>1</tessellate>
+                <altitudeMode>clampToGround</altitudeMode>
+                <coordinates>-76.9275638,38.1911773,0.0 -1.1833205,52.1057594,0.0</coordinates>
+            </LineString>
+        </Placemark>
+        <Placemark id="22501">
+            <name>Anne POPE(b)</name>
+            <description><![CDATA[ <br>1635 - 1668</br><br>Father: Nathaniel POPE</br><br>Mother: Lucy</br><br>Children: <a href=#22651;balloonFlyto>Lawrence WASHINGTON</a>, Ann WASHINGTON, Richard WASHINGTON, John WASHINGTON</br> ]]></description>
+            <TimeStamp id="22502">
+                <when>1635</when>
+            </TimeStamp>
+            <styleUrl>#22503</styleUrl>
+            <Point id="22500">
+                <coordinates>-76.9275638,38.1911773,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="22508">
+            <name>Anne POPE</name>
+            <description><![CDATA[ <br>Lifespan: 1635 to 1668, related as FFM     </br><br>Father: Nathaniel POPE</br><br>Mother: Lucy</br><br>Children: <a href=#22651;balloonFlyto>Lawrence WASHINGTON</a>, Ann WASHINGTON, Richard WASHINGTON, John WASHINGTON</br> ]]></description>
+            <TimeSpan id="22511">
+                <begin>1635</begin>
+                <end>1668</end>
+            </TimeSpan>
+            <styleUrl>#22509</styleUrl>
+            <LineString id="22507">
+                <extrude>1</extrude>
+                <tessellate>1</tessellate>
+                <altitudeMode>clampToGround</altitudeMode>
+                <coordinates>-76.9275638,38.1911773,0.0 -91.46261,29.7124309,0.0</coordinates>
+            </LineString>
+        </Placemark>
+        <Placemark id="22513">
+            <name>Augustine WARNER(b)</name>
+            <description><![CDATA[ <br>1642 - 1681</br><br>Father: Augustine WARNER</br><br>Mother: Mary TOWNELEY</br><br>Children: Mary WARNER, Mary WARNER, Augustine WARNER, <a href=#22663;balloonFlyto>Mildred WARNER</a>, Elizabeth WARNER, Mildred WARNER, George WARNER</br> ]]></description>
+            <TimeStamp id="22514">
+                <when>1642</when>
+            </TimeStamp>
+            <styleUrl>#22515</styleUrl>
+            <Point id="22512">
+                <coordinates>-77.6741751,38.1880936,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="22520">
+            <name>Augustine WARNER</name>
+            <description><![CDATA[ <br>Lifespan: 1642 to 1681, related as FMF     </br><br>Father: Augustine WARNER</br><br>Mother: Mary TOWNELEY</br><br>Children: Mary WARNER, Mary WARNER, Augustine WARNER, <a href=#22663;balloonFlyto>Mildred WARNER</a>, Elizabeth WARNER, Mildred WARNER, George WARNER</br> ]]></description>
+            <TimeSpan id="22523">
+                <begin>1642</begin>
+                <end>1681</end>
+            </TimeSpan>
+            <styleUrl>#22521</styleUrl>
+            <LineString id="22519">
+                <extrude>1</extrude>
+                <tessellate>1</tessellate>
+                <altitudeMode>clampToGround</altitudeMode>
+                <coordinates>-77.6741751,38.1880936,0.0 -77.5320322,38.2971472,0.0</coordinates>
+            </LineString>
+        </Placemark>
+        <Placemark id="22525">
+            <name>Mildred READE(b)</name>
+            <description><![CDATA[ <br>1643 - 1686</br><br>Father: George READE</br><br>Mother: Elizabeth MARTIAU (MARTAIN)</br><br>Children: Mary WARNER, Mary WARNER, Augustine WARNER, <a href=#22663;balloonFlyto>Mildred WARNER</a>, Elizabeth WARNER, Mildred WARNER, George WARNER</br> ]]></description>
+            <TimeStamp id="22526">
+                <when>1643</when>
+            </TimeStamp>
+            <styleUrl>#22527</styleUrl>
+            <Point id="22524">
+                <coordinates>-77.6741751,38.1880936,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="22532">
+            <name>Mildred READE</name>
+            <description><![CDATA[ <br>Lifespan: 1643 to 1686, related as FMM     </br><br>Father: George READE</br><br>Mother: Elizabeth MARTIAU (MARTAIN)</br><br>Children: Mary WARNER, Mary WARNER, Augustine WARNER, <a href=#22663;balloonFlyto>Mildred WARNER</a>, Elizabeth WARNER, Mildred WARNER, George WARNER</br> ]]></description>
+            <TimeSpan id="22535">
+                <begin>1643</begin>
+                <end>1686</end>
+            </TimeSpan>
+            <styleUrl>#22533</styleUrl>
+            <LineString id="22531">
+                <extrude>1</extrude>
+                <tessellate>1</tessellate>
+                <altitudeMode>clampToGround</altitudeMode>
+                <coordinates>-77.6741751,38.1880936,0.0 12.4528527,41.903411,0.0</coordinates>
+            </LineString>
+        </Placemark>
+        <Placemark id="22537">
+            <name>William BALL(b)</name>
+            <description><![CDATA[ <br>1614 - 1680</br><br>Father: William BALL</br><br>Mother: Alice WALTHAM</br><br>Children: Richard BALL, Richard BALL, William BALL, Richard BALL, William BALL, <a href=#22675;balloonFlyto>Joseph BALL</a>, Hannah BALL, Joseph BALL, Hannah BALL</br> ]]></description>
+            <TimeStamp id="22538">
+                <when>1614</when>
+            </TimeStamp>
+            <styleUrl>#22539</styleUrl>
+            <Point id="22536">
+                <coordinates>-76.4723233,37.7625738,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="22544">
+            <name>William BALL</name>
+            <description><![CDATA[ <br>Lifespan: 1614 to 1680, related as MFF     </br><br>Father: William BALL</br><br>Mother: Alice WALTHAM</br><br>Children: Richard BALL, Richard BALL, William BALL, Richard BALL, William BALL, <a href=#22675;balloonFlyto>Joseph BALL</a>, Hannah BALL, Joseph BALL, Hannah BALL</br> ]]></description>
+            <TimeSpan id="22547">
+                <begin>1614</begin>
+                <end>1680</end>
+            </TimeSpan>
+            <styleUrl>#22545</styleUrl>
+            <LineString id="22543">
+                <extrude>1</extrude>
+                <tessellate>1</tessellate>
+                <altitudeMode>clampToGround</altitudeMode>
+                <coordinates>-76.4723233,37.7625738,0.0 -1.9032487,51.324162,0.0</coordinates>
+            </LineString>
+        </Placemark>
+        <Placemark id="22549">
+            <name>Hannah ATHEROLD(b)</name>
+            <description><![CDATA[ <br>1619 - 1695</br><br>Father: Thomas ATHEROLD</br><br>Mother: Mary HARVEY</br><br>Children: Richard BALL, Richard BALL, William BALL, Richard BALL, William BALL, <a href=#22675;balloonFlyto>Joseph BALL</a>, Hannah BALL, Joseph BALL, Hannah BALL</br> ]]></description>
+            <TimeStamp id="22550">
+                <when>1619</when>
+            </TimeStamp>
+            <styleUrl>#22551</styleUrl>
+            <Point id="22548">
+                <coordinates>-76.4723233,37.7625738,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="22556">
+            <name>Hannah ATHEROLD</name>
+            <description><![CDATA[ <br>Lifespan: 1619 to 1695, related as MFM     </br><br>Father: Thomas ATHEROLD</br><br>Mother: Mary HARVEY</br><br>Children: Richard BALL, Richard BALL, William BALL, Richard BALL, William BALL, <a href=#22675;balloonFlyto>Joseph BALL</a>, Hannah BALL, Joseph BALL, Hannah BALL</br> ]]></description>
+            <TimeSpan id="22559">
+                <begin>1619</begin>
+                <end>1695</end>
+            </TimeSpan>
+            <styleUrl>#22557</styleUrl>
+            <LineString id="22555">
+                <extrude>1</extrude>
+                <tessellate>1</tessellate>
+                <altitudeMode>clampToGround</altitudeMode>
+                <coordinates>-76.4723233,37.7625738,0.0 -0.0919983,51.5156177,0.0</coordinates>
+            </LineString>
+        </Placemark>
+        <Placemark id="22561">
+            <name>Peter MONTAGUE(b)</name>
+            <description><![CDATA[ <br>1634 - 1702</br><br>Father: Peter MONTAGUE</br><br>Mother: Cicely MATTHEW</br><br>Children: Mary MONTEQUE, <a href=#22687;balloonFlyto>Mary MONTAGUE</a>, Peter MONTAGUE, William MONTAGUE, Katherine MONTAGUE, John MONTAGUE</br> ]]></description>
+            <TimeStamp id="22562">
+                <when>1634</when>
+            </TimeStamp>
+            <styleUrl>#22563</styleUrl>
+            <Point id="22560">
+                <coordinates>-77.175356,38.2786312,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="22568">
+            <name>Peter MONTAGUE</name>
+            <description><![CDATA[ <br>Lifespan: 1634 to 1702, related as MMF     </br><br>Father: Peter MONTAGUE</br><br>Mother: Cicely MATTHEW</br><br>Children: Mary MONTEQUE, <a href=#22687;balloonFlyto>Mary MONTAGUE</a>, Peter MONTAGUE, William MONTAGUE, Katherine MONTAGUE, John MONTAGUE</br> ]]></description>
+            <TimeSpan id="22571">
+                <begin>1634</begin>
+                <end>1702</end>
+            </TimeSpan>
+            <styleUrl>#22569</styleUrl>
+            <LineString id="22567">
+                <extrude>1</extrude>
+                <tessellate>1</tessellate>
+                <altitudeMode>clampToGround</altitudeMode>
+                <coordinates>-77.175356,38.2786312,0.0 -76.5307823,36.7670938,0.0</coordinates>
+            </LineString>
+        </Placemark>
+        <Placemark id="22573">
+            <name>Mary DOODES(b)</name>
+            <description><![CDATA[ <br>Born: 1642</br><br>Father: Maindort DOODES</br><br>Mother: Mary GERET</br><br>Children: Mary MONTEQUE, <a href=#22687;balloonFlyto>Mary MONTAGUE</a>, Peter MONTAGUE, William MONTAGUE, Katherine MONTAGUE, John MONTAGUE</br> ]]></description>
+            <TimeStamp id="22574">
+                <when>1642</when>
+            </TimeStamp>
+            <styleUrl>#22575</styleUrl>
+            <Point id="22572">
+                <coordinates>-77.175356,38.2786312,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="22580">
+            <name>Mary DOODES</name>
+            <description><![CDATA[ <br>Lifespan: 1642 to Unknown, related as MMM     </br><br>Father: Maindort DOODES</br><br>Mother: Mary GERET</br><br>Children: Mary MONTEQUE, <a href=#22687;balloonFlyto>Mary MONTAGUE</a>, Peter MONTAGUE, William MONTAGUE, Katherine MONTAGUE, John MONTAGUE</br> ]]></description>
+            <TimeStamp id="22583">
+                <when>1642</when>
+            </TimeStamp>
+            <styleUrl>#22581</styleUrl>
+            <LineString id="22579">
+                <extrude>1</extrude>
+                <tessellate>1</tessellate>
+                <altitudeMode>clampToGround</altitudeMode>
+                <coordinates>-77.175356,38.2786312,0.0 5.6343227,52.2434979,0.0</coordinates>
+            </LineString>
+        </Placemark>
+        <Placemark id="22585">
+            <name>Lawrence WASHINGTON(b)</name>
+            <description><![CDATA[ <br>1602 - 1652</br><br>Father: Lawrence WASHINGTON</br><br>Mother: Margaret BUTLER</br><br>Children: Elizabeth WASHINGTON, William WASHINGTON, Martha WASHINGTON, Margaret WASHINGTON, <a href=#22699;balloonFlyto>John WASHINGTON</a>, Lawrence WASHINGTON</br> ]]></description>
+            <TimeStamp id="22586">
+                <when>1602</when>
+            </TimeStamp>
+            <styleUrl>#22587</styleUrl>
+            <Point id="22584">
+                <coordinates>-1.1833205,52.1057594,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="22592">
+            <name>Lawrence WASHINGTON</name>
+            <description><![CDATA[ <br>Lifespan: 1602 to 1652, related as FFFF    </br><br>Father: Lawrence WASHINGTON</br><br>Mother: Margaret BUTLER</br><br>Children: Elizabeth WASHINGTON, William WASHINGTON, Martha WASHINGTON, Margaret WASHINGTON, <a href=#22699;balloonFlyto>John WASHINGTON</a>, Lawrence WASHINGTON</br> ]]></description>
+            <TimeSpan id="22595">
+                <begin>1602</begin>
+                <end>1652</end>
+            </TimeSpan>
+            <styleUrl>#22593</styleUrl>
+            <LineString id="22591">
+                <extrude>1</extrude>
+                <tessellate>1</tessellate>
+                <altitudeMode>clampToGround</altitudeMode>
+                <coordinates>-1.1833205,52.1057594,0.0 -1.1915121,52.1061958,0.0</coordinates>
+            </LineString>
+        </Placemark>
+        <Placemark id="22597">
+            <name>Amphyllis TWIGDEN(b)</name>
+            <description><![CDATA[ <br>1605 - 1655</br><br>Father: John TWIGDEN</br><br>Mother: Anne DICKENS</br><br>Children: Elizabeth WASHINGTON, William WASHINGTON, Martha WASHINGTON, Margaret WASHINGTON, <a href=#22699;balloonFlyto>John WASHINGTON</a>, Lawrence WASHINGTON</br> ]]></description>
+            <TimeStamp id="22598">
+                <when>1605</when>
+            </TimeStamp>
+            <styleUrl>#22599</styleUrl>
+            <Point id="22596">
+                <coordinates>-1.1833205,52.1057594,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="22604">
+            <name>Amphyllis TWIGDEN</name>
+            <description><![CDATA[ <br>Lifespan: 1605 to 1655, related as FFFM    </br><br>Father: John TWIGDEN</br><br>Mother: Anne DICKENS</br><br>Children: Elizabeth WASHINGTON, William WASHINGTON, Martha WASHINGTON, Margaret WASHINGTON, <a href=#22699;balloonFlyto>John WASHINGTON</a>, Lawrence WASHINGTON</br> ]]></description>
+            <TimeSpan id="22607">
+                <begin>1605</begin>
+                <end>1655</end>
+            </TimeSpan>
+            <styleUrl>#22605</styleUrl>
+            <LineString id="22603">
+                <extrude>1</extrude>
+                <tessellate>1</tessellate>
+                <altitudeMode>clampToGround</altitudeMode>
+                <coordinates>-1.1833205,52.1057594,0.0 -0.9028043,52.2343297,0.0</coordinates>
+            </LineString>
+        </Placemark>
+        <Placemark id="22609">
+            <name>Amphyllis TWIGDEN (CHR)</name>
+            <description><![CDATA[ <br>CHR: <geo_gedcom.gedcom_date.GedcomDate object at 0x00000259EA6B3600></br> ]]></description>
+            <styleUrl>#22610</styleUrl>
+            <Point id="22608">
+                <coordinates>-0.9477577,52.3228736,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="22613">
+            <name>George WASHINGTON(d)</name>
+            <description><![CDATA[ <br>1732 - 1799</br><br>Father: <a href=#22627;balloonFlyto>Augustine WASHINGTON</a></br><br>Mother: <a href=#22639;balloonFlyto>Mary BALL</a></br> ]]></description>
+            <TimeStamp id="22614">
+                <when>1799</when>
+            </TimeStamp>
+            <styleUrl>#22615</styleUrl>
+            <Point id="22612">
+                <coordinates>-77.0888199,38.710179,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="22622">
+            <name>George WASHINGTON</name>
+            <description><![CDATA[ <br>Lifespan: 1732 to 1799, related as         </br><br>Father: <a href=#22627;balloonFlyto>Augustine WASHINGTON</a></br><br>Mother: <a href=#22639;balloonFlyto>Mary BALL</a></br> ]]></description>
+            <TimeSpan id="22625">
+                <begin>1732</begin>
+                <end>1799</end>
+            </TimeSpan>
+            <styleUrl>#22623</styleUrl>
+            <LineString id="22621">
+                <extrude>1</extrude>
+                <tessellate>1</tessellate>
+                <altitudeMode>clampToGround</altitudeMode>
+                <coordinates>-77.0888199,38.710179,0.0 -77.0888199,38.710179,0.0</coordinates>
+            </LineString>
+        </Placemark>
+        <Placemark id="22627">
+            <name>Augustine WASHINGTON(d)</name>
+            <description><![CDATA[ <br>1693 - 1743</br><br>Father: <a href=#22651;balloonFlyto>Lawrence WASHINGTON</a></br><br>Mother: <a href=#22663;balloonFlyto>Mildred WARNER</a></br><br>Children: <a href=#22613;balloonFlyto>George WASHINGTON</a>, Betty WASHINGTON, Samuel WASHINGTON, John Augustine WASHINGTON, Charles WASHINGTON, Mildred WASHINGTON</br> ]]></description>
+            <TimeStamp id="22628">
+                <when>1743</when>
+            </TimeStamp>
+            <styleUrl>#22629</styleUrl>
+            <Point id="22626">
+                <coordinates>-77.175356,38.2786312,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="22634">
+            <name>Augustine WASHINGTON</name>
+            <description><![CDATA[ <br>Lifespan: 1693 to 1743, related as F       </br><br>Father: <a href=#22651;balloonFlyto>Lawrence WASHINGTON</a></br><br>Mother: <a href=#22663;balloonFlyto>Mildred WARNER</a></br><br>Children: <a href=#22613;balloonFlyto>George WASHINGTON</a>, Betty WASHINGTON, Samuel WASHINGTON, John Augustine WASHINGTON, Charles WASHINGTON, Mildred WASHINGTON</br> ]]></description>
+            <TimeSpan id="22637">
+                <begin>1693</begin>
+                <end>1743</end>
+            </TimeSpan>
+            <styleUrl>#22635</styleUrl>
+            <LineString id="22633">
+                <extrude>1</extrude>
+                <tessellate>1</tessellate>
+                <altitudeMode>clampToGround</altitudeMode>
+                <coordinates>-77.0888199,38.710179,0.0 -77.175356,38.2786312,0.0</coordinates>
+            </LineString>
+        </Placemark>
+        <Placemark id="22639">
+            <name>Mary BALL(d)</name>
+            <description><![CDATA[ <br>1708 - 1789</br><br>Father: <a href=#22675;balloonFlyto>Joseph BALL</a></br><br>Mother: <a href=#22687;balloonFlyto>Mary MONTAGUE</a></br><br>Children: <a href=#22613;balloonFlyto>George WASHINGTON</a>, Betty WASHINGTON, Samuel WASHINGTON, John Augustine WASHINGTON, Charles WASHINGTON, Mildred WASHINGTON</br> ]]></description>
+            <TimeStamp id="22640">
+                <when>1789</when>
+            </TimeStamp>
+            <styleUrl>#22641</styleUrl>
+            <Point id="22638">
+                <coordinates>-77.0888199,38.710179,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="22646">
+            <name>Mary BALL</name>
+            <description><![CDATA[ <br>Lifespan: 1708 to 1789, related as M       </br><br>Father: <a href=#22675;balloonFlyto>Joseph BALL</a></br><br>Mother: <a href=#22687;balloonFlyto>Mary MONTAGUE</a></br><br>Children: <a href=#22613;balloonFlyto>George WASHINGTON</a>, Betty WASHINGTON, Samuel WASHINGTON, John Augustine WASHINGTON, Charles WASHINGTON, Mildred WASHINGTON</br> ]]></description>
+            <TimeSpan id="22649">
+                <begin>1708</begin>
+                <end>1789</end>
+            </TimeSpan>
+            <styleUrl>#22647</styleUrl>
+            <LineString id="22645">
+                <extrude>1</extrude>
+                <tessellate>1</tessellate>
+                <altitudeMode>clampToGround</altitudeMode>
+                <coordinates>-77.0888199,38.710179,0.0 -77.0888199,38.710179,0.0</coordinates>
+            </LineString>
+        </Placemark>
+        <Placemark id="22651">
+            <name>Lawrence WASHINGTON(d)</name>
+            <description><![CDATA[ <br>1659 - 1699</br><br>Father: <a href=#22699;balloonFlyto>John WASHINGTON</a></br><br>Mother: <a href=#22711;balloonFlyto>Anne POPE</a></br><br>Children: John WASHINGTON, <a href=#22627;balloonFlyto>Augustine WASHINGTON</a>, Mildred WASHINGTON</br> ]]></description>
+            <TimeStamp id="22652">
+                <when>1699</when>
+            </TimeStamp>
+            <styleUrl>#22653</styleUrl>
+            <Point id="22650">
+                <coordinates>-77.4898499,38.2175382,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="22658">
+            <name>Lawrence WASHINGTON</name>
+            <description><![CDATA[ <br>Lifespan: 1659 to 1699, related as FF      </br><br>Father: <a href=#22699;balloonFlyto>John WASHINGTON</a></br><br>Mother: <a href=#22711;balloonFlyto>Anne POPE</a></br><br>Children: John WASHINGTON, <a href=#22627;balloonFlyto>Augustine WASHINGTON</a>, Mildred WASHINGTON</br> ]]></description>
+            <TimeSpan id="22661">
+                <begin>1659</begin>
+                <end>1699</end>
+            </TimeSpan>
+            <styleUrl>#22659</styleUrl>
+            <LineString id="22657">
+                <extrude>1</extrude>
+                <tessellate>1</tessellate>
+                <altitudeMode>clampToGround</altitudeMode>
+                <coordinates>-77.175356,38.2786312,0.0 -77.4898499,38.2175382,0.0</coordinates>
+            </LineString>
+        </Placemark>
+        <Placemark id="22663">
+            <name>Mildred WARNER(d)</name>
+            <description><![CDATA[ <br>1671 - 1700</br><br>Father: <a href=#22723;balloonFlyto>Augustine WARNER</a></br><br>Mother: <a href=#22735;balloonFlyto>Mildred READE</a></br><br>Children: John WASHINGTON, <a href=#22627;balloonFlyto>Augustine WASHINGTON</a>, Mildred WASHINGTON</br> ]]></description>
+            <TimeStamp id="22664">
+                <when>1700</when>
+            </TimeStamp>
+            <styleUrl>#22665</styleUrl>
+            <Point id="22662">
+                <coordinates>-3.5885335,54.5474199,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="22670">
+            <name>Mildred WARNER</name>
+            <description><![CDATA[ <br>Lifespan: 1671 to 1700, related as FM      </br><br>Father: <a href=#22723;balloonFlyto>Augustine WARNER</a></br><br>Mother: <a href=#22735;balloonFlyto>Mildred READE</a></br><br>Children: John WASHINGTON, <a href=#22627;balloonFlyto>Augustine WASHINGTON</a>, Mildred WASHINGTON</br> ]]></description>
+            <TimeSpan id="22673">
+                <begin>1671</begin>
+                <end>1700</end>
+            </TimeSpan>
+            <styleUrl>#22671</styleUrl>
+            <LineString id="22669">
+                <extrude>1</extrude>
+                <tessellate>1</tessellate>
+                <altitudeMode>clampToGround</altitudeMode>
+                <coordinates>-77.175356,38.2786312,0.0 -3.5885335,54.5474199,0.0</coordinates>
+            </LineString>
+        </Placemark>
+        <Placemark id="22675">
+            <name>Joseph BALL(d)</name>
+            <description><![CDATA[ <br>1649 - 1711</br><br>Father: <a href=#22747;balloonFlyto>William BALL</a></br><br>Mother: <a href=#22759;balloonFlyto>Hannah ATHEROLD</a></br><br>Children: John BALL, Martha BALL, <a href=#22639;balloonFlyto>Mary BALL</a>, Frances BALL, Sara BALL, Eve BALL, Jesse BALL, James BALL, Edwin BALL, Jeduthun BALL, Sinah BALL</br> ]]></description>
+            <TimeStamp id="22676">
+                <when>1711</when>
+            </TimeStamp>
+            <styleUrl>#22677</styleUrl>
+            <Point id="22674">
+                <coordinates>-76.4723233,37.7625738,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="22682">
+            <name>Joseph BALL</name>
+            <description><![CDATA[ <br>Lifespan: 1649 to 1711, related as MF      </br><br>Father: <a href=#22747;balloonFlyto>William BALL</a></br><br>Mother: <a href=#22759;balloonFlyto>Hannah ATHEROLD</a></br><br>Children: John BALL, Martha BALL, <a href=#22639;balloonFlyto>Mary BALL</a>, Frances BALL, Sara BALL, Eve BALL, Jesse BALL, James BALL, Edwin BALL, Jeduthun BALL, Sinah BALL</br> ]]></description>
+            <TimeSpan id="22685">
+                <begin>1649</begin>
+                <end>1711</end>
+            </TimeSpan>
+            <styleUrl>#22683</styleUrl>
+            <LineString id="22681">
+                <extrude>1</extrude>
+                <tessellate>1</tessellate>
+                <altitudeMode>clampToGround</altitudeMode>
+                <coordinates>-77.0888199,38.710179,0.0 -76.4723233,37.7625738,0.0</coordinates>
+            </LineString>
+        </Placemark>
+        <Placemark id="22687">
+            <name>Mary MONTAGUE(d)</name>
+            <description><![CDATA[ <br>1665 - 1743</br><br>Father: <a href=#22771;balloonFlyto>Peter MONTAGUE</a></br><br>Mother: <a href=#22573;balloonFlyto>Mary DOODES</a></br><br>Children: John BALL, Martha BALL, <a href=#22639;balloonFlyto>Mary BALL</a>, Frances BALL, Sara BALL, Eve BALL, Jesse BALL, James BALL, Edwin BALL, Jeduthun BALL, Sinah BALL</br> ]]></description>
+            <TimeStamp id="22688">
+                <when>1743</when>
+            </TimeStamp>
+            <styleUrl>#22689</styleUrl>
+            <Point id="22686">
+                <coordinates>-77.175356,38.2786312,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="22694">
+            <name>Mary MONTAGUE</name>
+            <description><![CDATA[ <br>Lifespan: 1665 to 1743, related as MM      </br><br>Father: <a href=#22771;balloonFlyto>Peter MONTAGUE</a></br><br>Mother: <a href=#22573;balloonFlyto>Mary DOODES</a></br><br>Children: John BALL, Martha BALL, <a href=#22639;balloonFlyto>Mary BALL</a>, Frances BALL, Sara BALL, Eve BALL, Jesse BALL, James BALL, Edwin BALL, Jeduthun BALL, Sinah BALL</br> ]]></description>
+            <TimeSpan id="22697">
+                <begin>1665</begin>
+                <end>1743</end>
+            </TimeSpan>
+            <styleUrl>#22695</styleUrl>
+            <LineString id="22693">
+                <extrude>1</extrude>
+                <tessellate>1</tessellate>
+                <altitudeMode>clampToGround</altitudeMode>
+                <coordinates>-77.0888199,38.710179,0.0 -77.175356,38.2786312,0.0</coordinates>
+            </LineString>
+        </Placemark>
+        <Placemark id="22699">
+            <name>John WASHINGTON(d)</name>
+            <description><![CDATA[ <br>1630 - 1677</br><br>Father: <a href=#22585;balloonFlyto>Lawrence WASHINGTON</a></br><br>Mother: <a href=#22783;balloonFlyto>Amphyllis TWIGDEN</a></br><br>Children: <a href=#22651;balloonFlyto>Lawrence WASHINGTON</a>, Ann WASHINGTON, Richard WASHINGTON, John WASHINGTON</br> ]]></description>
+            <TimeStamp id="22700">
+                <when>1677</when>
+            </TimeStamp>
+            <styleUrl>#22701</styleUrl>
+            <Point id="22698">
+                <coordinates>-77.4579783,38.4167265,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="22706">
+            <name>John WASHINGTON</name>
+            <description><![CDATA[ <br>Lifespan: 1630 to 1677, related as FFF     </br><br>Father: <a href=#22585;balloonFlyto>Lawrence WASHINGTON</a></br><br>Mother: <a href=#22783;balloonFlyto>Amphyllis TWIGDEN</a></br><br>Children: <a href=#22651;balloonFlyto>Lawrence WASHINGTON</a>, Ann WASHINGTON, Richard WASHINGTON, John WASHINGTON</br> ]]></description>
+            <TimeSpan id="22709">
+                <begin>1630</begin>
+                <end>1677</end>
+            </TimeSpan>
+            <styleUrl>#22707</styleUrl>
+            <LineString id="22705">
+                <extrude>1</extrude>
+                <tessellate>1</tessellate>
+                <altitudeMode>clampToGround</altitudeMode>
+                <coordinates>-77.4898499,38.2175382,0.0 -77.4579783,38.4167265,0.0</coordinates>
+            </LineString>
+        </Placemark>
+        <Placemark id="22711">
+            <name>Anne POPE(d)</name>
+            <description><![CDATA[ <br>1635 - 1668</br><br>Father: Nathaniel POPE</br><br>Mother: Lucy</br><br>Children: <a href=#22651;balloonFlyto>Lawrence WASHINGTON</a>, Ann WASHINGTON, Richard WASHINGTON, John WASHINGTON</br> ]]></description>
+            <TimeStamp id="22712">
+                <when>1668</when>
+            </TimeStamp>
+            <styleUrl>#22713</styleUrl>
+            <Point id="22710">
+                <coordinates>-76.9275638,38.1911773,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="22718">
+            <name>Anne POPE</name>
+            <description><![CDATA[ <br>Lifespan: 1635 to 1668, related as FFM     </br><br>Father: Nathaniel POPE</br><br>Mother: Lucy</br><br>Children: <a href=#22651;balloonFlyto>Lawrence WASHINGTON</a>, Ann WASHINGTON, Richard WASHINGTON, John WASHINGTON</br> ]]></description>
+            <TimeSpan id="22721">
+                <begin>1635</begin>
+                <end>1668</end>
+            </TimeSpan>
+            <styleUrl>#22719</styleUrl>
+            <LineString id="22717">
+                <extrude>1</extrude>
+                <tessellate>1</tessellate>
+                <altitudeMode>clampToGround</altitudeMode>
+                <coordinates>-77.4898499,38.2175382,0.0 -76.9275638,38.1911773,0.0</coordinates>
+            </LineString>
+        </Placemark>
+        <Placemark id="22723">
+            <name>Augustine WARNER(d)</name>
+            <description><![CDATA[ <br>1642 - 1681</br><br>Father: Augustine WARNER</br><br>Mother: Mary TOWNELEY</br><br>Children: Mary WARNER, Mary WARNER, Augustine WARNER, <a href=#22663;balloonFlyto>Mildred WARNER</a>, Elizabeth WARNER, Mildred WARNER, George WARNER</br> ]]></description>
+            <TimeStamp id="22724">
+                <when>1681</when>
+            </TimeStamp>
+            <styleUrl>#22725</styleUrl>
+            <Point id="22722">
+                <coordinates>-76.4746982,37.3396678,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="22730">
+            <name>Augustine WARNER</name>
+            <description><![CDATA[ <br>Lifespan: 1642 to 1681, related as FMF     </br><br>Father: Augustine WARNER</br><br>Mother: Mary TOWNELEY</br><br>Children: Mary WARNER, Mary WARNER, Augustine WARNER, <a href=#22663;balloonFlyto>Mildred WARNER</a>, Elizabeth WARNER, Mildred WARNER, George WARNER</br> ]]></description>
+            <TimeSpan id="22733">
+                <begin>1642</begin>
+                <end>1681</end>
+            </TimeSpan>
+            <styleUrl>#22731</styleUrl>
+            <LineString id="22729">
+                <extrude>1</extrude>
+                <tessellate>1</tessellate>
+                <altitudeMode>clampToGround</altitudeMode>
+                <coordinates>-3.5885335,54.5474199,0.0 -76.4746982,37.3396678,0.0</coordinates>
+            </LineString>
+        </Placemark>
+        <Placemark id="22735">
+            <name>Mildred READE(d)</name>
+            <description><![CDATA[ <br>1643 - 1686</br><br>Father: George READE</br><br>Mother: Elizabeth MARTIAU (MARTAIN)</br><br>Children: Mary WARNER, Mary WARNER, Augustine WARNER, <a href=#22663;balloonFlyto>Mildred WARNER</a>, Elizabeth WARNER, Mildred WARNER, George WARNER</br> ]]></description>
+            <TimeStamp id="22736">
+                <when>1686</when>
+            </TimeStamp>
+            <styleUrl>#22737</styleUrl>
+            <Point id="22734">
+                <coordinates>-78.2469202,37.5004191,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="22742">
+            <name>Mildred READE</name>
+            <description><![CDATA[ <br>Lifespan: 1643 to 1686, related as FMM     </br><br>Father: George READE</br><br>Mother: Elizabeth MARTIAU (MARTAIN)</br><br>Children: Mary WARNER, Mary WARNER, Augustine WARNER, <a href=#22663;balloonFlyto>Mildred WARNER</a>, Elizabeth WARNER, Mildred WARNER, George WARNER</br> ]]></description>
+            <TimeSpan id="22745">
+                <begin>1643</begin>
+                <end>1686</end>
+            </TimeSpan>
+            <styleUrl>#22743</styleUrl>
+            <LineString id="22741">
+                <extrude>1</extrude>
+                <tessellate>1</tessellate>
+                <altitudeMode>clampToGround</altitudeMode>
+                <coordinates>-3.5885335,54.5474199,0.0 -78.2469202,37.5004191,0.0</coordinates>
+            </LineString>
+        </Placemark>
+        <Placemark id="22747">
+            <name>William BALL(d)</name>
+            <description><![CDATA[ <br>1614 - 1680</br><br>Father: William BALL</br><br>Mother: Alice WALTHAM</br><br>Children: Richard BALL, Richard BALL, William BALL, Richard BALL, William BALL, <a href=#22675;balloonFlyto>Joseph BALL</a>, Hannah BALL, Joseph BALL, Hannah BALL</br> ]]></description>
+            <TimeStamp id="22748">
+                <when>1680</when>
+            </TimeStamp>
+            <styleUrl>#22749</styleUrl>
+            <Point id="22746">
+                <coordinates>-76.4885612,37.6698613,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="22754">
+            <name>William BALL</name>
+            <description><![CDATA[ <br>Lifespan: 1614 to 1680, related as MFF     </br><br>Father: William BALL</br><br>Mother: Alice WALTHAM</br><br>Children: Richard BALL, Richard BALL, William BALL, Richard BALL, William BALL, <a href=#22675;balloonFlyto>Joseph BALL</a>, Hannah BALL, Joseph BALL, Hannah BALL</br> ]]></description>
+            <TimeSpan id="22757">
+                <begin>1614</begin>
+                <end>1680</end>
+            </TimeSpan>
+            <styleUrl>#22755</styleUrl>
+            <LineString id="22753">
+                <extrude>1</extrude>
+                <tessellate>1</tessellate>
+                <altitudeMode>clampToGround</altitudeMode>
+                <coordinates>-76.4723233,37.7625738,0.0 -76.4885612,37.6698613,0.0</coordinates>
+            </LineString>
+        </Placemark>
+        <Placemark id="22759">
+            <name>Hannah ATHEROLD(d)</name>
+            <description><![CDATA[ <br>1619 - 1695</br><br>Father: Thomas ATHEROLD</br><br>Mother: Mary HARVEY</br><br>Children: Richard BALL, Richard BALL, William BALL, Richard BALL, William BALL, <a href=#22675;balloonFlyto>Joseph BALL</a>, Hannah BALL, Joseph BALL, Hannah BALL</br> ]]></description>
+            <TimeStamp id="22760">
+                <when>1695</when>
+            </TimeStamp>
+            <styleUrl>#22761</styleUrl>
+            <Point id="22758">
+                <coordinates>-76.4885612,37.6698613,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="22766">
+            <name>Hannah ATHEROLD</name>
+            <description><![CDATA[ <br>Lifespan: 1619 to 1695, related as MFM     </br><br>Father: Thomas ATHEROLD</br><br>Mother: Mary HARVEY</br><br>Children: Richard BALL, Richard BALL, William BALL, Richard BALL, William BALL, <a href=#22675;balloonFlyto>Joseph BALL</a>, Hannah BALL, Joseph BALL, Hannah BALL</br> ]]></description>
+            <TimeSpan id="22769">
+                <begin>1619</begin>
+                <end>1695</end>
+            </TimeSpan>
+            <styleUrl>#22767</styleUrl>
+            <LineString id="22765">
+                <extrude>1</extrude>
+                <tessellate>1</tessellate>
+                <altitudeMode>clampToGround</altitudeMode>
+                <coordinates>-76.4723233,37.7625738,0.0 -76.4885612,37.6698613,0.0</coordinates>
+            </LineString>
+        </Placemark>
+        <Placemark id="22771">
+            <name>Peter MONTAGUE(d)</name>
+            <description><![CDATA[ <br>1634 - 1702</br><br>Father: Peter MONTAGUE</br><br>Mother: Cicely MATTHEW</br><br>Children: Mary MONTEQUE, <a href=#22687;balloonFlyto>Mary MONTAGUE</a>, Peter MONTAGUE, William MONTAGUE, Katherine MONTAGUE, John MONTAGUE</br> ]]></description>
+            <TimeStamp id="22772">
+                <when>1702</when>
+            </TimeStamp>
+            <styleUrl>#22773</styleUrl>
+            <Point id="22770">
+                <coordinates>-76.5307823,36.7670938,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="22778">
+            <name>Peter MONTAGUE</name>
+            <description><![CDATA[ <br>Lifespan: 1634 to 1702, related as MMF     </br><br>Father: Peter MONTAGUE</br><br>Mother: Cicely MATTHEW</br><br>Children: Mary MONTEQUE, <a href=#22687;balloonFlyto>Mary MONTAGUE</a>, Peter MONTAGUE, William MONTAGUE, Katherine MONTAGUE, John MONTAGUE</br> ]]></description>
+            <TimeSpan id="22781">
+                <begin>1634</begin>
+                <end>1702</end>
+            </TimeSpan>
+            <styleUrl>#22779</styleUrl>
+            <LineString id="22777">
+                <extrude>1</extrude>
+                <tessellate>1</tessellate>
+                <altitudeMode>clampToGround</altitudeMode>
+                <coordinates>-77.175356,38.2786312,0.0 -76.5307823,36.7670938,0.0</coordinates>
+            </LineString>
+        </Placemark>
+        <Placemark id="22783">
+            <name>Amphyllis TWIGDEN(d)</name>
+            <description><![CDATA[ <br>1605 - 1655</br><br>Father: John TWIGDEN</br><br>Mother: Anne DICKENS</br><br>Children: Elizabeth WASHINGTON, William WASHINGTON, Martha WASHINGTON, Margaret WASHINGTON, <a href=#22699;balloonFlyto>John WASHINGTON</a>, Lawrence WASHINGTON</br> ]]></description>
+            <TimeStamp id="22784">
+                <when>1655</when>
+            </TimeStamp>
+            <styleUrl>#22785</styleUrl>
+            <Point id="22782">
+                <coordinates>-2.7151735,52.0553813,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="22790">
+            <name>Amphyllis TWIGDEN</name>
+            <description><![CDATA[ <br>Lifespan: 1605 to 1655, related as FFFM    </br><br>Father: John TWIGDEN</br><br>Mother: Anne DICKENS</br><br>Children: Elizabeth WASHINGTON, William WASHINGTON, Martha WASHINGTON, Margaret WASHINGTON, <a href=#22699;balloonFlyto>John WASHINGTON</a>, Lawrence WASHINGTON</br> ]]></description>
+            <TimeSpan id="22793">
+                <begin>1605</begin>
+                <end>1655</end>
+            </TimeSpan>
+            <styleUrl>#22791</styleUrl>
+            <LineString id="22789">
+                <extrude>1</extrude>
+                <tessellate>1</tessellate>
+                <altitudeMode>clampToGround</altitudeMode>
+                <coordinates>-77.4579783,38.4167265,0.0 -2.7151735,52.0553813,0.0</coordinates>
+            </LineString>
+        </Placemark>
+        <Placemark id="22795">
+            <name>Amphyllis TWIGDEN (CHR)</name>
+            <description><![CDATA[ <br>CHR: <geo_gedcom.gedcom_date.GedcomDate object at 0x00000259EDC73C40></br> ]]></description>
+            <styleUrl>#22796</styleUrl>
+            <Point id="22794">
+                <coordinates>-0.9477577,52.3228736,0.0</coordinates>
+            </Point>
+        </Placemark>
+    </Document>
+</kml>

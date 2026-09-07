@@ -1,0 +1,37 @@
+Birth Country,Birth Continent,Death Country,Death Continent,Count
+United States,North America,United States,North America,20
+United States,North America,none,none,20
+United States,North America,England,Europe,2
+United States,North America,Civitas Vaticana - Città del Vaticano,Europe,3
+none,none,none,none,61
+Civitas Vaticana - Città del Vaticano,Europe,Civitas Vaticana - Città del Vaticano,Europe,12
+England,Europe,United States,North America,14
+United States,North America,,,2
+Civitas Vaticana - Città del Vaticano,Europe,United States,North America,1
+Civitas Vaticana - Città del Vaticano,Europe,none,none,10
+,,Civitas Vaticana - Città del Vaticano,Europe,1
+none,none,España,Europe,1
+England,Europe,Civitas Vaticana - Città del Vaticano,Europe,4
+Netherlands,Europe,none,none,1
+England,Europe,none,none,224
+England,Europe,England,Europe,29
+England,Europe,United Kingdom,Europe,8
+United Kingdom,Europe,United Kingdom,Europe,11
+United Kingdom,Europe,none,none,70
+United Kingdom,Europe,United States,North America,4
+Civitas Vaticana - Città del Vaticano,Europe,,,1
+United Kingdom,Europe,England,Europe,5
+United Kingdom,Europe,,,2
+England,Europe,Spain,Europe,1
+England,Europe,USA,North America,1
+Österreich,Europe,none,none,1
+England,Europe,,,4
+United States,North America,United Kingdom,Europe,1
+none,none,England,Europe,3
+England,Europe,Deutschland,Europe,1
+England,Europe,France,Europe,2
+,,none,none,2
+France,Europe,England,Europe,1
+England,Europe,Italia,Europe,1
+England,Europe,Australia,Oceania,2
+Netherlands,Europe,United States,North America,3

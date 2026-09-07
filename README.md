@@ -209,7 +209,7 @@ This project now uses a dependency-injection/services pattern for all configurat
 ---
 
 ## Results
-
+- [See full set of example](docs/washington_example.md) for George Washington
 ### KML Example
 
 - Google Earth Online:
@@ -328,7 +328,6 @@ The report provides comprehensive insights into your genealogical data with 14 d
 ---
 
 ## Other Ideas
-
 - [See Exploring Family trees](docs/otherlearnings.md)
 
 ---

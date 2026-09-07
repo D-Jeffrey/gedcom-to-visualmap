@@ -23,6 +23,7 @@ All exporters and renderers use dependency injection via service objects for con
   - CSV summaries for places, countries, geocoding cache
   - Birth/death heatmap matrices
   - Enrichment issues reports
+  - Migration report and graph
 
 - **Name Processing:** Utilities for name normalization, comparison, and soundex (all static methods)
 - **Reference Tracking:** Manage references and links between people, places, and events

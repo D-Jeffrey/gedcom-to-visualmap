@@ -1,0 +1,620 @@
+
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Family Migration Flow Visualization</title>
+            <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+            <style>
+                * {
+                    margin: 0;
+                    padding: 0;
+                    box-sizing: border-box;
+                }
+                
+                body {
+                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+                    background: linear-gradient(135deg, #557eea 0%, #764ba2 100%);
+                    min-height: 100vh;
+                    padding: 20px;
+                }
+                
+                .container {
+                    max-width: 1400px;
+                    margin: 0 auto;
+                    background: white;
+                    border-radius: 12px;
+                    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+                    overflow: hidden;
+                }
+                
+                .header {
+                    background: linear-gradient(135deg, #7e1a 0%, #764ba2 100%);
+                    color: white;
+                    padding: 40px 30px;
+                    text-align: center;
+                }
+                
+                .header h1 {
+                    font-size: 2.5em;
+                    margin-bottom: 10px;
+                }
+                
+                .header p {
+                    font-size: 1.1em;
+                    opacity: 0.9;
+                }
+                
+                .content {
+                    display: flex;
+                    min-height: 500px;
+                }
+                
+                .sidebar {
+                    width: 350px;
+                    background: #f8f9fa;
+                    padding: 30px 20px;
+                    overflow-y: auto;
+                    border-right: 1px solid #dee2e6;
+                }
+                
+                .main {
+                    flex: 1;
+                    padding: 30px;
+                    overflow-y: auto;
+                }
+                
+                .stats-panel {
+                    background: grey;
+                }
+                
+                .stats-panel h2 {
+                    color: #111;
+                    font-size: 1.3em;
+                    margin-bottom: 15px;
+                    border-bottom: 2px solid #667eea;
+                    padding-bottom: 10px;
+                }
+                
+                .stats-panel h3 {
+                    color: #222;
+                    font-size: 1em;
+                    margin-top: 20px;
+                    margin-bottom: 10px;
+                }
+                
+                .stats-table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin-bottom: 20px;
+                    font-size: 0.9em;
+                }
+                
+                .stats-table tr:nth-child(odd) {
+                    background: #f8f9fa;
+                }
+                
+                .stats-table td {
+                    padding: 8px;
+                    border: 1px solid #dee2e6;
+                }
+                
+                .stats-table td:first-child {
+                    font-weight: 500;
+                    color: #222;
+                }
+                
+                .stats-panel ol {
+                    margin-left: 20px;
+                    font-size: 0.9em;
+                    line-height: 1.6;
+                    color: #333;
+                }
+                
+                .stats-panel ol li {
+                    margin-bottom: 5px;
+                }
+                
+                .plotly-container {
+                    width: 100%;
+                    min-height: 500px;
+                    border: 1px solid #dee2e6;
+                    border-radius: 8px;
+                    overflow: hidden;
+                }
+
+                .tab-pane h2 {
+                    color: #222;
+                    font-size: 1.35em;
+                    margin-bottom: 16px;
+                }
+                
+                .tabs {
+                    display: flex;
+                    gap: 0;
+                    margin-bottom: 20px;
+                    border-bottom: 2px solid #dee2e6;
+                }
+                
+                .tab-button {
+                    padding: 12px 20px;
+                    background: #f8f9fa;
+                    border: none;
+                    cursor: pointer;
+                    font-size: 0.95em;
+                    font-weight: 500;
+                    color: #555;
+                    border-bottom: 3px solid transparent;
+                    transition: all 0.3s ease;
+                }
+                
+                .tab-button:hover {
+                    background: #e9ecef;
+                    color: #333;
+                }
+                
+                .tab-button.active {
+                    background: white;
+                    color: #667eea;
+                    border-bottom-color: #667eea;
+                }
+                
+                .tab-pane {
+                    display: none;
+                }
+                
+                .tab-pane.active {
+                    display: block;
+                }
+                
+                .legend {
+                    background: #f8f9fa;
+                    padding: 15px;
+                    border-radius: 6px;
+                    margin-top: 20px;
+                    font-size: 0.85em;
+                    color: #555;
+                    line-height: 1.6;
+                }
+                
+                .legend strong {
+                    margin-bottom: 8px;
+                    color: #ddd;
+                }
+                
+                .legend-item {
+                    margin-bottom: 5px;
+                }
+
+                .migration-list-panel {
+                    padding: 30px;
+                    border-top: 1px solid #dee2e6;
+                }
+
+                .migration-list-panel h2 {
+                    color: #222;
+                    font-size: 1.3em;
+                    margin-bottom: 10px;
+                }
+
+                .migration-list-summary {
+                    color: #555;
+                    font-size: 0.9em;
+                    margin-bottom: 15px;
+                }
+
+                .migration-filter {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 6px;
+                    font-size: 0.9em;
+                    color: #333;
+                    margin-bottom: 12px;
+                    cursor: pointer;
+                }
+
+                .migration-table-wrapper {
+                    max-height: 600px;
+                    overflow-y: auto;
+                    border: 1px solid #dee2e6;
+                    border-radius: 8px;
+                }
+
+                .migration-table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    font-size: 0.9em;
+                }
+
+                .migration-table th {
+                    position: sticky;
+                    top: 0;
+                    background: #f8f9fa;
+                    text-align: left;
+                    padding: 10px;
+                    border-bottom: 2px solid #dee2e6;
+                    color: #222;
+                }
+
+                .migration-table th.sortable {
+                    cursor: pointer;
+                    user-select: none;
+                }
+
+                .migration-table th.sortable:hover {
+                    background: #e9ecef;
+                }
+
+                .migration-table th.sortable::after {
+                    content: "⇅";
+                    margin-left: 6px;
+                    opacity: 0.4;
+                    font-size: 0.85em;
+                }
+
+                .migration-table th.sortable[data-sort-dir="asc"]::after {
+                    content: "▲";
+                    opacity: 1;
+                }
+
+                .migration-table th.sortable[data-sort-dir="desc"]::after {
+                    content: "▼";
+                    opacity: 1;
+                }
+
+                .migration-table td {
+                    padding: 8px 10px;
+                    border-bottom: 1px solid #eee;
+                    color: #333;
+                }
+
+                .migration-table tr:nth-child(odd) td {
+                    background: #f8f9fa;
+                }
+
+                .migration-table tr.ocean-crossing td {
+                    background: #e6f3fb;
+                }
+
+                .migration-table .migration-record-badge {
+                    margin-left: 4px;
+                }
+
+                @media (max-width: 1024px) {
+                    .content {
+                        flex-direction: column;
+                    }
+                    .sidebar {
+                        width: 100%;
+                        border-right: none;
+                        border-bottom: 1px solid #dee2e6;
+                    }
+                }
+                
+                @media (prefers-color-scheme: dark) {
+                    body {
+                        background: #1a1a1a;
+                    }
+                    .container {
+                        background: #2d2d2d;
+                    }
+                    .sidebar {
+                        background: #1d1d1d;
+                        border-right-color: #555;
+                    }
+                    .stats-panel h2, .stats-panel h3 {
+                        color: #202020;
+                    }
+                    .stats-table tr:nth-child(odd) {
+                        background: #7d7d7d;
+                    }
+                    .stats-table {
+                        border-color: #555;
+                    }
+                    .stats-table td {
+                        border-color: #555;
+                        color: #f0f0f0;
+                    }
+                    .tab-button {
+                        background: #1d1d1d;
+                        color: #e0e0e0;
+                        border-bottom-color: transparent;
+                    }
+                    .tab-button:hover {
+                        background: #4d4d4d;
+                        color: #e0e0e0;
+                    }
+                    .tab-button.active {
+                        background: #2d2d2d;
+                        color: #667eea;
+                    }
+                    .legend {
+                        background: #3d3d3d;
+                        color: #c0c0c0;
+                    }
+                    .migration-list-panel {
+                        background: #2d2d2d;
+                        border-top-color: #555;
+                    }
+                    .migration-list-panel h2 {
+                        color: #f0f0f0;
+                    }
+                    .migration-list-summary {
+                        color: #c0c0c0;
+                    }
+                    .migration-filter {
+                        color: #e0e0e0;
+                    }
+                    .migration-table {
+                        border-color: #555;
+                    }
+                    .migration-table th {
+                        background: #1d1d1d;
+                        color: #f0f0f0;
+                        border-color: #555;
+                    }
+                    .migration-table td {
+                        border-color: #555;
+                        color: #f0f0f0;
+                    }
+                    .migration-table tr:nth-child(odd) td {
+                        background: #3a3a3a;
+                    }
+                    .migration-table tr.ocean-crossing td {
+                        background: #2d4a5a;
+                    }
+                }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <h1>🌍 Family Migration Flows</h1>
+                    <p>Sankey Diagram Analysis of Genealogical Movement Patterns</p>
+                    <p style="font-size: 0.9em">Source: washington.ged</p>
+                </div>
+                
+                <div class="content">
+                    <div class="sidebar">
+                        
+        <div class="stats-panel">
+            <h2>Migration Statistics</h2>
+            
+            <table class="stats-table">
+                <tr><td><strong>Total Migration Flows:</strong></td><td>14</td></tr>
+                <tr><td><strong>Total People Moved:</strong></td><td>13</td></tr>
+                <tr><td><strong>Average Flow Size:</strong></td><td>0.9 people</td></tr>
+                <tr><td><strong>Unique Locations:</strong></td><td>25</td></tr>
+                <tr><td><strong>Diaspora Index (spread):</strong></td><td>1.923</td></tr>
+            </table>
+            
+            <h3>Top 5 Destinations</h3>
+            <ol>
+                <li>mount vernon, United States: 2 people</li><li>millenbeck, United States: 2 people</li><li>ferry farm, United States: 1 people</li><li>"whitehaven", United Kingdom: 1 people</li><li>oakley, United States: 1 people</li>
+            </ol>
+            
+            <h3>Top 5 Origins</h3>
+            <ol>
+                <li>wakefield, United States: 1 people</li><li>bridge's creek, United States: 1 people</li><li>epping forest, United States: 1 people</li><li>offredericksburg, United States: 1 people</li><li>millenkick, United States: 1 people</li>
+            </ol>
+            
+            <h3>Most Common Routes</h3>
+            <ol>
+                <li>wakefield, United States → mount vernon, United States: 1 people</li><li>bridge's creek, United States → ferry farm, United States: 1 people</li><li>epping forest, United States → mount vernon, United States: 1 people</li><li>offredericksburg, United States → "whitehaven", United Kingdom: 1 people</li><li>millenkick, United States → oakley, United States: 1 people</li>
+            </ol>
+            
+        </div>
+        
+                        <div class="legend">
+
+                            <div class="legend-item">
+                            
+                                📊 <strong>Sankey Diagram:</strong> Shows the migration of people between locations during their lifetime using birth, death, burial, residence, occupation, marriage, arrival, departure, 
+                            immigration, and emigration events.
+                                Wider flows indicate more people moved on that route.
+                            </div>
+                            <div class="legend-item">
+                                🎨 <strong>Colors:</strong> Flows are colored by time period:
+                                Red = Early periods, Green = Medieval, Blue = Recent.
+                            </div>
+                            <div class="legend-item">
+                                📍 <strong>Nodes:</strong> Geographic locations where family lived.
+                                Left side = origins, right side = destinations.
+                            </div>
+                            <div class="legend-item">
+                                📈 <strong>Diaspora Index:</strong> Measures family spread.
+                                Higher values = more geographically dispersed.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="main">
+                        <div class="tabs">
+                            <button class="tab-button active" onclick="switchTab('0')">City and Country</button><button class="tab-button" onclick="switchTab('1')">State/Province</button><button class="tab-button" onclick="switchTab('2')">Country</button><button class="tab-button" onclick="switchTab('3')">Continent</button>
+                        </div>
+                        
+            <div id="tab-0" class="tab-pane active">
+                <h2>City and Country Summary</h2>
+                <div class="plotly-container">
+                    <div>                            <div id="7732014f-0c03-4f9a-9924-d1dabb1b0bcd" class="plotly-graph-div" style="height:620px; width:1000px;"></div>            <script>                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("7732014f-0c03-4f9a-9924-d1dabb1b0bcd")) {                    Plotly.newPlot(                        "7732014f-0c03-4f9a-9924-d1dabb1b0bcd",                        [{"link":{"color":["rgba(255, 77, 0, 0.4)","rgba(255, 0, 0, 0.4)","rgba(255, 0, 0, 0.4)","rgba(255, 0, 0, 0.4)","rgba(255, 0, 0, 0.4)","rgba(255, 0, 0, 0.4)","rgba(255, 0, 0, 0.4)","rgba(255, 0, 0, 0.4)","rgba(255, 0, 0, 0.4)","rgba(255, 0, 0, 0.4)","rgba(255, 0, 0, 0.4)","rgba(255, 0, 0, 0.4)","rgba(255, 0, 0, 0.4)","rgba(255, 0, 0, 0.4)"],"customdata":["WASHINGTON","WASHINGTON","BALL","WARNER","BALL","MONTAGUE","WASHINGTON","POPE","WARNER","READE","BALL","ATHEROLD","TWIGDEN","TWIGDEN"],"hovertemplate":"%{source.label} \u2192 %{target.label}\u003cbr\u003epeople moved: %{value:.0f}\u003cbr\u003elast names: %{customdata}\u003cextra\u003e\u003c\u002fextra\u003e","source":[0,2,4,5,7,9,11,13,15,17,19,21,22,23],"target":[1,3,1,6,8,10,12,14,16,18,20,20,23,24],"value":[1,1,1,1,1,1,1,1,1,1,1,1,1,1]},"node":{"color":["rgba(0, 100, 200, 0.7)","rgba(0, 100, 200, 0.7)","rgba(0, 100, 200, 0.7)","rgba(0, 100, 200, 0.7)","rgba(0, 100, 200, 0.7)","rgba(0, 100, 200, 0.7)","rgba(0, 100, 200, 0.7)","rgba(0, 100, 200, 0.7)","rgba(0, 100, 200, 0.7)","rgba(0, 100, 200, 0.7)","rgba(0, 100, 200, 0.7)","rgba(0, 100, 200, 0.7)","rgba(200, 100, 0, 0.7)","rgba(200, 100, 0, 0.7)","rgba(200, 100, 0, 0.7)","rgba(200, 100, 0, 0.7)","rgba(200, 100, 0, 0.7)","rgba(200, 100, 0, 0.7)","rgba(200, 100, 0, 0.7)","rgba(200, 100, 0, 0.7)","rgba(200, 100, 0, 0.7)","rgba(200, 100, 0, 0.7)","rgba(200, 100, 0, 0.7)","rgba(200, 100, 0, 0.7)","rgba(200, 100, 0, 0.7)"],"customdata":[[0,1],[2,0],[0,1],[1,0],[0,1],[0,1],[1,0],[0,1],[1,0],[0,1],[1,0],[0,1],[1,0],[0,1],[1,0],[0,1],[1,0],[0,1],[1,0],[0,1],[2,0],[0,1],[0,1],[1,1],[1,0]],"hoverinfo":"all","hovertemplate":"%{label}\u003cbr\u003emigrated to: %{customdata[0]}\u003cbr\u003emigrated away: %{customdata[1]}\u003cextra\u003e\u003c\u002fextra\u003e","label":["wakefield, United States","mount vernon, United States","bridge's creek, United States","ferry farm, United States","epping forest, United States","offredericksburg, United States","\"whitehaven\", United Kingdom","millenkick, United States","oakley, United States","king george, United States","ferry far, United States","sulgrave manor, United Kingdom","stafford co., United States","st mary, United States","bridge creek, United States","of glouster, United States","warner hall, United States","va, Civitas Vaticana - Citt\u00e0 del Vaticano","cumberland, United States","wiltshire, United Kingdom","millenbeck, United States","london, United Kingdom","spratton, United Kingdom","little creston, United Kingdom","tring, United Kingdom"],"line":{"color":"black","width":0.5},"pad":15,"thickness":20},"type":"sankey"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermap":[{"type":"scattermap","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}},"title":{"pad":{"t":10,"b":24},"text":"Top 1000 Family Migration Flows - City and Country","x":0.05,"y":0.98,"xanchor":"left","yanchor":"top"},"font":{"size":10},"margin":{"l":30,"r":30,"t":110,"b":120},"height":620,"width":1000,"hovermode":"closest"},                        {"responsive": true}                    )                };            </script>        </div>
+                </div>
+            </div>
+            
+            <div id="tab-1" class="tab-pane ">
+                <h2>State/Province Summary</h2>
+                <div class="plotly-container">
+                    <div>                            <div id="12a1d2d3-1215-41c9-964d-a1f7e54e8e00" class="plotly-graph-div" style="height:620px; width:1000px;"></div>            <script>                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("12a1d2d3-1215-41c9-964d-a1f7e54e8e00")) {                    Plotly.newPlot(                        "12a1d2d3-1215-41c9-964d-a1f7e54e8e00",                        [{"link":{"color":["rgba(255, 0, 0, 0.4)","rgba(255, 77, 0, 0.4)","rgba(255, 0, 0, 0.4)","rgba(255, 0, 0, 0.4)","rgba(255, 0, 0, 0.4)","rgba(255, 0, 0, 0.4)","rgba(255, 0, 0, 0.4)","rgba(255, 0, 0, 0.4)","rgba(255, 0, 0, 0.4)","rgba(255, 0, 0, 0.4)","rgba(255, 0, 0, 0.4)","rgba(255, 0, 0, 0.4)"],"customdata":["ATHEROLD, BALL","WASHINGTON","WASHINGTON","BALL","WARNER","BALL","MONTAGUE","WASHINGTON","POPE","WARNER","READE","TWIGDEN"],"hovertemplate":"%{source.label} \u2192 %{target.label}\u003cbr\u003epeople moved: %{value:.0f}\u003cbr\u003elast names: %{customdata}\u003cextra\u003e\u003c\u002fextra\u003e","source":[0,1,1,1,2,1,1,0,4,2,5,0],"target":[1,1,1,1,0,1,1,3,1,2,2,0],"value":[2,1,1,1,1,1,1,1,1,1,1,1]},"node":{"color":["rgba(0, 100, 200, 0.7)","rgba(0, 100, 200, 0.7)","rgba(0, 100, 200, 0.7)","rgba(200, 100, 0, 0.7)","rgba(200, 100, 0, 0.7)","rgba(200, 100, 0, 0.7)"],"customdata":[[2,4],[8,5],[2,2],[1,0],[0,1],[0,1]],"hoverinfo":"all","hovertemplate":"%{label}\u003cbr\u003emigrated to: %{customdata[0]}\u003cbr\u003emigrated away: %{customdata[1]}\u003cextra\u003e\u003c\u002fextra\u003e","label":["England, United Kingdom","Virginia, United States","VA, United States","Va., United States","Maryland, United States","Unknown, Civitas Vaticana - Citt\u00e0 del Vaticano"],"line":{"color":"black","width":0.5},"pad":15,"thickness":20},"type":"sankey"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermap":[{"type":"scattermap","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}},"title":{"pad":{"t":10,"b":24},"text":"Top 1000 Family Migration Flows - State\u002fProvince","x":0.05,"y":0.98,"xanchor":"left","yanchor":"top"},"font":{"size":10},"margin":{"l":30,"r":30,"t":110,"b":120},"height":620,"width":1000,"hovermode":"closest"},                        {"responsive": true}                    )                };            </script>        </div>
+                </div>
+            </div>
+            
+            <div id="tab-2" class="tab-pane ">
+                <h2>Country Summary</h2>
+                <div class="plotly-container">
+                    <div>                            <div id="6bbe477d-f14c-4955-aaea-327fc4c62477" class="plotly-graph-div" style="height:620px; width:1000px;"></div>            <script>                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("6bbe477d-f14c-4955-aaea-327fc4c62477")) {                    Plotly.newPlot(                        "6bbe477d-f14c-4955-aaea-327fc4c62477",                        [{"link":{"color":["rgba(255, 0, 0, 0.4)","rgba(255, 0, 0, 0.4)","rgba(255, 77, 0, 0.4)","rgba(255, 0, 0, 0.4)","rgba(255, 0, 0, 0.4)","rgba(255, 0, 0, 0.4)","rgba(255, 0, 0, 0.4)","rgba(255, 0, 0, 0.4)","rgba(255, 0, 0, 0.4)","rgba(255, 0, 0, 0.4)","rgba(255, 0, 0, 0.4)"],"customdata":["BALL, WARNER","ATHEROLD, BALL","WASHINGTON","WASHINGTON","BALL","WARNER","MONTAGUE","WASHINGTON","POPE","READE","TWIGDEN"],"hovertemplate":"%{source.label} \u2192 %{target.label}\u003cbr\u003epeople moved: %{value:.0f}\u003cbr\u003elast names: %{customdata}\u003cextra\u003e\u003c\u002fextra\u003e","source":[0,1,0,0,0,0,0,1,0,2,1],"target":[0,0,0,0,0,1,0,0,0,0,1],"value":[2,2,1,1,1,1,1,1,1,1,1]},"node":{"color":["rgba(0, 100, 200, 0.7)","rgba(200, 100, 0, 0.7)","rgba(200, 100, 0, 0.7)"],"customdata":[[11,8],[2,4],[0,1]],"hoverinfo":"all","hovertemplate":"%{label}\u003cbr\u003emigrated to: %{customdata[0]}\u003cbr\u003emigrated away: %{customdata[1]}\u003cextra\u003e\u003c\u002fextra\u003e","label":["United States","United Kingdom","Civitas Vaticana - Citt\u00e0 del Vaticano"],"line":{"color":"black","width":0.5},"pad":15,"thickness":20},"type":"sankey"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermap":[{"type":"scattermap","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}},"title":{"pad":{"t":10,"b":24},"text":"Top 1000 Family Migration Flows - Country","x":0.05,"y":0.98,"xanchor":"left","yanchor":"top"},"font":{"size":10},"margin":{"l":30,"r":30,"t":110,"b":120},"height":620,"width":1000,"hovermode":"closest"},                        {"responsive": true}                    )                };            </script>        </div>
+                </div>
+            </div>
+            
+            <div id="tab-3" class="tab-pane ">
+                <h2>Continent Summary</h2>
+                <div class="plotly-container">
+                    <div>                            <div id="c152e135-0c37-4af6-b740-cfe69e5dba98" class="plotly-graph-div" style="height:620px; width:1000px;"></div>            <script>                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("c152e135-0c37-4af6-b740-cfe69e5dba98")) {                    Plotly.newPlot(                        "c152e135-0c37-4af6-b740-cfe69e5dba98",                        [{"link":{"color":["rgba(255, 0, 0, 0.4)","rgba(255, 0, 0, 0.4)","rgba(255, 77, 0, 0.4)","rgba(255, 0, 0, 0.4)","rgba(255, 0, 0, 0.4)","rgba(255, 0, 0, 0.4)","rgba(255, 0, 0, 0.4)","rgba(255, 0, 0, 0.4)","rgba(255, 0, 0, 0.4)","rgba(255, 0, 0, 0.4)","rgba(255, 0, 0, 0.4)"],"customdata":["BALL, WARNER","ATHEROLD, BALL","WASHINGTON","WASHINGTON","BALL","WARNER","MONTAGUE","WASHINGTON","POPE","READE","TWIGDEN"],"hovertemplate":"%{source.label} \u2192 %{target.label}\u003cbr\u003epeople moved: %{value:.0f}\u003cbr\u003elast names: %{customdata}\u003cextra\u003e\u003c\u002fextra\u003e","source":[0,1,0,0,0,0,0,1,0,1,1],"target":[0,0,0,0,0,1,0,0,0,0,1],"value":[2,2,1,1,1,1,1,1,1,1,1]},"node":{"color":["rgba(0, 100, 200, 0.7)","rgba(200, 100, 0, 0.7)"],"customdata":[[11,8],[2,5]],"hoverinfo":"all","hovertemplate":"%{label}\u003cbr\u003emigrated to: %{customdata[0]}\u003cbr\u003emigrated away: %{customdata[1]}\u003cextra\u003e\u003c\u002fextra\u003e","label":["North America","Europe"],"line":{"color":"black","width":0.5},"pad":15,"thickness":20},"type":"sankey"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermap":[{"type":"scattermap","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}},"title":{"pad":{"t":10,"b":24},"text":"Top 1000 Family Migration Flows - Continent","x":0.05,"y":0.98,"xanchor":"left","yanchor":"top"},"font":{"size":10},"margin":{"l":30,"r":30,"t":110,"b":120},"height":620,"width":1000,"hovermode":"closest"},                        {"responsive": true}                    )                };            </script>        </div>
+                </div>
+            </div>
+            
+                    </div>
+                </div>
+
+                
+        <div class="migration-list-panel">
+            <h2>🧭 Individual Migration Records</h2>
+            <p class="migration-list-summary">5 people found who moved from one country to another (5 ocean-crossing). Entries marked 📜 have an explicit GEDCOM migration record. Click a column header to sort.</p>
+            <label class="migration-filter">
+                <input type="checkbox" id="oceanCrossingFilter" onchange="filterMigrationTable()">
+                Show only Ocean Crossing
+            </label>
+            <div class="migration-table-wrapper">
+                <table class="migration-table" id="migrationTable">
+                    <thead>
+                        <tr>
+                            <th class="sortable" onclick="sortMigrationTable(0, 'text', this)">Name</th>
+                            <th>First Name</th>
+                            <th class="sortable" onclick="sortMigrationTable(2, 'text', this)">Last Name</th>
+                            <th class="sortable" onclick="sortMigrationTable(3, 'number', this)">Date</th>
+                            <th class="sortable" onclick="sortMigrationTable(4, 'text', this)">From</th>
+                            <th class="sortable" onclick="sortMigrationTable(5, 'text', this)">To</th>
+                            <th>Migration Type</th>
+                            <th>Ocean Crossing</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+                <tr class="ocean-crossing" data-ocean-crossing="true">
+                    <td>Hannah ATHEROLD</td>
+                    <td>Hannah</td>
+                    <td>ATHEROLD</td>
+                    <td data-sort-value="1695">1695</td>
+                    <td>London, London, England</td>
+                    <td>, Millenbeck, Lancaster, Virginia</td>
+                    <td>Birth → Death</td>
+                    <td>⛴ Yes</td>
+                    <td>—</td>
+                </tr>
+            
+                <tr class="ocean-crossing" data-ocean-crossing="true">
+                    <td>John WASHINGTON</td>
+                    <td>John</td>
+                    <td>WASHINGTON</td>
+                    <td data-sort-value="1677">1677</td>
+                    <td>Sulgrave Manor, England</td>
+                    <td>, Stafford Co., Va.</td>
+                    <td>Birth → Death</td>
+                    <td>⛴ Yes</td>
+                    <td>—</td>
+                </tr>
+            
+                <tr class="ocean-crossing" data-ocean-crossing="true">
+                    <td>Mildred READE</td>
+                    <td>Mildred</td>
+                    <td>READE</td>
+                    <td data-sort-value="1686">1686</td>
+                    <td>, , VA</td>
+                    <td>, Cumberland, VA</td>
+                    <td>Birth → Death</td>
+                    <td>⛴ Yes</td>
+                    <td>—</td>
+                </tr>
+            
+                <tr class="ocean-crossing" data-ocean-crossing="true">
+                    <td>Mildred WARNER</td>
+                    <td>Mildred</td>
+                    <td>WARNER</td>
+                    <td data-sort-value="1700">1700</td>
+                    <td>Offredericksburg, Spotsylvania, VA</td>
+                    <td>&quot;Whitehaven&quot;, England</td>
+                    <td>Birth → Death</td>
+                    <td>⛴ Yes</td>
+                    <td>—</td>
+                </tr>
+            
+                <tr class="ocean-crossing" data-ocean-crossing="true">
+                    <td>William BALL</td>
+                    <td>William</td>
+                    <td>BALL</td>
+                    <td data-sort-value="1680">1680</td>
+                    <td>, , Wiltshire, England</td>
+                    <td>Millenbeck, Lancaster Co., Virginia</td>
+                    <td>Birth → Death</td>
+                    <td>⛴ Yes</td>
+                    <td>—</td>
+                </tr>
+            
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+            </div>
+            
+            <script>
+                function switchTab(tabId) {
+                    // Hide all tabs
+                    document.querySelectorAll('.tab-pane').forEach(tab => {
+                        tab.classList.remove('active');
+                    });
+                    document.querySelectorAll('.tab-button').forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+                    
+                    // Show selected tab
+                    document.getElementById(`tab-${tabId}`).classList.add('active');
+                    event.target.classList.add('active');
+                }
+
+                function sortMigrationTable(colIndex, type, headerEl) {
+                    const table = document.getElementById('migrationTable');
+                    if (!table) return;
+                    const tbody = table.tBodies[0];
+                    const rows = Array.from(tbody.rows);
+                    const ascending = headerEl.getAttribute('data-sort-dir') !== 'asc';
+
+                    rows.sort((rowA, rowB) => {
+                        const cellA = rowA.cells[colIndex];
+                        const cellB = rowB.cells[colIndex];
+                        let valueA = cellA.getAttribute('data-sort-value') ?? cellA.textContent.trim();
+                        let valueB = cellB.getAttribute('data-sort-value') ?? cellB.textContent.trim();
+
+                        if (type === 'number') {
+                            valueA = parseFloat(valueA) || 0;
+                            valueB = parseFloat(valueB) || 0;
+                            return ascending ? valueA - valueB : valueB - valueA;
+                        }
+
+                        valueA = valueA.toLowerCase();
+                        valueB = valueB.toLowerCase();
+                        if (valueA < valueB) return ascending ? -1 : 1;
+                        if (valueA > valueB) return ascending ? 1 : -1;
+                        return 0;
+                    });
+
+                    table.querySelectorAll('th.sortable').forEach(th => th.removeAttribute('data-sort-dir'));
+                    headerEl.setAttribute('data-sort-dir', ascending ? 'asc' : 'desc');
+                    rows.forEach(row => tbody.appendChild(row));
+                }
+
+                function filterMigrationTable() {
+                    const table = document.getElementById('migrationTable');
+                    const checkbox = document.getElementById('oceanCrossingFilter');
+                    if (!table || !checkbox) return;
+                    const onlyOceanCrossing = checkbox.checked;
+
+                    table.tBodies[0].querySelectorAll('tr').forEach(row => {
+                        const isOceanCrossing = row.getAttribute('data-ocean-crossing') === 'true';
+                        row.style.display = (!onlyOceanCrossing || isOceanCrossing) ? '' : 'none';
+                    });
+                }
+            </script>
+        </body>
+        </html>
+        

@@ -188,17 +188,22 @@ class MigrationFlowAnalyzer:
     
     def extract_events_with_locations(self, person, event_type: MigrationEventType) -> List[Tuple[str, str, str, Optional[int], str, str, str, str]]:
         """
-        Extract birth/death/residence events with their years and locations.
-        
+        Extract events with their years and locations.
+
+        Every record in the resolved bucket is examined, not just the first, so that
+        secondary records (census, occupation, education, immigration, etc. - which are
+        all stored under the 'residence' bucket) can each be used as an indicator of
+        migration when the country changes between consecutive records.
+
         Args:
             person: Person object from genealogy
-            event_type: Type of event to extract (BIRTH, DEATH, RESIDENCE, BURIAL)
+            event_type: Type of event to extract (BIRTH, DEATH, RESIDENCE, BURIAL, ...)
         
         Returns:
             List of (location, subdivision, country, year, continent, event_tag, description, raw_place) tuples
         """
         events = []
-        
+
         # Map event type to person attributes
         event_map = {
             MigrationEventType.BIRTH: 'birth',
@@ -208,30 +213,46 @@ class MigrationFlowAnalyzer:
             MigrationEventType.ARRIVAL: 'arrival',
             MigrationEventType.DEPARTURE: 'residence',  # Treat arrival/departure as residence for location extraction
             MigrationEventType.MARRIAGE: 'marriage',
-            MigrationEventType.IMMIGRATION : 'immigration',
-            MigrationEventType.OCCUPATION : 'occupation'
-
         }
-        
+
         attr_name = event_map.get(event_type)
         if not attr_name:
             return events
 
-        event = None
+        for raw_event in self._resolve_person_events(person, attr_name):
+            parsed_event = self._extract_location_from_event(raw_event, event_type)
+            if parsed_event:
+                events.append(parsed_event)
+
+        return events
+
+    def _resolve_person_events(self, person, attr_name: str) -> List[object]:
+        """Resolve every raw event record in a person's named bucket (e.g. 'residence' holds RESI/CENS/OCCU/IMMI/... records)."""
+        if hasattr(person, 'get_events') and callable(getattr(person, 'get_events')):
+            try:
+                raw_events = person.get_events(attr_name, date_order=True)
+            except TypeError:
+                raw_events = person.get_events(attr_name)
+            except Exception:
+                raw_events = None
+            if raw_events:
+                return list(raw_events)
+
         if hasattr(person, 'get_event') and callable(getattr(person, 'get_event')):
             candidate = person.get_event(attr_name)
             # Some mocks implement get_event but may return generic placeholder objects.
             if candidate is not None and hasattr(candidate, 'place') and (hasattr(candidate, 'date') or hasattr(candidate, 'year')):
                 # Ensure we have usable data
                 if isinstance(candidate.place, str) and (hasattr(candidate.date, 'year_num') or hasattr(candidate, 'year')):
-                    event = candidate
-            if event is None:
-                event = getattr(person, attr_name, None)
-        else:
-            event = getattr(person, attr_name, None)
+                    return [candidate]
 
+        fallback = getattr(person, attr_name, None)
+        return [fallback] if fallback is not None else []
+
+    def _extract_location_from_event(self, event, event_type: MigrationEventType) -> Optional[Tuple[str, str, str, int, str, str, str, str]]:
+        """Parse a single raw event record into a (location, subdivision, country, year, continent, event_tag, description, raw_place) tuple, or None if unusable."""
         if not event:
-            return events
+            return None
 
         place = getattr(event, 'place', None)
         evlocation = getattr(event, 'location', None)
@@ -248,59 +269,52 @@ class MigrationFlowAnalyzer:
             elif isinstance(event.date, int):
                 year = event.date
 
-        # If we still don't have numeric year, ignore this event
-        if year is None:
-            return events
-
-        # Only process when we have valid place string and year
+        # Only process when we have a valid place string and year
         if not place or not isinstance(place, str) or year is None:
-            return events
+            return None
 
         # Try to use geolocated event info and canonical normalization where possible.
-        if place:
-            normalized_location, normalized_subdivision, normalized_country, country_from_place = self._normalize_place_details(place, country)
-            if country_from_place:
-                derived_continent = self._get_continent_for_country(normalized_country)
-                if derived_continent:
-                    continent = derived_continent
+        normalized_location, normalized_subdivision, normalized_country, country_from_place = self._normalize_place_details(place, country)
+        if country_from_place:
+            derived_continent = self._get_continent_for_country(normalized_country)
+            if derived_continent:
+                continent = derived_continent
 
-            if hasattr(event, 'location') and getattr(event, 'location', None):
-                event_location = event.location
-                if not country_from_place and isinstance(getattr(event_location, 'country_name', None), str) and event_location.country_name:
-                    normalized_country = self._canonicalize_country_name(event_location.country_name)
-                    if not continent:
-                        derived_continent = self._get_continent_for_country(normalized_country)
-                        if derived_continent:
-                            continent = derived_continent
-                if not country_from_place and isinstance(getattr(event_location, 'continent', None), str) and event_location.continent:
-                    continent = event_location.continent
-                if isinstance(getattr(event_location, 'address', None), str) and event_location.address and not normalized_location:
-                    alt_city, _, _, _ = self._normalize_place_details(event_location.address, normalized_country)
-                    normalized_location = alt_city
+        if hasattr(event, 'location') and getattr(event, 'location', None):
+            event_location = event.location
+            if not country_from_place and isinstance(getattr(event_location, 'country_name', None), str) and event_location.country_name:
+                normalized_country = self._canonicalize_country_name(event_location.country_name)
+                if not continent:
+                    derived_continent = self._get_continent_for_country(normalized_country)
+                    if derived_continent:
+                        continent = derived_continent
+            if not country_from_place and isinstance(getattr(event_location, 'continent', None), str) and event_location.continent:
+                continent = event_location.continent
+            if isinstance(getattr(event_location, 'address', None), str) and event_location.address and not normalized_location:
+                alt_city, _, _, _ = self._normalize_place_details(event_location.address, normalized_country)
+                normalized_location = alt_city
 
-            if normalized_location:
-                location = normalized_location
-            else:
-                # Fallback city from original place string
-                parts = [p.strip() for p in place.split(',') if p.strip()]
-                location = parts[0] if parts else place
+        if normalized_location:
+            location = normalized_location
+        else:
+            # Fallback city from original place string
+            parts = [p.strip() for p in place.split(',') if p.strip()]
+            location = parts[0] if parts else place
 
-            if normalized_country:
-                country = normalized_country
-            else:
-                # fallback the last component
-                parts = [p.strip() for p in place.split(',') if p.strip()]
-                country = parts[-1] if len(parts) > 1 else ""
+        if normalized_country:
+            country = normalized_country
+        else:
+            # fallback the last component
+            parts = [p.strip() for p in place.split(',') if p.strip()]
+            country = parts[-1] if len(parts) > 1 else ""
 
-            if continent is None:
-                continent = ""
+        if continent is None:
+            continent = ""
 
-            event_tag = self._get_event_tag(event, event_type)
-            description = self._get_event_description(event)
+        event_tag = self._get_event_tag(event, event_type)
+        description = self._get_event_description(event)
 
-            events.append((location, normalized_subdivision, country, year, continent, event_tag, description, place))
-
-        return events
+        return (location, normalized_subdivision, country, year, continent, event_tag, description, place)
 
     def _get_event_tag(self, event, event_type: MigrationEventType) -> str:
         """Return the raw GEDCOM tag for an event (e.g. 'IMMI', 'RESI'), falling back to the event type."""
@@ -587,13 +601,16 @@ class MigrationFlowAnalyzer:
                            from_node: LocationNode, to_node: LocationNode,
                            from_raw_place: str, to_raw_place: str,
                            from_tag: str, to_tag: str, from_description: str, to_description: str,
-                           to_event_type: MigrationEventType, time_period: str, date: Optional[int]) -> None:
+                           to_event_type: MigrationEventType, time_period: str,
+                           from_year: Optional[int], to_year: Optional[int]) -> None:
         """Append a PersonMigrationRecord when a move crosses a country border or has an explicit migration record."""
         has_migration_record = to_tag in self.MIGRATION_RECORD_TAGS or from_tag in self.MIGRATION_RECORD_TAGS
         country_changed = bool(from_node.country) and bool(to_node.country) and from_node.country != to_node.country
 
         if not (country_changed or has_migration_record):
             return
+
+        date = self._estimate_migration_year(from_year, to_year, country_changed)
 
         if has_migration_record:
             migration_tag = to_tag if to_tag in self.MIGRATION_RECORD_TAGS else from_tag
@@ -623,6 +640,13 @@ class MigrationFlowAnalyzer:
             time_period=time_period,
         ))
 
+    @staticmethod
+    def _estimate_migration_year(from_year: Optional[int], to_year: Optional[int], country_changed: bool) -> Optional[int]:
+        """Estimate when a move happened: the midpoint between the surrounding records for a cross-country move, otherwise the later record's year."""
+        if country_changed and from_year is not None and to_year is not None:
+            return (from_year + to_year) // 2
+        return to_year if to_year is not None else from_year
+
     def analyze(self, 
                 event_types: Optional[List[MigrationEventType]] = None,
                 max_lines: Optional[int] = None) -> MigrationStats:
@@ -637,9 +661,10 @@ class MigrationFlowAnalyzer:
             MigrationStats with analysis results
         """
         if event_types is None:
-            event_types = [MigrationEventType.BIRTH, MigrationEventType.DEATH, 
-                          MigrationEventType.RESIDENCE, MigrationEventType.MARRIAGE,    
-                          MigrationEventType.IMMIGRATION, MigrationEventType.OCCUPATION]
+            # RESIDENCE covers the 'residence' bucket, which includes census, occupation,
+            # education, immigration, naturalization, and other secondary records.
+            event_types = [MigrationEventType.BIRTH, MigrationEventType.DEATH,
+                          MigrationEventType.RESIDENCE, MigrationEventType.MARRIAGE]
         
         flow_dict: Dict[Tuple[str, str], MigrationFlow] = {}
         self.locations = set()
@@ -728,7 +753,8 @@ class MigrationFlowAnalyzer:
                             to_description=to_description,
                             to_event_type=to_event_type,
                             time_period=from_period,
-                            date=to_year,
+                            from_year=from_year,
+                            to_year=to_year,
                         )
 
         full_flows = list(flow_dict.values())

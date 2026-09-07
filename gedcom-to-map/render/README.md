@@ -23,6 +23,7 @@ All exporters and renderers use dependency injection via service objects for con
   - CSV summaries for places, countries, geocoding cache
   - Birth/death heatmap matrices
   - Enrichment issues reports
+  - Migration report and graph
 
 - **Name Processing:** Utilities for name normalization, comparison, and soundex (all static methods)
 - **Reference Tracking:** Manage references and links between people, places, and events
@@ -117,6 +118,9 @@ render/
 │   ├── kml_exporter_refined.py
 │   ├── kml_life_lines_creator.py
 │   └── kml_life_lines.py
+├── migration/                    # Migration Sankey
+│   ├── __init__.py
+│   ├── sankey_exporter.py
 └── tests/                   # Unit tests
     └── test_result_type.py
 ```
@@ -131,6 +135,7 @@ render/
 - [pandas](https://pypi.org/project/pandas/) - Data manipulation and CSV export
 - [seaborn](https://pypi.org/project/seaborn/) - Statistical visualizations
 - [matplotlib](https://pypi.org/project/matplotlib/) - Plotting and heatmaps
+- [plotly](https://pypi.org/project/plotly/) - Plotting and graphing library
 
 ### Internal Dependencies
 - `services/`: Service interfaces (IConfig, IState, IProgressTracker)

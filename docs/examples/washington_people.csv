@@ -1,0 +1,530 @@
+ID,Name,birth_place,birth_alt_addr,birth_date,birth_country,birth_continent,death_place,death_alt_addr,death_date,death_country,death_continent
+@I1@,George WASHINGTON,"Wakefield, Popes Creek, Westmoreland, Virginia",,1732,United States,North America,"Mount Vernon, Fairfax, Virginia",,1799,United States,North America
+@I3@,Augustine WASHINGTON,"Bridge's Creek, Westmoreland, Virginia",,1693,United States,North America,"Ferry Farm, King George, Virginia",,1743,United States,North America
+@I4@,Mary BALL,"Of, Epping Forest, Lancaster, Virginia",,1708,United States,North America,"Mount Vernon, Fairfax, Virginia",,1789,United States,North America
+@I5@,Betty WASHINGTON,"Wakefield, Westmoreland, Virginia",,1733,United States,North America,"""Western View"", Culpeper, Virginia",,1797,United States,North America
+@I6@,Samuel WASHINGTON,"Wakefield, Westmoreland, Virginia",,1734,United States,North America,,,1781,,
+@I7@,John Augustine WASHINGTON,"Wakefield, Westmoreland, Virginia",,1736,United States,North America,,,1787,,
+@I8@,Charles WASHINGTON,"Wakefield, Westmoreland, Virginia",,1738,United States,North America,,,1799,,
+@I9@,Mildred WASHINGTON,"Wakefield, Westmoreland, Virginia",,1739,United States,North America,"Wakefield, Westmoreland, Virginia",,1740,United States,North America
+@I10@,Lawrence WASHINGTON,"Bridge Creek, Westmoreland, Virginia",,1659,United States,North America,"Bridge Creek, Westmorland, Virginia",,1699,United States,North America
+@I11@,Mildred WARNER,"Offredericksburg, Spotsylvania, VA",,1671,United States,North America,"""Whitehaven"", England",,1700,England,Europe
+@I12@,John WASHINGTON,"Bridges Creek, King George, VA",,1692,United States,North America,", , VA",,,Civitas Vaticana - Città del Vaticano,Europe
+@I13@,Mildred WASHINGTON,"Offredericksburg, Spotsylvania, VA",,1696,United States,North America,", , VA",,1747,Civitas Vaticana - Città del Vaticano,Europe
+@I14@,Joseph BALL,"Millenkick, Lancaster, Virginia",,1649,United States,North America,"Oakley, Lancaster, Virginia",,1711,United States,North America
+@I15@,Mary MONTAGUE,", King George, Virginia",,1665,United States,North America,"Ferry Far, King George, Virginia",,1743,United States,North America
+@I16@,John BALL,", , Stafford, Virginia",,1670,United States,North America,", , Stafford, Virginia",,1722,United States,North America
+@I17@,Martha BALL,,,1675,,,,,,,
+@I18@,Frances BALL,VA,,1709,Civitas Vaticana - Città del Vaticano,Europe,VA,,1730,Civitas Vaticana - Città del Vaticano,Europe
+@I19@,Sara BALL,"""Bewdley"", Lancaster Co, VA",,1712,United States,North America,VA,,,Civitas Vaticana - Città del Vaticano,Europe
+@I20@,Eve BALL,VA,,1713,Civitas Vaticana - Città del Vaticano,Europe,VA,,,Civitas Vaticana - Città del Vaticano,Europe
+@I21@,Jesse BALL,VA,,1716,Civitas Vaticana - Città del Vaticano,Europe,VA,,1747,Civitas Vaticana - Città del Vaticano,Europe
+@I22@,James BALL,VA,,1718,Civitas Vaticana - Città del Vaticano,Europe,VA,,1753,Civitas Vaticana - Città del Vaticano,Europe
+@I23@,Edwin BALL,VA,,1723,Civitas Vaticana - Città del Vaticano,Europe,VA,,,Civitas Vaticana - Città del Vaticano,Europe
+@I24@,Jeduthun BALL,VA,,1725,Civitas Vaticana - Città del Vaticano,Europe,VA,,1748,Civitas Vaticana - Città del Vaticano,Europe
+@I25@,Sinah BALL,VA,,1727,Civitas Vaticana - Città del Vaticano,Europe,VA,,,Civitas Vaticana - Città del Vaticano,Europe
+@I26@,John WASHINGTON,"Sulgrave Manor, England",,1630,England,Europe,", Stafford Co., Va.",,1677,United States,North America
+@I27@,Anne POPE,", St Mary, Maryland",,1635,United States,North America,"Bridge Creek, Westmoreland, Virginia",,1668,United States,North America
+@I28@,Ann WASHINGTON,"Lower Machodc, Westmoreland Co., Vi.",,1659,United States,North America,,,1697,,
+@I29@,Richard WASHINGTON,", Surry Co, VA",,1660,United States,North America,", Surry Co, VA",,19,United States,North America
+@I30@,John WASHINGTON,", Westmoreland, VA",,1661,United States,North America,Will Proved,,1698,,
+@I31@,Augustine WARNER,", Of Glouster, VA",,1642,United States,North America,"Warner Hall, Gloucester Co, VA",,1681,United States,North America
+@I32@,Mildred READE,", , VA",,1643,Civitas Vaticana - Città del Vaticano,Europe,", Cumberland, VA",,1686,United States,North America
+@I33@,Mary WARNER,"Lancaster Co., VA.",,1664,United States,North America,"Gloucester Co., VA.",,1700,United States,North America
+@I34@,Mary WARNER,", , VA",,1671,Civitas Vaticana - Città del Vaticano,Europe,,,1700,,
+@I35@,Augustine WARNER,"Gloucester, VA.",,1671,United States,North America,,,,,
+@I36@,Elizabeth WARNER,Chesake,,1672,,,"Gloucesterco, VA",,1720,Civitas Vaticana - Città del Vaticano,Europe
+@I37@,Mildred WARNER,", , VA",,1673,Civitas Vaticana - Città del Vaticano,Europe,,,,,
+@I38@,George WARNER,"Gloucester, VA.",,1674,United States,North America,,,,,
+@I39@,William BALL,", , Wiltshire, England",,1614,England,Europe,"Millenbeck, Lancaster Co., Virginia",,1680,United States,North America
+@I40@,Hannah ATHEROLD,"London, London, England",,1619,England,Europe,", Millenbeck, Lancaster, Virginia",,1695,United States,North America
+@I41@,Richard BALL,", , England",,1639,England,Europe,", Richmond, Virginia",,1676,United States,North America
+@I42@,Richard BALL,,,1639,,,Infant,,,España,Europe
+@I43@,William BALL,", , England",,1641,England,Europe,", , Virginia",,1694,United States,North America
+@I44@,Richard BALL,,,1641,,,,,,,
+@I45@,William BALL,,,1643,,,,,,,
+@I46@,Hannah BALL,", , England",,1650,England,Europe,VA,,1694,Civitas Vaticana - Città del Vaticano,Europe
+@I47@,Joseph BALL,,,1650,,,,,,,
+@I48@,Hannah BALL,,,1651,,,,,,,
+@I49@,Peter MONTAGUE,", Nansemond, VA",,1634,United States,North America,", Nansemond, VA",,1702,United States,North America
+@I50@,Mary DOODES,", , , Holland",,1642,Netherlands,Europe,,,,,
+@I51@,Mary MONTEQUE,"Christchurch, Middlesex, VA.",,1642,United States,North America,,,,,
+@I52@,Peter MONTAGUE,", Middlesex, VA",,1666,United States,North America,", Middlesex, Virginia",,1702,United States,North America
+@I53@,William MONTAGUE,", Middlesex Cnty, Virginia",,1670,United States,North America,", Middlesex Cnty, Virginia",,1713,United States,North America
+@I54@,Katherine MONTAGUE,", King George Co., VA",,1678,United States,North America,,,1743,,
+@I55@,John MONTAGUE,", Middlesex, VA",,1682,United States,North America,", Essex, VA",,1733,United States,North America
+@I56@,Lawrence WASHINGTON,"Sulgrave, Northamptonshire, England",,1602,England,Europe,,,1652,,
+@I57@,Amphyllis TWIGDEN,"Little Creston, Northampton, England",,1605,England,Europe,"Tring, Hereford, England",,1655,England,Europe
+@I58@,Elizabeth WASHINGTON,England,,1627,England,Europe,"Tring, Herts",,1636,United Kingdom,Europe
+@I59@,William WASHINGTON,England,,1627,England,Europe,"Tring, Herts",,1641,United Kingdom,Europe
+@I60@,Martha WASHINGTON,England,,1627,England,Europe,,,,,
+@I61@,Margaret WASHINGTON,England,,1627,England,Europe,,,,,
+@I62@,Lawrence WASHINGTON,England,,1635,England,Europe,Virginia,,1657,United States,North America
+@I63@,Nathaniel POPE,", , England",,1603,England,Europe,", Westmoreland, VA",,1660,United States,North America
+@I64@,Lucy,", Of Gloucester, England",,1611,England,Europe,", Westmoreland, VA",,1660,United States,North America
+@I65@,Thomas POPE,"Bristol, Gloucestershire, Eng",,1630,United Kingdom,Europe,"Bristol, Gloucestershire, Eng",,1685,United Kingdom,Europe
+@I66@,Thomas POPE,"Briston, , , England",,1633,England,Europe,"Bristol, , , England",,1685,England,Europe
+@I67@,Margaret POPE,"Bristol, Gloucestershire, Eng",,1633,United Kingdom,Europe,,,1669,,
+@I68@,Elizabeth POPE,", , Virginia",,1634,United States,North America,,,,,
+@I69@,Nathaniel POPE,,,1635,,,,,,,
+@I70@,Nathaniel POPE,", St. Marys Co., MD",,1635,United States,North America,", Westmoreland Co., VA",,1675,United States,North America
+@I71@,Thomas POPE,"St. Mary'S Par., Maryland",,1639,United States,North America,England,,1668,England,Europe
+@I72@,Margaret POPE,,,1642,,,,,,,
+@I73@,Nathaniel POPE,", St Mary'S, MD",,1642,United States,North America,,,,,
+@I74@,John POPE,,,1644,,,,,,,
+@I75@,Thomas POPE,", St Mary'S, MD",,1648,United States,North America,Will Proved,,1685,,
+@I76@,Augustine WARNER,Eng,,1610,United Kingdom,Europe,"Warner Hall, Gloucester, VA",,1674,United States,North America
+@I77@,Mary TOWNELEY,"Stone Edge, Lancashire, England",,1614,England,Europe,"Warner Hall, Gloucester, Virginia",,1662,United States,North America
+@I78@,Isabella WARNER,"Gloucesterco, VA",,1640,Civitas Vaticana - Città del Vaticano,Europe,"Gloucesterco, VA",,1703,Civitas Vaticana - Città del Vaticano,Europe
+@I79@,Sarah WARNER,"Of, Gloucester, VA",,1644,United States,North America,,,,,
+@I80@,George READE,"Linkenholt Manor, Hampshire, England",,1608,England,Europe,", , VA",,1671,Civitas Vaticana - Città del Vaticano,Europe
+@I81@,Elizabeth MARTIAU (MARTAIN),"Of Elizabeth City Co., VA",,1625,Civitas Vaticana - Città del Vaticano,Europe,Will Processed,,1686,,
+@I82@,George READE,", , VA",,1640,Civitas Vaticana - Città del Vaticano,Europe,,,,,
+@I83@,Robert READE,", , VA",,1644,Civitas Vaticana - Città del Vaticano,Europe,,,1712,,
+@I84@,Francis READE,", , VA",,1645,Civitas Vaticana - Città del Vaticano,Europe,,,1694,,
+@I85@,Benjamin READE,", , VA",,1647,Civitas Vaticana - Città del Vaticano,Europe,", , VA.",,1731,Civitas Vaticana - Città del Vaticano,Europe
+@I86@,Thomas READE,", , VA",,1649,Civitas Vaticana - Città del Vaticano,Europe,", , VA.",,1716,Civitas Vaticana - Città del Vaticano,Europe
+@I87@,Elizabeth READE,"Of York Co., VA",,1651,United States,North America,,,,,
+@I88@,Ann READE,"York Co, , VA",,1652,United States,North America,,,,,
+@I89@,Margaret READE,"York Co, , VA",,1654,United States,North America,,,,,
+@I90@,Thomas READE,VA,,1667,Civitas Vaticana - Città del Vaticano,Europe,,,,,
+@I91@,William BALL,", , Wiltshire, England",,1573,England,Europe,"New Haven, New Haven, CT",,1648,United States,North America
+@I92@,Alice WALTHAM,", Wiltshire, England",,1573,England,Europe,,,,,
+@I93@,John BALL,"Wiltshire, , Eng",,1580,United Kingdom,Europe,"Watertown, , Ma?",,1655,United States,North America
+@I94@,Samuel BALL,"Wilshire, England",,1592,England,Europe,,,,,
+@I95@,Richard BALL,"Salisbury, Massachusetts",,1594,United States,North America,,,,,
+@I96@,Alling Or Allen BALL,", , Wiltshire, England",,1595,England,Europe,"New Haven, New Haven Co., Connecticut",,,United States,North America
+@I97@,William BALL,", Lancaster, Virginia",,1596,United States,North America,,,1680,,
+@I98@,Alling BALL,"New Haven, Connecticut",,1598,United States,North America,,,1690,,
+@I99@,Francis BALL,"Springfield, , Massachusetts",,1599,United States,North America,"Springfield, Hampden, MA",,1648,United States,North America
+@I100@,Samuel BALL,", , Wiltshire, England",,1601,England,Europe,,,,,
+@I101@,Richard BALL,", , Wiltshire, England",,1603,England,Europe,", , , Virginia",,,United States,North America
+@I102@,Alling BALL,England,,1617,England,Europe,"New Haven, New Haven, Connecticut",,1716,United States,North America
+@I103@,Peter MONTAGUE,"Boveney, , , Eng",,1603,United Kingdom,Europe,", , Virginia",,1659,United States,North America
+@I104@,Cicely MATTHEW,,,1600,,,,,,,
+@I105@,Ann MONTAGUE,", , VA",,1630,Civitas Vaticana - Città del Vaticano,Europe,", , VA",,1659,Civitas Vaticana - Città del Vaticano,Europe
+@I106@,Ellen MONTAGUE,", , VA",,1632,Civitas Vaticana - Città del Vaticano,Europe,,,,,
+@I107@,Elizabeth MONTAGUE,", Nansemond, VA",,1636,United States,North America,,,,,
+@I108@,William MONTAGUE,", Nansemond, VA",,1638,United States,North America,"Middlesex County, VA",,1713,United States,North America
+@I109@,Sarah MONTAGUE,,,1638,,,,,,,
+@I110@,Margaret MONTAGUE,", Nansemond, VA",,1640,United States,North America,,,,,
+@I111@,Ann MONTAGUE,,,1668,,,,,,,
+@I112@,Elizabeth MONTAGUE,,,1670,,,,,,,
+@I113@,Margaret MONTAGUE,,,1672,,,,,,,
+@I114@,Ellen MONTAGUE,,,1674,,,,,,,
+@I115@,Lawrence WASHINGTON,"Sulgrave, Northampton, Eng",,1566,United Kingdom,Europe,"Brington, Northamptonshire, England",,1616,England,Europe
+@I116@,Margaret BUTLER,"Tighes, Surrey, Eng",,1568,United Kingdom,Europe,,,1622,,
+@I117@,John WASHINGTON,"Thrapston, Northants, Eng",,1589,United Kingdom,Europe,,,1688,,
+@I118@,William WASHINGTON,"Packington, Leics, Eng",,1590,United Kingdom,Europe,Will Proved,,1648,,
+@I119@,Robert WASHINGTON,"Brington, Northants, Eng",,1591,United Kingdom,Europe,,,,,
+@I120@,Richard WASHINGTON,"Brington, Northants, Eng",,1591,United Kingdom,Europe,,,,,
+@I121@,Ann WASHINGTON,"Brington, Northants, Eng",,1593,United Kingdom,Europe,,,1635,,
+@I122@,Elizabeth WASHINGTON,"Brington, Northants, Eng",,1595,United Kingdom,Europe,,,,,
+@I123@,Lucy WASHINGTON,"Brington, Northants, Eng",,1596,United Kingdom,Europe,,,,,
+@I124@,Jane WASHINGTON,"Brington, Northants, Eng",,1598,United Kingdom,Europe,,,,,
+@I125@,Amy WASHINGTON,"Althrop, Northants, Eng",,1600,United Kingdom,Europe,,,1636,,
+@I126@,Thomas WASHINGTON,England,,1602,England,Europe,"Madrid, Spain",,1622,Spain,Europe
+@I127@,Margaret WASHINGTON,"Brington, Northants, Eng",,1604,United Kingdom,Europe,,,,,
+@I128@,Gregory WASHINGTON,England,,,England,Europe,Great Brington,,1606,United Kingdom,Europe
+@I129@,George WASHINGTON,England,,,England,Europe,"Wormleighton, Warwickshire",,1608,United Kingdom,Europe
+@I130@,Alice WASHINGTON,"Brington, Northants, Eng",,1610,United Kingdom,Europe,,,,,
+@I131@,Joan WASHINGTON,"Brington, Northants, Eng",,1611,United Kingdom,Europe,,,,,
+@I132@,Frances WASHINGTON,"Brington, Northants, Eng",,1613,United Kingdom,Europe,,,,,
+@I133@,John TWIGDEN,"Of, Little Creston, Northants, England",,1579,England,Europe,"Little Creaton, Northamptonshire, England",,1610,England,Europe
+@I134@,Anne DICKENS,"Of, Great Creaton, Northants, England",,1582,England,Europe,,,1637,,
+@I135@,Robert READE,", , England",,1575,England,Europe,Linkenholt Eng.,,1626,United Kingdom,Europe
+@I136@,Mildred WINDIBANK,England,,1590,England,Europe,VA,,1656,Civitas Vaticana - Città del Vaticano,Europe
+@I137@,Nicholas MARTIAU,"Of, , Yorkshire, England",,1590,England,Europe,"Yorktown, Va, U.S.A.",,1656,USA,North America
+@I138@,Jane BERKELEY,", , , Eng",,1593,United Kingdom,Europe,"Elizabeth City, VA",,1624,United States,North America
+@I139@,Nicolas MARTIAU,", York, VA",,1623,United States,North America,,,1657,,
+@I140@,Sarah MARTIAU,", , VA",,1625,Civitas Vaticana - Città del Vaticano,Europe,,,,,
+@I141@,Mary MARTIAU,", Elizabethcity, VA",,1627,Civitas Vaticana - Città del Vaticano,Europe,", , VA",,1657,Civitas Vaticana - Città del Vaticano,Europe
+@I142@,Sarah MARTIAU,", , VA",,1629,Civitas Vaticana - Città del Vaticano,Europe,,,,,
+@I143@,Richard MARTIAU,"Norfolk, Elizabethcity, VA",,1630,Civitas Vaticana - Città del Vaticano,Europe,,,,,
+@I144@,John BALL,"Wokingham, Berkshsire, England",,1548,England,Europe,,,1628,,
+@I145@,Elizabeth WEBB,"Ruscombe, Comitatis, Berkshire, England",,1575,England,Europe,,,1595,,
+@I146@,Rachel BALL,"Ruscambe, , Eng",,1568,United Kingdom,Europe,,,,,
+@I147@,Thomas BALL,"Wokingham, Berkshire, England",,1575,England,Europe,,,1744,,
+@I148@,Richard BALL,"Wokingham, Berkshire, England",,1577,England,Europe,,,,,
+@I149@,George BALL,"Wokingham, Berkshire, England",,1579,England,Europe,,,,,
+@I150@,Samuel BALL,"Wokingham, Berkshire, England",,1581,England,Europe,,,,,
+@I151@,Rachel BALL,"Wokingham, Berkshire, England",,1583,England,Europe,,,,,
+@I152@,Elizabeth BALL,"Wokingham, Berkshire, England",,1585,England,Europe,,,,,
+@I153@,Susan BALL,"Wokingham, Berkshire, England",,1587,England,Europe,,,,,
+@I154@,Als (Sic) BALL,"Wokingham, Berkshire, England",,1589,England,Europe,,,,,
+@I155@,Dorothy BALL,"Wokingham, Berkshire, England",,1591,England,Europe,,,,,
+@I156@,Mary BALL,"Wokingham, Berkshire, England",,1593,England,Europe,,,,,
+@I157@,Richard WALTHAM,"Of, Wiltshire, England",,1550,England,Europe,,,,,
+@I158@,Peter Of Boveney MONTAGUE,"Boveny Parish, Burnham, Buckingham, Eng",,1580,United Kingdom,Europe,"Parish Burnham, Buckingham, Eng",,1659,United Kingdom,Europe
+@I159@,Eleanor ALLEN,"Of Burnham, Buckingham, Eng",,1585,United Kingdom,Europe,,,1656,,
+@I160@,Robert MONTAGUE,"Burnham, Boveney, Bucks, England",,1605,England,Europe,,,,,
+@I161@,William MONTAGUE,"Burnham, Boveney, Bucks, England",,1610,England,Europe,,,,,
+@I162@,Ann MONTAGUE,"Burnham, Boveney, Bucks, England",,1611,England,Europe,,,,,
+@I163@,Peter MONTAGUE,,,1612,,,,,1658,,
+@I164@,Richard MONTAGUE,England,,1614,England,Europe,"Hadley, Hampshire, MA",,1681,United States,North America
+@I165@,William MONTAGUE,"Of Burnham, Bucks, England",,1616,England,Europe,,,1681,,
+@I166@,Elizabeth MONTAGUE,"Burnham, Boveney, Bucks, England",,1618,England,Europe,,,,,
+@I167@,Peter MONTAGUE,,,1618,,,,,1659,,
+@I168@,Anne MONTAGUE,"Of Burnham, Buckingham, England",,1620,England,Europe,,,,,
+@I169@,Margaret MONTAGUE,"Burnham, Boveney, Bucks, England",,1622,England,Europe,,,,,
+@I170@,Robert WASHINGTON,"Sulgrave, Northampton, Eng.",,1544,United Kingdom,Europe,"South Isle Of Church, Sulgrave",,1623,United Kingdom,Europe
+@I171@,Elizabeth LIGHT,"Of Radway, Warwickshire, England",,1547,England,Europe,", , , Eng",,1599,United Kingdom,Europe
+@I172@,Robert WASHINGTON,"Of Whitefield, Lancs., Eng.",,1568,United Kingdom,Europe,,,1622,,
+@I173@,Walter WASHINGTON,"Sulgrave, Northants, Eng",,1570,United Kingdom,Europe,Will Dated,,1596,,
+@I174@,Christopher WASHINGTON,"Of Sulgrave, Northampton, Eng.",,1573,United Kingdom,Europe,,,1596,,
+@I175@,William WASHINGTON,"Of Sulgrave, Northampton, Eng.",,1575,United Kingdom,Europe,,,,,
+@I176@,Walter WASHINGTON,"Of Sulgrave, Northhampton, Eng.",,1577,United Kingdom,Europe,,,1597,,
+@I177@,Thomas WASHINGTON,"Sulgrave, Northampton, En",,1577,Österreich,Europe,,,,,
+@I178@,Anne Or Amy WASHINGTON,"Of Sulgrave, Northampton, Eng.",,1579,United Kingdom,Europe,,,,,
+@I179@,Ursula WASHINGTON,"Of Sulgrave, Northampton, Eng.",,1581,United Kingdom,Europe,,,,,
+@I180@,Elizabeth WASHINGTON,"Of Sulgrave, Northampton, Eng.",,1583,United Kingdom,Europe,,,,,
+@I181@,William BUTLER,"Tyes Hall, Cuckfield, Sussex, England",,1540,England,Europe,,,,,
+@I182@,Margaret,"Palstarr, , Lancaster, England",,1544,England,Europe,,,1580,,
+@I183@,Andrew READE,"Of, Faccombe, Hertfordshire, England",,1556,England,Europe,", Linkenwilt",,1623,,
+@I184@,Alice COOKE,"Of, , Kent",,1558,United States,North America,"Kent Manor, Linkenholt, Southhamptonshir, Eng.",,1605,United Kingdom,Europe
+@I185@,Henry READE,,,1566,,,", Faccombe, , England",,1647,England,Europe
+@I186@,Thomas WINDIBANK,"Haines Hillhurst, Parish, Berkshire",,1580,United Kingdom,Europe,"Scrivelsby, Lincolnshire, England",,1607,England,Europe
+@I187@,Frances DYMOKE,"Scrivelsby, Lincolnshire, England",,1550,England,Europe,,,1611,,
+@I188@,Anne WINDEBANK,,,1566,,,,,1624,,
+@I189@,Francis WINDEBANK,,,1583,,,,,1646,,
+@I190@,William MONTAGUE,"Boveney, , Bucks., Eng",,1548,United Kingdom,Europe,,,1595,,
+@I191@,Margaret MALTHOUSE,"Binfield, , Berks., Eng",,1558,United Kingdom,Europe,,,,,
+@I192@,William MONTAGUE,,,1573,,,,,,,
+@I193@,William MONTAGUE,"Boveney, Bucks, England",,1573,England,Europe,,,,,
+@I194@,Elizabeth MALTHOUSE,"Boveney, Bucks, Eng",,1575,United Kingdom,Europe,,,,,
+@I195@,Elizabeth MONTAGUE,,,1575,,,,,,,
+@I196@,Elizabeth MONTAGUE,"Boveney, Bucks, England",,1575,England,Europe,,,,,
+@I197@,William MALTHOUSE,"Boveney, Bucks, Eng",,1576,United Kingdom,Europe,,,,,
+@I198@,Ann MONTAGUE,,,1577,,,,,,,
+@I199@,Ann MONTAGUE,"Boveney, Bucks, England",,1577,England,Europe,,,,,
+@I200@,Anne MALTHOUSE,"Boveney, Bucks, Eng",,1578,United Kingdom,Europe,,,,,
+@I201@,George MALTHOUSE,"Boveney, Bucks, Eng",,1579,United Kingdom,Europe,,,,,
+@I202@,George MONTAGUE,"Boveney, Bucks, England",,1581,England,Europe,,,,,
+@I203@,William ALLEN,"Of Burnham, , Eng",,1553,United Kingdom,Europe,"Burnham, Boveney, Bucks, England",,1589,England,Europe
+@I204@,Ellen,,,1550,,,,,,,
+@I205@,Lawrence WASHINGTON,"Tewhitefield, Lancashire, England",,1500,England,Europe,"Sulgrave Manor, Northamps, Eng",,1583,United Kingdom,Europe
+@I206@,Amy PARGITER,"Gretworth, Northamptonshire, Eng",,1524,United Kingdom,Europe,"Of, Sulgrave, Northampton, England",,1564,England,Europe
+@I207@,William WASHINGTON,"Greys Inn, Middlesex, England",,1546,England,Europe,,,,,
+@I208@,John WASHINGTON,"Greys Inn, Middlesex, England",,1548,England,Europe,,,,,
+@I209@,Frances WASHINGTON,"Greys Inn, Middlesex, England",,1550,England,Europe,,,,,
+@I210@,Ann WASHINGTON,"Greys Inn, Middlesex, England",,1552,England,Europe,,,,,
+@I211@,Mary WASHINGTON,"Greys Inn, Middlesex, England",,1555,England,Europe,,,1622,,
+@I212@,Margaret WASHINGTON,,,1557,,,,,,,
+@I213@,Elizabeth WASHINGTON,,,1560,,,,,,,
+@I214@,Margaret WASHINGTON,,,1563,,,,,,,
+@I215@,Barbara WASHINGTON,,,1576,,,,,,,
+@I216@,Lawrence WASHINGTON,"Grays Inn London, , Eng",,1579,United Kingdom,Europe,,,,,
+@I217@,Walter LIGHT,"Radway, Grange, Oxfordshire, Eng",,1517,United Kingdom,Europe,,,1596,,
+@I218@,Ursula WOODFORD,"Of Radway, Warricks, Eng",,1519,United Kingdom,Europe,,,,,
+@I219@,Richard WINDIBANK,"Of, Wallop, Hants, England",,1532,England,Europe,,,,,
+@I220@,Margaret Verch GRIFFITH,,,1534,,,,,,,
+@I221@,Edward DYMOKE,"Scrivelsby, Lincolnshire, England",,1508,England,Europe,,,1566,,
+@I222@,Anne TALBOIS,"Kyme, Lincolnshire, England",,1508,England,Europe,,,,,
+@I223@,Robert DYMOKE,"Scrivelsby, Lincolnshire, England",,1526,England,Europe,,,1580,,
+@I224@,Margaret DYMOKE,"Scrivelsby, Lincoln, England",,1529,England,Europe,,,,,
+@I225@,Charles DYMOKE,"Scrivelsby, Lincolnshire, England",,1532,England,Europe,,,1611,,
+@I226@,Elizabeth DYMOKE,"Scrivelsby, Lincolnshire, England",,1535,England,Europe,,,,,
+@I227@,Dorothy DYMOKE,"Scrivelsby, Lincolnshire, England",,1538,England,Europe,,,,,
+@I228@,Bridget DYMOKE,"Scrivelsby, Lincolnshire, England",,1544,England,Europe,,,,,
+@I229@,Susan DYMOKE,"Of Scrivelsby, Lindssay, Lincolnshire, England",,1549,England,Europe,,,,,
+@I230@,Frances DYMOKE,"Scrivelsby, Lincolnshire, England",,1550,England,Europe,,,,,
+@I231@,Sarah DYMOKE,"Scrivelsby, Lincolnshire, England",,1552,England,Europe,,,,,
+@I232@,Edward DYMOKE,"Scrivelsby, Lincolnshire, England",,1555,England,Europe,,,1614,,
+@I233@,Margery DYMOKE,,,1589,,,,,,,
+@I234@,Robert MONTAGUE,"Boveney Buckinghamshire, England",,1528,England,Europe,"Boveney, Bucks, Eng",,1575,United Kingdom,Europe
+@I235@,Margaret COTTON,"Wardville, Berkshire, Eng",,1528,United Kingdom,Europe,,,,,
+@I236@,Lawrence MONTAGUE,"Of Boveney, Bckngh, England",,1541,England,Europe,,,,,
+@I237@,Lawrence MONTAGUE,"Dorney, Bucks, England",,1546,England,Europe,,,,,
+@I238@,John MALTHOUSE,"Binfield, Berkshire, Eng",,1532,United Kingdom,Europe,"Binfield, Berks, Eng",,,United Kingdom,Europe
+@I239@,Margaret BULLOCK,"Of Aberfelde, Berks, Eng",,1534,United Kingdom,Europe,"Binfield, Berks, Eng",,,United Kingdom,Europe
+@I240@,William BULLOCK,"Arborfield, Berks, Eng",,1522,United Kingdom,Europe,,,,,
+@I241@,John MALTHUS,,,,,,,,,,
+@I242@,Richard MALTHUS,,,,,,,,,,
+@I243@,William MALTHUS,,,,,,,,,,
+@I244@,Gilbert MALTHUS,,,,,,,,,,
+@I245@,Thomas MALTHUS,"Binfield, Berks, England",,1560,England,Europe,,,,,
+@I246@,Robert MALTHUS,,,,,,,,,,
+@I247@,Francis MALTHUS,,,,,,,,1563,,
+@I248@,John ALLEN,"Of Dorney, Bucks, Eng",,1520,United Kingdom,Europe,,,,,
+@I249@,John WASHINGTON,"Tewhitefield, Lancashire, England",,1465,England,Europe,,,1528,,
+@I250@,Margaret KITSON,", Wharton, Lancashire, England",,1482,England,Europe,,,,,
+@I251@,Nicholas WASHINGTON,"Warton, Lancashire, England",,1502,England,Europe,,,,,
+@I252@,Leonard WASHINGTON,"Warton, Lancashire, England",,1505,England,Europe,,,,,
+@I253@,Peter WASHINGTON,"Warton, Lancashire, England",,1507,England,Europe,,,,,
+@I254@,Thomas WASHINGTON,"Warton, Lancashire, England",,1510,England,Europe,,,,,
+@I255@,Jane WASHINGTON,"Warton, Lancashire, England",,1515,England,Europe,,,,,
+@I256@,Robert PARGITER,"Greatworth, Northamps, Eng",,1490,United Kingdom,Europe,"St. Katherine'S, Aisle, Greatworth, Church",,1557,United Kingdom,Europe
+@I257@,Anne KNIGHT,"Charwelton, Northamps, Eng",,1490,United Kingdom,Europe,,,,,
+@I258@,William PARGITER,"Shattiswell, Warwick, Eng",,1492,United Kingdom,Europe,,,,,
+@I259@,Anthony PARGITER,"Greatworth, Northamps, Eng",,1494,United Kingdom,Europe,,,,,
+@I260@,George PARGITER,"Greatworth, Northamps, Eng",,1496,United Kingdom,Europe,,,,,
+@I261@,Edward PARGITER,"Greatworth, Northamps, Eng",,1498,United Kingdom,Europe,,,,,
+@I262@,Mary PARGITER,"Greatworth, Northamps, Eng",,1500,United Kingdom,Europe,,,,,
+@I263@,Anne PARGITER,"Greatworth, Northamps, Eng",,1502,United Kingdom,Europe,,,,,
+@I264@,Cicely PARGITER,"Greatworth, Northamps, Eng",,1506,United Kingdom,Europe,,,,,
+@I265@,Christopher LIGHT,"Horley, Oxford, , Eng",,1500,United Kingdom,Europe,"Horley, Oxford, , Eng",,1546,United Kingdom,Europe
+@I266@,Elizabeth WARDE,"Pillerton, Warwick, , Eng",,1504,United Kingdom,Europe,,,,,
+@I267@,Christopher LIGHT,"Horley, Warwick, , Eng",,1528,United Kingdom,Europe,,,,,
+@I268@,Johanne LIGHT,"Horley, Warwick, , Eng",,1530,United Kingdom,Europe,,,,,
+@I269@,Agnes LIGHT,"Horley, Warwick, , Eng",,1532,United Kingdom,Europe,,,,,
+@I270@,Robert DYMOKE,"Scriveslby, Lincolnshire, England",,1561,England,Europe,,,1544,,
+@I271@,Anne SPARROW,"Of, London, Middlesex, England",,1470,England,Europe,,,,,
+@I272@,Margaret DYMOKE,"Of, Scriveslby, Lincolnshire, England",,1500,England,Europe,,,,,
+@I273@,Arthur DYMOKE,"Of, Scriveslby, Lincolnshire, England",,1510,England,Europe,,,,,
+@I274@,George TALBOYS,,,1467,,,,,1538,,
+@I275@,Elizabeth GASCOIGNE,"Of, Gawthorpe, York, England",,1471,England,Europe,,,1553,,
+@I276@,William MONTAGUE,"Buckingham, Berkshire, Eng",,1485,United Kingdom,Europe,"Boveney, Bucks, Eng",,1555,United Kingdom,Europe
+@I277@,Joan,", , Eng",,1489,United Kingdom,Europe,"Boveney, Bucks, Eng",,,United Kingdom,Europe
+@I278@,Roger COTTON,"Wardville, Berkshire, Eng",,1508,United Kingdom,Europe,,,,,
+@I279@,Mrs Roger COTTON,"Of, Wardville, Berkshire, England",,1508,England,Europe,,,,,
+@I280@,John MALTHUS,"Of Binfield, Berks, Eng",,1494,United Kingdom,Europe,"Binfield, Berks, Eng",,1558,United Kingdom,Europe
+@I281@,Anne,,,1500,,,,,,,
+@I282@,Thomas BULLOCK,"Arborfield, Berks, Eng",,1482,United Kingdom,Europe,,,1558,,
+@I283@,Alice KINGSMILL,"Basingstoke, Hants, Eng",,1500,United Kingdom,Europe,,,,,
+@I284@,William BULLOCK,"Arborfield, Berkshire, England",,1522,England,Europe,,,,,
+@I285@,Richard BULLOCK,"Arborfield, Berks, England",,1540,England,Europe,,,1570,,
+@I286@,Thomas BULLOCK,"Arborfield, Berks, England",,1544,England,Europe,,,,,
+@I287@,George BULLOCK,"Arborfield, Berks, England",,1546,England,Europe,,,,,
+@I288@,John BULLOCK,"Arborfield, Berks, England",,1548,England,Europe,,,,,
+@I289@,Gregory BULLOCK,"Arborfield, Berks, England",,1552,England,Europe,,,,,
+@I290@,Dorothy BULLOCK,"Arborfield, Berks, England",,1554,England,Europe,,,,,
+@I291@,Eleanor BULLOCK,"Arborfield, Berks, England",,1558,England,Europe,,,,,
+@I292@,Margery BULLOCK,"Arborfield, Berks, England",,1560,England,Europe,,,,,
+@I293@,Alice BULLOCK,"Arborfield, Berks, England",,1562,England,Europe,,,,,
+@I294@,Jane BULLOCK,"Arborfield, Berks, England",,1563,England,Europe,,,,,
+@I295@,Gilbert BULLOCK,"Arborfield, Berks, England",,1564,England,Europe,,,,,
+@I296@,Robert WASHINGTON,"Warton, Lancs, Eng",,1475,United Kingdom,Europe,,,1517,,
+@I297@,Elizabeth WESTFIELD,"Of, Warton, Lancashire, England",,1444,England,Europe,,,,,
+@I298@,Thomas WASHINGTON,"Warton, Lancs, Eng",,1467,United Kingdom,Europe,,,,,
+@I299@,Eleanor WASHINGTON,"Warton, Lancs, Eng",,1469,United Kingdom,Europe,,,,,
+@I300@,Robert KITSON,"Of, Warton, Lancashire, England",,1460,England,Europe,,,,,
+@I301@,Mrs Robert KITSON,"Of, Warton, Lancashire, England",,1460,England,Europe,,,,,
+@I302@,Thomas KITSON,"Hengrave, Suffolk, England",,1485,England,Europe,"Hengrave, Suffolk, England",,1540,England,Europe
+@I303@,Thomas LIGHT,"Horley, Warwick, , Eng",,1478,United Kingdom,Europe,,,,,
+@I304@,Agnes,"Horley, Warwick, , Eng",,1480,United Kingdom,Europe,,,,,
+@I305@,Henry WARDE,"Pillerton, Warwick, , Eng",,1484,United Kingdom,Europe,,,,,
+@I306@,Anne BISHOP,"Pillerton, Warwick, , Eng",,1586,United Kingdom,Europe,,,,,
+@I307@,William GASCOIGNE,"Of, Gawthorpe, Yorkshire, England",,1445,England,Europe,,,1486,,
+@I308@,Margaret PERCY,"Of, , Yorkshire, England",,1447,England,Europe,,,,,
+@I309@,William GASCOIGNE,"Of, Fryston, York, England",,1467,England,Europe,,,1551,,
+@I310@,John GASCOIGNE,"Of, Fryston, York, England",,1468,England,Europe,,,,,
+@I311@,Thomas GASCOIGNE,"Of, Gawthorpe, York, England",,1470,England,Europe,,,,,
+@I312@,Margaret GASCOIGNE,"Of, Gawthorpe, York, England",,1473,England,Europe,,,1515,,
+@I313@,Agnes GASCOIGNE,"Of, Gawthorpe, York, England",,1474,England,Europe,,,,,
+@I314@,Dorothy GASCOIGNE,"Of, Gawthorpe, York, England",,1476,England,Europe,,,,,
+@I315@,Elinor GASCOIGNE,"Of, Gawthorpe, York, England",,1478,England,Europe,,,,,
+@I316@,Anne GASCOIGNE,"Of, Gawthorpe, York, England",,1479,England,Europe,,,,,
+@I317@,Joan GASCOIGNE,"Of, Gawthorpe, York, England",,1481,England,Europe,,,,,
+@I318@,Maude GASCOIGNE,"Of, Gawthorpe, York, England",,1483,England,Europe,,,,,
+@I319@,Gilbert BULLOCK,"Arborfield, Berks, Eng",,1534,United Kingdom,Europe,,,,,
+@I320@,Margaret NORRIS,"Bray, Berks, Eng",,1458,United Kingdom,Europe,,,,,
+@I321@,Christopher BULLOCK,"Aberfeldy, Pershore, England",,1559,England,Europe,,,,,
+@I322@,Alice BULLOCK,"Aberfeldy, Pershore, England",,1563,England,Europe,,,,,
+@I323@,Anne BULLOCK,"Aberfeldy, Pershore, England",,1565,England,Europe,,,,,
+@I324@,Eleanor BULLOCK,"Aberfeldy, Pershore, England",,1567,England,Europe,,,,,
+@I325@,John KINGSMILL,"Of, Basingstoke, Berkshire, England",,1460,England,Europe,,,1509,,
+@I326@,Jane GIFFARD,"Of, Itchell, Hampshire, England",,1524,England,Europe,,,,,
+@I327@,John KINGSMILL,"Sidmanton, Hants, Eng",,1515,United Kingdom,Europe,,,1557,,
+@I328@,Robert WASHINGTON,"Warton, Lancs, Eng",,1404,United Kingdom,Europe,"Warton Lonesdale, Lancs, Eng",,1479,United Kingdom,Europe
+@I329@,WIFE,,,1406,,,,,,,
+@I330@,John WASHINGTON,"Warton, Lancs, Eng",,1430,United Kingdom,Europe,,,,,
+@I331@,Richard WASHINGTON,"Warton, Lancs, Eng",,1432,United Kingdom,Europe,,,,,
+@I332@,John WESTFIELD,"Of, Overton, Lancashire, England",,1418,England,Europe,,,,,
+@I333@,Mrs-John WESTFIELD,"Of, Warton, Lancashire, England",,1403,England,Europe,,,,,
+@I334@,William GASCOIGNE,"Of, Gawthorpe, Yorkshire, England",,1439,England,Europe,,,1463,,
+@I335@,Joan NEVILLE,"Of, Oversley, , England",,1443,England,Europe,,,,,
+@I336@,Humphrey GASCOIGNE,"Of, Newton Kyme, , England",,1447,England,Europe,,,,,
+@I337@,John GASCOIGNE,"Of, Burghwallis, , England",,1449,England,Europe,,,,,
+@I338@,Margaret GASCOIGNE,"Of, Gawthorpe, Yorkshire, England",,1453,England,Europe,,,,,
+@I339@,Agnes GASCOIGNE,"Of, Gowthorpe, Yorkshire, England",,1457,England,Europe,,,1504,,
+@I340@,Elizabeth GASCOIGNE,"Of, Gawthorpe, Yorkshire, England",,1473,England,Europe,,,,,
+@I341@,Henry PERCY,", Leckonfield, Yorkshire, England",,1421,England,Europe,"Battle Of, Towtown, Yorkshire, England",,1461,England,Europe
+@I342@,Eleanor POYNINGS,", , , Eng",,1422,United Kingdom,Europe,,,1483,,
+@I343@,Anne PERCY,"Of, , Yorkshire, England",,1436,England,Europe,,,1522,,
+@I344@,Ralph PERCY,"Of, , Yorkshire, England",,1440,England,Europe,,,,,
+@I345@,Henry PERCY,"Of, Leconfield, Yorkshire, England",,1449,England,Europe,"Manor, Cocks Lodge Near, Topcliffe, Yorkshire, England",,1489,England,Europe
+@I346@,Eleanor PERCY,"Of, , Yorkshire, England",,1455,England,Europe,,,,,
+@I347@,Elizabeth PERCY,"Of, Leckonfield, Yorkshire, England",,1460,England,Europe,,,1512,,
+@I348@,Robert BULLOCK,"Of, England",,1502,England,Europe,,,,,
+@I349@,Eleanor,,,1426,,,,,,,
+@I350@,William NORRIS,,,1428,,,,,,,
+@I351@,Richard KINGSMILL,"Of Barkham, Berks, Eng",,1440,United Kingdom,Europe,,,1511,,
+@I352@,Alice,,,1440,,,,,,,
+@I353@,John (Henry) GIFFORD,"Of, Itchell, Hampshire, England",,1502,England,Europe,,,,,
+@I354@,Joan (Johan) BRYDGES,"Of, Newbury, Berkshire, England",,1503,England,Europe,,,,,
+@I355@,John GIFFARD,"Of, Itchell, Hampshire, England",,1522,England,Europe,,,1563,,
+@I356@,Alice GIFFARD,"Of, Itchell, Hampshire, England",,1526,England,Europe,,,,,
+@I357@,Mary GIFFARD,"Of, Itchell, Hampshire, England",,1528,England,Europe,,,,,
+@I358@,Richard GIFFARD,"Of, Itchell, Hampshire, England",,1530,England,Europe,,,1568,,
+@I359@,George GIFFARD,"Of, Itchell, Hampshire, England",,1532,England,Europe,,,,,
+@I360@,John DE WASHINGTON,"Of Warton, Lancashire, , England",,1385,England,Europe,,,1423,,
+@I361@,William GASCOIGNE,"Of, Gawthorpe, Yorkshire, England",,1398,England,Europe,,,1466,,
+@I362@,Margaret CLARELL,"Of, Aldwark, Yorkshire, England",,1435,England,Europe,,,,,
+@I363@,Robert GASCOIGNE,"Of, Monston, Yorkshire, England",,1426,England,Europe,,,,,
+@I364@,John GASCOIGNE,"Of, Gawthorpe, Yorkshire, England",,1428,England,Europe,,,,,
+@I365@,Jane (Joan) GASCON,"Of, Gawthorpe, Yorkshire, England",,1428,England,Europe,,,1462,,
+@I366@,Ralph GASCOIGNE,"Of, Gawthorpe, Yorkshire, England",,1430,England,Europe,,,1486,,
+@I367@,Amy GASCOIGNE,"Of, Gawthorpe, Yorkshire, England",,1434,England,Europe,,,,,
+@I368@,Anne GASCOIGNE,"Of, Gawthorpe, Yorkshire, England",,1436,England,Europe,,,,,
+@I369@,Margaret GASCOIGNE,"Of, Gawthorpe, Yorkshire, England",,1438,England,Europe,,,,,
+@I370@,John NEVILLE,"Of, Oversley, Warwickshire, England",,1416,England,Europe,Spm,,1482,Deutschland,Europe
+@I371@,Elizabeth NEWMARCH,"Of, Oversley, Warwickshire, England",,1420,England,Europe,,,,,
+@I372@,Henry De PERCY,", Alnwick, Northumberland, England",,1392,England,Europe,"Battle Of, St Albans, Kent, England",,1455,England,Europe
+@I373@,Eleanor NEVILLE,"Of, Raby, Durham, England",,1407,England,Europe,", , , England",,1440,England,Europe
+@I374@,Joan PERCY,"Of, Warkworth, Yorkshire, England",,1415,England,Europe,,,,,
+@I375@,John PERCY,", Warkworth, Yorkshire, England",,1418,England,Europe,"Infant, , , England",,,England,Europe
+@I376@,John PERCY,"Of, Leckonfield, Yorkshire, England",,1420,England,Europe,"Sp Prob Infant, , , England",,,England,Europe
+@I377@,Thomas PERCY,", Leckonfield, Yorkshire, England",,1422,England,Europe,"Battle Of, Northampton, Northamptonshire, England",,1460,England,Europe
+@I378@,Catherine PERCY,", Leckonfield, Yorkshire, England",,1423,England,Europe,", , , England",,1475,England,Europe
+@I379@,George PERCY,", Leckonfield, Yorkshire, England",,1424,England,Europe,", , , England",,,England,Europe
+@I380@,Ralph PERCY,", Leckonfield, Yorkshire, England",,1425,England,Europe,", Hedgeley Moor, Northumberland, England",,1464,England,Europe
+@I381@,Richard PERCY,", Leckonfield, Yorkshire, England",,1426,England,Europe,", , , England",,1461,England,Europe
+@I382@,William PERCY,", Leckonfield, Yorkshire, England",,1428,England,Europe,", , , England",,1462,England,Europe
+@I383@,Richard POYNINGS,", , Yorkshire, England",,1392,England,Europe,"Vp, Orleans, , France",,1429,France,Europe
+@I384@,Alianore BERKELEY,"Of, Beverston, Gloucestershire, England",,1400,England,Europe,,,1455,,
+@I385@,Richard KINGSMILL,"Of Barkham, Berks, Eng",,1415,United Kingdom,Europe,,,,,
+@I386@,William GIFFORD,"Of, Itchell, Hampshire, England",,1482,England,Europe,,,,,
+@I387@,Eleanor PAULET,"Of, Itchell, Hampshire, England",,1479,England,Europe,,,,,
+@I388@,Alice GIFFARD,"Of, Itchell, Hampshire, England",,1503,England,Europe,,,,,
+@I389@,Ann GIFFARD,"Of, Itchell, Hampshire, England",,1504,England,Europe,,,,,
+@I390@,Mary GIFFARD,"Of, Itchell, Hampshire, England",,1505,England,Europe,,,,,
+@I391@,Richard GIFFARD,"Of, Itchell, Hampshire, England",,1506,England,Europe,,,,,
+@I392@,Jane GIFFARD,"Of, Itchell, Hampshire, England",,1508,England,Europe,,,,,
+@I393@,Henry BRUGGE,"Of, Cubberley, Gloucestershire, England",,1464,England,Europe,,,,,
+@I394@,Miss HUNGERFORD,"Of, Newbury, Gloucestershire, England",,1468,England,Europe,,,,,
+@I395@,Richard BRYDGES,"Of , Newbury, Berkshire, England",,1497,England,Europe,,,,,
+@I396@,Giles BRYDGES,"Of, Newbury, Berkshire, England",,1502,England,Europe,,,,,
+@I397@,John DE WASHINGTON,Of Tewitfield,,1359,,,,,1407,,
+@I398@,Joan DE CREFT,Of Tevitfield,,1363,,,,,,,
+@I399@,William GASCOIGNE,"Of, Harewood, Yorkshire, England",,1366,England,Europe,,,1422,,
+@I400@,Joan (Jane) WYMAN,"Of, , Yorkshire, England",,1370,England,Europe,,,,,
+@I401@,Alice GASCOIGNE,"Of, Harewood, Yorkshire, England",,1401,England,Europe,,,1482,,
+@I402@,Anne GASCOIGNE,"Of, Harewood, Yorkshire, England",,1404,England,Europe,,,,,
+@I403@,Katherine GASCOIGNE,"Of, Harewood, Yorkshire, England",,1407,England,Europe,,,,,
+@I404@,Elizabeth (Isabel) GASCOIGNE,"Of, Harewood, Yorkshire, England",,1411,England,Europe,,,,,
+@I405@,Henry GASCOIGNE,"Of, Micklefield, Yorkshire, England",,1415,England,Europe,,,1457,,
+@I406@,Thomas CLARELL,"Of, Aldwark, Yorkshire, England",,1411,England,Europe,,,,,
+@I407@,Mrs-Thomas CLARELL,,,1416,,,,,,,
+@I408@,Ralph De NEVILLE,"Of, Raby, Durham, England",,1392,England,Europe,,,1457,,
+@I409@,Mary De FERRERS,"Of, Oversley, Warwickshire, England",,1394,England,Europe,,,1457,,
+@I410@,Mary NEVILLE,"Of, Oversley, Warwickshire, England",,1414,England,Europe,,,,,
+@I411@,Robert NEWMARCH,"Of, Oversley, Warwickshire, England",,1394,England,Europe,,,,,
+@I412@,"Henry ""Hotspur"" De PERCY",", Alnwick, Northumberland, England",,1364,England,Europe,", Shrewsbury, Shropshire, England",,1403,England,Europe
+@I413@,Elizabeth MORTIMER,", Usk, Monmouthshire, England",,1370,England,Europe,", , , England",,1417,England,Europe
+@I414@,Elizabeth PERCY,"Of, Alnwick, Northumberland, England",,1390,England,Europe,", , , England",,1437,England,Europe
+@I415@,Ralph De NEVILLE,"Of Castle Raby, Raby With Keverstone, Durham, England",,1364,England,Europe,"Castle Raby, Raby With Keverstone, Durham, England",,1425,England,Europe
+@I416@,Joan De BEAUFORT,"Chateau De Beaufort, Meuse-et-Loire, France",,1375,France,Europe,", Howden, Yorkshire, England",,1440,England,Europe
+@I417@,Catherine De NEVILLE,"Of, Raby, Durham, England",,1397,England,Europe,,,1478,,
+@I418@,Joan NEVILLE,"Of, Raby, Durham, England",,1398,England,Europe,,,,,
+@I419@,Richard NEVILLE,"Of, Raby, Durham, England",,1400,England,Europe,", Wakefield, Yorkshire, England",,1460,England,Europe
+@I420@,Henry De NEVILLE,"Of, Raby, Durham, England",,1402,England,Europe,Died Young,,,,
+@I421@,Thomas De NEVILLE,"Of, Raby, Durham, England",,1403,England,Europe,,,,,
+@I422@,Cuthbert De NEVILLE,"Of, Raby, Durham, England",,1405,England,Europe,Died Young,,,,
+@I423@,Robert NEVILLE,"Of, Raby, Durham, England",,1408,England,Europe,,,8,,
+@I424@,William NEVILLE,"Of, Raby, Durham, England",,1409,England,Europe,"Of, Alnwick, Northumberland, England",,1462,England,Europe
+@I425@,Anne De NEVILLE,"Of, , Westmorland, England",,1411,England,Europe,Sp,,1480,Italia,Europe
+@I426@,John De NEVILLE,"Of, Raby, Durham, England",,1413,England,Europe,Died Young,,,,
+@I427@,George NEVILLE,"Of, Raby, Durham, England",,1414,England,Europe,,,1469,,
+@I428@,Cecily NEVILLE,", Raby, Durham, England",,1415,England,Europe,", Berkhamsted, Hertfordshire, England",,1495,England,Europe
+@I429@,Edward NEVILLE,"Of Raby With Keverstone, Staindrop, Durham, England",,1417,England,Europe,,,1476,,
+@I430@,Robert POYNINGS,"Okeford, Fitzpaine, Dorset, England",,1382,England,Europe,Orleans,,1446,France,Europe
+@I431@,Elizabeth (Eleanor) GREY,,,1443,,,,,,,
+@I432@,John De BERKELEY,"Wotton, Gloucestershire, England",,1351,England,Europe,"Of, Beverstone, Gloucestershire, England",,1428,England,Europe
+@I433@,Elizabeth BETTESHORNE,"Beverstone, Gloucs., , England",,1353,England,Europe,,,,,
+@I434@,Maurice De BERKELEY,"Beverstone, Gloucs., , England",,1398,England,Europe,,,1460,,
+@I435@,Elizabeth BERKELEY,"Of, Beverstone, Gloucestershire, England",,1400,England,Europe,,,1478,,
+@I436@,William KINGSMILL,"Of Barkham, Berks, Eng",,1390,United Kingdom,Europe,,,,,
+@I437@,John GIFFARD,"Of, Itchell, Southampton, England",,1456,England,Europe,,,,,
+@I438@,John Mrs GIFFORD,,,1460,,,,,,,
+@I439@,John GIFFARD,"Of, Itchell, Southampton, England",,1484,England,Europe,,,,,
+@I440@,John PAULET,"Of Basing, Hampshire, England",,1452,England,Europe,"Of Basing, Hampshire, England",,1524,England,Europe
+@I441@,Alice PAULET,"Of Hinton-St. George, Somersetshire, England",,1456,England,Europe,,,2,,
+@I442@,William PAULET (POWLETT),"Of, Basing, Hampshire, England",,1483,England,Europe,", Basing, Hampshire, England",,1571,England,Europe
+@I443@,Thomas PAULET,"Basing, Hampshire, Eng",,1483,United Kingdom,Europe,,,,,
+@I444@,Katherine PAULET,"Basing, Hampshire, Eng",,1488,United Kingdom,Europe,,,1510,,
+@I445@,George POWLETT (PAULET),"Of, Crandal, Hampshire, England",,1492,England,Europe,,,1558,,
+@I446@,Richard PAULET,"Of Herriard, Hampshire, Eng.",,1494,United Kingdom,Europe,,,,,
+@I447@,Thomas BRUGGE,"Of, Coberley, Gloucestershire, England",,1427,England,Europe,,,1493,,
+@I448@,Florence DARREL,"Of, Littlecote, Wiltshire, England",,1425,England,Europe,,,1506,,
+@I449@,Elizabeth BRUGGE,"Of, Coberley, Gloucestershire, England",,1459,England,Europe,,,1535,,
+@I450@,Alice BRUGGE,"Of, Coberley, Gloucestershire, England",,1460,England,Europe,,,,,
+@I451@,Giles BRUGGE,"Of, Cubberley, Gloucestershire, England",,1462,England,Europe,", Cubberley, Gloucestershire, England",,1511,England,Europe
+@I452@,Eleanor BRUGGE,"Of, Coberley, Gloucestershire, England",,1463,England,Europe,,,,,
+@I453@,Jane (Joan) BRUGGE,"Of, Coberley, Gloucestershire, England",,1469,England,Europe,Unmarried,,,Australia,Oceania
+@I454@,Thomas BRUGGE,"Of, Coberley, Gloucestershire, England",,1471,England,Europe,,,,,
+@I455@,Anne BRUGGE,"Of, Coberley, Gloucestershire, England",,1473,England,Europe,Unmarried,,,Australia,Oceania
+@I456@,John HUNGERFORD,"Of, Newbury, Berkshire, England",,1421,England,Europe,,,,,
+@I457@,Thomas ATHEROLD,Gray's Inn,,1590,United Kingdom,Europe,,,1658,,
+@I458@,Mary HARVEY,"London, London, England",,1595,England,Europe,,,1665,,
+@I459@,Maindort DOODES,", , , Holland",,1617,Netherlands,Europe,", Middlesex, VA",,1676,United States,North America
+@I460@,Mary GERET,", , , Holland",,1612,Netherlands,Europe,", Middlesex, VA",,1686,United States,North America
+@I461@,Mr DOODES,Holland,,1644,Netherlands,Europe,", Middlesex Co, VA",,13,United States,North America
+@I462@,Thomas WARNER,"Hoe, Norfolk, England",,1580,England,Europe,,,,,
+@I463@,Elizabeth SOTHERTON,,,1582,,,,,1629,,
+@I464@,Lawrence TOWNELEY,"Stonehedge, , , England",,1594,England,Europe,"Colne, Lancashire, England",,1655,England,Europe
+@I465@,Jennet HALSTEAD,"Of, Windlehouse, Lancaster, England",,1594,England,Europe,,,1623,,
+@I466@,Thomas ATHEROLD,"Burgh, Suffolk, England",,1570,England,Europe,,,,,
+@I467@,Mary VESSEY,,,1568,,,,,,,
+@I468@,Thomas VESEY,"Aldham, Suffolk, , England",,1570,England,Europe,,,,,
+@I469@,Elizabeth CHURCH,"Of, Maldon, Essex, England",,1570,England,Europe,,,,,
+@I470@,Samuel MATHEWS,", , , England",,1574,England,Europe,", , VA",,1660,Civitas Vaticana - Città del Vaticano,Europe
+@I471@,Samuel MATHEWS,,,1602,,,,,,,
+@I472@,Son MATHEWS,,,1604,,,,,,,
+@I473@,Thomas TWIGDEN,"Of, Little Creston, Northants, England",,1559,England,Europe,,,1580,,
+@I474@,Amphyllis WATTS,"Of, Little Creston, Northants, England",,1559,England,Europe,,,,,
+@I475@,William DICKENS,"Of, Great Creaton, Northants, England",,1555,England,Europe,,,1583,,
+@I476@,Anne THORNTON,"Of, Great Creaton, Northants, England",,1555,England,Europe,,,1614,,
+@I477@,William WARNER,"Hoe, , , England",,1540,England,Europe,,,,,
+@I478@,Mary,,,1540,,,,,,,
+@I479@,Augustine SOTHERTON,,,1553,,,,,,,
+@I480@,Ann PECK,,,,,,,,,,
+@I481@,Lawrence TOWNELEY,"Of, Barnside, Lancaster, England",,1543,England,Europe,,,,,
+@I482@,Mary HARTLEY,"Of, Stonehedge, Lancaster, England",,1574,England,Europe,,,,,
+@I483@,John HALSTEAD,"Of, Windlehouse, Lancaster, England",,1574,England,Europe,,,,,
+@I484@,Mrs John HALSTEAD,"Of, Windlehouse, Lancaster, England",,1574,England,Europe,,,,,
+@I485@,John BALL,"Workingham, Berkshire, , Eng",,1525,United Kingdom,Europe,"Wokingham, Berkshire, England",,1599,England,Europe
+@I486@,Agnes HATHOWAY,,,1529,,,,,,,
+@I487@,Robert BALL,"Wokingham, Berkshsire, England",,1553,England,Europe,,,,,
+@I488@,Thomas BALL,"Wokingham, Berkshire, England",,1555,England,Europe,,,,,
+@I489@,Alis BALL,,,,,,,,,,
+@I490@,Edith BALL,,,,,,,,,,
+@I491@,George BALL,,,,,,,,,,
+@I492@,Martha BALL,,,,,,,,,,
+@I493@,Rachel BALL,"Wokingham, Berkshire, England",,1583,England,Europe,,,1599,,
+@I494@,Thomas WEBB,"Of, Roscombe, , England",,1555,England,Europe,,,,,
+@I495@,Mrs Thomas WEBB,"Of, Roscombe, , England",,1555,England,Europe,,,,,
+@I496@,John BUTLER,"Tyes Hall, Cuckfield, Sussex, England",,1520,England,Europe,,,1558,,
+@I497@,Margaret Dudley SUTTON,"Tyes Hall, Cuckfield, Sussex, England",,1520,England,Europe,,,1563,,
+@I498@,Thomas GREEKE,"Palstarr, , Lancaster, England",,1524,England,Europe,,,,,
+@I499@,Jane THOMPSON,"Palstarr, , Lancaster, England",,1524,England,Europe,,,,,
+@I500@,William TWIGDEN,"Of, Little Creston, Northants, England",,1520,England,Europe,,,,,
+@I501@,Mrs William TWIGDEN,"Of, Little Creston, Northants, England",,1520,England,Europe,,,,,
+@I502@,John DICKENS,"Of, Great Creaton, Northants, England",,1535,England,Europe,,,1601,,
+@I503@,Mrs John DICKENS,"Of, Great Creaton, Northants, England",,1535,England,Europe,,,,,
+@I504@,Henry THORNTON,"Of, Great Creaton, Northants, England",,1530,England,Europe,,,1556,,
+@I505@,Anne WILMER,"Of, Great Creaton, Northants, England",,1530,England,Europe,,,,,
+@I506@,Thomas WARNER,,,1514,,,,,,,
+@I507@,Thomas PECK,,,1527,,,,,,,
+@I508@,Ursula GUYBAN,,,1531,,,,,,,
+@I509@,John HARTLEY,"Of, Stonehedge, Lancaster, England",,1554,England,Europe,,,,,
+@I510@,Mrs John HARTLEY,"Of, Stonehedge, Lancaster, England",,1554,England,Europe,,,,,
+@I511@,Robert READE,"Of, Linkenholt Manor, Hants, England",,1536,England,Europe,,,,,
+@I512@,O'Alice POOLEY,"Of, Linkenholt Manor, Hants, England",,1536,England,Europe,,,,,
+@I513@,William BALL,,,1505,,,"Wokingham, Berkshire, England",,1550,England,Europe
+@I514@,Unknown,,,1509,,,,,,,
+@I515@,Richard HATHOWAY,", , England",,1503,England,Europe,,,,,
+@I516@,Ralph BUTLER,"Tyes Hall, Cuckfield, Sussex, England",,1500,England,Europe,,,,,
+@I517@,Mrs Ralph BUTLER,"Tyes Hall, Cuckfield, Sussex, England",,1500,England,Europe,,,,,
+@I518@,George THOMPSON,"Of, Palstarr, Lancaster, England",,1504,England,Europe,,,,,
+@I519@,Mrs George THOMPSON,"Of, Palstarr, Lancaster, England",,1504,England,Europe,,,,,
+@I520@,Henry DICKENS,"Of, Great Creaton, Northants, England",,1515,England,Europe,,,1542,,
+@I521@,Mrs Henry DICKENS,"Of, Great Creaton, Northants, England",,1515,England,Europe,,,,,
+@I522@,John THORNTON,"Of, Great Creaton, Northants, England",,1510,England,Europe,,,,,
+@I523@,Lettuce NEWENHAM,"Of, Great Creaton, Northants, England",,1510,England,Europe,,,,,
+@I524@,William WILMER,"Of, Great Creaton, Northants, England",,1510,England,Europe,,,,,
+@I525@,Juliana SPENCER,"Of, Great Creaton, Northants, England",,1510,England,Europe,,,,,
+@I526@,Robert BALL,"Barkham, Berkshire, England",,1475,England,Europe,", , , England",,1543,England,Europe
+@I527@,Unknown,,,1475,,,,,,,
+@I528@,Edward BALL,"Barkham, Berkshire, England",,1507,England,Europe,,,,,
+@I529@,William BALL,,,1450,,,"Barkham Manor, Barkham, Berkshsire, England",,1480,England,Europe
+@I530@,Unknown,,,1450,,,,,,,

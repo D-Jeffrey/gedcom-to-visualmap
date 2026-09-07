@@ -99,6 +99,9 @@ class VisualMapFrame(wx.Frame):
             self, self.font_manager, self.color_manager, self.svc_config, self.svc_state, self.svc_progress
         )
 
+        # Bind window resize event to save the size
+        self.Bind(wx.EVT_SIZE, self.OnWindowSize)
+
     def set_current_font(self) -> None:
         """Ensure the frame uses the current font from the FontManager."""
         self.font = self.font_manager.get_font()
@@ -107,7 +110,33 @@ class VisualMapFrame(wx.Frame):
     def start(self) -> None:
         """Start the UI by starting the contained panel and showing the frame."""
         self.visual_map_panel.start()
+        self._restore_window_size()
         self.Show()
+
+    def _restore_window_size(self) -> None:
+        """Restore window size from config if it fits on screen."""
+        try:
+            saved_size = self.svc_config.get("window_size")
+            if saved_size and isinstance(saved_size, (list, tuple)) and len(saved_size) == 2:
+                width, height = int(saved_size[0]), int(saved_size[1])
+                
+                # Get screen dimensions
+                display = wx.Display()
+                screen_rect = display.GetClientArea()
+                
+                # Only apply size if it fits on screen with some margin
+                if width <= screen_rect.width - 50 and height <= screen_rect.height - 50:
+                    self.SetSize(width, height)
+                    _log.info(f"Restored window size: {width}x{height}")
+        except Exception as e:
+            _log.warning(f"Failed to restore window size: {e}")
+
+    def OnWindowSize(self, event: wx.SizeEvent) -> None:
+        """Handle window resize events and save the size to config."""
+        if self.IsShown():  # Only save if window is visible
+            size = self.GetSize()
+            self.svc_config.set("window_size", [size.width, size.height])
+        event.Skip()  # Allow default processing
 
     def stop(self) -> None:
         """Request clean shutdown of the UI by delegating to the panel."""
@@ -137,6 +166,7 @@ class VisualMapFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.onOptionsSetup, id=wx.ID_SETUP)
         self.Bind(wx.EVT_MENU, self.OnOpenCSV, id=self.id.IDs["BTNCSV"])
         self.Bind(wx.EVT_MENU, self.OnOpenBrowser, id=self.id.IDs["BTNBROWSER"])
+        self.Bind(wx.EVT_MENU, self.OnImageCache, id=self._image_cache_menu_id)
         # Bind window activation to check for appearance changes
         self.Bind(wx.EVT_ACTIVATE, self.OnActivate)
 
@@ -192,6 +222,9 @@ class VisualMapFrame(wx.Frame):
         ActionMenu.Append(wx.ID_INFO, "Statistics Summary")
         ActionMenu.Append(self.id.IDs["BTNBROWSER"], "Open Result in &Browser")
         ActionMenu.Append(self.id.IDs["BTNCSV"], "Open &CSV")
+        ActionMenu.AppendSeparator()
+        self._image_cache_menu_id = wx.NewIdRef()
+        ActionMenu.Append(self._image_cache_menu_id, "Image Caching…", "Manage cached remote photos")
 
         helpMenu = wx.Menu()
         helpMenu.Append(wx.ID_HELP, "Help")
@@ -291,6 +324,24 @@ class VisualMapFrame(wx.Frame):
             self.visual_map_panel.actions.OpenBrowser()
         except Exception:
             _log.exception("OnOpenBrowser failed")
+
+    def OnImageCache(self, event: wx.Event) -> None:
+        """Menu handler: open the Image Caching dialog."""
+        try:
+            from ..dialogs.image_cache_dialog import ImageCacheDialog
+
+            svc_state = getattr(self, "svc_state", None)
+            dialog = ImageCacheDialog(
+                self,
+                svc_config=self.svc_config,
+                svc_state=svc_state,
+                font_manager=self.font_manager,
+                color_manager=self.color_manager,
+            )
+            dialog.ShowModal()
+            dialog.Destroy()
+        except Exception:
+            _log.exception("OnImageCache failed")
 
     def OnFileOpenDialog(self, evt: wx.Event) -> None:
         """Show a file-open dialog for selecting a GEDCOM and load it if chosen.

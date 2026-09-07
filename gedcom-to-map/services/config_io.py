@@ -15,6 +15,7 @@ from pathlib import Path
 from typing import Any, Optional
 from const import (
     INI_SECTION_GEDCOM_MAIN,
+    INI_SECTION_GEDCOM_CACHE,
     INI_SECTION_GEO_CONFIG,
     MIGRATION_VERSION_UNSET,
     MIGRATION_VERSION_CURRENT,
@@ -52,7 +53,7 @@ def _get_ini_sections_from_yaml() -> list:
         sections = {"Core", "HTML", "Summary", "KML", "GeoCoding", "Performance", "Processing", "Statistics"}
 
     # Add special sections that aren't in the YAML options
-    special_sections = {"Logging", INI_SECTION_GEDCOM_MAIN, INI_SECTION_GEO_CONFIG}
+    special_sections = {"Logging", INI_SECTION_GEDCOM_MAIN, INI_SECTION_GEDCOM_CACHE, INI_SECTION_GEO_CONFIG}
     sections.update(special_sections)
 
     return sorted(sections)
@@ -60,7 +61,7 @@ def _get_ini_sections_from_yaml() -> list:
 
 # Dynamically generated list of all INI sections
 ini_sections = _get_ini_sections_from_yaml()
-ini_option_sections = [s for s in ini_sections if s not in ["Logging", INI_SECTION_GEDCOM_MAIN, INI_SECTION_GEO_CONFIG]]
+ini_option_sections = [s for s in ini_sections if s not in ["Logging", INI_SECTION_GEDCOM_MAIN, INI_SECTION_GEDCOM_CACHE, INI_SECTION_GEO_CONFIG]]
 
 
 def settings_file_pathname(file_name: str) -> str:

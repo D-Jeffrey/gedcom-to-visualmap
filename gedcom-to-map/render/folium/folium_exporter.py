@@ -23,6 +23,7 @@ from models.creator import DELTA
 from .legend import Legend
 from .mark_clusters import MyMarkClusters
 from .name_processor import NameProcessor
+from .layer_control_buttons import LayerControlButtons
 
 # Import constants and utilities
 from .constants import lgd_txt, MidPointMarker, icon_create_function
@@ -590,7 +591,7 @@ class foliumExporter:
             fm.add_child(fg)
 
     def _add_feature_groups_to_map(self, fm, show_all: bool = True):
-        for fgn in sorted(self.fglastname.keys(), key=lambda x: self.fglastname[x].depth, reverse=False):
+        for fgn in sorted(self.fglastname.keys(), key=lambda x: self.fglastname[x].count, reverse=True):
             info = self.fglastname[fgn]
             info.feature_group.layer_name = f"{info.original_name} : {info.count}"
             info.feature_group.show = show_all
@@ -609,6 +610,7 @@ class foliumExporter:
             )
             marker_cluster.add_to(fm)
         folium.map.LayerControl("topleft", collapsed=not show_control).add_to(fm)
+        fm.add_child(LayerControlButtons())
 
     def _add_main_star(self, main, fm):
         birth_event = getattr(main, "birth", None)

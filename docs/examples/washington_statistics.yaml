@@ -1,0 +1,2242 @@
+!!python/object:geo_gedcom.statistics.model.Stats
+categories:
+  demographics:
+    total_people: 529
+    living: 293
+    deceased: 236
+    birth_year_distribution:
+      1500: 8
+      1575: 7
+      1555: 7
+      1510: 6
+      1460: 6
+      1642: 5
+      1627: 5
+      1573: 5
+      1579: 5
+      1577: 5
+      1550: 5
+      1532: 5
+      1508: 5
+      1520: 5
+      1502: 5
+      1630: 4
+      1635: 4
+      1644: 4
+      1580: 4
+      1568: 4
+      1590: 4
+      1548: 4
+      1583: 4
+      1544: 4
+      1570: 4
+      1540: 4
+      1524: 4
+      1528: 4
+      1515: 4
+      1504: 4
+      1530: 4
+      1428: 4
+      1415: 4
+      1574: 4
+      1671: 3
+      1670: 3
+      1614: 3
+      1639: 3
+      1602: 3
+      1603: 3
+      1611: 3
+      1610: 3
+      1640: 3
+      1594: 3
+      1595: 3
+      1566: 3
+      1589: 3
+      1591: 3
+      1593: 3
+      1581: 3
+    earliest_birth_year: 1351
+    latest_birth_year: 1739
+    people_with_birth_year: 516
+    death_year_distribution:
+      1659: 4
+      1622: 4
+      1558: 4
+      1743: 3
+      1700: 3
+      1681: 3
+      1686: 3
+      1694: 3
+      1655: 3
+      1657: 3
+      1660: 3
+      1685: 3
+      1648: 3
+      1656: 3
+      1623: 3
+      1599: 3
+      1596: 3
+      1580: 3
+      1563: 3
+      1462: 3
+      1460: 3
+      1457: 3
+      1799: 2
+      1747: 2
+      1668: 2
+      1680: 2
+      1676: 2
+      1702: 2
+      1713: 2
+      1636: 2
+      1716: 2
+      1624: 2
+      1595: 2
+      1658: 2
+      1611: 2
+      1583: 2
+      1614: 2
+      1557: 2
+      1486: 2
+      1461: 2
+      1511: 2
+      1482: 2
+      1455: 2
+      1440: 2
+      1478: 2
+      1480: 2
+      1789: 1
+      1797: 1
+      1781: 1
+      1787: 1
+    earliest_death_year: 2
+    latest_death_year: 1799
+    people_with_death_year: 217
+    average_lifespan: 53.0
+    min_lifespan: 1
+    max_lifespan: 99
+    median_lifespan: 52.0
+    unique_surnames: 86
+    most_common_surnames:
+      WASHINGTON: 72
+      BALL: 56
+      MONTAGUE: 40
+      GASCOIGNE: 31
+      BULLOCK: 21
+      PERCY: 19
+      NEVILLE: 19
+      DYMOKE: 16
+      READE: 15
+      WARNER: 14
+      POPE: 13
+      GIFFARD: 13
+      PARGITER: 9
+      BRUGGE: 9
+      MALTHUS: 8
+      LIGHT: 7
+      DICKENS: 6
+      MARTIAU: 6
+      MALTHOUSE: 6
+      KINGSMILL: 6
+  events:
+    total_people: 529
+    event_counts:
+      birth: 529
+      death: 236
+      marriage: 168
+    completeness:
+      birth:
+        total: 529
+        with_date: 529
+        with_place: 464
+        date_percentage: 100.0
+        place_percentage: 87.7
+      death:
+        total: 236
+        with_date: 236
+        with_place: 140
+        date_percentage: 100.0
+        place_percentage: 59.3
+      marriage:
+        total: 168
+        with_date: 168
+        with_place: 138
+        date_percentage: 100.0
+        place_percentage: 82.1
+    people_with_birth: 529
+    people_with_death: 236
+    people_with_burial: 0
+    birth_coverage_percentage: 100.0
+    death_coverage_percentage: 44.6
+  geographic:
+    most_common_birth_places:
+      Of, Itchell, Hampshire, England: 14
+      Of, Great Creaton, Northants, England: 13
+      ', , VA': 12
+      Wokingham, Berkshire, England: 12
+      Of, Raby, Durham, England: 12
+      England: 11
+      Arborfield, Berks, England: 11
+      Of, Gawthorpe, Yorkshire, England: 11
+      Brington, Northants, Eng: 10
+      Scrivelsby, Lincolnshire, England: 10
+      Of, Gawthorpe, York, England: 9
+      VA: 8
+      Greatworth, Northamps, Eng: 7
+      ', Leckonfield, Yorkshire, England': 7
+      Of, Coberley, Gloucestershire, England: 7
+      ', , England': 6
+      Of, , Yorkshire, England: 6
+      Warton, Lancs, Eng: 6
+      Wakefield, Westmoreland, Virginia: 5
+      ', , Wiltshire, England': 5
+    unique_birth_places: 211
+    most_common_death_places:
+      VA: 10
+      ', , , England': 8
+      ', , VA': 6
+      Will Proved: 3
+      Boveney, Bucks, Eng: 3
+      Binfield, Berks, Eng: 3
+      Died Young: 3
+      Mount Vernon, Fairfax, Virginia: 2
+      Gloucesterco, VA: 2
+      ', , Virginia': 2
+      Tring, Herts: 2
+      ', Westmoreland, VA': 2
+      ', , VA.': 2
+      Unmarried: 2
+      ', Middlesex, VA': 2
+      Wokingham, Berkshire, England: 2
+      Ferry Farm, King George, Virginia: 1
+      '"Western View", Culpeper, Virginia': 1
+      Wakefield, Westmoreland, Virginia: 1
+      Bridge Creek, Westmorland, Virginia: 1
+    unique_death_places: 102
+    most_common_places:
+      ', , VA': 18
+      VA: 18
+      Wokingham, Berkshire, England: 14
+      Of, Itchell, Hampshire, England: 14
+      Of, Great Creaton, Northants, England: 13
+      England: 12
+      Of, Raby, Durham, England: 12
+      Scrivelsby, Lincolnshire, England: 11
+      Arborfield, Berks, England: 11
+      Of, Gawthorpe, Yorkshire, England: 11
+      Brington, Northants, Eng: 10
+      Of, Gawthorpe, York, England: 9
+      ', , , England': 9
+      Boveney, Bucks, Eng: 7
+      Greatworth, Northamps, Eng: 7
+      ', Leckonfield, Yorkshire, England': 7
+      Of, Coberley, Gloucestershire, England: 7
+      Wakefield, Westmoreland, Virginia: 6
+      ', , England': 6
+      Of, , Yorkshire, England: 6
+      Burnham, Boveney, Bucks, England: 6
+      Warton, Lancs, Eng: 6
+      ', , Wiltshire, England': 5
+      ', Nansemond, VA': 5
+      Of, Little Creston, Northants, England: 5
+      Of Sulgrave, Northampton, Eng.: 5
+      Tyes Hall, Cuckfield, Sussex, England: 5
+      Greys Inn, Middlesex, England: 5
+      Warton, Lancashire, England: 5
+      Horley, Warwick, , Eng: 5
+    unique_places: 288
+    countries:
+      England: 331
+      Eng: 93
+      VA: 75
+      Virginia: 35
+      Eng.: 10
+      VA.: 7
+      Holland: 4
+      Will Proved: 3
+      MD: 3
+      Connecticut: 3
+      Died Young: 3
+      Maryland: 2
+      Herts: 2
+      Massachusetts: 2
+      MA: 2
+      France: 2
+      Unmarried: 2
+      Va.: 1
+      Vi.: 1
+      Chesake: 1
+  gender:
+    male: 280
+    female: 249
+    unknown: 0
+    total: 529
+    male_percentage: 52.9
+    female_percentage: 47.1
+    unknown_percentage: 0.0
+    most_common_male_names:
+      John: 43
+      William: 40
+      Thomas: 34
+      Richard: 25
+      Robert: 22
+      George: 17
+      Henry: 11
+      Lawrence: 10
+      Peter: 7
+      Samuel: 6
+      Ralph: 6
+      Augustine: 5
+      Edward: 5
+      Nathaniel: 4
+      Francis: 4
+      Christopher: 4
+      Alling: 3
+      Walter: 3
+      Gilbert: 3
+      Charles: 2
+    most_common_female_names:
+      Elizabeth: 33
+      Margaret: 26
+      Anne: 21
+      Mary: 20
+      Alice: 12
+      Ann: 11
+      Joan: 10
+      Eleanor: 10
+      Mrs: 10
+      Jane: 9
+      Mildred: 6
+      Frances: 5
+      Sarah: 5
+      Agnes: 5
+      Dorothy: 4
+      Martha: 3
+      Hannah: 3
+      Katherine: 3
+      Ellen: 3
+      Amy: 3
+    male_living: 122
+    male_deceased: 158
+    female_living: 171
+    female_deceased: 78
+  names:
+    most_common_first_names:
+      John: 45
+      William: 41
+      Thomas: 34
+      Elizabeth: 33
+      Margaret: 26
+      Richard: 25
+      Robert: 22
+      Anne: 21
+      Mary: 20
+      George: 17
+      Alice: 12
+      Ann: 11
+      Henry: 11
+      Lawrence: 10
+      Joan: 10
+      Eleanor: 10
+      Mrs: 10
+      Jane: 9
+      Peter: 7
+      Samuel: 6
+      Mildred: 6
+      Ralph: 6
+      Augustine: 5
+      Frances: 5
+      Sarah: 5
+      Edward: 5
+      Agnes: 5
+      Nathaniel: 4
+      Francis: 4
+      Dorothy: 4
+    unique_first_names: 93
+    total_first_names: 526
+    unique_full_names: 381
+    total_full_names: 526
+    duplicate_names:
+      William MONTAGUE: 8
+      John WASHINGTON: 7
+      William BALL: 7
+      Lawrence WASHINGTON: 6
+      Richard BALL: 6
+      Peter MONTAGUE: 5
+      Ann MONTAGUE: 5
+      Elizabeth MONTAGUE: 5
+      Robert WASHINGTON: 5
+      William GASCOIGNE: 5
+      John BALL: 4
+      Elizabeth WASHINGTON: 4
+      William WASHINGTON: 4
+      Margaret WASHINGTON: 4
+      Nathaniel POPE: 4
+      Thomas POPE: 4
+      Thomas WASHINGTON: 4
+      Ann WASHINGTON: 3
+      Richard WASHINGTON: 3
+      Augustine WARNER: 3
+  ages:
+    deceased_people_count: 208
+    average_age_at_death: 53.0
+    median_age_at_death: 52.0
+    age_at_death_distribution:
+      1: 1
+      9: 1
+      14: 1
+      16: 1
+      20: 3
+      21: 2
+      22: 2
+      23: 2
+      24: 1
+      26: 2
+      27: 2
+      28: 1
+      29: 5
+      30: 3
+      31: 3
+      33: 2
+      34: 3
+      35: 2
+      36: 6
+      37: 4
+      38: 5
+      39: 3
+      40: 5
+      41: 3
+      42: 5
+      43: 3
+      44: 1
+      45: 1
+      46: 2
+      47: 9
+      48: 3
+      49: 5
+      50: 4
+      51: 4
+      52: 5
+      53: 2
+      54: 3
+      55: 5
+      56: 3
+      57: 1
+      58: 3
+      59: 4
+      60: 1
+      61: 6
+      62: 2
+      63: 6
+      64: 4
+      65: 4
+      66: 7
+      67: 6
+      68: 5
+      69: 1
+      70: 2
+      71: 3
+      72: 1
+      74: 2
+      75: 4
+      76: 3
+      77: 1
+      78: 2
+      79: 4
+      80: 2
+      81: 5
+      82: 1
+      83: 1
+      84: 3
+      86: 2
+      88: 1
+      92: 1
+      99: 2
+    age_at_death_ranges:
+      0-9: 2
+      10-19: 2
+      20-29: 20
+      30-39: 31
+      40-49: 37
+      50-59: 34
+      60-69: 42
+      70-79: 22
+      80-89: 15
+      90-99: 3
+      100+: 0
+    lived_longest:
+    - name: Alling BALL
+      lifespan: 99
+      birth_year: 1617
+      death_year: 1716
+    - name: John WASHINGTON
+      lifespan: 99
+      birth_year: 1589
+      death_year: 1688
+    - name: Alling BALL
+      lifespan: 92
+      birth_year: 1598
+      death_year: 1690
+    - name: William PAULET (POWLETT)
+      lifespan: 88
+      birth_year: 1483
+      death_year: 1571
+    - name: Anne PERCY
+      lifespan: 86
+      birth_year: 1436
+      death_year: 1522
+    - name: Samuel MATHEWS
+      lifespan: 86
+      birth_year: 1574
+      death_year: 1660
+    - name: Benjamin READE
+      lifespan: 84
+      birth_year: 1647
+      death_year: 1731
+    - name: William BALL
+      lifespan: 84
+      birth_year: 1596
+      death_year: 1680
+    - name: William GASCOIGNE
+      lifespan: 84
+      birth_year: 1467
+      death_year: 1551
+    - name: Lawrence WASHINGTON
+      lifespan: 83
+      birth_year: 1500
+      death_year: 1583
+    lived_shortest:
+    - name: William WASHINGTON
+      lifespan: 14
+      birth_year: 1627
+      death_year: 1641
+    - name: Rachel BALL
+      lifespan: 16
+      birth_year: 1583
+      death_year: 1599
+    - name: Thomas WASHINGTON
+      lifespan: 20
+      birth_year: 1602
+      death_year: 1622
+    - name: Elizabeth WEBB
+      lifespan: 20
+      birth_year: 1575
+      death_year: 1595
+    - name: Walter WASHINGTON
+      lifespan: 20
+      birth_year: 1577
+      death_year: 1597
+    - name: Frances BALL
+      lifespan: 21
+      birth_year: 1709
+      death_year: 1730
+    - name: Thomas TWIGDEN
+      lifespan: 21
+      birth_year: 1559
+      death_year: 1580
+    - name: Lawrence WASHINGTON
+      lifespan: 22
+      birth_year: 1635
+      death_year: 1657
+    - name: Katherine PAULET
+      lifespan: 22
+      birth_year: 1488
+      death_year: 1510
+    - name: Jeduthun BALL
+      lifespan: 23
+      birth_year: 1725
+      death_year: 1748
+  births:
+    birth_months:
+      January: 5
+      February: 4
+      March: 2
+      April: 1
+      May: 9
+      June: 3
+      July: 6
+      August: 2
+      September: 3
+      October: 3
+      November: 4
+      December: 4
+    people_with_birth_month: 46
+    most_common_birth_month:
+      month: May
+      count: 9
+    birth_seasons:
+      Winter: 13
+      Spring: 12
+      Summer: 11
+      Fall: 10
+    birth_decades:
+      1350s: 3
+      1360s: 4
+      1370s: 3
+      1380s: 2
+      1390s: 11
+      1400s: 15
+      1410s: 15
+      1420s: 18
+      1430s: 9
+      1440s: 11
+      1450s: 10
+      1460s: 17
+      1470s: 16
+      1480s: 14
+      1490s: 10
+      1500s: 33
+      1510s: 13
+      1520s: 22
+      1530s: 19
+      1540s: 19
+      1550s: 29
+      1560s: 18
+      1570s: 33
+      1580s: 20
+      1590s: 22
+      1600s: 14
+      1610s: 18
+      1620s: 11
+      1630s: 19
+      1640s: 21
+      1650s: 8
+      1660s: 7
+      1670s: 13
+      1680s: 1
+      1690s: 3
+      1700s: 2
+      1710s: 4
+      1720s: 3
+      1730s: 6
+    birth_centuries:
+      14th century: 26
+      15th century: 140
+      16th century: 222
+      17th century: 113
+      18th century: 15
+    earliest_birth_year: 1351
+    latest_birth_year: 1739
+    birth_year_span: 388
+    zodiac_signs:
+      Taurus: 6
+      Gemini: 5
+      Aquarius: 5
+      Sagittarius: 5
+      Capricorn: 4
+      Cancer: 4
+      Leo: 4
+      Pisces: 3
+      Scorpio: 2
+      Libra: 2
+      Virgo: 2
+      Aries: 1
+    people_with_zodiac: 43
+    most_common_zodiac:
+      sign: Taurus
+      count: 6
+    least_common_zodiac:
+      sign: Aries
+      count: 1
+  longevity:
+    life_expectancy_by_birth_decade:
+      1350s:
+        average: 62.5
+        median: 62.5
+        min: 48
+        max: 77
+        count: 2
+      1360s:
+        average: 52.0
+        median: 56
+        min: 39
+        max: 61
+        count: 3
+      1370s:
+        average: 56.0
+        median: 56.0
+        min: 47
+        max: 65
+        count: 2
+      1380s:
+        average: 51.0
+        median: 51.0
+        min: 38
+        max: 64
+        count: 2
+      1390s:
+        average: 60.8
+        median: 63.0
+        min: 37
+        max: 81
+        count: 8
+      1400s:
+        average: 62.1
+        median: 60
+        min: 33
+        max: 81
+        count: 7
+      1410s:
+        average: 61.8
+        median: 62.5
+        min: 42
+        max: 80
+        count: 6
+      1420s:
+        average: 48.0
+        median: 39.5
+        min: 34
+        max: 81
+        count: 10
+      1430s:
+        average: 55.3
+        median: 56
+        min: 24
+        max: 86
+        count: 3
+      1440s:
+        average: 50.7
+        median: 41
+        min: 40
+        max: 71
+        count: 3
+      1450s:
+        average: 56.2
+        median: 59.5
+        min: 30
+        max: 76
+        count: 4
+      1460s:
+        average: 61.3
+        median: 57.5
+        min: 49
+        max: 84
+        count: 6
+      1470s:
+        average: 58.5
+        median: 55.0
+        min: 42
+        max: 82
+        count: 4
+      1480s:
+        average: 62.2
+        median: 70
+        min: 22
+        max: 88
+        count: 5
+      1490s:
+        average: 65.7
+        median: 66
+        min: 64
+        max: 67
+        count: 3
+      1500s:
+        average: 58.0
+        median: 52.0
+        min: 45
+        max: 83
+        count: 4
+      1510s:
+        average: 49.3
+        median: 42
+        min: 27
+        max: 79
+        count: 3
+      1520s:
+        average: 48.1
+        median: 43
+        min: 38
+        max: 74
+        count: 7
+      1530s:
+        average: 52.2
+        median: 52.0
+        min: 26
+        max: 79
+        count: 4
+      1540s:
+        average: 54.0
+        median: 49.5
+        min: 30
+        max: 80
+        count: 6
+      1550s:
+        average: 49.4
+        median: 59
+        min: 21
+        max: 67
+        count: 9
+      1560s:
+        average: 59.4
+        median: 54
+        min: 50
+        max: 81
+        count: 5
+      1570s:
+        average: 41.5
+        median: 28.5
+        min: 20
+        max: 86
+        count: 8
+      1580s:
+        average: 59.1
+        median: 63
+        min: 16
+        max: 99
+        count: 9
+      1590s:
+        average: 59.7
+        median: 63.5
+        min: 29
+        max: 92
+        count: 12
+      1600s:
+        average: 47.4
+        median: 50
+        min: 20
+        max: 63
+        count: 7
+      1610s:
+        average: 62.8
+        median: 64.5
+        min: 41
+        max: 99
+        count: 12
+      1620s:
+        average: 29.6
+        median: 30
+        min: 9
+        max: 61
+        count: 5
+      1630s:
+        average: 43.6
+        median: 38.5
+        min: 22
+        max: 75
+        count: 12
+      1640s:
+        average: 56.5
+        median: 57.5
+        min: 37
+        max: 84
+        count: 10
+      1650s:
+        average: 40.7
+        median: 40
+        min: 38
+        max: 44
+        count: 3
+      1660s:
+        average: 46.8
+        median: 36.5
+        min: 36
+        max: 78
+        count: 4
+      1670s:
+        average: 44.3
+        median: 45.5
+        min: 29
+        max: 65
+        count: 6
+      1680s:
+        average: 51.0
+        median: 51
+        min: 51
+        max: 51
+        count: 1
+      1690s:
+        average: 50.5
+        median: 50.5
+        min: 50
+        max: 51
+        count: 2
+      1700s:
+        average: 51.0
+        median: 51.0
+        min: 21
+        max: 81
+        count: 2
+      1710s:
+        average: 33.0
+        median: 33.0
+        min: 31
+        max: 35
+        count: 2
+      1720s:
+        average: 23.0
+        median: 23
+        min: 23
+        max: 23
+        count: 1
+      1730s:
+        average: 48.5
+        median: 56.0
+        min: 1
+        max: 67
+        count: 6
+    life_expectancy_by_birth_century:
+      14th century:
+        average: 58.7
+        median: 61.5
+        min: 37
+        max: 81
+        count: 20
+      15th century:
+        average: 57.5
+        median: 57.5
+        min: 22
+        max: 88
+        count: 50
+      16th century:
+        average: 52.7
+        median: 53.0
+        min: 16
+        max: 99
+        count: 66
+      17th century:
+        average: 49.4
+        median: 49
+        min: 9
+        max: 99
+        count: 61
+      18th century:
+        average: 43.8
+        median: 47
+        min: 1
+        max: 81
+        count: 11
+    life_expectancy_by_gender:
+      M:
+        average: 54.1
+        median: 54.5
+        count: 138
+      F:
+        average: 50.9
+        median: 49.5
+        count: 70
+    life_expectancy_trends_by_gender:
+      1350s:
+        Male: 62.5
+      1360s:
+        Male: 52.0
+      1370s:
+        Female: 56.0
+      1380s:
+        Male: 51.0
+      1390s:
+        Male: 59.0
+        Female: 63.7
+      1400s:
+        Male: 62.7
+        Female: 61.8
+      1410s:
+        Male: 55.5
+        Female: 74.5
+      1420s:
+        Male: 42.0
+        Female: 57.0
+      1430s:
+        Male: 40.0
+        Female: 86.0
+      1440s:
+        Male: 50.7
+      1450s:
+        Male: 51.0
+        Female: 61.5
+      1460s:
+        Male: 63.2
+        Female: 52.0
+      1470s:
+        Male: 55.0
+        Female: 62.0
+      1480s:
+        Male: 72.2
+        Female: 22.0
+      1490s:
+        Male: 65.7
+      1500s:
+        Male: 58.0
+      1510s:
+        Male: 53.0
+        Female: 42.0
+      1520s:
+        Male: 50.8
+        Female: 41.5
+      1530s:
+        Male: 52.2
+      1540s:
+        Male: 59.0
+        Female: 44.0
+      1550s:
+        Male: 42.2
+        Female: 58.5
+      1560s:
+        Male: 61.7
+        Female: 56.0
+      1570s:
+        Male: 44.6
+        Female: 20.0
+      1580s:
+        Male: 68.6
+        Female: 47.2
+      1590s:
+        Male: 68.3
+        Female: 47.6
+      1600s:
+        Male: 49.2
+        Female: 43.0
+      1610s:
+        Male: 63.4
+        Female: 61.8
+      1620s:
+        Male: 24.0
+        Female: 33.3
+      1630s:
+        Male: 47.2
+        Female: 32.7
+      1640s:
+        Male: 57.4
+        Female: 53.0
+      1650s:
+        Male: 40.0
+        Female: 41.0
+      1660s:
+        Male: 36.5
+        Female: 57.0
+      1670s:
+        Male: 47.5
+        Female: 42.8
+      1680s:
+        Male: 51.0
+      1690s:
+        Male: 50.0
+        Female: 51.0
+      1700s:
+        Female: 51.0
+      1710s:
+        Male: 33.0
+      1720s:
+        Male: 23.0
+      1730s:
+        Male: 56.5
+        Female: 32.5
+    infant_mortality_count: 0
+    infant_mortality_rate: 0.0
+    child_mortality_count: 1
+    child_mortality_rate: 0.48
+    total_deaths_analyzed: 208
+    survival_rates:
+      survived_to_age_5:
+        count: 207
+        percentage: 99.5
+      survived_to_age_18:
+        count: 204
+        percentage: 98.1
+      survived_to_age_65:
+        count: 63
+        percentage: 30.3
+      survived_to_age_80:
+        count: 18
+        percentage: 8.7
+    births_by_decade:
+      1350: 3
+      1360: 4
+      1370: 3
+      1380: 2
+      1390: 11
+      1400: 15
+      1410: 15
+      1420: 18
+      1430: 9
+      1440: 11
+      1450: 10
+      1460: 17
+      1470: 16
+      1480: 14
+      1490: 10
+      1500: 33
+      1510: 13
+      1520: 22
+      1530: 19
+      1540: 19
+      1550: 29
+      1560: 18
+      1570: 33
+      1580: 20
+      1590: 22
+      1600: 14
+      1610: 18
+      1620: 11
+      1630: 19
+      1640: 21
+      1650: 8
+      1660: 7
+      1670: 13
+      1680: 1
+      1690: 3
+      1700: 2
+      1710: 4
+      1720: 3
+      1730: 6
+    deaths_by_decade:
+      1400: 2
+      1410: 1
+      1420: 5
+      1430: 1
+      1440: 3
+      1450: 5
+      1460: 12
+      1470: 5
+      1480: 8
+      1490: 2
+      1500: 3
+      1510: 6
+      1520: 3
+      1530: 2
+      1540: 4
+      1550: 11
+      1560: 5
+      1570: 3
+      1580: 6
+      1590: 9
+      1600: 3
+      1610: 6
+      1620: 12
+      1630: 4
+      1640: 6
+      1650: 16
+      1660: 8
+      1670: 6
+      1680: 12
+      1690: 8
+      1700: 6
+      1710: 6
+      1720: 2
+      1730: 3
+      1740: 7
+      1750: 1
+      1780: 3
+      1790: 3
+    longevity_improvement:
+      early_period_avg: 56.3
+      late_period_avg: 50.6
+      improvement_years: -5.7
+      improvement_percentage: -10.1
+  timeline:
+    total_events_with_dates: 753
+    years_with_events: 313
+    most_eventful_years:
+      1580: 9
+      1460: 9
+      1575: 8
+      1500: 8
+      1555: 8
+      1558: 7
+      1563: 7
+      1510: 7
+      1659: 6
+      1611: 6
+      1579: 6
+      1583: 6
+      1550: 6
+      1570: 6
+      1635: 5
+      1642: 5
+      1614: 5
+      1627: 5
+      1573: 5
+      1595: 5
+    peak_year:
+      year: 1580
+      events: 9
+    events_by_decade:
+      0s: 2
+      10s: 2
+      1350s: 3
+      1360s: 4
+      1370s: 3
+      1380s: 2
+      1390s: 11
+      1400s: 17
+      1410s: 16
+      1420s: 23
+      1430s: 10
+      1440s: 14
+      1450s: 15
+      1460s: 29
+      1470s: 21
+      1480s: 22
+      1490s: 12
+      1500s: 36
+      1510s: 19
+      1520s: 25
+      1530s: 21
+      1540s: 24
+      1550s: 46
+      1560s: 26
+      1570s: 40
+      1580s: 28
+      1590s: 31
+      1600s: 22
+      1610s: 25
+      1620s: 23
+      1630s: 23
+      1640s: 27
+      1650s: 24
+      1660s: 16
+      1670s: 19
+      1680s: 14
+      1690s: 11
+      1700s: 8
+      1710s: 10
+      1720s: 5
+      1730s: 9
+      1740s: 8
+      1750s: 1
+      1780s: 3
+      1790s: 3
+    peak_decade:
+      decade: 1550s
+      events: 46
+    events_by_century:
+      1st century: 4
+      14th century: 26
+      15th century: 184
+      16th century: 290
+      17th century: 205
+      18th century: 44
+    earliest_event_year: 2
+    latest_event_year: 1799
+    timeline_span_years: 1797
+    decades_covered: 45
+    centuries_covered: 6
+    events_by_type:
+      birth:
+        total: 516
+        by_decade:
+          1350s: 3
+          1360s: 4
+          1370s: 3
+          1380s: 2
+          1390s: 11
+          1400s: 15
+          1410s: 15
+          1420s: 18
+          1430s: 9
+          1440s: 11
+          1450s: 10
+          1460s: 17
+          1470s: 16
+          1480s: 14
+          1490s: 10
+          1500s: 33
+          1510s: 13
+          1520s: 22
+          1530s: 19
+          1540s: 19
+          1550s: 29
+          1560s: 18
+          1570s: 33
+          1580s: 20
+          1590s: 22
+          1600s: 14
+          1610s: 18
+          1620s: 11
+          1630s: 19
+          1640s: 21
+          1650s: 8
+          1660s: 7
+          1670s: 13
+          1680s: 1
+          1690s: 3
+          1700s: 2
+          1710s: 4
+          1720s: 3
+          1730s: 6
+      death:
+        total: 217
+        by_decade:
+          0s: 2
+          10s: 2
+          1400s: 2
+          1410s: 1
+          1420s: 5
+          1430s: 1
+          1440s: 3
+          1450s: 5
+          1460s: 12
+          1470s: 5
+          1480s: 8
+          1490s: 2
+          1500s: 3
+          1510s: 6
+          1520s: 3
+          1530s: 2
+          1540s: 5
+          1550s: 11
+          1560s: 6
+          1570s: 3
+          1580s: 6
+          1590s: 9
+          1600s: 5
+          1610s: 6
+          1620s: 12
+          1630s: 4
+          1640s: 6
+          1650s: 16
+          1660s: 8
+          1670s: 6
+          1680s: 12
+          1690s: 8
+          1700s: 6
+          1710s: 6
+          1720s: 2
+          1730s: 3
+          1740s: 8
+          1750s: 1
+          1780s: 3
+          1790s: 3
+      residence:
+        total: 20
+        by_decade:
+          1550s: 6
+          1560s: 2
+          1570s: 4
+          1580s: 2
+          1600s: 3
+          1610s: 1
+          1660s: 1
+          1680s: 1
+    data_completeness_by_birth_decade:
+      1350s:
+        total_people: 3
+        with_death_data: 2
+        with_place_data: 3
+        death_data_percentage: 66.7
+        place_data_percentage: 100.0
+      1360s:
+        total_people: 4
+        with_death_data: 3
+        with_place_data: 4
+        death_data_percentage: 75.0
+        place_data_percentage: 100.0
+      1370s:
+        total_people: 3
+        with_death_data: 2
+        with_place_data: 3
+        death_data_percentage: 66.7
+        place_data_percentage: 100.0
+      1380s:
+        total_people: 2
+        with_death_data: 2
+        with_place_data: 2
+        death_data_percentage: 100.0
+        place_data_percentage: 100.0
+      1390s:
+        total_people: 11
+        with_death_data: 8
+        with_place_data: 11
+        death_data_percentage: 72.7
+        place_data_percentage: 100.0
+      1400s:
+        total_people: 15
+        with_death_data: 8
+        with_place_data: 14
+        death_data_percentage: 53.3
+        place_data_percentage: 93.3
+      1410s:
+        total_people: 15
+        with_death_data: 6
+        with_place_data: 14
+        death_data_percentage: 40.0
+        place_data_percentage: 93.3
+      1420s:
+        total_people: 18
+        with_death_data: 10
+        with_place_data: 16
+        death_data_percentage: 55.6
+        place_data_percentage: 88.9
+      1430s:
+        total_people: 9
+        with_death_data: 3
+        with_place_data: 9
+        death_data_percentage: 33.3
+        place_data_percentage: 100.0
+      1440s:
+        total_people: 11
+        with_death_data: 3
+        with_place_data: 9
+        death_data_percentage: 27.3
+        place_data_percentage: 81.8
+      1450s:
+        total_people: 10
+        with_death_data: 5
+        with_place_data: 9
+        death_data_percentage: 50.0
+        place_data_percentage: 90.0
+      1460s:
+        total_people: 17
+        with_death_data: 6
+        with_place_data: 15
+        death_data_percentage: 35.3
+        place_data_percentage: 88.2
+      1470s:
+        total_people: 16
+        with_death_data: 4
+        with_place_data: 15
+        death_data_percentage: 25.0
+        place_data_percentage: 93.8
+      1480s:
+        total_people: 14
+        with_death_data: 5
+        with_place_data: 14
+        death_data_percentage: 35.7
+        place_data_percentage: 100.0
+      1490s:
+        total_people: 10
+        with_death_data: 3
+        with_place_data: 10
+        death_data_percentage: 30.0
+        place_data_percentage: 100.0
+      1500s:
+        total_people: 33
+        with_death_data: 4
+        with_place_data: 31
+        death_data_percentage: 12.1
+        place_data_percentage: 93.9
+      1510s:
+        total_people: 13
+        with_death_data: 3
+        with_place_data: 12
+        death_data_percentage: 23.1
+        place_data_percentage: 92.3
+      1520s:
+        total_people: 22
+        with_death_data: 7
+        with_place_data: 20
+        death_data_percentage: 31.8
+        place_data_percentage: 90.9
+      1530s:
+        total_people: 19
+        with_death_data: 4
+        with_place_data: 17
+        death_data_percentage: 21.1
+        place_data_percentage: 89.5
+      1540s:
+        total_people: 19
+        with_death_data: 6
+        with_place_data: 18
+        death_data_percentage: 31.6
+        place_data_percentage: 94.7
+      1550s:
+        total_people: 29
+        with_death_data: 9
+        with_place_data: 26
+        death_data_percentage: 31.0
+        place_data_percentage: 89.7
+      1560s:
+        total_people: 18
+        with_death_data: 6
+        with_place_data: 14
+        death_data_percentage: 33.3
+        place_data_percentage: 77.8
+      1570s:
+        total_people: 33
+        with_death_data: 9
+        with_place_data: 29
+        death_data_percentage: 27.3
+        place_data_percentage: 87.9
+      1580s:
+        total_people: 20
+        with_death_data: 9
+        with_place_data: 17
+        death_data_percentage: 45.0
+        place_data_percentage: 85.0
+      1590s:
+        total_people: 22
+        with_death_data: 12
+        with_place_data: 22
+        death_data_percentage: 54.5
+        place_data_percentage: 100.0
+      1600s:
+        total_people: 14
+        with_death_data: 7
+        with_place_data: 11
+        death_data_percentage: 50.0
+        place_data_percentage: 78.6
+      1610s:
+        total_people: 18
+        with_death_data: 12
+        with_place_data: 16
+        death_data_percentage: 66.7
+        place_data_percentage: 88.9
+      1620s:
+        total_people: 11
+        with_death_data: 5
+        with_place_data: 11
+        death_data_percentage: 45.5
+        place_data_percentage: 100.0
+      1630s:
+        total_people: 19
+        with_death_data: 12
+        with_place_data: 17
+        death_data_percentage: 63.2
+        place_data_percentage: 89.5
+      1640s:
+        total_people: 21
+        with_death_data: 11
+        with_place_data: 17
+        death_data_percentage: 52.4
+        place_data_percentage: 81.0
+      1650s:
+        total_people: 8
+        with_death_data: 3
+        with_place_data: 6
+        death_data_percentage: 37.5
+        place_data_percentage: 75.0
+      1660s:
+        total_people: 7
+        with_death_data: 5
+        with_place_data: 6
+        death_data_percentage: 71.4
+        place_data_percentage: 85.7
+      1670s:
+        total_people: 13
+        with_death_data: 6
+        with_place_data: 9
+        death_data_percentage: 46.2
+        place_data_percentage: 69.2
+      1680s:
+        total_people: 1
+        with_death_data: 1
+        with_place_data: 1
+        death_data_percentage: 100.0
+        place_data_percentage: 100.0
+      1690s:
+        total_people: 3
+        with_death_data: 2
+        with_place_data: 3
+        death_data_percentage: 66.7
+        place_data_percentage: 100.0
+      1700s:
+        total_people: 2
+        with_death_data: 2
+        with_place_data: 2
+        death_data_percentage: 100.0
+        place_data_percentage: 100.0
+      1710s:
+        total_people: 4
+        with_death_data: 2
+        with_place_data: 4
+        death_data_percentage: 50.0
+        place_data_percentage: 100.0
+      1720s:
+        total_people: 3
+        with_death_data: 1
+        with_place_data: 3
+        death_data_percentage: 33.3
+        place_data_percentage: 100.0
+      1730s:
+        total_people: 6
+        with_death_data: 6
+        with_place_data: 6
+        death_data_percentage: 100.0
+        place_data_percentage: 100.0
+    average_events_per_year: 0.42
+    years_with_no_events: 1485
+    data_coverage_percentage: 17.4
+    most_active_decade:
+      decade: 1550s
+      events: 46
+    least_active_decade:
+      decade: 1750s
+      events: 1
+  marriage:
+    total_people: 529
+    people_with_marriages: 168
+    people_never_married: 361
+    total_marriages_recorded: 84
+    marriages_per_person_distribution:
+      1: 168
+    most_marriages: 1
+    people_married_most:
+    - name: Augustine WASHINGTON
+      marriages: 1
+    - name: Mary BALL
+      marriages: 1
+    - name: Lawrence WASHINGTON
+      marriages: 1
+    - name: Mildred WARNER
+      marriages: 1
+    - name: Joseph BALL
+      marriages: 1
+    - name: Mary MONTAGUE
+      marriages: 1
+    - name: John WASHINGTON
+      marriages: 1
+    - name: Anne POPE
+      marriages: 1
+    - name: Augustine WARNER
+      marriages: 1
+    - name: Mildred READE
+      marriages: 1
+    average_marriage_age: 22.4
+    median_marriage_age: 19.0
+    youngest_marriage_age: 0
+    oldest_marriage_age: 58
+    average_marriage_age_male: 24.4
+    median_marriage_age_male: 22
+    average_marriage_age_female: 20.4
+    median_marriage_age_female: 18
+    average_marriage_duration: 26.2
+    median_marriage_duration: 26
+    shortest_marriage_duration: 0
+    longest_marriage_duration: 76
+    longest_marriages:
+    - duration: 76
+      person1: Thomas BULLOCK
+      person2: Alice KINGSMILL
+    - duration: 64
+      person1: John MALTHUS
+      person2: Anne
+    - duration: 58
+      person1: William BALL
+      person2: Alice WALTHAM
+    - duration: 53
+      person1: Robert WASHINGTON
+      person2: Elizabeth WESTFIELD
+    - duration: 50
+      person1: Walter LIGHT
+      person2: Ursula WOODFORD
+    - duration: 50
+      person1: Thomas ATHEROLD
+      person2: Mary HARVEY
+    - duration: 48
+      person1: Christopher LIGHT
+      person2: Elizabeth WARDE
+    - duration: 48
+      person1: John DICKENS
+      person2: Mrs John DICKENS
+    - duration: 42
+      person1: William BALL
+      person2: Hannah ATHEROLD
+    - duration: 41
+      person1: Thomas WINDIBANK
+      person2: Frances DYMOKE
+    shortest_marriages:
+    - duration: 1
+      person1: Nicholas MARTIAU
+      person2: Jane BERKELEY
+    - duration: 2
+      person1: William DICKENS
+      person2: Anne THORNTON
+    - duration: 3
+      person1: Thomas TWIGDEN
+      person2: Amphyllis WATTS
+    - duration: 5
+      person1: William GASCOIGNE
+      person2: Joan NEVILLE
+    - duration: 8
+      person1: Richard POYNINGS
+      person2: Alianore BERKELEY
+    - duration: 8
+      person1: Henry THORNTON
+      person2: Anne WILMER
+    - duration: 9
+      person1: Lawrence WASHINGTON
+      person2: Mildred WARNER
+    - duration: 9
+      person1: John TWIGDEN
+      person2: Anne DICKENS
+    - duration: 9
+      person1: Henry DICKENS
+      person2: Mrs Henry DICKENS
+    - duration: 10
+      person1: John WASHINGTON
+      person2: Anne POPE
+    average_age_difference: 8.1
+    median_age_difference: 3
+    max_age_difference: 102
+    husband_much_older_cases:
+    - husband: Henry WARDE
+      wife: Anne BISHOP
+      age_difference: 102
+    - husband: William GASCOIGNE
+      wife: Margaret CLARELL
+      age_difference: 37
+    - husband: Lawrence TOWNELEY
+      wife: Mary HARTLEY
+      age_difference: 31
+    - husband: John BALL
+      wife: Elizabeth WEBB
+      age_difference: 27
+    - husband: Lawrence WASHINGTON
+      wife: Amy PARGITER
+      age_difference: 24
+    - husband: Thomas BULLOCK
+      wife: Alice KINGSMILL
+      age_difference: 18
+    - husband: George READE
+      wife: Elizabeth MARTIAU (MARTAIN)
+      age_difference: 17
+    - husband: John WASHINGTON
+      wife: Margaret KITSON
+      age_difference: 17
+    - husband: Joseph BALL
+      wife: Mary MONTAGUE
+      age_difference: 16
+    - husband: Augustine WASHINGTON
+      wife: Mary BALL
+      age_difference: 15
+    wife_much_older_cases:
+    - husband: Robert DYMOKE
+      wife: Anne SPARROW
+      age_difference: 91
+    - husband: Robert WASHINGTON
+      wife: Elizabeth WESTFIELD
+      age_difference: 31
+    - husband: Thomas WINDIBANK
+      wife: Frances DYMOKE
+      age_difference: 30
+    - husband: John WESTFIELD
+      wife: Mrs-John WESTFIELD
+      age_difference: 15
+    marriages_by_decade:
+      1370s: 2
+      1390s: 4
+      1410s: 2
+      1420s: 2
+      1430s: 4
+      1450s: 6
+      1460s: 2
+      1470s: 2
+      1480s: 2
+      1490s: 8
+      1500s: 2
+      1510s: 4
+      1520s: 10
+      1530s: 8
+      1540s: 10
+      1550s: 4
+      1560s: 8
+      1570s: 8
+      1580s: 6
+      1590s: 6
+      1600s: 8
+      1610s: 2
+      1620s: 2
+      1630s: 8
+      1640s: 2
+      1650s: 2
+      1660s: 4
+      1670s: 2
+      1690s: 2
+      1700s: 2
+      1730s: 2
+    marriages_by_century:
+      14th century: 6
+      15th century: 28
+      16th century: 68
+      17th century: 32
+      18th century: 2
+    earliest_marriage_year: 1379
+    latest_marriage_year: 1731
+  children:
+    children_per_person_distribution:
+      1: 104
+      2: 16
+      3: 19
+      4: 4
+      5: 2
+      6: 22
+      7: 2
+      8: 8
+      9: 4
+      10: 6
+      11: 12
+      12: 8
+      13: 2
+      14: 2
+      17: 2
+    most_children: 17
+    people_with_most_children:
+    - name: Lawrence WASHINGTON
+      children: 17
+    - name: Margaret BUTLER
+      children: 17
+    most_children_male: 17
+    men_with_most_children:
+    - name: Lawrence WASHINGTON
+      children: 17
+    most_children_female: 17
+    women_with_most_children:
+    - name: Margaret BUTLER
+      children: 17
+    total_families: 100
+    average_family_size: 4.1
+    median_family_size: 2.0
+    largest_family_size: 17
+    smallest_family_size: 1
+    family_size_distribution:
+      1: 47
+      2: 8
+      3: 9
+      4: 2
+      5: 1
+      6: 10
+      7: 1
+      8: 4
+      9: 2
+      10: 3
+      11: 6
+      12: 4
+      13: 1
+      14: 1
+      17: 1
+    largest_families:
+    - size: 17
+      father: Lawrence WASHINGTON
+      mother: Margaret BUTLER
+    - size: 14
+      father: Ralph De NEVILLE
+      mother: Joan De BEAUFORT
+    - size: 13
+      father: Thomas BULLOCK
+      mother: Alice KINGSMILL
+    - size: 12
+      father: Nathaniel POPE
+      mother: Lucy
+    - size: 12
+      father: John BALL
+      mother: Elizabeth WEBB
+    - size: 12
+      father: William MONTAGUE
+      mother: Margaret MALTHOUSE
+    - size: 12
+      father: Edward DYMOKE
+      mother: Anne TALBOIS
+    - size: 11
+      father: Joseph BALL
+      mother: Mary MONTAGUE
+    - size: 11
+      father: William BALL
+      mother: Alice WALTHAM
+    - size: 11
+      father: Peter MONTAGUE
+      mother: Cicely MATTHEW
+    average_age_first_child_male: 26.7
+    youngest_father_at_first_child: 10
+    oldest_father_at_first_child: 51
+    average_age_last_child_male: 31.5
+    oldest_father_at_last_child: 59
+    average_age_first_child_female: 23.6
+    youngest_mother_at_first_child: 13
+    oldest_mother_at_first_child: 46
+    average_age_last_child_female: 30.4
+    oldest_mother_at_last_child: 69
+    average_sibling_age_gap: 3.8
+    median_sibling_age_gap: 2
+    largest_sibling_age_gap: 77
+    smallest_sibling_age_gap: 1
+    families_largest_sibling_gaps:
+    - max_gap: 77
+      min_gap: 2
+      father: Gilbert BULLOCK
+      mother: Margaret NORRIS
+    - max_gap: 43
+      min_gap: 2
+      father: Robert WASHINGTON
+      mother: WIFE
+    - max_gap: 36
+      min_gap: 2
+      father: John MALTHOUSE
+      mother: Margaret BULLOCK
+    - max_gap: 34
+      min_gap: 0
+      father: Edward DYMOKE
+      mother: Anne TALBOIS
+    - max_gap: 33
+      min_gap: 1
+      father: Joseph BALL
+      mother: Mary MONTAGUE
+    - max_gap: 28
+      min_gap: 0
+      father: Peter MONTAGUE
+      mother: Cicely MATTHEW
+    - max_gap: 28
+      min_gap: 2
+      father: John BALL
+      mother: Agnes HATHOWAY
+    - max_gap: 23
+      min_gap: 1
+      father: Peter MONTAGUE
+      mother: Mary DOODES
+    - max_gap: 18
+      min_gap: 2
+      father: Robert PARGITER
+      mother: Anne KNIGHT
+    - max_gap: 17
+      min_gap: 7
+      father: Thomas WINDIBANK
+      mother: Frances DYMOKE
+  relationship_status:
+    total_people: 529
+    never_married: 361
+    ever_married: 168
+    currently_married_living: 44
+    widowed: 60
+    never_married_percentage: 68.2
+    ever_married_percentage: 31.8
+    status_by_gender:
+      M:
+        never_married: 196
+        ever_married: 84
+        widowed: 13
+        currently_married: 22
+      F:
+        never_married: 165
+        ever_married: 84
+        widowed: 47
+        currently_married: 22
+      Unknown:
+        never_married: 0
+        ever_married: 0
+        widowed: 0
+        currently_married: 0
+    living_people: 312
+    marriage_rate_among_living: 14.1
+  divorce:
+    total_divorces: 0
+    people_with_divorces: 0
+    total_people: 529
+  relationship_path:
+    focus_person_id: '@I115@'
+    focus_person_name: Lawrence WASHINGTON
+    total_people_analyzed: 529
+    total_relationships_found: 528
+    direct_ancestors: 315
+    direct_descendants: 158
+    blood_relatives: 50
+    relatives_by_marriage: 5
+    steps_away_distribution:
+      1 step: 20
+      2 steps: 22
+      3 steps: 27
+      4 steps: 37
+      5 steps: 33
+      6 steps: 21
+      7 steps: 35
+      8 steps: 38
+      9 steps: 45
+      10 steps: 46
+      11 steps: 30
+      12 steps: 34
+      13 steps: 37
+      14 steps: 43
+      15 steps: 32
+      16 steps: 15
+      17 steps: 13
+    closest_step: 1
+    furthest_step: 17
+    average_steps: 9.0
+    generation_distribution:
+      -7 generations: 25
+      -6 generations: 49
+      -5 generations: 38
+      -4 generations: 33
+      -3 generations: 48
+      -2 generations (grandparents): 63
+      -1 generation (parents): 59
+      Same generation: 51
+      +1 generation (children): 60
+      +2 generations (grandchildren): 56
+      +3 generations: 26
+      +4 generations: 14
+      +5 generations: 6
+    oldest_generation: -7
+    youngest_generation: 5
+    generation_span: 12
+    total_generations: 13
+    relationship_types:
+      ancestor: 145
+      grandparent: 63
+      parent: 59
+      child: 59
+      grandchild: 55
+      great-grandparent: 48
+      great-grandchild: 25
+      descendant: 19
+      relative (11 steps away): 18
+      relative (9 steps away): 13
+      cousin/aunt/uncle: 9
+      relative (7 steps away): 8
+      in-law: 4
+      cousin/great-aunt/uncle: 2
+      spouse: 1
+    most_common_relationship:
+      type: ancestor
+      count: 145
+    direct_ancestors_list:
+    - name: Robert WASHINGTON
+      steps: 1
+      generation: -1
+      type: parent
+    - name: Elizabeth LIGHT
+      steps: 1
+      generation: -1
+      type: parent
+    - name: Lawrence WASHINGTON
+      steps: 2
+      generation: -2
+      type: grandparent
+    - name: Amy PARGITER
+      steps: 2
+      generation: -2
+      type: grandparent
+    - name: Walter LIGHT
+      steps: 2
+      generation: -2
+      type: grandparent
+    - name: Ursula WOODFORD
+      steps: 2
+      generation: -2
+      type: grandparent
+    - name: William BUTLER
+      steps: 2
+      generation: -1
+      type: parent
+    - name: Margaret
+      steps: 2
+      generation: -1
+      type: parent
+    - name: John WASHINGTON
+      steps: 3
+      generation: -3
+      type: great-grandparent
+    - name: Margaret KITSON
+      steps: 3
+      generation: -3
+      type: great-grandparent
+    - name: William WASHINGTON
+      steps: 3
+      generation: -1
+      type: parent
+    - name: John WASHINGTON
+      steps: 3
+      generation: -1
+      type: parent
+    - name: Frances WASHINGTON
+      steps: 3
+      generation: -1
+      type: parent
+    - name: Ann WASHINGTON
+      steps: 3
+      generation: -1
+      type: parent
+    - name: Mary WASHINGTON
+      steps: 3
+      generation: -1
+      type: parent
+    - name: Margaret WASHINGTON
+      steps: 3
+      generation: -1
+      type: parent
+    - name: Elizabeth WASHINGTON
+      steps: 3
+      generation: -1
+      type: parent
+    - name: Margaret WASHINGTON
+      steps: 3
+      generation: -1
+      type: parent
+    - name: Barbara WASHINGTON
+      steps: 3
+      generation: -1
+      type: parent
+    - name: Lawrence WASHINGTON
+      steps: 3
+      generation: -1
+      type: parent
+    direct_descendants_list:
+    - name: John WASHINGTON
+      steps: 1
+      generation: 1
+      type: child
+    - name: William WASHINGTON
+      steps: 1
+      generation: 1
+      type: child
+    - name: Robert WASHINGTON
+      steps: 1
+      generation: 1
+      type: child
+    - name: Richard WASHINGTON
+      steps: 1
+      generation: 1
+      type: child
+    - name: Ann WASHINGTON
+      steps: 1
+      generation: 1
+      type: child
+    - name: Elizabeth WASHINGTON
+      steps: 1
+      generation: 1
+      type: child
+    - name: Lucy WASHINGTON
+      steps: 1
+      generation: 1
+      type: child
+    - name: Jane WASHINGTON
+      steps: 1
+      generation: 1
+      type: child
+    - name: Amy WASHINGTON
+      steps: 1
+      generation: 1
+      type: child
+    - name: Thomas WASHINGTON
+      steps: 1
+      generation: 1
+      type: child
+    - name: Lawrence WASHINGTON
+      steps: 1
+      generation: 1
+      type: child
+    - name: Margaret WASHINGTON
+      steps: 1
+      generation: 1
+      type: child
+    - name: Gregory WASHINGTON
+      steps: 1
+      generation: 1
+      type: child
+    - name: George WASHINGTON
+      steps: 1
+      generation: 1
+      type: child
+    - name: Alice WASHINGTON
+      steps: 1
+      generation: 1
+      type: child
+    - name: Joan WASHINGTON
+      steps: 1
+      generation: 1
+      type: child
+    - name: Frances WASHINGTON
+      steps: 1
+      generation: 1
+      type: child
+    - name: Elizabeth WASHINGTON
+      steps: 2
+      generation: 2
+      type: grandchild
+    - name: William WASHINGTON
+      steps: 2
+      generation: 2
+      type: grandchild
+    - name: Martha WASHINGTON
+      steps: 2
+      generation: 2
+      type: grandchild
+    blood_relatives_list:
+    - name: Robert WASHINGTON
+      steps: 2
+      generation: 0
+      type: cousin/aunt/uncle
+    - name: Walter WASHINGTON
+      steps: 2
+      generation: 0
+      type: cousin/aunt/uncle
+    - name: Christopher WASHINGTON
+      steps: 2
+      generation: 0
+      type: cousin/aunt/uncle
+    - name: William WASHINGTON
+      steps: 2
+      generation: 0
+      type: cousin/aunt/uncle
+    - name: Walter WASHINGTON
+      steps: 2
+      generation: 0
+      type: cousin/aunt/uncle
+    - name: Thomas WASHINGTON
+      steps: 2
+      generation: 0
+      type: cousin/aunt/uncle
+    - name: Anne Or Amy WASHINGTON
+      steps: 2
+      generation: 0
+      type: cousin/aunt/uncle
+    - name: Ursula WASHINGTON
+      steps: 2
+      generation: 0
+      type: cousin/aunt/uncle
+    - name: Elizabeth WASHINGTON
+      steps: 2
+      generation: 0
+      type: cousin/aunt/uncle
+    - name: John TWIGDEN
+      steps: 3
+      generation: 0
+      type: cousin/great-aunt/uncle
+    - name: Anne DICKENS
+      steps: 3
+      generation: 0
+      type: cousin/great-aunt/uncle
+    - name: Thomas WARNER
+      steps: 7
+      generation: 0
+      type: relative (7 steps away)
+    - name: Elizabeth SOTHERTON
+      steps: 7
+      generation: 0
+      type: relative (7 steps away)
+    - name: Lawrence TOWNELEY
+      steps: 7
+      generation: 0
+      type: relative (7 steps away)
+    - name: Jennet HALSTEAD
+      steps: 7
+      generation: 0
+      type: relative (7 steps away)
+    - name: Robert READE
+      steps: 7
+      generation: 0
+      type: relative (7 steps away)
+    - name: Mildred WINDIBANK
+      steps: 7
+      generation: 0
+      type: relative (7 steps away)
+    - name: Nicholas MARTIAU
+      steps: 7
+      generation: 0
+      type: relative (7 steps away)
+    - name: Jane BERKELEY
+      steps: 7
+      generation: 0
+      type: relative (7 steps away)
+    - name: John BALL
+      steps: 9
+      generation: 0
+      type: relative (9 steps away)
+    relatives_by_marriage_list:
+    - name: Margaret BUTLER
+      steps: 1
+      generation: 0
+      type: spouse
+    - name: Amphyllis TWIGDEN
+      steps: 2
+      generation: 1
+      type: in-law
+    - name: Anne POPE
+      steps: 3
+      generation: 2
+      type: in-law
+    - name: Mildred WARNER
+      steps: 4
+      generation: 3
+      type: in-law
+    - name: Mary BALL
+      steps: 5
+      generation: 4
+      type: in-law

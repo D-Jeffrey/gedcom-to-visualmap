@@ -1,0 +1,273 @@
+count,latitude,longitude,found_country,place,country_name,continent
+1,38.1859162,-76.9161654,True,"Wakefield, Popes Creek, Westmoreland, Virginia",United States,North America
+1,38.710179,-77.0888199,True,"Mount Vernon, Fairfax, Virginia",United States,North America
+1,38.1153203,-76.7567355,True,"Bridge's Creek, Westmoreland, Virginia",United States,North America
+1,38.2786312,-77.175356,True,"Ferry Farm, King George, Virginia",United States,North America
+1,37.7913044,-76.5258553,True,"Epping Forest, Lancaster, VA",United States,North America
+1,37.7913044,-76.5258553,True,"Of, Epping Forest, Lancaster, Virginia",United States,North America
+1,38.1720754,-76.9491371,True,"Wakefield, Westmoreland, Virginia",United States,North America
+1,38.4733823,-77.9961275,True,"""Western View"", Culpeper, Virginia",United States,North America
+1,37.4452288,-76.5594479,True,"Gloucester Co., Virginia",United States,North America
+1,38.1880936,-77.6741751,True,"Offredericksburg, Spotsylvania, VA",United States,North America
+1,54.5474199,-3.5885335,True,"""Whitehaven"", England",England,Europe
+1,38.2786312,-77.175356,True,"Bridges Creek, King George, VA",United States,North America
+1,41.903411,12.4528527,True,", , VA",Civitas Vaticana - Città del Vaticano,Europe
+1,37.7625738,-76.4723233,True,"Millenkick, Lancaster, Virginia",United States,North America
+1,37.7625738,-76.4723233,True,"Oakley, Lancaster, Virginia",United States,North America
+1,40.043127,-76.3244568,True,"Of, , Lancaster, Virginia",United States,North America
+1,38.2786312,-77.175356,True,", King George, Virginia",United States,North America
+1,38.4167265,-77.4579783,True,", , Stafford, Virginia",United States,North America
+1,41.903411,12.4528527,True,VA,Civitas Vaticana - Città del Vaticano,Europe
+1,37.7665507,-76.570956,True,"""Bewdley"", Lancaster Co, VA",United States,North America
+1,52.1057594,-1.1833205,True,"Sulgrave Manor, England",England,Europe
+1,38.4167265,-77.4579783,True,", Stafford Co., Va.",United States,North America
+1,38.1153203,-76.7567355,True,", Westmoreland Co., VA",United States,North America
+1,29.7124309,-91.46261,True,", St Mary, Maryland",United States,North America
+1,38.1153203,-76.7567355,True,"Lower Machodc, Westmoreland Co., Vi.",United States,North America
+1,37.1118778,-76.895924,True,", Surry Co, VA",United States,North America
+1,38.1153203,-76.7567355,True,", Westmoreland, VA",United States,North America
+1,,,False,Will Proved,,
+1,38.2971472,-77.5320322,True,", Of Glouster, VA",United States,North America
+1,37.3396678,-76.4746982,True,"Warner Hall, Gloucester Co, VA",United States,North America
+1,37.2230374,-76.5156945,True,", York, VA.",United States,North America
+1,37.5004191,-78.2469202,True,", Cumberland, VA",United States,North America
+1,37.7625738,-76.4723233,True,"Lancaster Co., VA.",United States,North America
+1,37.4452288,-76.5594479,True,"Gloucester Co., VA.",United States,North America
+1,37.4452288,-76.5594479,True,"Gloucester, VA.",United States,North America
+1,,,False,Chesake,,
+1,51.324162,-1.9032487,True,", , Wiltshire, England",England,Europe
+1,37.6698613,-76.4885612,True,"Millenbeck, Lancaster Co., Virginia",United States,North America
+1,52.5310214,-1.2649062,True,", , England",England,Europe
+1,37.6698613,-76.4885612,True,"Millenbeck, Lancaster, VA",United States,North America
+1,51.5156177,-0.0919983,True,"London, London, England",England,Europe
+1,37.5385087,-77.43428,True,", Richmond, Virginia",United States,North America
+1,40.9985238,0.8493534,True,Infant,España,Europe
+1,37.1232245,-78.4927721,True,", , Virginia",United States,North America
+1,36.7670938,-76.5307823,True,", Nansemond, VA",United States,North America
+1,52.2434979,5.6343227,True,", , , Holland",Netherlands,Europe
+1,37.6048617,-76.5343958,True,"Christchurch, Middlesex, VA.",United States,North America
+1,37.6221412,-76.5904374,True,", Middlesex, VA",United States,North America
+1,37.6221412,-76.5904374,True,", Middlesex, Virginia",United States,North America
+1,37.1232245,-78.4927721,True,", Middlesex Cnty, Virginia",United States,North America
+1,38.2786312,-77.175356,True,", King George Co., VA",United States,North America
+1,37.9140592,-76.9326385,True,", Essex, VA",United States,North America
+1,52.1061958,-1.1915121,True,"Sulgrave, Northamptonshire, England",England,Europe
+1,52.2343297,-0.9028043,True,"Little Creston, Northampton, England",England,Europe
+1,52.0553813,-2.7151735,True,"Tring, Hereford, England",England,Europe
+1,52.3228736,-0.9477577,True,"Spratton, Northamptonshire, England",England,Europe
+1,52.5310214,-1.2649062,True,England,England,Europe
+1,51.7940357,-0.6609205,True,"Tring, Herts",United Kingdom,Europe
+1,37.1232245,-78.4927721,True,Virginia,United States,North America
+1,51.9610563,-2.301999,True,", Of Gloucester, England",England,Europe
+1,51.8527674,-2.2553694,True,"Bristol, Gloucestershire, Eng",United Kingdom,Europe
+1,51.4538022,-2.5972985,True,"Briston, , , England",England,Europe
+1,38.412926,-76.6077923,True,", St. Marys Co., MD",United States,North America
+1,39.5162401,-76.9382069,True,"St. Mary'S Par., Maryland",United States,North America
+1,38.206621,-76.5389973,True,", St Mary'S, MD",United States,North America
+1,52.5310214,-1.2649062,True,Eng,United Kingdom,Europe
+1,37.5594972,-76.5679782,True,"Of, Gloucester, VA",United States,North America
+1,52.5310214,-1.2649062,True,"Norfolkshire, England",England,Europe
+1,53.8633908,-2.2075841,True,"Stone Edge, Lancashire, England",England,Europe
+1,37.3396678,-76.4746982,True,"Warner Hall, Gloucester, Virginia",United States,North America
+1,51.3181076,-1.4889138,True,"Linkenholt Manor, Hampshire, England",England,Europe
+1,41.903411,12.4528527,True,"Yorkco, VA",Civitas Vaticana - Città del Vaticano,Europe
+1,41.903411,12.4528527,True,"Of Elizabeth City Co., VA",Civitas Vaticana - Città del Vaticano,Europe
+1,,,False,Will Processed,,
+1,40.8672004,-73.9055107,True,"Of York Co., VA",United States,North America
+1,37.2230374,-76.5156945,True,"York Co, , VA",United States,North America
+1,41.2976052,-72.9265437,True,"New Haven, New Haven, CT",United States,North America
+1,51.324162,-1.9032487,True,"Wiltshire, , Eng",United Kingdom,Europe
+1,42.3652576,-71.1843234,True,"Watertown, , Ma?",United States,North America
+1,51.449247,-2.5089459,True,"Wilshire, England",England,Europe
+1,42.8418855,-70.8602328,True,"Salisbury, Massachusetts",United States,North America
+1,41.317081,-72.9401956,True,"New Haven, New Haven Co., Connecticut",United States,North America
+1,41.3082138,-72.9250518,True,"New Haven, Connecticut",United States,North America
+1,42.1018764,-72.5886727,True,"Springfield, , Massachusetts",United States,North America
+1,42.1018764,-72.5886727,True,"Springfield, Hampden, MA",United States,North America
+1,51.4910492,-0.6507385,True,"Boveney, , , Eng",United Kingdom,Europe
+1,37.6221412,-76.5904374,True,"Middlesex County, VA",United States,North America
+1,52.2451778,-0.9182112,True,"Sulgrave, Northampton, Eng",United Kingdom,Europe
+1,52.2683065,-1.036296,True,"Brington, Northamptonshire, England",England,Europe
+1,52.1546172,-1.2742734,True,"Aston-Le-Walls, , , England",England,Europe
+1,51.2715316,-0.3414524,True,"Tighes, Surrey, Eng",United Kingdom,Europe
+1,52.3106138,-0.865913,True,"Thrapston, Northants, Eng",United Kingdom,Europe
+1,52.5100779,-0.9501074,True,"Packington, Leics, Eng",United Kingdom,Europe
+1,52.3106138,-0.865913,True,"Brington, Northants, Eng",United Kingdom,Europe
+1,52.3106138,-0.865913,True,"Althrop, Northants, Eng",United Kingdom,Europe
+1,40.416782,-3.703507,True,"Madrid, Spain",Spain,Europe
+1,52.2791465,-1.0251429,True,Great Brington,United Kingdom,Europe
+1,52.1790224,-1.3451912,True,"Wormleighton, Warwickshire",United Kingdom,Europe
+1,52.5310214,-1.2649062,True,"Wormleighton, Warws, Eng",United Kingdom,Europe
+1,52.3106138,-0.865913,True,"Of, Little Creston, Northants, England",England,Europe
+1,52.3106138,-0.865913,True,"Of, Great Creaton, Northants, England",England,Europe
+1,51.3198054,-1.4762773,True,Linkenholt Eng.,United Kingdom,Europe
+1,51.5074456,-0.1277653,True,London Eng.,United Kingdom,Europe
+1,53.5948684,-1.3788695,True,"Of, , Yorkshire, England",England,Europe
+1,37.2356655,-76.5136495,True,"Yorktown, Va, U.S.A.",USA,North America
+1,41.903411,12.4528527,True,"Elizabethcity, VA",Civitas Vaticana - Città del Vaticano,Europe
+1,52.5310214,-1.2649062,True,", , , Eng",United Kingdom,Europe
+1,36.8639003,-76.3079924,True,"Elizabeth City, VA",United States,North America
+1,41.903411,12.4528527,True,"Norfolk, Elizabethcity, VA",Civitas Vaticana - Città del Vaticano,Europe
+1,52.5310214,-1.2649062,True,"Wokingham, Berkshsire, England",England,Europe
+1,51.0690613,-1.7954134,True,"Of, , Wiltshire, Eng",United Kingdom,Europe
+1,51.4534889,-1.031873,True,"Ruscombe, Comitatis, Berkshire, England",England,Europe
+1,52.5310214,-1.2649062,True,"Ruscambe, , Eng",United Kingdom,Europe
+1,51.0648886,-1.7948028,True,"Of, Wiltshire, England",England,Europe
+1,51.5362073,-0.6571411,True,"Boveny Parish, Burnham, Buckingham, Eng",United Kingdom,Europe
+1,51.5692833,-0.6529766,True,"Parish Burnham, Buckingham, Eng",United Kingdom,Europe
+1,52.5310214,-1.2649062,True,"Of Burnham, Boven, Eng",United Kingdom,Europe
+1,51.5356133,-0.6589748,True,"Of Burnham, Buckingham, Eng",United Kingdom,Europe
+1,51.7834994,-0.8946441,True,"Burnham, Bucks, England",England,Europe
+1,51.7834994,-0.8946441,True,"Burnham, Boveney, Bucks, England",England,Europe
+1,42.3423259,-72.5891221,True,"Hadley, Hampshire, MA",United States,North America
+1,52.1061958,-1.1915121,True,"South Isle Of Church, Sulgrave",United Kingdom,Europe
+1,52.3213064,-1.5536906,True,"Of Radway, Warwickshire, England",England,Europe
+1,53.8378282,-2.2105512,True,"Of Whitefield, Lancs., Eng.",United Kingdom,Europe
+1,52.3106138,-0.865913,True,"Sulgrave, Northants, Eng",United Kingdom,Europe
+1,,,False,Will Dated,,
+1,51.0055129,-0.1393153,True,"Tyes Hall, Cuckfield, Sussex, England",England,Europe
+1,51.2715316,-0.3414524,True,"Of, Tighes, Surrey, England",England,Europe
+1,54.0488219,-2.8013499,True,"Palstarr, , Lancaster, England",England,Europe
+1,51.8400523,-0.0978552,True,"Of, Faccombe, Hertfordshire, England",England,Europe
+1,,,False,", Linkenwilt",,
+1,51.4269241,0.3612985,True,"Of, Kent, England",England,Europe
+1,41.6722912,-71.602762,True,"Of, , Kent",United States,North America
+1,52.5310214,-1.2649062,True,"Kent Manor, Linkenholt, Southhamptonshir, Eng.",United Kingdom,Europe
+1,51.3171692,-1.4425384,True,", Faccombe, , England",England,Europe
+1,51.4514323,-0.9881486,True,"Haines Hillhurst, Parish, Berkshire",United Kingdom,Europe
+1,53.1780161,-0.1023101,True,"Scrivelsby, Lincolnshire, England",England,Europe
+1,51.7834994,-0.8946441,True,"Boveney, , Bucks., Eng",United Kingdom,Europe
+1,51.7834994,-0.8946441,True,"Dorney, Bucks, England",England,Europe
+1,51.4312752,-0.7732314,True,"Binfield, , Berks., Eng",United Kingdom,Europe
+1,51.4312752,-0.7732314,True,"Binfield, Berkshire, Eng",United Kingdom,Europe
+1,51.7834994,-0.8946441,True,"Boveney, Bucks, England",England,Europe
+1,51.5185174,-0.6263098,True,"Of Burnham, , Eng",United Kingdom,Europe
+1,53.8611712,-2.5650945,True,"Tewhitefield, Lancashire, England",England,Europe
+1,52.5310214,-1.2649062,True,"Sulgrave Manor, Northamps, Eng",United Kingdom,Europe
+1,52.3106138,-0.865913,True,"Gretworth, Northamptonshire, Eng",United Kingdom,Europe
+1,52.2451778,-0.9182112,True,"Of, Sulgrave, Northampton, England",England,Europe
+1,51.5460558,-0.2537791,True,"Greys Inn, Middlesex, England",England,Europe
+1,51.5190382,-0.1114304,True,"Grays Inn London, , Eng",United Kingdom,Europe
+1,52.07588,-1.3685633,True,"Radway, Grange, Oxfordshire, Eng",United Kingdom,Europe
+1,52.5310214,-1.2649062,True,"Radway, Warricks, Eng",United Kingdom,Europe
+1,50.9125822,-1.3975608,True,"Of, Wallop, Hants, England",England,Europe
+1,53.0284973,-0.2511855,True,"Kyme, Lincolnshire, England",England,Europe
+1,53.1823034,-0.2031209,True,"Of Scrivelsby, Lindssay, Lincolnshire, England",England,Europe
+1,51.4910492,-0.6507385,True,"Boveney Buckinghamshire, England",England,Europe
+1,51.4534889,-1.031873,True,"Wardville, Berkshire, Eng",United Kingdom,Europe
+1,52.5310214,-1.2649062,True,"Of Boveney, Bckngh, England",England,Europe
+1,51.4658779,-0.7748399,True,"Of Binfield, Berks, England",England,Europe
+1,51.4534889,-1.031873,True,"Of Aberfelde, Berks, Eng",United Kingdom,Europe
+1,51.3963375,-0.9054306,True,"Arborfield, Berks, Eng",United Kingdom,Europe
+1,51.7834994,-0.8946441,True,"Of Dorney, Bucks, Eng",United Kingdom,Europe
+1,53.6037703,-2.9343637,True,", Wharton, Lancashire, England",England,Europe
+1,52.5310214,-1.2649062,True,"Greatworth, Northamps, Eng",United Kingdom,Europe
+1,52.0770068,-1.1959081,True,"St. Katherine'S, Aisle, Greatworth, Church",United Kingdom,Europe
+1,52.5310214,-1.2649062,True,"Charwelton, Northamps, Eng",United Kingdom,Europe
+1,52.2814519,-1.5815742,True,"Shattiswell, Warwick, Eng",United Kingdom,Europe
+1,51.7520131,-1.2578499,True,"Horley, Oxford, , Eng",United Kingdom,Europe
+1,52.2814519,-1.5815742,True,"Horley, Warwick, , Eng",United Kingdom,Europe
+1,52.1363333,-1.5625084,True,"Pillerton, Warwick, , Eng",United Kingdom,Europe
+1,51.5161738,-0.0761823,True,"Of, London, Middlesex, England",England,Europe
+1,53.9656579,-1.0743052,True,"Of, Gawthorpe, York, England",England,Europe
+1,51.556681,-0.7229044,True,"Buckingham, Berkshire, Eng",United Kingdom,Europe
+1,52.5310214,-1.2649062,True,", , Eng",United Kingdom,Europe
+1,51.840894,-0.8998074,True,"Of, Par. Of Burnham, Buckinghamshire, England",England,Europe
+1,51.4534889,-1.031873,True,"Of, Wardville, Berkshire, England",England,Europe
+1,50.9125822,-1.3975608,True,"Basingstoke, Hants, Eng",United Kingdom,Europe
+1,51.3963375,-0.9054306,True,"Arborfield, Berkshire, England",England,Europe
+1,54.1418786,-2.8123655,True,"Warton, Lancs, Eng",United Kingdom,Europe
+1,54.153376,-2.755655,True,"Of, Warton, Lancashire, England",England,Europe
+1,52.2860353,0.6727342,True,"Hengrave, Suffolk, England",England,Europe
+1,53.7598705,-1.2337599,True,"Of, Fryston, York, England",England,Europe
+1,51.5069253,-0.7110987,True,"Bray, Berks, Eng",United Kingdom,Europe
+1,52.1096993,-2.0754758,True,"Aberfeldy, Pershore, England",England,Europe
+1,51.4356541,-0.9682938,True,"Of, Basingstoke, Berkshire, England",England,Europe
+1,51.2911904,-0.847955,True,"Of, Itchell, Hampshire, England",England,Europe
+1,50.9125822,-1.3975608,True,"Sidmanton, Hants, Eng",United Kingdom,Europe
+1,53.8611743,-2.547115,True,"Warton Lonesdale, Lancs, Eng",United Kingdom,Europe
+1,52.3213064,-1.5536906,True,"Of, Oversly, Warwickshire, England",England,Europe
+1,53.350703,-2.2665186,True,"Of, Oversley, , England",England,Europe
+1,,,False,"Of, Wornsley",,
+1,53.8984388,-1.2952849,True,"Of, Newton Kyme, , England",England,Europe
+1,53.6000851,-1.187771,True,"Of, Burghwallis, , England",England,Europe
+1,53.9810347,-0.837235,True,"Of, Gowthorpe, Yorkshire, England",England,Europe
+1,53.9825271,-1.38525,True,", Leckonfield, Yorkshire, England",England,Europe
+1,53.9825271,-1.38525,True,"Battle Of, Towtown, Yorkshire, England",England,Europe
+1,53.8834471,-0.4435804,True,"Of, Leconfield, Yorkshire, England",England,Europe
+1,54.1781348,-1.3871054,True,"Manor, Cocks Lodge Near, Topcliffe, Yorkshire, England",England,Europe
+1,49.0709373,14.9071748,True,(40-1489),Česko,Europe
+1,52.5051933,-2.0159865,True,"Of, England",England,Europe
+1,51.4534889,-1.031873,True,"Of Barkham, Berks, Eng",United Kingdom,Europe
+1,51.3968471,-1.3249375,True,"Of, Newbury, Berkshire, England",England,Europe
+1,54.0689002,-1.28041,True,"Of, Aldwark, Yorkshire, England",England,Europe
+1,53.9825271,-1.38525,True,"Of, Monston, Yorkshire, England",England,Europe
+1,49.9795824,6.6996207,True,Spm,Deutschland,Europe
+1,55.4133398,-1.7072354,True,", Alnwick, Northumberland, England",England,Europe
+1,51.3934788,0.190539,True,"Battle Of, St Albans, Kent, England",England,Europe
+1,50.9853571,-2.0771314,True,", Berwick, Wiltshire, England",England,Europe
+1,54.5910607,-1.8017245,True,"Of, Raby, Durham, England",England,Europe
+1,53.9825271,-1.38525,True,"Of, Warkworth, Yorkshire, England",England,Europe
+1,51.4104104,-0.8275279,True,"Infant, , , England",England,Europe
+1,52.5310214,-1.2649062,True,"Sp Prob Infant, , , England",England,Europe
+1,52.2343297,-0.9028043,True,"Battle Of, Northampton, Northamptonshire, England",England,Europe
+1,55.4655667,-1.9070774,True,", Hedgeley Moor, Northumberland, England",England,Europe
+1,53.9825271,-1.38525,True,", , Yorkshire, England",England,Europe
+1,47.9278966,1.9180413,True,"Vp, Orleans, , France",France,Europe
+1,51.6432869,-2.2005697,True,"Of, Beverstone, Gloucestershire, England",England,Europe
+1,51.7643786,-2.1880662,True,"Of, Cubberley, Gloucestershire, England",England,Europe
+1,51.5040063,-2.4920541,True,"Of, Newbury, Gloucestershire, England",England,Europe
+1,,,False,Of Tewitfield,,
+1,53.9010438,-1.5111773,True,"Of, Harewood, Yorkshire, England",England,Europe
+1,53.7943276,-1.3293873,True,"Of, Micklefield, Yorkshire, England",England,Europe
+1,52.707755,-2.7540658,True,", Shrewsbury, Shropshire, England",England,Europe
+1,51.4818832,-2.7686972,True,", Usk, Monmouthshire, England",England,Europe
+1,54.5937943,-1.8190963,True,"Of Castle Raby, Raby With Keverstone, Durham, England",England,Europe
+1,47.4230544,0.8905783,True,"Chateau De Beaufort, Meuse-et-Loire, France",France,Europe
+1,36.0032435,-105.9552006,True,(61-1425),United States,North America
+1,53.7473189,-0.8622549,True,", Howden, Yorkshire, England",England,Europe
+1,53.6829541,-1.4967286,True,", Wakefield, Yorkshire, England",England,Europe
+1,,,False,Died Young,,
+1,53.6835789,-1.4968547,True,"Of, , Westmorland, England",England,Europe
+1,44.238366,9.6912326,True,Sp,Italia,Europe
+1,54.5910607,-1.8017245,True,", Raby, Durham, England",England,Europe
+1,51.7607271,-0.5652554,True,", Berkhamsted, Hertfordshire, England",England,Europe
+1,54.5800156,-1.8068071,True,"Of Raby With Keverstone, Staindrop, Durham, England",England,Europe
+1,50.9026432,-2.2726175,True,"Okeford, Fitzpaine, Dorset, England",England,Europe
+1,47.9027336,1.9086066,True,Orleans,France,Europe
+1,51.8690821,-2.2304022,True,"Wotton, Gloucestershire, England",England,Europe
+1,52.5310214,-1.2649062,True,"Beverstone, Gloucs., , England",England,Europe
+1,50.9025349,-1.404189,True,"Of, Itchell, Southampton, England",England,Europe
+1,51.2889702,-1.0447215,True,"Of Basing, Hampshire, England",England,Europe
+1,50.9093898,-2.8282672,True,"Of Hinton-St. George, Somersetshire, England",England,Europe
+1,37.5164595,126.9221918,True,(88-1571/1572),South Korea,Asia
+1,51.2712823,-1.046029,True,"Basing, Hampshire, Eng",United Kingdom,Europe
+1,51.0449814,-1.2433133,True,"Of, Crandal, Hampshire, England",England,Europe
+1,51.0449814,-1.2433133,True,"Of Herriard, Hampshire, Eng.",United Kingdom,Europe
+1,51.4333419,-1.5694908,True,"Of, Littlecote, Wiltshire, England",England,Europe
+1,47.8421665,18.2481705,True,(40-1467),Slovensko,Europe
+1,46.2960951,14.8057772,True,(30-1492/1493),Slovenia,Europe
+1,-33.4596678,149.5481193,True,Unmarried,Australia,Oceania
+1,51.520415,-0.1138437,True,Gray's Inn,United Kingdom,Europe
+1,52.2434979,5.6343227,True,Holland,Netherlands,Europe
+1,37.6221412,-76.5904374,True,", Middlesex Co, VA",United States,North America
+1,52.7184506,0.9472305,True,"Hoe, Norfolk, England",England,Europe
+1,52.6486234,1.2515655,True,"St. Mary, Hellesdon, Norfolk, England",England,Europe
+1,50.7047622,-3.5394457,True,"Stonehedge, , , England",England,Europe
+1,53.8567728,-2.1691238,True,"Colne, Lancashire, England",England,Europe
+1,54.0488219,-2.8013499,True,"Of, Stonehedge, Lancaster, England",England,Europe
+1,54.0488219,-2.8013499,True,"Of, Windlehouse, Lancaster, England",England,Europe
+1,52.1166641,1.2584744,True,"Burgh, Suffolk, England",England,Europe
+1,52.0632432,0.9717538,True,"Aldham, Suffolk, , England",England,Europe
+1,52.0632432,0.9717538,True,"Of, Aldham, Suffolk, England",England,Europe
+1,51.7952538,0.7823023,True,"Of, Maldon, Essex, England",England,Europe
+1,52.7184506,0.9472305,True,"Hoe, , , England",England,Europe
+1,52.6305193,1.2972286,True,"St. Michael, Plea, , England",England,Europe
+1,54.0488219,-2.8013499,True,"Of, Barnside, Lancaster, England",England,Europe
+1,51.4534889,-1.031873,True,"Workingham, Berkshire, , Eng",United Kingdom,Europe
+1,52.5279306,-1.3486528,True,Burbage,United Kingdom,Europe
+1,54.5652818,-2.9131428,True,"Of, Roscombe, , England",England,Europe
+1,51.0094539,-0.1345285,True,"Of, Cuckfield, Sussex, England",England,Europe
+1,50.9125822,-1.3975608,True,"Of, Linkenholt Manor, Hants, England",England,Europe
+1,51.4031075,-0.8733698,True,"Barkham, Berkshire, England",England,Europe
+1,52.5310214,-1.2649062,True,"Barkham Manor, Barkham, Berkshsire, England",England,Europe

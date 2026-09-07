@@ -1002,6 +1002,7 @@ class VisualMapPanel(wx.Panel):
         self.optionSbox.Hide()  # Summary options
         self.optionKbox.Hide()  # KML options
         self.optionK2box.Hide()  # KML2 options
+        self.optionMbox.Hide()  # MIG options
         # self.optionGbox.SetSize(self.optionGbox.GetBestSize())
 
         if ResultTypeSelect is ResultType.HTML:
@@ -1043,6 +1044,10 @@ class VisualMapPanel(wx.Panel):
             self.optionKbox.Show()
         elif ResultTypeSelect is ResultType.KML2:
             self.optionK2box.Show()
+        elif ResultTypeSelect is ResultType.MIG:
+            for ctrl in self.optionMbox.GetChildren():
+                ctrl.Enable()
+            self.optionMbox.Show()
 
         # Enable/disable trace button based on referenced data availability
         referenced = getattr(self.svc_state, "Referenced", None)
@@ -1116,6 +1121,21 @@ class VisualMapPanel(wx.Panel):
 
         map_style = self.svc_config.get("MapStyle")
         self.id.LISTMapStyle.SetSelection(self.id.LISTMapStyle.FindString(map_style))
+
+        use_soundex = self.svc_config.get("UseSoundexLocationGrouping", True)
+        self.id.CBUseSoundexLocationGrouping.SetValue(bool(use_soundex))
+
+        label_names = self.svc_config.get("LabelNames", False)
+        self.id.CBLabelNames.SetValue(bool(label_names))
+
+        exclude_unknown = self.svc_config.get("ExcludeUnknownMigrationCountries", False)
+        self.id.CBExcludeUnknownMigrationCountries.SetValue(bool(exclude_unknown))
+
+        max_lines = self.svc_config.get("MaxMigrationLines", 100)
+        try:
+            self.id.INTMaxMigrationLines.SetValue(int(max_lines))
+        except Exception:
+            self.id.INTMaxMigrationLines.SetValue(100)
 
         self.SetupButtonState()
 
@@ -1285,7 +1305,7 @@ class VisualMapPanel(wx.Panel):
                     continue
 
                 if name == "RBResultType":
-                    order = ("HTML", "KML", "KML2", "SUM")
+                    order = ("HTML", "KML", "KML2", "SUM", "MIG")
                     try:
                         rt = self.svc_config.get("ResultType")
                         # ResultType.get() now ensures proper Enum with uppercase .value

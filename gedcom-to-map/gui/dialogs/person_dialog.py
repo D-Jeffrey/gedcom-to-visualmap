@@ -62,7 +62,10 @@ class PersonDialog(wx.Dialog):
             showreferences: Whether to display lineage and reference information.
         """
         super().__init__(
-            parent, title="Person Details", size=(600, 600), style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER
+            parent,
+            title=f"Person Details - {person.name}",
+            size=(600, 600),
+            style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER,
         )
 
         # Prefer provided services; else pick from panel if available
@@ -396,6 +399,7 @@ class PersonDialog(wx.Dialog):
         if person.father:
             try:
                 self.fatherTextCtrl.SetValue(self.formatPersonName(people[person.father]))
+                self._bind_open_person_context_menu(self.fatherTextCtrl, person.father)
             except KeyError:
                 _log.debug("Father %s not in people dict", person.father)
             except Exception:
@@ -404,6 +408,7 @@ class PersonDialog(wx.Dialog):
         if person.mother:
             try:
                 self.motherTextCtrl.SetValue(self.formatPersonName(people[person.mother]))
+                self._bind_open_person_context_menu(self.motherTextCtrl, person.mother)
             except KeyError:
                 _log.debug("Mother %s not in people dict", person.mother)
             except Exception:
@@ -582,8 +587,10 @@ class PersonDialog(wx.Dialog):
     def _add_photo(self, panel: wx.Panel, person: Person = None):
         """Fetch and display the person's photo if available.
 
-        Supports both HTTP URLs and local file paths. Images are scaled to fit
-        within 400x500 pixels.
+        Supports HTTP/HTTPS URLs (with caching via ImageCacheService) and local
+        file paths.  Local-web URLs (matching configured ``local_photo_hosts``
+        patterns such as ``localhost``) are fetched directly without caching.
+        Images are scaled to fit within 400x500 pixels.
 
         Args:
             panel: Parent panel (used to resolve relative photo paths).
@@ -599,14 +606,45 @@ class PersonDialog(wx.Dialog):
         photourl = person.photo if person else None
         if photourl:
             if photourl.find("http") == 0:
+                # Try image cache first for true remote URLs
                 try:
-                    response = requests.get(photourl, timeout=10)
-                    response.raise_for_status()  # Raise an error for bad responses
-                    image_content = BytesIO(response.content)
-                except requests.RequestException as e:
-                    _log.error(f"Error fetching photo from {photourl}:\n      {e}")
-                    image = None
-                    image_content = None
+                    from gui.services.image_cache_service import ImageCacheService
+
+                    local_patterns = (
+                        self.svc_config.get_local_photo_hosts()
+                        if self.svc_config and hasattr(self.svc_config, "get_local_photo_hosts")
+                        else ["localhost"]
+                    )
+                    if ImageCacheService.is_remote_url(photourl, local_patterns):
+                        # Determine cache parameters
+                        cache_dir = (
+                            self.svc_config.get_effective_cache_dir()
+                            if self.svc_config and hasattr(self.svc_config, "get_effective_cache_dir")
+                            else None
+                        )
+                        preserve_name = (
+                            self.svc_config.get_image_cache_preserve_name()
+                            if self.svc_config and hasattr(self.svc_config, "get_image_cache_preserve_name")
+                            else True
+                        )
+                        if cache_dir:
+                            # Download-on-demand if not already cached
+                            local_path = ImageCacheService.download_one(photourl, cache_dir, preserve_name)
+                            if local_path:
+                                image_content = local_path
+                except Exception:
+                    _log.debug("ImageCacheService not available; falling back to direct fetch", exc_info=True)
+
+                if image_content is None:
+                    # Fallback: fetch directly (local-web URLs or cache download failed)
+                    try:
+                        response = requests.get(photourl, timeout=10)
+                        response.raise_for_status()
+                        image_content = BytesIO(response.content)
+                    except requests.RequestException as e:
+                        _log.error(f"Error fetching photo from {photourl}:\n      {e}")
+                        image = None
+                        image_content = None
             else:
                 infile = None
                 # Prefer service config GEDCOMinput only
@@ -627,6 +665,7 @@ class PersonDialog(wx.Dialog):
             if image_content:
                 try:
                     # Check if file exists before trying to load (for Path objects)
+                    # image_content may be: Path (local file or cached download), BytesIO (direct HTTP fetch)
                     if isinstance(image_content, Path):
                         if not image_content.exists():
                             _log.warning(f"Photo file not found for {photourl}:\n      File: {image_content}")
@@ -684,6 +723,36 @@ class PersonDialog(wx.Dialog):
             svc_state=svc_state,
             color_manager=self.color_manager,
         )
+
+    def _bind_open_person_context_menu(self, ctrl: wx.TextCtrl, xref_id: str) -> None:
+        """Bind a right-click on ctrl to open Person Details for xref_id directly.
+
+        Args:
+            ctrl: The read-only TextCtrl (e.g. father/mother) to attach the handler to.
+            xref_id: The GEDCOM xref_id of the person to open on right-click.
+        """
+        ctrl.SetToolTip("Right-click to open relative")
+        ctrl.Bind(wx.EVT_CONTEXT_MENU, lambda evt, xid=xref_id: self._open_person_dialog(xid))
+
+    def _open_person_dialog(self, xref_id: str) -> None:
+        """Open a new PersonDialog showing details for the person with xref_id."""
+        person = self.people.get(xref_id)
+        if not person:
+            wx.MessageBox("Person not found.", "Error", wx.OK | wx.ICON_ERROR)
+            return
+        dlg = PersonDialog(
+            self,
+            person,
+            self.panel,
+            font_manager=self.font_manager,
+            color_manager=self.color_manager,
+            svc_config=self.svc_config,
+            svc_state=self.svc_state,
+            svc_progress=self.svc_progress,
+            showreferences=self.showreferences,
+        )
+        dlg.Bind(wx.EVT_CLOSE, lambda evt: dlg.Destroy())
+        dlg.Show(True)
 
     def formatPersonName(self, person: Person, longForm=True):
         """Format a person's name for display.

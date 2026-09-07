@@ -84,8 +84,10 @@ class PeopleListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
         self.header_panel = wx.Panel(self, style=wx.SIMPLE_BORDER)
         self.header_labels: list[wx.StaticText] = []
         self.header_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        for title in self._header_titles:
+        for col, title in enumerate(self._header_titles):
             lbl = wx.StaticText(self.header_panel, label=title)
+            lbl.SetCursor(wx.Cursor(wx.CURSOR_HAND))
+            lbl.Bind(wx.EVT_LEFT_DOWN, lambda evt, col=col: self._on_header_label_click(col))
             self.header_labels.append(lbl)
             self.header_sizer.Add(lbl, 0, wx.EXPAND | wx.LEFT | wx.RIGHT, 3)
         self.header_panel.SetSizer(self.header_sizer)
@@ -252,6 +254,31 @@ class PeopleListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
             self.header_panel.Layout()
         except Exception:
             _log.debug("sync_custom_header_widths failed", exc_info=True)
+
+    def _on_header_label_click(self, col: int) -> None:
+        """Sort the people list when a custom header label is clicked.
+
+        Since the list uses LC_NO_HEADER (for themable colors), clicks never reach
+        the native header, so this routes them into the list's existing
+        ColumnSorterMixin-based sorting instead.
+        """
+        if not hasattr(self, "list") or not self.list:
+            return
+        try:
+            cur_col, cur_ascending = self.list.GetSortState()
+            ascending = 0 if (cur_col == col and cur_ascending) else 1
+            self.list.SortListItems(col, ascending)
+            self._update_header_sort_indicator(col, ascending)
+        except Exception:
+            _log.exception("_on_header_label_click failed for column %s", col)
+
+    def _update_header_sort_indicator(self, col: int, ascending: int) -> None:
+        """Show a sort direction arrow on the active column's custom header label."""
+        arrow = " \u25b2" if ascending else " \u25bc"
+        for i, lbl in enumerate(self.header_labels):
+            lbl.SetLabel(self._header_titles[i] + (arrow if i == col else ""))
+        self.header_panel.Layout()
+        self.sync_custom_header_widths()
 
     def _update_custom_header_colors(self) -> None:
         """Apply GRID colors to custom header background and text."""

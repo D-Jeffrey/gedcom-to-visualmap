@@ -15,6 +15,7 @@ Features:
 
 __all__ = ["MigrationFlowExporter", "MigrationFlowAnalyzer", "SankeyBuilder"]
 
+import html
 import logging
 import os
 import re
@@ -132,9 +133,39 @@ class MigrationStats:
     diaspora_index: float = 0.0  # Measure of family spread
 
 
+@dataclass
+class PersonMigrationRecord:
+    """Represents a single person's move from one location to another."""
+    person_name: str
+    first_name: str
+    last_name: str
+    from_location: str
+    to_location: str
+    from_country: str
+    to_country: str
+    event_type: str
+    ocean_crossing: bool
+    date: Optional[int] = None
+    description: str = ""
+    has_migration_record: bool = False
+    time_period: str = ""
+
+
 class MigrationFlowAnalyzer:
     """Analyzes genealogical data to extract migration patterns."""
-    
+
+    # Raw GEDCOM tags that explicitly denote a migration record.
+    MIGRATION_RECORD_TAGS: Set[str] = {"IMMI", "EMIG", "ARRV", "DEPT"}
+
+    # Friendly labels for the raw GEDCOM event tags shown in the migration list.
+    EVENT_TAG_LABELS: Dict[str, str] = {
+        "BIRT": "Birth", "DEAT": "Death", "BURI": "Burial", "RESI": "Residence",
+        "MARR": "Marriage", "IMMI": "Immigration", "EMIG": "Emigration",
+        "ARRV": "Arrival", "DEPT": "Departure", "CENS": "Census",
+        "NATU": "Naturalization", "OCCU": "Occupation", "EDUC": "Education",
+        "CHR": "Christening", "BAPM": "Baptism",
+    }
+
     def __init__(self, geolocated_gedcom, location_grouping: str = "City and Country", use_soundex: bool = True):
         """
         Initialize migration analyzer.
@@ -150,11 +181,12 @@ class MigrationFlowAnalyzer:
         self.flows: List[MigrationFlow] = []
         self.locations: Set[LocationNode] = set()
         self.stats = MigrationStats()
+        self.migration_records: List[PersonMigrationRecord] = []
         self._location_node_cache: Dict[str, LocationNode] = {}
         _log.info("MigrationFlowAnalyzer initialized with %d people", 
                  len(geolocated_gedcom.people) if hasattr(geolocated_gedcom, 'people') else 0)
     
-    def extract_events_with_locations(self, person, event_type: MigrationEventType) -> List[Tuple[str, str, str, Optional[int], str]]:
+    def extract_events_with_locations(self, person, event_type: MigrationEventType) -> List[Tuple[str, str, str, Optional[int], str, str, str, str]]:
         """
         Extract birth/death/residence events with their years and locations.
         
@@ -163,7 +195,7 @@ class MigrationFlowAnalyzer:
             event_type: Type of event to extract (BIRTH, DEATH, RESIDENCE, BURIAL)
         
         Returns:
-            List of (location, subdivision, country, year, continent) tuples where event occurred
+            List of (location, subdivision, country, year, continent, event_tag, description, raw_place) tuples
         """
         events = []
         
@@ -263,10 +295,86 @@ class MigrationFlowAnalyzer:
             if continent is None:
                 continent = ""
 
-            events.append((location, normalized_subdivision, country, year, continent))
+            event_tag = self._get_event_tag(event, event_type)
+            description = self._get_event_description(event)
+
+            events.append((location, normalized_subdivision, country, year, continent, event_tag, description, place))
 
         return events
-    
+
+    def _get_event_tag(self, event, event_type: MigrationEventType) -> str:
+        """Return the raw GEDCOM tag for an event (e.g. 'IMMI', 'RESI'), falling back to the event type."""
+        raw_tag = getattr(event, 'what', None)
+        if isinstance(raw_tag, str) and raw_tag.strip():
+            return raw_tag.strip().upper()
+        return event_type.value
+
+    def _get_event_description(self, event) -> str:
+        """Combine the direct note, any rolled-up nested notes, and source citation text into one inline-HTML description."""
+        parts: List[str] = []
+
+        direct_note = getattr(event, 'note', None)
+        if isinstance(direct_note, str) and direct_note.strip():
+            parts.append(self._strip_wrapping_quotes(direct_note))
+
+        record = getattr(event, 'record', None)
+        if record is not None and hasattr(record, 'sub_tag'):
+            try:
+                note_tag = record.sub_tag('NOTE')
+                note_value = getattr(note_tag, 'value', None) if note_tag is not None else None
+                if isinstance(note_value, str) and note_value.strip():
+                    parts.append(self._strip_wrapping_quotes(note_value))
+
+                parts.extend(self._collect_all_notes(record))
+                parts.extend(self._collect_source_texts(record))
+            except Exception:
+                _log.debug("Failed to extract description for event", exc_info=True)
+
+        if not parts:
+            return ""
+
+        # De-dupe while preserving order, then join unescaped so any embedded HTML renders directly.
+        return "<br>".join(dict.fromkeys(parts))
+
+    # Matching quote pairs stripped from the start/end of note and source text values.
+    _WRAPPING_QUOTE_PAIRS = (('"', '"'), ("'", "'"), ("\u201c", "\u201d"), ("\u2018", "\u2019"))
+
+    def _strip_wrapping_quotes(self, text: str) -> str:
+        """Decode any HTML entities and strip a single matching pair of leading/trailing quote marks."""
+        stripped = html.unescape(text).strip()
+        for open_quote, close_quote in self._WRAPPING_QUOTE_PAIRS:
+            if len(stripped) >= 2 and stripped.startswith(open_quote) and stripped.endswith(close_quote):
+                return stripped[1:-1].strip()
+        return stripped
+
+    def _collect_all_notes(self, record) -> List[str]:
+        """Recursively collect NOTE values from all sub-records of a GEDCOM record."""
+        notes: List[str] = []
+        sub_records = getattr(record, 'sub_records', None) if record is not None else None
+        if not sub_records:
+            return notes
+        for sub_record in sub_records:
+            if getattr(sub_record, 'tag', None) == 'NOTE':
+                value = getattr(sub_record, 'value', None)
+                if isinstance(value, str) and value.strip():
+                    notes.append(self._strip_wrapping_quotes(value))
+            notes.extend(self._collect_all_notes(sub_record))
+        return notes
+
+    def _collect_source_texts(self, record) -> List[str]:
+        """Recursively collect TEXT values from SOUR citations attached to a GEDCOM record."""
+        texts: List[str] = []
+        sub_records = getattr(record, 'sub_records', None) if record is not None else None
+        if not sub_records:
+            return texts
+        for sub_record in sub_records:
+            if getattr(sub_record, 'tag', None) == 'TEXT':
+                value = getattr(sub_record, 'value', None)
+                if isinstance(value, str) and value.strip():
+                    texts.append(self._strip_wrapping_quotes(value))
+            texts.extend(self._collect_source_texts(sub_record))
+        return texts
+
     def _normalize_name(self, name: Optional[str]) -> str:
         """Normalize a place name for matching/grouping."""
         if not name:
@@ -451,6 +559,70 @@ class MigrationFlowAnalyzer:
             display = country
         return key, display
 
+    def _get_person_display_name(self, person, fallback_id: str) -> str:
+        """Resolve a human-readable name for a person, falling back to their GEDCOM id."""
+        name = getattr(person, 'name', None)
+        if isinstance(name, str) and name.strip():
+            return name.strip()
+        display_name = getattr(person, 'display_name', None)
+        if isinstance(display_name, str) and display_name.strip():
+            return display_name.strip()
+        return fallback_id
+
+    def _get_person_name_parts(self, person, fallback_full_name: str) -> Tuple[str, str]:
+        """Resolve (first_name, last_name) for a person, falling back to splitting the full name."""
+        first_name = getattr(person, 'firstname', None)
+        last_name = getattr(person, 'surname', None)
+        if isinstance(first_name, str) and first_name.strip() and isinstance(last_name, str) and last_name.strip():
+            return first_name.strip(), last_name.strip()
+
+        parts = fallback_full_name.split()
+        if len(parts) >= 2:
+            return parts[0], parts[-1]
+        if parts:
+            return parts[0], ""
+        return "", ""
+
+    def _record_migration(self, person_name: str, first_name: str, last_name: str,
+                           from_node: LocationNode, to_node: LocationNode,
+                           from_raw_place: str, to_raw_place: str,
+                           from_tag: str, to_tag: str, from_description: str, to_description: str,
+                           to_event_type: MigrationEventType, time_period: str, date: Optional[int]) -> None:
+        """Append a PersonMigrationRecord when a move crosses a country border or has an explicit migration record."""
+        has_migration_record = to_tag in self.MIGRATION_RECORD_TAGS or from_tag in self.MIGRATION_RECORD_TAGS
+        country_changed = bool(from_node.country) and bool(to_node.country) and from_node.country != to_node.country
+
+        if not (country_changed or has_migration_record):
+            return
+
+        if has_migration_record:
+            migration_tag = to_tag if to_tag in self.MIGRATION_RECORD_TAGS else from_tag
+            event_label = self.EVENT_TAG_LABELS.get(migration_tag, migration_tag.title())
+        else:
+            # No explicit migration record: describe the pair of records the move occurred between.
+            from_label = self.EVENT_TAG_LABELS.get(from_tag, from_tag.title()) if from_tag else "Unknown"
+            to_label = self.EVENT_TAG_LABELS.get(to_tag, to_tag.title()) if to_tag else "Unknown"
+            event_label = f"{from_label} → {to_label}"
+
+        description = to_description or from_description
+        ocean_crossing = bool(from_node.continent) and bool(to_node.continent) and from_node.continent != to_node.continent
+
+        self.migration_records.append(PersonMigrationRecord(
+            person_name=person_name,
+            first_name=first_name,
+            last_name=last_name,
+            date=date,
+            from_location=from_raw_place or from_node.get_display_name("City and Country"),
+            to_location=to_raw_place or to_node.get_display_name("City and Country"),
+            from_country=from_node.country or "Unknown",
+            to_country=to_node.country or "Unknown",
+            event_type=event_label,
+            ocean_crossing=ocean_crossing,
+            description=description,
+            has_migration_record=has_migration_record,
+            time_period=time_period,
+        ))
+
     def analyze(self, 
                 event_types: Optional[List[MigrationEventType]] = None,
                 max_lines: Optional[int] = None) -> MigrationStats:
@@ -472,6 +644,7 @@ class MigrationFlowAnalyzer:
         flow_dict: Dict[Tuple[str, str], MigrationFlow] = {}
         self.locations = set()
         self._location_node_cache = {}
+        self.migration_records = []
 
         _log.info("Analyzing migration flows with %d event types", len(event_types))
 
@@ -490,22 +663,26 @@ class MigrationFlowAnalyzer:
                 _log.warning("Skipping empty person entry at index %d", person_index)
                 continue
             person_id = getattr(person, "xref_id", None) or str(person_index)
-            person_events = []  # List of (location, subdivision, country, year, continent, period, event_type)
+            person_events = []  # List of (location, subdivision, country, year, continent, period, event_type, event_tag, description, raw_place)
             
             for evt_type in event_types:
                 events = self.extract_events_with_locations(person, evt_type)
-                for loc, subdivision, country, year, continent in events:
+                for loc, subdivision, country, year, continent, event_tag, description, raw_place in events:
                     if loc and year:
                         decade_start = (year // 10) * 10
                         period = f"{decade_start}-{decade_start + 9}"
-                        person_events.append((loc, subdivision, country, year, continent, period, evt_type))
+                        person_events.append((loc, subdivision, country, year, continent, period, evt_type, event_tag, description, raw_place))
             
             person_events.sort(key=lambda x: x[3] if x[3] else 0)
             
             if len(person_events) >= 2:
+                person_name = self._get_person_display_name(person, person_id)
+                first_name, last_name = self._get_person_name_parts(person, person_name)
                 for i in range(len(person_events) - 1):
-                    from_loc, from_subdivision, from_country, from_year, from_continent, from_period, _ = person_events[i]
-                    to_loc, to_subdivision, to_country, to_year, to_continent, to_period, to_event_type = person_events[i + 1]
+                    (from_loc, from_subdivision, from_country, from_year, from_continent,
+                     from_period, _, from_tag, from_description, from_raw_place) = person_events[i]
+                    (to_loc, to_subdivision, to_country, to_year, to_continent,
+                     to_period, to_event_type, to_tag, to_description, to_raw_place) = person_events[i + 1]
 
                     from_key, _ = self._location_group_key(from_loc, from_country, from_continent, from_subdivision)
                     to_key, _ = self._location_group_key(to_loc, to_country, to_continent, to_subdivision)
@@ -536,6 +713,23 @@ class MigrationFlowAnalyzer:
                             flow = flow_dict[flow_key]
 
                         flow.add_person(person_id, to_event_type)
+
+                        self._record_migration(
+                            person_name=person_name,
+                            first_name=first_name,
+                            last_name=last_name,
+                            from_node=from_node,
+                            to_node=to_node,
+                            from_raw_place=from_raw_place,
+                            to_raw_place=to_raw_place,
+                            from_tag=from_tag,
+                            to_tag=to_tag,
+                            from_description=from_description,
+                            to_description=to_description,
+                            to_event_type=to_event_type,
+                            time_period=from_period,
+                            date=to_year,
+                        )
 
         full_flows = list(flow_dict.values())
 
@@ -1065,6 +1259,26 @@ class MigrationFlowExporter:
 
         return filtered_flows
 
+    def _filter_migration_records_for_known_countries(self, records: List[PersonMigrationRecord], geolocated_gedcom) -> List[PersonMigrationRecord]:
+        """Optionally drop individual migration records whose start or end country is not a known country."""
+        if not self.svc_config.get("ExcludeUnknownMigrationCountries", False):
+            return records
+
+        geo_config = getattr(geolocated_gedcom, "geo_config", None)
+        filtered_records = [
+            record for record in records
+            if self._is_known_country(record.from_country, geo_config)
+            and self._is_known_country(record.to_country, geo_config)
+        ]
+
+        if len(filtered_records) != len(records):
+            _log.info(
+                "Migration export removed %d individual migration records with unknown country endpoints",
+                len(records) - len(filtered_records),
+            )
+
+        return filtered_records
+
     @staticmethod
     def _clone_location_for_grouping(location: LocationNode, grouping: str) -> LocationNode:
         """Create a representative node for a specific grouping level."""
@@ -1165,6 +1379,7 @@ class MigrationFlowExporter:
         base_analyzer = MigrationFlowAnalyzer(scoped_gedcom, "City and Country", use_soundex=use_soundex)
         base_analyzer.analyze(max_lines=None)
         filtered_base_flows = self._filter_flows_for_known_countries(base_analyzer.flows, scoped_gedcom)
+        migration_records = self._filter_migration_records_for_known_countries(base_analyzer.migration_records, scoped_gedcom)
         
         # Create visualizations at different grouping levels using flows aggregated to that grouping.
         grouping_options = ["City and Country", "State/Province", "Country", "Continent"]
@@ -1197,7 +1412,7 @@ class MigrationFlowExporter:
         
         # Generate comprehensive HTML with multiple grouping tabs
         source = self.svc_config.get("GEDCOMinput", "Unknown Source")
-        html_content = self._generate_html(grouping_results, source)
+        html_content = self._generate_html(grouping_results, source, migration_records)
         
         # Write HTML file
         output_path = Path(output_file)
@@ -1209,8 +1424,83 @@ class MigrationFlowExporter:
         _log.info("Migration flow visualization saved to %s", output_path)
         
         return str(output_path)
-    
-    def _generate_html(self, grouping_results: List[Tuple[str, go.Figure, MigrationStats, MigrationFlowAnalyzer]], source_file: str) -> str:
+
+    def _build_migration_list_html(self, migration_records: List[PersonMigrationRecord]) -> str:
+        """Build the HTML section listing individual people who migrated between countries."""
+        if not migration_records:
+            return """
+            <div class="migration-list-panel">
+                <h2>🧭 Individual Migration Records</h2>
+                <p class="migration-list-summary">No cross-country migrations were detected.</p>
+            </div>
+            """
+
+        sorted_records = sorted(migration_records, key=lambda r: (r.person_name.lower(), r.time_period))
+
+        ocean_crossings = sum(1 for r in sorted_records if r.ocean_crossing)
+        summary = (
+            f"{len(sorted_records)} people found who moved from one country to another "
+            f"({ocean_crossings} ocean-crossing). Entries marked 📜 have an explicit GEDCOM migration record. "
+            f"Click a column header to sort."
+        )
+
+        rows = []
+        for record in sorted_records:
+            row_classes = "ocean-crossing" if record.ocean_crossing else ""
+            ocean_crossing_flag = "true" if record.ocean_crossing else "false"
+            record_badge = ' <span class="migration-record-badge" title="Explicit migration record">📜</span>' if record.has_migration_record else ""
+            ocean_cell = "⛴ Yes" if record.ocean_crossing else "No"
+            # record.description is already assembled as escaped inline HTML (e.g. joined with <br>).
+            description = record.description if record.description else "—"
+            date_display = record.date if record.date else "—"
+            date_sort_value = record.date if record.date else 0
+            rows.append(f"""
+                <tr class="{row_classes}" data-ocean-crossing="{ocean_crossing_flag}">
+                    <td>{html.escape(record.person_name)}</td>
+                    <td>{html.escape(record.first_name)}</td>
+                    <td>{html.escape(record.last_name)}</td>
+                    <td data-sort-value="{date_sort_value}">{date_display}</td>
+                    <td>{html.escape(record.from_location)}</td>
+                    <td>{html.escape(record.to_location)}</td>
+                    <td>{html.escape(record.event_type)}{record_badge}</td>
+                    <td>{ocean_cell}</td>
+                    <td>{description}</td>
+                </tr>
+            """)
+
+        return f"""
+        <div class="migration-list-panel">
+            <h2>🧭 Individual Migration Records</h2>
+            <p class="migration-list-summary">{html.escape(summary)}</p>
+            <label class="migration-filter">
+                <input type="checkbox" id="oceanCrossingFilter" onchange="filterMigrationTable()">
+                Show only Ocean Crossing
+            </label>
+            <div class="migration-table-wrapper">
+                <table class="migration-table" id="migrationTable">
+                    <thead>
+                        <tr>
+                            <th class="sortable" onclick="sortMigrationTable(0, 'text', this)">Name</th>
+                            <th>First Name</th>
+                            <th class="sortable" onclick="sortMigrationTable(2, 'text', this)">Last Name</th>
+                            <th class="sortable" onclick="sortMigrationTable(3, 'number', this)">Date</th>
+                            <th class="sortable" onclick="sortMigrationTable(4, 'text', this)">From</th>
+                            <th class="sortable" onclick="sortMigrationTable(5, 'text', this)">To</th>
+                            <th>Migration Type</th>
+                            <th>Ocean Crossing</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {''.join(rows)}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        """
+
+    def _generate_html(self, grouping_results: List[Tuple[str, go.Figure, MigrationStats, MigrationFlowAnalyzer]], source_file: str,
+                        migration_records: Optional[List[PersonMigrationRecord]] = None) -> str:
         """
         Generate comprehensive HTML document with all visualizations and statistics.
         
@@ -1276,6 +1566,8 @@ class MigrationFlowExporter:
                 </div>
             </div>
             """
+
+        migration_list_html = self._build_migration_list_html(migration_records or [])
         
         html = f"""
         <!DOCTYPE html>
@@ -1465,7 +1757,101 @@ class MigrationFlowExporter:
                 .legend-item {{
                     margin-bottom: 5px;
                 }}
-                
+
+                .migration-list-panel {{
+                    padding: 30px;
+                    border-top: 1px solid #dee2e6;
+                }}
+
+                .migration-list-panel h2 {{
+                    color: #222;
+                    font-size: 1.3em;
+                    margin-bottom: 10px;
+                }}
+
+                .migration-list-summary {{
+                    color: #555;
+                    font-size: 0.9em;
+                    margin-bottom: 15px;
+                }}
+
+                .migration-filter {{
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 6px;
+                    font-size: 0.9em;
+                    color: #333;
+                    margin-bottom: 12px;
+                    cursor: pointer;
+                }}
+
+                .migration-table-wrapper {{
+                    max-height: 600px;
+                    overflow-y: auto;
+                    border: 1px solid #dee2e6;
+                    border-radius: 8px;
+                }}
+
+                .migration-table {{
+                    width: 100%;
+                    border-collapse: collapse;
+                    font-size: 0.9em;
+                }}
+
+                .migration-table th {{
+                    position: sticky;
+                    top: 0;
+                    background: #f8f9fa;
+                    text-align: left;
+                    padding: 10px;
+                    border-bottom: 2px solid #dee2e6;
+                    color: #222;
+                }}
+
+                .migration-table th.sortable {{
+                    cursor: pointer;
+                    user-select: none;
+                }}
+
+                .migration-table th.sortable:hover {{
+                    background: #e9ecef;
+                }}
+
+                .migration-table th.sortable::after {{
+                    content: "⇅";
+                    margin-left: 6px;
+                    opacity: 0.4;
+                    font-size: 0.85em;
+                }}
+
+                .migration-table th.sortable[data-sort-dir="asc"]::after {{
+                    content: "▲";
+                    opacity: 1;
+                }}
+
+                .migration-table th.sortable[data-sort-dir="desc"]::after {{
+                    content: "▼";
+                    opacity: 1;
+                }}
+
+                .migration-table td {{
+                    padding: 8px 10px;
+                    border-bottom: 1px solid #eee;
+                    color: #333;
+                }}
+
+                .migration-table tr:nth-child(odd) td {{
+                    background: #f8f9fa;
+                }}
+
+                .migration-table tr.ocean-crossing td {{
+                    background: #e6f3fb;
+                }}
+
+                .migration-table .migration-record-badge {{
+                    margin-left: 4px;
+                }}
+
                 @media (max-width: 1024px) {{
                     .content {{
                         flex-direction: column;
@@ -1518,6 +1904,37 @@ class MigrationFlowExporter:
                         background: #3d3d3d;
                         color: #c0c0c0;
                     }}
+                    .migration-list-panel {{
+                        background: #2d2d2d;
+                        border-top-color: #555;
+                    }}
+                    .migration-list-panel h2 {{
+                        color: #f0f0f0;
+                    }}
+                    .migration-list-summary {{
+                        color: #c0c0c0;
+                    }}
+                    .migration-filter {{
+                        color: #e0e0e0;
+                    }}
+                    .migration-table {{
+                        border-color: #555;
+                    }}
+                    .migration-table th {{
+                        background: #1d1d1d;
+                        color: #f0f0f0;
+                        border-color: #555;
+                    }}
+                    .migration-table td {{
+                        border-color: #555;
+                        color: #f0f0f0;
+                    }}
+                    .migration-table tr:nth-child(odd) td {{
+                        background: #3a3a3a;
+                    }}
+                    .migration-table tr.ocean-crossing td {{
+                        background: #2d4a5a;
+                    }}
                 }}
             </style>
         </head>
@@ -1562,6 +1979,8 @@ class MigrationFlowExporter:
                         {tab_content}
                     </div>
                 </div>
+
+                {migration_list_html}
             </div>
             
             <script>
@@ -1577,6 +1996,49 @@ class MigrationFlowExporter:
                     // Show selected tab
                     document.getElementById(`tab-${{tabId}}`).classList.add('active');
                     event.target.classList.add('active');
+                }}
+
+                function sortMigrationTable(colIndex, type, headerEl) {{
+                    const table = document.getElementById('migrationTable');
+                    if (!table) return;
+                    const tbody = table.tBodies[0];
+                    const rows = Array.from(tbody.rows);
+                    const ascending = headerEl.getAttribute('data-sort-dir') !== 'asc';
+
+                    rows.sort((rowA, rowB) => {{
+                        const cellA = rowA.cells[colIndex];
+                        const cellB = rowB.cells[colIndex];
+                        let valueA = cellA.getAttribute('data-sort-value') ?? cellA.textContent.trim();
+                        let valueB = cellB.getAttribute('data-sort-value') ?? cellB.textContent.trim();
+
+                        if (type === 'number') {{
+                            valueA = parseFloat(valueA) || 0;
+                            valueB = parseFloat(valueB) || 0;
+                            return ascending ? valueA - valueB : valueB - valueA;
+                        }}
+
+                        valueA = valueA.toLowerCase();
+                        valueB = valueB.toLowerCase();
+                        if (valueA < valueB) return ascending ? -1 : 1;
+                        if (valueA > valueB) return ascending ? 1 : -1;
+                        return 0;
+                    }});
+
+                    table.querySelectorAll('th.sortable').forEach(th => th.removeAttribute('data-sort-dir'));
+                    headerEl.setAttribute('data-sort-dir', ascending ? 'asc' : 'desc');
+                    rows.forEach(row => tbody.appendChild(row));
+                }}
+
+                function filterMigrationTable() {{
+                    const table = document.getElementById('migrationTable');
+                    const checkbox = document.getElementById('oceanCrossingFilter');
+                    if (!table || !checkbox) return;
+                    const onlyOceanCrossing = checkbox.checked;
+
+                    table.tBodies[0].querySelectorAll('tr').forEach(row => {{
+                        const isOceanCrossing = row.getAttribute('data-ocean-crossing') === 'true';
+                        row.style.display = (!onlyOceanCrossing || isOceanCrossing) ? '' : 'none';
+                    }});
                 }}
             </script>
         </body>

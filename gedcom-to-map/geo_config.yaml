@@ -17,6 +17,7 @@ country_substitutions:
   UK: United Kingdom
   Prussia: Germany
   American Colonies: USA
+  Colonial America: USA
   Deutschland: Germany
   Rhodesia: Zimbabwe
   Czechoslovakia: Czech Republic
@@ -42,7 +43,8 @@ country_substitutions:
   U.S.: USA
   u.s.a.: USA
   Can: Canada
-  British Colonial America: Canada
+  British Colonial America: USA
+  British America: USA
   U.K.: United Kingdom
   United States of America: USA
 

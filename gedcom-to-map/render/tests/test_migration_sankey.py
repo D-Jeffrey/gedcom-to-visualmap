@@ -219,7 +219,7 @@ class TestMigrationFlowAnalyzer:
         
         events = analyzer.extract_events_with_locations(mock_person, MigrationEventType.BIRTH)
         assert len(events) == 1
-        assert events[0] == ("Boston", "Massachusetts", "USA", 1850, "North America")
+        assert events[0] == ("Boston", "Massachusetts", "USA", 1850, "North America", "BIRT", "", "Boston, Massachusetts, USA")
 
     def test_extract_events_prefers_country_from_place_over_bad_geocode(self):
         analyzer = MigrationFlowAnalyzer(self.mock_gedcom)
@@ -232,7 +232,7 @@ class TestMigrationFlowAnalyzer:
 
         events = analyzer.extract_events_with_locations(mock_person, MigrationEventType.BIRTH)
         assert len(events) == 1
-        assert events[0] == ("Viking", "Alberta", "Canada", 1928, "North America")
+        assert events[0] == ("Viking", "Alberta", "Canada", 1928, "North America", "BIRT", "", "Viking, Camrose, Alta., Can")
 
     def test_analyze_state_province_grouping_merges_cities_in_same_subdivision(self):
         analyzer = MigrationFlowAnalyzer(self.mock_gedcom, location_grouping="State/Province", use_soundex=False)
